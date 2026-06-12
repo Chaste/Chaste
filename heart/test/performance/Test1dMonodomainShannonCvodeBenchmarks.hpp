@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Shannon2004Cvode.hpp"
 //#include "Shannon2004BackwardEulerOpt.hpp"
 #include "AbstractCardiacCellFactory.hpp"
-#include "HeartConfig.hpp"
 #include "CvodeAdaptor.hpp"
 #include "EulerIvpOdeSolver.hpp"
 #include "Timer.hpp"
@@ -233,8 +232,6 @@ public:
     void TestWithDifferentCellsAndSolvers()
     {
         double duration = 25;
-        HeartConfig::Instance()->SetSimulationDuration(duration); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
         double pde_time_step = 0.1; //ms
         double printing_time_step = 0.1; //ms
 
@@ -243,10 +240,12 @@ public:
         std::vector<double> times;
 
         {
-            HeartConfig::Instance()->SetOutputDirectory("ShannonBenchmark/forward_euler");
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0025,pde_time_step,printing_time_step);
             ShannonCardiacCellFactory<CellShannon2004FromCellML> cell_factory;
             MonodomainProblem<1> monodomain_problem( &cell_factory );
+            monodomain_problem.SetSimulationDuration(duration); //ms
+            monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
+            monodomain_problem.SetOutputDirectory("ShannonBenchmark/forward_euler");
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.0025,pde_time_step,printing_time_step);
 
             monodomain_problem.Initialise();
 
@@ -303,10 +302,10 @@ public:
         // The ODE system remains the same (std::vectors) and standard vectors are converted into N_Vectors
         // every time CVODE talks to the ODE system.
         {
-            HeartConfig::Instance()->SetOutputDirectory("ShannonBenchmark/cvode_adaptor");
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(pde_time_step,pde_time_step,printing_time_step);
             ShannonCvodeAdaptorCellFactory cell_factory;
             MonodomainProblem<1> monodomain_problem( &cell_factory );
+            monodomain_problem.SetOutputDirectory("ShannonBenchmark/cvode_adaptor");
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(pde_time_step, pde_time_step, printing_time_step);
 
             monodomain_problem.Initialise();
 
@@ -329,10 +328,10 @@ public:
         // The ODE system uses N_Vectors, and interacts with CVODE optimally.
         // When Chaste needs to talk to the system, it converts to std::vector.
         {
-            HeartConfig::Instance()->SetOutputDirectory("ShannonBenchmark/cvode_native");
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(pde_time_step,pde_time_step,printing_time_step);
             ShannonCvodeNativeCellFactory cell_factory;
             MonodomainProblem<1> monodomain_problem( &cell_factory );
+            monodomain_problem.SetOutputDirectory("ShannonBenchmark/cvode_native");
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(pde_time_step, pde_time_step, printing_time_step);
 
             monodomain_problem.Initialise();
 

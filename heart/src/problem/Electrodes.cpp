@@ -35,20 +35,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Electrodes.hpp"
 #include "DistributedTetrahedralMesh.hpp"
-#include "HeartConfig.hpp"
 
 #include <cmath>
 
 template<unsigned DIM>
-Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
-    : mpMesh(&rMesh),
+Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
+                            bool groundSecondElectrode,
+                            unsigned axisIndex,
+                            double magnitude,
+                            double startTime,
+                            double duration)
+    : mGroundSecondElectrode(groundSecondElectrode),
+      mStartTime(startTime),
+      mpMesh(&rMesh),
       mLeftElectrodeArea(0.0),
       mRightElectrodeArea(0.0)
 {
-    unsigned axis_index;
-    double magnitude, duration;
-
-    HeartConfig::Instance()->GetElectrodeParameters(mGroundSecondElectrode, axis_index, magnitude, mStartTime, duration);
+    unsigned axis_index = axisIndex;
 
     assert(axis_index < DIM);
     assert(duration > 0);

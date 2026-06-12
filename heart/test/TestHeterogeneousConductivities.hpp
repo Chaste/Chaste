@@ -39,7 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <fstream>
 
+#include <boost/make_shared.hpp>
 #include "BidomainProblem.hpp"
+#include "ChasteCuboid.hpp"
 #include "GeneralPlaneStimulusCellFactory.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "DistributedTetrahedralMesh.hpp"
@@ -56,9 +58,6 @@ public:
     void TestSimpleSimulation()
     {
         /*Simulation parameters*/
-        HeartConfig::Instance()->SetSimulationDuration(0.7); //ms (falls over after this)
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-6);
-        //HeartConfig::Instance()->SetOdeTimeStep(0.01);
 
         const double width = 0.1;
         const double height = 0.1;
@@ -77,36 +76,29 @@ public:
         /* monodomain problem class using (a pointer to) the cell factory */
         BidomainProblem<3> problem( &cell_factory );
         problem.SetMesh(&mesh);
+        problem.SetSimulationDuration(0.7); //ms (falls over after this)
+        problem.SetKspAbsoluteTolerance(1e-6);
 
         /*
         * HOW_TO_TAG Cardiac/Problem definition
         * Set discrete **cuboid** areas to have heterogeneous (intra- and/or extra-cellular) conductivity tensors.
         */
-        std::vector<ChasteCuboid<3> > input_areas;
-        std::vector< c_vector<double,3> > intra_conductivities;
-        std::vector< c_vector<double,3> > extra_conductivities;
         ChastePoint<3> corner_a(width/2, 0, 0);
         ChastePoint<3> corner_b(width, height, depth);
-
-        input_areas.push_back(ChasteCuboid<3> (corner_a, corner_b));
-        //within the cuboid
-        intra_conductivities.push_back( Create_c_vector(0.1, 0.1, 0.1) );
-        extra_conductivities.push_back( Create_c_vector(0.0, 0.0, 0.0) );
         //This test should *fail* if you comment out the following line
         //(which blocks conductivity on the RHS of the slab).
-        HeartConfig::Instance()->SetConductivityHeterogeneities(input_areas, intra_conductivities, extra_conductivities);
+        problem.AddConductivityHeterogeneity(
+            boost::make_shared<ChasteCuboid<3> >(corner_a, corner_b),
+            Create_c_vector(0.1, 0.1, 0.1),  // intra within cuboid
+            Create_c_vector(0.0, 0.0, 0.0)); // extra within cuboid
 
         //elsewhere
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.2, 1.2, 1.2));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1.2, 1.2, 1.2));
+        problem.SetIntracellularConductivities(Create_c_vector(1.2, 1.2, 1.2));
+        problem.SetExtracellularConductivities(Create_c_vector(1.2, 1.2, 1.2));
 
-        /* set  parameters*/
-        // HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        // HeartConfig::Instance()->SetCapacitance(1.0);
-
-         /* Output Directory and prefix (for the hdf5 file), relative to CHASTE_TEST_OUTPUT*/
-        HeartConfig::Instance()->SetOutputDirectory("slab_results_het_halfcond");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("Slab_small");
+        /* Output Directory and prefix (for the hdf5 file), relative to CHASTE_TEST_OUTPUT*/
+        problem.SetOutputDirectory("slab_results_het_halfcond");
+        problem.SetOutputFilenamePrefix("Slab_small");
 
         /* Initialise the problem*/
         problem.Initialise();

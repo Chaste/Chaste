@@ -70,11 +70,6 @@ class TestAnotherBidomainTutorial : public CxxTest::TestSuite
 public:
     void TestFibreSimulation()
     {
-        /* It is not the case here, but if there were other tests in the file that
-         * had already been run and might have changed parameters in `HeartConfig`, we
-         * would need to call `Reset` */
-        HeartConfig::Instance()->Reset();
-
         /* Next, we have to create a cell factory of the type we defined above. The plane
          * stimulus cell factory sets up cells of the given type with a non-zero stimulus
          * for cells on the $x=0$ boundary. The 2 below is the dimension, and the `-2000000`
@@ -82,21 +77,24 @@ public:
          */
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML,2> cell_factory(-2000000);
 
+        /* Now we create a problem class, initialise and solve */
+        BidomainProblem<2> bidomain_problem( &cell_factory );
+
         /* Define an end time, output directory and prefix as before */
-        HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainFibresTutorial");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
+        bidomain_problem.SetSimulationDuration(5.0); //ms
+        bidomain_problem.SetOutputDirectory("BidomainFibresTutorial");
+        bidomain_problem.SetOutputFilenamePrefix("results");
 
         /* HOW_TO_TAG Cardiac/Problem definition
          * Specify fibre directions
          *
-         * Define a mesh to be read, saying that we also want to read fibres. The extra part can either be
-         * `cp::media_type::Orthotropic`, in which case `2D_0_to_1mm_800_elements.ortho` will also be read;
-         * or `cp::media_type::Axisymmetric`, in which case `2D_0_to_1mm_800_elements.axi` will also be read.
+         * Define a mesh to be read, saying that we also want to read fibres. The "ortho" type means
+         * `2D_0_to_1mm_800_elements.ortho` will also be read; "axi" means the `.axi` file will also be read.
          * See the file formats documentation for full descriptions of these formats, but basically .axi
          * files provide the fibre direction for each element in the mesh, and .ortho files provide the fibre,
          * sheet (and normal in 3D) directions for each element in the mesh. */
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements", cp::media_type::Orthotropic);
+        bidomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
+        bidomain_problem.SetFibreOrientationFile("mesh/test/data/2D_0_to_1mm_800_elements", "ortho");
 
         /* The fibre file provided here defines (non-physiological) 'kinked' fibres which are
          * in the x-direction for $x<0.05$, and then the diagonal $(1,1)$ direction for $x \geqslant 0.05$.
@@ -130,26 +128,23 @@ public:
          * scale = 1 to see the error message).
          */
         double scale = 2;
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75*scale, 0.19*scale));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0*scale, 2.4*scale));
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75*scale, 0.19*scale));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(7.0*scale, 2.4*scale));
 
         /* HOW_TO_TAG Cardiac/Output
          * Specify output formats (for different visualisers)
          *
          * The output will be written to `$CHASTE_TEST_OUTPUT/BidomainFibresTutorial`
          * in HDF5 format.  It can be converted to visualisable formats (Meshalyzer, Cmgui or VTK) at the end
-         * of the simulation using methods in `HeartConfig`,  e.g.
+         * of the simulation, e.g.
          */
-        //HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
-        HeartConfig::Instance()->SetVisualizeWithCmgui(true);
+        //bidomain_problem.SetVisualizeWithMeshalyzer(true);
+        bidomain_problem.SetVisualizeWithCmgui(true);
         /* The other option is to write in VTK format (which needs VTK installed), following
          * which the results can be loaded in the visualiser Paraview */
-        //HeartConfig::Instance()->SetVisualizeWithVtk(true);
+        //bidomain_problem.SetVisualizeWithVtk(true);
         /* If the mesh is a DistributedTetrahedralMesh then we can use parallel VTK files (.pvtu)*/
-        //HeartConfig::Instance()->SetVisualizeWithParallelVtk(true);
-
-        /* Now we create a problem class, initialise and solve */
-        BidomainProblem<2> bidomain_problem( &cell_factory );
+        //bidomain_problem.SetVisualizeWithParallelVtk(true);
 
         bidomain_problem.Initialise();
         bidomain_problem.Solve();

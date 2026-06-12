@@ -180,6 +180,12 @@ public:
     bool Converged; /**< Set to true when convergence has been reached */
     StimulusType Stimulus; /**< The type of stimulus: PLANE (x=0), REGION (first quarter in x) or NEUMANN (monodomain only)*/
     double NeumannStimulus; /**< Quantity of face stimulus to use in the Neumann case */
+    double KspAbsoluteTolerance; /**< KSP absolute tolerance to apply to the problem (0 = use problem default) */
+    bool UseKspAbsoluteTolerance; /**< Whether to override the problem's KSP tolerance */
+    double KspRelativeTolerance; /**< KSP relative tolerance (used when UseKspRelativeTolerance is true) */
+    bool UseKspRelativeTolerance; /**< Whether to use relative KSP tolerance */
+    std::string KspPreconditionerType; /**< KSP preconditioner type string; empty = use problem default */
+    std::string KspSolverType; /**< KSP solver type string; empty = use problem default */
 
     AbstractUntemplatedConvergenceTester();
 
@@ -202,29 +208,14 @@ void SetConductivities(CARDIAC_PROBLEM& rCardiacProblem);
 template<unsigned DIM>
 void SetConductivities(BidomainProblem<DIM>& rProblem)
 {
-    c_vector<double, DIM> conductivities;
-    for (unsigned i=0; i<DIM; i++)
-    {
-        conductivities[i] = 1.75;
-    }
-    HeartConfig::Instance()->SetIntracellularConductivities(conductivities);
-
-    for (unsigned i=0; i<DIM; i++)
-    {
-        conductivities[i] = 7.0;
-    }
-    HeartConfig::Instance()->SetExtracellularConductivities(conductivities);
+    rProblem.SetIntracellularConductivities(scalar_vector<double>(DIM, 1.75));
+    rProblem.SetExtracellularConductivities(scalar_vector<double>(DIM, 7.0));
 }
 
 template<unsigned DIM>
 void SetConductivities(MonodomainProblem<DIM>& rProblem)
 {
-    c_vector<double, DIM> conductivities;
-    for (unsigned i=0; i<DIM; i++)
-    {
-        conductivities[i] = 1.75;
-    }
-    HeartConfig::Instance()->SetIntracellularConductivities(conductivities);
+    rProblem.SetIntracellularConductivities(scalar_vector<double>(DIM, 1.75));
 }
 
 /**
@@ -286,20 +277,7 @@ public:
                 std::cout<<"Warning: PrintingTimeStep increased\n";
             }
 // LCOV_EXCL_STOP
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(this->OdeTimeStep, this->PdeTimeStep, printing_step);
-// LCOV_EXCL_START
-            if (SimulateFullActionPotential)
-            {
-                HeartConfig::Instance()->SetSimulationDuration(400.0);
-            }
-            else
-            {
-                HeartConfig::Instance()->SetSimulationDuration(8.0);
-            }
-// LCOV_EXCL_STOP
-            HeartConfig::Instance()->SetOutputDirectory("Convergence"+nameOfTest);
-            HeartConfig::Instance()->SetOutputFilenamePrefix("Results");
-
+            double sim_duration = SimulateFullActionPotential ? 400.0 : 8.0;
             DistributedTetrahedralMesh<DIM, DIM> mesh;
             constructor.Construct(mesh, this->MeshNum, mMeshWidth);
 
@@ -332,6 +310,26 @@ public:
 
             CARDIAC_PROBLEM cardiac_problem(p_cell_factory);
             cardiac_problem.SetMesh(&mesh);
+            cardiac_problem.SetOdePdeAndPrintingTimeSteps(this->OdeTimeStep, this->PdeTimeStep, printing_step);
+            cardiac_problem.SetSimulationDuration(sim_duration);
+            cardiac_problem.SetOutputDirectory("Convergence"+nameOfTest);
+            cardiac_problem.SetOutputFilenamePrefix("Results");
+            if (this->UseKspAbsoluteTolerance)
+            {
+                cardiac_problem.SetKspAbsoluteTolerance(this->KspAbsoluteTolerance);
+            }
+            else if (this->UseKspRelativeTolerance)
+            {
+                cardiac_problem.SetKspRelativeTolerance(this->KspRelativeTolerance);
+            }
+            if (!this->KspPreconditionerType.empty())
+            {
+                cardiac_problem.SetKspPreconditionerType(this->KspPreconditionerType);
+            }
+            if (!this->KspSolverType.empty())
+            {
+                cardiac_problem.SetKspSolverType(this->KspSolverType);
+            }
 
             // Calculate positions of nodes 1/4 and 3/4 through the mesh
             unsigned third_quadrant_node;
@@ -639,14 +637,7 @@ public:
         std::cout<<"Space step " << scaling << " cm (mesh " << this->MeshNum << ")" << "\n";
         std::cout<<"PDE step " << this->PdeTimeStep << " ms" << "\t";
         std::cout<<"ODE step " << this->OdeTimeStep << " ms" << "\t";
-        if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
-        {
-            std::cout<<"KSP absolute "<<HeartConfig::Instance()->GetAbsoluteTolerance()<<"\t";
-        }
-        else
-        {
-            std::cout<<"KSP relative "<<HeartConfig::Instance()->GetRelativeTolerance()<<"\t";
-        }
+        // KSP tolerance settings are stored on the problem object
         switch (this->Stimulus)
         {
             case PLANE:

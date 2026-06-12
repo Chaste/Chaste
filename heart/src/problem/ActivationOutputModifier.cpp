@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ActivationOutputModifier.hpp"
 #include "OutputFileHandler.hpp"
-#include "HeartConfig.hpp"
 
 void ActivationOutputModifier::InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation)
 {
@@ -49,7 +48,7 @@ void ActivationOutputModifier::InitialiseAtStart(DistributedVectorFactory* pVect
 void ActivationOutputModifier::FinaliseAtEnd()
 {
     //Dump out all data in a round-robin fashion
-    OutputFileHandler output_handler(HeartConfig::Instance()->GetOutputDirectory(), false);
+    OutputFileHandler output_handler(mOutputDirectory, false);
 
     // Belt and braces
     std::stringstream filepath_process_specific;

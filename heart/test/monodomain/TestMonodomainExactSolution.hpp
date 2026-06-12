@@ -198,22 +198,20 @@ public:
 
         mesh.ConstructRegularSlabMesh(h, 1.0);
 
-        HeartConfig::Instance()->SetOutputDirectory("TestMonodomainExactSolution1d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-        HeartConfig::Instance()->SetSimulationDuration(1); //ms
-
-
-        // Note pde_timestep=0.01 is hardcoded above in GetIonic, and printing
-        // timestep hardcoding below in test!
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(2);
-        HeartConfig::Instance()->SetCapacitance(1.5);
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(2));
-
         MyCellFactory<1> cell_factory;
 
         MonodomainProblem<1> problem( &cell_factory );
+        problem.SetOutputDirectory("TestMonodomainExactSolution1d");
+        problem.SetOutputFilenamePrefix("results");
+        problem.SetSimulationDuration(1); //ms
+
+        // Note pde_timestep=0.01 is hardcoded above in GetIonic, and printing
+        // timestep hardcoding below in test!
+        problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+
+        problem.SetSurfaceAreaToVolumeRatio(2);
+        problem.SetCapacitance(1.5);
+        problem.SetIntracellularConductivities(Create_c_vector(2));
         problem.SetMesh(&mesh);
         problem.Initialise();
 
@@ -261,22 +259,20 @@ public:
 
         mesh.ConstructRegularSlabMesh(h, 1.0, 1.0);
 
-        HeartConfig::Instance()->SetOutputDirectory("TestMonodomainExactSolution2d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-        HeartConfig::Instance()->SetSimulationDuration(1); //ms
-
-
-        // Note pde_timestep=0.01 is hardcoded above in GetIonic, and printing
-        // timestep hardcoding below in test!
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(2);
-        HeartConfig::Instance()->SetCapacitance(1.5);
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.2,0.8));
-
         MyCellFactory<2> cell_factory;
 
         MonodomainProblem<2> problem( &cell_factory );
+        problem.SetOutputDirectory("TestMonodomainExactSolution2d");
+        problem.SetOutputFilenamePrefix("results");
+        problem.SetSimulationDuration(1); //ms
+
+        // Note pde_timestep=0.01 is hardcoded above in GetIonic, and printing
+        // timestep hardcoding below in test!
+        problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+
+        problem.SetSurfaceAreaToVolumeRatio(2);
+        problem.SetCapacitance(1.5);
+        problem.SetIntracellularConductivities(Create_c_vector(1.2,0.8));
         problem.SetMesh(&mesh);
         problem.Initialise();
 
@@ -331,19 +327,18 @@ public:
 
         mesh.ConstructRegularSlabMesh(h, 1.0, 1.0, 1.0);
 
-        HeartConfig::Instance()->SetOutputDirectory("TestMonodomainExactSolution3d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-        HeartConfig::Instance()->SetSimulationDuration(1); //ms
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(2);
-        HeartConfig::Instance()->SetCapacitance(1.5);
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.8, 0.7, 0.5));
-
         MyCellFactory<3> cell_factory;
 
         MonodomainProblem<3> problem( &cell_factory );
+        problem.SetOutputDirectory("TestMonodomainExactSolution3d");
+        problem.SetOutputFilenamePrefix("results");
+        problem.SetSimulationDuration(1); //ms
+
+        problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+
+        problem.SetSurfaceAreaToVolumeRatio(2);
+        problem.SetCapacitance(1.5);
+        problem.SetIntracellularConductivities(Create_c_vector(0.8, 0.7, 0.5));
         problem.SetMesh(&mesh);
         problem.Initialise();
 

@@ -62,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 #include "SingleTraceOutputModifier.hpp"
 #include "TetrahedralMesh.hpp"
+#include "DistributedTetrahedralMesh.hpp"
 #include "VtkMeshReader.hpp"
 #include "Warnings.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -154,7 +155,6 @@ private:
 public:
     void setUp()
     {
-        HeartConfig::Reset();
     }
 
     // This is a test on a very small mesh (where there may be more processes than there are nodes)
@@ -190,19 +190,17 @@ public:
                 TS_ASSERT_EQUALS(mesh.GetNumLocalElements(), 0u);
             }
         }
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem1dSimplest");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
-        //HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_1_element");
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
         monodomain_problem.SetMesh(&mesh);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        monodomain_problem.SetSimulationDuration(2.0); //ms
+        monodomain_problem.SetOutputDirectory("MonoProblem1dSimplest");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(10.0);
 
         monodomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(10.0);
 
         monodomain_problem.Solve();
         // test whether voltages and gating variables are in correct ranges
@@ -225,17 +223,12 @@ public:
     // (Historical reasons...)
     void TestMonodomainProblem1D()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem1d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
         // Set extra variable (to cover extension of HDF5 with named variables) in a later test
         std::vector<std::string> output_variables;
         /*
          * HOW_TO_TAG Cardiac/Output
          * Calculating and outputting ionic currents ('derived quantities') in a tissue simulation using
-         * [HeartConfig](/doxygen-latest/classHeartConfig.html) - see also
+         * SetOutputVariables() on the problem - see also
          * [chaste_codegen documentation](/docs/user-guides/code-generation-from-cellml/#derived-quantities).
          */
         // This is how to output an additional state variable
@@ -244,19 +237,23 @@ public:
         // the variable 'potassium_currents' (sum of potassium currents) is annotated as a
         // derived quantity to be calculated.
         output_variables.push_back("potassium_currents");
-        HeartConfig::Instance()->SetOutputVariables(output_variables);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        monodomain_problem.SetSimulationDuration(2.0); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("MonoProblem1d");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d");
+        monodomain_problem.SetOutputVariables(output_variables);
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
 
         // Just checking an exception message here.
         TS_ASSERT_THROWS_THIS(monodomain_problem.GetTissue(),
                               "Tissue not yet set up, you may need to call Initialise() before GetTissue().");
 
         monodomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
         monodomain_problem.Solve();
 
@@ -302,17 +299,16 @@ public:
     // (Historical reasons...)
     void TestMonodomainProblem1DWithRelativeTolerance()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-        HeartConfig::Instance()->SetUseRelativeTolerance(1e-9);
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem1dRelTol");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        monodomain_problem.SetSimulationDuration(2.0); //ms
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
+        monodomain_problem.SetKspRelativeTolerance(1e-9);
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("MonoProblem1dRelTol");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d");
 
         monodomain_problem.Initialise();
 
@@ -347,18 +343,16 @@ public:
     // (Historical reasons...)
     void TestMonodomainProblem1Din3D()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_in_3D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem1din3d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1din3d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1, 3> cell_factory;
         MonodomainProblem<1, 3> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0, 0.0));
+        monodomain_problem.SetSimulationDuration(2.0); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_in_3D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("MonoProblem1din3d");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1din3d");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
         monodomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
         monodomain_problem.Solve();
 
@@ -396,20 +390,19 @@ public:
     void TestMonodomainProblem1DWithAbsoluteTolerance()
     {
         double atol = 1e-4;
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(2); //ms
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetAbsoluteTolerance(), 2e-4);
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(atol / 20.0);
-        ///\todo this is dependent on the number of processes used
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetAbsoluteTolerance(), 5e-6);
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem1dAbsTol");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        monodomain_problem.SetSimulationDuration(2); //ms
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
+        TS_ASSERT_EQUALS(monodomain_problem.GetKspAbsoluteTolerance(), 2e-4);
+        monodomain_problem.SetKspAbsoluteTolerance(atol / 20.0);
+        ///\todo this is dependent on the number of processes used
+        TS_ASSERT_EQUALS(monodomain_problem.GetKspAbsoluteTolerance(), 5e-6);
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("MonoProblem1dAbsTol");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d");
 
         monodomain_problem.Initialise();
 
@@ -444,24 +437,22 @@ public:
     // (Historical reasons...)
     void TestMonodomainProblem2DWithEdgeStimulus()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(2); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem2dWithEdgeStimulus");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_2dWithEdgeStimulus");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
 
         // using the criss-cross mesh so wave propagates properly
         MonodomainProblem<2> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+        monodomain_problem.SetSimulationDuration(2); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
+        monodomain_problem.SetOutputDirectory("MonoProblem2dWithEdgeStimulus");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_2dWithEdgeStimulus");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
 
         // Coverage
         TS_ASSERT(!monodomain_problem.GetHasBath());
 
         monodomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
         monodomain_problem.Solve();
 
@@ -533,12 +524,6 @@ public:
     // (Historical reasons...)
     void TestMonodomainProblem2DWithPointStimulusInTheVeryCentreOfTheMesh()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(1.3); //ms - needs to be 1.3 ms to pass test
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem2dWithPointStimulus");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_2dWithPointStimulus");
-
         // To time the solve
         time_t start, end;
 
@@ -547,11 +532,15 @@ public:
         PointStimulus2dCellFactory cell_factory;
 
         MonodomainProblem<2> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+        monodomain_problem.SetSimulationDuration(1.3); //ms - needs to be 1.3 ms to pass test
+        monodomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
+        monodomain_problem.SetOutputDirectory("MonoProblem2dWithPointStimulus");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_2dWithPointStimulus");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
 
         monodomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
         monodomain_problem.Solve();
 
@@ -657,15 +646,14 @@ public:
     ///////////////////////////////////////////////////////////////////
     void TestMonodomainProblemPrintsOnlyAtRequestedTimes()
     {
-        HeartConfig::Instance()->SetPrintingTimeStep(0.1);
-        HeartConfig::Instance()->SetSimulationDuration(0.3); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem1dRequestedTimes");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("mono_testPrintTimes");
-
         // run testing PrintingTimeSteps
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1>* p_monodomain_problem = new MonodomainProblem<1>(&cell_factory);
+        p_monodomain_problem->SetPrintingTimeStep(0.1);
+        p_monodomain_problem->SetSimulationDuration(0.3); //ms
+        p_monodomain_problem->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        p_monodomain_problem->SetOutputDirectory("MonoProblem1dRequestedTimes");
+        p_monodomain_problem->SetOutputFilenamePrefix("mono_testPrintTimes");
 
         p_monodomain_problem->Initialise();
         p_monodomain_problem->SetWriteInfo();
@@ -692,17 +680,6 @@ public:
     // (Historical reasons...)
     void TestMonodomainWithMeshInMemoryToMeshalyzer()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(0.1); //ms
-        HeartConfig::Instance()->SetOutputDirectory("Monodomain2d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("monodomain2d");
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
-
-        //set the postprocessing information we want
-        std::vector<unsigned> origin_nodes;
-        origin_nodes.push_back(0u);
-        HeartConfig::Instance()->SetConductionVelocityMaps(origin_nodes);
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
 
         ///////////////////////////////////////////////////////////////////
@@ -713,10 +690,18 @@ public:
         TetrahedralMesh<2, 2> mesh;
         mesh.ConstructRegularSlabMesh(0.01, 0.1, 0.1);
         monodomain_problem.SetMesh(&mesh);
-        monodomain_problem.Initialise();
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+        monodomain_problem.SetSimulationDuration(0.1); //ms
+        monodomain_problem.SetOutputDirectory("Monodomain2d");
+        monodomain_problem.SetOutputFilenamePrefix("monodomain2d");
+        monodomain_problem.SetVisualizeWithMeshalyzer(true);
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
 
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
+        //set the postprocessing information we want
+        monodomain_problem.AddConductionVelocityMap(0u);
+
+        monodomain_problem.Initialise();
 
         //Clean previous output
         OutputFileHandler handler1("Monodomain2d", true); //This one makes sure that we leave a signature file in Monodomain2d so that we can clean up later
@@ -724,9 +709,9 @@ public:
         PetscTools::Barrier();
 
         // Checking that the following files don't exist in the output directory before calling Solve()
-        unsigned num_files = 5;
-        std::string test_file_names[5] = { "monodomain2d_mesh.pts", "monodomain2d_mesh.tri", "monodomain2d_V.dat",
-                                           "ChasteParameters.xml", "ConductionVelocityFromNode0.dat" };
+        unsigned num_files = 4;
+        std::string test_file_names[4] = { "monodomain2d_mesh.pts", "monodomain2d_mesh.tri", "monodomain2d_V.dat",
+                                           "ConductionVelocityFromNode0.dat" };
         for (unsigned i = 0; i < num_files; i++)
         {
             TS_ASSERT(!handler.FindFile(test_file_names[i]).Exists());
@@ -760,42 +745,28 @@ public:
                  * should abort the file check.  This is why we pretend not to be called collectively.
                  */
                 FileComparison comparer(file_1, file_2, false /*Pretend that it's not called collectively*/);
-                comparer.SetIgnoreLinesBeginningWith("<cp:ChasteParameters");
-                comparer.IgnoreBlankLines(); // Needed for XSD 4.0, which strips blanks on writing
-
-                bool result = comparer.CompareFiles(0, false); // Don't throw a TS_ASSERT
-
-                if (!result && (i == 3))
-                {
-                    // For "ChasteParameters.xml" there is an alternative file
-                    // This is because different versions of XSD produce rounded/full precision floating point numbers
-                    FileComparison comparer2(file_1, file_2 + "_alt");
-                    comparer2.SetIgnoreLinesBeginningWith("<cp:ChasteParameters");
-                    TS_ASSERT(comparer2.CompareFiles());
-                }
-                else
-                {
-                    TS_ASSERT(comparer.CompareFiles());
-                }
+                TS_ASSERT(comparer.CompareFiles());
             }
         }
     }
 
     void TestMonodomainProblemCreates1DGeometry()
     {
-        HeartConfig::Instance()->SetSpaceDimension(1);
-        HeartConfig::Instance()->SetFibreLength(1, 0.01);
-        HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
-        HeartConfig::Instance()->SetOutputDirectory("MonodomainCreates1dGeometry");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("monodomain1d");
-
-        // Switch on 1D VTK output
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
-        HeartConfig::Instance()->SetVisualizeWithParallelVtk(true);
+        DistributedTetrahedralMesh<1,1> mesh_1d;
+        mesh_1d.ConstructRegularSlabMesh(0.01, 1); // length=1, step=0.01
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory(-600 * 5000);
 
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetMesh(&mesh_1d);
+        monodomain_problem.SetSimulationDuration(5.0); //ms
+        monodomain_problem.SetOutputDirectory("MonodomainCreates1dGeometry");
+        monodomain_problem.SetOutputFilenamePrefix("monodomain1d");
+
+        // Switch on 1D VTK output
+        monodomain_problem.SetVisualizeWithVtk(true);
+        monodomain_problem.SetVisualizeWithParallelVtk(true);
+
         monodomain_problem.Initialise();
 
         monodomain_problem.Solve();
@@ -825,15 +796,16 @@ public:
 
     void TestMonodomainProblemCreates2DGeometry()
     {
-        HeartConfig::Instance()->SetSpaceDimension(2);
-        HeartConfig::Instance()->SetSheetDimensions(0.3, 0.3, 0.01);
-        HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
-        HeartConfig::Instance()->SetOutputDirectory("MonodomainCreatesGeometry");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("monodomain2d");
+        DistributedTetrahedralMesh<2,2> mesh_2d;
+        mesh_2d.ConstructRegularSlabMesh(0.01, 0.3, 0.3); // w=0.3, h=0.3, step=0.01
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-600 * 5000);
 
         MonodomainProblem<2> monodomain_problem(&cell_factory);
+        monodomain_problem.SetMesh(&mesh_2d);
+        monodomain_problem.SetSimulationDuration(4.0); //ms
+        monodomain_problem.SetOutputDirectory("MonodomainCreatesGeometry");
+        monodomain_problem.SetOutputFilenamePrefix("monodomain2d");
         monodomain_problem.Initialise();
 
         monodomain_problem.Solve();
@@ -850,21 +822,21 @@ public:
 
     void TestMonodomainProblemCreates3DGeometry()
     {
-        HeartConfig::Instance()->SetSpaceDimension(3);
-        HeartConfig::Instance()->SetSlabDimensions(0.1, 0.1, 0.1, 0.01);
-        HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
-        HeartConfig::Instance()->SetOutputDirectory("MonodomainCreatesGeometry");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("monodomain3d");
+        DistributedTetrahedralMesh<3,3> mesh_3d;
+        mesh_3d.ConstructRegularSlabMesh(0.01, 0.1, 0.1, 0.1); // w=h=d=0.1, step=0.01
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-600 * 5000);
 
         MonodomainProblem<3> monodomain_problem(&cell_factory);
-
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
-        HeartConfig::Instance()->SetVisualizeWithCmgui(true);
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
-        HeartConfig::Instance()->SetVisualizeWithParallelVtk(true);
-        HeartConfig::Instance()->SetVisualizerOutputPrecision(6);
+        monodomain_problem.SetMesh(&mesh_3d);
+        monodomain_problem.SetSimulationDuration(2.0); //ms
+        monodomain_problem.SetOutputDirectory("MonodomainCreatesGeometry");
+        monodomain_problem.SetOutputFilenamePrefix("monodomain3d");
+        monodomain_problem.SetVisualizeWithMeshalyzer(true);
+        monodomain_problem.SetVisualizeWithCmgui(true);
+        monodomain_problem.SetVisualizeWithVtk(true);
+        monodomain_problem.SetVisualizeWithParallelVtk(true);
+        monodomain_problem.SetVisualizerOutputPrecision(6);
         monodomain_problem.Initialise();
 
         monodomain_problem.Solve();
@@ -892,8 +864,6 @@ public:
             TS_ASSERT(pvtk_file.Exists());
             FileFinder vtk_file(vtu_path.str(), RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
-            FileFinder param_file(filepath + "ChasteParameters.xml", RelativeTo::Absolute);
-            TS_ASSERT(param_file.Exists());
             FileFinder info_file(basename + "_times.info", RelativeTo::Absolute);
             TS_ASSERT(info_file.Exists());
         }
@@ -933,9 +903,6 @@ public:
         FileComparison comparer4(results_dir + "/monodomain3d_times.info", "heart/test/data/CmguiData/monodomain/monodomain3dValidData_times.info");
         TS_ASSERT(comparer4.CompareFiles());
 
-        //HeartConfig XML
-        TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
-
 #ifdef CHASTE_VTK
         // Requires  "sudo aptitude install libvtk5-dev" or similar
         results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "MonodomainCreatesGeometry/vtk_output/";
@@ -965,8 +932,6 @@ public:
         TS_ASSERT_DELTA(v_at_last[665], 32.6531, 1e-3);
         TS_ASSERT_DELTA(v_at_last[1330], 34.5152, 1e-3);
 
-        //HeartConfig XML
-        TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
 #else
         std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
@@ -976,12 +941,17 @@ public:
     // Test the functionality for outputing the values of requested cell state variables
     void TestMonodomainProblemPrintsMultipleVariables()
     {
-        // Set configuration file
-        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/MultipleVariablesMonodomain.xml");
-
         // Set up problem
         PlaneStimulusCellFactory<CellFaberRudy2000FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetSimulationDuration(0.1); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("MultipleVariablesMonodomain");
+        monodomain_problem.SetOutputFilenamePrefix("SimulationResults");
+        std::vector<std::string> output_vars = {"cytosolic_calcium_concentration",
+                                                "ionic_concentrations__Nai",
+                                                "ionic_concentrations__Ki"};
+        monodomain_problem.SetOutputVariables(output_vars);
 
         // Solve
         monodomain_problem.Initialise();
@@ -1014,30 +984,28 @@ public:
 
     void TestMonodomainProblemExceptions()
     {
-        HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
-
         TS_ASSERT_THROWS_THIS(MonodomainProblem<1> monodomain_problem(NULL),
                               "AbstractCardiacProblem: Please supply a cell factory pointer to your cardiac problem constructor.");
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetSimulationDuration(1.0); //ms
 
         // Throws because we've not called initialise
         TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),
                               "Cardiac tissue is null, Initialise() probably hasn\'t been called");
 
         // Throws because mesh filename is unset
-        TS_ASSERT_THROWS_CONTAINS(monodomain_problem.Initialise(),
-                                  "No mesh given: define it in XML parameters file or call SetMesh()\n"
-                                  "No XML element Simulation/Mesh found in parameters when calling");
+        TS_ASSERT_THROWS_THIS(monodomain_problem.Initialise(),
+                              "No mesh given: call SetMesh() or SetMeshFileName() before Initialise()");
 
         // Throws because initialise hasn't been called
         TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),
                               "Cardiac tissue is null, Initialise() probably hasn\'t been called");
 
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("");
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("");
+        monodomain_problem.SetOutputFilenamePrefix("");
 
         monodomain_problem.Initialise();
 
@@ -1046,10 +1014,10 @@ public:
                               "Data reader invalid as data writer cannot be initialised");
 
         // throw because end time is negative
-        HeartConfig::Instance()->SetSimulationDuration(-1.0); //ms
+        monodomain_problem.SetSimulationDuration(-1.0); //ms
         TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),
-                              "End time should be in the future");
-        HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
+                              "Simulation duration must be set (call SetSimulationDuration()) and be positive");
+        monodomain_problem.SetSimulationDuration(1.0); //ms
 
         // throws because output dir and filename are both ""
         TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),
@@ -1058,8 +1026,8 @@ public:
 
         // Throws because can't open the results file
         std::string directory("UnwriteableFolder");
-        HeartConfig::Instance()->SetOutputDirectory(directory);
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
+        monodomain_problem.SetOutputDirectory(directory);
+        monodomain_problem.SetOutputFilenamePrefix("results");
         OutputFileHandler handler(directory, false);
         if (PetscTools::AmMaster())
         {
@@ -1094,23 +1062,23 @@ public:
 
         // Save
         {
-            HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-            HeartConfig::Instance()->SetOutputDirectory("MonoProblemArchive");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
-            HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-            HeartConfig::Instance()->SetCapacitance(1.0);
             // Set extra variables (to cover extension of HDF5 with named variables) - in a later test
             std::vector<std::string> output_variables;
             output_variables.push_back("cytosolic_calcium_concentration");
             output_variables.push_back("potassium_currents");
-            HeartConfig::Instance()->SetOutputVariables(output_variables);
 
             PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
             MonodomainProblem<1> monodomain_problem(&cell_factory);
+            monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+            monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+            monodomain_problem.SetOutputDirectory("MonoProblemArchive");
+            monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d");
+            monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+            monodomain_problem.SetCapacitance(1.0);
+            monodomain_problem.SetOutputVariables(output_variables);
+            monodomain_problem.SetSimulationDuration(1.0); //ms
 
             monodomain_problem.Initialise();
-            HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
             monodomain_problem.Solve();
 
             num_cells = monodomain_problem.GetTissue()->rGetCellsDistributed().size();
@@ -1135,7 +1103,7 @@ public:
                              num_cells);
             TS_ASSERT(!p_monodomain_problem->mUseHdf5DataWriterCache);
 
-            HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
+            p_monodomain_problem->SetSimulationDuration(2.0); //ms
             p_monodomain_problem->Solve();
 
             // test whether voltages and gating variables are in correct ranges
@@ -1177,28 +1145,27 @@ public:
      */
     void TestMonodomainProblem1dInTwoHalves()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem1dInTwoHalves");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-
         // Set extra variables (to cover extension of HDF5 with named variables)
         std::vector<std::string> output_variables;
         output_variables.push_back("cytosolic_calcium_concentration");
         output_variables.push_back("potassium_currents");
-        HeartConfig::Instance()->SetOutputVariables(output_variables);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("MonoProblem1dInTwoHalves");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
+        monodomain_problem.SetOutputVariables(output_variables);
+        monodomain_problem.SetSimulationDuration(1.0); //ms
 
         monodomain_problem.Initialise();
 
-        HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
         monodomain_problem.Solve();
         ReplicatableVector voltage_replicated_midway(monodomain_problem.GetSolution());
-        HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
+        monodomain_problem.SetSimulationDuration(2.0); //ms
         monodomain_problem.Solve();
 
         // test whether voltages and gating variables are in correct ranges
@@ -1226,26 +1193,23 @@ public:
 
     void TestMonodomain2dOriginalPermutationInParallel()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(0.5); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem2dOriginalPermutation");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_2d");
-        HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
 
         // using the criss-cross mesh so wave propagates properly
         MonodomainProblem<2> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+        monodomain_problem.SetSimulationDuration(0.5); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
+        monodomain_problem.SetOutputDirectory("MonoProblem2dOriginalPermutation");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_2d");
+        monodomain_problem.SetOutputUsingOriginalNodeOrdering(true);
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
+        monodomain_problem.SetVisualizeWithMeshalyzer(true);
+        monodomain_problem.SetVisualizeWithVtk(true);
+        monodomain_problem.SetVisualizeWithCmgui(true);
 
         monodomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
-        HeartConfig::Instance()->SetVisualizeWithVtk();
-        HeartConfig::Instance()->SetVisualizeWithCmgui();
 
         monodomain_problem.Solve();
 
@@ -1255,12 +1219,12 @@ public:
         // In sequential mode, no permutation is applied
         if (PetscTools::IsSequential())
         {
-            TS_ASSERT_EQUALS(HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(), false);
+            TS_ASSERT_EQUALS(monodomain_problem.GetOutputUsingOriginalNodeOrdering(), false);
         }
         else
         {
             // In parallel the mesh in memory has been permuted. Will check the output has been unpermuted.
-            TS_ASSERT_EQUALS(HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(), true);
+            TS_ASSERT_EQUALS(monodomain_problem.GetOutputUsingOriginalNodeOrdering(), true);
         }
 
         OutputFileHandler handler("MonoProblem2dOriginalPermutation/", false);
@@ -1334,19 +1298,18 @@ public:
      */
     void TestMonodomain2dOutputAtSpecificNodes()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(0.5); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoProblem2dSpecificNode");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_2d_specific_node");
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
 
         // Check an exception for coverage
         {
             MonodomainProblem<2> monodomain_problem_fail(&cell_factory);
+            monodomain_problem_fail.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+            monodomain_problem_fail.SetSimulationDuration(0.5); //ms
+            monodomain_problem_fail.SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
+            monodomain_problem_fail.SetOutputDirectory("MonoProblem2dSpecificNode");
+            monodomain_problem_fail.SetOutputFilenamePrefix("MonodomainLR91_2d_specific_node");
+            monodomain_problem_fail.SetSurfaceAreaToVolumeRatio(1.0);
+            monodomain_problem_fail.SetCapacitance(1.0);
 
             // Check output at specific nodes in parallel
             std::vector<unsigned> output_node;
@@ -1356,14 +1319,21 @@ public:
 
             if (monodomain_problem_fail.rGetMesh().rGetNodePermutation().size() > 0)
             {
-                HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true); //
+                monodomain_problem_fail.SetOutputUsingOriginalNodeOrdering(true); //
                 TS_ASSERT_THROWS_THIS(monodomain_problem_fail.Solve(),
                                       "HeartConfig setting `GetOutputUsingOriginalNodeOrdering` is meaningless when outputting particular nodes in parallel. (Nodes are written with their original indices by default).");
-                HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(false); //
+                monodomain_problem_fail.SetOutputUsingOriginalNodeOrdering(false); //
             }
         }
 
         MonodomainProblem<2> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+        monodomain_problem.SetSimulationDuration(0.5); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
+        monodomain_problem.SetOutputDirectory("MonoProblem2dSpecificNode");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_2d_specific_node");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
 
         // Check output at specific nodes in parallel
         std::vector<unsigned> output_nodes;
@@ -1412,17 +1382,12 @@ public:
         // Switch this back on to watch linear solver converge on each step.
         //PetscTools::SetOption("-ksp_monitor", "");
 
-        // Make sure that this test isn't having problems because of PDE tolerances.
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-
         const double mesh_spacing = 0.01;
         const double x_size = 1.0;
         DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(mesh_spacing, x_size);
         const unsigned max_node_index = mesh.GetNumNodes() - 1;
         Cvode1dCellFactory cell_factory;
-        HeartConfig::Instance()->SetSimulationDuration(10.0); //ms
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(2.0));
 
         // Test two values of print timestep
         const unsigned num_print_steps_to_test = 2u;
@@ -1435,13 +1400,17 @@ public:
         {
             std::stringstream str_stream;
             str_stream << print_steps[i];
-            HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_" + str_stream.str());
-            HeartConfig::Instance()->SetOutputDirectory("TestCvodePrintTimestepDependence" + str_stream.str());
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(ode_and_pde_steps, ode_and_pde_steps, print_steps[i]);
-            HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
 
             MonodomainProblem<1> monodomain_problem(&cell_factory);
             monodomain_problem.SetMesh(&mesh);
+            // Make sure that this test isn't having problems because of PDE tolerances.
+            monodomain_problem.SetKspAbsoluteTolerance(1e-12);
+            monodomain_problem.SetSimulationDuration(10.0); //ms
+            monodomain_problem.SetIntracellularConductivities(Create_c_vector(2.0));
+            monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d_" + str_stream.str());
+            monodomain_problem.SetOutputDirectory("TestCvodePrintTimestepDependence" + str_stream.str());
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(ode_and_pde_steps, ode_and_pde_steps, print_steps[i]);
+            monodomain_problem.SetVisualizeWithMeshalyzer(true);
             //monodomain_problem.SetWriteInfo(); //Uncomment for progress
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
@@ -1498,12 +1467,11 @@ public:
         Cvode1dCellFactory cell_factory;
 
         double all_steps = 1.0;
-        HeartConfig::Instance()->SetSimulationDuration(3); //ms
-        HeartConfig::Instance()->SetOutputDirectory("TestCvodeInTissueErrorHandling");
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(all_steps, all_steps, all_steps);
-
         MonodomainProblem<1> monodomain_problem(&cell_factory);
         monodomain_problem.SetMesh(&mesh);
+        monodomain_problem.SetSimulationDuration(3); //ms
+        monodomain_problem.SetOutputDirectory("TestCvodeInTissueErrorHandling");
+        monodomain_problem.SetOdePdeAndPrintingTimeSteps(all_steps, all_steps, all_steps);
         monodomain_problem.Initialise();
         monodomain_problem.Solve();
 #else
@@ -1573,27 +1541,22 @@ public:
 
         // Do first stage of simulation
         {
-
-            // Standard HeartConfig set-up
-            HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
-            HeartConfig::Instance()->SetSimulationDuration(.5); //ms
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
-            HeartConfig::Instance()->SetOutputDirectory(output_dir);
-            HeartConfig::Instance()->SetOutputFilenamePrefix(output_dir);
-            HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
-            HeartConfig::Instance()->SetVisualizeWithVtk();
-            HeartConfig::Instance()->SetVisualizeWithParallelVtk();
-
-            HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);
-
             // Use cell factory to create monodomain problem
             PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
             MonodomainProblem<2> monodomain_problem(&cell_factory);
+            monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+            monodomain_problem.SetSimulationDuration(.5); //ms
+            monodomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
+            monodomain_problem.SetOutputDirectory(output_dir);
+            monodomain_problem.SetOutputFilenamePrefix(output_dir);
+            monodomain_problem.SetVisualizeWithMeshalyzer(true);
+            monodomain_problem.SetVisualizeWithVtk(true);
+            monodomain_problem.SetVisualizeWithParallelVtk(true);
+            monodomain_problem.SetOutputUsingOriginalNodeOrdering(true);
+            monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+            monodomain_problem.SetCapacitance(1.0);
             monodomain_problem.Initialise();
             monodomain_problem.SetUseHdf5DataWriterCache(true); // cache on, for coveraging of archiving this
-
-            HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-            HeartConfig::Instance()->SetCapacitance(1.0);
 
             { // Add output modifiers
                 boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5));
@@ -1614,7 +1577,7 @@ public:
         // Second stage - load from archive and run for an extra time before saving again
         { // Load and run - first go
             MonodomainProblem<2>* p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_1);
-            HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
+            p_monodomain_problem->SetSimulationDuration(1.0); //ms
             TS_ASSERT(p_monodomain_problem->mUseHdf5DataWriterCache);
             p_monodomain_problem->Solve();
             CardiacSimulationArchiver<MonodomainProblem<2> >::Save(*p_monodomain_problem, archive_location_2);
@@ -1624,7 +1587,7 @@ public:
         // Third stage - repeat procedure from second
         { // Load and run - second go
             MonodomainProblem<2>* p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_2);
-            HeartConfig::Instance()->SetSimulationDuration(1.5); //ms
+            p_monodomain_problem->SetSimulationDuration(1.5); //ms
             TS_ASSERT(p_monodomain_problem->mUseHdf5DataWriterCache);
             p_monodomain_problem->Solve();
             { // Check that the modifiers are still there
@@ -1651,14 +1614,13 @@ public:
      */
     void TestMonodomainProblemWithWriterCache()
     {
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonodomainWithWriterCache");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_with_cache");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+        monodomain_problem.SetSimulationDuration(1.0);
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("MonodomainWithWriterCache");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d_with_cache");
         monodomain_problem.SetUseHdf5DataWriterCache(true); // cache on
 
         monodomain_problem.Initialise();
@@ -1672,13 +1634,12 @@ public:
 
     void TestMonodomainProblemWithWriterCacheIncomplete()
     {
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonodomainWithWriterCacheIncomplete");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_with_cache_incomplete");
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("MonodomainWithWriterCacheIncomplete");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d_with_cache_incomplete");
+        monodomain_problem.SetSimulationDuration(1.0);
         monodomain_problem.SetUseHdf5DataWriterCache(true); // cache on
 
         std::vector<unsigned> nodes_to_be_output;
@@ -1702,18 +1663,15 @@ public:
             DistributedTetrahedralMesh<3, 3> mesh;
             mesh.ConstructRegularSlabMesh(0.01, 0.42, 0.12, 0.03);
 
-            HeartConfig::Instance()->SetOutputDirectory("MonodomainWithTargetChunkSizeAndAlignment");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-            HeartConfig::Instance()->SetSimulationDuration(10.0);
-            // Some postprocessing to test passing chunk size through to PostProcessingWriter
-            std::vector<double> upstroke_voltages;
-            upstroke_voltages.push_back(0.0);
-            HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_voltages);
-
             PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-600 * 5000);
 
             MonodomainProblem<3> monodomain_problem(&cell_factory);
             monodomain_problem.SetMesh(&mesh);
+            monodomain_problem.SetOutputDirectory("MonodomainWithTargetChunkSizeAndAlignment");
+            monodomain_problem.SetOutputFilenamePrefix("results");
+            monodomain_problem.SetSimulationDuration(10.0);
+            // Some postprocessing to test passing chunk size through to PostProcessingWriter
+            monodomain_problem.AddUpstrokeTimeMap(0.0);
             monodomain_problem.SetHdf5DataWriterTargetChunkSizeAndAlignment(0x2000); // 8 K
 
             monodomain_problem.Initialise();
@@ -1778,10 +1736,8 @@ public:
         // Resume from previous test
         {
             MonodomainProblem<3>* p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<3> >::Load("MonodomainWithTargetChunkSizeAndAlignment/checkpoint");
-            HeartConfig::Instance()->SetSimulationDuration(11.0);
-            std::vector<double> upstroke_voltages;
-            upstroke_voltages.push_back(3.0);
-            HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_voltages);
+            p_monodomain_problem->SetSimulationDuration(11.0);
+            p_monodomain_problem->AddUpstrokeTimeMap(3.0);
 
             p_monodomain_problem->Solve();
             //Tidy up

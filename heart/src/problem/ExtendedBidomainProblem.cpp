@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ExtendedBidomainProblem.hpp"
 #include "ExtendedBidomainSolver.hpp"
 #include "AbstractDynamicLinearPdeSolver.hpp"
-#include "HeartConfig.hpp"
 #include "Exception.hpp"
 #include "DistributedVector.hpp"
 #include "ReplicatableVector.hpp"
@@ -157,10 +156,14 @@ AbstractCardiacTissue<DIM> * ExtendedBidomainProblem<DIM>::CreateCardiacTissue()
     {
         mpExtendedBidomainTissue->SetIntracellularConductivitiesSecondCell(mIntracellularConductivitiesSecondCell);
     }
-    else //..otherwise it gets the same as the first cell (according to heartconfig...)
+    else //..otherwise it gets the same as the first cell
     {
+        // Use the problem's stored intracellular conductivities (set via SetIntracellularConductivities)
         c_vector<double, DIM> intra_conductivities;
-        HeartConfig::Instance()->GetIntracellularConductivities(intra_conductivities);
+        for (unsigned i = 0; i < DIM; i++)
+        {
+            intra_conductivities[i] = this->mIntraConductivitiesOrthotropic[i];
+        }
         mpExtendedBidomainTissue->SetIntracellularConductivitiesSecondCell(intra_conductivities);
     }
 
@@ -177,14 +180,14 @@ AbstractCardiacTissue<DIM> * ExtendedBidomainProblem<DIM>::CreateCardiacTissue()
         mpExtendedBidomainTissue->SetCmFirstCell(mCmFirstCell);
         mpExtendedBidomainTissue->SetCmSecondCell(mCmSecondCell);
     }
-    else//we set all the Am and Cm to the values set by the heartconfig (only one value for all Am and one value for all Cms)
+    else // use the problem's physiological parameter values
     {
-        mpExtendedBidomainTissue->SetAmFirstCell(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
-        mpExtendedBidomainTissue->SetAmSecondCell(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
-        mpExtendedBidomainTissue->SetAmGap(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
+        mpExtendedBidomainTissue->SetAmFirstCell(this->mSurfaceAreaToVolumeRatio);
+        mpExtendedBidomainTissue->SetAmSecondCell(this->mSurfaceAreaToVolumeRatio);
+        mpExtendedBidomainTissue->SetAmGap(this->mSurfaceAreaToVolumeRatio);
         mpExtendedBidomainTissue->SetGGap(0.0);
-        mpExtendedBidomainTissue->SetCmFirstCell(HeartConfig::Instance()->GetCapacitance());
-        mpExtendedBidomainTissue->SetCmSecondCell(HeartConfig::Instance()->GetCapacitance());
+        mpExtendedBidomainTissue->SetCmFirstCell(this->mCapacitance);
+        mpExtendedBidomainTissue->SetCmSecondCell(this->mCapacitance);
     }
 
     mpExtendedBidomainTissue->SetGgapHeterogeneities(mGgapHeterogeneityRegions, mGgapHeterogenousValues);//set user input into the tissue class
@@ -362,8 +365,8 @@ void ExtendedBidomainProblem<DIM>::DefineWriterColumns(bool extending)
 
         // Only used to get an estimate of the # of timesteps below (copied from Abstract class)
         TimeStepper stepper(AbstractCardiacProblem<DIM,DIM,3>::mCurrentTime,
-                            HeartConfig::Instance()->GetSimulationDuration(),
-                            HeartConfig::Instance()->GetPrintingTimeStep());
+                            this->mSimulationDuration,
+                            this->mPrintingTimeStep);
         this->mpWriter->DefineUnlimitedDimension("Time", "msecs", stepper.EstimateTimeSteps()+1); // +1 for start and end
     }
     else
@@ -426,7 +429,7 @@ void ExtendedBidomainProblem<DIM>::PreSolveChecks()
             // We're not using the constrain Average phi_e to 0 method, hence use a null space
             // Check that the KSP solver isn't going to do anything stupid:
             // phi_e is not bounded, so it'd be wrong to use a relative tolerance
-            if (HeartConfig::Instance()->GetUseRelativeTolerance())
+            if (!this->mUseAbsoluteTolerance)
             {
                 EXCEPTION("Bidomain external voltage is not bounded in this simulation - use KSP *absolute* tolerance");
             }

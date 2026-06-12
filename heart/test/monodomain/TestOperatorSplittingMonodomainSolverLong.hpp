@@ -94,22 +94,20 @@ public:
         ReplicatableVector final_voltage_normal;
         ReplicatableVector final_voltage_operator_splitting;
 
-        HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
         double h = 0.001; // very fine
 
         // Normal
         {
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.001, 0.1); // very small timesteps
-
             TetrahedralMesh<1,1> mesh;
             mesh.ConstructRegularSlabMesh(h, 1.0);
-            HeartConfig::Instance()->SetOutputDirectory("MonodomainCompareWithOperatorSplitting_normal");
             BlockCellFactory<1> cell_factory;
 
             MonodomainProblem<1> monodomain_problem( &cell_factory );
             monodomain_problem.SetMesh(&mesh);
+            monodomain_problem.SetSimulationDuration(4.0); //ms
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.001, 0.001, 0.1); // very small timesteps
+            monodomain_problem.SetOutputDirectory("MonodomainCompareWithOperatorSplitting_normal");
+            monodomain_problem.SetOutputFilenamePrefix("results");
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
 
@@ -118,19 +116,19 @@ public:
 
         // Operator splitting
         {
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.002, 0.1); // very small timesteps - use pde-dt = 2 ode-dt
-                                                                                       // as effective_ode_dt = min{pde_dt/2, ode_dt} in
-                                                                                       // our operator splitting implementation
-
             TetrahedralMesh<1,1> mesh;
             mesh.ConstructRegularSlabMesh(h, 1.0);
-            HeartConfig::Instance()->SetOutputDirectory("MonodomainCompareWithOperatorSplitting_splitting");
             BlockCellFactory<1> cell_factory;
-
-            HeartConfig::Instance()->SetUseReactionDiffusionOperatorSplitting();
 
             MonodomainProblem<1> monodomain_problem( &cell_factory );
             monodomain_problem.SetMesh(&mesh);
+            monodomain_problem.SetSimulationDuration(4.0); //ms
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.001, 0.002, 0.1); // very small timesteps - use pde-dt = 2 ode-dt
+                                                                                 // as effective_ode_dt = min{pde_dt/2, ode_dt} in
+                                                                                 // our operator splitting implementation
+            monodomain_problem.SetOutputDirectory("MonodomainCompareWithOperatorSplitting_splitting");
+            monodomain_problem.SetOutputFilenamePrefix("results");
+            monodomain_problem.SetUseReactionDiffusionOperatorSplitting(true);
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
 

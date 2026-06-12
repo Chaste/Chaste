@@ -59,24 +59,22 @@ class TestNeumannStimulus : public CxxTest::TestSuite
 public:
     void tearDown()
     {
-        HeartConfig::Reset();
     }
 
     // Solve on a 1D string of cells, 1mm long with a space step of 0.1mm.
     void TestMonodomainConstantStimulus()
     {
         // this parameters are a bit arbitrary, and chosen to get a good spread of voltages
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75));
-        HeartConfig::Instance()->SetSimulationDuration(2); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoNeumannConst");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
-
         ZeroStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem( &cell_factory );
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(1.75));
+        monodomain_problem.SetSimulationDuration(2); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("MonoNeumannConst");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1*1.75/0.0005);
 
         monodomain_problem.Initialise();
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1*1.75/0.0005);
 
         // create boundary conditions container
         boost::shared_ptr<BoundaryConditionsContainer<1,1,1> > p_bcc(new BoundaryConditionsContainer<1,1,1>);
@@ -118,17 +116,16 @@ public:
     void TestMonodomainSquareWaveStimulus()
     {
         // this parameters are a bit arbitrary, and chosen to get a good spread of voltages
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75));
-        HeartConfig::Instance()->SetSimulationDuration(2); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoNeumannSquare");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
-
         ZeroStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem( &cell_factory );
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(1.75));
+        monodomain_problem.SetSimulationDuration(2); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        monodomain_problem.SetOutputDirectory("MonoNeumannSquare");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1*1.75/0.0005);
 
         monodomain_problem.Initialise();
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1*1.75/0.0005);
 
         // create boundary conditions container
         boost::shared_ptr<BoundaryConditionsContainer<1,1,1> > p_bcc(new BoundaryConditionsContainer<1,1,1>);

@@ -82,7 +82,6 @@ public:
 
         QuadraticMesh<2> mechanics_mesh;
         mechanics_mesh.ConstructRegularSlabMesh(0.025, 0.05, 0.05);
-        HeartConfig::Instance()->SetSimulationDuration(10.0);
 
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
         problem_defn.SetContractionModel(KERCHOFFS2003,1.0);
@@ -173,8 +172,6 @@ public:
         boundary_elems.push_back(* (mechanics_mesh.GetBoundaryElementIteratorBegin()));
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, 0.0);
 
-        HeartConfig::Instance()->SetSimulationDuration(10.0);
-
         CardiacElectroMechanicsProblem<2,1>   problem(COMPRESSIBLE,
                                                       MONODOMAIN,
                                                       &electrics_mesh,
@@ -182,6 +179,7 @@ public:
                                                       &cell_factory,
                                                       &problem_defn,
                                                       "TestCardiacEmHomogeneousEverythingCompressible");
+        problem.GetElectricsProblem()->SetSimulationDuration(10.0);
         problem.Solve();
         std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
 
@@ -259,9 +257,6 @@ public:
         boundary_elems.push_back(* (mechanics_mesh.GetBoundaryElementIteratorBegin()));
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, 0.0);
 
-        HeartConfig::Instance()->SetSimulationDuration(10.0);
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
         //creates the EM problem with ELEC_PROB_DIM=2
         CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
                                                     BIDOMAIN,
@@ -270,6 +265,9 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacEmHomogeneousEverythingCompressibleBidomain");
+        problem.GetElectricsProblem()->SetSimulationDuration(10.0);
+        problem.GetElectricsProblem()->SetExtracellularConductivities(Create_c_vector(1500,1500));
+        problem.GetElectricsProblem()->SetVisualizeWithVtk(true);
 
         problem.Solve();
         std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
@@ -361,8 +359,6 @@ public:
         FileFinder fibre_file("heart/test/data/fibre_tests/2by2mesh_fibres.ortho", RelativeTo::ChasteSourceRoot);
         problem_defn.SetVariableFibreSheetDirectionsFile(fibre_file, false);
 
-        HeartConfig::Instance()->SetSimulationDuration(10.0);
-
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
@@ -370,6 +366,7 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacEmHomogeneousEverythingIncompressible");
+        problem.GetElectricsProblem()->SetSimulationDuration(10.0);
 
         problem.Solve();
 
@@ -465,11 +462,8 @@ public:
         problem_defn.SetContractionModel(KERCHOFFS2003,1.0);
         problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
         problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,1.0);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
-        HeartConfig::Instance()->SetSimulationDuration(10.0);
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
         CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
                                                     BIDOMAIN_WITH_BATH,
                                                     &electrics_mesh,
@@ -477,6 +471,9 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacEmWithBath");
+        problem.GetElectricsProblem()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,1.0);
+        problem.GetElectricsProblem()->SetSimulationDuration(10.0);
+        problem.GetElectricsProblem()->SetExtracellularConductivities(Create_c_vector(1500,1500));
 
         problem.Solve();
         std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
@@ -552,11 +549,8 @@ public:
         problem_defn.SetContractionModel(NASH2004,1.0);
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
         problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,1.0);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
-        HeartConfig::Instance()->SetSimulationDuration(10.0);
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
         CardiacElectroMechanicsProblem<2,2> problem(INCOMPRESSIBLE,
                                                     BIDOMAIN_WITH_BATH,
                                                     &electrics_mesh,
@@ -564,6 +558,9 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacEmWithBath");
+        problem.GetElectricsProblem()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,1.0);
+        problem.GetElectricsProblem()->SetSimulationDuration(10.0);
+        problem.GetElectricsProblem()->SetExtracellularConductivities(Create_c_vector(1500,1500));
 
         problem.Solve();
         std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
@@ -584,8 +581,6 @@ public:
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
-        HeartConfig::Instance()->SetSimulationDuration(10.0);
-
         CardiacElectroMechProbRegularGeom<2> problem(INCOMPRESSIBLE,
                                                      0.05, /* width (cm) */
                                                      1,    /* mech mesh size*/
@@ -595,6 +590,7 @@ public:
                                                      1.0,  /* mechanics solve timestep */
                                                      0.01, /* contraction model ode timestep */
                                                      "TestCardiacElectroMechOneElement");
+        problem.GetElectricsProblem()->SetSimulationDuration(10.0);
         c_vector<double,2> pos;
         pos(0) = 0.05;
         pos(1) = 0.0;
@@ -629,8 +625,6 @@ public:
 
         // coverage
 
-        HeartConfig::Instance()->SetSimulationDuration(10.0); // has to be reset after a solve, it seems..
-
         // We can now #2370 put any model anywhere, so these checks don't make sense...
 //        CardiacElectroMechProbRegularGeom<2> prob_with_bad_model(INCOMPRESSIBLE,0.05,1,5,&cell_factory,NONPHYSIOL1,1,0.01,"");
 //        TS_ASSERT_THROWS_CONTAINS(prob_with_bad_model.Solve(),"Invalid contraction model");
@@ -639,6 +633,7 @@ public:
 //        TS_ASSERT_THROWS_CONTAINS(prob_with_bad_model_comp.Solve(),"Invalid contraction model");
 
         CardiacElectroMechProbRegularGeom<2> prob_with_bad_timesteps(INCOMPRESSIBLE,0.05,1,5,&cell_factory,NHS,0.025,0.01,"");
+        prob_with_bad_timesteps.GetElectricsProblem()->SetSimulationDuration(10.0);
         TS_ASSERT_THROWS_CONTAINS(prob_with_bad_timesteps.Initialise(),"does not divide");
 
 
@@ -650,9 +645,6 @@ public:
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
-        HeartConfig::Instance()->SetSimulationDuration(20.0);
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
-
         CardiacElectroMechProbRegularGeom<2> problem(INCOMPRESSIBLE,
                                                      0.05, /* width (cm) */
                                                      1,    /* mech mesh size*/
@@ -662,6 +654,8 @@ public:
                                                      1.0,   /* mechanics solve timestep */
                                                      0.01,  /* Kerchoffs ode timestep */
                                                      "TestCardiacEmWithKerchoffs");
+        problem.GetElectricsProblem()->SetSimulationDuration(20.0);
+        problem.GetElectricsProblem()->SetVisualizeWithVtk(true);
 
         c_vector<double,2> pos;
         pos(0) = 0.05;
@@ -697,8 +691,6 @@ public:
 
         PlaneStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 2> cell_factory(-1000*1000);
 
-        HeartConfig::Instance()->SetSimulationDuration(20.0);
-
         CardiacElectroMechProbRegularGeom<2> problem(INCOMPRESSIBLE,
                                                      0.05, /* width (cm) */
                                                      1,    /* mech mesh size*/
@@ -708,6 +700,7 @@ public:
                                                      1.0,   /* mechanics solve timestep */
                                                      0.01,  /* nash ode timestep */
                                                      "TestExplicitWithNash");
+        problem.GetElectricsProblem()->SetSimulationDuration(20.0);
 
         c_vector<double,2> pos;
         pos(0) = 0.05;
@@ -730,8 +723,6 @@ public:
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
-        HeartConfig::Instance()->SetSimulationDuration(20.0);
-
         CardiacElectroMechProbRegularGeom<2> problem(COMPRESSIBLE,
                                                      0.05, /* width (cm) */
                                                      1,    /* mech mesh size*/
@@ -741,6 +732,7 @@ public:
                                                      1.0,   /* mechanics solve timestep */
                                                      0.01,  /* Kerchoffs ode timestep */
                                                      "TestCompressibleWithKerchoffs");
+        problem.GetElectricsProblem()->SetSimulationDuration(20.0);
 
         problem.Solve();
 
@@ -752,10 +744,10 @@ public:
         TS_ASSERT_DELTA(problem.rGetDeformedPosition()[1](1),-0.0012, 0.0002);
 
         // create and initialise an incompressible NASH2004 problem, just for coverage..
-        HeartConfig::Instance()->SetSimulationDuration(20.0);
         CardiacElectroMechProbRegularGeom<2> problem2(COMPRESSIBLE,0.05,1,5,&cell_factory,
                                                       NASH2004,
                                                       1.0, 0.01,"");
+        problem2.GetElectricsProblem()->SetSimulationDuration(20.0);
         problem2.Initialise();
     }
 };

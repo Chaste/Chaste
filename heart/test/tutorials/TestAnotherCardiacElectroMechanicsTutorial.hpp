@@ -212,8 +212,6 @@ public:
         problem_defn.SetDeformationAffectsElectrophysiology(false /*deformation affects conductivity*/, true /*deformation affects cell models*/);
 
         /* Set the end time, create the problem, and solve */
-        HeartConfig::Instance()->SetSimulationDuration(50.0);
-
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
@@ -221,6 +219,7 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacElectroMechanicsWithMef");
+        problem.GetElectricsProblem()->SetSimulationDuration(50.0);
         problem.Solve();
 
         /* Nothing exciting happens in the simulation as it is currently written. To get some interesting occurring,
@@ -239,7 +238,7 @@ public:
         FileFinder test_output_folder("TestCardiacElectroMechanicsWithMef/electrics", RelativeTo::ChasteTestOutput);
         Hdf5ToMeshalyzerConverter<2,2> converter(test_output_folder, "voltage",
                                                  &electrics_mesh, false,
-                                                 HeartConfig::Instance()->GetVisualizerOutputPrecision());
+                                                 0u /* default visualizer output precision */);
 
         /* Some other notes. If you want to apply time-dependent traction boundary conditions, this is possible by
          * specifying the traction in functional form - see solid mechanics tutorials. Similarly, more natural
@@ -315,9 +314,6 @@ public:
             }
         }
 
-        /* Increase this end time to see more contraction */
-        HeartConfig::Instance()->SetSimulationDuration(30.0);
-
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 
         problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
@@ -372,6 +368,9 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestAnnulusWithInternalPressure");
+
+        /* Increase this end time to see more contraction */
+        problem.GetElectricsProblem()->SetSimulationDuration(30.0);
 
         /* If we want stresses and strains output, we can do the following. The deformation gradients and 2nd PK stresses
          * for each element will be written at the requested times.  */

@@ -131,9 +131,6 @@ public:
         ReplicatableVector final_solution_svi;
         ReplicatableVector final_solution_svit;
 
-        HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
-
         for (unsigned i=0; i<3; i++)
         {
             // ICI - ionic current interpolation - the default
@@ -143,14 +140,15 @@ public:
 
                 std::stringstream output_dir;
                 output_dir << "BidomainIci_" << h[i];
-                HeartConfig::Instance()->SetOutputDirectory(output_dir.str());
-                HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-                // need to have this for i=1,2 cases!!
-                HeartConfig::Instance()->SetUseStateVariableInterpolation(false);
 
                 BlockCellFactory<1> cell_factory;
                 BidomainProblem<1> bidomain_problem( &cell_factory );
+                bidomain_problem.SetSimulationDuration(4.0); //ms
+                bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+                bidomain_problem.SetOutputDirectory(output_dir.str());
+                bidomain_problem.SetOutputFilenamePrefix("results");
+                // need to have this for i=1,2 cases!!
+                // (ICI is the default; SVI is not used here)
                 bidomain_problem.SetMesh(&mesh);
                 bidomain_problem.Initialise();
 
@@ -166,13 +164,14 @@ public:
 
                 std::stringstream output_dir;
                 output_dir << "BidomainSvi_" << h[i];
-                HeartConfig::Instance()->SetOutputDirectory(output_dir.str());
-                HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-                HeartConfig::Instance()->SetUseStateVariableInterpolation();
 
                 BlockCellFactory<1> cell_factory;
                 BidomainProblem<1> bidomain_problem( &cell_factory );
+                bidomain_problem.SetSimulationDuration(4.0); //ms
+                bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+                bidomain_problem.SetOutputDirectory(output_dir.str());
+                bidomain_problem.SetOutputFilenamePrefix("results");
+                bidomain_problem.SetUseStateVariableInterpolation(true);
                 bidomain_problem.SetMesh(&mesh);
                 bidomain_problem.Initialise();
 
@@ -188,13 +187,14 @@ public:
 
                 std::stringstream output_dir;
                 output_dir << "BidomainSviTet_" << h[i];
-                HeartConfig::Instance()->SetOutputDirectory(output_dir.str());
-                HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-                HeartConfig::Instance()->SetUseStateVariableInterpolation();
 
                 BlockCellFactory<1> cell_factory;
                 BidomainProblem<1> bidomain_problem( &cell_factory );
+                bidomain_problem.SetSimulationDuration(4.0); //ms
+                bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+                bidomain_problem.SetOutputDirectory(output_dir.str());
+                bidomain_problem.SetOutputFilenamePrefix("results");
+                bidomain_problem.SetUseStateVariableInterpolation(true);
                 bidomain_problem.SetMesh(&mesh);
                 bidomain_problem.Initialise();
 
@@ -251,25 +251,20 @@ public:
         ReplicatableVector final_solution_ici;
         ReplicatableVector final_solution_svi;
 
-        HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.01);
-
-        // much lower conductivity in cross-fibre direction - ICI will struggle
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 0.7));
-
         // ICI - nodal current interpolation - the default
         {
             TetrahedralMesh<2,2> mesh;
             mesh.ConstructRegularSlabMesh(0.02 /*h*/, 0.5, 0.3);
 
-            HeartConfig::Instance()->SetOutputDirectory("BidomainIci2d");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-            HeartConfig::Instance()->SetUseStateVariableInterpolation(false);
-
             BlockCellFactory<2> cell_factory;
             BidomainProblem<2> bidomain_problem( &cell_factory );
+            bidomain_problem.SetSimulationDuration(4.0); //ms
+            bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.01);
+            // much lower conductivity in cross-fibre direction - ICI will struggle
+            bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
+            bidomain_problem.SetExtracellularConductivities(Create_c_vector(7.0, 0.7));
+            bidomain_problem.SetOutputDirectory("BidomainIci2d");
+            bidomain_problem.SetOutputFilenamePrefix("results");
             bidomain_problem.SetMesh(&mesh);
             bidomain_problem.Initialise();
             bidomain_problem.Solve();
@@ -282,13 +277,16 @@ public:
             TetrahedralMesh<2,2> mesh;
             mesh.ConstructRegularSlabMesh(0.02 /*h*/, 0.5, 0.3);
 
-            HeartConfig::Instance()->SetOutputDirectory("BidomainSvi2d");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-            HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
-
             BlockCellFactory<2> cell_factory;
             BidomainProblem<2> bidomain_problem( &cell_factory );
+            bidomain_problem.SetSimulationDuration(4.0); //ms
+            bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.01);
+            // much lower conductivity in cross-fibre direction - ICI will struggle
+            bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
+            bidomain_problem.SetExtracellularConductivities(Create_c_vector(7.0, 0.7));
+            bidomain_problem.SetOutputDirectory("BidomainSvi2d");
+            bidomain_problem.SetOutputFilenamePrefix("results");
+            bidomain_problem.SetUseStateVariableInterpolation(true);
             bidomain_problem.SetMesh(&mesh);
             bidomain_problem.Initialise();
 
@@ -331,22 +329,19 @@ public:
             }
         }
 
-        HeartConfig::Instance()->SetSimulationDuration(10.0); // ms
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.025, 0.25);
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 0.7));
-
         ReplicatableVector final_solution_ici;
         ReplicatableVector final_solution_svi;
 
         // ICI - ionic current interpolation (the default)
         {
-            HeartConfig::Instance()->SetOutputDirectory("BidomainWithBathIci2d");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-            HeartConfig::Instance()->SetUseStateVariableInterpolation(false);
-
             BathCellFactory cell_factory;
             BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
+            bidomain_problem.SetSimulationDuration(10.0); // ms
+            bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.001, 0.025, 0.25);
+            bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
+            bidomain_problem.SetExtracellularConductivities(Create_c_vector(7.0, 0.7));
+            bidomain_problem.SetOutputDirectory("BidomainWithBathIci2d");
+            bidomain_problem.SetOutputFilenamePrefix("results");
             bidomain_problem.SetMesh(&mesh);
             bidomain_problem.Initialise();
             bidomain_problem.Solve();
@@ -356,12 +351,15 @@ public:
 
         // SVI - state variable interpolation
         {
-            HeartConfig::Instance()->SetOutputDirectory("BidomainWithBathSvi2d");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-            HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
-
             BathCellFactory cell_factory;
             BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
+            bidomain_problem.SetSimulationDuration(10.0); // ms
+            bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.001, 0.025, 0.25);
+            bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
+            bidomain_problem.SetExtracellularConductivities(Create_c_vector(7.0, 0.7));
+            bidomain_problem.SetOutputDirectory("BidomainWithBathSvi2d");
+            bidomain_problem.SetOutputFilenamePrefix("results");
+            bidomain_problem.SetUseStateVariableInterpolation(true);
             bidomain_problem.SetMesh(&mesh);
             bidomain_problem.Initialise();
             bidomain_problem.Solve();

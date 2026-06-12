@@ -44,23 +44,23 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(
     // linear system created here
     AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 3>::InitialiseForSolve(initialSolution);
 
-    if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
+    if (mUseAbsoluteTolerance)
     {
 #ifdef TRACE_KSP
-        std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() << "\n";
+        std::cout << "Using absolute tolerance: " << mKspAbsoluteTolerance << "\n";
 #endif
-        this->mpLinearSystem->SetAbsoluteTolerance(mpConfig->GetAbsoluteTolerance());
+        this->mpLinearSystem->SetAbsoluteTolerance(mKspAbsoluteTolerance);
     }
     else
     {
 #ifdef TRACE_KSP
-        std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() << "\n";
+        std::cout << "Using relative tolerance: " << mKspRelativeTolerance << "\n";
 #endif
-        this->mpLinearSystem->SetRelativeTolerance(mpConfig->GetRelativeTolerance());
+        this->mpLinearSystem->SetRelativeTolerance(mKspRelativeTolerance);
     }
 
-    this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
-    this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
+    this->mpLinearSystem->SetKspType(mKspSolverType.c_str());
+    this->mpLinearSystem->SetPcType(mKspPreconditionerType.c_str());
 
     if (mRowForAverageOfPhiZeroed == INT_MAX)
     {
@@ -130,9 +130,8 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem
         else  // mRowForAverageOfPhiZeroed!=INT_MAX, i.e. we're using the 'Average phi_e = 0' method
         {
             // CG (default solver) won't work since the system isn't symmetric anymore. Switch to GMRES
-            this->mpLinearSystem->SetKspType("gmres"); // Switches the solver
-            mpConfig->SetKSPSolver("gmres", true); // Makes sure this change will be reflected in the XML file written to disk at the end of the simulation.
-            //(If the user doesn't have gmres then the "true" warns the user about the switch)
+            this->mpLinearSystem->SetKspType("gmres");
+            mKspSolverType = "gmres";
 
             // Set average phi_e to zero
             unsigned matrix_size = this->mpLinearSystem->GetSize();
@@ -207,7 +206,12 @@ AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractExtendedBidomainS
     : AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,3>(pMesh),
               mBathSimulation(bathSimulation),
               mpExtendedBidomainTissue(pTissue),
-              mpBoundaryConditions(pBcc)
+              mpBoundaryConditions(pBcc),
+              mUseAbsoluteTolerance(true),
+              mKspAbsoluteTolerance(2e-4),
+              mKspRelativeTolerance(1e-6),
+              mKspSolverType("cg"),
+              mKspPreconditionerType("bjacobi")
 {
     assert(pTissue != NULL);
     assert(pBcc != NULL);
@@ -217,8 +221,7 @@ AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractExtendedBidomainS
     // important!
     this->mMatrixIsConstant = true;
 
-    mRowForAverageOfPhiZeroed = INT_MAX; //this->mpLinearSystem->GetSize() - 1;
-    mpConfig = HeartConfig::Instance();
+    mRowForAverageOfPhiZeroed = INT_MAX;
 
     mpExtendedBidomainAssembler = NULL; // can't initialise until know what dt is
 }
@@ -270,6 +273,18 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetRowForAverageOfPh
     }
 
     mRowForAverageOfPhiZeroed = row;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetKspConfig(
+    bool useAbsTol, double absTol, double relTol,
+    const std::string& rKspType, const std::string& rPcType)
+{
+    mUseAbsoluteTolerance = useAbsTol;
+    mKspAbsoluteTolerance = absTol;
+    mKspRelativeTolerance = relTol;
+    mKspSolverType = rKspType;
+    mKspPreconditionerType = rPcType;
 }
 
 // Explicit instantiation

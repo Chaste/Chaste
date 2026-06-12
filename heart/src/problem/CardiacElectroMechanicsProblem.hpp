@@ -251,6 +251,17 @@ public :
     void SetNoElectricsOutput();
 
     /**
+     * Get the underlying electrics problem (MonodomainProblem or BidomainProblem).
+     * Can be used to configure simulation duration, time steps, conductivities, etc.
+     * before calling Initialise().
+     * @return pointer to the electrics problem
+     */
+    AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>* GetElectricsProblem()
+    {
+        return mpElectricsProblem;
+    }
+
+    /**
      *  Set a location to be watched - for which lots of output
      *  is given. Should correspond to nodes in both meshes.
      *

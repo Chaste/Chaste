@@ -46,6 +46,16 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec curr
     assert(this->mpLinearSystem->rGetLhsMatrix() != NULL);
     assert(this->mpLinearSystem->rGetRhsVector() != NULL);
 
+    // Lazily create assemblers on first use (after SetKspConfig has been called)
+    if (!mpVolumeAssembler)
+    {
+        mpVolumeAssembler = new MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM,SPACE_DIM>(mpMixedMesh,this->mpMonodomainTissue);
+        mpCableAssembler = new MonodomainPurkinjeCableAssembler<ELEMENT_DIM,SPACE_DIM>(mpMixedMesh,
+                                                                                        mPurkinjeCapacitance,
+                                                                                        mPurkinjeSurfaceAreaToVolumeRatio,
+                                                                                        1.75); // default Purkinje conductivity
+    }
+
     /////////////////////////////////////////
     // set up LHS matrix (and mass matrix)
     /////////////////////////////////////////
@@ -63,11 +73,11 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec curr
         this->mpLinearSystem->FinaliseLhsMatrix();
 
 
-        MonodomainPurkinjeVolumeMassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> volume_mass_matrix_assembler(mpMixedMesh, HeartConfig::Instance()->GetUseMassLumping());
+        MonodomainPurkinjeVolumeMassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> volume_mass_matrix_assembler(mpMixedMesh, mUseMassLumping);
         volume_mass_matrix_assembler.SetMatrixToAssemble(mMassMatrix);
         volume_mass_matrix_assembler.Assemble();
 
-        MonodomainPurkinjeCableMassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> cable_mass_matrix_assembler(mpMixedMesh, HeartConfig::Instance()->GetUseMassLumping());
+        MonodomainPurkinjeCableMassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> cable_mass_matrix_assembler(mpMixedMesh, mUseMassLumping);
         cable_mass_matrix_assembler.SetMatrixToAssemble(mMassMatrix,false /* don't zero the matrix*/);
         cable_mass_matrix_assembler.Assemble();
 
@@ -90,11 +100,11 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec curr
     DistributedVector::Stripe dist_vec_matrix_based_volume(dist_vec_matrix_based, 0);
     DistributedVector::Stripe dist_vec_matrix_based_cable(dist_vec_matrix_based, 1);
 
-    double Am = HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio();
-    double Cm  = HeartConfig::Instance()->GetCapacitance();
+    double Am = mpMonodomainTissue->GetSurfaceAreaToVolumeRatio();
+    double Cm = mpMonodomainTissue->GetCapacitance();
 
-    double Am_purkinje = HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio();
-    double Cm_purkinje  = HeartConfig::Instance()->GetPurkinjeCapacitance();
+    double Am_purkinje = mPurkinjeSurfaceAreaToVolumeRatio;
+    double Cm_purkinje = mPurkinjeCapacitance;
 
 
     for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
@@ -172,20 +182,19 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec ini
     AbstractLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,2>::InitialiseForSolve(initialSolution);
 
     //..then do a bit extra
-    if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
+    if (mUseAbsoluteTolerance)
     {
-        this->mpLinearSystem->SetAbsoluteTolerance(HeartConfig::Instance()->GetAbsoluteTolerance());
+        this->mpLinearSystem->SetAbsoluteTolerance(mKspAbsoluteTolerance);
     }
     else
     {
-        NEVER_REACHED;
-//        this->mpLinearSystem->SetRelativeTolerance(HeartConfig::Instance()->GetRelativeTolerance());
+        this->mpLinearSystem->SetRelativeTolerance(mKspRelativeTolerance);
     }
 
-    this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
-    this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
+    this->mpLinearSystem->SetKspType(mKspSolverType.c_str());
+    this->mpLinearSystem->SetPcType(mKspPreconditionerType.c_str());
     this->mpLinearSystem->SetMatrixIsSymmetric(true);
-    this->mpLinearSystem->SetUseFixedNumberIterations(HeartConfig::Instance()->GetUseFixedNumberIterationsLinearSolver(), HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves());
+    this->mpLinearSystem->SetUseFixedNumberIterations(mUseFixedNumberIterations, mEvaluateNumItsEveryNSolves);
 
     // Initialise sizes/partitioning of mass matrix & vector, using the initial condition as a template
     VecDuplicate(initialSolution, &mVecForConstructingRhs);
@@ -214,18 +223,26 @@ MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainPurkinjeSolver(
     : AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,2>(pMesh),
       mpMixedMesh(pMesh),
       mpMonodomainTissue(pTissue),
-      mpBoundaryConditions(pBoundaryConditions)
+      mpBoundaryConditions(pBoundaryConditions),
+      mUseAbsoluteTolerance(true),
+      mKspAbsoluteTolerance(2e-4),
+      mKspRelativeTolerance(1e-6),
+      mKspSolverType("cg"),
+      mKspPreconditionerType("bjacobi"),
+      mUseMassLumping(false),
+      mUseFixedNumberIterations(false),
+      mEvaluateNumItsEveryNSolves(0),
+      mUseStateVariableInterpolation(false),
+      mPurkinjeSurfaceAreaToVolumeRatio(2800.0),
+      mPurkinjeCapacitance(1.0)
 {
     assert(pTissue);
     assert(pBoundaryConditions);
-    if(HeartConfig::Instance()->GetUseStateVariableInterpolation())
-    {
-        EXCEPTION("State-variable interpolation is not yet supported with Purkinje");
-    }
     this->mMatrixIsConstant = true;
 
-    mpVolumeAssembler = new MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM,SPACE_DIM>(mpMixedMesh,this->mpMonodomainTissue);
-    mpCableAssembler = new MonodomainPurkinjeCableAssembler<ELEMENT_DIM,SPACE_DIM>(mpMixedMesh);
+    // Created lazily in SetupLinearSystem after SetKspConfig has been called
+    mpVolumeAssembler = nullptr;
+    mpCableAssembler = nullptr;
     mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,2>(pMesh,pBoundaryConditions);
 
     // Tell tissue there's no need to replicate ionic caches
@@ -248,6 +265,32 @@ MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::~MonodomainPurkinjeSolver()
     }
 }
 
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetKspConfig(
+    bool useAbsTol, double absTol, double relTol,
+    const std::string& rKspType, const std::string& rPcType,
+    bool useMassLumping, bool /*useMassLumpingForPrecond*/,
+    bool useFixedIts, unsigned evalEvery,
+    bool useStateVarInterp,
+    double purkinjeAm, double purkinjeCm)
+{
+    mUseAbsoluteTolerance = useAbsTol;
+    mKspAbsoluteTolerance = absTol;
+    mKspRelativeTolerance = relTol;
+    mKspSolverType = rKspType;
+    mKspPreconditionerType = rPcType;
+    mUseMassLumping = useMassLumping;
+    mUseFixedNumberIterations = useFixedIts;
+    mEvaluateNumItsEveryNSolves = evalEvery;
+    mUseStateVariableInterpolation = useStateVarInterp;
+    if (mUseStateVariableInterpolation)
+    {
+        EXCEPTION("State-variable interpolation is not yet supported with Purkinje");
+    }
+    mPurkinjeSurfaceAreaToVolumeRatio = purkinjeAm;
+    mPurkinjeCapacitance = purkinjeCm;
+}
 
 ///////////////////////////////////////////////////////
 // explicit instantiation

@@ -56,10 +56,11 @@ c_matrix<double,1*(ELEMENT_DIM+1),1*(ELEMENT_DIM+1)> MonodomainAssembler<ELEMENT
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>::MonodomainAssembler(
                         AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                        MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue)
+                        MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
+                        bool useMassLumping)
     : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,1,false,true,CARDIAC>(pMesh,pTissue),
-      mMassMatrixAssembler(pMesh, HeartConfig::Instance()->GetUseMassLumping(),
-                           HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio()*HeartConfig::Instance()->GetCapacitance()),
+      mMassMatrixAssembler(pMesh, useMassLumping,
+                           pTissue->GetSurfaceAreaToVolumeRatio()*pTissue->GetCapacitance()),
       mStiffnessMatrixAssembler(pMesh, pTissue)
 {
     assert(pTissue);

@@ -107,8 +107,8 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
     DistributedVector::Stripe dist_vec_matrix_based_vm(dist_vec_matrix_based, 0);
     DistributedVector::Stripe dist_vec_matrix_based_phie(dist_vec_matrix_based, 1);
 
-    double Am = HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio();
-    double Cm  = HeartConfig::Instance()->GetCapacitance();
+    double Am = this->mpBidomainTissue->GetSurfaceAreaToVolumeRatio();
+    double Cm = this->mpBidomainTissue->GetCapacitance();
 
     if (!(this->mBathSimulation))
     {
@@ -221,7 +221,7 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
 
     mpBidomainNeumannSurfaceTermAssembler = new BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM>(pMesh,pBoundaryConditions);
 
-    if (HeartConfig::Instance()->GetUseStateVariableInterpolation())
+    if (this->mUseStateVariableInterpolation)
     {
         mpBidomainCorrectionTermAssembler
             = new BidomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);

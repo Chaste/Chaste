@@ -64,14 +64,9 @@ stimuli/TestStimulus.hpp
 stimuli/TestStimulusBoundaryCondition.hpp
 TestAbstractContractionCellFactory.hpp
 TestAbstractPurkinjeCellFactory.hpp
-TestCardiacSimulation.hpp
 TestCardiacSimulationArchiver.hpp
-TestChasteXsdVersion.hpp
-TestCheckpointing.hpp
 TestConductivityTensors.hpp
 TestElectrodes.hpp
-TestHeartConfig.hpp
-TestHeartFileFinder.hpp
 TestHeartGeometryInformation.hpp
 TestHeartRegionCodes.hpp
 TestHeterogeneousConductivities.hpp

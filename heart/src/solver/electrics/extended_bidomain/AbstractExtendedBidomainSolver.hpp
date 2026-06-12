@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractDynamicLinearPdeSolver.hpp"
 #include "ExtendedBidomainTissue.hpp"
-#include "HeartConfig.hpp"
 #include "ExtendedBidomainAssembler.hpp"
 
 /**
@@ -69,8 +68,12 @@ protected:
      */
     ExtendedBidomainAssembler<ELEMENT_DIM,SPACE_DIM>* mpExtendedBidomainAssembler;
 
-    /** Local cache of the configuration singleton instance*/
-    HeartConfig* mpConfig;
+    // KSP configuration
+    bool mUseAbsoluteTolerance;
+    double mKspAbsoluteTolerance;
+    double mKspRelativeTolerance;
+    std::string mKspSolverType;
+    std::string mKspPreconditionerType;
 
     /** Used when intialising null-space solver to resolve singularity*/
     bool mNullSpaceCreated;
@@ -160,6 +163,10 @@ public:
      * Destructor.
      */
     virtual ~AbstractExtendedBidomainSolver();
+
+    /** Configure KSP solver settings. */
+    void SetKspConfig(bool useAbsTol, double absTol, double relTol,
+                      const std::string& rKspType, const std::string& rPcType);
 
     /**
      *  Set the nodes at which phi_e (the extracellular potential) is fixed to

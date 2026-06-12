@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "HeartConfig.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -59,7 +58,7 @@ public:
         args.push_back("--cvode");
 
         SetUseCvodeJacobian(false);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
+        SetDefaultOdeDt(0.005);
 
         RunTests(dirname, models, args);
 

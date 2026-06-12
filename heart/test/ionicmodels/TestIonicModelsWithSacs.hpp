@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <string>
 
-#include "HeartConfig.hpp"
 #include "SimpleStimulus.hpp"
 #include "ZeroStimulus.hpp"
 #include "OutputFileHandler.hpp"
@@ -77,9 +76,9 @@ private:
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         double time_step = 0.01;
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, 1.0);
 
         CML_noble_varghese_kohl_noble_1998_basic_with_sac   n98_with_sac(p_solver, p_stimulus);
+        n98_with_sac.SetTimestep(time_step);
 
         OutputFileHandler handler(directory,clearDir);
         out_stream p_file = handler.OpenOutputFile(filePrefix+".dat");

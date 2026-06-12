@@ -51,7 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacCellFactory.hpp"
 #include "RegularStimulus.hpp"
 #include "LuoRudy1991.hpp"
-#include "HeartConfig.hpp"
 #include "MonodomainProblem.hpp"
 #include "TetrahedralMesh.hpp"
 #include "Exception.hpp"
@@ -120,26 +119,8 @@ public:
         std::string archive_dir_base("LongPostprocessing_archives/archive");
         std::string archive_dir_current;
 
-        // Setup
-        HeartConfig::Instance()->SetSimulationDuration(pacing_cycle_length); //ms
-        HeartConfig::Instance()->SetOutputDirectory("LongPostprocessing");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-        // These lines make postprocessing fast or slow.
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(ode_time_step, pde_time_step, 10); // Leads to 10MB VTK file
-        //HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(ode_time_step, pde_time_step, 0.01); // Leads to 1GB VTK file
-
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.4*conductivity_scale*1.171, 1.4*conductivity_scale*1.171));
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1400.0); // 1/cm
-        HeartConfig::Instance()->SetCapacitance(1.0); // uF/cm^2
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
-#ifdef CHASTE_VTK
-        HeartConfig::Instance()->SetVisualizeWithVtk();
-#endif
-
         std::vector<std::pair<double,double> > apds_requested;
         apds_requested.push_back(std::pair<double, double>(90,-30)); //repolarisation percentage and threshold
-        HeartConfig::Instance()->SetApdMaps(apds_requested);
 //        std::vector<double> excitation_threshold;
 //        excitation_threshold.push_back(-30.0);
 //        HeartConfig::Instance()->SetUpstrokeTimeMaps(excitation_threshold);
@@ -154,6 +135,18 @@ public:
                 PointStimulusCellFactory<2> cell_factory(stim_mag, stim_dur, pacing_cycle_length, area);
                 p_monodomain_problem = new MonodomainProblem<2>( &cell_factory );
                 p_monodomain_problem->SetMesh(&mesh);
+                p_monodomain_problem->SetSimulationDuration(pacing_cycle_length); //ms
+                p_monodomain_problem->SetOutputDirectory("LongPostprocessing");
+                p_monodomain_problem->SetOutputFilenamePrefix("results");
+                p_monodomain_problem->SetOdePdeAndPrintingTimeSteps(ode_time_step, pde_time_step, 10);
+                p_monodomain_problem->SetIntracellularConductivities(Create_c_vector(1.4*conductivity_scale*1.171, 1.4*conductivity_scale*1.171));
+                p_monodomain_problem->SetSurfaceAreaToVolumeRatio(1400.0); // 1/cm
+                p_monodomain_problem->SetCapacitance(1.0); // uF/cm^2
+                p_monodomain_problem->SetVisualizeWithMeshalyzer(true);
+#ifdef CHASTE_VTK
+                p_monodomain_problem->SetVisualizeWithVtk(true);
+#endif
+                p_monodomain_problem->AddApdMap(90, -30);
                 p_monodomain_problem->Initialise();
             }
             else
@@ -161,7 +154,7 @@ public:
                 p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_dir_current);
             }
 
-            HeartConfig::Instance()->SetSimulationDuration((double) (stim_counter+1)*pacing_cycle_length); //ms
+            p_monodomain_problem->SetSimulationDuration((double) (stim_counter+1)*pacing_cycle_length); //ms
 
             // set new directories to work from
             std::stringstream stringoutput;
@@ -170,7 +163,7 @@ public:
 
             archive_dir_current = archive_dir_base + "_" + stim_counter_string;
             OutputFileHandler archive_directory(archive_dir_current, true); // Clean a folder for new results
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results_" + stim_counter_string);
+            p_monodomain_problem->SetOutputFilenamePrefix("results_" + stim_counter_string);
 
             // Solve problem (this does the postprocessing too when HeartConfig options are set).
             p_monodomain_problem->Solve();
@@ -190,7 +183,7 @@ public:
 
             for (unsigned i=0; i<files.size(); i++)
             {
-                FileFinder file_to_copy(HeartConfig::Instance()->GetOutputDirectory() + "/output/" + files[i] + ".dat", RelativeTo::ChasteTestOutput);
+                FileFinder file_to_copy(p_monodomain_problem->GetOutputDirectory() + "/output/" + files[i] + ".dat", RelativeTo::ChasteTestOutput);
                 TS_ASSERT(file_to_copy.IsFile());
                 archive_directory.CopyFileTo(file_to_copy);
             }

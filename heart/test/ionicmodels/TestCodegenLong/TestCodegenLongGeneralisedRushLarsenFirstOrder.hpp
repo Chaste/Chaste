@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "HeartConfig.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -63,7 +62,7 @@ public:
 
 
         // Winslow model needs a smaller timestep
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        SetDefaultOdeDt(0.0001);
         RunTests(dirname, models, args, false, 0, false);
     }
 

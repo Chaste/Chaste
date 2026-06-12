@@ -37,13 +37,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPurkinjeCellFactory.hpp"
 #include "PurkinjeVentricularJunctionStimulus.hpp"
 #include "MultiStimulus.hpp"
-#include "HeartConfig.hpp"
 #include "Warnings.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractPurkinjeCellFactory()
     : AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>(),
-      mpMixedDimensionMesh(NULL)
+      mpMixedDimensionMesh(NULL),
+      mPurkinjeSurfaceAreaToVolumeRatio(2800.0)
 {
 }
 
@@ -55,8 +55,15 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::ReadJunctionsFile()
 
     try
     {
-        // HeartConfig::Instance()->GetMeshName() will throw an exception if no mesh name is defined
-        pvj_file_name = HeartConfig::Instance()->GetMeshName() + ".pvj";
+        // Try to build the .pvj file path from the mesh base name
+        if (mpMixedDimensionMesh && mpMixedDimensionMesh->IsMeshOnDisk())
+        {
+            pvj_file_name = mpMixedDimensionMesh->GetMeshFileBaseName() + ".pvj";
+        }
+        else
+        {
+            file_specified = false;
+        }
     }
     catch(Exception&)
     {
@@ -136,7 +143,7 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const No
             double cable_radius = p_cable->GetAttribute();
             total_cross_sectional_area += M_PI*cable_radius*cable_radius;
         }
-        resistance *= total_cross_sectional_area / HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio();
+        resistance *= total_cross_sectional_area / mPurkinjeSurfaceAreaToVolumeRatio;
     }
     // Create the junction stimuli, and associate them with the cells
     boost::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_ventricular_stim(new PurkinjeVentricularJunctionStimulus(resistance));

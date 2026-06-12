@@ -116,7 +116,6 @@ public:
         DistributedTetrahedralMesh<3,3> mesh;
         double h=0.02;
         mesh.ConstructRegularSlabMesh(h, 0.8 /*length*/, 0.3 /*width*/, 0.3 /*depth*/);
-        HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);
         /* (In 2D the call is identical, but without the depth parameter).
          *
          * Set the simulation duration, etc, and create an instance of the cell factory.
@@ -124,13 +123,8 @@ public:
          * conductivity'' is used as the monodomain effective conductivity (not a
          * harmonic mean of intra and extracellular conductivities). So if you want to
          * alter the monodomain conductivity call
-         * `HeartConfig::Instance()->SetIntracellularConductivities`
+         * `problem.SetIntracellularConductivities`
          */
-        HeartConfig::Instance()->SetSimulationDuration(5); //ms
-        HeartConfig::Instance()->SetOutputDirectory("Monodomain3dExample");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.1);
-
         BenchmarkCellFactory cell_factory;
 
         /* Now we declare the problem class, `MonodomainProblem<3>` instead of `BidomainProblem<2>`.
@@ -138,7 +132,13 @@ public:
          */
         MonodomainProblem<3> monodomain_problem( &cell_factory );
 
-        /* If a mesh-file-name hasn't been set using `HeartConfig`, we have to pass in
+        monodomain_problem.SetSimulationDuration(5); //ms
+        monodomain_problem.SetOutputDirectory("Monodomain3dExample");
+        monodomain_problem.SetOutputFilenamePrefix("results");
+        monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.1);
+        monodomain_problem.SetOutputUsingOriginalNodeOrdering(true);
+
+        /* If a mesh hasn't been set using `SetMeshFileName`, we have to pass in
          * a mesh using the `SetMesh` method (must be called before `Initialise`). */
         monodomain_problem.SetMesh(&mesh);
 

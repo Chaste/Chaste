@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleBathProblemSetup.hpp"
 #include "FileComparison.hpp"
 #include "SingleTraceOutputModifier.hpp"
+#include "DistributedTetrahedralMesh.hpp"
 
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
@@ -174,7 +175,6 @@ private:
 public:
     void tearDown()
     {
-        HeartConfig::Reset();
     }
 
 
@@ -186,24 +186,25 @@ public:
             TS_TRACE("This test is not suitable for more than 2 processes.");
             return;
         }
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_1_element");
-        HeartConfig::Instance()->SetOutputDirectory("BidomainWithErrors");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain");
-
-        // Check the linear system can be solved to a low tolerance (in particular, checks the null space
-        // stuff was implemented correctly
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-14);
-
-        // We put in a massive stimulus, and alter the printing timestep from default, to cover
-        // some memory handling in the case of exceptions being thrown (#1222).
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
 
         // 100x bigger stimulus than normal.
         ExceptionStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory(1, 0.02);
         BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(7.0));
+        bidomain_problem.SetSimulationDuration(1.0);  //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_1_element");
+        bidomain_problem.SetOutputDirectory("BidomainWithErrors");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain");
+
+        // Check the linear system can be solved to a low tolerance (in particular, checks the null space
+        // stuff was implemented correctly
+        bidomain_problem.SetKspAbsoluteTolerance(1e-14);
+
+        // We put in a massive stimulus, and alter the printing timestep from default, to cover
+        // some memory handling in the case of exceptions being thrown (#1222).
+        bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+
         bidomain_problem.Initialise();
 
         TS_ASSERT_THROWS_THIS(bidomain_problem.Solve(),
@@ -218,15 +219,17 @@ public:
             TS_TRACE("This test is not suitable for more than 3 processes.");
             return;
         }
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetFibreLength(0.1, 0.05);
-        HeartConfig::Instance()->SetSpaceDimension(1u);
-        HeartConfig::Instance()->SetOutputDirectory("Bidomain1dSmall");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("small");
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 0.1);
+
+        DistributedTetrahedralMesh<1,1> mesh;
+        mesh.ConstructRegularSlabMesh(0.05, 0.1);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
         BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
+        bidomain_problem.SetSimulationDuration(1.0);  //ms
+        bidomain_problem.SetOutputDirectory("Bidomain1dSmall");
+        bidomain_problem.SetOutputFilenamePrefix("small");
+        bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 0.1);
+        bidomain_problem.SetMesh(&mesh);
 
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
@@ -239,20 +242,18 @@ public:
     // (Historical reasons...)
     void TestBidomainDg01DPinned()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
-        HeartConfig::Instance()->SetOutputDirectory("bidomainDg01d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
         BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetSimulationDuration(1.0);  //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
+        bidomain_problem.SetOutputDirectory("bidomainDg01d");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
+        bidomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        bidomain_problem.SetCapacitance(1.0);
 
         bidomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
         std::vector<unsigned> pinned_nodes;
 
@@ -340,23 +341,21 @@ public:
     {
         HeartEventHandler::Disable();
 
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
-        HeartConfig::Instance()->SetOutputDirectory("bidomainDg01d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-
-        // Final values to test against have been produced with ksp_rtol=1e-9
-        HeartConfig::Instance()->SetUseRelativeTolerance(1e-8);
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
         BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetSimulationDuration(1.0);  //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
+        bidomain_problem.SetOutputDirectory("bidomainDg01d");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
+        bidomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        bidomain_problem.SetCapacitance(1.0);
+
+        // Final values to test against have been produced with ksp_rtol=1e-9
+        bidomain_problem.SetKspRelativeTolerance(1e-8);
 
         bidomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
 
         // Apply the constraint 'Average phi = 0' to nodes 0, 50, 100.
@@ -474,12 +473,6 @@ public:
      */
     void TestCompareBidomainProblemWithMonodomain()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
-        HeartConfig::Instance()->SetOutputDirectory("Monodomain1dVersusBidomain");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("monodomain1d");
-
         Vec monodomain_results;
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
@@ -491,11 +484,15 @@ public:
             // monodomain
             ///////////////////////////////////////////////////////////////////
             MonodomainProblem<1> monodomain_problem( &cell_factory );
+            monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+            monodomain_problem.SetSimulationDuration(1.0);  //ms
+            monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
+            monodomain_problem.SetOutputDirectory("Monodomain1dVersusBidomain");
+            monodomain_problem.SetOutputFilenamePrefix("monodomain1d");
+            monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+            monodomain_problem.SetCapacitance(1.0);
 
             monodomain_problem.Initialise();
-
-            HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-            HeartConfig::Instance()->SetCapacitance(1.0);
 
             // now solve
             monodomain_problem.Solve();
@@ -511,19 +508,20 @@ public:
 
         // keep the intra conductivity to be the same as monodomain
         // and the extra conductivity to be very large in comparison
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1));
-        HeartConfig::Instance()->SetOutputDirectory("Bidomain1d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain1d");
-
         BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(1));
+        bidomain_problem.SetSimulationDuration(1.0);  //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
+        bidomain_problem.SetOutputDirectory("Bidomain1d");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain1d");
+        bidomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        bidomain_problem.SetCapacitance(1.0);
 
         // Not really needed for coverage, but it's worth checking that logic works properly in both scenarios.
         TS_ASSERT(!bidomain_problem.GetHasBath());
 
         bidomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
         // now solve
         bidomain_problem.Solve();
@@ -563,16 +561,15 @@ public:
     {
         HeartEventHandler::Disable();
 
-        HeartConfig::Instance()->SetPrintingTimeStep(0.1);
-        HeartConfig::Instance()->SetPdeTimeStep(0.01);
-        HeartConfig::Instance()->SetSimulationDuration(0.3);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("Bidomain1d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_testPrintTimes");
-
         // run testing PrintingTimeSteps
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainProblem<1>* p_bidomain_problem = new BidomainProblem<1>( &cell_factory );
+        p_bidomain_problem->SetPrintingTimeStep(0.1);
+        p_bidomain_problem->SetPdeTimeStep(0.01);
+        p_bidomain_problem->SetSimulationDuration(0.3);  //ms
+        p_bidomain_problem->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        p_bidomain_problem->SetOutputDirectory("Bidomain1d");
+        p_bidomain_problem->SetOutputFilenamePrefix("bidomain_testPrintTimes");
 
 
         /* HOW_TO_TAG Cardiac/Output
@@ -633,11 +630,16 @@ public:
         delete p_bidomain_problem;
 
         p_bidomain_problem = new BidomainProblem<1>( &cell_factory );
+        p_bidomain_problem->SetPdeTimeStep(0.01);
+        p_bidomain_problem->SetSimulationDuration(0.3);  //ms
+        p_bidomain_problem->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        p_bidomain_problem->SetOutputDirectory("Bidomain1d");
+        p_bidomain_problem->SetOutputFilenamePrefix("bidomain_testPrintTimes");
 
         // Now check that we can turn off output printing
         // Output should be the same as above: printing every 10th time step
         // because even though we set to print every time step...
-        HeartConfig::Instance()->SetPrintingTimeStep(1);
+        p_bidomain_problem->SetPrintingTimeStep(1);
         // ...we have output turned off
         p_bidomain_problem->PrintOutput(false);
 
@@ -660,17 +662,16 @@ public:
     void TestBidomainFallsOverProducesOutput()
     {
 #ifndef NDEBUG //Note that this test relies on the debug VerifyStateVariables() method throwing
-        HeartConfig::Instance()->SetSimulationDuration(0.3);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
-        HeartConfig::Instance()->SetOutputDirectory("BidomainFallsOver");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("res");
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
-
         // Something happens at 0.1ms
 
         // DelayedTotalStimCellFactory bidomain_cell_factory(-6e5); //Normal stimulus
         DelayedTotalStimCellFactory bidomain_cell_factory(-6e6); //Takes sodium out of range
         BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
+        bidomain_problem.SetSimulationDuration(0.3);  //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
+        bidomain_problem.SetOutputDirectory("BidomainFallsOver");
+        bidomain_problem.SetOutputFilenamePrefix("res");
+        bidomain_problem.SetVisualizeWithMeshalyzer(true);
 
         bidomain_problem.Initialise();
 
@@ -698,10 +699,10 @@ public:
         // Test for post-processed output (and don't wipe the directory!)
         OutputFileHandler handler("BidomainFallsOver/output", false);
 
-        std::string files[6] = {"res_mesh.pts","res_mesh.cnnx","ChasteParameters.xml",
+        std::string files[5] = {"res_mesh.pts","res_mesh.cnnx",
                                 "res_Phi_e.dat","res_V.dat","res_times.info"};
 
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<5; i++)
         {
             TS_ASSERT(handler.FindFile(files[i]).Exists());
         }
@@ -718,32 +719,31 @@ public:
         TS_ASSERT_THROWS_THIS(bidomain_problem.Solve(), "Cardiac tissue is null, Initialise() probably hasn\'t been called");
 
         // Throws because mesh filename is unset
-        TS_ASSERT_THROWS_CONTAINS(bidomain_problem.Initialise(),
-                "No mesh given: define it in XML parameters file or call SetMesh()\n"
-                "No XML element Simulation/Mesh found in parameters when calling");
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        TS_ASSERT_THROWS_THIS(bidomain_problem.Initialise(),
+                "No mesh given: call SetMesh() or SetMeshFileName() before Initialise()");
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
         TS_ASSERT_THROWS_NOTHING(bidomain_problem.Initialise());
 
         // Negative simulation duration
-        HeartConfig::Instance()->SetSimulationDuration(-1.0);  //ms
-        TS_ASSERT_THROWS_THIS(bidomain_problem.Solve(), "End time should be in the future");
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
+        bidomain_problem.SetSimulationDuration(-1.0);  //ms
+        TS_ASSERT_THROWS_THIS(bidomain_problem.Solve(), "Simulation duration must be set (call SetSimulationDuration()) and be positive");
+        bidomain_problem.SetSimulationDuration(1.0);  //ms
 
         // set output data to avoid their exceptions (which is covered in TestMonoDg0Assembler
-        HeartConfig::Instance()->SetOutputDirectory("temp");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("temp");
+        bidomain_problem.SetOutputDirectory("temp");
+        bidomain_problem.SetOutputFilenamePrefix("temp");
 
         // Exception caused by relative tolerance and no clamping
-        HeartConfig::Instance()->SetUseRelativeTolerance(2e-3);
+        bidomain_problem.SetKspRelativeTolerance(2e-3);
         TS_ASSERT_THROWS_THIS(bidomain_problem.Solve(), "Bidomain external voltage is not bounded in this simulation - use KSP *absolute* tolerance");
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(2e-3);
+        bidomain_problem.SetKspAbsoluteTolerance(2e-3);
 
         // Throws (in AbstractCardiacProblem) as dt does not divide end time
-        HeartConfig::Instance()->SetPrintingTimeStep(0.15);
-        HeartConfig::Instance()->SetPdeTimeStep(0.15);
+        bidomain_problem.SetPrintingTimeStep(0.15);
+        bidomain_problem.SetPdeTimeStep(0.15);
         TS_ASSERT_THROWS_THIS( bidomain_problem.Solve(),"PDE timestep does not seem to divide end time - check parameters" );
-        HeartConfig::Instance()->SetPdeTimeStep(0.01);
-        HeartConfig::Instance()->SetPrintingTimeStep(0.01);
+        bidomain_problem.SetPdeTimeStep(0.01);
+        bidomain_problem.SetPrintingTimeStep(0.01);
 
         //Throws because the node number is slightly bigger than the number of nodes in the mesh
         std::vector<unsigned> too_large;
@@ -758,23 +758,6 @@ public:
 
     void TestCompareOrthotropicWithAxisymmetricBidomain()
     {
-#ifdef CHASTE_SCOTCH_PARMETIS
-        // Turn off smart partitioning.
-        // PT-Scotch will produce good partitions but it cannot be forced to always
-        // give the same partition of the same mesh twice running.
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
-        HeartConfig::Instance()->SetMeshPartitioning("dumb");
-#endif
-
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetMeshFileName("heart/test/data/box_shaped_heart/box_heart", cp::media_type::Orthotropic);
-        HeartConfig::Instance()->SetOutputDirectory("OrthotropicBidomain");
-
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetMeshFileName("heart/test/data/box_shaped_heart/box_heart", cp::media_type::Orthotropic);
-        HeartConfig::Instance()->SetOutputDirectory("OrthotropicBidomain");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("ortho3d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory;
 
         ///////////////////////////////////////////////////////////////////
@@ -782,6 +765,17 @@ public:
         ///////////////////////////////////////////////////////////////////
 
         BidomainProblem<3> orthotropic_bido( &cell_factory );
+        orthotropic_bido.SetSimulationDuration(1.0);  //ms
+        orthotropic_bido.SetFibreOrientationFile("heart/test/data/box_shaped_heart/box_heart", "ortho");
+        orthotropic_bido.SetMeshFileName("heart/test/data/box_shaped_heart/box_heart");
+        orthotropic_bido.SetOutputDirectory("OrthotropicBidomain");
+        orthotropic_bido.SetOutputFilenamePrefix("ortho3d");
+#ifdef CHASTE_SCOTCH_PARMETIS
+        // Turn off smart partitioning.
+        // PT-Scotch will produce good partitions but it cannot be forced to always
+        // give the same partition of the same mesh twice running.
+        orthotropic_bido.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::DUMB);
+#endif
 
         orthotropic_bido.Initialise();
         orthotropic_bido.Solve();
@@ -789,13 +783,17 @@ public:
         ///////////////////////////////////////////////////////////////////
         // axisymmetric
         ///////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetMeshFileName("heart/test/data/box_shaped_heart/box_heart", cp::media_type::Axisymmetric);
-        HeartConfig::Instance()->SetOutputDirectory("AxisymmetricBidomain");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("axi3d");
-
         BidomainProblem<3> axisymmetric_bido( &cell_factory);
-        HeartConfig::Instance()->SetVisualizeWithCmgui(true);
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
+        axisymmetric_bido.SetSimulationDuration(1.0);  //ms
+        axisymmetric_bido.SetFibreOrientationFile("heart/test/data/box_shaped_heart/box_heart", "axi");
+        axisymmetric_bido.SetMeshFileName("heart/test/data/box_shaped_heart/box_heart");
+        axisymmetric_bido.SetOutputDirectory("AxisymmetricBidomain");
+        axisymmetric_bido.SetOutputFilenamePrefix("axi3d");
+        axisymmetric_bido.SetVisualizeWithCmgui(true);
+        axisymmetric_bido.SetVisualizeWithVtk(true);
+#ifdef CHASTE_SCOTCH_PARMETIS
+        axisymmetric_bido.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::DUMB);
+#endif
 
         axisymmetric_bido.Initialise();
         axisymmetric_bido.Solve();
@@ -819,10 +817,6 @@ public:
             TS_ASSERT_DELTA(ortho_voltage[index], axi_voltage[index], 1e-7);
             TS_ASSERT_DELTA(ortho_ex_pot[index], axi_ex_pot[index], 1e-7);
         }
-#ifdef CHASTE_SCOTCH_PARMETIS
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::DUMB);
-        HeartConfig::Instance()->SetMeshPartitioning("parmetis");
-#endif
 
         // We check that the cmgui files generated by the convert command in the problem class are OK
         // We compare against mesh files and one data file that are known to be visualized correctly in Cmgui.
@@ -861,9 +855,6 @@ public:
                 "heart/test/data/CmguiData/bidomain/axi3d_times.info");
         TS_ASSERT(comparer5.CompareFiles());
 
-        //HeartConfig XML
-        TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
-
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
         results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "AxisymmetricBidomain/vtk_output/";
@@ -895,8 +886,6 @@ public:
         mesh_reader.GetPointData( "V_000100", v_at_last);
         TS_ASSERT_DELTA( v_at_last[0],   -83.6863, 1e-3 );
 
-        //HeartConfig XML
-        TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
 #else
         std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
@@ -906,12 +895,6 @@ public:
     // Test the functionality for outputting the values of requested cell state variables
     void TestBidomainProblemPrintsMultipleVariables()
     {
-        // Get the singleton in a clean state
-        HeartConfig::Instance()->Reset();
-
-        // Set configuration file
-        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/MultipleVariablesBidomain.xml");
-
         // Override the variables we are interested in writing.
         std::vector<std::string> output_variables;
         output_variables.push_back("calcium_dynamics__Ca_NSR");
@@ -919,11 +902,18 @@ public:
         output_variables.push_back("fast_sodium_current_j_gate__j");
         output_variables.push_back("ionic_concentrations__Ki");
 
-        HeartConfig::Instance()->SetOutputVariables( output_variables );
-
         // Set up problem
         PlaneStimulusCellFactory<CellFaberRudy2000FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );
+
+        // Settings from MultipleVariablesBidomain.xml
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        bidomain_problem.SetOutputDirectory("MultipleVariablesBidomain");
+        bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+        bidomain_problem.SetKspAbsoluteTolerance(1e-8);
+        bidomain_problem.SetSimulationDuration(0.1);
+
+        bidomain_problem.SetOutputVariables( output_variables );
 
         // Solve
         bidomain_problem.Initialise();
@@ -969,30 +959,31 @@ public:
      */
     void TestBidomainProblemPrintsAllStateVariables()
     {
-        // Get the singleton in a clean state
-        HeartConfig::Instance()->Reset();
-
-        // Set configuration file
-        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/MultipleVariablesBidomain.xml");
-
-        //Override the output directory so that this test goes into a fresh place
-        HeartConfig::Instance()->SetOutputDirectory("AllStateVariablesBidomain");
-
+        std::vector<std::string> all_state_var_names;
         {
             //MultipleVariablesBidomain.xml uses FaberRudy.  Interrogate a model to get all the state variables
             boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
             boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
             CellFaberRudy2000FromCellML temporary_fr2000_ode_system(p_solver, p_stimulus);
             TS_ASSERT_EQUALS(temporary_fr2000_ode_system.rGetStateVariableNames().size(), 25u);
-
-
-            // Copy all the state variable names from the temporary cell into HeartConfig so that they are all printed
-            HeartConfig::Instance()->SetOutputVariables( temporary_fr2000_ode_system.rGetStateVariableNames() );
+            all_state_var_names = temporary_fr2000_ode_system.rGetStateVariableNames();
         }
 
         // Set up problem
         PlaneStimulusCellFactory<CellFaberRudy2000FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );
+
+        // Settings from MultipleVariablesBidomain.xml
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+        bidomain_problem.SetKspAbsoluteTolerance(1e-8);
+        bidomain_problem.SetSimulationDuration(0.1);
+
+        //Override the output directory so that this test goes into a fresh place
+        bidomain_problem.SetOutputDirectory("AllStateVariablesBidomain");
+
+        // Copy all the state variable names so that they are all printed
+        bidomain_problem.SetOutputVariables( all_state_var_names );
 
         // Solve
         bidomain_problem.Initialise();
@@ -1021,18 +1012,17 @@ public:
      */
     void TestSimpleBidomain1D()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("BidomainSimple1dInOneGo");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        bidomain_problem.SetCapacitance(1.0);
+        bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        bidomain_problem.SetSimulationDuration(2.0); //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        bidomain_problem.SetOutputDirectory("BidomainSimple1dInOneGo");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
 
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
@@ -1083,20 +1073,17 @@ public:
         //Rotate the permutation
         mesh.PermuteNodes(rotation_perm);
 
-        HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);
-
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-
-        HeartConfig::Instance()->SetSimulationDuration(0.5); //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainUnpermuted1d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetOutputUsingOriginalNodeOrdering(true);
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        bidomain_problem.SetCapacitance(1.0);
+        bidomain_problem.SetSimulationDuration(0.5); //ms
+        bidomain_problem.SetOutputDirectory("BidomainUnpermuted1d");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
+        bidomain_problem.SetVisualizeWithMeshalyzer(true);
 
         // Single trace at node 5
         boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5u, 0.1));
@@ -1137,25 +1124,24 @@ public:
      */
     void TestBidomainProblemInTwoHalves()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("BidomainSimple1dInTwoHalves");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(0.0005));
+        bidomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        bidomain_problem.SetCapacitance(1.0);
+        bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        bidomain_problem.SetOutputDirectory("BidomainSimple1dInTwoHalves");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
 
         bidomain_problem.Initialise();
 
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
+        bidomain_problem.SetSimulationDuration(1.0);
         bidomain_problem.Solve();
         TS_ASSERT_DELTA(bidomain_problem.GetCurrentTime(), 1.0, 1e-12);
 
-        HeartConfig::Instance()->SetSimulationDuration(2.0);
+        bidomain_problem.SetSimulationDuration(2.0);
         bidomain_problem.Solve();
         TS_ASSERT_DELTA(bidomain_problem.GetCurrentTime(), 2.0, 1e-12);
 
@@ -1184,25 +1170,24 @@ public:
 
         // Test that we can keep solving even if the results have been deleted (i.e. by creating a new
         // .h5 file when we realize that there isn't one to extend)
-        HeartConfig::Instance()->SetOutputDirectory("BidomainSimple1dInTwoHalves_2");
+        bidomain_problem.SetOutputDirectory("BidomainSimple1dInTwoHalves_2");
         OutputFileHandler file_handler("BidomainSimple1dInTwoHalves_2", true);
         FileFinder h5_file = file_handler.FindFile("BidomainLR91_1d.h5");
         TS_ASSERT(!h5_file.Exists());
-        HeartConfig::Instance()->SetSimulationDuration(3.0);
+        bidomain_problem.SetSimulationDuration(3.0);
         TS_ASSERT_THROWS_NOTHING( bidomain_problem.Solve() );
         TS_ASSERT(h5_file.Exists());
     }
 
     void TestBidomainProblemWithWriterCache()
     {
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("BidomainWithWriterCache");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d_with_cache");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+        bidomain_problem.SetSimulationDuration(1.0);
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        bidomain_problem.SetOutputDirectory("BidomainWithWriterCache");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d_with_cache");
         bidomain_problem.SetUseHdf5DataWriterCache(true); // cache on
 
         bidomain_problem.Initialise();
@@ -1216,13 +1201,12 @@ public:
 
     void TestBidomainProblemWithWriterCacheIncomplete()
     {
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("BidomainWithWriterCacheIncomplete");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d_with_cache_incomplete");
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        bidomain_problem.SetOutputDirectory("BidomainWithWriterCacheIncomplete");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d_with_cache_incomplete");
+        bidomain_problem.SetSimulationDuration(1.0);
         bidomain_problem.SetUseHdf5DataWriterCache(true); // cache on
 
         std::vector<unsigned> nodes_to_be_output;
@@ -1242,17 +1226,23 @@ public:
     /* Disabled this one for now as it passes in an ugly way */
     void louieTestBidomainProblemWithWriterCacheExtraVarsException()
     {
-        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/MultipleVariablesBidomain.xml");
-
         std::vector<std::string> output_variables;
         output_variables.push_back("calcium_dynamics__Ca_NSR");
         output_variables.push_back("ionic_concentrations__Nai");
         output_variables.push_back("fast_sodium_current_j_gate__j");
         output_variables.push_back("ionic_concentrations__Ki");
-        HeartConfig::Instance()->SetOutputVariables( output_variables );
 
         PlaneStimulusCellFactory<CellFaberRudy2000FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );
+
+        // Settings from MultipleVariablesBidomain.xml
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        bidomain_problem.SetOutputDirectory("MultipleVariablesBidomain");
+        bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+        bidomain_problem.SetKspAbsoluteTolerance(1e-8);
+        bidomain_problem.SetSimulationDuration(0.1);
+
+        bidomain_problem.SetOutputVariables( output_variables );
         bidomain_problem.SetUseHdf5DataWriterCache();
 
         bidomain_problem.Initialise();
@@ -1275,20 +1265,19 @@ public:
 
         // Save
         {
-            HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-            HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-            HeartConfig::Instance()->SetOutputDirectory("BiProblemArchive");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-            HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-            HeartConfig::Instance()->SetCapacitance(1.0);
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-
             PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
             BidomainProblem<1> bidomain_problem( &cell_factory );
+            bidomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+            bidomain_problem.SetExtracellularConductivities(Create_c_vector(0.0005));
+            bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+            bidomain_problem.SetOutputDirectory("BiProblemArchive");
+            bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
+            bidomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+            bidomain_problem.SetCapacitance(1.0);
+            bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+            bidomain_problem.SetSimulationDuration(1.0); //ms
 
             bidomain_problem.Initialise();
-            HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
             bidomain_problem.Solve();
 
             num_cells = bidomain_problem.GetTissue()->rGetCellsDistributed().size();
@@ -1312,7 +1301,7 @@ public:
             TS_ASSERT_EQUALS(p_bidomain_problem->GetTissue()->rGetCellsDistributed().size(),
                              num_cells);
 
-            HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
+            p_bidomain_problem->SetSimulationDuration(2.0); //ms
             p_bidomain_problem->Solve();
 
             // check some voltages

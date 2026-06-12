@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define HEARTREGIONCODES_HPP_
 
 #include <climits>
+#include <set>
 
 /** Type for region codes */
 typedef unsigned HeartRegionType;
@@ -45,19 +46,55 @@ typedef unsigned HeartRegionType;
  *
  * See Node::GetRegion, Node::SetRegion, AbstractElement::GetUnsignedAttribute, AbstractElement::SetAttribute.
  *
- * Note: these constants are set explicitly to be of type unsigned, so as to match
- * the above methods.  Hence why we use a class instead of an enum - you can't
- * (until C++0x) specify the underlying type of an enum.
+ * The tissue and bath identifier sets default to {0} and {1} respectively.  They
+ * can be changed globally via SetTissueIdentifiers() / SetBathIdentifiers() before
+ * a simulation runs, and are reset to the defaults via Reset().
  */
 class HeartRegionCode
 {
 
 public:
-    /** @return a valid tissue identifier */
+    /** @return a valid tissue identifier (the first one in the tissue set) */
     static HeartRegionType GetValidTissueId();
 
-    /** @return a valid bath identifier */
+    /** @return a valid bath identifier (the first one in the bath set) */
     static HeartRegionType GetValidBathId();
+
+    /**
+     * @return the set of all tissue identifiers
+     */
+    static const std::set<HeartRegionType>& rGetTissueIdentifiers();
+
+    /**
+     * @return the set of all bath identifiers
+     */
+    static const std::set<HeartRegionType>& rGetBathIdentifiers();
+
+    /**
+     * Replace the current tissue identifier set.
+     * @param rIds  new set of tissue identifiers
+     */
+    static void SetTissueIdentifiers(const std::set<HeartRegionType>& rIds);
+
+    /**
+     * Replace the current bath identifier set.
+     * @param rIds  new set of bath identifiers
+     */
+    static void SetBathIdentifiers(const std::set<HeartRegionType>& rIds);
+
+    /**
+     * Set both tissue and bath identifier sets atomically, validating that
+     * neither is empty and that they do not overlap.
+     * @param rTissueIds  new set of tissue identifiers (must be non-empty)
+     * @param rBathIds    new set of bath identifiers   (must be non-empty, no overlap)
+     */
+    static void SetTissueAndBathIdentifiers(const std::set<HeartRegionType>& rTissueIds,
+                                            const std::set<HeartRegionType>& rBathIds);
+
+    /**
+     * Reset tissue and bath identifiers to their defaults ({0} and {1}).
+     */
+    static void Reset();
 
     /**
      *  @return For a given region identifier, determines whether it is a tissue identifier
@@ -81,6 +118,11 @@ private:
     /** No instances of this class should be created.
      * @return reference by language convention*/
     HeartRegionCode& operator=(const HeartRegionCode&);
+
+    /** Set of region identifiers considered cardiac tissue. Default: {0}. */
+    static std::set<HeartRegionType> msTissueIdentifiers;
+    /** Set of region identifiers considered bath. Default: {1}. */
+    static std::set<HeartRegionType> msBathIdentifiers;
 };
 
 #endif /*HEARTREGIONCODES_HPP_*/

@@ -34,22 +34,6 @@ find_package(Chaste COMPONENTS ${Chaste_DEPENDS_heart})
 
 set(Chaste_heart_SOURCES "")
 
-file(GLOB xsd_config_files src/io/*.xsd)
-foreach(xsd_config ${xsd_config_files})
-    xsd_schema(Chaste_heart_SOURCES ${xsd_config}
-                "--generate-serialization"
-                "--hxx-suffix" ".hpp"
-                "--cxx-suffix" ".cpp"
-                "--prologue-file" "${CMAKE_CURRENT_SOURCE_DIR}/src/io/XsdPrologue.txt"
-                "--epilogue-file" "${CMAKE_CURRENT_SOURCE_DIR}/src/io/XsdEpilogue.txt"
-                "--namespace-regex" "X.* $Xchaste::parametersX"
-                "--namespace-regex" "X.* https://chaste.comlab.ox.ac.uk/nss/parameters/(.+)Xchaste::parameters::v$1X"
-                )
-
-endforeach()
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src/io)
-set(Chaste_heart_INCLUDE_DIRS ${Chaste_heart_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/src/io)
-
 # Make dynamic directory for dynamic cellml compilation
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dynamic)
 
@@ -80,5 +64,4 @@ foreach(dyn_source ${dyn_sources})
     add_dependencies(heart ${dyn_source_name})
     add_dependencies(Continuous ${dyn_source_name})
     add_dependencies(TestDynamicallyLoadedCellModels ${dyn_source_name})
-    add_dependencies(TestHeartConfig ${dyn_source_name})
 endforeach(dyn_source)

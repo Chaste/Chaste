@@ -60,44 +60,41 @@ public:
 
     void xxTest3DSpace()
     {
-
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
-        HeartConfig::Instance()->SetUseRelativeTolerance(1e-8);
-        //tester.SetKspRelativeTolerance(1e-8);
+        tester.KspRelativeTolerance = 1e-8;
+        tester.UseKspRelativeTolerance = true;
         tester.SetMeshWidth(0.15);//cm
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 4u); ///Just to prove the thing works
-        HeartConfig::Instance()->Reset();
     }
 
     //Experiments with ksp_atol follow.
     //This first one has to be done with GMRES as 1D are known to be a bit flakey
     void TestSpaceConvergencein1DWithAtol()
     {
-        HeartConfig::Instance()->SetKSPSolver("gmres");
-        HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
-       //tester.SetKspAbsoluteTolerance(1e-5);
+        tester.KspSolverType = "gmres";
+        tester.KspPreconditionerType = "jacobi";
+        tester.KspAbsoluteTolerance = 1e-5;
+        tester.UseKspAbsoluteTolerance = true;
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 5u);
         TS_ASSERT_LESS_THAN(tester.LastDifference, 0.0041039);
         //Has to be at least as good as the 1D with Rtol=1e-7
         //Note the final line fails with ksp_atol=1e-4
-        HeartConfig::Instance()->Reset();
     }
 
 
     void Test3DSpace10()
     {
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         PetscTools::SetOption("-log_summary", "");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-7);
-        //tester.SetKspAbsoluteTolerance(1e-7);
+        tester.KspSolverType = "symmlq";
+        tester.KspPreconditionerType = "bjacobi";
+        tester.KspAbsoluteTolerance = 1e-7;
+        tester.UseKspAbsoluteTolerance = true;
         tester.OdeTimeStep /= 2.0;
         tester.PdeTimeStep /= 2.0;
         tester.SetMeshWidth(0.10);//cm
@@ -105,17 +102,16 @@ public:
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 3u);
-        HeartConfig::Instance()->Reset();
     }
 
     void Test3DSpace10RampedQuarterStimulus()
     {
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         PetscTools::SetOption("-log_summary", "");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-7);
-        //tester.SetKspAbsoluteTolerance(1e-7);
+        tester.KspSolverType = "symmlq";
+        tester.KspPreconditionerType = "bjacobi";
+        tester.KspAbsoluteTolerance = 1e-7;
+        tester.UseKspAbsoluteTolerance = true;
         tester.OdeTimeStep /= 2.0;
         tester.PdeTimeStep /= 2.0;
         tester.SetMeshWidth(0.10);//cm
@@ -124,40 +120,36 @@ public:
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 3u);
-        HeartConfig::Instance()->Reset();
     }
 
     //More experiments with ksp_atol follow.
     void TestSpaceConvergencein2DWithAtol()
     {
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<2>, 2, 2> tester;
-        //tester.SetKspAbsoluteTolerance(1e-5);
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
+        tester.KspSolverType = "symmlq";
+        tester.KspPreconditionerType = "bjacobi";
+        tester.KspAbsoluteTolerance = 1e-5;
+        tester.UseKspAbsoluteTolerance = true;
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 5u);
         TS_ASSERT_LESS_THAN(tester.LastDifference, 0.0081583);
         //Comes in at 1.17118e-5
         //Has to be at least as good as the 2D with Rtol=5e-8
-        HeartConfig::Instance()->Reset();
-
     }
 
     //Copied from projects/jmpf since this converges on mesh4
     void Test3DSpaceRelaxWidthWithAtol()
     {
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
-        //tester.SetKspAbsoluteTolerance(1e-3);
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-3);
+        tester.KspSolverType = "symmlq";
+        tester.KspPreconditionerType = "bjacobi";
+        tester.KspAbsoluteTolerance = 1e-3;
+        tester.UseKspAbsoluteTolerance = true;
         tester.SetMeshWidth(0.15);//cm
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 4u);
-        HeartConfig::Instance()->Reset();
     }
 };
 

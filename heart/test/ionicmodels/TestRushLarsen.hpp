@@ -49,7 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FileFinder.hpp"
 #include "OutputFileHandler.hpp"
-#include "HeartConfig.hpp"
 #include "CellMLToSharedLibraryConverter.hpp"
 #include "DynamicCellModelLoader.hpp"
 #include "Warnings.hpp"
@@ -106,7 +105,6 @@ class TestRushLarsen : public CxxTest::TestSuite
 public:
     void TestLuoRudyRushLarsenMethod()
     {
-        HeartConfig::Instance()->SetOdeTimeStep(0.01);
         GenerateCells();
 
         // Check the models really use Rush-Larsen

@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5ToCmguiConverter.hpp"
 #include "CmguiMeshWriter.hpp"
 #include "UblasCustomFunctions.hpp"
-#include "HeartConfig.hpp"
 #include "PetscTools.hpp"
 #include "Exception.hpp"
 #include "ReplicatableVector.hpp"
@@ -137,7 +136,8 @@ Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(const FileFind
                                                                   const std::string& rFileBaseName,
                                                                   AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                                                                   bool hasBath,
-                                                                  unsigned precision)
+                                                                  unsigned precision,
+                                                                  bool outputUsingOriginalNodeOrdering)
     : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "cmgui_output", precision)
 {
     ///\todo #1660 at present this converter is hardcoded to work with "Data" using the below statement
@@ -152,9 +152,14 @@ Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(const FileFind
     Write("");
 
     // Write mesh in a suitable form for cmgui
-    std::string output_directory =  HeartConfig::Instance()->GetOutputDirectory() + "/cmgui_output";
+    std::string output_directory = this->mpOutputFileHandler->GetOutputDirectoryFullPath();
+    // Remove trailing slash then append subdirectory separator
+    if (!output_directory.empty() && output_directory.back() == '/')
+    {
+        output_directory.pop_back();
+    }
 
-    CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM> cmgui_mesh_writer(output_directory, HeartConfig::Instance()->GetOutputFilenamePrefix(), false);
+    CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM> cmgui_mesh_writer(this->mpOutputFileHandler->GetRelativePath() /* rel path */, this->mFileBaseName, false);
 
     // Used to inform the mesh of the data names
     std::vector<std::string> field_names = this->mpReader->GetVariableNames();
@@ -168,7 +173,7 @@ Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(const FileFind
     }
 
     // Normally the in-memory mesh is converted:
-    if (HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering() == false || !this->mpMesh->IsMeshOnDisk())
+    if (!outputUsingOriginalNodeOrdering || !this->mpMesh->IsMeshOnDisk())
     {
         cmgui_mesh_writer.WriteFilesUsingMesh(*(this->mpMesh), false);
     }
@@ -203,15 +208,15 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::WriteCmguiScript()
         *p_script_file << comment;
 
         *p_script_file << "# Read the mesh \n"
-                       << "gfx read node "<<HeartConfig::Instance()->GetOutputFilenamePrefix()<<".exnode \n"
-                       << "gfx read elem "<<HeartConfig::Instance()->GetOutputFilenamePrefix()<<".exelem \n" // note the mesh file name is taken from HeartConfig...
-                       << "gfx define faces egroup "<<HeartConfig::Instance()->GetOutputFilenamePrefix()<<"\n"
+                       << "gfx read node "<<this->mFileBaseName<<".exnode \n"
+                       << "gfx read elem "<<this->mFileBaseName<<".exelem \n"
+                       << "gfx define faces egroup "<<this->mFileBaseName<<"\n"
                        << "# Create a window \n"
                        << "gfx cre win 1 \n"
                        << "# Modify the scene (obtained by gfx list g_element XXXX commands) to visualize first var on lines and nodes \n"
-                       << "gfx modify g_element "<< HeartConfig::Instance()->GetOutputFilenamePrefix()<<" general clear circle_discretization 6 default_coordinate coordinates element_discretization \"4*4*4\" native_discretization none; \n"
-                       << "gfx modify g_element "<< HeartConfig::Instance()->GetOutputFilenamePrefix()<<" lines select_on material default data "<<variable_name<<" spectrum default selected_material default_selected; \n"
-                       << "gfx modify g_element "<< HeartConfig::Instance()->GetOutputFilenamePrefix()<<" node_points glyph point general size \"1*1*1\" centre 0,0,0 font default select_on material default data "<<variable_name<<" spectrum default selected_material default_selected; \n"
+                       << "gfx modify g_element "<< this->mFileBaseName<<" general clear circle_discretization 6 default_coordinate coordinates element_discretization \"4*4*4\" native_discretization none; \n"
+                       << "gfx modify g_element "<< this->mFileBaseName<<" lines select_on material default data "<<variable_name<<" spectrum default selected_material default_selected; \n"
+                       << "gfx modify g_element "<< this->mFileBaseName<<" node_points glyph point general size \"1*1*1\" centre 0,0,0 font default select_on material default data "<<variable_name<<" spectrum default selected_material default_selected; \n"
                        << "# Load the data \n"
                        << "for ($i=0; $i<" << num_timesteps << "; $i++) { \n"
                        << "    gfx read node " << this->mFileBaseName << "_$i.exnode time $i\n" // ...while the data file from mFileBaseName...

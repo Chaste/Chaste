@@ -55,8 +55,6 @@ class Test3DPerformance : public CxxTest::TestSuite
 public:
     void TestPerf()
     {
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         PetscTools::SetOption("-log_summary", "");
         // write headings
         PerformanceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3>::DisplayHeadings();
@@ -64,6 +62,8 @@ public:
 
         // base line test
         PerformanceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3> tester("Test3DPerf");
+        tester.KspSolverType = "symmlq";
+        tester.KspPreconditionerType = "bjacobi";
         tester.MeshNum=1;
         tester.SimTime=4.0;
         tester.Run();

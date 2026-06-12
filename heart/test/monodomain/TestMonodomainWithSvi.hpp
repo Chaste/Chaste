@@ -166,11 +166,6 @@ public:
 
 class TestMonodomainWithSvi : public CxxTest::TestSuite
 {
-    void setUp()
-    {
-        HeartConfig::Instance()->Reset();
-    }
-
 public:
     void TestConductionVelocityConvergesFasterWithSvi1d()
     {
@@ -182,10 +177,6 @@ public:
 
         ReplicatableVector final_voltage_ici;
         ReplicatableVector final_voltage_svi;
-
-        //HeartConfig::Instance()->SetUseRelativeTolerance(1e-8);
-        HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
 
         for (unsigned i=0; i<3; i++)
         {
@@ -202,14 +193,15 @@ public:
                 }
                 std::stringstream output_dir;
                 output_dir << "MonodomainIci_" << h[i];
-                HeartConfig::Instance()->SetOutputDirectory(output_dir.str());
-                HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
                 // need to have this for i=1,2 cases!!
-                HeartConfig::Instance()->SetUseStateVariableInterpolation(false);
-
                 BlockCellFactory<1> cell_factory;
                 MonodomainProblem<1> monodomain_problem( &cell_factory );
+                monodomain_problem.SetSimulationDuration(4.0); //ms
+                monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+                monodomain_problem.SetOutputDirectory(output_dir.str());
+                monodomain_problem.SetOutputFilenamePrefix("results");
+                monodomain_problem.SetUseStateVariableInterpolation(false);
                 monodomain_problem.SetMesh(&mesh);
                 monodomain_problem.Initialise();
 
@@ -242,13 +234,14 @@ public:
                 }
                 std::stringstream output_dir;
                 output_dir << "MonodomainSvi_" << h[i];
-                HeartConfig::Instance()->SetOutputDirectory(output_dir.str());
-                HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-                HeartConfig::Instance()->SetUseStateVariableInterpolation();
 
                 BlockCellFactory<1> cell_factory;
                 MonodomainProblem<1> monodomain_problem( &cell_factory );
+                monodomain_problem.SetSimulationDuration(4.0); //ms
+                monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+                monodomain_problem.SetOutputDirectory(output_dir.str());
+                monodomain_problem.SetOutputFilenamePrefix("results");
+                monodomain_problem.SetUseStateVariableInterpolation(true);
                 monodomain_problem.SetMesh(&mesh);
                 monodomain_problem.Initialise();
 
@@ -314,25 +307,21 @@ public:
         ReplicatableVector final_voltage_svi;
         ReplicatableVector final_voltage_svit;
 
-        HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
-        //HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0005, 0.01, 0.01); //See comment below
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.01);
-
-        // much lower conductivity in cross-fibre direction - ICI will struggle
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
-
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRegularSlabMesh(0.02 /*h*/, 0.5, 0.3);
 
         // ICI - nodal current interpolation - the default
         {
-            HeartConfig::Instance()->SetOutputDirectory("MonodomainIci2d");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-            HeartConfig::Instance()->SetUseStateVariableInterpolation(false);
-
             BlockCellFactory<2> cell_factory;
             MonodomainProblem<2> monodomain_problem( &cell_factory );
+            monodomain_problem.SetSimulationDuration(5.0); //ms
+            //monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.0005, 0.01, 0.01); //See comment below
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.01);
+            // much lower conductivity in cross-fibre direction - ICI will struggle
+            monodomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
+            monodomain_problem.SetOutputDirectory("MonodomainIci2d");
+            monodomain_problem.SetOutputFilenamePrefix("results");
+            monodomain_problem.SetUseStateVariableInterpolation(false);
             monodomain_problem.SetMesh(&mesh);
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
@@ -342,13 +331,14 @@ public:
 
         // SVI - state variable interpolation
         {
-            HeartConfig::Instance()->SetOutputDirectory("MonodomainSvi2d");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-            HeartConfig::Instance()->SetUseStateVariableInterpolation();
-
             BlockCellFactory<2> cell_factory;
             MonodomainProblem<2> monodomain_problem( &cell_factory );
+            monodomain_problem.SetSimulationDuration(5.0); //ms
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.01);
+            monodomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
+            monodomain_problem.SetOutputDirectory("MonodomainSvi2d");
+            monodomain_problem.SetOutputFilenamePrefix("results");
+            monodomain_problem.SetUseStateVariableInterpolation(true);
             monodomain_problem.SetMesh(&mesh);
             monodomain_problem.Initialise();
 
@@ -361,13 +351,14 @@ public:
         ReplicatableVector final_voltage_svi_cvode;
         // SVI - state variable interpolation with CVODE cells
         {
-            HeartConfig::Instance()->SetOutputDirectory("MonodomainSvi2dCvode");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-            HeartConfig::Instance()->SetUseStateVariableInterpolation();
-
             BlockCellFactoryCvode<2> cell_factory;
             MonodomainProblem<2> monodomain_problem( &cell_factory );
+            monodomain_problem.SetSimulationDuration(5.0); //ms
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.01);
+            monodomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
+            monodomain_problem.SetOutputDirectory("MonodomainSvi2dCvode");
+            monodomain_problem.SetOutputFilenamePrefix("results");
+            monodomain_problem.SetUseStateVariableInterpolation(true);
             monodomain_problem.SetMesh(&mesh);
             monodomain_problem.Initialise();
 
@@ -379,14 +370,14 @@ public:
 
         // SVIT - state variable interpolation on non-distributed tetrahedral mesh
         {
-
-            HeartConfig::Instance()->SetOutputDirectory("MonodomainSviTet2d");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-            HeartConfig::Instance()->SetUseStateVariableInterpolation();
-
             BlockCellFactory<2> cell_factory;
             MonodomainProblem<2> monodomain_problem( &cell_factory );
+            monodomain_problem.SetSimulationDuration(5.0); //ms
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.01);
+            monodomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
+            monodomain_problem.SetOutputDirectory("MonodomainSviTet2d");
+            monodomain_problem.SetOutputFilenamePrefix("results");
+            monodomain_problem.SetUseStateVariableInterpolation(true);
             monodomain_problem.SetMesh(&mesh);
             monodomain_problem.Initialise();
 
@@ -432,15 +423,14 @@ public:
 
     void TestCoverage3d()
     {
-        HeartConfig::Instance()->SetSimulationDuration(0.1); //ms
-        HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.1);
-
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructRegularSlabMesh(0.02, 0.02, 0.02, 0.02);
 
         ZeroStimulusCellFactory<CellLuoRudy1991FromCellML,3> cell_factory;
         MonodomainProblem<3> monodomain_problem( &cell_factory );
+        monodomain_problem.SetSimulationDuration(0.1); //ms
+        monodomain_problem.SetUseStateVariableInterpolation(true);
+        monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.1);
         monodomain_problem.SetMesh(&mesh);
         monodomain_problem.Initialise();
         monodomain_problem.Solve();
@@ -448,15 +438,14 @@ public:
 
     void TestWithHeterogeneousCellModels()
     {
-        HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
-        HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 1.0);
-
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(0.01, 1.0);
 
         HeterogeneousCellFactory cell_factory;
         MonodomainProblem<1> monodomain_problem( &cell_factory );
+        monodomain_problem.SetSimulationDuration(1.0); //ms
+        monodomain_problem.SetUseStateVariableInterpolation(true);
+        monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 1.0);
         monodomain_problem.SetMesh(&mesh);
         monodomain_problem.Initialise();
 
@@ -484,17 +473,16 @@ public:
         std::string output_dir = "monodomain_svi_output";
 
         { // Save
-            HeartConfig::Instance()->SetSimulationDuration(0.1); //ms
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
-            HeartConfig::Instance()->SetOutputDirectory(output_dir);
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-            HeartConfig::Instance()->SetUseStateVariableInterpolation();
-
             DistributedTetrahedralMesh<1,1> mesh;
             mesh.ConstructRegularSlabMesh(0.02, 1.0);
 
             BlockCellFactory<1> cell_factory;
             MonodomainProblem<1> monodomain_problem( &cell_factory );
+            monodomain_problem.SetSimulationDuration(0.1); //ms
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+            monodomain_problem.SetOutputDirectory(output_dir);
+            monodomain_problem.SetOutputFilenamePrefix("results");
+            monodomain_problem.SetUseStateVariableInterpolation(true);
             monodomain_problem.SetMesh(&mesh);
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
@@ -502,13 +490,10 @@ public:
             CardiacSimulationArchiver<MonodomainProblem<1> >::Save(monodomain_problem, archive_dir);
         }
 
-        HeartConfig::Instance()->Reset();
-
         { // Load
-            HeartConfig::Instance()->SetUseStateVariableInterpolation(false); // Just in case...
             MonodomainProblem<1> *p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<1> >::Load(archive_dir);
 
-            HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
+            p_monodomain_problem->SetSimulationDuration(4.0); //ms
             p_monodomain_problem->Solve();
 
             ReplicatableVector final_voltage;
@@ -534,24 +519,20 @@ public:
             TS_TRACE("This test is not suitable for more than 3 processes.");
             return;
         }
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(1); //ms
-//        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_20_elements");
-//        HeartConfig::Instance()->SetSpaceDimension(1);
-//        HeartConfig::Instance()->SetFibreLength(1.0, 1.0/20.0);
-        HeartConfig::Instance()->SetSpaceDimension(3);
-        HeartConfig::Instance()->SetSlabDimensions(0.2, 0.1, 0.1, 0.05);
-        HeartConfig::Instance()->SetOutputDirectory("MonoFailing");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_SVI");
-        HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
+        DistributedTetrahedralMesh<3,3> mesh;
+        mesh.ConstructRegularSlabMesh(0.05, 0.2, 0.1, 0.1);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory;
         MonodomainProblem<3> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005, 0.0005));
+        monodomain_problem.SetSimulationDuration(1); //ms
+        monodomain_problem.SetOutputDirectory("MonoFailing");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_SVI");
+        monodomain_problem.SetUseStateVariableInterpolation(true);
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetMesh(&mesh);
 
         monodomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-//        HeartConfig::Instance()->SetCapacitance(1.0);
 
         // the mesh is too coarse, and this simulation will result in cell gating
         // variables going out of range. An exception should be thrown in the

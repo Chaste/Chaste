@@ -57,9 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleStimulus.hpp"
 #include "EulerIvpOdeSolver.hpp"
 #include "ChasteBuildRoot.hpp"
-#include "HeartConfig.hpp"
 #include "FileFinder.hpp"
-#include "HeartFileFinder.hpp"
 #include "ChasteSyscalls.hpp"
 
 #include "AbstractDynamicallyLoadableEntity.hpp"

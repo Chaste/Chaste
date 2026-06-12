@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasIncludes.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-#include "HeartConfig.hpp"
 #include "SimpleStimulus.hpp"
 #include "ArchiveOpener.hpp"
 #include "LuoRudy1991.hpp"
@@ -199,21 +198,21 @@ private:
 
     unsigned mProbeNode; //probe node in the original mesh numbering
 
-    void SetupParameters()
+    template<class PROBLEM>
+    void SetupParameters(PROBLEM& rProblem)
     {
-        HeartConfig::Instance()->Reset();
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.5, 0.5));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(5.0, 5.0));
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1400.0);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-        HeartConfig::Instance()->SetKSPSolver("gmres");
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
-        HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
+        rProblem.SetIntracellularConductivities(Create_c_vector(0.5, 0.5));
+        rProblem.SetExtracellularConductivities(Create_c_vector(5.0, 5.0));
+        rProblem.SetSurfaceAreaToVolumeRatio(1400.0);
+        rProblem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        rProblem.SetCapacitance(1.0);
+        rProblem.SetKspSolverType("gmres");
+        rProblem.SetKspAbsoluteTolerance(1e-5);
+        rProblem.SetKspPreconditionerType("jacobi");
+        rProblem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
         //Dumb partitioning is needed because we unarchive only with dumb partitioning (see #1199).
         //This does not affect the hdf5 file, but it does affect the numbering of the node for the traces (which we test here).
-        HeartConfig::Instance()->SetMeshPartitioning("dumb");
+        rProblem.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::DUMB);
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,18 +221,15 @@ private:
 
     void RunFull2DSimulationIntraStim()
     {
-        SetupParameters();
-
-        HeartConfig::Instance()->SetSimulationDuration(5.0);
-
         StimulatedCellFactory stimulated_cell_factory;
         UnStimulatedCellFactory unstimulated_cell_factory;
 
-        HeartConfig::Instance()->SetOutputDirectory("Extended2DFull");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("extended2d");
-
         //stimulated cell factory passed in as second cell
         ExtendedBidomainProblem<2> extended_problem( &unstimulated_cell_factory,  &stimulated_cell_factory);
+        SetupParameters(extended_problem);
+        extended_problem.SetSimulationDuration(5.0);
+        extended_problem.SetOutputDirectory("Extended2DFull");
+        extended_problem.SetOutputFilenamePrefix("extended2d");
 
         //change some values of parameters
         extended_problem.SetExtendedBidomainParameters(1400, 1500, 1600, 1.0 , 1.0, 0.0);
@@ -259,18 +255,15 @@ private:
 
     void Run2DSimulationSaveAfterThreemilliSecondsIntraStim(FileFinder archive_dir, std::string archive_file)
     {
-        SetupParameters();
-
-        HeartConfig::Instance()->SetSimulationDuration(3.0);
-
         StimulatedCellFactory stimulated_cell_factory;
         UnStimulatedCellFactory unstimulated_cell_factory;
 
-        HeartConfig::Instance()->SetOutputDirectory("Extended2DArchived");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("extended2d");
-
         //stimulated cell factory passed in as second cell
         ExtendedBidomainProblem<2> extended_problem( &unstimulated_cell_factory,  &stimulated_cell_factory);
+        SetupParameters(extended_problem);
+        extended_problem.SetSimulationDuration(3.0);
+        extended_problem.SetOutputDirectory("Extended2DArchived");
+        extended_problem.SetOutputFilenamePrefix("extended2d");
 
         //change some values of parameters
         extended_problem.SetExtendedBidomainParameters(1400, 1500, 1600, 1.0 , 1.0, 0.0);
@@ -304,9 +297,6 @@ private:
 
         AbstractCardiacProblem<2,2,3> *p_problem;
         (*p_arch) >> p_problem;//load
-
-        //see if the heartconfig is saved properly
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetSimulationDuration(), 3.0);
 
         //check specific variables of the extended problem (need to do dynamic cast)
         ExtendedBidomainProblem<2>* p_extended_problem =  dynamic_cast<ExtendedBidomainProblem<2>*>(p_problem);
@@ -354,8 +344,8 @@ private:
         TS_ASSERT_EQUALS(global_size_second_cell, number_of_nodes);
         TS_ASSERT_EQUALS(global_size_extrastim, number_of_nodes);
 
-        //now solve for the remining 2 ms
-        HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
+        //now solve for the remaining 2 ms
+        p_problem->SetSimulationDuration(5.0); //ms
         p_problem->Solve();
         delete p_problem;
     }
@@ -368,19 +358,16 @@ private:
 
     void RunFull2DSimulationExtraStim()
     {
-        SetupParameters();
-
-        HeartConfig::Instance()->SetSimulationDuration(5.0);
-
         UnStimulatedCellFactory unstimulated_cell_factory_1;
         UnStimulatedCellFactory unstimulated_cell_factory_2;
         ExtracellularStimulusFactory extra_stim;
 
-        HeartConfig::Instance()->SetOutputDirectory("Extended2DFullExtraStim");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("extended2d");
-
         //stimulated cell factory passed in as second cell
         ExtendedBidomainProblem<2> extended_problem( &unstimulated_cell_factory_1,  &unstimulated_cell_factory_2);
+        SetupParameters(extended_problem);
+        extended_problem.SetSimulationDuration(5.0);
+        extended_problem.SetOutputDirectory("Extended2DFullExtraStim");
+        extended_problem.SetOutputFilenamePrefix("extended2d");
         extended_problem.SetExtracellularStimulusFactory(&extra_stim);
 
         //change some values of parameters
@@ -396,18 +383,15 @@ private:
     }
     void Run2DSimulationSaveAfterThreemilliSecondsExtraStim(FileFinder archive_dir, std::string archive_file)
     {
-        SetupParameters();
-
-        HeartConfig::Instance()->SetSimulationDuration(3.0);
-
         UnStimulatedCellFactory unstimulated_cell_factory_1;
         UnStimulatedCellFactory unstimulated_cell_factory_2;
         ExtracellularStimulusFactory extra_stim;
 
-        HeartConfig::Instance()->SetOutputDirectory("Extended2DArchivedExtraStim");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("extended2d");
-
         ExtendedBidomainProblem<2> extended_problem( &unstimulated_cell_factory_1,  &unstimulated_cell_factory_2);
+        SetupParameters(extended_problem);
+        extended_problem.SetSimulationDuration(3.0);
+        extended_problem.SetOutputDirectory("Extended2DArchivedExtraStim");
+        extended_problem.SetOutputFilenamePrefix("extended2d");
         extended_problem.SetExtracellularStimulusFactory(&extra_stim);
 
         //change some values of parameters
@@ -433,11 +417,10 @@ private:
         AbstractCardiacProblem<2,2,3> *p_problem;
         (*p_arch) >> p_problem;//load
 
-        //see if the heartconfig is saved properly
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetSimulationDuration(), 3.0);
-
         //check specific variables of the extended problem (need to do dynamic cast)
         ExtendedBidomainProblem<2>* p_extended_problem =  dynamic_cast<ExtendedBidomainProblem<2>*>(p_problem);
+        //see if the simulation duration is saved properly
+        TS_ASSERT_EQUALS(p_problem->GetSimulationDuration(), 3.0);
         TS_ASSERT_EQUALS(p_extended_problem->GetHasBath(), false);
         TS_ASSERT_EQUALS(p_extended_problem->mUserSpecifiedSecondCellConductivities, true);
         TS_ASSERT_EQUALS(p_extended_problem->mAmFirstCell, 1800);
@@ -476,7 +459,7 @@ private:
         TS_ASSERT_EQUALS(global_size_extrastim, number_of_nodes);
 
         //now solve for the remining 2 ms
-        HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
+        p_problem->SetSimulationDuration(5.0); //ms
         p_problem->Solve();
         delete p_problem;
     }

@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/split_member.hpp>
 
 #include <vector>
 #include "UblasMatrixInclude.hpp"
@@ -68,14 +69,30 @@ private:
      * @param version
      */
     template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    void save(Archive & archive, const unsigned int version) const
     {
         archive & boost::serialization::base_object<AbstractCardiacTissue<SPACE_DIM> >(*this);
-        // Conductivity tensors are dealt with by HeartConfig, and the caches get regenerated.
+        archive & mDefaultExtraConductivities;
     }
+
+    template<class Archive>
+    void load(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractCardiacTissue<SPACE_DIM> >(*this);
+        archive & mDefaultExtraConductivities;
+        // mpExtracellularConductivityTensors is reconstructed from archived parameters.
+        delete mpExtracellularConductivityTensors;
+        mpExtracellularConductivityTensors = nullptr;
+        CreateExtracellularConductivityTensors();
+    }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     /** Extracellular conductivity tensors. */
     AbstractConductivityTensors<SPACE_DIM,SPACE_DIM> *mpExtracellularConductivityTensors;
+
+    /** Default extracellular conductivities (mS/cm). Default: 7.0 in all directions. */
+    c_vector<double, SPACE_DIM> mDefaultExtraConductivities;
 
     /**
      * Convenience method for extracellular conductivity tensors creation
@@ -107,6 +124,18 @@ public:
      * @param elementIndex  index of the element of interest
      */
      const c_matrix<double, SPACE_DIM, SPACE_DIM>& rGetExtracellularConductivityTensor(unsigned elementIndex);
+
+    /**
+     * Set the default extracellular conductivities (mS/cm).
+     * @param rConductivities  conductivity vector
+     */
+    void SetExtracellularConductivities(const c_vector<double, SPACE_DIM>& rConductivities);
+
+    /**
+     * Rebuild the extracellular conductivity tensors using the current default conductivities.
+     * Call this after SetExtracellularConductivities() to apply the new values.
+     */
+    void RebuildExtracellularConductivityTensors();
 };
 
 // Declare identifier for the serializer
@@ -124,12 +153,7 @@ inline void save_construct_data(
 {
     const AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* p_mesh = t->pGetMesh();
     ar & p_mesh;
-
-    // CreateIntracellularConductivityTensor() is called by constructor and uses HeartConfig. So make sure that it is
-    // archived too (needs doing before construction so appears here instead of usual archive location).
-    HeartConfig* p_config = HeartConfig::Instance();
-    ar & *p_config;
-    ar & p_config;
+    // Conductivity parameters are archived by AbstractCardiacTissue::save().
 }
 
 /**
@@ -142,13 +166,7 @@ inline void load_construct_data(
 {
     AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* p_mesh;
     ar & p_mesh;
-
-    // CreateIntracellularConductivityTensor() is called by AbstractCardiacTissue constructor and uses HeartConfig.
-    // (as does CreateExtracellularConductivityTensor). So make sure that it is
-    // archived too (needs doing before construction so appears here instead of usual archive location).
-    HeartConfig* p_config = HeartConfig::Instance();
-    ar & *p_config;
-    ar & p_config;
+    // Conductivity parameters are restored by AbstractCardiacTissue::load().
 
     ::new(t)BidomainTissue<SPACE_DIM>(p_mesh);
 }

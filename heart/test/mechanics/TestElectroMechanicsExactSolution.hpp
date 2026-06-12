@@ -137,8 +137,6 @@ public:
         MechanicsEventHandler::Reset();
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(0.0);
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-
 
         TetrahedralMesh<2,2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.02, 1.0, 1.0);
@@ -182,6 +180,7 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestElectroMechanicsExactSolution");
+        problem.GetElectricsProblem()->SetSimulationDuration(1.0);
 
         problem.Initialise();
 

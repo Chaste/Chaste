@@ -42,28 +42,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::CreateCardiacTissue()
 {
-    return new MonodomainTissue<ELEMENT_DIM,SPACE_DIM>(this->mpCellFactory, HeartConfig::Instance()->GetUseStateVariableInterpolation());
+    return new MonodomainTissue<ELEMENT_DIM,SPACE_DIM>(this->mpCellFactory, this->mUseStateVariableInterpolation);
 }
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>* MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::CreateSolver()
 {
-    assert(!HeartConfig::Instance()->GetUseReactionDiffusionOperatorSplitting());
+    assert(!this->mUseReactionDiffusionOperatorSplitting);
     MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* p_mesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>*>(this->mpMesh);
     EXCEPT_IF_NOT(p_mesh); ///\todo #2017 give a nice error
     MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* p_tissue = dynamic_cast<MonodomainTissue<ELEMENT_DIM,SPACE_DIM>*>(this->GetTissue());
     assert(p_tissue);
-    return new MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>(p_mesh,
-                                                               p_tissue,
-                                                               this->mpBoundaryConditionsContainer.get());
+    MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>* p_solver =
+        new MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>(p_mesh,
+                                                            p_tissue,
+                                                            this->mpBoundaryConditionsContainer.get());
+    p_solver->SetKspConfig(this->mUseAbsoluteTolerance, this->mKspAbsoluteTolerance,
+                           this->mKspRelativeTolerance, this->mKspSolver, this->mKspPreconditioner,
+                           this->mUseMassLumping, this->mUseMassLumpingForPrecond,
+                           this->mUseFixedNumberIterations, this->mEvaluateNumItsEveryNSolves,
+                           this->mUseStateVariableInterpolation,
+                           mPurkinjeSurfaceAreaToVolumeRatio);
+    return p_solver;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MonodomainPurkinjeProblem<ELEMENT_DIM,SPACE_DIM>::CreateMeshFromHeartConfig()
-{
-    this->mpMesh = new MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>(HeartConfig::Instance()->GetMeshPartitioning());
-}
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -90,9 +93,17 @@ Vec MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::CreateInitialCondition()
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::SetPurkinjeSurfaceAreaToVolumeRatio(double ratio)
+{
+    mPurkinjeSurfaceAreaToVolumeRatio = ratio;
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem(AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory)
         : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>(pCellFactory),
-          mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
+          mPurkinjeVoltageColumnId(UNSIGNED_UNSET),
+          mPurkinjeSurfaceAreaToVolumeRatio(2800.0)
 {
 }
 
@@ -101,7 +112,8 @@ MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem(Abs
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem()
     : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>(),
-      mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
+      mPurkinjeVoltageColumnId(UNSIGNED_UNSET),
+      mPurkinjeSurfaceAreaToVolumeRatio(2800.0)
 {
 }
 // LCOV_EXCL_STOP

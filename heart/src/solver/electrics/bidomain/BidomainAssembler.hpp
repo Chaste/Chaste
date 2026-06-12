@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCardiacFeVolumeIntegralAssembler.hpp"
 #include "BidomainTissue.hpp"
-#include "HeartConfig.hpp"
 
 /**
  *  Assembler, used for assembling the LHS matrix of the linear system

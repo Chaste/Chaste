@@ -86,17 +86,16 @@ class TestMonodomainWithTimeAdaptivity : public CxxTest::TestSuite
 public:
     void TestWithCube()
     {
-        HeartConfig::Instance()->SetPrintingTimeStep(1.0);
-        HeartConfig::Instance()->SetSimulationDuration(3); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-600.0*1000);
 
         //////////////////////////////////////////////////////////////////////////
         // run original simulation - no adaptivity, dt=0.01 all the way through
         //////////////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOutputDirectory("MonoWithTimeAdaptivity/OrigNoAdapt");
         MonodomainProblem<3> problem(&cell_factory);
+        problem.SetPrintingTimeStep(1.0);
+        problem.SetSimulationDuration(3); //ms
+        problem.SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
+        problem.SetOutputDirectory("MonoWithTimeAdaptivity/OrigNoAdapt");
         problem.Initialise();
         problem.Solve();
 
@@ -114,8 +113,11 @@ public:
         //////////////////////////////////////////////////////////////////////////
         // run adaptive simulation - dt=0.01 for first 2ms, then dt=1
         //////////////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOutputDirectory("MonoWithTimeAdaptivity/SimpleAdapt");
         MonodomainProblem<3> adaptive_problem(&cell_factory);
+        adaptive_problem.SetPrintingTimeStep(1.0);
+        adaptive_problem.SetSimulationDuration(3); //ms
+        adaptive_problem.SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
+        adaptive_problem.SetOutputDirectory("MonoWithTimeAdaptivity/SimpleAdapt");
         FixedTimeAdaptivityController controller(2.0);
         adaptive_problem.SetUseTimeAdaptivityController(true, &controller);
         adaptive_problem.Initialise();
@@ -143,14 +145,6 @@ public:
 
     void TestWithChebyshevAndFixedIterations()
     {
-        HeartConfig::Instance()->Reset();
-        HeartConfig::Instance()->SetPrintingTimeStep(1.0);
-        HeartConfig::Instance()->SetSimulationDuration(3); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
-
-        HeartConfig::Instance()->SetKSPSolver("chebychev");
-        HeartConfig::Instance()->SetUseFixedNumberIterationsLinearSolver(true, 30);
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-600.0*1000);
 
         double min_non_adaptive;
@@ -164,8 +158,13 @@ public:
             // run original simulation - no adaptivity, dt=0.01 all the way through
             //////////////////////////////////////////////////////////////////////////
             {
-                HeartConfig::Instance()->SetOutputDirectory("MonoWithTimeAdaptivityOrigNoAdapt");
                 MonodomainProblem<3> problem(&cell_factory);
+                problem.SetPrintingTimeStep(1.0);
+                problem.SetSimulationDuration(3); //ms
+                problem.SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
+                problem.SetOutputDirectory("MonoWithTimeAdaptivityOrigNoAdapt");
+                problem.SetKspSolverType("chebychev");
+                problem.SetUseFixedNumberIterationsLinearSolver(true, 30);
                 problem.Initialise();
                 problem.Solve();
 
@@ -189,8 +188,13 @@ public:
             // run adaptive simulation - dt=0.01 for first 2ms, then dt=1
             //////////////////////////////////////////////////////////////////////////
             {
-                HeartConfig::Instance()->SetOutputDirectory("MonoWithTimeAdaptivitySimpleAdapt");
                 MonodomainProblem<3> adaptive_problem(&cell_factory);
+                adaptive_problem.SetPrintingTimeStep(1.0);
+                adaptive_problem.SetSimulationDuration(3); //ms
+                adaptive_problem.SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
+                adaptive_problem.SetOutputDirectory("MonoWithTimeAdaptivitySimpleAdapt");
+                adaptive_problem.SetKspSolverType("chebychev");
+                adaptive_problem.SetUseFixedNumberIterationsLinearSolver(true, 30);
                 FixedTimeAdaptivityController controller(2.0);
                 adaptive_problem.SetUseTimeAdaptivityController(true, &controller);
                 adaptive_problem.Initialise();

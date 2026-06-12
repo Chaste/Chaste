@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MONODOMAINPURKINJECABLEMASSMATRIXASSEMBLER_HPP_
 
 #include "AbstractFeCableIntegralAssembler.hpp"
-#include "HeartConfig.hpp"
 
 /**
  * Simple implementation of AbstractFeCableIntegralAssembler which provides the cable part of the Monodomain mass matrix

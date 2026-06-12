@@ -37,7 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCARDIACPROBLEM_HPP_
 #define ABSTRACTCARDIACPROBLEM_HPP_
 
+#include <map>
+#include <set>
 #include <string>
+#include <utility>
 #include <vector>
 #include <cassert>
 #include <climits>
@@ -48,15 +51,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/set.hpp>
+#include <boost/serialization/utility.hpp>
 #include "ClassIsAbstract.hpp"
 #include "ChasteSerializationVersion.hpp"
 
+#include "UblasVectorInclude.hpp"
+#include "AbstractChasteRegion.hpp"
 #include "AbstractTetrahedralMesh.hpp"
 #include "AbstractCardiacCell.hpp"
 #include "AbstractCardiacCellFactory.hpp"
 #include "AbstractCardiacTissue.hpp"
 #include "AbstractDynamicLinearPdeSolver.hpp"
 #include "BoundaryConditionsContainer.hpp"
+#include "ChastePoint.hpp"
+#include "DistributedTetrahedralMeshPartitionType.hpp"
 #include "DistributedVectorFactory.hpp"
 #include "Hdf5DataReader.hpp"
 #include "Hdf5DataWriter.hpp"
@@ -85,7 +95,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BidomainTissue.hpp"
 
 /**
- * Empty untemplated base class so that CardiacSimulation::GetSavedProblem can work.
+ * Empty untemplated base class so that CardiacSimulationArchiver can work with problem pointers.
  */
 class AbstractUntemplatedCardiacProblem : private boost::noncopyable
 {
@@ -102,11 +112,8 @@ public:
  * This class contains the tissue (PDEs and 'cells' ODEs),
  * boundary conditions, and postprocessing/results writers.
  *
- * It is called by CardiacSimulation, which is the outer wrapper class
- * for running a cardiac simulation, used by the executable.
- *
- * Many non-standard simulations will use this class directly,
- * and this is the preferred method for non-executable users.
+ * Many non-standard simulations will use this class directly.
+ * See tutorials for usage.
  * See tutorials for usage.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
@@ -211,6 +218,47 @@ private:
         {
             archive & mUseHdf5DataWriterCache;
             archive & mHdf5DataWriterChunkSizeAndAlignment;
+        }
+
+        if (version >= 5)
+        {
+            archive & mSimulationDuration;
+            archive & mOdeTimeStep;
+            archive & mPdeTimeStep;
+            archive & mPrintingTimeStep;
+            archive & mOutputDirectory;
+            archive & mOutputFilenamePrefix;
+            archive & mOutputVariables;
+            archive & mOutputUsingOriginalNodeOrdering;
+            archive & mVisualizeWithMeshalyzer;
+            archive & mVisualizeWithCmgui;
+            archive & mVisualizeWithVtk;
+            archive & mVisualizeWithParallelVtk;
+            archive & mVisualizerOutputPrecision;
+            archive & mCheckpointSimulation;
+            archive & mCheckpointTimestep;
+            archive & mMaxCheckpointsOnDisk;
+            archive & mUseAbsoluteTolerance;
+            archive & mKspAbsoluteTolerance;
+            archive & mKspRelativeTolerance;
+            archive & mKspSolver;
+            archive & mKspPreconditioner;
+            archive & mUseMassLumping;
+            archive & mUseMassLumpingForPrecond;
+            archive & mUseFixedNumberIterations;
+            archive & mEvaluateNumItsEveryNSolves;
+            archive & mUseStateVariableInterpolation;
+            archive & mUseReactionDiffusionOperatorSplitting;
+            archive & mSurfaceAreaToVolumeRatio;
+            archive & mCapacitance;
+            archive & mApdMaps;
+            archive & mUpstrokeTimeMaps;
+            archive & mMaxUpstrokeVelocityMaps;
+            archive & mConductionVelocityMaps;
+            archive & mNodalTimeTraces;
+            archive & mTissueIdentifiers;
+            archive & mBathIdentifiers;
+            archive & mBathConductivities;
         }
     }
 
@@ -337,6 +385,47 @@ private:
             archive & mUseHdf5DataWriterCache;
             archive & mHdf5DataWriterChunkSizeAndAlignment;
         }
+
+        if (version >= 5)
+        {
+            archive & mSimulationDuration;
+            archive & mOdeTimeStep;
+            archive & mPdeTimeStep;
+            archive & mPrintingTimeStep;
+            archive & mOutputDirectory;
+            archive & mOutputFilenamePrefix;
+            archive & mOutputVariables;
+            archive & mOutputUsingOriginalNodeOrdering;
+            archive & mVisualizeWithMeshalyzer;
+            archive & mVisualizeWithCmgui;
+            archive & mVisualizeWithVtk;
+            archive & mVisualizeWithParallelVtk;
+            archive & mVisualizerOutputPrecision;
+            archive & mCheckpointSimulation;
+            archive & mCheckpointTimestep;
+            archive & mMaxCheckpointsOnDisk;
+            archive & mUseAbsoluteTolerance;
+            archive & mKspAbsoluteTolerance;
+            archive & mKspRelativeTolerance;
+            archive & mKspSolver;
+            archive & mKspPreconditioner;
+            archive & mUseMassLumping;
+            archive & mUseMassLumpingForPrecond;
+            archive & mUseFixedNumberIterations;
+            archive & mEvaluateNumItsEveryNSolves;
+            archive & mUseStateVariableInterpolation;
+            archive & mUseReactionDiffusionOperatorSplitting;
+            archive & mSurfaceAreaToVolumeRatio;
+            archive & mCapacitance;
+            archive & mApdMaps;
+            archive & mUpstrokeTimeMaps;
+            archive & mMaxUpstrokeVelocityMaps;
+            archive & mConductionVelocityMaps;
+            archive & mNodalTimeTraces;
+            archive & mTissueIdentifiers;
+            archive & mBathIdentifiers;
+            archive & mBathConductivities;
+        }
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -452,15 +541,6 @@ protected:
     virtual AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* CreateSolver() =0;
 
     /**
-     * Subclasses must override this method to create a suitable mesh object.
-     *
-     * Only needed if the subclass needs something other than a DistributedTetrahedralMesh.
-     *
-     * This class will take responsibility for freeing the object when it is finished with.
-     */
-    virtual void CreateMeshFromHeartConfig();
-
-    /**
      * CardiacElectroMechanicsProblem needs access to #mpWriter.
      */
     template<unsigned DIM, unsigned ELEC_PROB_DIM>
@@ -485,6 +565,122 @@ protected:
      * A vector of user-defined output modifiers which may be used to produce lightweight on the fly output
      */
     std::vector<boost::shared_ptr<AbstractOutputModifier> > mOutputModifiers;
+
+    // -----------------------------------------------------------------------
+    // Simulation settings owned by the problem object
+    // -----------------------------------------------------------------------
+
+    /** Total simulation duration (ms). Must be set before calling Solve(). */
+    double mSimulationDuration;
+
+    /** ODE time step (ms). Default 0.01. */
+    double mOdeTimeStep;
+    /** PDE time step (ms). Default 0.01. */
+    double mPdeTimeStep;
+    /** Printing (output sampling) time step (ms). Default 0.01. */
+    double mPrintingTimeStep;
+
+    /** Directory for HDF5 output (relative to CHASTE_TEST_OUTPUT). Default "ChasteResults". */
+    std::string mOutputDirectory;
+    /** Filename prefix for output files. Default "SimulationResults". */
+    std::string mOutputFilenamePrefix;
+    /** Extra cell-model state variables to write to HDF5. */
+    std::vector<std::string> mOutputVariables;
+    /** Whether to write HDF5 using the original (pre-partition) node ordering. */
+    bool mOutputUsingOriginalNodeOrdering;
+
+    /** Write Meshalyzer visualisation files after the simulation. */
+    bool mVisualizeWithMeshalyzer;
+    /** Write Cmgui visualisation files after the simulation. */
+    bool mVisualizeWithCmgui;
+    /** Write VTK visualisation files after the simulation. */
+    bool mVisualizeWithVtk;
+    /** Write parallel VTK visualisation files after the simulation. */
+    bool mVisualizeWithParallelVtk;
+    /** Number of significant digits for visualiser output (0 = default precision). */
+    unsigned mVisualizerOutputPrecision;
+
+    /** Whether to write simulation checkpoint archives. */
+    bool mCheckpointSimulation;
+    /** How often to write a checkpoint (ms). Ignored if mCheckpointSimulation is false. */
+    double mCheckpointTimestep;
+    /** Maximum number of checkpoint archives to keep on disk. */
+    unsigned mMaxCheckpointsOnDisk;
+
+    /** Mesh partitioning method. Default parmetis. */
+    DistributedTetrahedralMeshPartitionType::type mMeshPartitioning;
+
+    /** Whether to use an absolute (true) or relative (false) KSP tolerance. */
+    bool mUseAbsoluteTolerance;
+    /** KSP absolute tolerance. Default 2e-4. */
+    double mKspAbsoluteTolerance;
+    /** KSP relative tolerance. Only used when mUseAbsoluteTolerance is false. Default 1e-6. */
+    double mKspRelativeTolerance;
+    /** KSP solver type string (e.g. "cg", "gmres"). Default "cg". */
+    std::string mKspSolver;
+    /** KSP preconditioner type string (e.g. "bjacobi", "hypre"). Default "bjacobi". */
+    std::string mKspPreconditioner;
+    /** Use mass-lumped FE matrices in the solver. */
+    bool mUseMassLumping;
+    /** Use mass-lumped matrices in the preconditioner only. */
+    bool mUseMassLumpingForPrecond;
+    /** Use a fixed number of KSP iterations (evaluated periodically). */
+    bool mUseFixedNumberIterations;
+    /** Re-evaluate the iteration count every N solves when using fixed iterations. */
+    unsigned mEvaluateNumItsEveryNSolves;
+
+    /** Use state-variable interpolation in the PDE assembler. */
+    bool mUseStateVariableInterpolation;
+    /** Use reaction-diffusion operator splitting (Strang splitting). */
+    bool mUseReactionDiffusionOperatorSplitting;
+
+    /** Surface-area-to-volume ratio Am (1/cm). Default 1400. */
+    double mSurfaceAreaToVolumeRatio;
+    /** Membrane capacitance Cm (uF/cm^2). Default 1.0. */
+    double mCapacitance;
+
+    /** Intracellular conductivities (mS/cm), long/trans/normal. Default 1.75 all. */
+    c_vector<double, SPACE_DIM> mIntraConductivitiesOrthotropic;
+    /** Extracellular conductivities (mS/cm), long/trans/normal. Default 7.0 all. Only used in bidomain. */
+    c_vector<double, SPACE_DIM> mExtraConductivitiesOrthotropic;
+    /**
+     * Path to a fibre orientation file (without extension); empty string means no fibre
+     * orientation will be loaded (isotropic media assumed).
+     */
+    std::string mFibreFilePath;
+    /**
+     * Fibre orientation media type: empty string = no fibres, "ortho" = orthotropic,
+     * "axi" = axisymmetric.
+     */
+    std::string mFibreFileType;
+
+    /**
+     * Conductivity heterogeneity regions (axis-aligned boxes or ellipsoids) and their
+     * intracellular/extracellular conductivity vectors.
+     */
+    std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > mConductivityHeterogeneityAreas;
+    std::vector<c_vector<double, SPACE_DIM> > mConductivityHeterogeneityIntra;
+    std::vector<c_vector<double, SPACE_DIM> > mConductivityHeterogeneityExtra;
+
+    /** APD map requests: each entry is (repolarisation_percentage, threshold_mV). */
+    std::vector<std::pair<double,double> > mApdMaps;
+    /** Upstroke-time map threshold values (mV). */
+    std::vector<double> mUpstrokeTimeMaps;
+    /** Maximum-upstroke-velocity map threshold values (mV). */
+    std::vector<double> mMaxUpstrokeVelocityMaps;
+    /** Conduction-velocity map source node indices. */
+    std::vector<unsigned> mConductionVelocityMaps;
+    /** Node indices for nodal time-trace output. */
+    std::vector<unsigned> mNodalTimeTraces;
+    /** Pseudo-ECG electrode positions. */
+    std::vector<ChastePoint<SPACE_DIM> > mPseudoEcgElectrodePositions;
+
+    /** Region identifiers that denote cardiac tissue (default: {0}). */
+    std::set<unsigned> mTissueIdentifiers;
+    /** Region identifiers that denote perfusing bath (default: {1}). */
+    std::set<unsigned> mBathIdentifiers;
+    /** Per-bath-region conductivities (mS/cm). Keyed by region identifier. */
+    std::map<unsigned, double> mBathConductivities;
 
 public:
     /**
@@ -556,6 +752,15 @@ public:
      * @param pMesh  the mesh object to use
      */
     void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+
+    /**
+     * Load the mesh from a file during Initialise().  The file is read using
+     * GenericMeshReader and a DistributedTetrahedralMesh is created with the
+     * partitioning set by SetMeshPartitioning() (default: PARMETIS_LIBRARY).
+     * SetMesh() takes precedence if both are called.
+     * @param rFilePath  path to the mesh file (no extension)
+     */
+    void SetMeshFileName(const std::string& rFilePath);
 
     /**
      *  Set whether the simulation will generate results files.
@@ -800,6 +1005,221 @@ public:
     {
         mOutputModifiers.push_back(pOutputModifier);
     }
+
+    // -----------------------------------------------------------------------
+    // Setters for simulation settings
+    // -----------------------------------------------------------------------
+
+    /** @param duration  total simulation duration (ms) */
+    void SetSimulationDuration(double duration);
+
+    /**
+     * Set ODE, PDE and printing (sampling) time steps.
+     * @param odeTimeStep   ODE time step (ms)
+     * @param pdeTimeStep   PDE time step (ms)
+     * @param printingTimeStep  output sampling time step (ms)
+     */
+    void SetOdePdeAndPrintingTimeSteps(double odeTimeStep, double pdeTimeStep, double printingTimeStep);
+
+    /** @param odeTimeStep  ODE time step (ms) */
+    void SetOdeTimeStep(double odeTimeStep);
+    /** @param pdeTimeStep  PDE time step (ms) */
+    void SetPdeTimeStep(double pdeTimeStep);
+    /** @param printingTimeStep  output sampling time step (ms) */
+    void SetPrintingTimeStep(double printingTimeStep);
+
+    /** @return simulation duration (ms) */
+    double GetSimulationDuration() const;
+    /** @return ODE time step (ms) */
+    double GetOdeTimeStep() const;
+    /** @return PDE time step (ms) */
+    double GetPdeTimeStep() const;
+    /** @return printing (sampling) time step (ms) */
+    double GetPrintingTimeStep() const;
+
+    /** @param rOutputDirectory  output directory (relative to CHASTE_TEST_OUTPUT) */
+    void SetOutputDirectory(const std::string& rOutputDirectory);
+    /** @param rPrefix  filename prefix for output files */
+    void SetOutputFilenamePrefix(const std::string& rPrefix);
+    /** @param rVariables  names of extra cell-model variables to write to HDF5 */
+    void SetOutputVariables(const std::vector<std::string>& rVariables);
+    /** @param useOriginal  whether to write HDF5 using original (pre-partition) node ordering */
+    void SetOutputUsingOriginalNodeOrdering(bool useOriginal);
+
+    /** @return output directory */
+    std::string GetOutputDirectory() const;
+    /** @return output filename prefix */
+    std::string GetOutputFilenamePrefix() const;
+    /** @return whether HDF5 output uses original (pre-partition) node ordering */
+    bool GetOutputUsingOriginalNodeOrdering() const;
+
+    /** @param vis  whether to write Meshalyzer visualisation files (default true) */
+    void SetVisualizeWithMeshalyzer(bool vis = true);
+    /** @param vis  whether to write Cmgui visualisation files (default true) */
+    void SetVisualizeWithCmgui(bool vis = true);
+    /** @param vis  whether to write VTK visualisation files (default true) */
+    void SetVisualizeWithVtk(bool vis = true);
+    /** @param vis  whether to write parallel VTK visualisation files (default true) */
+    void SetVisualizeWithParallelVtk(bool vis = true);
+    /** @param precision  number of significant digits for visualiser output (0 = default) */
+    void SetVisualizerOutputPrecision(unsigned precision);
+
+    /**
+     * Configure simulation checkpointing.
+     * @param checkpointSimulation  whether to write checkpoint archives
+     * @param checkpointTimestep   how often to write a checkpoint (ms)
+     * @param maxCheckpointsOnDisk  maximum archives to keep on disk
+     */
+    void SetCheckpointSimulation(bool checkpointSimulation, double checkpointTimestep = -1.0, unsigned maxCheckpointsOnDisk = UINT_MAX);
+
+    /** @param method  mesh partitioning method */
+    void SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::type method);
+
+    /** Use an absolute KSP tolerance. @param tol  absolute tolerance */
+    void SetKspAbsoluteTolerance(double tol);
+    /** Use a relative KSP tolerance. @param tol  relative tolerance */
+    void SetKspRelativeTolerance(double tol);
+    /** @return KSP absolute tolerance (only meaningful when mUseAbsoluteTolerance is true) */
+    double GetKspAbsoluteTolerance() const;
+    /** @return true if using absolute KSP tolerance, false if using relative */
+    bool GetUseAbsoluteTolerance() const;
+    /** @param solver  KSP solver type string, e.g. "cg", "gmres" */
+    void SetKspSolverType(const std::string& solver);
+    /** @param preconditioner  KSP preconditioner string, e.g. "bjacobi", "hypre" */
+    void SetKspPreconditionerType(const std::string& preconditioner);
+    /** @param useLumping  whether to use mass-lumped FE matrices */
+    void SetUseMassLumping(bool useLumping = true);
+    /** @param useLumping  whether to use mass-lumped preconditioner only */
+    void SetUseMassLumpingForPrecond(bool useLumping = true);
+    /**
+     * Use a fixed number of KSP iterations (re-evaluated every N solves).
+     * @param useFixedIts  whether to use fixed iterations
+     * @param evaluateEvery  re-evaluate iteration count every this many solves
+     */
+    void SetUseFixedNumberIterationsLinearSolver(bool useFixedIts, unsigned evaluateEvery = 1);
+
+    /** @param use  whether to use state-variable interpolation in the PDE assembler */
+    void SetUseStateVariableInterpolation(bool use = true);
+    /** @param use  whether to use Strang reaction-diffusion operator splitting */
+    void SetUseReactionDiffusionOperatorSplitting(bool use = true);
+
+    /** @param ratio  surface-area-to-volume ratio Am (1/cm) */
+    void SetSurfaceAreaToVolumeRatio(double ratio);
+    /** @return surface-area-to-volume ratio Am (1/cm) */
+    double GetSurfaceAreaToVolumeRatio() const;
+
+    /** @param capacitance  membrane capacitance Cm (uF/cm^2) */
+    void SetCapacitance(double capacitance);
+    /** @return membrane capacitance Cm (uF/cm^2) */
+    double GetCapacitance() const;
+
+    /**
+     * Request an action potential duration (APD) map to be computed after the simulation.
+     * @param repolarisationPct  repolarisation percentage in [1, 100)
+     * @param threshold  threshold voltage (mV) for detecting depolarisation
+     */
+    void AddApdMap(double repolarisationPct, double threshold);
+
+    /**
+     * Request an upstroke time map after the simulation.
+     * @param threshold  voltage threshold (mV)
+     */
+    void AddUpstrokeTimeMap(double threshold);
+
+    /**
+     * Request a maximum upstroke velocity map after the simulation.
+     * @param threshold  voltage threshold (mV)
+     */
+    void AddMaxUpstrokeVelocityMap(double threshold);
+
+    /**
+     * Request a conduction velocity map from a given source node.
+     * @param sourceNode  node index to treat as the wave source
+     */
+    void AddConductionVelocityMap(unsigned sourceNode);
+
+    /**
+     * Request a nodal time trace for a given node.
+     * @param nodeIndex  global node index
+     */
+    void AddNodalTimeTrace(unsigned nodeIndex);
+
+    /**
+     * Add a pseudo-ECG electrode position.
+     * @param rPosition  position of the electrode
+     */
+    void AddPseudoEcgElectrode(const ChastePoint<SPACE_DIM>& rPosition);
+
+    /** Set intracellular conductivities (mS/cm).  Component order: longitudinal, transverse, normal.
+     *  @param rConductivities  conductivity vector of length SPACE_DIM (mS/cm) */
+    void SetIntracellularConductivities(const c_vector<double, SPACE_DIM>& rConductivities)
+    {
+        mIntraConductivitiesOrthotropic = rConductivities;
+    }
+
+    /** Get intracellular conductivities (mS/cm) into the provided vector.
+     *  @param rIntraConductivities  output vector of length SPACE_DIM */
+    void GetIntracellularConductivities(c_vector<double, SPACE_DIM>& rIntraConductivities) const
+    {
+        rIntraConductivities = mIntraConductivitiesOrthotropic;
+    }
+
+    /** Set extracellular conductivities (mS/cm).  Only relevant for bidomain or extended-bidomain.
+     *  @param rConductivities  conductivity vector of length SPACE_DIM (mS/cm) */
+    void SetExtracellularConductivities(const c_vector<double, SPACE_DIM>& rConductivities)
+    {
+        mExtraConductivitiesOrthotropic = rConductivities;
+    }
+
+    /** Get extracellular conductivities (mS/cm) into the provided vector.
+     *  Only relevant for bidomain or extended-bidomain.
+     *  @param rExtraConductivities  output vector of length SPACE_DIM */
+    void GetExtracellularConductivities(c_vector<double, SPACE_DIM>& rExtraConductivities) const
+    {
+        rExtraConductivities = mExtraConductivitiesOrthotropic;
+    }
+
+    /**
+     * Specify a fibre orientation file for conductivity anisotropy.
+     * @param rFilePath  path to the file without extension (e.g. "mesh/heart_fibres")
+     * @param rFileType  "ortho" for orthotropic (.ortho file) or "axi" for axisymmetric (.axi file)
+     */
+    void SetFibreOrientationFile(const std::string& rFilePath, const std::string& rFileType);
+
+    /**
+     * Add a conductivity heterogeneity region.
+     * @param pRegion  the region (cuboid or ellipsoid)
+     * @param rIntraConductivities  intracellular conductivities in this region (mS/cm)
+     * @param rExtraConductivities  extracellular conductivities (mS/cm); only used in bidomain
+     */
+    void AddConductivityHeterogeneity(boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > pRegion,
+                                      const c_vector<double, SPACE_DIM>& rIntraConductivities,
+                                      const c_vector<double, SPACE_DIM>& rExtraConductivities);
+
+    /**
+     * Set which mesh region identifiers denote cardiac tissue and bath.
+     * @param rTissueIds  set of tissue identifiers
+     * @param rBathIds    set of bath identifiers
+     */
+    void SetTissueAndBathIdentifiers(const std::set<unsigned>& rTissueIds, const std::set<unsigned>& rBathIds);
+
+    /** @return the set of tissue region identifiers */
+    const std::set<unsigned>& rGetTissueIdentifiers() const;
+    /** @return the set of bath region identifiers */
+    const std::set<unsigned>& rGetBathIdentifiers() const;
+
+    /**
+     * Set per-region bath conductivities (mS/cm).
+     * @param rBathConductivities  map from region identifier to conductivity
+     */
+    void SetBathMultipleConductivities(const std::map<unsigned, double>& rBathConductivities);
+
+    /**
+     * Get the bath conductivity for a given region.
+     * @param bathRegion  region identifier (UINT_MAX for the global default)
+     * @return  conductivity (mS/cm)
+     */
+    double GetBathConductivity(unsigned bathRegion = UINT_MAX) const;
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_3_UNSIGNED(AbstractCardiacProblem)
@@ -889,7 +1309,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM,  unsigned PROBLEM_DIM>
 struct version<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
 {
     ///Macro to set the version number of templated archive in known versions of Boost
-    CHASTE_VERSION_CONTENT(4);
+    CHASTE_VERSION_CONTENT(5);
 };
 } // namespace serialization
 } // namespace boost

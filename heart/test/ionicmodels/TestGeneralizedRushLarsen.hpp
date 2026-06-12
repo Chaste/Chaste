@@ -52,7 +52,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FileFinder.hpp"
 #include "OutputFileHandler.hpp"
-#include "HeartConfig.hpp"
 #include "CellMLToSharedLibraryConverter.hpp"
 #include "DynamicCellModelLoader.hpp"
 #include "Warnings.hpp"
@@ -133,7 +132,6 @@ public:
     void TestLuoRudyGeneralizedRushLarsenMethod()
     {
         EXIT_IF_PARALLEL;
-        HeartConfig::Instance()->SetOdeTimeStep(0.01);
         GenerateCells();
 
         // Check the models really use Rush-Larsen
@@ -255,7 +253,6 @@ public:
     void TestLuoRudyGeneralizedRushLarsenMethod2()
     {
         EXIT_IF_PARALLEL;
-        HeartConfig::Instance()->SetOdeTimeStep(0.01);
         GenerateCells2();
 
         // Check the models really use Rush-Larsen

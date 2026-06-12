@@ -63,6 +63,7 @@ class ActivationOutputModifier : public AbstractOutputModifier
 private:
     double mThreshold; /**< The user-defined threshold at which activation and recovery is to be measured */
     unsigned mLocalSize; /**< The number of nodes on this process (calculated in #InitialiseAtStart)*/
+    std::string mOutputDirectory; /**< Output directory (set by SetOutputDirectory). Default "ChasteResults". */
     std::vector<double> mFirstActivitationTimes; /**< The first activation (first time above threshold) for all local nodes on this process*/
     std::vector<double> mFirstRecoveryTimes; /**< The first recovery (first time subsequent time below threshold) for all local nodes on this process*/
     std::vector<double> mSecondActivitationTimes; /**< The second activation time for local nodes */
@@ -103,7 +104,8 @@ public:
      */
     ActivationOutputModifier(const std::string& rFilename, double threshold)
         : AbstractOutputModifier(rFilename),
-          mThreshold(threshold)
+          mThreshold(threshold),
+          mOutputDirectory("ChasteResults")
     {
     }
 
@@ -115,6 +117,9 @@ public:
      * @param pVectorFactory  The vector factory which is associated with the calling problem's mesh
      * @param rNodePermutation The permutation associated with the calling problem's mesh (when running with parallel partitioning)
      */
+    /** Store the output directory for use in FinaliseAtEnd(). */
+    virtual void SetOutputDirectory(const std::string& rDirectory) { mOutputDirectory = rDirectory; }
+
     virtual void InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation);
 
     /**

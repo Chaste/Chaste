@@ -153,14 +153,14 @@ public:
     /**
      * @return The maximum timestep that is used by CVODE with this cell.
      */
-    double GetTimestep();
+    double GetTimestep() const;
 
     /**
      * Simulate this cell's behaviour between the time interval [tStart, tEnd],
      * updating the internal state variable values.
      *
      * The maximum time step to use is given by #mMaxDt, which defaults to
-     * HeartConfig::Instance()->GetPrintingTimeStep() if unset.
+     * (tEnd - tStart) if unset.
      *
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
@@ -172,12 +172,11 @@ public:
      * and return state variable values.
      *
      * The maximum time step to use will be taken as #mMaxDt.  If this is unset
-     * it is the same as tSamp, which defaults to
-     * HeartConfig::Instance()->GetPrintingTimeStep().
+     * it defaults to tSamp.
      *
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
-     * @param tSamp  sampling interval for returned results (defaults to HeartConfig printing time step)
+     * @param tSamp  sampling interval for returned results (defaults to the full interval tEnd-tStart)
      * @return solution object
      */
     OdeSolution Compute(double tStart, double tEnd, double tSamp=0.0);

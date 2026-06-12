@@ -58,7 +58,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Mahajan2008.hpp"
 #include "TenTusscher2006Epi.hpp"
 #include "CellProperties.hpp"
-#include "HeartConfig.hpp"
 
 #include "FakePetscSetup.hpp"
 
@@ -81,10 +80,9 @@ public:
         double end_time = 1000.0; //One second in milliseconds
 
 
-        HeartConfig::Instance()->SetOdeTimeStep(0.002); // 0.005 leads to NaNs.
-
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         CellFoxModel2002FromCellML fox_ode_system(p_solver, p_stimulus);
+        fox_ode_system.SetTimestep(0.002); // 0.005 leads to NaNs.
 
         // Solve and write to file
         ck_start = clock();
@@ -97,8 +95,7 @@ public:
 
         CheckCellModelResults("FoxRegularStimLong");
 
-        // Solve using Backward Euler
-        HeartConfig::Instance()->SetOdeTimeStep(0.01);
+        // Solve using Backward Euler (uses default dt=0.01)
         CellFoxModel2002FromCellMLBackwardEulerOpt backward_system(p_solver, p_stimulus);
         ck_start = clock();
         RunOdeSolverWithIonicModel(&backward_system,
@@ -241,15 +238,13 @@ public:
                                                                         duration,
                                                                         start));
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver); //define the solver
-        HeartConfig::Instance()->SetOdeTimeStep(0.001);// with Forward Euler, this must be as small as 0.001.
-
-
         const std::string control_file = "TT_epi";
         const std::string mid_file = "TT_mid";
         const std::string endo_file = "TT_endo";
         const std::string LQT_file = "TT_LQT";
 
         CellTenTusscher2006EpiFromCellML TT_model_epi(p_solver, p_stimulus);
+        TT_model_epi.SetTimestep(0.001); // with Forward Euler, this must be as small as 0.001.
 
         TT_model_epi.SetParameter("ScaleFactorIto", 1.0);
         TT_model_epi.SetParameter("ScaleFactorGkr", 1.0);
@@ -341,8 +336,8 @@ public:
                                                                           4.0));
 
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver); //define the solver
-        HeartConfig::Instance()->SetOdeTimeStep(0.001);
         CellMaleckar2008FromCellML atrial_ode_system(p_solver, p_stimulus);
+        atrial_ode_system.SetTimestep(0.001);
 
         const std::string control_file = "control";
         const std::string first_set_file = "first_scale_factor_set";

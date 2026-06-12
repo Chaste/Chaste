@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NobleVargheseKohlNoble1998WithSac.hpp"
-#include "HeartConfig.hpp"
 
 CML_noble_varghese_kohl_noble_1998_basic_with_sac::CML_noble_varghese_kohl_noble_1998_basic_with_sac(
         boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
@@ -243,7 +242,7 @@ double CML_noble_varghese_kohl_noble_1998_basic_with_sac::GetIIonic(const std::v
     value_in_nA += sac_ionic_current;
 
     double value_in_microA = 0.001*value_in_nA;
-    double estimated_cell_surface_in_cm_square = 9.5e-05 / HeartConfig::Instance()->GetCapacitance();
+    double estimated_cell_surface_in_cm_square = 9.5e-05 / mCapacitance;
     double value_in_microA_per_cm_square = value_in_microA/estimated_cell_surface_in_cm_square;
     return value_in_microA_per_cm_square;
 }

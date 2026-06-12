@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "DistributedVector.hpp"
-#include "HeartConfig.hpp"
 
 class TestElectrodes : public CxxTest::TestSuite
 {
@@ -62,8 +61,7 @@ public:
         double start_time = 1.0; //ms
         double duration = 2.0; //ms
 
-        HeartConfig::Instance()->SetElectrodeParameters(true, 0, magnitude, start_time, duration);
-        Electrodes<2> electrodes(mesh);
+        Electrodes<2> electrodes(mesh, true, 0, magnitude, start_time, duration);
 
         TS_ASSERT_EQUALS(electrodes.HasGroundedElectrode(), true);
         TS_ASSERT_DELTA(electrodes.GetSwitchOnTime(), start_time, 1e-12);
@@ -136,8 +134,7 @@ public:
         double magnitude = 543.324;
         double duration = 2.0;
 
-        HeartConfig::Instance()->SetElectrodeParameters(false,0,magnitude,0.0,duration);
-        Electrodes<2> electrodes(mesh);
+        Electrodes<2> electrodes(mesh, false, 0, magnitude, 0.0, duration);
 
         TS_ASSERT_EQUALS(electrodes.HasGroundedElectrode(), false);
 
@@ -198,8 +195,7 @@ public:
         double flux_out_magnitude = flux_in_magnitude * 10/9;
 
         double duration = 2.0;
-        HeartConfig::Instance()->SetElectrodeParameters(false,0,flux_in_magnitude,0.0,duration);
-        Electrodes<2> electrodes(mesh);
+        Electrodes<2> electrodes(mesh, false, 0, flux_in_magnitude, 0.0, duration);
 
         TS_ASSERT_THROWS_ANYTHING(electrodes.ComputeElectrodesAreasAndCheckEquality(0,0,10));
 
@@ -232,8 +228,7 @@ public:
 
         double magnitude = 543.324;
         double duration = 2.0;
-        HeartConfig::Instance()->SetElectrodeParameters(true,1,magnitude,0.0,duration);
-        Electrodes<3> electrodes(mesh);
+        Electrodes<3> electrodes(mesh, true, 1, magnitude, 0.0, duration);
 
         boost::shared_ptr<BoundaryConditionsContainer<3,3,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
 
@@ -272,8 +267,7 @@ public:
 
         double magnitude = 543.324;
         double duration = 2.0;
-        HeartConfig::Instance()->SetElectrodeParameters(false,1,magnitude,0.0,duration);
-        Electrodes<3> electrodes(mesh);
+        Electrodes<3> electrodes(mesh, false, 1, magnitude, 0.0, duration);
 
         boost::shared_ptr<BoundaryConditionsContainer<3,3,2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
 

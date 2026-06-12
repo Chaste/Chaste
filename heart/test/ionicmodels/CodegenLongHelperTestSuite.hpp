@@ -67,7 +67,6 @@ the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src
 
 #include "CellProperties.hpp"
 #include "Exception.hpp"
-#include "HeartConfig.hpp"
 #include "RunAndCheckIonicModels.hpp"
 #include "Warnings.hpp"
 
@@ -80,6 +79,7 @@ class CodegenLongHelperTestSuite : public CxxTest::TestSuite
 private:
     bool mUseCvodeJacobian = true;
     double cvOdeTolerances = DOUBLE_UNSET;
+    double mDefaultOdeDt = 0.01; ///< Default ODE dt used when cell has no SuggestedForwardEulerTimestep attribute
 
     double GetAttribute(boost::shared_ptr<AbstractCardiacCellInterface> pCell,
                         const std::string& rAttrName,
@@ -107,11 +107,8 @@ private:
         double end_time = GetAttribute(pCell, "SuggestedCycleLength", 700.0); // ms
         if (pCell->GetSolver() || dynamic_cast<AbstractRushLarsenCardiacCell*>(pCell.get()))
         {
-            double dt = GetAttribute(pCell, "SuggestedForwardEulerTimestep", 0.0);
-            if (dt > 0.0)
-            {
-                pCell->SetTimestep(dt);
-            }
+            double dt = GetAttribute(pCell, "SuggestedForwardEulerTimestep", mDefaultOdeDt);
+            pCell->SetTimestep(dt);
         }
 #ifdef CHASTE_CVODE
         AbstractCvodeSystem* p_cvode_cell = dynamic_cast<AbstractCvodeSystem*>(pCell.get());
@@ -272,6 +269,9 @@ protected:
     }
 
 public:
+    /** Set the default ODE timestep for cells that lack a SuggestedForwardEulerTimestep attribute. */
+    void SetDefaultOdeDt(double dt) { mDefaultOdeDt = dt; }
+
     void RunTests(const std::string& rOutputDirName,
                   const std::vector<std::string>& rModels,
                   const std::vector<std::string>& rArgs,

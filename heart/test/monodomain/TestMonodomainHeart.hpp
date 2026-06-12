@@ -124,17 +124,16 @@ public:
         double pde_time_step = 0.01;  // ms
         double end_time = 100;        // ms
 
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
-        HeartConfig::Instance()->SetPrintingTimeStep(end_time/100);
-        HeartConfig::Instance()->SetPdeTimeStep(pde_time_step);
-        HeartConfig::Instance()->SetOdeTimeStep(pde_time_step/4.0);
-        HeartConfig::Instance()->SetSimulationDuration(end_time); //ms
-        HeartConfig::Instance()->SetMeshFileName("heart/test/data/UCSD_heart"); // note that this is the full heart mesh (not fifthheart)
-        HeartConfig::Instance()->SetOutputDirectory("MonoDg0Heart");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_Heart");
-
         PointStimulusHeartCellFactory cell_factory;
         MonodomainProblem<3> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
+        monodomain_problem.SetPrintingTimeStep(end_time/100);
+        monodomain_problem.SetPdeTimeStep(pde_time_step);
+        monodomain_problem.SetOdeTimeStep(pde_time_step/4.0);
+        monodomain_problem.SetSimulationDuration(end_time); //ms
+        monodomain_problem.SetMeshFileName("heart/test/data/UCSD_heart"); // note that this is the full heart mesh (not fifthheart)
+        monodomain_problem.SetOutputDirectory("MonoDg0Heart");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_Heart");
 
         monodomain_problem.SetWriteInfo();
 

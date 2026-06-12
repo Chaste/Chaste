@@ -65,6 +65,7 @@ private:
     unsigned mGlobalIndex;
     unsigned mLocalIndex; /**< The local index of the node for which the trace is to be made - set to UINT_MAX if the node is not local to the process*/
     out_stream mFileStream; /**< Output file stream (remains open during solve).*/
+    std::string mOutputDirectory; /**< Output directory (set by SetOutputDirectory). Default "ChasteResults". */
 
     friend class TestOutputModifiers;
 
@@ -86,7 +87,8 @@ private:
     /** Private constructor that resets process-specific data, for archiving */
     SingleTraceOutputModifier()
         : mLocalIndex(UINT_MAX),
-          mFileStream(NULL)
+          mFileStream(NULL),
+          mOutputDirectory("ChasteResults")
     {}
 
 public:
@@ -110,9 +112,13 @@ public:
         : AbstractOutputModifier(rFilename, flushTime),
           mGlobalIndex(globalIndex),
           mLocalIndex(UINT_MAX),
-          mFileStream(NULL)
+          mFileStream(NULL),
+          mOutputDirectory("ChasteResults")
     {
     }
+
+    /** Store the output directory for use in InitialiseAtStart(). */
+    virtual void SetOutputDirectory(const std::string& rDirectory) { mOutputDirectory = rDirectory; }
 
     /**
      * Initialise the modifier (open a file or make some memory) when the solve loop is starting

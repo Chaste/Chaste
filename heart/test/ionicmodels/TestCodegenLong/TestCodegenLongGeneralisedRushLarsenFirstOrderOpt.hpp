@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "HeartConfig.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -72,10 +71,10 @@ public:
                                                                                              "noble_model_1998"});
 
         std::vector<std::string> bad_models = special_treatment_models(models, {"difrancesco_noble_model_1985", "iyer_2004", "faber_rudy_2000", "iyer_model_2007"});
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        SetDefaultOdeDt(0.01);
         RunTests(dirname, models, args, true, -1000, false);
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        SetDefaultOdeDt(0.0001);
         RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
 
     }

@@ -50,7 +50,7 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem
         mpMonodomainAssembler->SetMatrixToAssemble(this->mpLinearSystem->rGetLhsMatrix());
         mpMonodomainAssembler->AssembleMatrix();
 
-        MassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> mass_matrix_assembler(this->mpMesh, HeartConfig::Instance()->GetUseMassLumping());
+        MassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> mass_matrix_assembler(this->mpMesh, mUseMassLumping);
         mass_matrix_assembler.SetMatrixToAssemble(mMassMatrix);
         mass_matrix_assembler.Assemble();
 
@@ -69,8 +69,8 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem
     // dist stripe for z (return value)
     DistributedVector dist_vec_matrix_based = p_factory->CreateDistributedVector(mVecForConstructingRhs);
 
-    double Am = HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio();
-    double Cm  = HeartConfig::Instance()->GetCapacitance();
+    double Am = mpMonodomainTissue->GetSurfaceAreaToVolumeRatio();
+    double Cm = mpMonodomainTissue->GetCapacitance();
 
     for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
          index!= dist_vec_matrix_based.End();
@@ -134,21 +134,19 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolv
     AbstractLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>::InitialiseForSolve(initialSolution);
 
     //..then do a bit extra
-    if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
+    if (mUseAbsoluteTolerance)
     {
-        this->mpLinearSystem->SetAbsoluteTolerance(HeartConfig::Instance()->GetAbsoluteTolerance());
+        this->mpLinearSystem->SetAbsoluteTolerance(mKspAbsoluteTolerance);
     }
     else
     {
-        NEVER_REACHED;
-        // re-implement when needed
-        //this->mpLinearSystem->SetRelativeTolerance(HeartConfig::Instance()->GetRelativeTolerance());
+        this->mpLinearSystem->SetRelativeTolerance(mKspRelativeTolerance);
     }
 
-    this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
-    this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
+    this->mpLinearSystem->SetKspType(mKspSolverType.c_str());
+    this->mpLinearSystem->SetPcType(mKspPreconditionerType.c_str());
     this->mpLinearSystem->SetMatrixIsSymmetric(true);
-    this->mpLinearSystem->SetUseFixedNumberIterations(HeartConfig::Instance()->GetUseFixedNumberIterationsLinearSolver(), HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves());
+    this->mpLinearSystem->SetUseFixedNumberIterations(mUseFixedNumberIterations, mEvaluateNumItsEveryNSolves);
 
     // initialise matrix-based RHS vector and matrix, and use the linear
     // system rhs as a template
@@ -170,7 +168,16 @@ OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::OperatorSplittingMonod
             BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions)
     : AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>(pMesh),
       mpBoundaryConditions(pBoundaryConditions),
-      mpMonodomainTissue(pTissue)
+      mpMonodomainTissue(pTissue),
+      mUseAbsoluteTolerance(true),
+      mKspAbsoluteTolerance(2e-4),
+      mKspRelativeTolerance(1e-6),
+      mKspSolverType("cg"),
+      mKspPreconditionerType("bjacobi"),
+      mUseMassLumping(false),
+      mUseMassLumpingForPrecond(false),
+      mUseFixedNumberIterations(false),
+      mEvaluateNumItsEveryNSolves(0)
 {
     assert(pTissue);
     assert(pBoundaryConditions);
@@ -195,6 +202,24 @@ OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::~OperatorSplittingMono
         PetscTools::Destroy(mVecForConstructingRhs);
         PetscTools::Destroy(mMassMatrix);
     }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetKspConfig(
+    bool useAbsTol, double absTol, double relTol,
+    const std::string& rKspType, const std::string& rPcType,
+    bool useMassLumping, bool useMassLumpingForPrecond,
+    bool useFixedIts, unsigned evalEvery, bool /*ignored*/)
+{
+    mUseAbsoluteTolerance = useAbsTol;
+    mKspAbsoluteTolerance = absTol;
+    mKspRelativeTolerance = relTol;
+    mKspSolverType = rKspType;
+    mKspPreconditionerType = rPcType;
+    mUseMassLumping = useMassLumping;
+    mUseMassLumpingForPrecond = useMassLumpingForPrecond;
+    mUseFixedNumberIterations = useFixedIts;
+    mEvaluateNumItsEveryNSolves = evalEvery;
 }
 
 // Explicit instantiation

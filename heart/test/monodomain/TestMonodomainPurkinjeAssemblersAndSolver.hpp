@@ -291,8 +291,7 @@ public:
         PdeSimulationTime::SetTime(0.0);
         PdeSimulationTime::SetPdeTimeStepAndNextTime(0.01, 0.01);
 
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
+        // KSP and Purkinje settings will be configured on the solver via SetKspConfig below
 
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         TrianglesMeshReader<2,2> reader(mesh_base);
@@ -328,6 +327,10 @@ public:
         BoundaryConditionsContainer<2,2,1> bcc_for_just_monodomain;
 
         MonodomainPurkinjeSolver<2,2> solver(&mesh, &tissue, &bcc);
+        // Set absolute tolerance and Purkinje SAV ratio (same as myocardium default 1400/cm)
+        solver.SetKspConfig(true/*abs tol*/, 1e-12, 1e-6, "cg", "bjacobi",
+                            false, false, false, 0, false/*no SVI*/,
+                            1400.0/*Purkinje Am = same as myocardium default*/, 1.0);
 
         MonodomainSolver<2,2> solver_just_monodomain(&mesh_just_monodomain, &tissue_for_just_monodomain, &bcc_for_just_monodomain);
 
@@ -437,9 +440,13 @@ public:
             TS_ASSERT_DELTA(soln_repl[2*i], soln_mono_repl[i], 1e-5);
         }
 
-        HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
-        TS_ASSERT_THROWS_THIS(MonodomainPurkinjeSolver2d bad_solver(&mesh, &tissue, &bcc),"State-variable interpolation is not yet supported with Purkinje");
-        HeartConfig::Instance()->SetUseStateVariableInterpolation(false);
+        // Test that enabling state-variable interpolation throws an exception
+        {
+            MonodomainPurkinjeSolver2d bad_solver(&mesh, &tissue, &bcc);
+            TS_ASSERT_THROWS_THIS(bad_solver.SetKspConfig(true, 1e-12, 1e-6, "cg", "bjacobi",
+                                                          false, false, false, 0, true/*SVI=true*/),
+                                  "State-variable interpolation is not yet supported with Purkinje");
+        }
 
 
         PetscTools::Destroy(solution);

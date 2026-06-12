@@ -176,8 +176,8 @@ public:
         TS_ASSERT_EQUALS(normal.GetVoltageIndex(), 0u);
         CheckCai(normal, true, 0.0002);
         double normal_initial_i_ionic = normal.GetIIonic();
-        // Coverage
-        normal.SetTimestep(HeartConfig::Instance()->GetOdeTimeStep());
+        // Coverage (SetTimestep with the default value, 0.01ms)
+        normal.SetTimestep(0.01);
 
         // Optimised model
         // test error from codegen about concentration
@@ -224,7 +224,7 @@ public:
         AbstractLookupTableCollection::EventHandler::Report();
         TS_ASSERT_THROWS_THIS(p_tables->SetTableProperties("membrane_voltage", -1, 0.03, 1),
                               "Table step size does not divide range between table limits.");
-        p_tables->SetTimestep(HeartConfig::Instance()->GetOdeTimeStep());
+        p_tables->SetTimestep(0.01);
         p_tables->SetTableProperties("membrane_voltage", -150.0001, 0.01, 199.9999);
         p_tables->RegenerateTables();
         AbstractLookupTableCollection::EventHandler::Report();
@@ -285,7 +285,7 @@ public:
         AbstractLookupTableCollection::EventHandler::Report();
         TS_ASSERT_THROWS_THIS(p_tables->SetTableProperties("membrane_voltage", -1, 0.03, 1),
                               "Table step size does not divide range between table limits.");
-        p_tables->SetTimestep(HeartConfig::Instance()->GetOdeTimeStep());
+        p_tables->SetTimestep(0.01);
         p_tables->SetTableProperties("membrane_voltage", -150.0001, 0.01, 199.9999);
         p_tables->RegenerateTables();
         AbstractLookupTableCollection::EventHandler::Report();

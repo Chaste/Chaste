@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "HeartConfig.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -60,11 +59,11 @@ public:
         // Models that need a very small dt
         std::vector<std::string> small_dt_models = special_treatment_models(models, {"pandit_clark_giles_demir_2001_epicardial_cell", "ten_tusscher_model_2006_epi", "li_mouse_2010"});
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
+        SetDefaultOdeDt(0.005);
         RunTests(dirname, models, args, true);
 
         // See Cooper Spiteri Mirams paper table 2
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
+        SetDefaultOdeDt(0.0001953125);
         RunTests(dirname + "-small-dt", small_dt_models, args, true);
     }
 };

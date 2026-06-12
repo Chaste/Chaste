@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChastePoint.hpp"
 #include "AbstractChasteRegion.hpp"
 #include "HeartEventHandler.hpp"
+#include "UblasCustomFunctions.hpp"
 
 
 /**
@@ -53,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   * @param rTo reference to the c_vector to explicitly copy to
  */
 template <unsigned SPACE_DIM>
-void ExplicitCVectorCopy(c_vector<double, SPACE_DIM>& rFrom, c_vector<double, SPACE_DIM>& rTo)
+void ExplicitCVectorCopy(const c_vector<double, SPACE_DIM>& rFrom, c_vector<double, SPACE_DIM>& rTo)
 {
     if constexpr (SPACE_DIM == 1u)
     {
@@ -133,6 +134,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
     mExtracellularStimulusCacheReplicated.Resize(pExtracellularStimulusFactory->GetNumberOfCells());
     HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
 
+    mDefaultExtraConductivities = scalar_vector<double>(SPACE_DIM, 7.0);
     //Create the extracellular conductivity tensor
     CreateExtracellularConductivityTensors();
 }
@@ -163,6 +165,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(std::vector<AbstractCa
     mGgapCacheReplicated.Resize(this->mpDistributedVectorFactory->GetProblemSize());
     mExtracellularStimulusCacheReplicated.Resize(this->mpDistributedVectorFactory->GetProblemSize());
 
+    mDefaultExtraConductivities = scalar_vector<double>(SPACE_DIM, 7.0);
     CreateIntracellularConductivityTensorSecondCell();
     CreateExtracellularConductivityTensors();
 }
@@ -219,43 +222,31 @@ template <unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSecondCell()
 {
     HeartEventHandler::BeginEvent(HeartEventHandler::READ_MESH);
-    this->mpConfig = HeartConfig::Instance();
 
-    if (this->mpConfig->IsMeshProvided() && this->mpConfig->GetLoadMesh())
+    if (!this->mFibreFilePathNoExtension.empty())
     {
-        assert(this->mFibreFilePathNoExtension != "");
-
-        switch (this->mpConfig->GetConductivityMedia())
+        if (this->mFibreFileType == "ortho")
         {
-            case cp::media_type::Orthotropic:
-            {
-                mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
-                FileFinder ortho_file(this->mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
-                assert(ortho_file.Exists());
-                mpIntracellularConductivityTensorsSecondCell->SetFibreOrientationFile(ortho_file);
-                break;
-            }
-
-            case cp::media_type::Axisymmetric:
-            {
-                mpIntracellularConductivityTensorsSecondCell =  new AxisymmetricConductivityTensors<SPACE_DIM,SPACE_DIM>;
-                FileFinder axi_file(this->mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
-                assert(axi_file.Exists());
-                mpIntracellularConductivityTensorsSecondCell->SetFibreOrientationFile(axi_file);
-                break;
-            }
-
-            case cp::media_type::NoFibreOrientation:
-                mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
-                break;
-
-            default:
-                NEVER_REACHED;
+            mpIntracellularConductivityTensorsSecondCell = new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+            FileFinder ortho_file(this->mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
+            assert(ortho_file.Exists());
+            mpIntracellularConductivityTensorsSecondCell->SetFibreOrientationFile(ortho_file);
+        }
+        else if (this->mFibreFileType == "axi")
+        {
+            mpIntracellularConductivityTensorsSecondCell = new AxisymmetricConductivityTensors<SPACE_DIM,SPACE_DIM>;
+            FileFinder axi_file(this->mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
+            assert(axi_file.Exists());
+            mpIntracellularConductivityTensorsSecondCell->SetFibreOrientationFile(axi_file);
+        }
+        else
+        {
+            mpIntracellularConductivityTensorsSecondCell = new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
         }
     }
-    else // Slab defined in config file or SetMesh() called; no fibre orientation assumed
+    else
     {
-        mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+        mpIntracellularConductivityTensorsSecondCell = new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
     }
 
     // this definition must be here (and not inside the if statement) because SetNonConstantConductivities() will keep
@@ -263,10 +254,9 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
     unsigned num_elements = this->mpMesh->GetNumElements();
     std::vector<c_vector<double, SPACE_DIM> > hetero_intra_conductivities;
 
-    c_vector<double, SPACE_DIM> intra_conductivities;
-    this->mpConfig->GetIntracellularConductivities(intra_conductivities);//this one is used just for resizing
+    const c_vector<double, SPACE_DIM>& intra_conductivities = this->mDefaultIntraConductivities;
 
-    if (this->mpConfig->GetConductivityHeterogeneitiesProvided())
+    if (!this->mConductivityHeterogeneityAreas.empty())
     {
         try
         {
@@ -289,28 +279,19 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
 
         PetscTools::ReplicateException(false);
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
-        std::vector< c_vector<double,3> > intra_h_conductivities;
-        std::vector< c_vector<double,3> > extra_h_conductivities;
-        HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
-                                                                intra_h_conductivities,
-                                                                extra_h_conductivities);
         unsigned local_element_index = 0;
         for (typename AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>::ElementIterator it = this->mpMesh->GetElementIteratorBegin();
              it != this->mpMesh->GetElementIteratorEnd();
              ++it)
         {
-            //unsigned element_index = it->GetIndex();
-            // if element centroid is contained in the region
             ChastePoint<SPACE_DIM> element_centroid(it->CalculateCentroid());
-            for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
+            for (unsigned region_index=0; region_index < this->mConductivityHeterogeneityAreas.size(); region_index++)
             {
-                if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
+                if (this->mConductivityHeterogeneityAreas[region_index]->DoesContain(element_centroid))
                 {
-                    // We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
                     for (unsigned i=0; i<SPACE_DIM; i++)
                     {
-                        hetero_intra_conductivities[local_element_index][i] = intra_h_conductivities[region_index][i];
+                        hetero_intra_conductivities[local_element_index][i] = this->mConductivityHeterogeneityIntra[region_index][i];
                     }
                 }
             }
@@ -361,58 +342,44 @@ const std::vector<boost::shared_ptr<AbstractStimulusFunction> >& ExtendedBidomai
 template <unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
 {
-    if (this->mpConfig->IsMeshProvided() && this->mpConfig->GetLoadMesh())
+    if (!this->mFibreFilePathNoExtension.empty())
     {
-        assert(this->mFibreFilePathNoExtension != "");
-        switch (this->mpConfig->GetConductivityMedia())
+        if (this->mFibreFileType == "ortho")
         {
-            case cp::media_type::Orthotropic:
-            {
-                mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
-                FileFinder ortho_file(this->mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
-                assert(ortho_file.Exists());
-                mpExtracellularConductivityTensors->SetFibreOrientationFile(ortho_file);
-                break;
-            }
-
-            case cp::media_type::Axisymmetric:
-            {
-                mpExtracellularConductivityTensors =  new AxisymmetricConductivityTensors<SPACE_DIM,SPACE_DIM>;
-                FileFinder axi_file(this->mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
-                assert(axi_file.Exists());
-                mpExtracellularConductivityTensors->SetFibreOrientationFile(axi_file);
-                break;
-            }
-
-            case cp::media_type::NoFibreOrientation:
-                mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
-                break;
-
-            default:
-                NEVER_REACHED;
+            mpExtracellularConductivityTensors = new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+            FileFinder ortho_file(this->mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
+            assert(ortho_file.Exists());
+            mpExtracellularConductivityTensors->SetFibreOrientationFile(ortho_file);
+        }
+        else if (this->mFibreFileType == "axi")
+        {
+            mpExtracellularConductivityTensors = new AxisymmetricConductivityTensors<SPACE_DIM,SPACE_DIM>;
+            FileFinder axi_file(this->mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
+            assert(axi_file.Exists());
+            mpExtracellularConductivityTensors->SetFibreOrientationFile(axi_file);
+        }
+        else
+        {
+            mpExtracellularConductivityTensors = new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
         }
     }
-    else // no fibre orientation assumed
+    else
     {
-        mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+        mpExtracellularConductivityTensors = new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
     }
 
-    c_vector<double, SPACE_DIM> extra_conductivities;
-    this->mpConfig->GetExtracellularConductivities(extra_conductivities);
+    const c_vector<double, SPACE_DIM>& extra_conductivities = mDefaultExtraConductivities;
 
-    // this definition must be here (and not inside the if statement) because SetNonConstantConductivities() will keep
-    // a pointer to it and we don't want it to go out of scope before Init() is called
     unsigned num_elements = this->mpMesh->GetNumElements();
     std::vector<c_vector<double, SPACE_DIM> > hetero_extra_conductivities;
 
-    if (this->mpConfig->GetConductivityHeterogeneitiesProvided())
+    if (!this->mConductivityHeterogeneityAreas.empty())
     {
         try
         {
             assert(hetero_extra_conductivities.size()==0);
-            //initialise with the values of teh default conductivity tensor
             hetero_extra_conductivities.resize(num_elements);
-            for(auto& elem : hetero_extra_conductivities)
+            for (auto& elem : hetero_extra_conductivities)
             {
                 ExplicitCVectorCopy<SPACE_DIM>(extra_conductivities, elem);
             }
@@ -428,29 +395,19 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
 
         PetscTools::ReplicateException(false);
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
-        std::vector< c_vector<double,3> > intra_h_conductivities;
-        std::vector< c_vector<double,3> > extra_h_conductivities;
-        HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
-                                                                intra_h_conductivities,
-                                                                extra_h_conductivities);
         unsigned local_element_index = 0;
         for (typename AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>::ElementIterator iter = (this->mpMesh)->GetElementIteratorBegin();
              iter != (this->mpMesh)->GetElementIteratorEnd();
              ++iter)
         {
-            //unsigned element_index = iter->GetIndex();
-            // if element centroid is contained in the region
             ChastePoint<SPACE_DIM> element_centroid(iter->CalculateCentroid());
-            for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
+            for (unsigned region_index=0; region_index < this->mConductivityHeterogeneityAreas.size(); region_index++)
             {
-                // If element centroid is contained in the region
-                if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
+                if (this->mConductivityHeterogeneityAreas[region_index]->DoesContain(element_centroid))
                 {
-                    // We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
                     for (unsigned i=0; i<SPACE_DIM; i++)
                     {
-                        hetero_extra_conductivities[local_element_index][i] = extra_h_conductivities[region_index][i];
+                        hetero_extra_conductivities[local_element_index][i] = this->mConductivityHeterogeneityExtra[region_index][i];
                     }
                 }
             }
@@ -495,6 +452,12 @@ void ExtendedBidomainTissue<SPACE_DIM>::SetIntracellularConductivitiesSecondCell
     {
         mIntracellularConductivitiesSecondCell[i] = conductivities[i];
     }
+}
+
+template <unsigned SPACE_DIM>
+void ExtendedBidomainTissue<SPACE_DIM>::SetExtracellularConductivities(c_vector<double, SPACE_DIM> conductivities)
+{
+    mDefaultExtraConductivities = conductivities;
 }
 
 template <unsigned SPACE_DIM>

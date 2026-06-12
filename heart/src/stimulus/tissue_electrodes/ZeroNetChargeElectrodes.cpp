@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ElectrodesStimulusFactory.hpp"
 #include "RegularStimulusZeroNetCharge.hpp"
 #include "DistributedTetrahedralMesh.hpp"
-#include "HeartConfig.hpp"
 
 template<unsigned DIM>
 ZeroNetChargeElectrodes<DIM>::ZeroNetChargeElectrodes(std::vector<std::pair<AbstractChasteRegion<DIM>*, AbstractChasteRegion<DIM>*> >& rElectrodePairs,

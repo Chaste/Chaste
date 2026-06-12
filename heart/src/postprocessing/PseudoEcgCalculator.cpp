@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PseudoEcgCalculator.hpp"
 #include "HeartRegionCodes.hpp"
-#include "HeartConfig.hpp"
 #include "PetscTools.hpp"
 #include "Version.hpp"
 #include <iostream>
@@ -68,7 +67,9 @@ PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::PseudoEcgCalculator(Ab
   : mrMesh(rMesh),
     mProbeElectrode(rProbeElectrode),
     mVariableName(rVariableName),
-    mTimestepStride(timestepStride)
+    mTimestepStride(timestepStride),
+    mDirectory(rDirectory),
+    mOutputDirectory("")
 {
     mpDataReader = new Hdf5DataReader(rDirectory, rHdf5FileName);
     mNumberOfNodes = mpDataReader->GetNumberOfRows();
@@ -124,6 +125,12 @@ double PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ComputePseudoEc
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetOutputDirectory(const std::string& rDirectory)
+{
+    mOutputDirectory = rDirectory;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::WritePseudoEcg ()
 {
     // Cache the time values so that we can plot a decent x-axis
@@ -133,7 +140,10 @@ void PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::WritePseudoEcg ()
     stream << "PseudoEcgFromElectrodeAt" << "_" << mProbeElectrode.GetWithDefault(0)
                           << "_" << mProbeElectrode.GetWithDefault(1)
                           << "_" << mProbeElectrode.GetWithDefault(2) << ".dat";
-    OutputFileHandler output_file_handler(HeartConfig::Instance()->GetOutputDirectory() + "/output", false);
+    std::string output_dir = mOutputDirectory.empty()
+        ? mDirectory.GetRelativePath(FileFinder("", RelativeTo::ChasteTestOutput))
+        : mOutputDirectory;
+    OutputFileHandler output_file_handler(output_dir + "/output", false);
     out_stream p_file=out_stream(NULL);
     if (PetscTools::AmMaster())
     {

@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "PetscVecTools.hpp"
 #include "AbstractCvodeCell.hpp"
+#include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
@@ -55,6 +56,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
             bool exchangeHalos)
     : mpMesh(pCellFactory->GetMesh()),
       mpDistributedVectorFactory(mpMesh->GetDistributedVectorFactory()),
+      mFibreFileType(""),
       mpConductivityModifier(NULL),
       mHasPurkinje(false),
       mDoCacheReplication(true),
@@ -164,15 +166,11 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     }
     HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
 
-    if (HeartConfig::Instance()->IsMeshProvided() && HeartConfig::Instance()->GetLoadMesh())
-    {
-        mFibreFilePathNoExtension = HeartConfig::Instance()->GetMeshName();
-    }
-    else
-    {
-        // As of r10671 fibre orientation can only be defined when loading a mesh from disc.
-        mFibreFilePathNoExtension = "";
-    }
+    // Initialise default intracellular conductivities and Am/Cm
+    mDefaultIntraConductivities = scalar_vector<double>(SPACE_DIM, 1.75);
+    mSurfaceAreaToVolumeRatio = 1400.0;
+    mCapacitance = 1.0;
+    // mFibreFilePathNoExtension defaults to "" (set in constructor initialiser list)
     CreateIntracellularConductivityTensor();
 }
 
@@ -189,6 +187,9 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(AbstractTetr
     mIionicCacheReplicated.Resize(mpDistributedVectorFactory->GetProblemSize());
     mIntracellularStimulusCacheReplicated.Resize(mpDistributedVectorFactory->GetProblemSize());
 
+    mDefaultIntraConductivities = scalar_vector<double>(SPACE_DIM, 1.75);
+    mSurfaceAreaToVolumeRatio = 1400.0;
+    mCapacitance = 1.0;
     mFibreFilePathNoExtension = ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename();
     CreateIntracellularConductivityTensor();
 }
@@ -240,56 +241,42 @@ template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivityTensor()
 {
     HeartEventHandler::BeginEvent(HeartEventHandler::READ_MESH);
-    mpConfig = HeartConfig::Instance();
 
-    if (mpConfig->IsMeshProvided() && mpConfig->GetLoadMesh())
+    if (!mFibreFilePathNoExtension.empty())
     {
-        assert(mFibreFilePathNoExtension != "");
-
-        switch (mpConfig->GetConductivityMedia())
+        if (mFibreFileType == "ortho")
         {
-            case cp::media_type::Orthotropic:
-            {
-                mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
-                FileFinder ortho_file(mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
-                assert(ortho_file.Exists());
-                mpIntracellularConductivityTensors->SetFibreOrientationFile(ortho_file);
-                break;
-            }
-
-            case cp::media_type::Axisymmetric:
-            {
-                mpIntracellularConductivityTensors = new AxisymmetricConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
-                FileFinder axi_file(mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
-                assert(axi_file.Exists());
-                mpIntracellularConductivityTensors->SetFibreOrientationFile(axi_file);
-                break;
-            }
-
-            case cp::media_type::NoFibreOrientation:
-                /// \todo #1316 Create a class defining constant tensors to be used when no fibre orientation is provided.
-                mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
-                break;
-
-            default:
-                NEVER_REACHED;
+            mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
+            FileFinder ortho_file(mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
+            assert(ortho_file.Exists());
+            mpIntracellularConductivityTensors->SetFibreOrientationFile(ortho_file);
+        }
+        else if (mFibreFileType == "axi")
+        {
+            mpIntracellularConductivityTensors = new AxisymmetricConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
+            FileFinder axi_file(mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
+            assert(axi_file.Exists());
+            mpIntracellularConductivityTensors->SetFibreOrientationFile(axi_file);
+        }
+        else
+        {
+            mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
         }
     }
-    else // Slab defined in config file or SetMesh() called; no fibre orientation assumed
+    else // No fibre orientation file; use isotropic conductivities
     {
         /// \todo #1316 Create a class defining constant tensors to be used when no fibre orientation is provided.
         mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
     }
 
-    c_vector<double, SPACE_DIM> intra_conductivities;
-    mpConfig->GetIntracellularConductivities(intra_conductivities);
+    const c_vector<double, SPACE_DIM>& intra_conductivities = mDefaultIntraConductivities;
 
     // this definition must be here (and not inside the if statement) because SetNonConstantConductivities() will keep
     // a pointer to it and we don't want it to go out of scope before Init() is called
     unsigned num_local_elements = mpMesh->GetNumLocalElements();
     std::vector<c_vector<double, SPACE_DIM> > hetero_intra_conductivities;
 
-    if (mpConfig->GetConductivityHeterogeneitiesProvided())
+    if (!mConductivityHeterogeneityAreas.empty())
     {
         try
         {
@@ -307,30 +294,20 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
 
         PetscTools::ReplicateException(false);
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
-        std::vector< c_vector<double,3> > intra_h_conductivities;
-        std::vector< c_vector<double,3> > extra_h_conductivities;
-        HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
-                                                                intra_h_conductivities,
-                                                                extra_h_conductivities);
-
         unsigned local_element_index = 0;
 
         for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator it = mpMesh->GetElementIteratorBegin();
              it != mpMesh->GetElementIteratorEnd();
              ++it)
         {
-//            unsigned element_index = it->GetIndex();
-            // if element centroid is contained in the region
             ChastePoint<SPACE_DIM> element_centroid(it->CalculateCentroid());
-            for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
+            for (unsigned region_index=0; region_index < mConductivityHeterogeneityAreas.size(); region_index++)
             {
-                if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
+                if (mConductivityHeterogeneityAreas[region_index]->DoesContain(element_centroid))
                 {
-                    //We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
                     for (unsigned i=0; i<SPACE_DIM; i++)
                     {
-                        hetero_intra_conductivities[local_element_index][i] = intra_h_conductivities[region_index][i];
+                        hetero_intra_conductivities[local_element_index][i] = mConductivityHeterogeneityIntra[region_index][i];
                     }
                 }
             }
@@ -348,6 +325,97 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
     HeartEventHandler::EndEvent(HeartEventHandler::READ_MESH);
 }
 
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetIntracellularConductivities(
+    const c_vector<double, SPACE_DIM>& rConductivities)
+{
+    mDefaultIntraConductivities = rConductivities;
+    if (mpIntracellularConductivityTensors)
+    {
+        mpIntracellularConductivityTensors->SetConstantConductivities(rConductivities);
+    }
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetFibreOrientationFile(
+    const std::string& rFilePath, const std::string& rFileType)
+{
+    mFibreFilePathNoExtension = rFilePath;
+    mFibreFileType = rFileType;
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetBathConductivities(const std::map<unsigned, double>& rConductivities)
+{
+    mBathConductivities = rConductivities;
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+double AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetBathConductivity(unsigned bathRegion) const
+{
+    if (bathRegion != UINT_MAX)
+    {
+        auto it = mBathConductivities.find(bathRegion);
+        if (it != mBathConductivities.end())
+        {
+            return it->second;
+        }
+    }
+    return 7.0; // default bath conductivity (mS/cm)
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetSurfaceAreaToVolumeRatio(double ratio)
+{
+    mSurfaceAreaToVolumeRatio = ratio;
+    // Propagate to all local cells
+    for (AbstractCardiacCellInterface* p_cell : mCellsDistributed)
+    {
+        p_cell->SetSurfaceAreaToVolumeRatio(ratio);
+    }
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+double AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetSurfaceAreaToVolumeRatio() const
+{
+    return mSurfaceAreaToVolumeRatio;
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetCapacitance(double capacitance)
+{
+    mCapacitance = capacitance;
+    for (AbstractCardiacCellInterface* p_cell : mCellsDistributed)
+    {
+        p_cell->SetCapacitance(capacitance);
+    }
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+double AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetCapacitance() const
+{
+    return mCapacitance;
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AddConductivityHeterogeneity(
+    boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > pRegion,
+    const c_vector<double, SPACE_DIM>& rIntraConds,
+    const c_vector<double, SPACE_DIM>& rExtraConds)
+{
+    mConductivityHeterogeneityAreas.push_back(pRegion);
+    mConductivityHeterogeneityIntra.push_back(rIntraConds);
+    mConductivityHeterogeneityExtra.push_back(rExtraConds);
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::RebuildConductivityTensors()
+{
+    delete mpIntracellularConductivityTensors;
+    mpIntracellularConductivityTensors = nullptr;
+    CreateIntracellularConductivityTensor();
+}
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetCacheReplication(bool doCacheReplication)

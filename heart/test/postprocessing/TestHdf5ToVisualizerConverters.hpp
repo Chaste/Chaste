@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
 #include "FileFinder.hpp"
-#include "HeartConfig.hpp"
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
@@ -95,7 +94,7 @@ public:
 
         // Convert
         Hdf5ToCmguiConverter<1,1> converter(FileFinder(output_dir, RelativeTo::ChasteTestOutput),
-                                            "many_variables", &mesh, false, HeartConfig::Instance()->GetVisualizerOutputPrecision());
+                                            "many_variables", &mesh, false, 0u);
 
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
@@ -158,7 +157,7 @@ public:
 
         // Convert
         Hdf5ToCmguiConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
-                                            "cube_2mm_12_elements", &mesh, false, HeartConfig::Instance()->GetVisualizerOutputPrecision());
+                                            "cube_2mm_12_elements", &mesh, false, 0u);
 
         // Compare the voltage file with a correct version that is known to visualize correctly in Cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -185,10 +184,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_with_bath_1d");
-        HeartConfig::Instance()->SetOutputDirectory(working_directory);
         Hdf5ToCmguiConverter<1,1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
-                                            "bidomain_with_bath_1d", &mesh, true, HeartConfig::Instance()->GetVisualizerOutputPrecision());
+                                            "bidomain_with_bath_1d", &mesh, true, 0u);
 
         // Compare the voltage file with a correct version that is known to visualize correctly in Cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -228,7 +225,6 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        HeartConfig::Instance()->SetOutputDirectory(working_directory);
         Hdf5ToCmguiConverter<2,2> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                             "2D_0_to_1mm_400_elements", &mesh);
 
@@ -257,7 +253,6 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        HeartConfig::Instance()->SetOutputDirectory(working_directory);
         Hdf5ToCmguiConverter<1,1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                             "1D_0_to_1_100_elements", &mesh);
 
@@ -286,8 +281,6 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        HeartConfig::Instance()->SetOutputFilenamePrefix("3_vars");
-        HeartConfig::Instance()->SetOutputDirectory(working_directory);
         Hdf5ToCmguiConverter<1,1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                             "3_vars", &mesh);
 

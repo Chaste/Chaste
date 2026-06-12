@@ -52,7 +52,7 @@ private:
     /**
      * Reads in node id and resistance values of junction nodes
      *
-     * The .pvj file path is specified by HeartConfig::Instance()->GetMeshFileName() + ".pvj"
+     * The .pvj file path is derived from the mesh base name + ".pvj"
      *
      * Note, this is called by SetMesh
      */
@@ -67,6 +67,9 @@ protected:
 
     /** A map between junction node ids and resistances */
     std::map<unsigned, double> mJunctionMap;
+
+    /** Purkinje surface-area-to-volume ratio Am (1/cm). Default 2800. */
+    double mPurkinjeSurfaceAreaToVolumeRatio;
 
     /**
      * @return a newly created purkinje cells for the given node.
@@ -110,6 +113,11 @@ public:
     /* Constructor does nothing */
     AbstractPurkinjeCellFactory();
 
+    /**
+     * Set the Purkinje surface-area-to-volume ratio Am.
+     * @param ratio  Am (1/cm), default 2800
+     */
+    void SetPurkinjeSurfaceAreaToVolumeRatio(double ratio) { mPurkinjeSurfaceAreaToVolumeRatio = ratio; }
 
     /** Overridden set mesh which must take a MixedDimensionMesh
      *  @param pMesh Pointer to the mesh. */

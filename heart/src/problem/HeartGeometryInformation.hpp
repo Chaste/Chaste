@@ -153,7 +153,6 @@ private:
     ChasteCuboid<SPACE_DIM> CalculateBoundingBoxOfSurface(const std::vector<unsigned>& rSurfaceNodes);
 
 public:
-/// \todo #1703 Perhaps add these constants to HeartConfig...
     /** Left ventricular wall */
     static const HeartRegionType LEFT_VENTRICLE_WALL=1001;
     /** Right ventricular wall */

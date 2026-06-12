@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacCellFactory.hpp"
 #include "FakeBathCell.hpp"
 #include "AbstractCvodeCell.hpp"
-#include "HeartConfig.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateCardiacCellForNode(
@@ -49,6 +48,8 @@ AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
     else
     {
         AbstractCardiacCellInterface* p_cell = CreateCardiacCellForTissueNode(pNode);
+        // Set ODE timestep for all tissue cells (CVODE cells may override below)
+        p_cell->SetTimestep(mOdeTimeStep);
 #ifdef CHASTE_CVODE
         if (dynamic_cast<AbstractCvodeCell*>(p_cell))
         {
@@ -59,7 +60,7 @@ AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
             static_cast<AbstractCvodeCell*>(p_cell)->SetMinimalReset(true);
 #endif // SUNDIALS_VERSION
             // Use the PDE timestep as the [maximum] CVODE timestep.
-            static_cast<AbstractCvodeCell*>(p_cell)->SetTimestep(HeartConfig::Instance()->GetPdeTimeStep());
+            static_cast<AbstractCvodeCell*>(p_cell)->SetTimestep(mPdeTimeStep);
         }
 #endif // CHASTE_CVODE
         return p_cell;
@@ -77,8 +78,7 @@ void AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::FinaliseCellCreation(
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::FillInCellularTransmuralAreas()
 {
-    EXCEPTION("To get here you have probably asked for Epi/Mid/Endo CellularHeterogeneities in your HeartConfig "
-              "options or configuration .xml file, to use this you will need to provide a method"
+    EXCEPTION("To use cellular transmural heterogeneities you will need to provide a method"
               " `FillInCellularTransmuralAreas()` in your cell factory to override this one.");
 }
 
@@ -95,13 +95,27 @@ AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacCellFactory(
     : mpMesh(NULL),
       mpHeartGeometryInformation(NULL),
       mpZeroStimulus(new ZeroStimulus),
-      mpSolver(pSolver)
+      mpSolver(pSolver),
+      mPdeTimeStep(0.01),
+      mOdeTimeStep(0.01)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::~AbstractCardiacCellFactory()
 {
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::SetPdeTimeStep(double pdeTimeStep)
+{
+    mPdeTimeStep = pdeTimeStep;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::SetOdeTimeStep(double odeTimeStep)
+{
+    mOdeTimeStep = odeTimeStep;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

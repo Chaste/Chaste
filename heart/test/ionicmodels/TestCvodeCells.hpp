@@ -61,7 +61,6 @@ the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src
 #include "DummyModifier.hpp"
 #include "SmartPointers.hpp"
 
-#include "HeartConfig.hpp"
 #include "RegularStimulus.hpp"
 #include "SimpleStimulus.hpp"
 #include "ZeroStimulus.hpp"
@@ -204,18 +203,17 @@ public:
 
         // Check Compute* & SolveAndUpdateState methods from AbstractCardiacCellInterface
         lr91_cvode_system.ResetToInitialConditions();
-        HeartConfig::Instance()->SetPrintingTimeStep(sampling_time);
-        OdeSolution solution_cvode_2 = lr91_cvode_system.Compute(start_time, end_time);
+        OdeSolution solution_cvode_2 = lr91_cvode_system.Compute(start_time, end_time, sampling_time);
         solution_cvode_2.WriteToFile("TestCvodeCells","lr91_cvode_2","ms",1,clean_dir);
         CompareCellModelResults("lr91_cvode_2", "lr91_cvode", 1e-8, voltage_only, "TestCvodeCells");
         lr91_cvode_system.SetMaxSteps(10000); // Needed since we're not sampling
 
         lr91_cvode_system.ResetToInitialConditions();
         TS_ASSERT_EQUALS(lr91_cvode_system.GetMaxSteps(), 10000);
-        lr91_cvode_system.SetMaxTimestep(DOUBLE_UNSET); // Use default (set from HeartConfig)
+        lr91_cvode_system.SetMaxTimestep(DOUBLE_UNSET); // Use default (full interval)
         lr91_cvode_system.SolveAndUpdateState(start_time, end_time);
-        // The max time step, which was unset, should now be set to printing time step.
-        TS_ASSERT_DELTA(lr91_cvode_system.GetTimestep(), HeartConfig::Instance()->GetPrintingTimeStep(), 1e-9);
+        // The max time step, which was unset, should now be set to the full interval length.
+        TS_ASSERT_DELTA(lr91_cvode_system.GetTimestep(), end_time - start_time, 1e-9);
         TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), solution_cvode_2.rGetSolutions().back()[lr91_cvode_system.GetVoltageIndex()], 1e-4);
         // Note: adaptive solve takes different time steps when not sampling => can't use very tight tolerance
 
@@ -340,8 +338,6 @@ public:
                                                                           period,
                                                                           start));
 
-        double ode_time_step = 0.001;
-        HeartConfig::Instance()->SetOdeTimeStep(ode_time_step);
         double start_time = 0.0;
         double end_time = 1000.0; //One second in milliseconds
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);

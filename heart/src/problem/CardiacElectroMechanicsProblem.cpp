@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OutputFileHandler.hpp"
 #include "ReplicatableVector.hpp"
-#include "HeartConfig.hpp"
 #include "LogFile.hpp"
 #include "ChastePoint.hpp"
 #include "Element.hpp"
@@ -292,9 +291,6 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
     // if we didn't disable it.
     HeartEventHandler::Disable();
 
-    assert(HeartConfig::Instance()->GetSimulationDuration()>0.0);
-    assert(HeartConfig::Instance()->GetPdeTimeStep()>0.0);
-
     // Create the monodomain problem.
     // **NOTE** WE ONLY USE THIS TO: set up the cells, get an initial condition
     // (voltage) vector, and get a solver. We won't ever call Solve on the cardiac problem class
@@ -313,8 +309,8 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
         // create the directory
         OutputFileHandler handler(mOutputDirectory);
         mDeformationOutputDirectory = mOutputDirectory + "/deformation";
-        HeartConfig::Instance()->SetOutputDirectory(mOutputDirectory + "/electrics");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("voltage");
+        mpElectricsProblem->SetOutputDirectory(mOutputDirectory + "/electrics");
+        mpElectricsProblem->SetOutputFilenamePrefix("voltage");
     }
     else
     {
@@ -350,11 +346,13 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     assert(mpMechanicsMesh!=NULL);
     assert(mpProblemDefinition!=NULL);
     assert(mpCardiacMechSolver==NULL);
+    assert(mpElectricsProblem->GetSimulationDuration()>0.0);
 
     ///\todo This is fragile: check how the TimeStepper does it, and possibly refactor the behaviour there
     /// into a static helper method if it isn't already.
-    mNumElecTimestepsPerMechTimestep = (unsigned) floor((mpProblemDefinition->GetMechanicsSolveTimestep()/HeartConfig::Instance()->GetPdeTimeStep())+0.5);
-    if (fabs(mNumElecTimestepsPerMechTimestep*HeartConfig::Instance()->GetPdeTimeStep() - mpProblemDefinition->GetMechanicsSolveTimestep()) > 1e-6)
+    double elec_pde_dt = mpElectricsProblem->GetPdeTimeStep();
+    mNumElecTimestepsPerMechTimestep = (unsigned) floor((mpProblemDefinition->GetMechanicsSolveTimestep()/elec_pde_dt)+0.5);
+    if (fabs(mNumElecTimestepsPerMechTimestep*elec_pde_dt - mpProblemDefinition->GetMechanicsSolveTimestep()) > 1e-6)
     {
         EXCEPTION("Electrics PDE timestep does not divide mechanics solve timestep");
     }
@@ -365,7 +363,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     LogFile::Instance()->Set(2, mOutputDirectory);
     LogFile::Instance()->WriteHeader("Electromechanics");
     LOG(2, DIM << "d Implicit CardiacElectroMechanics Simulation:");
-    LOG(2, "End time = " << HeartConfig::Instance()->GetSimulationDuration() << ", electrics time step = " << HeartConfig::Instance()->GetPdeTimeStep() << ", mechanics timestep = " << mpProblemDefinition->GetMechanicsSolveTimestep() << "\n");
+    LOG(2, "End time = " << mpElectricsProblem->GetSimulationDuration() << ", electrics time step = " << mpElectricsProblem->GetPdeTimeStep() << ", mechanics timestep = " << mpProblemDefinition->GetMechanicsSolveTimestep() << "\n");
     LOG(2, "Contraction model ode timestep " << mpProblemDefinition->GetContractionModelOdeTimestep());
     LOG(2, "Output is written to " << mOutputDirectory << "/[deformation/electrics]");
 
@@ -519,7 +517,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     // write the initial position
     unsigned counter = 0;
 
-    TimeStepper stepper(0.0, HeartConfig::Instance()->GetSimulationDuration(), mpProblemDefinition->GetMechanicsSolveTimestep());
+    TimeStepper stepper(0.0, mpElectricsProblem->GetSimulationDuration(), mpProblemDefinition->GetMechanicsSolveTimestep());
 
     CmguiDeformedSolutionsWriter<DIM>* p_cmgui_writer = NULL;
 
@@ -528,7 +526,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     if (mWriteOutput)
     {
 #ifdef CHASTE_VTK
-        if (HeartConfig::Instance()->GetVisualizeWithVtk())
+        if (mpElectricsProblem->mVisualizeWithVtk)
         {
             ReplicatableVector ic(initial_voltage);
             mpCardiacVtkWriter = new CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>(*mpMechanicsSolver,
@@ -620,10 +618,9 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
         if (!mNoElectricsOutput)
         {
-            // the writer inside monodomain problem uses the printing timestep
-            // inside HeartConfig to estimate total number of timesteps, so make
-            // sure this is set to what we will use.
-            HeartConfig::Instance()->SetPrintingTimeStep(mpProblemDefinition->GetMechanicsSolveTimestep());
+            // Set the printing timestep to the mechanics solve timestep so the writer
+            // correctly estimates the number of timesteps.
+            mpElectricsProblem->SetPrintingTimeStep(mpProblemDefinition->GetMechanicsSolveTimestep());
 
             // When we consider archiving these simulations we will need to get a bool back from the following
             // command to decide whether or not the file is being extended, and hence whether to write the
@@ -704,7 +701,8 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             }
         }
 
-        p_electrics_solver->SetTimeStep(HeartConfig::Instance()->GetPdeTimeStep());
+        double elec_dt = mpElectricsProblem->GetPdeTimeStep();
+        p_electrics_solver->SetTimeStep(elec_dt);
 
         /////////////////////////////////////////////////////////////////////////
         ////
@@ -715,8 +713,8 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         MechanicsEventHandler::BeginEvent(MechanicsEventHandler::NON_MECH);
         for (unsigned i=0; i<mNumElecTimestepsPerMechTimestep; i++)
         {
-            double current_time = stepper.GetTime() + i*HeartConfig::Instance()->GetPdeTimeStep();
-            double next_time = stepper.GetTime() + (i+1)*HeartConfig::Instance()->GetPdeTimeStep();
+            double current_time = stepper.GetTime() + i*elec_dt;
+            double next_time = stepper.GetTime() + (i+1)*elec_dt;
 
             // solve the electrics
             p_electrics_solver->SetTimes(current_time, next_time);
@@ -870,7 +868,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             p_cmgui_writer->WriteDeformationPositions(rGetDeformedPosition(), counter);
 
 #ifdef CHASTE_VTK
-            if (HeartConfig::Instance()->GetVisualizeWithVtk())
+            if (mpElectricsProblem->mVisualizeWithVtk)
             {
                 mpCardiacVtkWriter->WriteSolution(counter,electrics_solution_repl);//writer will pick up mech solution from solver
             }
@@ -902,42 +900,19 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     if ((mWriteOutput) && (!mNoElectricsOutput))
     {
-        HeartConfig::Instance()->Reset();
         mpElectricsProblem->mpWriter->Close();
         delete mpElectricsProblem->mpWriter;
 
         std::string input_dir = mOutputDirectory+"/electrics";
 
-        // Convert simulation data to meshalyzer format - commented
-        std::string config_directory = HeartConfig::Instance()->GetOutputDirectory();
-        HeartConfig::Instance()->SetOutputDirectory(input_dir);
-
-//      Hdf5ToMeshalyzerConverter<DIM,DIM> meshalyzer_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
-//                                                              "voltage", mpElectricsMesh,
-//                                                                HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
-//                                                                HeartConfig::Instance()->GetVisualizerOutputPrecision() );
-        // Write mesh in a suitable form for meshalyzer
-        //std::string output_directory =  mOutputDirectory + "/electrics/output";
-        // Write the mesh
-        //MeshalyzerMeshWriter<DIM,DIM> mesh_writer(output_directory, "mesh", false);
-        //mesh_writer.WriteFilesUsingMesh(*mpElectricsMesh);
-        // Write the parameters out
-        //HeartConfig::Instance()->Write();
-
         // convert output to CMGUI format
         Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
                                                       "voltage", mpElectricsMesh, mHasBath,
-                                                      HeartConfig::Instance()->GetVisualizerOutputPrecision());
+                                                      mpElectricsProblem->mVisualizerOutputPrecision);
 
         // interpolate the electrical data onto the mechanics mesh nodes and write CMGUI...
-        // Note: this calculates the data on ALL nodes of the mechanics mesh (incl internal,
-        // non-vertex ones), which won't be used if linear CMGUI visualisation
-        // of the mechanics solution is used.
         VoltageInterpolaterOntoMechanicsMesh<DIM> converter(*mpElectricsMesh,*mpMechanicsMesh);
         converter.OutputToCmgui(variable_names,input_dir,"voltage");
-
-        // reset to the default value
-        HeartConfig::Instance()->SetOutputDirectory(config_directory);
     }
 
     if (p_cmgui_writer)

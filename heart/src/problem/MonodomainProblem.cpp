@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::CreateCardiacTissue()
 {
-    mpMonodomainTissue = new MonodomainTissue<ELEMENT_DIM,SPACE_DIM>(this->mpCellFactory, HeartConfig::Instance()->GetUseStateVariableInterpolation());
+    mpMonodomainTissue = new MonodomainTissue<ELEMENT_DIM,SPACE_DIM>(this->mpCellFactory, this->mUseStateVariableInterpolation);
     return mpMonodomainTissue;
 }
 
@@ -62,17 +62,31 @@ AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>* MonodomainProblem<ELE
      * required in the solvers it should all work OK.
      */
 
-    if (HeartConfig::Instance()->GetUseReactionDiffusionOperatorSplitting())
+    if (this->mUseReactionDiffusionOperatorSplitting)
     {
-        return new OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,
-                                                                            mpMonodomainTissue,
-                                                                            this->mpBoundaryConditionsContainer.get());
+        OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>* p_solver =
+            new OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,
+                                                                         mpMonodomainTissue,
+                                                                         this->mpBoundaryConditionsContainer.get());
+        p_solver->SetKspConfig(this->mUseAbsoluteTolerance, this->mKspAbsoluteTolerance,
+                               this->mKspRelativeTolerance, this->mKspSolver, this->mKspPreconditioner,
+                               this->mUseMassLumping, this->mUseMassLumpingForPrecond,
+                               this->mUseFixedNumberIterations, this->mEvaluateNumItsEveryNSolves,
+                               this->mUseStateVariableInterpolation);
+        return p_solver;
     }
     else
     {
-        return new MonodomainSolver<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,
-                                                           mpMonodomainTissue,
-                                                           this->mpBoundaryConditionsContainer.get());
+        MonodomainSolver<ELEMENT_DIM,SPACE_DIM>* p_solver =
+            new MonodomainSolver<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,
+                                                        mpMonodomainTissue,
+                                                        this->mpBoundaryConditionsContainer.get());
+        p_solver->SetKspConfig(this->mUseAbsoluteTolerance, this->mKspAbsoluteTolerance,
+                               this->mKspRelativeTolerance, this->mKspSolver, this->mKspPreconditioner,
+                               this->mUseMassLumping, this->mUseMassLumpingForPrecond,
+                               this->mUseFixedNumberIterations, this->mEvaluateNumItsEveryNSolves,
+                               this->mUseStateVariableInterpolation);
+        return p_solver;
     }
 }
 

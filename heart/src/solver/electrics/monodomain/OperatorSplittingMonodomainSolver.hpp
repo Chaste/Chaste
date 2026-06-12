@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *   (a)  Stages (iii) and (i) can normally be solved together in one go, except just before/after printing the voltage to file.
  *        However for simplicity of code this has not been implemented
  *   (b)  Therefore, the effective ODE timestep will be:  min(ode_dt, pde_dt/2), where ode_dt and pde_dt are those
- *        given via HeartConfig.
+ *        given on the problem object.
  *   (c)  This solver is FOR COMPARING ACCURACY, NOT PERFORMANCE. It has not been optimised and may or may not
  *        perform well in parallel.
  *   (d)  We don't implement the simpler form of operator splitting, Godunov splitting, where the ODEs are
@@ -96,6 +96,17 @@ private:
      *  is no Iionic term.
      */
     Vec mVecForConstructingRhs;
+
+    // KSP configuration
+    bool mUseAbsoluteTolerance;
+    double mKspAbsoluteTolerance;
+    double mKspRelativeTolerance;
+    std::string mKspSolverType;
+    std::string mKspPreconditionerType;
+    bool mUseMassLumping;
+    bool mUseMassLumpingForPrecond;
+    bool mUseFixedNumberIterations;
+    unsigned mEvaluateNumItsEveryNSolves;
 
     /**
      *  Implementation of SetupLinearSystem() which uses the assembler to compute the
@@ -144,6 +155,12 @@ public:
      *  Destructor
      */
     ~OperatorSplittingMonodomainSolver();
+
+    /** Configure KSP solver settings (same signature as MonodomainSolver::SetKspConfig). */
+    void SetKspConfig(bool useAbsTol, double absTol, double relTol,
+                      const std::string& rKspType, const std::string& rPcType,
+                      bool useMassLumping, bool useMassLumpingForPrecond,
+                      bool useFixedIts, unsigned evalEvery, bool /*ignored: useStateVarInterp*/);
 };
 
 #endif /* OPERATORSPLITTINGMONODOMAINSOLVER_HPP_ */

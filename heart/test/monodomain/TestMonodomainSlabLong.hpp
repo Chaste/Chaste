@@ -84,14 +84,13 @@ class TestMonodomainSlabLong : public CxxTest::TestSuite
 public:
     void TestMonodomainSlabLongWithCornerNodesStimulated( void )
     {
-        HeartConfig::Instance()->SetSimulationDuration(200); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoDg03dSlabLong");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_3dSlabLong");
-
         CornerStimulusCellFactory cell_factory;
 
         MonodomainProblem<3> monodomain_problem( &cell_factory );
+        monodomain_problem.SetSimulationDuration(200); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
+        monodomain_problem.SetOutputDirectory("MonoDg03dSlabLong");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_3dSlabLong");
 
         monodomain_problem.Initialise();
         monodomain_problem.Solve();

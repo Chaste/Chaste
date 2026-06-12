@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCvodeCell.hpp"
 #include "Exception.hpp"
-#include "HeartConfig.hpp"
 #include "VectorHelperFunctions.hpp"
 
 
@@ -84,7 +83,7 @@ void AbstractCvodeCell::SetTimestep(double maxDt)
     mMaxDt = maxDt;
 }
 
-double AbstractCvodeCell::GetTimestep()
+double AbstractCvodeCell::GetTimestep() const
 {
     return mMaxDt;
 }
@@ -94,7 +93,7 @@ void AbstractCvodeCell::SolveAndUpdateState(double tStart, double tEnd)
 {
     if (mMaxDt == DOUBLE_UNSET)
     {
-        SetTimestep(HeartConfig::Instance()->GetPrintingTimeStep());
+        SetTimestep(tEnd - tStart); // Use the full interval as the max CVODE timestep
     }
     Solve(tStart, tEnd, mMaxDt);
 }
@@ -103,7 +102,7 @@ OdeSolution AbstractCvodeCell::Compute(double tStart, double tEnd, double tSamp)
 {
     if (tSamp == 0.0)
     {
-        tSamp = HeartConfig::Instance()->GetPrintingTimeStep();
+        tSamp = tEnd - tStart; // sample at the end of the interval
     }
     if (mMaxDt == DOUBLE_UNSET)
     {

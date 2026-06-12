@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "HeartConfig.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -63,11 +62,11 @@ public:
         // These have NaN in the jacobian due to massive exponentials
         std::vector<std::string> bad_models = special_treatment_models(models, {"faber_rudy_2000", "difrancesco_noble_model_1985"});
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
+        SetDefaultOdeDt(0.001);
         RunTests(dirname, models, args, false, 0, false);
 
         // See Cooper Spiteri Mirams paper table 2
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
+        SetDefaultOdeDt(0.0001953125);
         RunTests(dirname + "-small-dt", small_dt_models, args, false, 0, false);
 
     }

@@ -50,8 +50,8 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)>
             Element<ELEMENT_DIM,SPACE_DIM>* pElement)
 {
     // get bidomain parameters
-    double Am = this->mpConfig->GetSurfaceAreaToVolumeRatio();
-    double Cm = this->mpConfig->GetCapacitance();
+    double Am = this->mpCardiacTissue->GetSurfaceAreaToVolumeRatio();
+    double Cm = this->mpCardiacTissue->GetCapacitance();
 
     const c_matrix<double, SPACE_DIM, SPACE_DIM>& sigma_i = this->mpCardiacTissue->rGetIntracellularConductivityTensor(pElement->GetIndex());
     const c_matrix<double, SPACE_DIM, SPACE_DIM>& sigma_e = this->mpCardiacTissue->rGetExtracellularConductivityTensor(pElement->GetIndex());

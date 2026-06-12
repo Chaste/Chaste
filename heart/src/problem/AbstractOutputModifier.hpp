@@ -113,6 +113,13 @@ public:
      * @param pVectorFactory  The vector factory which is associated with the calling problem's mesh
      * @param rNodePermutation The permutation associated with the calling problem's mesh (when running with parallel partitioning)
      */
+    /**
+     * Set the output directory.  Called by AbstractCardiacProblem before the solve loop starts.
+     * The default implementation does nothing; override to store and use the directory.
+     * @param rDirectory  output directory (relative to CHASTE_TEST_OUTPUT)
+     */
+    virtual void SetOutputDirectory(const std::string& rDirectory) {}
+
     virtual void InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation)=0;
 
     /**

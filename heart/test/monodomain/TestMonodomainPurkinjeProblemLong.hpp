@@ -134,15 +134,6 @@ public:
     // run with
     void TestIn3d()
     {
-        // Settings common to both problems
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
-        // make both problems use the same surface area
-        HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
-
-
         ReplicatableVector soln_repl;
         ReplicatableVector soln_mono_repl;
 
@@ -159,9 +150,13 @@ public:
 
             // Set up normal monodomain
             NonPurkinjeCellFactory3d cell_factory_for_just_monodomain;
-            HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinje3d_normal");
             MonodomainProblem<3,3> monodomain_problem(&cell_factory_for_just_monodomain);
             monodomain_problem.SetMesh(&mesh);
+            monodomain_problem.SetKspAbsoluteTolerance(1e-12);
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+            monodomain_problem.SetSimulationDuration(1.0);
+            monodomain_problem.SetVisualizeWithVtk(true);
+            monodomain_problem.SetOutputDirectory("TestMonodomainPurkinje3d_normal");
             monodomain_problem.Initialise();
             monodomain_problem.SetWriteInfo();
             // Solve
@@ -184,10 +179,15 @@ public:
             HeartEventHandler::Reset();
 
             // Set up Purkinje problem
-            HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinje3d_purkinje");
             PurkinjeCellFactory3d cell_factory;
             MonodomainPurkinjeProblem<3,3> purkinje_problem(&cell_factory);
             purkinje_problem.SetMesh(&mesh);
+            purkinje_problem.SetPurkinjeSurfaceAreaToVolumeRatio(1400.0); // match default myocardial Am
+            purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+            purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+            purkinje_problem.SetSimulationDuration(1.0);
+            purkinje_problem.SetVisualizeWithVtk(true);
+            purkinje_problem.SetOutputDirectory("TestMonodomainPurkinje3d_purkinje");
             purkinje_problem.Initialise();
             purkinje_problem.SetWriteInfo();
 

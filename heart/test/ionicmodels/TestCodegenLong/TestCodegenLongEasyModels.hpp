@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "HeartConfig.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -73,7 +72,7 @@ public:
         args.push_back("--backward-euler");
         args.push_back("--opt");
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        SetDefaultOdeDt(0.01);
         RunTests(dirname, easy_models, args, true);
     }
 };

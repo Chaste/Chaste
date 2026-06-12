@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/make_shared.hpp>
 
 #include <iostream>
 #include <vector>
@@ -250,7 +251,6 @@ public:
     /**This test checks heterogeneous conductivities*/
     void TestExtendedTissueHeterogeneous3D()
     {
-        HeartConfig::Instance()->Reset();
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -280,14 +280,9 @@ public:
         intra_conductivities.push_back( Create_c_vector(11.0, 22.0, 33.0) );
         extra_conductivities.push_back( Create_c_vector(151.0, 152.0, 153.0) );
 
-        HeartConfig::Instance()->SetConductivityHeterogeneities(heterogeneity_area, intra_conductivities, extra_conductivities);
-
         //elsewhere
         double isotropic_intra_conductivity=15.0;
         double isotropic_extra_conductivity=65.0;
-
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(isotropic_intra_conductivity, isotropic_intra_conductivity, isotropic_intra_conductivity));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(isotropic_extra_conductivity, isotropic_extra_conductivity, isotropic_extra_conductivity));
 
         StimulatedCellFactory stimulated_cell_factory;
         UnStimulatedCellFactory unstimulated_cell_factory;
@@ -298,6 +293,17 @@ public:
         extracellular_stimulus_factory.SetMesh(&mesh);
 
         ExtendedBidomainTissue<3>  extended_bidomain_tissue( &stimulated_cell_factory,  &unstimulated_cell_factory, &extracellular_stimulus_factory);
+
+        // Set conductivities on the tissue directly
+        extended_bidomain_tissue.SetIntracellularConductivities(Create_c_vector(isotropic_intra_conductivity, isotropic_intra_conductivity, isotropic_intra_conductivity));
+        extended_bidomain_tissue.SetExtracellularConductivities(Create_c_vector(isotropic_extra_conductivity, isotropic_extra_conductivity, isotropic_extra_conductivity));
+        for (unsigned i = 0; i < heterogeneity_area.size(); i++)
+        {
+            extended_bidomain_tissue.AddConductivityHeterogeneity(
+                boost::make_shared<ChasteCuboid<3>>(heterogeneity_area[i]),
+                intra_conductivities[i], extra_conductivities[i]);
+        }
+        extended_bidomain_tissue.RebuildConductivityTensors();
 
         extended_bidomain_tissue.SetIntracellularConductivitiesSecondCell(Create_c_vector(isotropic_intra_conductivity, isotropic_intra_conductivity, isotropic_intra_conductivity));
         extended_bidomain_tissue.CreateIntracellularConductivityTensorSecondCell();
@@ -325,45 +331,39 @@ public:
 
     void TestExtendedTissueHeterogeneousConductivities2D()
     {
-        HeartConfig::Instance()->Reset();
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        //HeartConfig setup needs to be in 3D anyway (hardcoded in HeartConfig).
-        std::vector<ChasteCuboid<3> > heterogeneity_area;
-        std::vector< c_vector<double,3> > intra_conductivities;
-        std::vector< c_vector<double,3> > extra_conductivities;
+        std::vector<ChasteCuboid<2> > heterogeneity_area;
+        std::vector< c_vector<double,2> > intra_conductivities;
+        std::vector< c_vector<double,2> > extra_conductivities;
 
         //first cuboid includes element 0
-        ChastePoint<3> cornerA(-1, -1,-1);
-        ChastePoint<3> cornerB(0.48, 2.0, 0.48);
-        ChasteCuboid<3> cuboid_1(cornerA, cornerB);
+        ChastePoint<2> cornerA(-1, -1);
+        ChastePoint<2> cornerB(0.48, 2.0);
+        ChasteCuboid<2> cuboid_1(cornerA, cornerB);
 
         heterogeneity_area.push_back(cuboid_1);
 
         //second cuboid includes element 2
-        ChastePoint<3> cornerC(0.52, -1, 0.52);
-        ChastePoint<3> cornerD(2, 2, 2);
-        ChasteCuboid<3> cuboid_2(cornerC, cornerD);
+        ChastePoint<2> cornerC(0.52, -1);
+        ChastePoint<2> cornerD(2, 2);
+        ChasteCuboid<2> cuboid_2(cornerC, cornerD);
 
         heterogeneity_area.push_back(cuboid_2);
 
         //within the first area
-        intra_conductivities.push_back( Create_c_vector(1.0, 2.0, 3.0) );
-        extra_conductivities.push_back( Create_c_vector(51.0, 52.0, 53.0) );
+        intra_conductivities.push_back( Create_c_vector(1.0, 2.0) );
+        extra_conductivities.push_back( Create_c_vector(51.0, 52.0) );
 
         //within the second area
-        intra_conductivities.push_back( Create_c_vector(11.0, 22.0, 33.0) );
-        extra_conductivities.push_back( Create_c_vector(151.0, 152.0, 153.0) );
-
-        HeartConfig::Instance()->SetConductivityHeterogeneities(heterogeneity_area, intra_conductivities, extra_conductivities);
+        intra_conductivities.push_back( Create_c_vector(11.0, 22.0) );
+        extra_conductivities.push_back( Create_c_vector(151.0, 152.0) );
 
         //elsewhere
         double isotropic_intra_conductivity=15.0;
         double isotropic_extra_conductivity=65.0;
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(isotropic_intra_conductivity, isotropic_intra_conductivity, isotropic_intra_conductivity));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(isotropic_extra_conductivity, isotropic_extra_conductivity, isotropic_extra_conductivity));
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory_1;
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory_2;
@@ -376,9 +376,19 @@ public:
         //2D tissue
         ExtendedBidomainTissue<2>  extended_bidomain_tissue( &cell_factory_1,  &cell_factory_2, &extracellular_stimulus_factory);
 
+        extended_bidomain_tissue.SetIntracellularConductivities(Create_c_vector(isotropic_intra_conductivity, isotropic_intra_conductivity));
+        extended_bidomain_tissue.SetExtracellularConductivities(Create_c_vector(isotropic_extra_conductivity, isotropic_extra_conductivity));
+        for (unsigned i = 0; i < heterogeneity_area.size(); i++)
+        {
+            extended_bidomain_tissue.AddConductivityHeterogeneity(
+                boost::make_shared<ChasteCuboid<2>>(heterogeneity_area[i]),
+                intra_conductivities[i], extra_conductivities[i]);
+        }
+
         // Do conductivity modifier here too (for coverage)
         SimpleConductivityModifier conductivity_modifier;
         extended_bidomain_tissue.SetConductivityModifier( &conductivity_modifier );
+        extended_bidomain_tissue.RebuildConductivityTensors();
 
         extended_bidomain_tissue.SetIntracellularConductivitiesSecondCell(Create_c_vector(isotropic_intra_conductivity, isotropic_intra_conductivity));
         extended_bidomain_tissue.CreateIntracellularConductivityTensorSecondCell();
@@ -404,7 +414,6 @@ public:
 
     void TestExtendedTissueHeterogeneousGgap3D()
     {
-        HeartConfig::Instance()->Reset();
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -480,8 +489,6 @@ public:
 
     void TestExtendedBidomainTissueParameters()
     {
-        HeartConfig::Instance()->Reset();
-
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(2,2,2);
 
@@ -524,14 +531,11 @@ public:
      */
     void TestSaveAndLoadExtendedBidomainTissue()
     {
-        HeartConfig::Instance()->Reset();
         // Archive settings
         FileFinder archive_dir("extended_tissue_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "extended_bidomain_tissue.arch";
 
         bool cache_replication_saved = false;
-        double saved_printing_timestep = 2.0;
-        double default_printing_timestep = HeartConfig::Instance()->GetPrintingTimeStep();
 
         c_matrix<double, 3, 3> intra_tensor_before_archiving;
         c_matrix<double, 3, 3> intra_tensor_second_cell_before_archiving;
@@ -539,10 +543,6 @@ public:
 
         //creation and save
         {
-            // This call is required to set the appropriate conductivity media and to make sure that HeartConfig
-            // knows the mesh filename despite we use our own mesh reader.
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/cube_136_elements");
-
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
 #ifndef CHASTE_SCOTCH_PARMETIS
             DistributedTetrahedralMesh<3,3> mesh;
@@ -591,10 +591,6 @@ public:
             extended_tissue.SetGgapHeterogeneities(heterogeneity_areas, Ggap_values);
             extended_tissue.CreateGGapConductivities();
 
-            // Some checks to make sure HeartConfig is being saved and loaded by this too.
-            HeartConfig::Instance()->SetPrintingTimeStep(saved_printing_timestep);
-            TS_ASSERT_DELTA(HeartConfig::Instance()->GetPrintingTimeStep(), saved_printing_timestep, 1e-9);
-
             intra_tensor_before_archiving = extended_tissue.rGetIntracellularConductivityTensor(0);
             intra_tensor_second_cell_before_archiving = extended_tissue.rGetIntracellularConductivityTensorSecondCell(0);
             extra_tensor_before_archiving = extended_tissue.rGetExtracellularConductivityTensor(0);
@@ -605,10 +601,6 @@ public:
 
             AbstractCardiacTissue<3>* const p_archive_bidomain_tissue = &extended_tissue;
             (*p_arch) << p_archive_bidomain_tissue;
-
-            HeartConfig::Reset();
-            TS_ASSERT_DELTA(HeartConfig::Instance()->GetPrintingTimeStep(), default_printing_timestep, 1e-9);
-            TS_ASSERT_DIFFERS(saved_printing_timestep, default_printing_timestep);
         }
         //load
         {
@@ -730,8 +722,6 @@ public:
             TS_ASSERT_EQUALS(p_extended_tissue->HasTheUserSuppliedExtracellularStimulus(),true);
 
             TS_ASSERT_EQUALS(cache_replication_saved, p_extended_tissue->GetDoCacheReplication());
-            TS_ASSERT_DELTA(HeartConfig::Instance()->GetPrintingTimeStep(), saved_printing_timestep, 1e-9);
-            TS_ASSERT_DIFFERS(saved_printing_timestep, default_printing_timestep); // Test we are testing something in case default changes
 
             delete p_extended_tissue;
         }

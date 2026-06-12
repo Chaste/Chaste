@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "BidomainProblem.hpp"
 #include "DistributedVector.hpp"
-#include "HeartConfig.hpp"
 #include "PlaneStimulusCellFactory.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "TetrahedralMesh.hpp"
@@ -54,10 +53,6 @@ public:
 
     void TestBidomainProblemWithDistributedMesh2D()
     {
-        HeartConfig::Instance()->SetSimulationDuration(1);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("DistributedMesh2d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("tetrahedral2d");
-
         // The default stimulus in PlaneStimulusCellFactory is not enough to generate propagation
         // here, increasing it an order of magnitude
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-6000);
@@ -74,11 +69,13 @@ public:
             mesh.ConstructFromMeshReader(mesh_reader);
 
             BidomainProblem<2> nondistributed_problem( &cell_factory );
+            nondistributed_problem.SetSimulationDuration(1);  //ms
+            nondistributed_problem.SetOutputDirectory("DistributedMesh2d");
+            nondistributed_problem.SetOutputFilenamePrefix("tetrahedral2d");
+            nondistributed_problem.SetSurfaceAreaToVolumeRatio(1.0);
+            nondistributed_problem.SetCapacitance(1.0);
             nondistributed_problem.SetMesh(&mesh);
             nondistributed_problem.Initialise();
-
-            HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-            HeartConfig::Instance()->SetCapacitance(1.0);
 
             nondistributed_problem.Solve();
 
@@ -108,21 +105,21 @@ public:
         ///////////////////////////////////////////////////////////////////
         // DistributedTetrahedralMesh
         ///////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOutputFilenamePrefix("distributed2d");
-
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
         DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
 
         mesh.ConstructFromMeshReader(mesh_reader);
 
         BidomainProblem<2> distributed_problem( &cell_factory );
+        distributed_problem.SetSimulationDuration(1);  //ms
+        distributed_problem.SetOutputDirectory("DistributedMesh2d");
+        distributed_problem.SetOutputFilenamePrefix("distributed2d");
+        distributed_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        distributed_problem.SetCapacitance(1.0);
 
         distributed_problem.SetMesh(&mesh);
 
         distributed_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
         distributed_problem.Solve();
 
@@ -161,10 +158,6 @@ public:
 
     void TestBidomainProblemWithDistributedMesh2DParMetis()
     {
-        HeartConfig::Instance()->SetSimulationDuration(1);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("DistributedMesh2d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("tetrahedral2d");
-
         // The default stimulus in PlaneStimulusCellFactory is not enough to generate propagation
         // here, increasing it an order of magnitude
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-6000, 0.5);
@@ -181,11 +174,13 @@ public:
             mesh.ConstructFromMeshReader(mesh_reader);
 
             BidomainProblem<2> nondistributed_problem( &cell_factory );
+            nondistributed_problem.SetSimulationDuration(1);  //ms
+            nondistributed_problem.SetOutputDirectory("DistributedMesh2d");
+            nondistributed_problem.SetOutputFilenamePrefix("tetrahedral2d");
+            nondistributed_problem.SetSurfaceAreaToVolumeRatio(1.0);
+            nondistributed_problem.SetCapacitance(1.0);
             nondistributed_problem.SetMesh(&mesh);
             nondistributed_problem.Initialise();
-
-            HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-            HeartConfig::Instance()->SetCapacitance(1.0);
 
             nondistributed_problem.Solve();
 
@@ -214,24 +209,18 @@ public:
         ///////////////////////////////////////////////////////////////////
         // DistributedTetrahedralMesh
         ///////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOutputFilenamePrefix("distributed2d");
-        HeartConfig::Instance()->SetMeshPartitioning("parmetis");
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
-
-//        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-//        DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
-//        mesh.ConstructFromMeshReader(mesh_reader);
-
         BidomainProblem<2> distributed_problem( &cell_factory );
+        distributed_problem.SetSimulationDuration(1);  //ms
+        distributed_problem.SetOutputDirectory("DistributedMesh2d");
+        distributed_problem.SetOutputFilenamePrefix("distributed2d");
+        distributed_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        distributed_problem.SetCapacitance(1.0);
+        distributed_problem.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        distributed_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
 
         //distributed_problem.PrintOutput(false);
 
-//        distributed_problem.SetMesh(&mesh);
-
         distributed_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
         distributed_problem.Solve();
 
@@ -269,10 +258,6 @@ public:
     }
     void TestBidomainProblemWithDistributedMeshFromMemfem3DParMetis()
     {
-        HeartConfig::Instance()->SetSimulationDuration(1);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("DistributedMesh3dRepViaTri");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("tetrahedral3d");
-
         // The default stimulus in PlaneStimulusCellFactory is not enough to generate propagation
         // here, increasing it an order of magnitude
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-6000);
@@ -295,11 +280,13 @@ public:
 
 
             BidomainProblem<3> nondistributed_problem( &cell_factory );
+            nondistributed_problem.SetSimulationDuration(1);  //ms
+            nondistributed_problem.SetOutputDirectory("DistributedMesh3dRepViaTri");
+            nondistributed_problem.SetOutputFilenamePrefix("tetrahedral3d");
+            nondistributed_problem.SetSurfaceAreaToVolumeRatio(1.0);
+            nondistributed_problem.SetCapacitance(1.0);
             nondistributed_problem.SetMesh(&mesh);
             nondistributed_problem.Initialise();
-
-            HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-            HeartConfig::Instance()->SetCapacitance(1.0);
 
             nondistributed_problem.Solve();
 
@@ -328,15 +315,14 @@ public:
         ///////////////////////////////////////////////////////////////////
         // DistributedTetrahedralMesh from Memfem
         ///////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOutputDirectory("DistributedMesh3dDistViaMem");
-
         BidomainProblem<3> distributed_problem( &cell_factory );
-
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/Memfem_slab");
+        distributed_problem.SetSimulationDuration(1);  //ms
+        distributed_problem.SetOutputDirectory("DistributedMesh3dDistViaMem");
+        distributed_problem.SetOutputFilenamePrefix("tetrahedral3d");
+        distributed_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        distributed_problem.SetCapacitance(1.0);
+        distributed_problem.SetMeshFileName("mesh/test/data/Memfem_slab");
         distributed_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
         distributed_problem.Solve();
 

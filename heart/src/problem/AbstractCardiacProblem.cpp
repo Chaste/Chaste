@@ -34,14 +34,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "AbstractCardiacProblem.hpp"
 
+#include "UblasCustomFunctions.hpp"
+#include "BidomainTissue.hpp"
 #include "DistributedVector.hpp"
 #include "Exception.hpp"
 #include "GenericMeshReader.hpp"
 #include "Hdf5ToCmguiConverter.hpp"
 #include "Hdf5ToMeshalyzerConverter.hpp"
 #include "Hdf5ToVtkConverter.hpp"
-#include "HeartConfig.hpp"
+#include "ChastePoint.hpp"
+#include "DistributedTetrahedralMeshPartitionType.hpp"
 #include "HeartEventHandler.hpp"
+#include "HeartRegionCodes.hpp"
 #include "LinearSystem.hpp"
 #include "PetscTools.hpp"
 #include "PostProcessingWriter.hpp"
@@ -64,8 +68,42 @@ AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractCardiacProb
           mpTimeAdaptivityController(NULL),
           mpWriter(NULL),
           mUseHdf5DataWriterCache(false),
-          mHdf5DataWriterChunkSizeAndAlignment(0)
+          mHdf5DataWriterChunkSizeAndAlignment(0),
+          mSimulationDuration(-1.0),
+          mOdeTimeStep(0.01),
+          mPdeTimeStep(0.01),
+          mPrintingTimeStep(0.01),
+          mOutputDirectory("ChasteResults"),
+          mOutputFilenamePrefix("SimulationResults"),
+          mOutputUsingOriginalNodeOrdering(false),
+          mVisualizeWithMeshalyzer(false),
+          mVisualizeWithCmgui(false),
+          mVisualizeWithVtk(false),
+          mVisualizeWithParallelVtk(false),
+          mVisualizerOutputPrecision(0),
+          mCheckpointSimulation(false),
+          mCheckpointTimestep(-1.0),
+          mMaxCheckpointsOnDisk(UINT_MAX),
+          mMeshPartitioning(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY),
+          mUseAbsoluteTolerance(true),
+          mKspAbsoluteTolerance(2e-4),
+          mKspRelativeTolerance(1e-6),
+          mKspSolver("cg"),
+          mKspPreconditioner("bjacobi"),
+          mUseMassLumping(false),
+          mUseMassLumpingForPrecond(false),
+          mUseFixedNumberIterations(false),
+          mEvaluateNumItsEveryNSolves(0),
+          mUseStateVariableInterpolation(false),
+          mUseReactionDiffusionOperatorSplitting(false),
+          mSurfaceAreaToVolumeRatio(1400.0),
+          mCapacitance(1.0),
+          mFibreFileType("")
 {
+    mTissueIdentifiers.insert(0u);
+    mBathIdentifiers.insert(1u);
+    mIntraConductivitiesOrthotropic = scalar_vector<double>(SPACE_DIM, 1.75);
+    mExtraConductivitiesOrthotropic = scalar_vector<double>(SPACE_DIM, 7.0);
     assert(mNodesToOutput.empty());
     if (!mpCellFactory)
     {
@@ -94,8 +132,42 @@ AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractCardiacProb
           mpTimeAdaptivityController(NULL),
           mpWriter(NULL),
           mUseHdf5DataWriterCache(false),
-          mHdf5DataWriterChunkSizeAndAlignment(0)
+          mHdf5DataWriterChunkSizeAndAlignment(0),
+          mSimulationDuration(-1.0),
+          mOdeTimeStep(0.01),
+          mPdeTimeStep(0.01),
+          mPrintingTimeStep(0.01),
+          mOutputDirectory("ChasteResults"),
+          mOutputFilenamePrefix("SimulationResults"),
+          mOutputUsingOriginalNodeOrdering(false),
+          mVisualizeWithMeshalyzer(false),
+          mVisualizeWithCmgui(false),
+          mVisualizeWithVtk(false),
+          mVisualizeWithParallelVtk(false),
+          mVisualizerOutputPrecision(0),
+          mCheckpointSimulation(false),
+          mCheckpointTimestep(-1.0),
+          mMaxCheckpointsOnDisk(UINT_MAX),
+          mMeshPartitioning(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY),
+          mUseAbsoluteTolerance(true),
+          mKspAbsoluteTolerance(2e-4),
+          mKspRelativeTolerance(1e-6),
+          mKspSolver("cg"),
+          mKspPreconditioner("bjacobi"),
+          mUseMassLumping(false),
+          mUseMassLumpingForPrecond(false),
+          mUseFixedNumberIterations(false),
+          mEvaluateNumItsEveryNSolves(0),
+          mUseStateVariableInterpolation(false),
+          mUseReactionDiffusionOperatorSplitting(false),
+          mSurfaceAreaToVolumeRatio(1400.0),
+          mCapacitance(1.0),
+          mFibreFileType("")
 {
+    mTissueIdentifiers.insert(0u);
+    mBathIdentifiers.insert(1u);
+    mIntraConductivitiesOrthotropic = scalar_vector<double>(SPACE_DIM, 1.75);
+    mExtraConductivitiesOrthotropic = scalar_vector<double>(SPACE_DIM, 7.0);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
@@ -124,76 +196,60 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Initialise()
             WARNING("Using a non-distributed mesh in a parallel simulation is not a good idea.");
         }
     }
+    else if (!mMeshFilename.empty())
+    {
+        auto* p_mesh = new DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>(mMeshPartitioning);
+        std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>> p_reader
+            = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(mMeshFilename);
+        p_mesh->ConstructFromMeshReader(*p_reader);
+        mpMesh = p_mesh;
+        mAllocatedMemoryForMesh = true;
+    }
     else
     {
-        // If no mesh has been passed, we get it from the configuration file
-        try
-        {
-            if (HeartConfig::Instance()->GetLoadMesh())
-            {
-                CreateMeshFromHeartConfig();
-                std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_mesh_reader
-                    = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(HeartConfig::Instance()->GetMeshName());
-                mpMesh->ConstructFromMeshReader(*p_mesh_reader);
-            }
-            else if (HeartConfig::Instance()->GetCreateMesh())
-            {
-                CreateMeshFromHeartConfig();
-                assert(HeartConfig::Instance()->GetSpaceDimension() == SPACE_DIM);
-                double inter_node_space = HeartConfig::Instance()->GetInterNodeSpace();
-
-                switch (HeartConfig::Instance()->GetSpaceDimension())
-                {
-                    case 1:
-                    {
-                        c_vector<double, 1> fibre_length;
-                        HeartConfig::Instance()->GetFibreLength(fibre_length);
-                        mpMesh->ConstructRegularSlabMesh(inter_node_space, fibre_length[0]);
-                        break;
-                    }
-                    case 2:
-                    {
-                        c_vector<double, 2> sheet_dimensions; //cm
-                        HeartConfig::Instance()->GetSheetDimensions(sheet_dimensions);
-                        mpMesh->ConstructRegularSlabMesh(inter_node_space, sheet_dimensions[0], sheet_dimensions[1]);
-                        break;
-                    }
-                    case 3:
-                    {
-                        c_vector<double, 3> slab_dimensions; //cm
-                        HeartConfig::Instance()->GetSlabDimensions(slab_dimensions);
-                        mpMesh->ConstructRegularSlabMesh(inter_node_space, slab_dimensions[0], slab_dimensions[1], slab_dimensions[2]);
-                        break;
-                    }
-                    default:
-                        NEVER_REACHED;
-                }
-            }
-            else
-            {
-                NEVER_REACHED;
-            }
-
-            mAllocatedMemoryForMesh = true;
-        }
-        catch (Exception& e)
-        {
-            EXCEPTION(std::string("No mesh given: define it in XML parameters file or call SetMesh()\n") + e.GetShortMessage());
-        }
+        EXCEPTION("No mesh given: call SetMesh() or SetMeshFileName() before Initialise()");
     }
     mpCellFactory->SetMesh(mpMesh);
+    mpCellFactory->SetPdeTimeStep(mPdeTimeStep);
+    mpCellFactory->SetOdeTimeStep(mOdeTimeStep);
     HeartEventHandler::EndEvent(HeartEventHandler::READ_MESH);
+
+    // Propagate the tissue/bath region identifiers to HeartRegionCode global state
+    HeartRegionCode::SetTissueIdentifiers(mTissueIdentifiers);
+    HeartRegionCode::SetBathIdentifiers(mBathIdentifiers);
 
     HeartEventHandler::BeginEvent(HeartEventHandler::INITIALISE);
 
-    // If the user requested transmural stuff, we fill in the mCellHeterogeneityAreas here
-    if (HeartConfig::Instance()->AreCellularTransmuralHeterogeneitiesRequested())
-    {
-        mpCellFactory->FillInCellularTransmuralAreas();
-    }
-
     delete mpCardiacTissue; // In case we're called twice
     mpCardiacTissue = CreateCardiacTissue();
+
+    // Propagate conductivity and fibre settings from problem to tissue
+    {
+        mpCardiacTissue->SetIntracellularConductivities(mIntraConductivitiesOrthotropic);
+        if (!mFibreFilePath.empty())
+        {
+            mpCardiacTissue->SetFibreOrientationFile(mFibreFilePath, mFibreFileType);
+        }
+        for (unsigned i = 0; i < mConductivityHeterogeneityAreas.size(); i++)
+        {
+            mpCardiacTissue->AddConductivityHeterogeneity(mConductivityHeterogeneityAreas[i],
+                                                          mConductivityHeterogeneityIntra[i],
+                                                          mConductivityHeterogeneityExtra[i]);
+        }
+        mpCardiacTissue->RebuildConductivityTensors();
+        // Propagate Am/Cm and bath conductivities
+        mpCardiacTissue->SetSurfaceAreaToVolumeRatio(mSurfaceAreaToVolumeRatio);
+        mpCardiacTissue->SetCapacitance(mCapacitance);
+        mpCardiacTissue->SetBathConductivities(mBathConductivities);
+
+        // For bidomain: propagate extracellular conductivities
+        BidomainTissue<SPACE_DIM>* p_bidomain_tissue = dynamic_cast<BidomainTissue<SPACE_DIM>*>(mpCardiacTissue);
+        if (p_bidomain_tissue)
+        {
+            p_bidomain_tissue->SetExtracellularConductivities(mExtraConductivitiesOrthotropic);
+            p_bidomain_tissue->RebuildExtracellularConductivityTensors();
+        }
+    }
 
     HeartEventHandler::EndEvent(HeartEventHandler::INITIALISE);
 
@@ -214,12 +270,6 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Initialise()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::CreateMeshFromHeartConfig()
-{
-    mpMesh = new DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>(HeartConfig::Instance()->GetMeshPartitioning());
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetBoundaryConditionsContainer(boost::shared_ptr<BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> > pBcc)
 {
     this->mpBoundaryConditionsContainer = pBcc;
@@ -232,27 +282,31 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::PreSolveChecks
     {
         EXCEPTION("Cardiac tissue is null, Initialise() probably hasn't been called");
     }
-    if (HeartConfig::Instance()->GetSimulationDuration() <= mCurrentTime)
+    if (mSimulationDuration <= 0.0)
+    {
+        EXCEPTION("Simulation duration must be set (call SetSimulationDuration()) and be positive");
+    }
+    if (mSimulationDuration <= mCurrentTime)
     {
         EXCEPTION("End time should be in the future");
     }
     if (mPrintOutput)
     {
-        if ((HeartConfig::Instance()->GetOutputDirectory() == "") || (HeartConfig::Instance()->GetOutputFilenamePrefix() == ""))
+        if ((mOutputDirectory == "") || (mOutputFilenamePrefix == ""))
         {
             EXCEPTION("Either explicitly specify not to print output (call PrintOutput(false)) or specify the output directory and filename prefix");
         }
     }
 
-    double end_time = HeartConfig::Instance()->GetSimulationDuration();
-    double pde_time = HeartConfig::Instance()->GetPdeTimeStep();
+    double end_time = mSimulationDuration;
+    double pde_time = mPdeTimeStep;
 
     /*
      * MatrixIsConstant stuff requires CONSTANT dt - do some checks to make sure
      * the TimeStepper won't find non-constant dt.
      * Note: printing_time does not have to divide end_time, but dt must divide
      * printing_time and end_time.
-     * HeartConfig checks pde_dt divides printing dt.
+     * The problem checks pde_dt divides printing dt.
      */
     ///\todo remove magic number? (#1884)
     if (fabs(end_time - pde_time * round(end_time / pde_time)) > 1e-10)
@@ -302,6 +356,12 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetMesh(Abstra
     assert(pMesh != NULL);
     mAllocatedMemoryForMesh = false;
     mpMesh = pMesh;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetMeshFileName(const std::string& rFilePath)
+{
+    mMeshFilename = rFilePath;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
@@ -376,8 +436,8 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
     SetUpAdditionalStoppingTimes(additional_stopping_times);
 
     TimeStepper stepper(mCurrentTime,
-                        HeartConfig::Instance()->GetSimulationDuration(),
-                        HeartConfig::Instance()->GetPrintingTimeStep(),
+                        mSimulationDuration,
+                        mPrintingTimeStep,
                         false,
                         additional_stopping_times);
     // Note that SetUpAdditionalStoppingTimes is a method from the BidomainWithBath class it adds
@@ -451,7 +511,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
         }
         HeartEventHandler::EndEvent(HeartEventHandler::WRITE_OUTPUT);
 
-        progress_reporter_dir = HeartConfig::Instance()->GetOutputDirectory();
+        progress_reporter_dir = mOutputDirectory;
     }
     else
     {
@@ -459,6 +519,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
     }
     for (boost::shared_ptr<AbstractOutputModifier> p_output_modifier : mOutputModifiers)
     {
+        p_output_modifier->SetOutputDirectory(mOutputDirectory);
         p_output_modifier->InitialiseAtStart(this->mpMesh->GetDistributedVectorFactory(), this->mpMesh->rGetNodePermutation());
         p_output_modifier->ProcessSolutionAtTimeStep(stepper.GetTime(), initial_condition, PROBLEM_DIM);
     }
@@ -470,10 +531,10 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
      */
     ProgressReporter progress_reporter(progress_reporter_dir,
                                        mCurrentTime,
-                                       HeartConfig::Instance()->GetSimulationDuration());
+                                       mSimulationDuration);
     progress_reporter.Update(mCurrentTime);
 
-    mpSolver->SetTimeStep(HeartConfig::Instance()->GetPdeTimeStep());
+    mpSolver->SetTimeStep(mPdeTimeStep);
     if (mpTimeAdaptivityController)
     {
         mpSolver->SetTimeAdaptivityController(mpTimeAdaptivityController);
@@ -598,26 +659,30 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::CloseFilesAndP
     mpWriter = NULL;
     HeartEventHandler::EndEvent(HeartEventHandler::WRITE_OUTPUT);
 
-    FileFinder test_output(HeartConfig::Instance()->GetOutputDirectory(), RelativeTo::ChasteTestOutput);
+    FileFinder test_output(mOutputDirectory, RelativeTo::ChasteTestOutput);
 
     /********************************************************************************
      * Run all post processing.
-     *
-     * The PostProcessingWriter class examines what is requested in HeartConfig and
-     * adds the relevant data to the HDF5 file.
-     * This is converted to different visualizer formats along with the solution
-     * in the DATA_CONVERSION block below.
      *********************************************************************************/
 
     HeartEventHandler::BeginEvent(HeartEventHandler::POST_PROC);
-    if (HeartConfig::Instance()->IsPostProcessingRequested())
+    bool any_post_processing = !mApdMaps.empty() || !mUpstrokeTimeMaps.empty()
+                               || !mMaxUpstrokeVelocityMaps.empty() || !mConductionVelocityMaps.empty()
+                               || !mNodalTimeTraces.empty() || !mPseudoEcgElectrodePositions.empty();
+    if (any_post_processing)
     {
         PostProcessingWriter<ELEMENT_DIM, SPACE_DIM> post_writer(*mpMesh,
                                                                  test_output,
-                                                                 HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                                                 mOutputFilenamePrefix,
                                                                  "V",
                                                                  mHdf5DataWriterChunkSizeAndAlignment);
-        post_writer.WritePostProcessingFiles();
+        post_writer.WritePostProcessingFiles(mApdMaps,
+                                             mUpstrokeTimeMaps,
+                                             mMaxUpstrokeVelocityMaps,
+                                             mConductionVelocityMaps,
+                                             mNodalTimeTraces,
+                                             mPseudoEcgElectrodePositions,
+                                             mOutputUsingOriginalNodeOrdering);
     }
     HeartEventHandler::EndEvent(HeartEventHandler::POST_PROC);
 
@@ -629,52 +694,45 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::CloseFilesAndP
     // Only if results files were written and we are outputting all nodes
     if (mNodesToOutput.empty())
     {
-        if (HeartConfig::Instance()->GetVisualizeWithMeshalyzer())
+        if (mVisualizeWithMeshalyzer)
         {
             // Convert simulation data to Meshalyzer format
             Hdf5ToMeshalyzerConverter<ELEMENT_DIM, SPACE_DIM> converter(test_output,
-                                                                        HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                                                        mOutputFilenamePrefix,
                                                                         mpMesh,
-                                                                        HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
-                                                                        HeartConfig::Instance()->GetVisualizerOutputPrecision());
-            std::string subdirectory_name = converter.GetSubdirectory();
-            HeartConfig::Instance()->Write(false, subdirectory_name);
+                                                                        mOutputUsingOriginalNodeOrdering,
+                                                                        mVisualizerOutputPrecision);
         }
 
-        if (HeartConfig::Instance()->GetVisualizeWithCmgui())
+        if (mVisualizeWithCmgui)
         {
             // Convert simulation data to Cmgui format
             Hdf5ToCmguiConverter<ELEMENT_DIM, SPACE_DIM> converter(test_output,
-                                                                   HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                                                   mOutputFilenamePrefix,
                                                                    mpMesh,
                                                                    GetHasBath(),
-                                                                   HeartConfig::Instance()->GetVisualizerOutputPrecision());
-            std::string subdirectory_name = converter.GetSubdirectory();
-            HeartConfig::Instance()->Write(false, subdirectory_name);
+                                                                   mVisualizerOutputPrecision,
+                                                                   mOutputUsingOriginalNodeOrdering);
         }
 
-        if (HeartConfig::Instance()->GetVisualizeWithVtk())
+        if (mVisualizeWithVtk)
         {
             // Convert simulation data to VTK format
             Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM> converter(test_output,
-                                                                 HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                                                 mOutputFilenamePrefix,
                                                                  mpMesh,
                                                                  false,
-                                                                 HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
-            std::string subdirectory_name = converter.GetSubdirectory();
-            HeartConfig::Instance()->Write(false, subdirectory_name);
+                                                                 mOutputUsingOriginalNodeOrdering);
         }
 
-        if (HeartConfig::Instance()->GetVisualizeWithParallelVtk())
+        if (mVisualizeWithParallelVtk)
         {
             // Convert simulation data to parallel VTK (pvtu) format
             Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM> converter(test_output,
-                                                                 HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                                                 mOutputFilenamePrefix,
                                                                  mpMesh,
                                                                  true,
-                                                                 HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
-            std::string subdirectory_name = converter.GetSubdirectory();
-            HeartConfig::Instance()->Write(false, subdirectory_name);
+                                                                 mOutputUsingOriginalNodeOrdering);
         }
     }
     HeartEventHandler::EndEvent(HeartEventHandler::DATA_CONVERSION);
@@ -695,9 +753,9 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::DefineWriterCo
             // Added for #2980
             if (mpMesh->rGetNodePermutation().size() > 0)
             {
-                if (HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering())
+                if (mOutputUsingOriginalNodeOrdering)
                 {
-                    EXCEPTION("HeartConfig setting `GetOutputUsingOriginalNodeOrdering` is meaningless when outputting particular nodes in parallel. (Nodes are written with their original indices by default).");
+                    EXCEPTION("Output using original node ordering is meaningless when outputting particular nodes in parallel. (Nodes are written with their original indices by default).");
                 }
                 std::vector<unsigned> nodes_to_output_permuted(mNodesToOutput.size());
                 for (unsigned i = 0; i < mNodesToOutput.size(); i++)
@@ -715,8 +773,8 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::DefineWriterCo
 
         // Only used to get an estimate of the # of timesteps below
         TimeStepper stepper(mCurrentTime,
-                            HeartConfig::Instance()->GetSimulationDuration(),
-                            HeartConfig::Instance()->GetPrintingTimeStep());
+                            mSimulationDuration,
+                            mPrintingTimeStep);
 
         mpWriter->DefineUnlimitedDimension("Time", "msecs", stepper.EstimateTimeSteps() + 1); // plus one for start and end points
     }
@@ -731,11 +789,10 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::DefineExtraVar
 {
     mExtraVariablesId.clear();
     // Check if any extra output variables have been requested
-    if (HeartConfig::Instance()->GetOutputVariablesProvided())
+    if (!mOutputVariables.empty())
     {
         // Get their names in a vector
-        std::vector<std::string> output_variables;
-        HeartConfig::Instance()->GetOutputVariables(output_variables);
+        std::vector<std::string> output_variables = mOutputVariables;
         const unsigned num_vars = output_variables.size();
         mExtraVariablesId.reserve(num_vars);
 
@@ -767,13 +824,9 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::DefineExtraVar
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::WriteExtraVariablesOneStep()
 {
-    // Get the variable names in a vector
-    std::vector<std::string> output_variables;
+    // Use the stored list of variable names
+    const std::vector<std::string>& output_variables = mOutputVariables;
     unsigned num_vars = mExtraVariablesId.size();
-    if (num_vars > 0)
-    {
-        HeartConfig::Instance()->GetOutputVariables(output_variables);
-    }
     assert(output_variables.size() == num_vars);
 
     // Loop over the requested variables
@@ -820,8 +873,8 @@ bool AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::InitialiseWrit
 
     if (extend_file)
     {
-        FileFinder h5_file(OutputFileHandler::GetChasteTestOutputDirectory() + HeartConfig::Instance()->GetOutputDirectory()
-                               + "/" + HeartConfig::Instance()->GetOutputFilenamePrefix() + ".h5",
+        FileFinder h5_file(OutputFileHandler::GetChasteTestOutputDirectory() + mOutputDirectory
+                               + "/" + mOutputFilenamePrefix + ".h5",
                            RelativeTo::Absolute);
         //We are going to test for existence before creating the file.
         //Therefore we should make sure that this existence test is thread-safe.
@@ -834,21 +887,21 @@ bool AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::InitialiseWrit
         }
         else // if it does exist check that it is sensible to extend it by running from the archive we loaded.
         {
-            Hdf5DataReader reader(HeartConfig::Instance()->GetOutputDirectory(),
-                                  HeartConfig::Instance()->GetOutputFilenamePrefix(),
+            Hdf5DataReader reader(mOutputDirectory,
+                                  mOutputFilenamePrefix,
                                   true);
             std::vector<double> times = reader.GetUnlimitedDimensionValues();
             if (times.back() > mCurrentTime)
             {
                 EXCEPTION("Attempting to extend " << h5_file.GetAbsolutePath() << " with results from time = " << mCurrentTime << ", but it already contains results up to time = " << times.back() << "."
-                                                                                                                                                                                                       " Calling HeartConfig::Instance()->SetOutputDirectory() before Solve() will direct results elsewhere.");
+                                                                                                                                                                                                       " Calling SetOutputDirectory() before Solve() will direct results elsewhere.");
             }
         }
         PetscTools::Barrier("InitialiseWriter::Extension check");
     }
     mpWriter = new Hdf5DataWriter(*mpMesh->GetDistributedVectorFactory(),
-                                  HeartConfig::Instance()->GetOutputDirectory(),
-                                  HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                  mOutputDirectory,
+                                  mOutputFilenamePrefix,
                                   !extend_file, // don't clear directory if extension requested
                                   extend_file,
                                   "Data",
@@ -871,13 +924,13 @@ bool AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::InitialiseWrit
     DefineWriterColumns(extend_file);
 
     // Possibility of applying a permutation
-    if (HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering())
+    if (mOutputUsingOriginalNodeOrdering)
     {
         bool success = mpWriter->ApplyPermutation(mpMesh->rGetNodePermutation(), true /*unsafe mode - extending*/);
         if (success == false)
         {
             //It's not really a permutation, so reset
-            HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(false);
+            mOutputUsingOriginalNodeOrdering = false;
         }
     }
 
@@ -910,11 +963,11 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetOutputNodes
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 Hdf5DataReader AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetDataReader()
 {
-    if ((HeartConfig::Instance()->GetOutputDirectory() == "") || (HeartConfig::Instance()->GetOutputFilenamePrefix() == ""))
+    if ((mOutputDirectory == "") || (mOutputFilenamePrefix == ""))
     {
         EXCEPTION("Data reader invalid as data writer cannot be initialised");
     }
-    return Hdf5DataReader(HeartConfig::Instance()->GetOutputDirectory(), HeartConfig::Instance()->GetOutputFilenamePrefix());
+    return Hdf5DataReader(mOutputDirectory, mOutputFilenamePrefix);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
@@ -926,6 +979,348 @@ bool AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetHasBath()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetElectrodes()
 {
+}
+
+// -----------------------------------------------------------------------
+// Setter/getter implementations for simulation settings
+// -----------------------------------------------------------------------
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetSimulationDuration(double duration)
+{
+    mSimulationDuration = duration;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetOdePdeAndPrintingTimeSteps(
+    double odeTimeStep, double pdeTimeStep, double printingTimeStep)
+{
+    mOdeTimeStep = odeTimeStep;
+    mPdeTimeStep = pdeTimeStep;
+    mPrintingTimeStep = printingTimeStep;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetOdeTimeStep(double odeTimeStep)
+{
+    mOdeTimeStep = odeTimeStep;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetPdeTimeStep(double pdeTimeStep)
+{
+    mPdeTimeStep = pdeTimeStep;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetPrintingTimeStep(double printingTimeStep)
+{
+    mPrintingTimeStep = printingTimeStep;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+double AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetSimulationDuration() const
+{
+    return mSimulationDuration;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+double AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetOdeTimeStep() const
+{
+    return mOdeTimeStep;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+double AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetPdeTimeStep() const
+{
+    return mPdeTimeStep;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+double AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetPrintingTimeStep() const
+{
+    return mPrintingTimeStep;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetOutputDirectory(const std::string& rOutputDirectory)
+{
+    mOutputDirectory = rOutputDirectory;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetOutputFilenamePrefix(const std::string& rPrefix)
+{
+    mOutputFilenamePrefix = rPrefix;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetOutputVariables(
+    const std::vector<std::string>& rVariables)
+{
+    mOutputVariables = rVariables;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetOutputUsingOriginalNodeOrdering(bool useOriginal)
+{
+    mOutputUsingOriginalNodeOrdering = useOriginal;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+bool AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetOutputUsingOriginalNodeOrdering() const
+{
+    return mOutputUsingOriginalNodeOrdering;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+std::string AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetOutputDirectory() const
+{
+    return mOutputDirectory;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+std::string AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetOutputFilenamePrefix() const
+{
+    return mOutputFilenamePrefix;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetVisualizeWithMeshalyzer(bool vis)
+{
+    mVisualizeWithMeshalyzer = vis;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetVisualizeWithCmgui(bool vis)
+{
+    mVisualizeWithCmgui = vis;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetVisualizeWithVtk(bool vis)
+{
+    mVisualizeWithVtk = vis;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetVisualizeWithParallelVtk(bool vis)
+{
+    mVisualizeWithParallelVtk = vis;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetVisualizerOutputPrecision(unsigned precision)
+{
+    mVisualizerOutputPrecision = precision;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetCheckpointSimulation(
+    bool checkpointSimulation, double checkpointTimestep, unsigned maxCheckpointsOnDisk)
+{
+    mCheckpointSimulation = checkpointSimulation;
+    mCheckpointTimestep = checkpointTimestep;
+    mMaxCheckpointsOnDisk = maxCheckpointsOnDisk;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetMeshPartitioning(
+    DistributedTetrahedralMeshPartitionType::type method)
+{
+    mMeshPartitioning = method;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetKspAbsoluteTolerance(double tol)
+{
+    mUseAbsoluteTolerance = true;
+    mKspAbsoluteTolerance = tol;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetKspRelativeTolerance(double tol)
+{
+    mUseAbsoluteTolerance = false;
+    mKspRelativeTolerance = tol;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+double AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetKspAbsoluteTolerance() const
+{
+    return mKspAbsoluteTolerance;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+bool AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetUseAbsoluteTolerance() const
+{
+    return mUseAbsoluteTolerance;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetKspSolverType(const std::string& solver)
+{
+    mKspSolver = solver;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetKspPreconditionerType(const std::string& preconditioner)
+{
+    mKspPreconditioner = preconditioner;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetUseMassLumping(bool useLumping)
+{
+    mUseMassLumping = useLumping;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetUseMassLumpingForPrecond(bool useLumping)
+{
+    mUseMassLumpingForPrecond = useLumping;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetUseFixedNumberIterationsLinearSolver(
+    bool useFixedIts, unsigned evaluateEvery)
+{
+    mUseFixedNumberIterations = useFixedIts;
+    mEvaluateNumItsEveryNSolves = evaluateEvery;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetUseStateVariableInterpolation(bool use)
+{
+    mUseStateVariableInterpolation = use;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetUseReactionDiffusionOperatorSplitting(bool use)
+{
+    mUseReactionDiffusionOperatorSplitting = use;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetSurfaceAreaToVolumeRatio(double ratio)
+{
+    mSurfaceAreaToVolumeRatio = ratio;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+double AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetSurfaceAreaToVolumeRatio() const
+{
+    return mSurfaceAreaToVolumeRatio;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetCapacitance(double capacitance)
+{
+    mCapacitance = capacitance;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+double AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetCapacitance() const
+{
+    return mCapacitance;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AddApdMap(double repolarisationPct, double threshold)
+{
+    mApdMaps.push_back(std::make_pair(repolarisationPct, threshold));
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AddUpstrokeTimeMap(double threshold)
+{
+    mUpstrokeTimeMaps.push_back(threshold);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AddMaxUpstrokeVelocityMap(double threshold)
+{
+    mMaxUpstrokeVelocityMaps.push_back(threshold);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AddConductionVelocityMap(unsigned sourceNode)
+{
+    mConductionVelocityMaps.push_back(sourceNode);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AddNodalTimeTrace(unsigned nodeIndex)
+{
+    mNodalTimeTraces.push_back(nodeIndex);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AddPseudoEcgElectrode(
+    const ChastePoint<SPACE_DIM>& rPosition)
+{
+    mPseudoEcgElectrodePositions.push_back(rPosition);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetFibreOrientationFile(
+    const std::string& rFilePath, const std::string& rFileType)
+{
+    mFibreFilePath = rFilePath;
+    mFibreFileType = rFileType;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AddConductivityHeterogeneity(
+    boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > pRegion,
+    const c_vector<double, SPACE_DIM>& rIntraConductivities,
+    const c_vector<double, SPACE_DIM>& rExtraConductivities)
+{
+    mConductivityHeterogeneityAreas.push_back(pRegion);
+    mConductivityHeterogeneityIntra.push_back(rIntraConductivities);
+    mConductivityHeterogeneityExtra.push_back(rExtraConductivities);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetTissueAndBathIdentifiers(
+    const std::set<unsigned>& rTissueIds, const std::set<unsigned>& rBathIds)
+{
+    HeartRegionCode::SetTissueAndBathIdentifiers(rTissueIds, rBathIds);
+    mTissueIdentifiers = rTissueIds;
+    mBathIdentifiers = rBathIds;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+const std::set<unsigned>& AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::rGetTissueIdentifiers() const
+{
+    return mTissueIdentifiers;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+const std::set<unsigned>& AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::rGetBathIdentifiers() const
+{
+    return mBathIdentifiers;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetBathMultipleConductivities(
+    const std::map<unsigned, double>& rBathConductivities)
+{
+    mBathConductivities = rBathConductivities;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+double AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetBathConductivity(unsigned bathRegion) const
+{
+    if (bathRegion != UINT_MAX)
+    {
+        auto it = mBathConductivities.find(bathRegion);
+        if (it != mBathConductivities.end())
+        {
+            return it->second;
+        }
+    }
+    return 7.0; // default bath conductivity (mS/cm)
 }
 
 // Explicit instantiation

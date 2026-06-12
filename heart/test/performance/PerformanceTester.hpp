@@ -68,16 +68,14 @@ public:
       //RelativeConvergenceCriterion(1e-4),
       SimTime(8.0),
       PrintingTimeStep(0.04),
+      KspSolverType("cg"),
+      KspPreconditionerType("bjacobi"),
       mTestName(rTestName)
     {
     }
 
     void Run()
     {
-        HeartConfig::Instance()->SetOdeTimeStep(this->OdeTimeStep);
-        HeartConfig::Instance()->SetSimulationDuration(SimTime);
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(KspAtol);
-
         // Create the meshes on which the test will be based
         const std::string mesh_dir = mTestName+"Mesh/";
         OutputFileHandler output_file_handler(mesh_dir);
@@ -104,17 +102,22 @@ public:
         GeneralPlaneStimulusCellFactory<CELL, DIM> cell_factory(num_ele_across, mMeshWidth);
         CARDIAC_PROBLEM cardiac_problem(&cell_factory);
 
-        HeartConfig::Instance()->SetMeshFileName(output_file_handler.GetOutputDirectoryFullPath()+mesh_filename);
-        HeartConfig::Instance()->SetOutputDirectory (mTestName);
-        HeartConfig::Instance()->SetOutputFilenamePrefix ("Results");
+        cardiac_problem.SetOdeTimeStep(this->OdeTimeStep);
+        cardiac_problem.SetSimulationDuration(SimTime);
+        cardiac_problem.SetKspAbsoluteTolerance(KspAtol);
+        cardiac_problem.SetKspSolverType(KspSolverType);
+        cardiac_problem.SetKspPreconditionerType(KspPreconditionerType);
+        cardiac_problem.SetMeshFileName(output_file_handler.GetOutputDirectoryFullPath()+mesh_filename);
+        cardiac_problem.SetOutputDirectory(mTestName);
+        cardiac_problem.SetOutputFilenamePrefix("Results");
 
 //        cardiac_problem.SetLinearSolverRelativeTolerance(KspRtol);
 
 
         assert(fabs(0.04/PdeTimeStep - round(0.04/PdeTimeStep)) <1e-15 );
 
-        HeartConfig::Instance()->SetPdeTimeStep(PdeTimeStep);
-        HeartConfig::Instance()->SetPrintingTimeStep(PrintingTimeStep);
+        cardiac_problem.SetPdeTimeStep(PdeTimeStep);
+        cardiac_problem.SetPrintingTimeStep(PrintingTimeStep);
 
         cardiac_problem.Initialise();
 
@@ -159,6 +162,8 @@ public:
     //double RelativeConvergenceCriterion;
     double SimTime;
     double PrintingTimeStep;
+    std::string KspSolverType;      ///< KSP solver type (e.g. "symmlq", "cg")
+    std::string KspPreconditionerType; ///< KSP preconditioner (e.g. "bjacobi")
 
 private:
     std::string mTestName;

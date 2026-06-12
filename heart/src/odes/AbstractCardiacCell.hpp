@@ -133,7 +133,7 @@ private:
     void CheckForArchiveFix();
 
 protected:
-    /** The timestep to use when simulating this cell.  Set from the HeartConfig object. */
+    /** The timestep to use when simulating this cell. */
     double mDt;
 
 public:
@@ -171,6 +171,11 @@ public:
      * @param dt  the timestep
      */
     void SetTimestep(double dt);
+
+    /**
+     * @return the timestep for this cell.
+     */
+    double GetTimestep() const { return mDt; }
 
     /**
      * Simulate this cell's behaviour between the time interval [tStart, tEnd],

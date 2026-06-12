@@ -116,12 +116,7 @@ inline void save_construct_data(
 {
     const AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_mesh = t->pGetMesh();
     ar & p_mesh;
-
-    // CreateIntracellularConductivityTensor() is called by constructor and uses HeartConfig. So make sure that it is
-    // archived too (needs doing before construction so appears here instead of usual archive location).
-    HeartConfig* p_config = HeartConfig::Instance();
-    ar & *p_config;
-    ar & p_config;
+    // Conductivity parameters are archived by AbstractCardiacTissue::save().
 }
 
 /**
@@ -134,12 +129,7 @@ inline void load_construct_data(
 {
     AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_mesh;
     ar & p_mesh;
-
-    // CreateIntracellularConductivityTensor() is called by AbstractCardiacTissue constructor and uses HeartConfig.
-    // So make sure that it is archived too (needs doing before construction so appears here instead of usual archive location).
-    HeartConfig* p_config = HeartConfig::Instance();
-    ar & *p_config;
-    ar & p_config;
+    // Conductivity parameters are restored by AbstractCardiacTissue::load().
 
     ::new(t)MonodomainTissue<ELEMENT_DIM, SPACE_DIM>(p_mesh);
 }

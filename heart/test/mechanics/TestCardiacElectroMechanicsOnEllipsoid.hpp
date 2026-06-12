@@ -196,9 +196,6 @@ public:
         double apex_stim_threshold = -0.95;
         ApexStimulusCellFactory cell_factory(apex_stim_threshold);
 
-        HeartConfig::Instance()->SetOdeTimeStep(0.005);
-        HeartConfig::Instance()->SetSimulationDuration(70.0); // see comment below on mechanics timestep
-
         ElectroMechanicsProblemDefinition<3> problem_defn(mechanics_mesh);
         problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
         problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
@@ -228,6 +225,8 @@ public:
                                                   &cell_factory,
                                                   &problem_defn,
                                                   "TestCardiacElectroMechanicsEllipsoid");
+        problem.GetElectricsProblem()->SetOdeTimeStep(0.005);
+        problem.GetElectricsProblem()->SetSimulationDuration(70.0); // see comment below on mechanics timestep
 
         // problem.SetNoElectricsOutput();
 

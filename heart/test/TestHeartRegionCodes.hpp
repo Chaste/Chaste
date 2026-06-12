@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTHEARTREGIONCODES_HPP_
 
 #include "HeartRegionCodes.hpp"
-#include "HeartConfig.hpp"
 
 class TestHeartRegionCodes : public CxxTest::TestSuite
 {
@@ -52,7 +51,7 @@ class TestHeartRegionCodes : public CxxTest::TestSuite
         bath_ids.insert(1);
         bath_ids.insert(2);
 
-        HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
+        HeartRegionCode::SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
 
         TS_ASSERT(HeartRegionCode::IsRegionTissue(0));
         TS_ASSERT(HeartRegionCode::IsRegionTissue(10));
@@ -90,14 +89,14 @@ class TestHeartRegionCodes : public CxxTest::TestSuite
 
         std::set<unsigned> bath_ids;
         //Empty set
-        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids, bath_ids),
+        TS_ASSERT_THROWS_THIS(HeartRegionCode::SetTissueAndBathIdentifiers(tissue_ids, bath_ids),
             "Identifying set must be non-empty");
 
 
         bath_ids.insert(1);
         bath_ids.insert(10);  //Overlaps with previous
 
-        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids, bath_ids),
+        TS_ASSERT_THROWS_THIS(HeartRegionCode::SetTissueAndBathIdentifiers(tissue_ids, bath_ids),
             "Tissue identifiers and bath identifiers overlap");
 
      }

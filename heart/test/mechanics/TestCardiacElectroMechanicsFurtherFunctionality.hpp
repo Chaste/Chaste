@@ -56,8 +56,6 @@ public:
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-
         CardiacElectroMechProbRegularGeom<2> problem(INCOMPRESSIBLE,
                                                      1.0, /* width (cm) */
                                                      1,   /* mech elem each dir */
@@ -67,6 +65,7 @@ public:
                                                      1.0,  /* mechanics solve timestep */
                                                      0.01, /* contraction model ode timestep */
                                                      "");
+        problem.GetElectricsProblem()->SetSimulationDuration(1.0);
 
         c_vector<double,2> pos;
         pos(0) = 1.0;
@@ -104,8 +103,6 @@ public:
 
         QuadraticMesh<2> mechanics_mesh(0.1, 0.1, 0.1);
 
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
         problem_defn.SetContractionModel(NASH2004,1.0);
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
@@ -139,6 +136,7 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestNobleSacActivatedByStretchTissue");
+        problem.GetElectricsProblem()->SetSimulationDuration(1.0);
 
         problem.Initialise();
 
@@ -159,7 +157,7 @@ public:
 
         // just get the default conductivity so don't to hardcode it (1.75 at the moment)
         c_vector<double, 2> conductivities;
-        HeartConfig::Instance()->GetIntracellularConductivities(conductivities);
+        problem.GetElectricsProblem()->GetIntracellularConductivities(conductivities);
         assert((conductivities(0)-conductivities(1))<1e-8);
         double default_conductivity = conductivities(0);
 
@@ -222,8 +220,6 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mechanics_mesh,0,0);
 
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
         problem_defn.SetContractionModel(NASH2004,1.0);
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
@@ -239,6 +235,7 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "");
+        problem.GetElectricsProblem()->SetSimulationDuration(1.0);
 
 
         problem.Initialise();
@@ -267,7 +264,7 @@ public:
 
         // just get the default conductivity so don't to hardcode it (1.75 at the moment)
         c_vector<double, 2> conductivities;
-        HeartConfig::Instance()->GetIntracellularConductivities(conductivities);
+        problem.GetElectricsProblem()->GetIntracellularConductivities(conductivities);
         assert((conductivities(0)-conductivities(1))<1e-8);
         double default_conductivity = conductivities(0);
 
@@ -351,9 +348,6 @@ public:
                 dir = "TestCardiacEmDeformationAffectingConductivity";
             }
 
-            // Small enough end-time so that the wavefront doesn't reach the other side..
-            HeartConfig::Instance()->SetSimulationDuration(5.0);
-
             CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
                                                       MONODOMAIN,
                                                       &electrics_mesh,
@@ -361,6 +355,8 @@ public:
                                                       &cell_factory,
                                                       &problem_defn,
                                                       dir);
+            // Small enough end-time so that the wavefront doesn't reach the other side..
+            problem.GetElectricsProblem()->SetSimulationDuration(5.0);
 
 
             problem.Initialise();
@@ -417,9 +413,6 @@ public:
         std::vector<unsigned> fixed_nodes
             = NonlinearElasticityTools<2>::GetNodesByComponentValue(mechanics_mesh, 0, 0.0);
 
-
-        HeartConfig::Instance()->SetSimulationDuration(20.0);
-
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
         problem_defn.SetContractionModel(KERCHOFFS2003,0.01);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
@@ -454,7 +447,7 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacElectroMechanicsHeterogeneousMaterialLaws" /* output directory */);
-
+        problem.GetElectricsProblem()->SetSimulationDuration(20.0);
 
         problem.Solve();
 

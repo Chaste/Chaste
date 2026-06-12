@@ -44,8 +44,6 @@ BidomainCorrectionTermAssembler<ELEM_DIM,SPACE_DIM>::BidomainCorrectionTermAssem
      BidomainTissue<SPACE_DIM>* pTissue)
         : AbstractCorrectionTermAssembler<ELEM_DIM,SPACE_DIM,2>(pMesh,pTissue)
 {
-    mpConfig = HeartConfig::Instance();
-    assert(mpConfig->GetUseStateVariableInterpolation());
 }
 
 template<unsigned ELEM_DIM, unsigned SPACE_DIM>
@@ -57,7 +55,7 @@ c_vector<double,2*(ELEM_DIM+1)> BidomainCorrectionTermAssembler<ELEM_DIM,SPACE_D
     c_matrix<double, 2, SPACE_DIM> &rGradU /* not used */,
     Element<ELEM_DIM,SPACE_DIM>* pElement /* not used */)
 {
-    double Am = mpConfig->GetSurfaceAreaToVolumeRatio();
+    double Am = this->mpCardiacTissue->GetSurfaceAreaToVolumeRatio();
 
     // compute the ionic current at this quadrature point using the
     // interpolated state variables, and a random choice of cell (all

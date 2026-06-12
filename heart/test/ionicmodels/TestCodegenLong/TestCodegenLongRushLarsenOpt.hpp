@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "HeartConfig.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -68,11 +67,11 @@ public:
                                                                                      "shannon_wang_puglisi_weber_bers_2004"});
 
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        SetDefaultOdeDt(0.01);
         RunTests(dirname, models, args, true, -1000, false);
 
         // See Cooper Spiteri Mirams paper table 2
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
+        SetDefaultOdeDt(0.0001953125);
         RunTests(dirname + "-small-dt", small_dt_models, args, true, -1000, true);
     }
 };

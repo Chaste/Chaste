@@ -84,9 +84,6 @@ class TestMonodomainWithTimeAdaptivity : public CxxTest::TestSuite
 public:
     void Test1dApd()
     {
-        HeartConfig::Instance()->SetPrintingTimeStep(1.0);
-        HeartConfig::Instance()->SetSimulationDuration(400); //ms
-
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(0.01, 1.0); // h=0.01cm, width=1cm
 
@@ -95,9 +92,11 @@ public:
         //////////////////////////////////////////////////////////////////////////
         // run original simulation - no adaptivity, dt=0.01 all the way through
         //////////////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOutputDirectory("MonoWithTimeAdaptivity1dLong/OrigNoAdapt");
         MonodomainProblem<1> problem(&cell_factory);
         problem.SetMesh(&mesh);
+        problem.SetPrintingTimeStep(1.0);
+        problem.SetSimulationDuration(400); //ms
+        problem.SetOutputDirectory("MonoWithTimeAdaptivity1dLong/OrigNoAdapt");
 
         problem.Initialise();
         problem.Solve();
@@ -108,9 +107,11 @@ public:
         //////////////////////////////////////////////////////////////////////////
         // run adaptive simulation - dt=0.01 for first 2ms, then dt=1
         //////////////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOutputDirectory("MonoWithTimeAdaptivity1dLong/SimpleAdapt");
         MonodomainProblem<1> adaptive_problem(&cell_factory);
         adaptive_problem.SetMesh(&mesh);
+        adaptive_problem.SetPrintingTimeStep(1.0);
+        adaptive_problem.SetSimulationDuration(400); //ms
+        adaptive_problem.SetOutputDirectory("MonoWithTimeAdaptivity1dLong/SimpleAdapt");
 
         FixedTimeAdaptivityController controller(25);
         adaptive_problem.SetUseTimeAdaptivityController(true, &controller);

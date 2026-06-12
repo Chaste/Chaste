@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTBENCHMARKMESHINDEPENDENCE_HPP_
 #define TESTBENCHMARKMESHINDEPENDENCE_HPP_
 
+#include <string>
 #include "AbstractCardiacCellFactory.hpp"
 #include "BidomainProblem.hpp"
 #include "GeneralPlaneStimulusCellFactory.hpp"
@@ -59,53 +60,58 @@ private:
     double mMeshWidth;
     unsigned mNumMeshes;
 
-    void DisplayRun(unsigned numMesh)
-    {
-        unsigned num_ele_across = (unsigned) pow(2, numMesh+1);// number of elements in each dimension
-        double scaling = mMeshWidth/(double) num_ele_across;
-
-        std::cout<<"================================================================================"<<std::endl;
-        std::cout<<"Solving in "<<DIM<<"D\t";
-        std::cout<<"Space step "<< scaling << " cm (mesh " << numMesh << ")" << "\n";
-        std::cout<<"PDE step "<<HeartConfig::Instance()->GetPdeTimeStep()<<" ms"<<"\t";
-        std::cout<<"ODE step "<<HeartConfig::Instance()->GetOdeTimeStep()<<" ms"<<"\t";
-        if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
-        {
-            std::cout<<"KSP absolute "<<HeartConfig::Instance()->GetAbsoluteTolerance()<<"\t";
-        }
-        else
-        {
-            std::cout<<"KSP relative "<<HeartConfig::Instance()->GetRelativeTolerance()<<"\t";
-        }
-    }
+    // Problem settings (formerly HeartConfig)
+    double mOdeTimeStep;
+    double mPdeTimeStep;
+    double mPrintingTimeStep;
+    double mSimulationDuration;
+    std::string mOutputDirectory;
+    std::string mOutputFilenamePrefix;
+    std::string mKspSolver;
+    std::string mKspPreconditioner;
+    double mKspAbsoluteTolerance;
 
 public:
 
     MultiMeshSolver(double meshWidth, unsigned numMeshes):
         mMeshWidth(meshWidth),
-        mNumMeshes(numMeshes)
+        mNumMeshes(numMeshes),
+        mOdeTimeStep(0.01),
+        mPdeTimeStep(0.01),
+        mPrintingTimeStep(0.1),
+        mSimulationDuration(0.1),
+        mOutputDirectory("BenchmarkMeshIndependence"),
+        mOutputFilenamePrefix("Results"),
+        mKspSolver("cg"),
+        mKspPreconditioner("bjacobi"),
+        mKspAbsoluteTolerance(1e-10)
     {
     }
+
+    void SetOutputFilenamePrefix(const std::string& prefix) { mOutputFilenamePrefix = prefix; }
+    void SetKspPreconditioner(const std::string& pc)        { mKspPreconditioner = pc; }
 
     void Solve()
     {
         // Loop over all the values of h requested
         for (unsigned mesh_index=0; mesh_index<mNumMeshes; mesh_index++)
         {
-            // DisplayRun(mesh_index);
-
             CuboidMeshConstructor<DIM> constructor;
             DistributedTetrahedralMesh<DIM, DIM> mesh;
             constructor.Construct(mesh, mesh_index, mMeshWidth);
-
-            // Do I need a unique name for the output file???
-            //HeartConfig::Instance()->SetOutputFilenamePrefix ("Results");
 
             unsigned num_ele_across = (unsigned) pow(2, mesh_index+1); // number of elements in each dimension
             GeneralPlaneStimulusCellFactory<CELL, DIM> cell_factory(num_ele_across, constructor.GetWidth());
 
             CARDIAC_PROBLEM cardiac_problem(&cell_factory);
             cardiac_problem.SetMesh(&mesh);
+            cardiac_problem.SetOdePdeAndPrintingTimeSteps(mOdeTimeStep, mPdeTimeStep, mPrintingTimeStep);
+            cardiac_problem.SetSimulationDuration(mSimulationDuration);
+            cardiac_problem.SetOutputDirectory(mOutputDirectory);
+            cardiac_problem.SetOutputFilenamePrefix(mOutputFilenamePrefix);
+            cardiac_problem.SetKspSolverType(mKspSolver);
+            cardiac_problem.SetKspPreconditionerType(mKspPreconditioner);
+            cardiac_problem.SetKspAbsoluteTolerance(mKspAbsoluteTolerance);
 
             cardiac_problem.Initialise();
 
@@ -133,21 +139,8 @@ private:
     void SetParametersMeshIndependent()
     {
         HeartEventHandler::Reset();
-
-        // Timesteps and simulation duration
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetSimulationDuration(0.1);  //ms
-
-        // Output directory
-        HeartConfig::Instance()->SetOutputDirectory("BenchmarkMeshIndependence");
-
-        // Solver and preconditioner selection through Chaste parameter system.
-        // Not all the possible methods can be selected via HeartConfig. If an error like the following
-        // happens, see next comment.
-        //    heart/test/TestRealisticLinearAlgebra.hpp:105: Error: Test failed:
-        //    Chaste error: heart/src/problem/HeartConfig.cpp:866: Unknown solver type provided
-        HeartConfig::Instance()->SetKSPSolver("cg");
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-10);
+        // Settings are now applied to the problem in MultiMeshSolver::Solve()
+        // KSP solver type, tolerance, timesteps, etc. are set in the tester constructor defaults.
         //HeartConfig::Instance()->SetUseRelativeTolerance(1e-12);
 
         // In the case you want to select a solver or preconditioner not supported in HeartConfig,
@@ -183,33 +176,27 @@ public:
     void TestMeshIndependentPreconditionersBJ()
     {
         SetParametersMeshIndependent();
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainMeshIndependencePEBJ");
-
         MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
-
+        tester.SetKspPreconditioner("bjacobi");
+        tester.SetOutputFilenamePrefix("BidomainMeshIndependencePEBJ");
         tester.Solve();
     }
 
     void TestMeshIndependentPreconditionersBD()
     {
         SetParametersMeshIndependent();
-        HeartConfig::Instance()->SetKSPPreconditioner("blockdiagonal");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainMeshIndependencePEBD");
-
         MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
-
+        tester.SetKspPreconditioner("blockdiagonal");
+        tester.SetOutputFilenamePrefix("BidomainMeshIndependencePEBD");
         tester.Solve();
     }
 
     void TestMeshIndependentPreconditionersLDU()
     {
         SetParametersMeshIndependent();
-        HeartConfig::Instance()->SetKSPPreconditioner("ldufactorisation");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainMeshIndependencePELDU");
-
         MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
-
+        tester.SetKspPreconditioner("ldufactorisation");
+        tester.SetOutputFilenamePrefix("BidomainMeshIndependencePELDU");
         tester.Solve();
     }
 };

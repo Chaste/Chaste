@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractStimulusFunction.hpp"
 #include "ElectrodesStimulusFactory.hpp"
 #include "ExtendedBidomainProblem.hpp"
-#include "HeartConfig.hpp"
 #include "SimpleStimulus.hpp"
 #include "TetrahedralMesh.hpp"
 
@@ -92,8 +91,6 @@ class TestStimulusFactory : public CxxTest::TestSuite
 public:
     void TestDefaultImplementation()
     {
-        HeartConfig::Instance()->Reset();
-
         TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(2, 2, 2);
 
@@ -115,8 +112,6 @@ public:
 
     void TestOneFactory()
     {
-        HeartConfig::Instance()->Reset();
-
         TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(2, 2, 2);
 
@@ -146,7 +141,6 @@ public:
 
     void TestComputeContributiontoRHS()
     {
-        HeartConfig::Instance()->Reset();
 
         /**
          * In this test the mesh NEEDS to be a Distributed mesh.
@@ -199,33 +193,27 @@ public:
     }
 
     /**
-     * Convenience heartconfig setups for the tests below
+     * Convenience setups for the tests below
      */
-    void SetupParameters()
+    template<class PROBLEM>
+    void SetupParameters(PROBLEM& rProblem)
     {
-        HeartConfig::Instance()->Reset();
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        HeartConfig::Instance()->SetKSPSolver("gmres");
-        HeartConfig::Instance()->SetKSPPreconditioner("jacobi"); // block jacobi is slow
+        rProblem.SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        rProblem.SetKspSolverType("gmres");
+        rProblem.SetKspPreconditionerType("jacobi"); // block jacobi is slow
 
-        HeartConfig::Instance()->SetSimulationDuration(0.1); // ms.
+        rProblem.SetSimulationDuration(0.1); // ms.
 
         /** Output visualization options, we ask for meshalyzer and cmgui **/
-        HeartConfig::Instance()->SetVisualizeWithCmgui(true);
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
-        HeartConfig::Instance()->SetVisualizeWithVtk(false);
+        rProblem.SetVisualizeWithCmgui(true);
+        rProblem.SetVisualizeWithMeshalyzer(true);
+        rProblem.SetVisualizeWithVtk(false);
     }
 
     void TestRegularCubeChasteNodesList()
     {
-        SetupParameters();
-
         std::string directory = "RegularCube";
         std::string filename = "extended3d";
-
-        /**Where to utput stuff**/
-        HeartConfig::Instance()->SetOutputDirectory(directory);
-        HeartConfig::Instance()->SetOutputFilenamePrefix(filename);
 
         TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
         DistributedTetrahedralMesh<3, 3> mesh;
@@ -235,6 +223,9 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> second_cell_factory(0.0);
 
         ExtendedBidomainProblem<3> extended_problem(&first_cell_factory, &second_cell_factory);
+        SetupParameters(extended_problem);
+        extended_problem.SetOutputDirectory(directory);
+        extended_problem.SetOutputFilenamePrefix(filename);
         extended_problem.SetMesh(&mesh);
 
         std::vector<std::pair<AbstractChasteRegion<3>*, AbstractChasteRegion<3>*> > electrode_pairs;
@@ -307,14 +298,8 @@ public:
 
     void TestIrregularCubeChastecuboid()
     {
-        SetupParameters();
-
         std::string directory = "IrregularCube";
         std::string filename = "extended3d";
-
-        /**Where to utput stuff**/
-        HeartConfig::Instance()->SetOutputDirectory(directory);
-        HeartConfig::Instance()->SetOutputFilenamePrefix(filename);
 
         TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/3D_0_to_.5mm_1889_elements_irregular");
         DistributedTetrahedralMesh<3, 3> mesh;
@@ -353,6 +338,9 @@ public:
 
         // test this in a real problem.
         ExtendedBidomainProblem<3> extended_problem(&first_cell_factory, &second_cell_factory);
+        SetupParameters(extended_problem);
+        extended_problem.SetOutputDirectory(directory);
+        extended_problem.SetOutputFilenamePrefix(filename);
         extended_problem.SetMesh(&mesh);
         extended_problem.SetExtracellularStimulusFactory(&electrodes);
         TS_ASSERT_THROWS_NOTHING(extended_problem.Initialise());
@@ -363,14 +351,8 @@ public:
 
     void TestRegularCubeZeroNetChargeElectrodes()
     {
-        SetupParameters();
-
         std::string directory = "IrregularCube";
         std::string filename = "extended3d";
-
-        /**Where to utput stuff**/
-        HeartConfig::Instance()->SetOutputDirectory(directory);
-        HeartConfig::Instance()->SetOutputFilenamePrefix(filename);
 
         TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
         DistributedTetrahedralMesh<3, 3> mesh;
@@ -380,6 +362,9 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> second_cell_factory(0.0);
 
         ExtendedBidomainProblem<3> extended_problem(&first_cell_factory, &second_cell_factory);
+        SetupParameters(extended_problem);
+        extended_problem.SetOutputDirectory(directory);
+        extended_problem.SetOutputFilenamePrefix(filename);
         extended_problem.SetMesh(&mesh);
 
         std::vector<std::pair<AbstractChasteRegion<3>*, AbstractChasteRegion<3>*> > electrode_pairs;
@@ -420,17 +405,8 @@ public:
 
     void TestGroundingSecondElectrode()
     {
-        SetupParameters();
-
-        // this one needs to be a bit longer so that we are sure the second electrode stays at zero...
-        HeartConfig::Instance()->SetSimulationDuration(2.0); // ms.
-
         std::string directory = "GroundedElectrode";
         std::string filename = "extended3d";
-
-        /**Where to utput stuff**/
-        HeartConfig::Instance()->SetOutputDirectory(directory);
-        HeartConfig::Instance()->SetOutputFilenamePrefix(filename);
 
         TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
         TetrahedralMesh<3, 3> mesh;
@@ -440,6 +416,11 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> second_cell_factory(0.0);
 
         ExtendedBidomainProblem<3> extended_problem(&first_cell_factory, &second_cell_factory);
+        SetupParameters(extended_problem);
+        // this one needs to be a bit longer so that we are sure the second electrode stays at zero...
+        extended_problem.SetSimulationDuration(2.0); // ms.
+        extended_problem.SetOutputDirectory(directory);
+        extended_problem.SetOutputFilenamePrefix(filename);
         extended_problem.SetMesh(&mesh);
 
         std::vector<std::pair<AbstractChasteRegion<3>*, AbstractChasteRegion<3>*> > electrode_pairs;

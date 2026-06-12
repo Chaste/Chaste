@@ -151,13 +151,6 @@ public:
          * factory stimulates the LHS side (X=0) surface. */
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-5000*1000);
 
-        /* Electro-physiology parameters, such as the cell-model ODE timestep, the monodomain PDE timestep,
-         * the conductivities, capacitance etc, are set using `HeartConfig` as in electro-physiological
-         * (ie not mechanical) simulations. We use the defaults for all of these. The one variable that
-         * has to be set on `HeartConfig` is the end time of the simulation.
-         */
-        HeartConfig::Instance()->SetSimulationDuration(40.0);
-
         /* The main solver class for electro-mechanics, equivalent to `MonodomainProblem` or `BidomainProblem`,
          * is `CardiacElectroMechanicsProblem`. We will show how to use this class in later tests. The
          * subclass of `CardiacElectroMechanicsProblem` called `CardiacElectroMechProbRegularGeom`
@@ -178,6 +171,12 @@ public:
                                                      1.0,  // mechanics solve timestep
                                                      0.01, // contraction model ode timestep
                                                      "TestCardiacElectroMechanicsExample" /* output directory */);
+
+        /* Electro-physiology parameters, such as the cell-model ODE timestep, the monodomain PDE timestep,
+         * the conductivities, capacitance etc, are set on the electrics problem. We use the defaults for
+         * all of these. The one variable that has to be set is the end time of the simulation.
+         */
+        problem.GetElectricsProblem()->SetSimulationDuration(40.0);
         /* The contraction model chosen above is 'KERCHOFFS2003' (Kerchoffs, Journal of Engineering Mathematics, 2003). Other possibilities
          * are 'NHS' (Niederer, Hunter, Smith, 2006), and 'NASH2004' (Nash, Progress in Biophysics and Molecular Biology, 2004).
          *
@@ -242,9 +241,6 @@ public:
         QuadraticMesh<2> mechanics_mesh;
         mechanics_mesh.ConstructRegularSlabMesh(0.02, 0.1, 0.1, 0.1 /*as above with a different stepsize*/);
 
-        /* Set the end time as above */
-        HeartConfig::Instance()->SetSimulationDuration(40.0);
-
         /* In the solid mechanics tutorials, you can see how to use the class `SolidMechanicsProblemDefinition`
          * to set up a mechanics problem to be solved. The class allows you to specify things like: material law,
          * fixed nodes, traction boundary conditions, gravity, and so on. For electro-mechanics problems, we use
@@ -284,6 +280,8 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacElectroMechanicsExample2");
+        problem.GetElectricsProblem()->SetSimulationDuration(40.0);
+
         /* In this second example, we ask for VTK output as well, to be visualized using, for example,
          * Paraview. Having specified TestCardiacElectroMechanicsExample2 as output
          * directory in the problem class (relative to CHASTE_TEST_OUTPUT), you will find the VTK files in
@@ -304,7 +302,7 @@ public:
          * button you will see the mesh deforming over time with the chosen variable
          * plotted with the color according to the spectrum.
          */
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
+        problem.GetElectricsProblem()->SetVisualizeWithVtk(true);
         problem.Solve();
         /* Visualise as above.
          *
@@ -374,9 +372,6 @@ public:
         /* Collect the nodes on Z=0 */
         std::vector<unsigned> fixed_nodes
             = NonlinearElasticityTools<3>::GetNodesByComponentValue(mechanics_mesh, 2, 0.0);
-
-        /* Set the simulation end time as before */
-        HeartConfig::Instance()->SetSimulationDuration(50.0);
 
         /* Create the problem definition object as before (except now the template parameter is 3). */
         ElectroMechanicsProblemDefinition<3> problem_defn(mechanics_mesh);
@@ -450,6 +445,7 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacElectroMech3dTwistingCube");
+        problem.GetElectricsProblem()->SetSimulationDuration(50.0);
 
         /* Now call `Solve`. This will take a while to run, so watch progress using the log file to estimate when
          * it will finish. `build=GccOpt_ndebug` will speed this up by a factor of about 5. Visualise in Cmgui as usual.

@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "HeartConfig.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -63,10 +62,10 @@ public:
         std::vector<std::string> different_lookup_table_models = special_treatment_models(models, {"ten_tusscher_model_2004_endo"});
 
         SetUseCvodeJacobian(false);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        SetDefaultOdeDt(0.01);
         RunTests(dirname, models, args);
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
+        SetDefaultOdeDt(0.0001953125);
         RunTests(dirname, different_lookup_table_models, args);
 
         SetUseCvodeJacobian(true);

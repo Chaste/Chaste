@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MONODOMAINPURKINJECABLEASSEMBLER_HPP_
 
 #include "AbstractFeCableIntegralAssembler.hpp"
-#include "HeartConfig.hpp"
 #include "PdeSimulationTime.hpp"
 
 
@@ -64,6 +63,13 @@ private:
      */
     static const unsigned PROBLEM_DIM=2;
 
+    /** Purkinje membrane capacitance Cm (uF/cm^2). Default 1.0. */
+    double mPurkinjeCapacitance;
+    /** Purkinje surface-area-to-volume ratio chi (1/cm). Default 2800. */
+    double mPurkinjeChi;
+    /** Purkinje conductivity (mS/cm). Default 1.75. */
+    double mPurkinjeConductivity;
+
     /**
      * Compute the cable element contribution to the matrix
      *
@@ -84,9 +90,9 @@ private:
         Element<1,SPACE_DIM>* pElement)
     {
         c_matrix<double,PROBLEM_DIM*2, PROBLEM_DIM*2> ret = zero_matrix<double>(PROBLEM_DIM*2, PROBLEM_DIM*2);
-        double capacitance = HeartConfig::Instance()->GetPurkinjeCapacitance();
-        double chi = HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio();
-        double conductivity = HeartConfig::Instance()->GetPurkinjeConductivity();
+        double capacitance = mPurkinjeCapacitance;
+        double chi = mPurkinjeChi;
+        double conductivity = mPurkinjeConductivity;
 
         //We have to scale the assembled matrix by the cross sectional area of the Purkinje
         //fibre to ensure conservation of current at branch points. See #1899.
@@ -117,8 +123,14 @@ public:
      * Constructor
      * @param pMesh a pointer to a MixedDimensionMesh
      */
-    MonodomainPurkinjeCableAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
-        : AbstractFeCableIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,NORMAL>(pMesh)
+    MonodomainPurkinjeCableAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+                                     double purkinjeCapacitance = 1.0,
+                                     double purkinjeChi = 2800.0,
+                                     double purkinjeConductivity = 1.75)
+        : AbstractFeCableIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,NORMAL>(pMesh),
+          mPurkinjeCapacitance(purkinjeCapacitance),
+          mPurkinjeChi(purkinjeChi),
+          mPurkinjeConductivity(purkinjeConductivity)
     {
         // Check radii have been set on the purkinje elements
         for (typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableElementIterator iter = pMesh->GetCableElementIteratorBegin();

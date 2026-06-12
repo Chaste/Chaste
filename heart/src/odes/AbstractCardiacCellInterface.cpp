@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "HeartConfig.hpp" // First for Boost 1.33/PETSc 2.2
 #include "AbstractCardiacCellInterface.hpp"
 #include "Exception.hpp"
 
@@ -59,6 +58,8 @@ AbstractCardiacCellInterface::AbstractCardiacCellInterface(
       mpIntracellularStimulus(pIntracellularStimulus),
       mSetVoltageDerivativeToZero(false),
       mIsUsedInTissue(false),
+      mSurfaceAreaToVolumeRatio(1400.0),
+      mCapacitance(1.0),
       mHasDefaultStimulusFromCellML(false),
       mFixedVoltage(DOUBLE_UNSET)
 {
@@ -109,13 +110,23 @@ double AbstractCardiacCellInterface::GetIntracellularAreaStimulus(double time)
     if (mIsUsedInTissue)
     {
         // Convert from uA/cm^3 to uA/cm^2 by dividing by Am
-        stim = GetIntracellularStimulus(time) / HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio();
+        stim = GetIntracellularStimulus(time) / mSurfaceAreaToVolumeRatio;
     }
     else
     {
         stim = GetIntracellularStimulus(time);
     }
     return stim;
+}
+
+void AbstractCardiacCellInterface::SetSurfaceAreaToVolumeRatio(double ratio)
+{
+    mSurfaceAreaToVolumeRatio = ratio;
+}
+
+void AbstractCardiacCellInterface::SetCapacitance(double capacitance)
+{
+    mCapacitance = capacitance;
 }
 
 void AbstractCardiacCellInterface::SetUsedInTissueSimulation(bool tissue)

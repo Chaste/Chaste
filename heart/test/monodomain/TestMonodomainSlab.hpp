@@ -58,15 +58,14 @@ public:
     // See also TestMonodomainSlab.hpp
     void TestMonodomain3DWithFaceStimulus( void )
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
-        HeartConfig::Instance()->SetSimulationDuration(4); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoDg03dWithFaceStimulus");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_3dWithFaceStimulus");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-600.0*1000);
 
         MonodomainProblem<3> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
+        monodomain_problem.SetSimulationDuration(4); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
+        monodomain_problem.SetOutputDirectory("MonoDg03dWithFaceStimulus");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_3dWithFaceStimulus");
 
         monodomain_problem.Initialise();
 

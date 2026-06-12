@@ -1,5 +1,4 @@
 performance/Test1dMonodomainShannonCvodeBenchmarks.hpp
-TestCardiacSimulation.hpp
 TestCardiacSimulationArchiver.hpp
 ionicmodels/TestCvodeCells.hpp
 ionicmodels/TestDynamicallyLoadedCellModels.hpp

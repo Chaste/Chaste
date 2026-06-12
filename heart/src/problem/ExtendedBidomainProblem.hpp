@@ -394,7 +394,7 @@ public:
 
     /**
      * Allow the user to specify different values for the bidomain parameters in the extened bidomain framework.
-     * This method switches the mUserHasSetBidomainValuesExplicitly to true and tells the problem to overwrite the corresponding parameters in HeartConfig.
+     * This method switches the mUserHasSetBidomainValuesExplicitly to true.
      * It needs to be called before Initialise() to have any effect.
      *
      * @param Am1 value of the surface-to-volume ratio for the first cell
@@ -448,8 +448,7 @@ public:
     /**
      * Define what variables are written to the primary results file.
      * Hardcoded variable names are "V", "V_2" and "Phi_e" for the three variables.
-     * If you request any extra variable (via HeartConfig), this method will also define
-     * the extra variables by calling a method in the parent class.
+     * Also defines any extra variables by calling a method in the parent class.
      *
      * @param extending  whether we are extending an existing results file
      */
@@ -461,7 +460,7 @@ public:
      * (i.e., transmembrane potentials of the two cells plus extracellular potential).
      * It then writes to file V_1, V_2 and Phi_e.
      *
-     * It also writes any extra variable (defined by HeartConfig).
+     * It also writes any extra variables.
      * Note that it does the job by calling the method in the parent class.
      * This implies that the extra variable must be in the first cell (not the second)
      * because the generic method to write extra variables only looks into the first cell factory.

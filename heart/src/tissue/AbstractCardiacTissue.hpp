@@ -35,11 +35,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCARDIACTISSUE_HPP_
 #define ABSTRACTCARDIACTISSUE_HPP_
 
+#include <map>
 #include <set>
+#include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
 #include "UblasMatrixInclude.hpp"
+#include "UblasVectorInclude.hpp"
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
@@ -50,13 +53,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/split_member.hpp>
 
+#include "AbstractChasteRegion.hpp"
 #include "AbstractCardiacCellInterface.hpp"
 #include "FakeBathCell.hpp"
 #include "AbstractCardiacCellFactory.hpp"
 #include "AbstractConductivityTensors.hpp"
 #include "AbstractPurkinjeCellFactory.hpp"
 #include "ReplicatableVector.hpp"
-#include "HeartConfig.hpp"
 #include "ArchiveLocationInfo.hpp"
 #include "AbstractDynamicallyLoadableEntity.hpp"
 #include "DynamicModelLoaderRegistry.hpp"
@@ -112,37 +115,29 @@ private:
         SaveCardiacCells(*ProcessSpecificArchive<Archive>::Get(), version);
 
         // archive & mpMesh; Archived in save/load_constructs at the bottom of Mono/BidomainTissue.hpp
-        // archive & mpIntracellularConductivityTensors; Loaded from HeartConfig every time constructor is called
-        if (HeartConfig::Instance()->IsMeshProvided() && HeartConfig::Instance()->GetLoadMesh())
+        // archive & mpIntracellularConductivityTensors; Reconstructed on load from archived parameters below.
+        archive & mDefaultIntraConductivities;
+        archive & mFibreFilePathNoExtension;
+        archive & mFibreFileType;
+        archive & mSurfaceAreaToVolumeRatio;
+        archive & mCapacitance;
+
+        // Copy fibre orientation files to the archive directory so they can be found on restore.
+        if (!mFibreFilePathNoExtension.empty())
         {
-            switch (HeartConfig::Instance()->GetConductivityMedia())
+            if (mFibreFileType == "ortho")
             {
-                case cp::media_type::Orthotropic:
-                {
-                    FileFinder source_file(mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
-                    assert(source_file.Exists());
-                    FileFinder dest_file(ArchiveLocationInfo::GetArchiveRelativePath() + ArchiveLocationInfo::GetMeshFilename() + ".ortho", RelativeTo::ChasteTestOutput);
-
-                    TRY_IF_MASTER(source_file.CopyTo(dest_file));
-                    break;
-                }
-
-                case cp::media_type::Axisymmetric:
-                {
-                    FileFinder source_file(mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
-                    assert(source_file.Exists());
-                    FileFinder dest_file(ArchiveLocationInfo::GetArchiveRelativePath()
-                                       + ArchiveLocationInfo::GetMeshFilename() + ".axi", RelativeTo::ChasteTestOutput);
-
-                    TRY_IF_MASTER(source_file.CopyTo(dest_file));
-                    break;
-                }
-
-                case cp::media_type::NoFibreOrientation:
-                    break;
-
-                default:
-                    NEVER_REACHED;
+                FileFinder source_file(mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
+                assert(source_file.Exists());
+                FileFinder dest_file(ArchiveLocationInfo::GetArchiveRelativePath() + ArchiveLocationInfo::GetMeshFilename() + ".ortho", RelativeTo::ChasteTestOutput);
+                TRY_IF_MASTER(source_file.CopyTo(dest_file));
+            }
+            else if (mFibreFileType == "axi")
+            {
+                FileFinder source_file(mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
+                assert(source_file.Exists());
+                FileFinder dest_file(ArchiveLocationInfo::GetArchiveRelativePath() + ArchiveLocationInfo::GetMeshFilename() + ".axi", RelativeTo::ChasteTestOutput);
+                TRY_IF_MASTER(source_file.CopyTo(dest_file));
             }
         }
 
@@ -169,7 +164,7 @@ private:
     void load(Archive & archive, const unsigned int version)
     {
         // archive & mpMesh; Archived in save/load_constructs at the bottom of Mono/BidomainTissue.hpp
-        // archive & mpIntracellularConductivityTensors; Loaded from HeartConfig every time constructor is called
+        // archive & mpIntracellularConductivityTensors; Reconstructed from archived parameters below.
 
         if (version >= 3)
         {
@@ -199,6 +194,20 @@ private:
         // mCellsDistributed & mHaloCellsDistributed:
         LoadCardiacCells(*ProcessSpecificArchive<Archive>::Get(), version);
 
+        // archive & mpIntracellularConductivityTensors; Reconstructed from parameters below.
+        if (version >= 4)
+        {
+            archive & mDefaultIntraConductivities;
+            archive & mFibreFilePathNoExtension;
+            archive & mFibreFileType;
+            archive & mSurfaceAreaToVolumeRatio;
+            archive & mCapacitance;
+            // Rebuild the intracellular conductivity tensor with the restored parameters.
+            delete mpIntracellularConductivityTensors;
+            mpIntracellularConductivityTensors = nullptr;
+            CreateIntracellularConductivityTensor();
+        }
+
         // archive & mIionicCacheReplicated; // will be regenerated
         // archive & mIntracellularStimulusCacheReplicated; // will be regenerated
         archive & mDoCacheReplication;
@@ -223,6 +232,10 @@ private:
         // do not get archived...). mpConductivityModifier has to be reset to NULL upon load.
         mpConductivityModifier = NULL;
     }
+
+    /**
+     * Bump archive version to 4 to include conductivity member variables.
+     */
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     /**
@@ -235,8 +248,7 @@ protected:
     /** It's handy to keep a pointer to the mesh object*/
     AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
 
-    /** Intracellular conductivity tensors. Not archived, since it's loaded from the
-     *  HeartConfig singleton. */
+    /** Intracellular conductivity tensors. Reconstructed at load from archived conductivity parameters. */
     AbstractConductivityTensors<ELEMENT_DIM,SPACE_DIM>* mpIntracellularConductivityTensors;
 
     /** The vector of cells. Distributed. */
@@ -270,9 +282,6 @@ protected:
      */
     ReplicatableVector mPurkinjeIntracellularStimulusCacheReplicated;
 
-    /** Local pointer to the HeartConfig singleton instance, for convenience. */
-    HeartConfig* mpConfig;
-
     /**
      * Local pointer to the distributed vector factory associated with the mesh object used.
      *
@@ -287,6 +296,36 @@ protected:
      * Path to the location of the fibre file without extension.
      */
     std::string mFibreFilePathNoExtension;
+
+    /**
+     * Default intracellular conductivities (mS/cm) used when no heterogeneous regions are set.
+     * Initialised to 1.75 in all directions.
+     */
+    c_vector<double, SPACE_DIM> mDefaultIntraConductivities;
+
+    /**
+     * Fibre orientation media type:
+     *  - empty string = no fibre orientation (isotropic)
+     *  - "ortho"      = orthotropic (.ortho file)
+     *  - "axi"        = axisymmetric (.axi file)
+     */
+    std::string mFibreFileType;
+
+    /**
+     * Conductivity heterogeneity regions: each entry is a region with its own
+     * intracellular conductivity vector.  Populated by AbstractCardiacProblem::Initialise().
+     */
+    std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > mConductivityHeterogeneityAreas;
+    std::vector<c_vector<double, SPACE_DIM> > mConductivityHeterogeneityIntra;
+    std::vector<c_vector<double, SPACE_DIM> > mConductivityHeterogeneityExtra;
+
+    /** Surface-area-to-volume ratio Am (1/cm). Default 1400. */
+    double mSurfaceAreaToVolumeRatio;
+    /** Membrane capacitance Cm (uF/cm^2). Default 1.0. */
+    double mCapacitance;
+
+    /** Per-bath-region conductivities (mS/cm). Keyed by region identifier. Default bath conductivity is 7.0. */
+    std::map<unsigned, double> mBathConductivities;
 
     /**
      * This class, if not NULL, will be used to modify the conductivity that is obtained from
@@ -382,6 +421,66 @@ public:
 
     /** @return whether this tissue contains Purkinje fibres. */
     bool HasPurkinje();
+
+    /**
+     * Set the default intracellular conductivities (mS/cm).  If the conductivity tensor has
+     * already been created, this updates its constant value.  If called before the first use,
+     * the value will be used when the tensor is first created.
+     *
+     * @param rConductivities  conductivity vector (length SPACE_DIM)
+     */
+    void SetIntracellularConductivities(const c_vector<double, SPACE_DIM>& rConductivities);
+
+    /**
+     * Specify a fibre orientation file and type to use when (re-)building the conductivity tensors.
+     * Must be called before CreateIntracellularConductivityTensor() or before calling
+     * SetIntracellularConductivities() to rebuild with fibres.
+     *
+     * @param rFilePath  path to the fibre file without extension
+     * @param rFileType  "ortho" or "axi"
+     */
+    void SetFibreOrientationFile(const std::string& rFilePath, const std::string& rFileType);
+
+    /**
+     * Add a conductivity heterogeneity region.  This must be called before the conductivity
+     * tensors are first used, i.e. before Solve().
+     *
+     * @param pRegion        the region (cuboid or ellipsoid)
+     * @param rIntraConds    intracellular conductivities in this region (mS/cm)
+     * @param rExtraConds    extracellular conductivities in this region (mS/cm); only used by BidomainTissue
+     */
+    void AddConductivityHeterogeneity(boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > pRegion,
+                                      const c_vector<double, SPACE_DIM>& rIntraConds,
+                                      const c_vector<double, SPACE_DIM>& rExtraConds);
+
+    /**
+     * Set the bath conductivity map.
+     * @param rConductivities  map from region identifier to conductivity (mS/cm)
+     */
+    void SetBathConductivities(const std::map<unsigned, double>& rConductivities);
+
+    /**
+     * Get the bath conductivity for a given region.
+     * @param bathRegion  region identifier (UINT_MAX for global default)
+     * @return conductivity (mS/cm)
+     */
+    double GetBathConductivity(unsigned bathRegion = UINT_MAX) const;
+
+    /** @param ratio  surface-area-to-volume ratio Am (1/cm) */
+    void SetSurfaceAreaToVolumeRatio(double ratio);
+    /** @return surface-area-to-volume ratio Am (1/cm) */
+    double GetSurfaceAreaToVolumeRatio() const;
+
+    /** @param capacitance  membrane capacitance Cm (uF/cm^2) */
+    void SetCapacitance(double capacitance);
+    /** @return membrane capacitance Cm (uF/cm^2) */
+    double GetCapacitance() const;
+
+    /**
+     * Rebuild the intracellular conductivity tensor.  This is called automatically after the
+     * tissue is constructed, but can be called again after updating conductivity settings.
+     */
+    void RebuildConductivityTensors();
 
     /**
      * Set whether or not to replicate the caches across all processors.
@@ -746,7 +845,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 struct version<AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM> >
 {
     ///Macro to set the version number of templated archive in known versions of Boost
-    CHASTE_VERSION_CONTENT(3);
+    CHASTE_VERSION_CONTENT(4);
 };
 } // namespace serialization
 } // namespace boost

@@ -86,6 +86,10 @@ protected:
     boost::shared_ptr<ZeroStimulus> mpZeroStimulus;
     /** The solver to give each of the cells */
     boost::shared_ptr<AbstractIvpOdeSolver> mpSolver;
+    /** PDE timestep (ms) — used as the maximum CVODE timestep. Default 0.01. */
+    double mPdeTimeStep;
+    /** ODE timestep (ms) — used as the ODE solver step for non-CVODE cells. Default 0.01. */
+    double mOdeTimeStep;
 
 public:
     /**
@@ -144,6 +148,20 @@ public:
      * @param pMesh  the mesh for which to create cardiac cells.
      */
     virtual void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+
+    /**
+     * Set the PDE time step.  This is used as the maximum CVODE timestep when
+     * creating CVODE cell models.  Must be called before the factory is used.
+     * @param pdeTimeStep  PDE timestep (ms)
+     */
+    void SetPdeTimeStep(double pdeTimeStep);
+
+    /**
+     * Set the ODE time step.  This is used as the internal step for non-CVODE
+     * cell models.  Must be called before the factory is used.
+     * @param odeTimeStep  ODE timestep (ms)
+     */
+    void SetOdeTimeStep(double odeTimeStep);
 
     /**
      * @return  the mesh used to create the cells.

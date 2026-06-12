@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ExtendedBidomainProblem.hpp"
 #include "CorriasBuistSMCModified.hpp"
 #include "BidomainProblem.hpp"
+#include "DistributedTetrahedralMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 #ifndef TESTFIBREREADERABILITYEXTENDEDBIDOMAINPROBLEM_HPP_
@@ -85,20 +86,19 @@ public:
 
     void TestFibreAbilityNoFibreExtendedProblem()
     {
-        HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();
 
         UnStimulatedCellFactory un_stimulated_cell_factory;
         ExtendedBidomainProblem<2> extended_problem( &un_stimulated_cell_factory , &un_stimulated_cell_factory);
         extended_problem.SetExtendedBidomainParameters(1, 2, 3, 4, 5, 6);
 
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1, 2));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(3, 4));
+        extended_problem.SetIntracellularConductivities(Create_c_vector(1, 2));
+        extended_problem.SetExtracellularConductivities(Create_c_vector(3, 4));
         extended_problem.SetIntracellularConductivitiesForSecondCell(Create_c_vector(5, 6));
 
         // This mesh has parallel to x axis fibre for x < 0.5 mm and aligned 45 degrees for x > 0.5 mm. However,
         // in this case the fibre is not read.
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
+        extended_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
 
         extended_problem.Initialise();
 
@@ -136,18 +136,18 @@ public:
 
     void TestOrthoFibreAbilityExtendedProblem()
     {
-        HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();
-
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1, 2));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(3, 4));
-
-        // This mesh has parallel to x axis fibre for x < 0.5 mm and aligned 45 degrees for x > 0.5 mm.
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements", cp::media_type::Orthotropic);
 
         UnStimulatedCellFactory un_stimulated_cell_factory;
 
         ExtendedBidomainProblem<2> extended_problem( &un_stimulated_cell_factory , &un_stimulated_cell_factory);
+
+        extended_problem.SetIntracellularConductivities(Create_c_vector(1, 2));
+        extended_problem.SetExtracellularConductivities(Create_c_vector(3, 4));
+
+        // This mesh has parallel to x axis fibre for x < 0.5 mm and aligned 45 degrees for x > 0.5 mm.
+        extended_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
+        extended_problem.SetFibreOrientationFile("mesh/test/data/2D_0_to_1mm_800_elements", "ortho");
 
         extended_problem.SetExtendedBidomainParameters(1, 2, 3, 4, 5, 6);
 
@@ -213,20 +213,21 @@ public:
 
     void Test3DAxiFibreAbilityExtendedProblem()
     {
-        HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1, 2, 2));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(3, 4, 4));
-
-        // This mesh defines a single tetrahdera with fibre oriented along y axis
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_Single_tetrahedron_element", cp::media_type::Axisymmetric);
-
-        // We ignore mesh partitioning as this mesh has only one element.
-        HeartConfig::Instance()->SetMeshPartitioning("dumb");
 
         UnStimulated3DCellFactory un_stimulated_3Dcell_factory;
 
         ExtendedBidomainProblem<3> extended_problem( &un_stimulated_3Dcell_factory , &un_stimulated_3Dcell_factory);
+        extended_problem.SetIntracellularConductivities(Create_c_vector(1, 2, 2));
+        extended_problem.SetExtracellularConductivities(Create_c_vector(3, 4, 4));
+
+        // This mesh defines a single tetrahedra with fibre oriented along y axis
+        extended_problem.SetMeshFileName("mesh/test/data/3D_Single_tetrahedron_element");
+        extended_problem.SetFibreOrientationFile("mesh/test/data/3D_Single_tetrahedron_element", "axi");
+
+        // We ignore mesh partitioning as this mesh has only one element.
+        extended_problem.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::DUMB);
+
         extended_problem.SetExtendedBidomainParameters(1, 2, 3, 4, 5, 6);
         extended_problem.SetIntracellularConductivitiesForSecondCell(Create_c_vector(5, 6, 6));
         extended_problem.Initialise();

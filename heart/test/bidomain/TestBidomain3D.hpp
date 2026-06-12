@@ -54,20 +54,20 @@ public:
     void TestBidomain3d()
     {
         HeartEventHandler::Reset();
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
-        HeartConfig::Instance()->SetSimulationDuration(4.0);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
-        HeartConfig::Instance()->SetOutputDirectory("Bidomain3d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain3d");
-
-        // Check the linear system can be solved to a low tolerance (in particular, checks the null space
-        // stuff was implemented correctly
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-14);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> bidomain_cell_factory(-600.0*1000);
 
         BidomainProblem<3> bidomain_problem( &bidomain_cell_factory );
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
+        bidomain_problem.SetSimulationDuration(4.0);  //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
+        bidomain_problem.SetOutputDirectory("Bidomain3d");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain3d");
+
+        // Check the linear system can be solved to a low tolerance (in particular, checks the null space
+        // stuff was implemented correctly
+        bidomain_problem.SetKspAbsoluteTolerance(1e-14);
 
         bidomain_problem.Initialise();
 
@@ -138,18 +138,17 @@ public:
         // the bidomain equations reduce to the monodomain equations
         // if sigma_e is infinite (equivalent to saying the extra_cellular
         // space is grounded. sigma_e is set to be very large here:
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(17500, 17500, 17500));
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
-        HeartConfig::Instance()->SetOutputDirectory("Monodomain3d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("monodomain3d");
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-600.0*1000);
 
         ///////////////////////////////////////////////////////////////////
         // monodomain
         ///////////////////////////////////////////////////////////////////
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-600.0*1000);
         MonodomainProblem<3> monodomain_problem( &cell_factory );
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
+        monodomain_problem.SetSimulationDuration(1.0);  //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
+        monodomain_problem.SetOutputDirectory("Monodomain3d");
+        monodomain_problem.SetOutputFilenamePrefix("monodomain3d");
 
         monodomain_problem.Initialise();
         monodomain_problem.Solve();
@@ -157,10 +156,14 @@ public:
         ///////////////////////////////////////////////////////////////////
         // bidomain
         ///////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOutputDirectory("Bidomain3d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain3d");
-
         BidomainProblem<3> bidomain_problem( &cell_factory );
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(17500, 17500, 17500));
+        bidomain_problem.SetSimulationDuration(1.0);  //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
+        bidomain_problem.SetOutputDirectory("Bidomain3d");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain3d");
+
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
 

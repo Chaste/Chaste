@@ -63,10 +63,11 @@ class TestConvergenceEfficiency : public CxxTest::TestSuite
 public:
     void Test3DSpace10Efficiency()
     {
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-7);
+        tester.KspSolverType = "symmlq";  // Moved from HeartConfig
+        tester.KspPreconditionerType = "bjacobi";
+        tester.KspAbsoluteTolerance = 1e-7;
+        tester.UseKspAbsoluteTolerance = true;
         tester.OdeTimeStep /= 2.0;
         tester.PdeTimeStep /= 2.0;
         tester.SetMeshWidth(0.10);//cm
@@ -74,7 +75,6 @@ public:
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 3u);
-        HeartConfig::Instance()->Reset();
     }
 };
 

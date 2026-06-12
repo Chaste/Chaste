@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "OdeSystemInformation.hpp"
 #include "CorriasBuistSMCModified.hpp"
-#include "HeartConfig.hpp"
 
 
     CorriasBuistSMCModified::CorriasBuistSMCModified(boost::shared_ptr<AbstractIvpOdeSolver> pSolver, boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
@@ -57,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         /* parameters */
         Cm = 77.0*1e-6;// 77 pF --> microF
 
-        Asurf_in_cm_square = Cm / HeartConfig::Instance()->GetCapacitance();
+        Asurf_in_cm_square = Cm / mCapacitance;
         Asurf = Asurf_in_cm_square / 0.01;//cm2 --> mm2 /*cell surface area (mm2)*/
 
         VolCell   =      3.5e-6;      /*cell volume (mm3)*/

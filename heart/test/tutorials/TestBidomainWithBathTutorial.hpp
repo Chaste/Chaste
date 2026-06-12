@@ -85,18 +85,6 @@ public: // Tests should be public!
 
     void TestWithBathAndElectrodes()
     {
-        /* First, set the end time and output info. In this simulation
-         * we'll explicitly read the mesh, alter it, then pass it
-         * to the problem class, so we don't set the mesh file name.
-         */
-        HeartConfig::Instance()->SetSimulationDuration(3.0);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainTutorialWithBath");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-        /* Bath problems seem to require decreased ODE timesteps.
-         */
-        HeartConfig::Instance()->SetOdeTimeStep(0.001);  //ms
-
         /* Use the `PlaneStimulusCellFactory` to define a set
          * of Luo-Rudy cells. We pass the stimulus magnitude as 0.0
          * as we don't want any stimulated cells.
@@ -132,7 +120,22 @@ public: // Tests should be public!
         static unsigned bath_id2=2;
         bath_ids.insert(bath_id2);
 
-        HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
+        /* Now create the bidomain problem (before setting tissue/bath ids since it is needed before Initialise). */
+        BidomainProblem<2> bidomain_problem( &cell_factory, true );
+
+        /* First, set the end time and output info. In this simulation
+         * we'll explicitly read the mesh, alter it, then pass it
+         * to the problem class, so we don't set the mesh file name.
+         */
+        bidomain_problem.SetSimulationDuration(3.0);  //ms
+        bidomain_problem.SetOutputDirectory("BidomainTutorialWithBath");
+        bidomain_problem.SetOutputFilenamePrefix("results");
+
+        /* Bath problems seem to require decreased ODE timesteps.
+         */
+        bidomain_problem.SetOdeTimeStep(0.001);  //ms
+
+        bidomain_problem.SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
 
         /* In bath problems, each element has an attribute which must be set
          * to 0 (cardiac tissue) or 1 (bath). This can be done by having an
@@ -191,11 +194,11 @@ public: // Tests should be public!
          *  * heterogeneous overides can be set with `SetBathMultipleConductivities(std::map<unsigned, double> )`
          */
 
-        HeartConfig::Instance()->SetBathConductivity(7.0);  //bath_id1 tags will take the default value (actually 7.0 is the default)
+        // bath_id1 tags will take the default value of 7.0 mS/cm
         std::map<unsigned, double> multiple_bath_conductivities;
         multiple_bath_conductivities[bath_id2] = 6.5;  // mS/cm
 
-        HeartConfig::Instance()->SetBathMultipleConductivities(multiple_bath_conductivities);
+        bidomain_problem.SetBathMultipleConductivities(multiple_bath_conductivities);
 
 
         /* Now we define the electrodes. First define the magnitude of the electrodes
@@ -219,15 +222,9 @@ public: // Tests should be public!
          * (This explains why the full mesh ought to be rectangular/cuboid - the nodes on
          * $x=xmin$ and $x=xmax$ ought to be form two surfaces of equal area.
          */
-        HeartConfig::Instance()->SetElectrodeParameters(false, 0, magnitude, start_time, duration);
+        bidomain_problem.SetElectrodeParameters(false, 0, magnitude, start_time, duration);
 
-        /* Now create the problem class, using the cell factory and passing
-         * in `true` as the second argument to indicate we are solving a bath
-         * problem..
-         */
-        BidomainProblem<2> bidomain_problem( &cell_factory, true );
-
-        /* ..set the mesh and electrodes.. */
+        /* Set the mesh. */
         bidomain_problem.SetMesh(&mesh);
 
         /* ..and solve as before. */

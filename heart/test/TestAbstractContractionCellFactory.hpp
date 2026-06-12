@@ -134,8 +134,6 @@ public:
         // create mechanics mesh
         QuadraticMesh<2>* p_mesh_m = new QuadraticMesh<2>(0.02, 0.1, 0.1);//width/no of ele, width, height
 
-        //General simulation setup
-        HeartConfig::Instance()->SetSimulationDuration(5.0);
         //Set up the electrophysiology
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-5000*1000); //stimulates along X=0
 
@@ -172,6 +170,8 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestContractionCellFactoryOnSquare");
+        //General simulation setup
+        problem.GetElectricsProblem()->SetSimulationDuration(5.0);
 
         problem.Solve();
 

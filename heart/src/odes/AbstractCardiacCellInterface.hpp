@@ -85,6 +85,11 @@ public:
     virtual void SetTimestep(double dt)=0;
 
     /**
+     * @return the timestep (or maximum timestep when using CVODE) for this cell.
+     */
+    virtual double GetTimestep() const=0;
+
+    /**
      * All subclasses must implement this method to get the number of state variables.
      *
      * This needs to be declared here as AbstractCorrectionTermAssembler uses it.
@@ -165,8 +170,6 @@ public:
     /**
      * All subclasses must implement a method that returns a parameter value.
      *
-     * This needs to be declared here as HeartConfigCellFactory uses it.
-     *
      * @param rParameterName  the name of a parameter to get the value of,
      * @return  the parameter's value.
      */
@@ -175,8 +178,6 @@ public:
     /**
      * All subclasses must implement a method that returns a parameter value.
      *
-     * This needs to be declared here as HeartConfigCellFactory uses it.
-     *
      * @param parameterIndex  the index of a parameter to get the value of,
      * @return  the parameter's value.
      */
@@ -184,8 +185,6 @@ public:
 
     /**
      * All subclasses must implement a method that sets a parameter value.
-     *
-     * This needs to be declared here as HeartConfigCellFactory uses it.
      *
      * @param rParameterName  the parameter name to set the value of,
      * @param value  value to set it to.
@@ -243,8 +242,7 @@ public:
      * In both cases additional scaling may be required to obtain correct units once the
      * dimensions have been sorted out.
      *
-     * Chaste's value for C_m can be obtained from HeartConfig::Instance()->GetCapacitance()
-     * and is measured in uF/cm^2.
+     * Chaste's default C_m is 1.0 uF/cm^2; this can be overridden via SetCapacitance().
      *
      * For state-variable interpolation (SVI) we need to interpolate state variables at nodes onto
      * quadrature points and then pass these into this method (see optional argument). Otherwise
@@ -322,6 +320,19 @@ public:
      * @param tissue  true if cell is in a tissue
      */
     void SetUsedInTissueSimulation(bool tissue=true);
+
+    /**
+     * Set the surface-area-to-volume ratio Am (1/cm) used when converting volumetric to
+     * area stimulus in GetIntracellularAreaStimulus().  Default is 1400 1/cm.
+     * @param ratio  Am (1/cm)
+     */
+    void SetSurfaceAreaToVolumeRatio(double ratio);
+
+    /**
+     * Set the membrane capacitance Cm (uF/cm^2).  Default is 1.0.
+     * @param capacitance  Cm (uF/cm^2)
+     */
+    void SetCapacitance(double capacitance);
 
     /**
      * Use CellML metadata to set up the default stimulus for this cell.
@@ -441,6 +452,12 @@ protected:
 
     /** Whether this cell exists in a tissue, or is an isolated cell. */
     bool mIsUsedInTissue;
+
+    /** Surface-area-to-volume ratio Am (1/cm) used when converting volumetric to area stimulus. Default 1400. */
+    double mSurfaceAreaToVolumeRatio;
+
+    /** Membrane capacitance Cm (uF/cm^2). Default 1.0. */
+    double mCapacitance;
 
     /** Whether this cell has a default stimulus specified by CellML metadata. */
     bool mHasDefaultStimulusFromCellML;

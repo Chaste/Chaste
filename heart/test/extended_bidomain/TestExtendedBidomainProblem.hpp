@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 #include "PetscSetupAndFinalize.hpp"
 
-#include "HeartConfig.hpp"
 #include "SimpleStimulus.hpp"
 #include "CorriasBuistSMCModified.hpp"
 #include "CorriasBuistICCModified.hpp"
@@ -108,17 +107,16 @@ class TestExtendedBidomainProblem: public CxxTest::TestSuite
 
 public:
 
-    void SetupParameters()
+    void SetupParameters(ExtendedBidomainProblem<1>& rProblem)
     {
-        HeartConfig::Instance()->Reset();
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(5.0));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1.0));
+        rProblem.SetIntracellularConductivities(Create_c_vector(5.0));
+        rProblem.SetExtracellularConductivities(Create_c_vector(1.0));
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.1,0.1,10.0);
+        rProblem.SetOdePdeAndPrintingTimeSteps(0.1, 0.1, 10.0);
 
-        //HeartConfig::Instance()->SetKSPSolver("gmres");
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
+        //rProblem.SetKspSolverType("gmres");
+        rProblem.SetKspAbsoluteTolerance(1e-5);
+        rProblem.SetKspPreconditionerType("bjacobi");
     }
 
     /**
@@ -129,8 +127,6 @@ public:
      */
     void TestExtendedProblemVsMartincCode()
     {
-        SetupParameters();
-
         TetrahedralMesh<1,1> mesh;
         unsigned number_of_elements = 100;//this is nGrid in Martin's code
         double length = 10.0;//100mm as in Martin's code
@@ -144,17 +140,17 @@ public:
         double Cm_smc = 1.0;
         double G_gap = 20.0;//mS/cm^2
 
-        HeartConfig::Instance()->SetSimulationDuration(1000.0);  //ms.
-
         ICC_Cell_factory icc_factory;
         SMC_Cell_factory smc_factory;
 
         std::string dir = "ICCandSMC";
         std::string filename = "extended1d";
-        HeartConfig::Instance()->SetOutputDirectory(dir);
-        HeartConfig::Instance()->SetOutputFilenamePrefix(filename);
 
         ExtendedBidomainProblem<1> extended_problem( &icc_factory , &smc_factory);
+        SetupParameters(extended_problem);
+        extended_problem.SetSimulationDuration(1000.0);  //ms.
+        extended_problem.SetOutputDirectory(dir);
+        extended_problem.SetOutputFilenamePrefix(filename);
         extended_problem.SetMesh(&mesh);
 
         extended_problem.SetExtendedBidomainParameters(Am_icc,Am_smc, Am_gap, Cm_icc, Cm_smc, G_gap);
@@ -162,7 +158,7 @@ public:
 
         std::vector<unsigned> outputnodes;
         outputnodes.push_back(50u);
-        HeartConfig::Instance()->SetRequestedNodalTimeTraces(outputnodes);
+        extended_problem.AddNodalTimeTrace(50u);
 
         extended_problem.Initialise();
         extended_problem.Solve();
@@ -199,23 +195,9 @@ public:
     // Test the functionality for outputting the values of requested cell state variables
     void TestExtendedBidomainProblemPrintsMultipleVariables()
     {
-        // Get the singleton in a clean state
-        HeartConfig::Instance()->Reset();
-
         // Set configuration file
         std::string dir = "ExtBidoMultiVars";
         std::string filename = "extended";
-        HeartConfig::Instance()->SetOutputDirectory(dir);
-        HeartConfig::Instance()->SetOutputFilenamePrefix(filename);
-
-        HeartConfig::Instance()->SetSimulationDuration(0.1);
-        // HeartConfig::Instance()->SetKSPSolver("gmres");
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(2e-4);
-        HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
-
-        /** Check that also the converters handle multiple variables**/
-        HeartConfig::Instance()->SetVisualizeWithCmgui(true);
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
 
         TetrahedralMesh<1,1> mesh;
         unsigned number_of_elements = 100;
@@ -229,12 +211,22 @@ public:
         output_variables.push_back("fast_sodium_current_j_gate__j");
         output_variables.push_back("ionic_concentrations__Ki");
 
-        HeartConfig::Instance()->SetOutputVariables( output_variables );
-
         // Set up problem
         PlaneStimulusCellFactory<CellFaberRudy2000FromCellML, 1> cell_factory_1(-60, 0.5);
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory_2(0.0,0.5);
         ExtendedBidomainProblem<1> ext_problem( &cell_factory_1, &cell_factory_2 );
+        ext_problem.SetOutputDirectory(dir);
+        ext_problem.SetOutputFilenamePrefix(filename);
+        ext_problem.SetSimulationDuration(0.1);
+        // ext_problem.SetKspSolverType("gmres");
+        ext_problem.SetKspAbsoluteTolerance(2e-4);
+        ext_problem.SetKspPreconditionerType("jacobi");
+
+        /** Check that also the converters handle multiple variables**/
+        ext_problem.SetVisualizeWithCmgui(true);
+        ext_problem.SetVisualizeWithMeshalyzer(true);
+
+        ext_problem.SetOutputVariables( output_variables );
         ext_problem.SetMesh(&mesh);
 
         // Solve

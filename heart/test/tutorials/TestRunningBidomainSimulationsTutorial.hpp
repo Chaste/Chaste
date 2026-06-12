@@ -167,17 +167,21 @@ public:
      */
     void TestSimpleSimulation()
     {
-        /* The `HeartConfig` class is used to set various parameters (see the main [ChasteGuides](/docs/user-guides/#miscellaneous-information) page
-         * for information on default parameter values. Parameters in this file can be re-set
-         * with `HeartConfig` if the user wishes, and other parameters such as end time must be set
-         * using `HeartConfig`. Let us begin by setting the end time (in ms), the mesh to use, and the
+        /* Let us begin by creating the problem and setting the end time (in ms), the mesh to use, and the
          * output directory and filename-prefix. Note that the spatial units in cardiac Chaste is CENTIMETRES,
          * so that mesh 2D_0_to_1mm_800_elements is a mesh over [0,0.1]x[0,0.1].
          */
-        HeartConfig::Instance()->SetSimulationDuration(5.0); // ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
-        HeartConfig::Instance()->SetOutputDirectory("BidomainTutorial");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
+
+        /* Next, we have to create a cell factory of the type we defined above. */
+        PointStimulus2dCellFactory cell_factory;
+
+        /* Now we create a problem class using (a pointer to) the cell factory. */
+        BidomainProblem<2> bidomain_problem(&cell_factory);
+
+        bidomain_problem.SetSimulationDuration(5.0); // ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
+        bidomain_problem.SetOutputDirectory("BidomainTutorial");
+        bidomain_problem.SetOutputFilenamePrefix("results");
 
         /* There is an alternate method of loading a mesh that can be seen in [Monodomain 3d Example](/docs/user-tutorials/monodomain3dexample/),
          * using `DistributedTetrahedralMesh`.
@@ -185,17 +189,11 @@ public:
          * It is possible to over-ride the default visualisation output (which is done during simulation
          * post-processing).
          */
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
-        HeartConfig::Instance()->SetVisualizeWithCmgui(true);
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
+        bidomain_problem.SetVisualizeWithMeshalyzer(true);
+        bidomain_problem.SetVisualizeWithCmgui(true);
+        bidomain_problem.SetVisualizeWithVtk(true);
         /* If the mesh is a DistributedTetrahedralMesh then we can use parallel VTK files (.pvtu)*/
-        // HeartConfig::Instance()->SetVisualizeWithParallelVtk(true);
-
-        /* Next, we have to create a cell factory of the type we defined above. */
-        PointStimulus2dCellFactory cell_factory;
-
-        /* Now we create a problem class using (a pointer to) the cell factory. */
-        BidomainProblem<2> bidomain_problem(&cell_factory);
+        // bidomain_problem.SetVisualizeWithParallelVtk(true);
 
         /* This is enough setup to run a simulation: we could now call `Initialise()`
          * and `Solve()` to run... */
@@ -208,20 +206,20 @@ public:
          * of the correct size (2, in this case). Make sure these methods are called before
          * `Initialise()`.
          */
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.19));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(6.2, 2.4));
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.19));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(6.2, 2.4));
 
         /* This is how to reset the surface-area-to-volume ratio and the capacitance.
          * (Here, we are actually just resetting them to their default values). */
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1400); // 1/cm
-        HeartConfig::Instance()->SetCapacitance(1.0); // uF/cm^2
+        bidomain_problem.SetSurfaceAreaToVolumeRatio(1400); // 1/cm
+        bidomain_problem.SetCapacitance(1.0); // uF/cm^2
 
         /* This is how to set the ode timestep (the timestep used to solve the cell models)
          * the pde timestep (the timestep used in solving the bidomain PDE), and the
          * printing timestep (how often the output is written to file). The defaults are
          * all 0.01, here we increase the printing timestep.
          */
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
 
         /* Now we call `Initialise()`... */
         bidomain_problem.Initialise();

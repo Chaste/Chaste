@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <petscvec.h>
 
 #include "AbstractBidomainSolver.hpp"
-#include "HeartConfig.hpp"
 #include "BidomainAssembler.hpp"
 #include "BidomainMassMatrixAssembler.hpp"
 #include "BidomainCorrectionTermAssembler.hpp"
@@ -70,7 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  and also to compute c1_surf and c2_surf, and one to assemble the mass matrix M.
  *
  *  Also allows state variable interpolation (SVI) to be used on elements for which it
- *  will be needed, if the appropriate HeartConfig boolean is set.
+ *  will be needed, if SVI is enabled on the problem.
  *  See https://chaste.github.io/docs/user-guides/state-variable-interpolation/ for more details on this. In this
  *  case the vector [c_correction, 0] is added to the above, and another assembler is
  *  used to create the c_correction.

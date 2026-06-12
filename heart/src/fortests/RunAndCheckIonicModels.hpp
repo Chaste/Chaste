@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ColumnDataReader.hpp"
 
 #include "AbstractCardiacCell.hpp"
-#include "HeartConfig.hpp"
 
 #include <cxxtest/TestSuite.h>
 
@@ -107,7 +106,7 @@ void RunOdeSolverWithIonicModel(AbstractCardiacCellInterface* pOdeSystem,
     // Solve and write to file
     if (useSamplingInterval)
     {
-        OdeSolution solution = pOdeSystem->Compute(start_time, endTime, HeartConfig::Instance()->GetOdeTimeStep() * stepPerRow);
+        OdeSolution solution = pOdeSystem->Compute(start_time, endTime, pOdeSystem->GetTimestep() * stepPerRow);
         solution.WriteToFile("TestIonicModels", filename, "ms", 1, false, 4);
     }
     else

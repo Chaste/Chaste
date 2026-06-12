@@ -143,7 +143,8 @@ public:
     void TestSpaceConvergenceMonoIn1DWithRelativeTolerance()
     {
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<1>, 1, 1> tester;
-        HeartConfig::Instance()->SetUseRelativeTolerance(1e-4);
+        tester.KspRelativeTolerance = 1e-4;
+        tester.UseKspRelativeTolerance = true;
         tester.RelativeConvergenceCriterion=0.14142;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);
@@ -151,16 +152,15 @@ public:
         TS_ASSERT_EQUALS(tester.GetMeshNum(), 2);
         TS_ASSERT_DELTA(tester.GetSpaceStep(), 0.0125, 1e-8);
         TS_ASSERT_LESS_THAN(tester.LastDifference, 0.070711);
-        HeartConfig::Instance()->Reset();
     }
 
     void TestSpaceConvergenceBidomainIn1DWithAbsoluteTolerance()
     {
         // Zero pivot detected in Cholesky factorisation for mesh 1. This is not an error and it may always happen when using bjacobi with singular systems.
-        HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
-
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(2e-4);
+        tester.KspPreconditionerType = "jacobi";
+        tester.KspAbsoluteTolerance = 2e-4;
+        tester.UseKspAbsoluteTolerance = true;
         tester.RelativeConvergenceCriterion=0.14142;
         tester.AbsoluteStimulus = -5.5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);
@@ -168,7 +168,6 @@ public:
         TS_ASSERT_EQUALS(tester.GetMeshNum(), 2);
         TS_ASSERT_DELTA(tester.GetSpaceStep(), 0.0125, 1e-8);
         TS_ASSERT_LESS_THAN(tester.LastDifference, 0.062450);
-        HeartConfig::Instance()->Reset();
      }
 };
 

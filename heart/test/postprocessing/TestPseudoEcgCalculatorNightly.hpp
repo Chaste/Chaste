@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 #include "OutputFileHandler.hpp"
 #include "TrianglesMeshReader.hpp"
-#include "HeartConfig.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "NumericFileComparison.hpp"
 
@@ -76,7 +75,7 @@ public:
 
         //where to put results...
         std::string pseudo_ecg_output_dir = "TestRealisticPseudoEcg";
-        HeartConfig::Instance()->SetOutputDirectory(pseudo_ecg_output_dir);
+        calculator.SetOutputDirectory(pseudo_ecg_output_dir);
 
         //write out the pseudoECG
         calculator.WritePseudoEcg();
@@ -111,7 +110,7 @@ public:
 
         //where to put results...
         std::string pseudo_ecg_output_dir = "TestRealisticPseudoEcgNonDist";
-        HeartConfig::Instance()->SetOutputDirectory(pseudo_ecg_output_dir);
+        calculator.SetOutputDirectory(pseudo_ecg_output_dir);
 
         //write out the pseudoECG
         calculator.WritePseudoEcg();

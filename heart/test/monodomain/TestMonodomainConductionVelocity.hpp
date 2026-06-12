@@ -55,11 +55,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestMonodomainConductionVelocity : public CxxTest::TestSuite
 {
 public:
-    void tearDown()
-    {
-        HeartConfig::Reset();
-    }
-
     // Solve on a 1D string of cells, 1cm long with a space step of 0.1mm.
     //
     // NOTE: This test uses NON-PHYSIOLOGICAL parameters values (conductivities,
@@ -68,14 +63,15 @@ public:
     // (Historical reasons...)
     void TestMonodomainDg01DWith100elements()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(30); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoConductionVel");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        monodomain_problem.SetSimulationDuration(30); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
+        monodomain_problem.SetOutputDirectory("MonoConductionVel");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
 
         std::vector<unsigned> output_nodes;
         output_nodes.push_back(5);
@@ -83,9 +79,6 @@ public:
         monodomain_problem.SetOutputNodes(output_nodes);
 
         monodomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
         boost::shared_ptr<ActivationOutputModifier> activation_map_0(new ActivationOutputModifier("activation_map_0.0.txt", 0.0));
         boost::shared_ptr<ActivationOutputModifier> activation_map_minus70(new ActivationOutputModifier("activation_map_-70.0.txt", -70.0));
         monodomain_problem.AddOutputModifier(activation_map_0);
@@ -137,19 +130,17 @@ public:
     void TestMonodomainDg01DWith20elements()
     {
 #ifndef NDEBUG //Note that this test relies on the debug VerifyStateVariables() method throwing
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSimulationDuration(1); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_20_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoConductionVelThrows");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem(&cell_factory);
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.0005));
+        monodomain_problem.SetSimulationDuration(1); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_20_elements");
+        monodomain_problem.SetOutputDirectory("MonoConductionVelThrows");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainLR91_1d");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
 
         monodomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
         // the mesh is too coarse, and this simulation will result in cell gating
         // variables going out of range. An exception should be thrown in the

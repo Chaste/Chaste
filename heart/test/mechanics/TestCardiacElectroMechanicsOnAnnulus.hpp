@@ -129,8 +129,6 @@ public:
             }
         }
 
-        HeartConfig::Instance()->SetSimulationDuration(110.0);
-
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 
         problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
@@ -174,6 +172,7 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestEmOnAnnulusDiastolicFilling");
+        problem.GetElectricsProblem()->SetSimulationDuration(110.0);
         problem.Solve();
 
         // Hardcoded test of deformed position of (partially constrained) top node of the annulus, to check nothing has changed and that
@@ -235,8 +234,6 @@ public:
         //
         // See ticket #2193
 
-        HeartConfig::Instance()->SetSimulationDuration(400.0);
-
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 
         problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
@@ -281,6 +278,7 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestEmOnAnnulus");
+        problem.GetElectricsProblem()->SetSimulationDuration(400.0);
 
         problem.Solve();
 

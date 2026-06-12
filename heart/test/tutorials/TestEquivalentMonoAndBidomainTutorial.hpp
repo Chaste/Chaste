@@ -95,25 +95,8 @@ class TestEquivalentMonoAndBidomainTutorial : public CxxTest::TestSuite
 public:
     void TestCompareMonoAndBidomain()
     {
-        /* The `HeartConfig` class is used to set various parameters (see the main ChasteGuides page
-         * for information on default parameter values.
-         *
-         * See the [Running Bidomain Simulations](/docs/user-tutorials/runningbidomainsimulations/) tutorial for more details.
+        /* See the [Running Bidomain Simulations](/docs/user-tutorials/runningbidomainsimulations/) tutorial for more details.
          */
-        HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
-        HeartConfig::Instance()->SetOutputDirectory("EquivalentMonoAndBidomainTutorial");
-
-        /* This is how to reset the surface-area-to-volume ratio and the capacitance.
-         * (Here, we are actually just resetting them to their default values). */
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1400); // 1/cm
-        HeartConfig::Instance()->SetCapacitance(1.0); // uF/cm^2
-
-        // This is how to set the ode timestep (the timestep used to solve the cell models)
-        // the pde timestep (the timestep used in solving the bidomain PDE), and the
-        // printing timestep (how often the output is written to file). The defaults are
-        // all 0.01, here we increase the printing timestep.
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
 
         // Next, we have to create a cell factory of the type we defined above.
         PointStimulus2dCellFactory cell_factory;
@@ -127,10 +110,24 @@ public:
         ReplicatableVector* p_bidomain_results;
         // Bidomain
         {
-            HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_results");
-
             // Now we create a problem class using (a pointer to) the cell factory.
             BidomainProblem<2> bidomain_problem( &cell_factory );
+
+            bidomain_problem.SetSimulationDuration(5.0); //ms
+            bidomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
+            bidomain_problem.SetOutputDirectory("EquivalentMonoAndBidomainTutorial");
+            bidomain_problem.SetOutputFilenamePrefix("bidomain_results");
+
+            /* This is how to reset the surface-area-to-volume ratio and the capacitance.
+             * (Here, we are actually just resetting them to their default values). */
+            bidomain_problem.SetSurfaceAreaToVolumeRatio(1400); // 1/cm
+            bidomain_problem.SetCapacitance(1.0); // uF/cm^2
+
+            // This is how to set the ode timestep (the timestep used to solve the cell models)
+            // the pde timestep (the timestep used in solving the bidomain PDE), and the
+            // printing timestep (how often the output is written to file). The defaults are
+            // all 0.01, here we increase the printing timestep.
+            bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
 
             /*
              * Here we have conductivities that can be expressed as sigma_i = scalar * sigma_e.
@@ -146,8 +143,8 @@ public:
              *
              * For more information on this see e.g. Keener & Sneyd, Mathematical Physiology textbook.
              */
-            HeartConfig::Instance()->SetIntracellularConductivities(intracellular_conductivities);
-            HeartConfig::Instance()->SetExtracellularConductivities(extracellular_conductivities);
+            bidomain_problem.SetIntracellularConductivities(intracellular_conductivities);
+            bidomain_problem.SetExtracellularConductivities(extracellular_conductivities);
 
             /* Initialise and solve as normal */
             bidomain_problem.Initialise();
@@ -198,11 +195,16 @@ public:
                                                / (intracellular_conductivities[dim] + extracellular_conductivities[dim]);
             }
 
-            HeartConfig::Instance()->SetIntracellularConductivities(monodomain_conductivities);
-
             /* Now we create a monodomain problem class in exactly the same way as bidomain above */
-            HeartConfig::Instance()->SetOutputFilenamePrefix("monodomain_results");
             MonodomainProblem<2> monodomain_problem( &cell_factory );
+            monodomain_problem.SetSimulationDuration(5.0); //ms
+            monodomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
+            monodomain_problem.SetOutputDirectory("EquivalentMonoAndBidomainTutorial");
+            monodomain_problem.SetOutputFilenamePrefix("monodomain_results");
+            monodomain_problem.SetSurfaceAreaToVolumeRatio(1400); // 1/cm
+            monodomain_problem.SetCapacitance(1.0); // uF/cm^2
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+            monodomain_problem.SetIntracellularConductivities(monodomain_conductivities);
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
             p_monodomain_results = new ReplicatableVector(monodomain_problem.GetSolution());

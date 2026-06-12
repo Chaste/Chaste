@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTCARDIACFEVOLUMEINTEGRALASSEMBLER_HPP_
 
 #include "AbstractFeVolumeIntegralAssembler.hpp"
-#include "HeartConfig.hpp"
 #include "AbstractCardiacTissue.hpp"
 
 /**
@@ -52,9 +51,6 @@ protected:
     /** The Cardiac tissue on which to solve. */
     AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* mpCardiacTissue;
 
-    /** Local cache of the configuration singleton pointer*/
-    HeartConfig* mpConfig;
-
 public:
 
     /**
@@ -65,8 +61,7 @@ public:
     AbstractCardiacFeVolumeIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                                              AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* pTissue)
         : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX,INTERPOLATION_LEVEL>(pMesh),
-          mpCardiacTissue(pTissue),
-          mpConfig(HeartConfig::Instance())
+          mpCardiacTissue(pTissue)
     {
         assert(pTissue);
     }

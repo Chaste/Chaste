@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <iostream>
 
-#include "HeartConfig.hpp"
 #include "Exception.hpp"
 
 AbstractCardiacCell::AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
@@ -46,7 +45,7 @@ AbstractCardiacCell::AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver>
                                          boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
     : AbstractCardiacCellInterface(pOdeSolver, voltageIndex, pIntracellularStimulus),
       AbstractOdeSystem(numberOfStateVariables),
-      mDt(HeartConfig::Instance()->GetOdeTimeStep())
+      mDt(0.01)  // Default ODE timestep (ms). Set via SetTimestep() or AbstractCardiacCellFactory.
 {
     // The second clause is to allow for FakeBathCell.
     assert(voltageIndex < mNumberOfStateVariables || mNumberOfStateVariables == 0);

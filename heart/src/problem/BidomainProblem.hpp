@@ -134,6 +134,19 @@ protected:
     /** Electrodes used to provide a shock */
     boost::shared_ptr<Electrodes<DIM> > mpElectrodes;
 
+    /** Whether electrodes have been configured via SetElectrodeParameters(). */
+    bool mHasElectrodeParameters;
+    /** Whether to ground the second electrode (only valid when mHasElectrodeParameters is true). */
+    bool mGroundSecondElectrode;
+    /** Electrode axis index. */
+    unsigned mElectrodeAxisIndex;
+    /** Electrode stimulus magnitude (uA/cm^2). */
+    double mElectrodeMagnitude;
+    /** Electrode switch-on time (ms). */
+    double mElectrodeStartTime;
+    /** Electrode stimulus duration (ms). */
+    double mElectrodeDuration;
+
     /**
      *  Create normal initial condition but overwrite V to zero for bath nodes, if
      *  there are any.
@@ -187,6 +200,22 @@ public:
      *  @note currently, the value of phi_e at the fixed nodes cannot be set to be
      *  anything other than zero.
      */
+    /**
+     * Configure electrode parameters.  When set, an Electrodes object will be
+     * created during Initialise() and activated/deactivated at the appropriate times.
+     *
+     * @param groundSecondElectrode  whether to ground the second electrode
+     * @param axisIndex       electrode axis (0=x, 1=y, 2=z)
+     * @param magnitude       stimulus magnitude (uA/cm^2)
+     * @param startTime       switch-on time (ms)
+     * @param duration        stimulus duration (ms)
+     */
+    void SetElectrodeParameters(bool groundSecondElectrode,
+                                unsigned axisIndex,
+                                double magnitude,
+                                double startTime,
+                                double duration);
+
     void SetFixedExtracellularPotentialNodes(std::vector<unsigned> nodes);
 
     /**

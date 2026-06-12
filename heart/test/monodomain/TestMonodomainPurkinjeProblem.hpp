@@ -248,30 +248,23 @@ public:
     // This version uses the problem classes.  It also checks things still work with a permuted mesh.
     void TestMonodomainPurkinjeProblemRunning()
     {
-#ifdef CHASTE_SCOTCH_PARMETIS
-        // Turn off smart partitioning.
-        // PT-Scotch will produce good partitions but it cannot be forced to always
-        // give the same partition of the same mesh twice running (for ortho and axi).
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
-        HeartConfig::Instance()->SetMeshPartitioning("dumb");
-#endif
-
-        // Settings common to both problems
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-        HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
-
         ReplicatableVector soln_repl;
         ReplicatableVector soln_mono_repl;
 
         {
             // Set up normal monodomain
             NonPurkinjeCellFactory cell_factory_for_just_monodomain;
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_200_elements");
-            HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_normal");
             MonodomainProblem<2,2> monodomain_problem(&cell_factory_for_just_monodomain);
+            monodomain_problem.SetKspAbsoluteTolerance(1e-12);
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+            monodomain_problem.SetSimulationDuration(1.0);
+            monodomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_200_elements");
+            monodomain_problem.SetOutputDirectory("TestMonodomainPurkinjeProblem_normal");
+            monodomain_problem.SetVisualizeWithMeshalyzer();
+#ifdef CHASTE_SCOTCH_PARMETIS
+            // Turn off smart partitioning so that results are reproducible.
+            monodomain_problem.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::DUMB);
+#endif
             monodomain_problem.Initialise();
 
             // Solve
@@ -280,10 +273,18 @@ public:
         }
 
         // Set up Purkinje problem
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_purkinje");
         PurkinjeCellFactory cell_factory;
+        cell_factory.SetPurkinjeSurfaceAreaToVolumeRatio(1400.0); // same as myocardium default
         MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+        purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        purkinje_problem.SetSimulationDuration(1.0);
+        purkinje_problem.SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
+        purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblem_purkinje");
+        purkinje_problem.SetVisualizeWithMeshalyzer();
+#ifdef CHASTE_SCOTCH_PARMETIS
+        purkinje_problem.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::DUMB);
+#endif
         purkinje_problem.Initialise();
 
         MixedDimensionMesh<2, 2>& r_mesh = static_cast<MixedDimensionMesh<2, 2>& >(purkinje_problem.rGetMesh());
@@ -337,14 +338,8 @@ public:
         comparison.CompareFiles();
 
         // For coverage, call Solve again to extend the solution
-        HeartConfig::Instance()->SetSimulationDuration(1.1);
+        purkinje_problem.SetSimulationDuration(1.1);
         purkinje_problem.Solve();
-
-#ifdef CHASTE_SCOTCH_PARMETIS
-        // Make sure smart partitioning is switched back on.
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::DUMB);
-        HeartConfig::Instance()->SetMeshPartitioning("parmetis");
-#endif
     }
 
     // Solve a Purkinje problem on a branched domain
@@ -357,12 +352,6 @@ public:
         //and equal to the single fibre. This occurs because the cross sectional area of the fibres
         //is equal (0.3^2 + 0.4^2 = 0.5^2)
 
-        // Settings common to both problems
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-        HeartConfig::Instance()->SetVisualizeWithVtk();
-        HeartConfig::Instance()->SetVisualizeWithParallelVtk();
         ReplicatableVector soln_repl_branched;
         ReplicatableVector soln_repl;
 
@@ -395,9 +384,13 @@ public:
             }
 
             // Set up Purkinje problem
-            HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_purkinje_branched");
             PurkinjeCellFactory cell_factory;
             MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+            purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+            purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+            purkinje_problem.SetSimulationDuration(1.0);
+            purkinje_problem.SetVisualizeWithVtk();
+            purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblem_purkinje_branched");
             purkinje_problem.SetMesh(&mesh);
             purkinje_problem.Initialise();
 
@@ -431,9 +424,13 @@ public:
 
         {
             // Set up Purkinje problem
-            HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_purkinje_branched_symmetric");
             PurkinjeCellFactory cell_factory;
             MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+            purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+            purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+            purkinje_problem.SetSimulationDuration(1.0);
+            purkinje_problem.SetVisualizeWithParallelVtk();
+            purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblem_purkinje_branched_symmetric");
             purkinje_problem.SetMesh(&mesh);
             purkinje_problem.Initialise();
 
@@ -491,11 +488,6 @@ public:
         //The different lengths are required to avoid the branches having the
         //same transmembrane potential (see previous test)
 
-        // Settings common to both problems
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-
         ReplicatableVector soln_repl_branched;
         ReplicatableVector soln_repl_anti_branched;
 
@@ -534,9 +526,12 @@ public:
             }
 
             // Set up Purkinje problem
-            HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblemPurkinjeBranched");
             PurkinjeCellFactory cell_factory;
             MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+            purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+            purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+            purkinje_problem.SetSimulationDuration(1.0);
+            purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblemPurkinjeBranched");
             purkinje_problem.SetMesh(&mesh);
             purkinje_problem.Initialise();
 
@@ -580,9 +575,12 @@ public:
 
         {
             // Set up Purkinje problem
-            HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblemPurkinjeBranched");
             PurkinjeCellFactory cell_factory;
             MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+            purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+            purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+            purkinje_problem.SetSimulationDuration(1.0);
+            purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblemPurkinjeBranched");
             purkinje_problem.SetMesh(&mesh);
             purkinje_problem.Initialise();
 
@@ -711,19 +709,17 @@ public:
             return;
         }
         // Set up Purkinje problem
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetSimulationDuration(6.5);
-        HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_half_cable");
-        HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_retrograde_purkinje");
-        HeartConfig::Instance()->SetMeshPartitioning("dumb");
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
         PurkinjeCellFactory cell_factory(false, true);  // false: Only stimulate the myocardial region, not the Purkinje region
                                                         // true: Make a junction at (0.05, 0.05)
-
-
+        cell_factory.SetPurkinjeSurfaceAreaToVolumeRatio(1400.0); // same as myocardium default
         MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+        purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        purkinje_problem.SetSimulationDuration(6.5);
+        purkinje_problem.SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_half_cable");
+        purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblem_retrograde_purkinje");
+        purkinje_problem.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::DUMB);
+        purkinje_problem.SetVisualizeWithVtk();
         purkinje_problem.Initialise();
 
         // Solve
@@ -755,21 +751,21 @@ public:
             return;
         }
         // Set up Purkinje problem
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
-        HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_noactivate_purkinje");
-        HeartConfig::Instance()->SetMeshPartitioning("dumb");
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
         PurkinjeStarCellFactory cell_factory(false, true); //no stimulus, junction
+        cell_factory.SetPurkinjeSurfaceAreaToVolumeRatio(1400.0); // same as myocardium default
         MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+        purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        purkinje_problem.SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
+        purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblem_noactivate_purkinje");
+        purkinje_problem.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::DUMB);
+        purkinje_problem.SetVisualizeWithVtk();
         purkinje_problem.Initialise();
 
         //With no stimulus & the same cell model there should be no difference between the Purkinje and the myocardium.
         //However, the PMJ subtly magnifies numerical errors so that the Purkinje & Myocardial voltages drift apart slightly
         //Here we check that they do not drift apart during a longer running simulation
-        HeartConfig::Instance()->SetSimulationDuration(50.0);
+        purkinje_problem.SetSimulationDuration(50.0);
         purkinje_problem.Solve();
 
         ReplicatableVector soln_repl;
@@ -795,19 +791,19 @@ public:
             return;
         }
         // Set up Purkinje problem
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
-        HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_activate_purkinje");
-        HeartConfig::Instance()->SetMeshPartitioning("dumb");
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
         PurkinjeStarCellFactory cell_factory; //Stimulates at the left (only on Purkinje cable) and makes multiple junctions
+        cell_factory.SetPurkinjeSurfaceAreaToVolumeRatio(1400.0); // same as myocardium default
         MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+        purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        purkinje_problem.SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
+        purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblem_activate_purkinje");
+        purkinje_problem.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::DUMB);
+        purkinje_problem.SetVisualizeWithVtk();
         purkinje_problem.Initialise();
 
         // Solve to the point where the stimulus enters the PVJ
-        HeartConfig::Instance()->SetSimulationDuration(1.8);
+        purkinje_problem.SetSimulationDuration(1.8);
         purkinje_problem.Solve();
 
         ReplicatableVector soln_repl;
@@ -821,7 +817,7 @@ public:
         TS_ASSERT_LESS_THAN(monodomain_junction_voltage, purkinje_junction_voltage);
 
         //Solve so that the whole myocardium is activated
-        HeartConfig::Instance()->SetSimulationDuration(6.5);
+        purkinje_problem.SetSimulationDuration(6.5);
         purkinje_problem.Solve();
 
         //Check that the myocardium has been activated.
@@ -843,20 +839,20 @@ public:
             return;
         }
         // Set up Purkinje problem
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
-        HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_activate_purkinje");
-        HeartConfig::Instance()->SetMeshPartitioning("dumb");
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
         PurkinjeStarCellFactoryFromFile cell_factory; //Stimulates at the left (only on Purkinje cable) and makes multiple junctions
+        cell_factory.SetPurkinjeSurfaceAreaToVolumeRatio(1400.0); // same as myocardium default
 
         MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+        purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        purkinje_problem.SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
+        purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblem_activate_purkinje");
+        purkinje_problem.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::DUMB);
+        purkinje_problem.SetVisualizeWithVtk();
         purkinje_problem.Initialise();
 
         // Solve to the point where the stimulus enters the PVJ
-        HeartConfig::Instance()->SetSimulationDuration(1.8);
+        purkinje_problem.SetSimulationDuration(1.8);
         purkinje_problem.Solve();
 
         ReplicatableVector soln_repl;
@@ -870,7 +866,7 @@ public:
         TS_ASSERT_LESS_THAN(monodomain_junction_voltage, purkinje_junction_voltage);
 
         //Solve so that the whole myocardium is activated
-        HeartConfig::Instance()->SetSimulationDuration(6.5);
+        purkinje_problem.SetSimulationDuration(6.5);
         purkinje_problem.Solve();
 
         //Check that the myocardium has been activated.
@@ -884,24 +880,22 @@ public:
     void TestMonodomainPurkinjeActivationFromFileWithPartitioning()
     {
         // Set up Purkinje problem
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
-        HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_activate_purkinje");
+        PurkinjeStarCellFactoryFromFile cell_factory; //Stimulates at the left (only on Purkinje cable) and makes multiple junctions
+        cell_factory.SetPurkinjeSurfaceAreaToVolumeRatio(1400.0); // same as myocardium default
 
         ///Note that if PETSc partitioning is not available then
         // * We drop through and create a extra warning
-        //HeartConfig::Instance()->SetMeshPartitioning("petsc");
-        HeartConfig::Instance()->SetMeshPartitioning("parmetis");
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
-        PurkinjeStarCellFactoryFromFile cell_factory; //Stimulates at the left (only on Purkinje cable) and makes multiple junctions
-
         MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+        purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        purkinje_problem.SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
+        purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblem_activate_purkinje");
+        purkinje_problem.SetMeshPartitioning(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        purkinje_problem.SetVisualizeWithVtk();
         purkinje_problem.Initialise();
 
         // Solve to the point where the stimulus enters the PVJ
-        HeartConfig::Instance()->SetSimulationDuration(1.8);
+        purkinje_problem.SetSimulationDuration(1.8);
         purkinje_problem.Solve();
 
         ReplicatableVector soln_repl;
@@ -915,7 +909,7 @@ public:
         TS_ASSERT_LESS_THAN(monodomain_junction_voltage, purkinje_junction_voltage);
 
         //Solve so that the whole myocardium is activated
-        HeartConfig::Instance()->SetSimulationDuration(6.5);
+        purkinje_problem.SetSimulationDuration(6.5);
         purkinje_problem.Solve();
 
         //Check that the myocardium has been activated.
@@ -928,18 +922,17 @@ public:
     void TestPvjFileErrorHandling()
     {
         // Set up Purkinje problem
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
-        HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_activate_purkinje");
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        PurkinjeStarCellFactoryFromFile cell_factory; //Stimulates at the left (only on Purkinje cable) and makes multiple junctions
+        cell_factory.SetPurkinjeSurfaceAreaToVolumeRatio(1400.0); // same as myocardium default
+        MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        purkinje_problem.SetKspAbsoluteTolerance(1e-12);
+        purkinje_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        purkinje_problem.SetOutputDirectory("TestMonodomainPurkinjeProblem_activate_purkinje");
 
         //Cover warning that a .pvj file doesn't exist
-        PurkinjeStarCellFactoryFromFile cell_factory; //Stimulates at the left (only on Purkinje cable) and makes multiple junctions
-        MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
         {
             Warnings::QuietDestroy();
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
+            purkinje_problem.SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
             purkinje_problem.Initialise();
             TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
             TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "No Purkinje-Ventricular junction (.pvj) file found. Junctions must be specified manually.");
@@ -949,7 +942,7 @@ public:
         //Cover warning that a .pvj file can't be read
         if (PetscTools::AmMaster())
         {
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
+            purkinje_problem.SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
 
             chmod("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star.pvj", 0000);
             TS_ASSERT_THROWS_CONTAINS(purkinje_problem.Initialise(), "Couldn't open data file:");
@@ -958,7 +951,7 @@ public:
 
         //Covers empty lines in .pvj file
         {
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/bad_pvj_mesh");
+            purkinje_problem.SetMeshFileName("mesh/test/data/mixed_dimension_meshes/bad_pvj_mesh");
 
             TS_ASSERT_THROWS_CONTAINS(purkinje_problem.Initialise(), "No data found on line in file:");
         }

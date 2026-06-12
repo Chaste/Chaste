@@ -52,18 +52,17 @@ class Test1dBidomainProblemForEfficiency : public CxxTest::TestSuite
 public:
     void TestBidomainDg01WithNoOutput()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.00005));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.00005));
-        HeartConfig::Instance()->SetSimulationDuration(1.0);
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_1000_elements");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
         BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
 
-        bidomain_problem.Initialise();
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(0.00005));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(0.00005));
+        bidomain_problem.SetSimulationDuration(1.0);
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_1000_elements");
+        bidomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        bidomain_problem.SetCapacitance(1.0);
 
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
+        bidomain_problem.Initialise();
 
         bidomain_problem.PrintOutput(false);
 

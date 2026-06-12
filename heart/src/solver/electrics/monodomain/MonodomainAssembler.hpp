@@ -105,7 +105,8 @@ public:
      * @param pTissue pointer to the tissue
      */
     MonodomainAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                        MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue);
+                        MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
+                        bool useMassLumping = false);
 };
 
 #endif /*MONODOMAINASSEMBLER_HPP_*/

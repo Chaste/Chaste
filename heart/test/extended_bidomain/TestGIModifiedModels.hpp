@@ -51,7 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RegularStimulus.hpp"
 #include "ZeroStimulus.hpp"
 #include "EulerIvpOdeSolver.hpp"
-#include "HeartConfig.hpp"
 #include "ColumnDataReader.hpp"
 #include "CellProperties.hpp"
 #include "CorriasBuistSMCModified.hpp"
@@ -68,13 +67,11 @@ public:
 
     void TestICCmodelModified(void)
     {
-        HeartConfig::Instance()->Reset();
-
         boost::shared_ptr<ZeroStimulus> stimulus(new ZeroStimulus()); //define the stimulus
         boost::shared_ptr<EulerIvpOdeSolver> solver(new EulerIvpOdeSolver); //define the solver
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.1,0.1,0.1);
         CorriasBuistICCModified icc_ode_system(solver, stimulus);
+        icc_ode_system.SetTimestep(0.1);
         icc_ode_system.SetIP3Concentration(0.000635);
         icc_ode_system.SetFractionOfVDDRInPU(0.04);
 
@@ -127,8 +124,8 @@ public:
 
         boost::shared_ptr<EulerIvpOdeSolver> solver(new EulerIvpOdeSolver); //define the solver
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.1,0.1,1);
         CorriasBuistSMCModified smc_ode_system(solver, stimulus);
+        smc_ode_system.SetTimestep(0.1);
 
         TS_ASSERT_EQUALS(smc_ode_system.GetCarbonMonoxideScaleFactor(), 1.0); //coverage
         smc_ode_system.SetCarbonMonoxideScaleFactor(1.0);//coverage
@@ -195,8 +192,7 @@ public:
 
             boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(0.0,1.0,0.5));
             boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
-            double time_step = 0.01;
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, time_step);
+            // cells use default timestep of 0.01 ms
 
             // icc and smc
             AbstractCardiacCell* const p_smc = new CorriasBuistSMCModified(p_solver, p_stimulus);

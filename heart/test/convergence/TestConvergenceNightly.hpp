@@ -64,10 +64,12 @@ class TestConvergenceNightly : public CxxTest::TestSuite
 
 public:
 
-    void RunConvergenceTester(AbstractUntemplatedConvergenceTester* pTester, StimulusType stimulusType)
+    void RunConvergenceTester(AbstractUntemplatedConvergenceTester* pTester, StimulusType stimulusType,
+                              double kspAtol = 5e-4)
     {
         pTester->Stimulus = stimulusType;
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(5e-4);
+        pTester->KspAbsoluteTolerance = kspAtol;
+        pTester->UseKspAbsoluteTolerance = true;
 
         pTester->Converge("Automated_test");
         TS_ASSERT(pTester->Converged);
@@ -75,40 +77,39 @@ public:
 
     void ConvergeInVarious(StimulusType stimulusType)
     {
-        TS_ASSERT(strcmp(HeartConfig::Instance()->GetKSPPreconditioner(), "bjacobi")==0);
-        TS_ASSERT(strcmp(HeartConfig::Instance()->GetKSPSolver(), "cg")==0);
-        HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
-        HeartConfig::Instance()->SetKSPSolver("gmres");
         {
             std::cout << "PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2>\n";
             PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
+            tester.KspPreconditionerType = "jacobi";
+            tester.KspSolverType = "gmres";
             RunConvergenceTester(&tester, stimulusType);
             TS_ASSERT_DELTA(tester.PdeTimeStep, 5.0e-3, 1e-10);
         }
 
         {
             std::cout << "SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2>\n";
-            //Block Jacobi with CG can detect zero pivots in a 1-D convergence test
             SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
+            tester.KspPreconditionerType = "jacobi";
+            tester.KspSolverType = "gmres";
             RunConvergenceTester(&tester, stimulusType);
             TS_ASSERT_EQUALS(tester.MeshNum, 5u);
         }
 
         {
             std::cout << "KspConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2>\n";
-            TS_ASSERT_EQUALS(HeartConfig::Instance()->GetAbsoluteTolerance(), 5.0e-4);
-            KspConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
-            RunConvergenceTester(&tester, stimulusType);
-            //Result of KSP tester:
-            TS_ASSERT_DELTA(HeartConfig::Instance()->GetAbsoluteTolerance(), 1e-3, 1e-10);
-
-            //See above - we've fiddled with HeartConfig...
-            HeartConfig::Instance()->SetUseAbsoluteTolerance(5.0e-4);
+            KspConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> ksp_tester;
+            ksp_tester.KspPreconditionerType = "jacobi";
+            ksp_tester.KspSolverType = "gmres";
+            RunConvergenceTester(&ksp_tester, stimulusType);
+            // After running, KspConvergenceTester should have iterated the tolerance to ~1e-3
+            TS_ASSERT_DELTA(ksp_tester.KspAbsoluteTolerance, 1e-3, 1e-10);
         }
 
         {
             std::cout << "OdeConvergenceTester<CellLuoRudy1991FromCellML, BidomainProblem<1>, 1, 2>\n";
             OdeConvergenceTester<CellLuoRudy1991FromCellML, BidomainProblem<1>, 1, 2> tester;
+            tester.KspPreconditionerType = "jacobi";
+            tester.KspSolverType = "gmres";
             RunConvergenceTester(&tester, stimulusType);
             TS_ASSERT_DELTA(tester.OdeTimeStep, 0.0025, 1e-10);
         }
@@ -116,15 +117,12 @@ public:
         {
             std::cout << "OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2>\n";
             OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
+            tester.KspPreconditionerType = "jacobi";
+            tester.KspSolverType = "gmres";
             tester.PdeTimeStep=0.01;
             RunConvergenceTester(&tester, stimulusType);
             TS_ASSERT_DELTA(tester.OdeTimeStep, 0.0025, 1e-10);
         }
-        //Put the KSP defaults back (see above)
-        TS_ASSERT(strcmp(HeartConfig::Instance()->GetKSPPreconditioner(), "jacobi")==0);
-        TS_ASSERT(strcmp(HeartConfig::Instance()->GetKSPSolver(), "gmres")==0);
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        HeartConfig::Instance()->SetKSPSolver("cg");
     }
 
 public:
@@ -157,7 +155,7 @@ public:
         TS_ASSERT_DELTA(331.1049, tester.Apd90FirstQn, 1.5); //330.8
         TS_ASSERT_DELTA(329.5, tester.Apd90ThirdQn, 1.5); //329.3
         TS_ASSERT_DELTA(0.0675, tester.ConductionVelocity, 1e-3);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        // Note: SetOdePdeAndPrintingTimeSteps was historically called here to reset HeartConfig; no longer needed.
     }
 
     void TestFullActionPotentialWithRampedStimulus()
@@ -184,48 +182,45 @@ public:
     //This is much longer (1 hour?) with default ksp
     void Test2DSpaceSymmLq()
     {
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<2>, 2, 2> tester;
-        //tester.SetKspAbsoluteTolerance(1e-3);
-         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-3);
+        tester.KspSolverType = "symmlq";
+        tester.KspPreconditionerType = "bjacobi";
+        tester.KspAbsoluteTolerance = 1e-3;
+        tester.UseKspAbsoluteTolerance = true;
 
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 5u);
         TS_ASSERT(tester.IsConverged());
-        //TS_ASSERT_EQUALS(tester.GetMeshNum(), 4);
-        //TS_ASSERT_DELTA(tester.GetSpaceStep(), 0.0023 /*cm*/, 1e-4 /*Allowed error*/);
-        HeartConfig::Instance()->Reset();
     }
 
     void Test2DSpaceWithRegionStimulus()
     {
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<2>, 2, 2> tester;
+        tester.KspSolverType = "symmlq";
+        tester.KspPreconditionerType = "bjacobi";
         tester.Stimulus = QUARTER;
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-3);
+        tester.KspAbsoluteTolerance = 1e-3;
+        tester.UseKspAbsoluteTolerance = true;
 
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 4u);
-        HeartConfig::Instance()->Reset();
     }
 
     //Currently takes about 15 seconds to do mesh0, mesh1 and mesh2
     void Test3DSpace()
     {
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-3);
+        tester.KspSolverType = "symmlq";
+        tester.KspPreconditionerType = "bjacobi";
+        tester.KspAbsoluteTolerance = 1e-3;
+        tester.UseKspAbsoluteTolerance = true;
 
         tester.RelativeConvergenceCriterion=2e-1;//Just to prove the thing works
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 2u); ///Just to prove the thing works
-        HeartConfig::Instance()->Reset();
     }
 
     void TestSpaceConvergencein1DWithBackwardN98()

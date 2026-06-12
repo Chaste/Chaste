@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "AbstractCardiacFeVolumeIntegralAssembler.hpp"
-#include "HeartConfig.hpp"
 #include "AbstractCardiacTissue.hpp"
 
 /**

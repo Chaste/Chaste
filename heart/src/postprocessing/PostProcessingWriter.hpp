@@ -37,10 +37,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define POSTPROCESSINGWRITER_HPP_
 
 
+#include "ChastePoint.hpp"
 #include "Hdf5DataReader.hpp"
 #include "PropagationPropertiesCalculator.hpp"
 #include "AbstractTetrahedralMesh.hpp"
 #include <string>
+#include <utility>
+#include <vector>
 
 /**
  * Write out physiological parameters at the end of a simulation
@@ -70,6 +73,11 @@ private:
     AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& mrMesh;/**< A mesh used to calculate the distance map to pass to the conduction velocity calculator*/
     hsize_t mHdf5DataWriterChunkSize; /**< Chunk size parameter for Hdf5DataWriter */
 
+    /** Directory path relative to CHASTE_TEST_OUTPUT (cached for use by WriteGenericFileToMeshalyzer). */
+    std::string mOutputDirectory;
+    /** Whether to use original (pre-partition) node ordering when reading nodal data. */
+    bool mOutputUsingOriginalNodeOrdering;
+
 public:
     /**
      * Constructor
@@ -88,10 +96,24 @@ public:
                          hsize_t hdf5DataWriterChunkSize=0);
 
     /**
-     *  Write out data files. The data that is written depends on which maps have been requested using
-     *  either the XML file or HeartConfig
+     * Write out post-processing data files.
+     *
+     * @param rApdMaps                 APD map requests: (repolarisation_pct, threshold_mV) pairs
+     * @param rUpstrokeTimeMaps        Upstroke time map thresholds (mV)
+     * @param rMaxUpstrokeVelocityMaps Maximum upstroke velocity map thresholds (mV)
+     * @param rConductionVelocityMaps  Source node indices for conduction velocity maps
+     * @param rNodalTimeTraces         Node indices to write full time traces for
+     * @param rPseudoEcgElectrodes     Pseudo-ECG electrode positions
+     * @param outputUsingOriginalNodeOrdering  Whether HDF5 is in original node ordering
      */
-    void WritePostProcessingFiles();
+    void WritePostProcessingFiles(
+        const std::vector<std::pair<double,double> >& rApdMaps,
+        const std::vector<double>& rUpstrokeTimeMaps,
+        const std::vector<double>& rMaxUpstrokeVelocityMaps,
+        const std::vector<unsigned>& rConductionVelocityMaps,
+        const std::vector<unsigned>& rNodalTimeTraces,
+        const std::vector<ChastePoint<SPACE_DIM> >& rPseudoEcgElectrodes,
+        bool outputUsingOriginalNodeOrdering);
 
     /**
      * Destructor
@@ -107,9 +129,7 @@ public:
      * For the nodes where the threshold isn't crossed, the 'number of upstrokes' will be 0
      * (so will the number of above-threshold depolarisations for that node)
      *
-     * \todo This method ought to be private and called by the  WritePostProcessingFiles method if the user requests for it.
-     *       This will be possible after modifying the schema and specifying Get and Set methods in HeartConfig
-     *       to check whether the user wants this file or not
+     * \todo This method ought to be private and called by the WritePostProcessingFiles method if the user requests for it.
      *
      * @param  threshold - used to signify the upstroke (mV) AND to specify above which voltage value the depolarisations are counted
      */
@@ -142,7 +162,7 @@ private:
      *
      * @param rNodeIndices the node indices (in the unpermuted mesh) that we want the output for.
      */
-    void WriteVariablesOverTimeAtNodes(std::vector<unsigned>& rNodeIndices);
+    void WriteVariablesOverTimeAtNodes(const std::vector<unsigned>& rNodeIndices);
 
     /**
      * Method for opening an APD map file and writing one row per node

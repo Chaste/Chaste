@@ -74,14 +74,14 @@ protected:
     /** Used by the writer. */
     unsigned mPurkinjeVoltageColumnId;
 
+    /** Purkinje surface-area-to-volume ratio Am (1/cm). Default 2800. */
+    double mPurkinjeSurfaceAreaToVolumeRatio;
+
     /** @return newly created our tissue object. */
     AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* CreateCardiacTissue();
 
     /** @return newly created suitable solver for monodomain problems with Purkinje. */
     AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>* CreateSolver();
-
-    /** Create suitable (MixedDimensionMesh) mesh for monodomain problems with Purkinje. */
-    virtual void CreateMeshFromHeartConfig();
 
     /**
      *  Overridden method which creates initial condition using Purkinje initial voltages
@@ -91,6 +91,12 @@ protected:
     Vec CreateInitialCondition();
 
 public:
+    /**
+     * Set the Purkinje surface-area-to-volume ratio Am (1/cm).
+     * @param ratio  Am value (default 2800)
+     */
+    void SetPurkinjeSurfaceAreaToVolumeRatio(double ratio);
+
     /**
      * Constructor
      * @param pCellFactory  user defined cell factory which shows how the tissue should create cells.

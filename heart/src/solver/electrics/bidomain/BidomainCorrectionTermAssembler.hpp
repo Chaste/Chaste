@@ -54,8 +54,6 @@ class BidomainCorrectionTermAssembler
     :  public AbstractCorrectionTermAssembler<ELEM_DIM,SPACE_DIM,2>
 {
 protected:
-    /** Local cache of the configuration singleton instance*/
-    HeartConfig* mpConfig;
 
     /**
      * This method is called by AssembleOnElement and tells the assembler

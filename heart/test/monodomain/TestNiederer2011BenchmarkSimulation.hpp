@@ -120,36 +120,35 @@ private:
         std::stringstream output_dir;
         output_dir << "Benchmark" << "_h" << h << "_dt" << dt;
 
-        HeartConfig::Instance()->SetOutputDirectory(output_dir.str());
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-        HeartConfig::Instance()->SetSimulationDuration(endTime); //ms
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, dt, 0.1);
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1400); // 1400 1/cm
-        HeartConfig::Instance()->SetCapacitance(1); // 1uF/cm^2
-
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(false);
-
-        // The Chaste results for the benchmark paper use STATE-VARIABLE INTERPOLATION switched on
-        // (see comments above)
-        HeartConfig::Instance()->SetUseStateVariableInterpolation(useSvi);
-
-        // Regarding the second paper described above, to run the simulations with ICI, comment out the
-        // above line. To run the simulation with operator splitting, or with (full) mass-lumping,
-        // comment out the above SVI line and uncomment one of the below. (Note: half-lumping is not
-        // available).
-        //HeartConfig::Instance()->SetUseMassLumping(true); // what is described as full-lumping in this paper
-        //HeartConfig::Instance()->SetUseReactionDiffusionOperatorSplitting(true);
-
         double long_conductance = 0.17 * 0.62/(0.17+0.62) * 10;    // harmonic mean of 0.17, 0.62 S/m converted to mS/cm
         double trans_conductance = 0.019 * 0.24/(0.019+0.24) * 10; // harmonic mean of 0.019,0.24 S/m converted to mS/cm
-
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(long_conductance, trans_conductance, trans_conductance));
 
         BenchmarkCellFactory cell_factory;
 
         MonodomainProblem<3> problem( &cell_factory );
         problem.SetMesh(&mesh);
+        problem.SetOutputDirectory(output_dir.str());
+        problem.SetOutputFilenamePrefix("results");
+        problem.SetSimulationDuration(endTime); //ms
+
+        problem.SetOdePdeAndPrintingTimeSteps(0.005, dt, 0.1);
+        problem.SetSurfaceAreaToVolumeRatio(1400); // 1400 1/cm
+        problem.SetCapacitance(1); // 1uF/cm^2
+
+        problem.SetVisualizeWithMeshalyzer(false);
+
+        // The Chaste results for the benchmark paper use STATE-VARIABLE INTERPOLATION switched on
+        // (see comments above)
+        problem.SetUseStateVariableInterpolation(useSvi);
+
+        // Regarding the second paper described above, to run the simulations with ICI, comment out the
+        // above line. To run the simulation with operator splitting, or with (full) mass-lumping,
+        // comment out the above SVI line and uncomment one of the below. (Note: half-lumping is not
+        // available).
+        //problem.SetUseMassLumping(true); // what is described as full-lumping in this paper
+        //problem.SetUseReactionDiffusionOperatorSplitting(true);
+
+        problem.SetIntracellularConductivities(Create_c_vector(long_conductance, trans_conductance, trans_conductance));
 
         problem.Initialise();
         problem.SetWriteInfo();

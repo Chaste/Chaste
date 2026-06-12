@@ -65,21 +65,27 @@ class TestBidomainWithBathAndFibresTutorial : public CxxTest::TestSuite
 public:
     void TestSimulation()
     {
-        HeartConfig::Instance()->SetSimulationDuration(5.0);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainTutorialWithBathAndFibres");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-        /* Bath problems seem to require decreased ODE timesteps. We use the
-         * Backward Euler version of the Luo-Rudy model (see below) instead to
-         * improve code performance.
-         */
-        HeartConfig::Instance()->SetOdeTimeStep(0.01);  //ms
-
         /* Use the `PlaneStimulusCellFactory` to define a set of Luo-Rudy cells, in this
          * case with a Backward Euler solver. We pass the stimulus magnitude as 0.0
          * as we don't want any stimulated cells.
          */
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt,2> cell_factory(0.0);
+
+        /* Now create the problem class, using the cell factory and passing
+         * in `true` as the second argument to indicate we are solving a bath
+         * problem, and solve.
+         */
+        BidomainProblem<2> bidomain_problem( &cell_factory, true );
+
+        bidomain_problem.SetSimulationDuration(5.0);  //ms
+        bidomain_problem.SetOutputDirectory("BidomainTutorialWithBathAndFibres");
+        bidomain_problem.SetOutputFilenamePrefix("results");
+
+        /* Bath problems seem to require decreased ODE timesteps. We use the
+         * Backward Euler version of the Luo-Rudy model (see below) instead to
+         * improve code performance.
+         */
+        bidomain_problem.SetOdeTimeStep(0.01);  //ms
 
         /*
          * Note that in the previous bath example, a mesh was read in and elements where then set to be
@@ -90,24 +96,20 @@ public:
          * in the simulation. (The fibres read here are the same 'kinked' fibres as in the previous fibre
          * tutorial).
          */
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements_bath_sides", cp::media_type::Orthotropic);
+        bidomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements_bath_sides");
+        bidomain_problem.SetFibreOrientationFile("mesh/test/data/2D_0_to_1mm_800_elements_bath_sides", "ortho");
 
         /* Set anistropic conductivities.
          */
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.175));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 0.7));
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.175));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(7.0, 0.7));
 
         /* and now we define the electrodes.. */
         double magnitude = -9.0e3; // uA/cm^2
         double start_time = 0.0;
         double duration = 2; //ms
-        HeartConfig::Instance()->SetElectrodeParameters(false, 0, magnitude, start_time, duration);
+        bidomain_problem.SetElectrodeParameters(false, 0, magnitude, start_time, duration);
 
-        /* Now create the problem class, using the cell factory and passing
-         * in `true` as the second argument to indicate we are solving a bath
-         * problem, and solve.
-         */
-        BidomainProblem<2> bidomain_problem( &cell_factory, true );
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
     }

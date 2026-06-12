@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedTetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "DistanceMapCalculator.hpp"
-#include "HeartConfig.hpp"
 #include "NumericFileComparison.hpp"
 #include "BidomainProblem.hpp"
 #include "PlaneStimulusCellFactory.hpp"
@@ -60,14 +59,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPostProcessingWriter : public CxxTest::TestSuite
 {
     /**
-     * Set the test output directory in HeartConfig, and return it.
+     * Return a FileFinder for the given test output directory.
      *
      * @param rOutputDirName  the leaf folder name
      * @return  FileFinder for the output folder within this
      */
     FileFinder GetPath(const std::string& rOutputDirName)
     {
-        HeartConfig::Instance()->SetOutputDirectory(rOutputDirName);
         OutputFileHandler handler(rOutputDirName, false);
         return handler.FindFile("");
     }
@@ -120,7 +118,7 @@ public:
         Hdf5ToMeshalyzerConverter<1,1> converter(test_dir,
                                                  "postprocessingapd",
                                                  &mesh,
-                                                 HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
+                                                 false);
 
         // Check the meshalyzer files are good
         FileFinder output_file("output/Apd_60_minus_30_Map.dat", test_dir);
@@ -167,7 +165,7 @@ public:
         Hdf5ToMeshalyzerConverter<1,1> converter(output_dir,
                                                  "MonodomainLR91_1d",
                                                  &mesh,
-                                                 HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
+                                                 false);
 
         std::string file1 = FileFinder("output/Apd_90_minus_30_Map.dat", output_dir).GetAbsolutePath();
         std::string file2 = "heart/test/data/PostProcessingWriter/101_zeroes.dat";
@@ -187,39 +185,35 @@ public:
         std::vector<std::pair<double,double> > apd_maps;
         apd_maps.push_back(std::pair<double, double>(80,-30));//repolarisation percentage first, as per schema
         apd_maps.push_back(std::pair<double, double>(90,-20));//repolarisation percentage first, as per schema
-        HeartConfig::Instance()->SetApdMaps(apd_maps);
 
         std::vector<double> upstroke_time_map;
         upstroke_time_map.push_back(-70.0);
         upstroke_time_map.push_back( 20.0);
         upstroke_time_map.push_back(  0.4);
         upstroke_time_map.push_back( -0.4);
-        HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_time_map);
 
         std::vector<double> upstroke_velocity_map;
         upstroke_velocity_map.push_back(-50.0);
         upstroke_velocity_map.push_back(50.0);
-        HeartConfig::Instance()->SetMaxUpstrokeVelocityMaps(upstroke_velocity_map);
 
         std::vector<unsigned> conduction_velocity_map;
         conduction_velocity_map.push_back(0u);
-        HeartConfig::Instance()->SetConductionVelocityMaps(conduction_velocity_map);
 
         //test the method that extrapolates nodal traces
         std::vector<unsigned> nodes_to_extrapolate;//1D test, does not cover node permutation case
         nodes_to_extrapolate.push_back(1u);
         nodes_to_extrapolate.push_back(99u);
-        HeartConfig::Instance()->SetRequestedNodalTimeTraces(nodes_to_extrapolate);
 
         std::vector<ChastePoint<1> > pseudo_ecg_electrodes;
         pseudo_ecg_electrodes.push_back(ChastePoint<1>(11.0));
         pseudo_ecg_electrodes.push_back(ChastePoint<1>(-1.0));
-        HeartConfig::Instance()->SetPseudoEcgElectrodePositions(pseudo_ecg_electrodes);
 
         ///\todo #2359 allow PostProcessingWriter and Hdf5 converters to be in same scope (conflicting Hdf5DataReaders).
         {
             PostProcessingWriter<1,1> writer(mesh, test_dir, "MonodomainLR91_1d");
-            writer.WritePostProcessingFiles();
+            writer.WritePostProcessingFiles(apd_maps, upstroke_time_map, upstroke_velocity_map,
+                                            conduction_velocity_map, nodes_to_extrapolate,
+                                            pseudo_ecg_electrodes, false);
             writer.WriteAboveThresholdDepolarisationFile(-40.0);
         }
 
@@ -227,7 +221,7 @@ public:
         Hdf5ToMeshalyzerConverter<1,1> converter(test_dir,
                                                  "MonodomainLR91_1d",
                                                  &mesh,
-                                                 HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
+                                                 false);
 
         std::string file1 = FileFinder("output/Apd_80_minus_30_Map.dat", test_dir).GetAbsolutePath();
         std::string file2 = "heart/test/data/PostProcessingWriter/101_zeroes.dat";
@@ -288,29 +282,27 @@ public:
 
     void TestExtractNodeTracesWithNodePermutation()
     {
-        HeartConfig::Instance()->Reset();
         FileFinder output_dir = GetPath("TestPostProcessingWriter_ExtractNodeTracesWithNodePermutation");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("NodalTracesTest");
 
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
         DistributedTetrahedralMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        // The point of this test is to check the method handles permutation properly...
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(), false);
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-        HeartConfig::Instance()->SetSimulationDuration(2); //ms
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
         BidomainProblem<2> problem( &cell_factory );
         problem.SetMesh(&mesh);
+        problem.SetOutputDirectory("TestPostProcessingWriter_ExtractNodeTracesWithNodePermutation");
+        problem.SetOutputFilenamePrefix("NodalTracesTest");
+        problem.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+        problem.SetSurfaceAreaToVolumeRatio(1.0);
+        problem.SetCapacitance(1.0);
+        problem.SetSimulationDuration(2); //ms
 
-        std::vector<unsigned> nodes;
-        nodes.push_back(0u);
-        nodes.push_back(13u);
-        HeartConfig::Instance()->SetRequestedNodalTimeTraces(nodes);
+        // The point of this test is to check the method handles permutation properly...
+        TS_ASSERT_EQUALS(problem.GetOutputUsingOriginalNodeOrdering(), false);
+
+        problem.AddNodalTimeTrace(0u);
+        problem.AddNodalTimeTrace(13u);
 
         problem.Initialise();
         problem.Solve();
@@ -336,7 +328,6 @@ public:
 
     void TestWritingEads()
     {
-        HeartConfig::Instance()->Reset();
         FileFinder output_dir = GetPath("TestPostProcessingWriter_WritingEads");
 
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_10_100_elements");
@@ -356,9 +347,7 @@ public:
 
     void TestSwitchingOutputFormat()
     {
-        HeartConfig::Instance()->Reset();
         FileFinder test_dir = GetPath("TestPostProcessingWriter_SwitchingOutputFormat");
-        HeartConfig::Instance()->SetVisualizeWithCmgui();
 
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
         DistributedTetrahedralMesh<1,1> mesh;
@@ -379,7 +368,7 @@ public:
         Hdf5ToMeshalyzerConverter<1,1> converter(test_dir,
                                                  "postprocessingapd",
                                                  &mesh,
-                                                 HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
+                                                 false);
 
         // Now (as part of #1660) call the converter in a separate step.
         Hdf5ToCmguiConverter<1,1> converter2(test_dir,
@@ -416,7 +405,6 @@ public:
     // NB The dataset and variable name are Apd_60_minus_30_Map here...
     void TestHdfOutput()
     {
-        HeartConfig::Instance()->Reset();
         FileFinder output_dir("TestPostProcessingWriter_AddingToHdf5", RelativeTo::ChasteTestOutput);
 
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -471,30 +459,24 @@ public:
     void TestVtkOutput()
     {
 #ifdef CHASTE_VTK
-        HeartConfig::Instance()->Reset();
-
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
         DistributedTetrahedralMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-        HeartConfig::Instance()->SetSimulationDuration(2); //ms
-        HeartConfig::Instance()->SetVisualizeWithVtk();
-        // Switch off meshalyzer to make sure we don't need the "/output" directory.
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(false);
-        HeartConfig::Instance()->SetVisualizeWithCmgui(false);
-        HeartConfig::Instance()->SetOutputDirectory("TestPostProcessingWriter_VtkOutput");
-
-        std::vector<std::pair<double,double> > apd_maps;
-        apd_maps.push_back(std::pair<double, double>(90,-30)); // Repolarisation percentage and upstroke threshold.
-        apd_maps.push_back(std::pair<double, double>(50,-30));
-        HeartConfig::Instance()->SetApdMaps(apd_maps);
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
         BidomainProblem<2> problem( &cell_factory );
         problem.SetMesh(&mesh);
+        problem.SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+        problem.SetSurfaceAreaToVolumeRatio(1.0);
+        problem.SetCapacitance(1.0);
+        problem.SetSimulationDuration(2); //ms
+        problem.SetVisualizeWithVtk(true);
+        // Switch off meshalyzer to make sure we don't need the "/output" directory.
+        problem.SetVisualizeWithMeshalyzer(false);
+        problem.SetVisualizeWithCmgui(false);
+        problem.SetOutputDirectory("TestPostProcessingWriter_VtkOutput");
+        problem.AddApdMap(90, -30);
+        problem.AddApdMap(50, -30);
 
         problem.Initialise();
         problem.Solve();
@@ -536,7 +518,6 @@ public:
 
     void TestDifferentNumberOfPaces()
     {
-        HeartConfig::Instance()->Reset();
         FileFinder output_dir("TestPostProcessingWriter_DifferentNumberOfPaces", RelativeTo::ChasteTestOutput);
         {
             DistributedTetrahedralMesh<1,1> mesh;
@@ -546,10 +527,16 @@ public:
 
             std::vector<double> upstroke_time_map;
             upstroke_time_map.push_back(0.0);
-            HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_time_map);
 
             PostProcessingWriter<1,1> writer(mesh, output_dir, "DifferentNumberOfPaces");
-            writer.WritePostProcessingFiles();
+            writer.WritePostProcessingFiles(
+                std::vector<std::pair<double,double> >(),   // no APD maps
+                upstroke_time_map,
+                std::vector<double>(),                       // no max upstroke velocity maps
+                std::vector<unsigned>(),                     // no conduction velocity maps
+                std::vector<unsigned>(),                     // no nodal time traces
+                std::vector<ChastePoint<1> >(),             // no pseudo-ECG electrodes
+                false);
         }
         {
             Hdf5DataReader reader(output_dir, "DifferentNumberOfPaces", "UpstrokeTimeMap_0");

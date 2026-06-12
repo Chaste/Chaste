@@ -164,11 +164,6 @@ public:
         DistributedTetrahedralMesh<3,3> mesh;
         double h=0.02;
         mesh.ConstructRegularSlabMesh(h, 0.8 /*length*/, 0.3 /*width*/, 0.3 /*depth*/);
-        HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);
-
-        HeartConfig::Instance()->SetSimulationDuration(5); //ms
-        HeartConfig::Instance()->SetOutputDirectory("Monodomain3dExampleWithCvode");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
         /*
          * Note - when using CVODE in cardiac tissue simulations the ODE timestep
@@ -185,13 +180,16 @@ public:
          * A convergence analysis should be performed to ensure that the PDE is being solved
          * accurately before reducing the step just to get faster ODE solution!
          */
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
 
         /*
          * The rest of the code is unchanged.
          */
         BenchmarkCellFactory cell_factory;
         MonodomainProblem<3> monodomain_problem( &cell_factory );
+        monodomain_problem.SetSimulationDuration(5); //ms
+        monodomain_problem.SetOutputDirectory("Monodomain3dExampleWithCvode");
+        monodomain_problem.SetOutputFilenamePrefix("results");
+        monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
         monodomain_problem.SetMesh( &mesh );
 
         bool partial_output = false;

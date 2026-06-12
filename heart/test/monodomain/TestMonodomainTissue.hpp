@@ -138,7 +138,6 @@ public:
             TS_TRACE("This test is not suitable for more than 2 processes.");
             return;
         }
-        HeartConfig::Instance()->Reset();
         unsigned num_nodes=2;
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. A mesh with 2 nodes
@@ -244,7 +243,6 @@ public:
             TS_TRACE("This test is not suitable for more than 2 processes.");
             return;
         }
-        HeartConfig::Instance()->Reset();
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. 2 nodes in the mesh
 
@@ -274,7 +272,6 @@ public:
             TS_TRACE("This test is not suitable for more than 2 processes.");
             return;
         }
-        HeartConfig::Instance()->Reset();
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. a 2 node mesh
 
@@ -324,9 +321,6 @@ public:
 
     void TestNodeExchange()
     {
-        HeartConfig::Instance()->Reset();
-
-        HeartConfig::Instance()->Reset();
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(0.1, 1.0); // [0,1] with h=0.1, ie 11 node mesh
 
@@ -381,7 +375,6 @@ public:
             TS_TRACE("This test is not suitable for more than 2 processes.");
             return;
         }
-        HeartConfig::Instance()->Reset();
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. 2 node mesh
 
@@ -449,14 +442,11 @@ public:
 
     void TestSaveAndLoadCardiacTissue()
     {
-        HeartConfig::Instance()->Reset();
         // Archive settings
         FileFinder archive_dir("monodomain_tissue_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "monodomain_tissue.arch";
 
         bool cache_replication_saved = false;
-        double saved_printing_timestep = 2.0;
-        double default_printing_timestep = HeartConfig::Instance()->GetPrintingTimeStep();
 
         // Info about the first cell on this process (if any)
         bool has_cell = false;
@@ -486,10 +476,6 @@ public:
                 cell_v = r_cells[0]->GetVoltage();
             }
 
-            // Some checks to make sure HeartConfig is being saved and loaded by this too.
-            HeartConfig::Instance()->SetPrintingTimeStep(saved_printing_timestep);
-            TS_ASSERT_DELTA(HeartConfig::Instance()->GetPrintingTimeStep(), saved_printing_timestep, 1e-9);
-
             // Save
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
@@ -497,9 +483,6 @@ public:
             AbstractCardiacTissue<1>* const p_archive_monodomain_tissue = &monodomain_tissue;
             (*p_arch) << p_archive_monodomain_tissue;
 
-            HeartConfig::Reset();
-            TS_ASSERT_DELTA(HeartConfig::Instance()->GetPrintingTimeStep(), default_printing_timestep, 1e-9);
-            TS_ASSERT_DIFFERS(saved_printing_timestep, default_printing_timestep);
         }
 
         {
@@ -514,8 +497,6 @@ public:
             TS_ASSERT_DELTA(tensor_before_archiving(0,0), tensor_after_archiving(0,0), 1e-9);
 
             TS_ASSERT_EQUALS(cache_replication_saved, p_monodomain_tissue->GetDoCacheReplication());
-            TS_ASSERT_DELTA(HeartConfig::Instance()->GetPrintingTimeStep(), saved_printing_timestep, 1e-9);
-            TS_ASSERT_DIFFERS(saved_printing_timestep, default_printing_timestep); // Test we are testing something in case default changes
 
             // Test cardiac cells have also been archived
             const std::vector<AbstractCardiacCellInterface*>& r_cells = p_monodomain_tissue->rGetCellsDistributed();
@@ -532,8 +513,6 @@ public:
 
     void TestMonodomainTissueUsingPurkinjeCellFactory()
     {
-        HeartConfig::Instance()->Reset();
-
         TrianglesMeshReader<2,2> reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         MixedDimensionMesh<2,2> mixed_mesh;
         mixed_mesh.ConstructFromMeshReader(reader);

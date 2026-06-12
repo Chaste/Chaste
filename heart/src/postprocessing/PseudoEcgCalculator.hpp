@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractFunctionalCalculator.hpp"
 #include "AbstractTetrahedralMesh.hpp"
 #include "ChastePoint.hpp"
+#include "FileFinder.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Hdf5DataReader.hpp"
 
@@ -82,6 +83,8 @@ private:
     double mDiffusionCoefficient;/**<The diffusion coefficient D*/
     std::string mVariableName;/**< the variable for which we want to calculate the pseudo ecg, defaults to "V"*/
     unsigned mTimestepStride; /**< The number of timesteps in a stride (so that we don't have to compute all the ECGs).  This defaults to 1.*/
+    FileFinder mDirectory; /**< The directory the HDF5 input data is in. */
+    std::string mOutputDirectory; /**< Directory (relative to ChasteTestOutput) for WritePseudoEcg output. Defaults to alongside HDF5 data. */
     /**
      * @return the integrand.
      * The pseudo-ECG is defined as the integral over the mesh of the following integrand:
@@ -153,12 +156,19 @@ public:
     void SetDiffusionCoefficient(double diffusionCoefficient);
 
     /**
+     * Set the output directory for WritePseudoEcg(), relative to ChasteTestOutput.
+     * By default, output is written alongside the HDF5 input data.
+     * @param rDirectory  output directory path relative to ChasteTestOutput
+     */
+    void SetOutputDirectory(const std::string& rDirectory);
+
+    /**
      *
      * Calculates and writes the pseudo-ECG to file. the file will be named PseudoEcgFromElectrodeAt_x_y_z.dat,
      * where x,y,z are replaced by the location of the electrode.
      * It will contain one column of numbers, each being the pseudoECG at each time step.
-     * It will be created  by the master processor into /output relaitive to where the output
-     * directory is set (by the HeartConfig or by default)
+     * It will be created by the master processor into /output relative to the output directory
+     * (set via SetOutputDirectory() or by default alongside the HDF5 input data).
      *
      */
     void WritePseudoEcg();

@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCardiacFeVolumeIntegralAssembler.hpp"
 #include "AbstractExtendedBidomainSolver.hpp"
-#include "HeartConfig.hpp"
 #include "BidomainAssembler.hpp"
 #include "BidomainMassMatrixAssembler.hpp"
 #include "ExtendedBidomainNeumannSurfaceTermAssembler.hpp"

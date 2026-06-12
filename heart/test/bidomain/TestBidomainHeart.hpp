@@ -76,33 +76,25 @@ public:
 
 class TestBidomainHeart : public CxxTest::TestSuite
 {
-private:
-    void SetParameters()
-    {
-        HeartConfig::Instance()->Reset();
-        //The conductivities were in the Metis test (not the plain test)
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0025, 0.005, 0.1);
-        HeartConfig::Instance()->SetSimulationDuration(100.0);  //ms
-
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
-        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91HalfHeart");
-        PetscTools::SetOption("-options_table", "");
-    }
 public:
 
     void TestBidomainDg0Heart()
     {
-        SetParameters();
-
-        HeartConfig::Instance()->SetMeshFileName("heart/test/data/scaled_UCSD_heart");
-        HeartConfig::Instance()->SetOutputDirectory("BiDg0Heart");
-
         PointStimulusHeartCellFactory cell_factory;
         BidomainProblem<3> bidomain_problem(&cell_factory);
+
+        //The conductivities were in the Metis test (not the plain test)
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
+        bidomain_problem.SetOdePdeAndPrintingTimeSteps(0.0025, 0.005, 0.1);
+        bidomain_problem.SetSimulationDuration(100.0);  //ms
+        bidomain_problem.SetKspSolverType("symmlq");
+        bidomain_problem.SetKspPreconditionerType("bjacobi");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91HalfHeart");
+        bidomain_problem.SetMeshFileName("heart/test/data/scaled_UCSD_heart");
+        bidomain_problem.SetOutputDirectory("BiDg0Heart");
+
+        PetscTools::SetOption("-options_table", "");
 
         bidomain_problem.SetWriteInfo();
 

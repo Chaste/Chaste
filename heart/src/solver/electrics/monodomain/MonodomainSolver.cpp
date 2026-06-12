@@ -44,6 +44,11 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
     assert(this->mpLinearSystem->rGetLhsMatrix() != NULL);
     assert(this->mpLinearSystem->rGetRhsVector() != NULL);
 
+    // Lazily create the assembler on first use (so mass lumping setting from SetKspConfig is available)
+    if (!mpMonodomainAssembler)
+    {
+        mpMonodomainAssembler = new MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh, this->mpMonodomainTissue, mUseMassLumping);
+    }
 
     /////////////////////////////////////////
     // set up LHS matrix (and mass matrix)
@@ -53,23 +58,25 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
         mpMonodomainAssembler->SetMatrixToAssemble(this->mpLinearSystem->rGetLhsMatrix());
         mpMonodomainAssembler->AssembleMatrix();
 
-        MassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> mass_matrix_assembler(this->mpMesh, HeartConfig::Instance()->GetUseMassLumping());
+        MassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> mass_matrix_assembler(this->mpMesh, mUseMassLumping);
         mass_matrix_assembler.SetMatrixToAssemble(mMassMatrix);
         mass_matrix_assembler.Assemble();
 
         this->mpLinearSystem->FinaliseLhsMatrix();
         PetscMatTools::Finalise(mMassMatrix);
 
-        if (HeartConfig::Instance()->GetUseMassLumpingForPrecond() && !HeartConfig::Instance()->GetUseMassLumping())
+        if (mUseMassLumpingForPrecond && !mUseMassLumping)
         {
             this->mpLinearSystem->SetPrecondMatrixIsDifferentFromLhs();
 
             MonodomainAssembler<ELEMENT_DIM,SPACE_DIM> lumped_mass_assembler(this->mpMesh,this->mpMonodomainTissue);
             lumped_mass_assembler.SetMatrixToAssemble(this->mpLinearSystem->rGetPrecondMatrix());
 
-            HeartConfig::Instance()->SetUseMassLumping(true);
+            // Temporarily enable mass lumping for the preconditioner assembly
+            bool savedLumping = mUseMassLumping;
+            mUseMassLumping = true;
             lumped_mass_assembler.AssembleMatrix();
-            HeartConfig::Instance()->SetUseMassLumping(false);
+            mUseMassLumping = savedLumping;
 
             this->mpLinearSystem->FinalisePrecondMatrix();
         }
@@ -86,8 +93,8 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
     // dist stripe for z (return value)
     DistributedVector dist_vec_matrix_based = p_factory->CreateDistributedVector(mVecForConstructingRhs);
 
-    double Am = HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio();
-    double Cm = HeartConfig::Instance()->GetCapacitance();
+    double Am = mpMonodomainTissue->GetSurfaceAreaToVolumeRatio();
+    double Cm = mpMonodomainTissue->GetCapacitance();
 
     for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
          index!= dist_vec_matrix_based.End();
@@ -142,19 +149,27 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolu
     AbstractLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>::InitialiseForSolve(initialSolution);
 
     //..then do a bit extra
-    if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
+    if (mUseAbsoluteTolerance)
     {
-        this->mpLinearSystem->SetAbsoluteTolerance(HeartConfig::Instance()->GetAbsoluteTolerance());
+        this->mpLinearSystem->SetAbsoluteTolerance(mKspAbsoluteTolerance);
     }
     else
     {
-        this->mpLinearSystem->SetRelativeTolerance(HeartConfig::Instance()->GetRelativeTolerance());
+        this->mpLinearSystem->SetRelativeTolerance(mKspRelativeTolerance);
     }
 
-    this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
-    this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
+    this->mpLinearSystem->SetKspType(mKspSolverType.c_str());
+    this->mpLinearSystem->SetPcType(mKspPreconditionerType.c_str());
     this->mpLinearSystem->SetMatrixIsSymmetric(true);
-    this->mpLinearSystem->SetUseFixedNumberIterations(HeartConfig::Instance()->GetUseFixedNumberIterationsLinearSolver(), HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves());
+    this->mpLinearSystem->SetUseFixedNumberIterations(mUseFixedNumberIterations, mEvaluateNumItsEveryNSolves);
+
+    // Set up state variable interpolation correction term if needed
+    if (mUseStateVariableInterpolation)
+    {
+        mpMonodomainCorrectionTermAssembler
+            = new MonodomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
+        mpMonodomainTissue->SetCacheReplication(true);
+    }
 
     // initialise matrix-based RHS vector and matrix, and use the linear
     // system rhs as a template
@@ -183,31 +198,29 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainSolver(
             BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions)
     : AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>(pMesh),
       mpMonodomainTissue(pTissue),
-      mpBoundaryConditions(pBoundaryConditions)
+      mpBoundaryConditions(pBoundaryConditions),
+      mUseAbsoluteTolerance(true),
+      mKspAbsoluteTolerance(2e-4),
+      mKspRelativeTolerance(1e-6),
+      mKspSolverType("cg"),
+      mKspPreconditionerType("bjacobi"),
+      mUseMassLumping(false),
+      mUseMassLumpingForPrecond(false),
+      mUseFixedNumberIterations(false),
+      mEvaluateNumItsEveryNSolves(0),
+      mUseStateVariableInterpolation(false)
 {
     assert(pTissue);
     assert(pBoundaryConditions);
     this->mMatrixIsConstant = true;
 
-    mpMonodomainAssembler = new MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
+    mpMonodomainAssembler = NULL; // Created lazily in SetupLinearSystem after SetKspConfig is called
     mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,1>(pMesh,pBoundaryConditions);
-
 
     // Tell tissue there's no need to replicate ionic caches
     pTissue->SetCacheReplication(false);
     mVecForConstructingRhs = NULL;
-
-    if (HeartConfig::Instance()->GetUseStateVariableInterpolation())
-    {
-        mpMonodomainCorrectionTermAssembler
-            = new MonodomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
-        //We are going to need those caches after all
-        pTissue->SetCacheReplication(true);
-    }
-    else
-    {
-        mpMonodomainCorrectionTermAssembler = NULL;
-    }
+    mpMonodomainCorrectionTermAssembler = NULL;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -226,6 +239,31 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::~MonodomainSolver()
     {
         delete mpMonodomainCorrectionTermAssembler;
     }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetKspConfig(
+    bool useAbsTol,
+    double absTol,
+    double relTol,
+    const std::string& rKspType,
+    const std::string& rPcType,
+    bool useMassLumping,
+    bool useMassLumpingForPrecond,
+    bool useFixedIts,
+    unsigned evalEvery,
+    bool useStateVarInterp)
+{
+    mUseAbsoluteTolerance = useAbsTol;
+    mKspAbsoluteTolerance = absTol;
+    mKspRelativeTolerance = relTol;
+    mKspSolverType = rKspType;
+    mKspPreconditionerType = rPcType;
+    mUseMassLumping = useMassLumping;
+    mUseMassLumpingForPrecond = useMassLumpingForPrecond;
+    mUseFixedNumberIterations = useFixedIts;
+    mEvaluateNumItsEveryNSolves = evalEvery;
+    mUseStateVariableInterpolation = useStateVarInterp;
 }
 
 // Explicit instantiation

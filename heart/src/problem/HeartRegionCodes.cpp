@@ -33,30 +33,78 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include "HeartRegionCodes.hpp"
-#include "HeartConfig.hpp"
+#include <algorithm>
 #include <cassert>
+#include <iterator>
+#include "Exception.hpp"
 
+// Initialise static members with the default identifiers
+std::set<HeartRegionType> HeartRegionCode::msTissueIdentifiers = std::set<HeartRegionType>({0u});
+std::set<HeartRegionType> HeartRegionCode::msBathIdentifiers   = std::set<HeartRegionType>({1u});
 
 HeartRegionType HeartRegionCode::GetValidTissueId()
 {
-    // Returns the identifier of the first region defined as tissue
-    assert(!HeartConfig::Instance()->rGetTissueIdentifiers().empty());
-    return *HeartConfig::Instance()->rGetTissueIdentifiers().begin();
+    assert(!msTissueIdentifiers.empty());
+    return *msTissueIdentifiers.begin();
 }
 
 HeartRegionType HeartRegionCode::GetValidBathId()
 {
-    // Returns the identifier of the first region defined as bath
-    assert(!HeartConfig::Instance()->rGetBathIdentifiers().empty());
-    return *HeartConfig::Instance()->rGetBathIdentifiers().begin();
+    assert(!msBathIdentifiers.empty());
+    return *msBathIdentifiers.begin();
+}
+
+const std::set<HeartRegionType>& HeartRegionCode::rGetTissueIdentifiers()
+{
+    return msTissueIdentifiers;
+}
+
+const std::set<HeartRegionType>& HeartRegionCode::rGetBathIdentifiers()
+{
+    return msBathIdentifiers;
+}
+
+void HeartRegionCode::SetTissueIdentifiers(const std::set<HeartRegionType>& rIds)
+{
+    msTissueIdentifiers = rIds;
+}
+
+void HeartRegionCode::SetBathIdentifiers(const std::set<HeartRegionType>& rIds)
+{
+    msBathIdentifiers = rIds;
+}
+
+void HeartRegionCode::SetTissueAndBathIdentifiers(const std::set<HeartRegionType>& rTissueIds,
+                                                   const std::set<HeartRegionType>& rBathIds)
+{
+    if (rTissueIds.empty() || rBathIds.empty())
+    {
+        EXCEPTION("Identifying set must be non-empty");
+    }
+    std::set<HeartRegionType> shared_identifiers;
+    std::set_intersection(rTissueIds.begin(), rTissueIds.end(),
+                          rBathIds.begin(), rBathIds.end(),
+                          std::inserter(shared_identifiers, shared_identifiers.begin()));
+    if (!shared_identifiers.empty())
+    {
+        EXCEPTION("Tissue identifiers and bath identifiers overlap");
+    }
+    msTissueIdentifiers = rTissueIds;
+    msBathIdentifiers = rBathIds;
+}
+
+void HeartRegionCode::Reset()
+{
+    msTissueIdentifiers = {0u};
+    msBathIdentifiers   = {1u};
 }
 
 bool HeartRegionCode::IsRegionTissue(HeartRegionType regionId)
 {
-    return (HeartConfig::Instance()->rGetTissueIdentifiers().find(regionId) != HeartConfig::Instance()->rGetTissueIdentifiers().end());
+    return (msTissueIdentifiers.find(regionId) != msTissueIdentifiers.end());
 }
 
 bool HeartRegionCode::IsRegionBath(HeartRegionType regionId)
 {
-    return (HeartConfig::Instance()->rGetBathIdentifiers().find(regionId) != HeartConfig::Instance()->rGetBathIdentifiers().end());
+    return (msBathIdentifiers.find(regionId) != msBathIdentifiers.end());
 }

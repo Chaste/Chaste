@@ -106,7 +106,8 @@ public:
                          const std::string& rFileBaseName,
                          AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                          bool hasBath = false,
-                         unsigned precision = 0u);
+                         unsigned precision = 0u,
+                         bool outputUsingOriginalNodeOrdering = false);
 };
 
 #endif /*HDF5TOCMGUICONVERTER_HPP_*/

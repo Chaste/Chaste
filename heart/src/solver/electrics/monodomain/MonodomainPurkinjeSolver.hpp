@@ -127,6 +127,22 @@ private:
      */
     Vec mVecForConstructingRhs;
 
+    // KSP configuration
+    bool mUseAbsoluteTolerance;
+    double mKspAbsoluteTolerance;
+    double mKspRelativeTolerance;
+    std::string mKspSolverType;
+    std::string mKspPreconditionerType;
+    bool mUseMassLumping;
+    bool mUseFixedNumberIterations;
+    unsigned mEvaluateNumItsEveryNSolves;
+    bool mUseStateVariableInterpolation;
+
+    /** Purkinje surface-area-to-volume ratio Am (1/cm). Default 2800. */
+    double mPurkinjeSurfaceAreaToVolumeRatio;
+    /** Purkinje membrane capacitance Cm (uF/cm^2). Default 1.0. */
+    double mPurkinjeCapacitance;
+
     /**
      *  Implementation of SetupLinearSystem() which uses the assembler to compute the
      *  LHS matrix, but sets up the RHS vector using the mass-matrix (constructed
@@ -171,6 +187,14 @@ public:
     MonodomainPurkinjeSolver(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                              MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
                              BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions);
+
+    /** Configure KSP and Purkinje physiological settings. */
+    void SetKspConfig(bool useAbsTol, double absTol, double relTol,
+                      const std::string& rKspType, const std::string& rPcType,
+                      bool useMassLumping, bool /*useMassLumpingForPrecond*/,
+                      bool useFixedIts, unsigned evalEvery,
+                      bool useStateVarInterp,
+                      double purkinjeAm = 2800.0, double purkinjeCm = 1.0);
 
     /**
      *  Destructor

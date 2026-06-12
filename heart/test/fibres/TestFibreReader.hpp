@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "FibreReader.hpp"
-#include "HeartFileFinder.hpp"
 #include "TetrahedralMesh.hpp"
 #include "VtkMeshWriter.hpp"
 

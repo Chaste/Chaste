@@ -112,14 +112,8 @@ public:
     {
         /*
          * HOW_TO_TAG Cardiac/Problem definition
-         * Read in a mesh from file, via `HeartConfig`.
+         * Read in a mesh from file.
          */
-        HeartConfig::Instance()->SetMeshFileName("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um",
-                                                 cp::media_type::Axisymmetric);
-
-//        HeartConfig::Instance()->SetMeshFileName("OxfordRabbitHeart_ascii",
-//                                                         cp::media_type::Axisymmetric);
-
 
         /*
          * Specify the conductivity vector to use in the simulation. Since this is going to be
@@ -131,7 +125,6 @@ public:
          * The 3rd entry would be different for an orthotropic mesh with fibre, sheet and
          * normal directions. For a simulation without fibre directions, there should be one value.
          */
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.19, 0.19));
 
         /*
          * Set the simulation duration, output directory, filename and VTK visualization.
@@ -139,16 +132,11 @@ public:
          * We have set the simulation duration to be very short here so this tutorial runs
          * quickly, increase it to see decent propagation of the wavefront.
          */
-        HeartConfig::Instance()->SetSimulationDuration(2); //ms
-        HeartConfig::Instance()->SetOutputDirectory("Monodomain3dRabbitHeart");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
 
         /* The ODE and PDE timesteps should be refined when using this code for real
          * scientific simulations. The values here are sufficient to ensure stability
          * in this case, but not sufficient for converged numerical behaviour.
         */
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.02, 0.1, 0.2);
 
         /*
          * Here we create an instance of our cell factory, which will tell the `MonodomainProblem`
@@ -157,6 +145,18 @@ public:
          */
         RabbitHeartCellFactory cell_factory;
         MonodomainProblem<3> monodomain_problem( &cell_factory );
+
+        monodomain_problem.SetMeshFileName("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
+        monodomain_problem.SetFibreOrientationFile("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um", "axi");
+//        monodomain_problem.SetMeshFileName("OxfordRabbitHeart_ascii");
+//        monodomain_problem.SetFibreOrientationFile("OxfordRabbitHeart_ascii", "axi");
+
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 0.19, 0.19));
+        monodomain_problem.SetSimulationDuration(2); //ms
+        monodomain_problem.SetOutputDirectory("Monodomain3dRabbitHeart");
+        monodomain_problem.SetOutputFilenamePrefix("results");
+        monodomain_problem.SetVisualizeWithVtk(true);
+        monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.02, 0.1, 0.2);
         monodomain_problem.SetWriteInfo();
         monodomain_problem.Initialise();
         monodomain_problem.Solve();

@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VoltageInterpolaterOntoMechanicsMesh.hpp"
 #include "Hdf5ToCmguiConverter.hpp"
-#include "HeartConfig.hpp"
 #include "Hdf5DataReader.hpp"
 #include "PetscTools.hpp"
 #include "Hdf5DataWriter.hpp"
@@ -154,15 +153,10 @@ void VoltageInterpolaterOntoMechanicsMesh<DIM>::OutputToCmgui(std::vector<std::s
     delete p_writer;
 
     // Convert the new data to CMGUI format.
-    // alter the directory in HeartConfig as that is where Hdf5ToCmguiConverter decides
-    // where to output
-    std::string config_directory = HeartConfig::Instance()->GetOutputDirectory();
-    HeartConfig::Instance()->SetOutputDirectory(directory);
     Hdf5ToCmguiConverter<DIM,DIM> converter(FileFinder(directory, RelativeTo::ChasteTestOutput),
                                             "voltage_mechanics_mesh",
                                             &mrMechanicsMesh,
                                             false);
-    HeartConfig::Instance()->SetOutputDirectory(config_directory);
 }
 
 // Explicit instantiation

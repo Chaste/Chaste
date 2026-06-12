@@ -150,13 +150,22 @@ private:
 public:
 
 
-    /** Constructor.
-     * Needs only a reference to a mesh.
-     * All other parameters from the HeartConfig class
+    /**
+     * Constructor taking explicit electrode parameters.
      *
-     *  @param rMesh The mesh, assumed to be a cuboid.
+     * @param rMesh              the mesh (assumed to be a cuboid)
+     * @param groundSecondElectrode  whether to ground the second electrode
+     * @param axisIndex          which axis the electrodes are applied along (x_i = a and x_i = b)
+     * @param magnitude          stimulus magnitude at the input electrode (uA/cm^2)
+     * @param startTime          time the electrodes switch on (ms)
+     * @param duration           how long the stimulus lasts (ms)
      */
-    Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh); // implemented in cpp
+    Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
+               bool groundSecondElectrode,
+               unsigned axisIndex,
+               double magnitude,
+               double startTime,
+               double duration); // implemented in cpp
 
     /**
      *  @return the boundary conditions container in which is set up the Neumann

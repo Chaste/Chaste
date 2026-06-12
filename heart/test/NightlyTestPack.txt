@@ -32,4 +32,3 @@ tutorials/TestCardiacCheckpointingAndRestartingTutorial.hpp
 tutorials/TestCardiacElectroMechanicsTutorial.hpp
 tutorials/TestAnotherCardiacElectroMechanicsTutorial.hpp
 tutorials/TestSingleCellSimulationTutorial.hpp
-TestCardiacSimulationNightly.hpp

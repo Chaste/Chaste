@@ -73,17 +73,16 @@ public:
     void TestCheckpointing()
     {
         /* We set up exactly the same simulation as in the [Another Bidomain Simulation](/docs/user-tutorials/anotherbidomainsimulation/) tutorial. */
-        HeartConfig::Instance()->Reset();
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML,2> cell_factory(-2000000);
-        HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainCheckpointingTutorial");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements", cp::media_type::Orthotropic);
+        BidomainProblem<2> bidomain_problem( &cell_factory );
+        bidomain_problem.SetSimulationDuration(5.0); //ms
+        bidomain_problem.SetOutputDirectory("BidomainCheckpointingTutorial");
+        bidomain_problem.SetOutputFilenamePrefix("results");
+        bidomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
+        bidomain_problem.SetFibreOrientationFile("mesh/test/data/2D_0_to_1mm_800_elements", "ortho");
 
         double scale = 2;
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75*scale, 0.19*scale));
-        BidomainProblem<2> bidomain_problem( &cell_factory );
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75*scale, 0.19*scale));
 
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
@@ -108,14 +107,12 @@ public:
          * This means that we are running from `t=5 ms` (the end of the previous simulation) to `t=10 ms`.
          * The output files are concatenated so that they appear to be made by a single simulation running from
          * `t=0 ms` to `t=10 ms`.
-         * Note: loading an archive also loads `HeartConfig` options, so `HeartConfig` calls such as this one must appear
-         * **after** `CardiacSimulationArchiver::Load()`.
          */
-        HeartConfig::Instance()->SetSimulationDuration(10); //ms
+        p_bidomain_problem->SetSimulationDuration(10); //ms
 
         /* One point of checkpointing and restarting is that there may be something which we want to change
          * during the course of experiment.  Here we change the conductivity. */
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(3.0, 0.3));
+        p_bidomain_problem->SetIntracellularConductivities(Create_c_vector(3.0, 0.3));
 
         p_bidomain_problem->Solve();
 

@@ -75,30 +75,23 @@ class TestMonodomainFitzHughNagumo : public CxxTest::TestSuite
 {
 public:
 
-    void tearDown()
-    {
-        HeartConfig::Reset();
-    }
-
     // Solve on a 2D 1mm by 1mm mesh (space step = 0.1mm), stimulating the left
     // edge.
     void TestMonodomainFitzHughNagumoWithEdgeStimulus( void )
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.01, 0.01));
-        HeartConfig::Instance()->SetSimulationDuration(1.2); //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
-        HeartConfig::Instance()->SetOutputDirectory("FhnWithEdgeStimulus");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainFhn_2dWithEdgeStimulus");
-
         FhnEdgeStimulusCellFactory cell_factory;
 
         // using the criss-cross mesh so wave propagates properly
         MonodomainProblem<2> monodomain_problem( &cell_factory );
+        monodomain_problem.SetIntracellularConductivities(Create_c_vector(0.01, 0.01));
+        monodomain_problem.SetSimulationDuration(1.2); //ms
+        monodomain_problem.SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
+        monodomain_problem.SetOutputDirectory("FhnWithEdgeStimulus");
+        monodomain_problem.SetOutputFilenamePrefix("MonodomainFhn_2dWithEdgeStimulus");
+        monodomain_problem.SetSurfaceAreaToVolumeRatio(1.0);
+        monodomain_problem.SetCapacitance(1.0);
 
         monodomain_problem.Initialise();
-
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
 
 
         monodomain_problem.Solve();

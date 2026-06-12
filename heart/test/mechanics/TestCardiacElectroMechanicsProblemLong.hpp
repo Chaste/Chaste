@@ -57,8 +57,6 @@ public:
         // ORIGINAL run to 125 ms - about where the width is at its minimum (see figures
         // in "A numerical method for cardiac mechano–electric simulations", Annals of Biomed. Imaging
         // UPDATE : fragile test -- falls over after 110ms on some configurations so run for a little less time.
-        HeartConfig::Instance()->SetSimulationDuration(110.0);
-
         CardiacElectroMechProbRegularGeom<2> problem(INCOMPRESSIBLE,
                                                      1.0,  /* width */
                                                      5,    /* mech mesh size */
@@ -69,6 +67,7 @@ public:
                                                      1.0,  /* contraction model ode dt */
                                                      "TestCardiacEmNhs2dLong");
 
+        problem.GetElectricsProblem()->SetSimulationDuration(110.0);
         problem.SetNoElectricsOutput();
         problem.Solve();
 
@@ -107,8 +106,6 @@ public:
         problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
         // Test shortened from 125.0 ms because there is an issue with convergence at 120.0 ms
-        HeartConfig::Instance()->SetSimulationDuration(120.0);
-
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
                                                   MONODOMAIN,
                                                   &electrics_mesh,
@@ -116,17 +113,7 @@ public:
                                                   &cell_factory,
                                                   &problem_defn,
                                                   "TestCardiacEmVaryingFibres");
-
-
-//        // fibres going from (1,0) at X=0 to (1,1)-direction at X=1
-//        // the fibres file was created with the code (inside a class that owns a mesh)
-//        for (unsigned elem_index=0; elem_index<mechanics_mesh.GetNumElements(); elem_index++)
-//        {
-//            double X = mechanics_mesh.GetElement(elem_index)->CalculateCentroid()[0];
-//            double theta = M_PI*X/4;
-//            std::cout << cos(theta) << " " << sin(theta) << " " << -sin(theta) << " " << cos(theta) << "\n" << std::flush;
-//        }
-//        assert(0);
+        problem.GetElectricsProblem()->SetSimulationDuration(120.0);
 
         // problem.SetNoElectricsOutput();
         problem.Solve();
@@ -158,8 +145,6 @@ public:
           = NonlinearElasticityTools<3>::GetNodesByComponentValue(mechanics_mesh,0,0);
 
 
-        HeartConfig::Instance()->SetSimulationDuration(50.0);
-
         ElectroMechanicsProblemDefinition<3> problem_defn(mechanics_mesh);
         problem_defn.SetContractionModel(NHS,1.0);
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
@@ -173,7 +158,7 @@ public:
                                                   &cell_factory,
                                                   &problem_defn,
                                                   "TestCardiacElectroMech3d");
-
+        problem.GetElectricsProblem()->SetSimulationDuration(50.0);
         problem.SetNoElectricsOutput();
         problem.Solve();
 
@@ -212,8 +197,6 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<3>::GetNodesByComponentValue(mechanics_mesh,2,0.0);
 
-        HeartConfig::Instance()->SetSimulationDuration(50.0);
-
         ElectroMechanicsProblemDefinition<3> problem_defn(mechanics_mesh);
         problem_defn.SetContractionModel(KERCHOFFS2003,1.0);
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
@@ -229,7 +212,7 @@ public:
                                                   &cell_factory,
                                                   &problem_defn,
                                                   "TestCardiacElectroMech3dTwistingCube");
-
+        problem.GetElectricsProblem()->SetSimulationDuration(50.0);
         problem.Solve();
 
         // verified that it twists by visualising, some hardcoded values here..
@@ -266,8 +249,6 @@ public:
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
-        HeartConfig::Instance()->SetSimulationDuration(50.0);
-
         CardiacElectroMechProbRegularGeom<2> problem(COMPRESSIBLE,
                                                      0.05, /* width (cm) */
                                                      20,   /* mech mesh size*/
@@ -277,7 +258,7 @@ public:
                                                      1.0,   /* mechanics solve timestep */
                                                      0.01,  /* Kerchoffs ode timestep */
                                                      "TestCompressibleWithKerchoffsLong");
-
+        problem.GetElectricsProblem()->SetSimulationDuration(50.0);
         problem.Solve();
 
         // Mainly just testing no errors when Solve was called.
@@ -305,8 +286,6 @@ public:
         std::vector<unsigned> fixed_nodes
             = NonlinearElasticityTools<3>::GetNodesByComponentValue(mechanics_mesh, 2, 0.0);
 
-
-        HeartConfig::Instance()->SetSimulationDuration(10.0);
 
         ElectroMechanicsProblemDefinition<3> problem_defn(mechanics_mesh);
         problem_defn.SetContractionModel(KERCHOFFS2003,1.0);
@@ -352,8 +331,6 @@ public:
         //////////////////////////////////////////////////////////////////
         std::vector<c_vector<double,3> > r_deformed_position_no_fibres;
         {
-            HeartConfig::Instance()->SetSimulationDuration(20.0);
-
             CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
                                                       MONODOMAIN,
                                                       &electrics_mesh,
@@ -361,8 +338,7 @@ public:
                                                       &cell_factory,
                                                       &problem_defn,
                                                       "TestCardiacEmFibreRead");
-
-
+            problem.GetElectricsProblem()->SetSimulationDuration(20.0);
             problem.Solve();
             r_deformed_position_no_fibres = problem.rGetDeformedPosition();
         }
@@ -372,7 +348,6 @@ public:
         //////////////////////////////////////////////////////////////////
         std::vector<c_vector<double,3> > r_deformed_position_fibres_alongX;
         {
-            HeartConfig::Instance()->SetSimulationDuration(20.0);
             FileFinder finder("heart/test/data/fibre_tests/alongX.ortho", RelativeTo::ChasteSourceRoot);
             problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
@@ -383,8 +358,7 @@ public:
                                                       &cell_factory,
                                                       &problem_defn,
                                                       "TestCardiacEmFibreRead");
-
-
+            problem.GetElectricsProblem()->SetSimulationDuration(20.0);
             problem.Solve();
             r_deformed_position_fibres_alongX = problem.rGetDeformedPosition();
         }
@@ -417,7 +391,6 @@ public:
         ////////////////////////////////////////////////////////////////////
         std::vector<c_vector<double,3> > r_deformed_position_fibres_alongY1;
         {
-            HeartConfig::Instance()->SetSimulationDuration(20.0);
             FileFinder finder("heart/test/data/fibre_tests/alongY1.ortho", RelativeTo::ChasteSourceRoot);
             problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
@@ -428,8 +401,7 @@ public:
                                                       &cell_factory,
                                                       &problem_defn,
                                                       "TestCardiacEmFibreRead");
-
-
+            problem.GetElectricsProblem()->SetSimulationDuration(20.0);
             problem.Solve();
             r_deformed_position_fibres_alongY1 = problem.rGetDeformedPosition();
         }
@@ -440,7 +412,6 @@ public:
         ////////////////////////////////////////////////////////////////////
         std::vector<c_vector<double,3> > r_deformed_position_fibres_alongY2;
         {
-            HeartConfig::Instance()->SetSimulationDuration(20.0);
             FileFinder fibres_file("heart/test/data/fibre_tests/alongY2.ortho", RelativeTo::ChasteSourceRoot);
             problem_defn.SetVariableFibreSheetDirectionsFile(fibres_file, false);
 
@@ -451,7 +422,7 @@ public:
                                                         &cell_factory,
                                                         &problem_defn,
                                                         "TestCardiacEmFibreRead");
-
+            problem.GetElectricsProblem()->SetSimulationDuration(20.0);
             problem.Solve();
             r_deformed_position_fibres_alongY2 = problem.rGetDeformedPosition();
         }
@@ -481,7 +452,6 @@ public:
         //////////////////////////////////////////////////////////////////
         std::vector<c_vector<double,3> > r_deformed_position_fibres_alongZ;
         {
-            HeartConfig::Instance()->SetSimulationDuration(20.0);
             FileFinder finder("heart/test/data/fibre_tests/alongZ.ortho", RelativeTo::ChasteSourceRoot);
             problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
@@ -492,8 +462,7 @@ public:
                                                       &cell_factory,
                                                       &problem_defn,
                                                       "TestCardiacEmFibreRead");
-
-
+            problem.GetElectricsProblem()->SetSimulationDuration(20.0);
             problem.Solve();
             r_deformed_position_fibres_alongZ = problem.rGetDeformedPosition();
         }

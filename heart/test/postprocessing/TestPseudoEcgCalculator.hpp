@@ -50,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "TetrahedralMesh.hpp"
-#include "HeartConfig.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "FileComparison.hpp"
 #include "SimpleBathProblemSetup.hpp"
@@ -150,9 +149,10 @@ public:
         }
 
         //now we test the writer method
+        calculator.SetOutputDirectory("ChasteResults"); // write to a human-readable location
         calculator.WritePseudoEcg();
 
-        std::string output_dir = "ChasteResults/output";//default value
+        std::string output_dir = "ChasteResults/output";
         {
             FileComparison comparer(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/PseudoEcgFromElectrodeAt_15_0_0.dat",
                                     "heart/test/data/ValidPseudoEcg1D.dat");
@@ -164,6 +164,7 @@ public:
             PseudoEcgCalculator<1,1,1> course_calculator (mesh, probe_electrode,
                                                    FileFinder("hdf5",RelativeTo::ChasteTestOutput),
                                                    "gradient_V", "V" /*Voltage name*/, 2 /*Time stride*/);
+            course_calculator.SetOutputDirectory("ChasteResults");
             course_calculator.WritePseudoEcg();
             FileComparison comparer(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/PseudoEcgFromElectrodeAt_15_0_0.dat",
                     "heart/test/data/CoarsePseudoEcg1D.dat");
@@ -284,15 +285,14 @@ public:
      */
     void TestBathEcgCalculations()
     {
-        HeartConfig::Instance()->SetSimulationDuration(2.0);  //ms - set to 500 to see whole AP trace.
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBath1d_PseudoEcg");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_1d");
-
         c_vector<double,1> centre;
         centre(0) = 0.5;
         BathCellFactory<1> cell_factory(-1e6, centre); // stimulates x=0.5 node
 
         BidomainWithBathProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetSimulationDuration(2.0);  //ms - set to 500 to see whole AP trace.
+        bidomain_problem.SetOutputDirectory("BidomainBath1d_PseudoEcg");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_1d");
 
         TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
         TetrahedralMesh<1,1> mesh;

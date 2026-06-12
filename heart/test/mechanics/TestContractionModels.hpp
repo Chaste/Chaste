@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "EulerIvpOdeSolver.hpp"
 #include "ZeroStimulus.hpp"
-#include "HeartConfig.hpp"
 #include "SimpleStimulus.hpp"
 #include "TimeStepper.hpp"
 #include "SimpleDataWriter.hpp"
@@ -187,6 +186,7 @@ public :
         boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(magnitude, duration, when));
 
         double end_time = 1000.0;
+        double dt = 0.01; // ODE timestep (ms)
 
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         CellLuoRudy1991FromCellML electrophys_model(p_solver, p_stimulus);
@@ -218,10 +218,10 @@ public :
 
 
         // time loop
-        for (double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
+        for (double current_time = 0; current_time<end_time; current_time+=dt)
         {
             // solve electrophys model
-            electrophys_model.Compute(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep());
+            electrophys_model.Compute(current_time, current_time+dt);
 
             // get CaI
             double Ca_I = electrophys_model.rGetStateVariables()[Ca_i_index];
@@ -232,7 +232,7 @@ public :
             cellmech_model.SetInputParameters(input_parameters);
 
             // solve the cellular mechanics model
-            cellmech_model.RunDoNotUpdate(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep(), HeartConfig::Instance()->GetOdeTimeStep());
+            cellmech_model.RunDoNotUpdate(current_time, current_time+dt, dt);
             cellmech_model.UpdateStateVariables();
 
 
@@ -293,6 +293,7 @@ public :
     {
         boost::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
         double end_time = 100.0;
+        double dt = 0.01; // ODE timestep (ms)
 
         double min_lam = 0.85;
 
@@ -323,10 +324,10 @@ public :
         std::vector<double> Q2;
         std::vector<double> Q3;
         // time loop
-        for (double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
+        for (double current_time = 0; current_time<end_time; current_time+=dt)
         {
             // solve electrophys model
-            electrophys_model.Compute(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep());
+            electrophys_model.Compute(current_time, current_time+dt);
 
             // get CaI
             double Ca_I = electrophys_model.rGetStateVariables()[Ca_i_index];
@@ -341,7 +342,7 @@ public :
             cellmech_model.SetInputParameters(input_parameters);
 
             // solve the cellular mechanics model
-            cellmech_model.RunDoNotUpdate(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep(), HeartConfig::Instance()->GetOdeTimeStep());
+            cellmech_model.RunDoNotUpdate(current_time, current_time+dt, dt);
             cellmech_model.UpdateStateVariables();
 
 
@@ -400,6 +401,7 @@ public :
         boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(magnitude, duration, when));
 
         double end_time = 1000.0;
+        double dt = 0.01; // ODE timestep (ms)
 
         std::vector<std::vector<double> > data;
 
@@ -422,10 +424,10 @@ public :
             std::vector<double> active_tensions;
 
             // time loop
-            for (double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
+            for (double current_time = 0; current_time<end_time; current_time+=dt)
             {
                 // solve electrophys model
-                electrophys_model.Compute(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep());
+                electrophys_model.Compute(current_time, current_time+dt);
 
                 // get CaI
                 double Ca_I = electrophys_model.rGetStateVariables()[Ca_i_index];
@@ -436,7 +438,7 @@ public :
                 cellmech_model.SetInputParameters(input_parameters);
 
                 // solve the cellular mechanics model
-                cellmech_model.RunDoNotUpdate(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep(), HeartConfig::Instance()->GetOdeTimeStep());
+                cellmech_model.RunDoNotUpdate(current_time, current_time+dt, dt);
                 cellmech_model.UpdateStateVariables();
 
                 times.push_back(current_time);

@@ -91,7 +91,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCardiacTissue<SPACE_DIM> >(*this);
-        // Conductivity tensors are dealt with by HeartConfig, and the caches get regenerated.
+        // Conductivity tensors are stored directly on the tissue; caches get regenerated on load.
 
         archive & mAmFirstCell;
         archive & mAmSecondCell;
@@ -114,6 +114,9 @@ private:
 
     /** Extracellular conductivity tensors. */
     AbstractConductivityTensors<SPACE_DIM, SPACE_DIM> *mpExtracellularConductivityTensors;
+
+    /** Default extracellular conductivities (mS/cm). Default 7.0 in all directions. */
+    c_vector<double, SPACE_DIM> mDefaultExtraConductivities;
 
     /**
      *  Cache containing all the stimulus currents for each node,
@@ -222,7 +225,7 @@ public:
      * @param rExtraStimuliDistributed local extracellular stimuli (recovered from archive)
      * @param rGgapsDistributed distributed Ggaps (recovered from archive)
      * @param pMesh  a pointer to the AbstractTetrahedral mesh (recovered from archive).
-     * @param intracellularConductivitiesSecondCell a vector with the orthotropic conductivities for the second cell (this is needed because the second cell values may not be taken from HeartConfig as the the ones for the first cell are).
+     * @param intracellularConductivitiesSecondCell a vector with the orthotropic conductivities for the second cell (passed explicitly since the second cell has independent conductivity settings).
      */
     ExtendedBidomainTissue(std::vector<AbstractCardiacCellInterface*> & rCellsDistributed,
                            std::vector<AbstractCardiacCellInterface*> & rSecondCellsDistributed,
@@ -242,6 +245,12 @@ public:
      * @param conductivities the conductivities to be set.
      */
     void SetIntracellularConductivitiesSecondCell(c_vector<double, SPACE_DIM> conductivities);
+
+    /**
+     * Set default extracellular conductivities.  Must be called before Initialise().
+     * @param conductivities  extracellular conductivities (mS/cm) in each direction
+     */
+    void SetExtracellularConductivities(c_vector<double, SPACE_DIM> conductivities);
 
     /**
      * @return a pointer to the second cell
@@ -651,11 +660,7 @@ public:
      t->SaveExtendedBidomainCells(ar, file_version);
      t->SaveExtracellularStimulus(ar, file_version);
 
-     // Creation of conductivity tensors are called by constructor and uses HeartConfig. So make sure that it is
-     // archived too (needs doing before construction so appears here instead of usual archive location).
-     HeartConfig* p_config = HeartConfig::Instance();
-     ar & *p_config;
-     ar & p_config;
+     // Conductivity parameters are archived by AbstractCardiacTissue::save().
  }
 
  /**
@@ -691,12 +696,7 @@ public:
      t->LoadExtracellularStimulus(
              *ProcessSpecificArchive<Archive>::Get(), file_version, extra_stim, p_mesh);
 
-     // CreateIntracellularConductivityTensor() is called by AbstractCardiacTissue constructor and uses HeartConfig.
-     // (as does CreateExtracellularConductivityTensor). So make sure that it is
-     // archived too (needs doing before construction so appears here instead of usual archive location).
-     HeartConfig* p_config = HeartConfig::Instance();
-     ar & *p_config;
-     ar & p_config;
+     // Conductivity parameters are restored by AbstractCardiacTissue::load().
 
      ::new(t)ExtendedBidomainTissue<SPACE_DIM>(cells_distributed, cells_distributed_second_cell, extra_stim, g_gaps, p_mesh, intra_cond_second_cell);
  }

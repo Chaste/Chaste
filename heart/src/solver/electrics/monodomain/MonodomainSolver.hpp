@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  and MonodomainStiffnessMatrixAssembler for K.
  *
  *  Also allows state variable interpolation (SVI) to be used on elements for which it
- *  will be needed, if the appropriate HeartConfig boolean is set.
+ *  will be needed, if SVI is enabled on the problem.
  *  See https://chaste.github.io/docs/user-guides/state-variable-interpolation/ for more details on this.
  *  In this case the equation is
  *  ( (chi*C/dt) M  + K ) V^{n+1} = (chi*C/dt) M V^{n} + M F^{n} + c_surf + c_correction
@@ -101,6 +101,18 @@ private:
      *  be solved is Ax=b (excluding surface integrals), this vector is z where b=Mz.
      */
     Vec mVecForConstructingRhs;
+
+    // KSP configuration
+    bool mUseAbsoluteTolerance;         /**< Use absolute (true) or relative (false) KSP tolerance. */
+    double mKspAbsoluteTolerance;       /**< KSP absolute tolerance. */
+    double mKspRelativeTolerance;       /**< KSP relative tolerance. */
+    std::string mKspSolverType;         /**< KSP solver type. */
+    std::string mKspPreconditionerType; /**< KSP preconditioner type. */
+    bool mUseMassLumping;               /**< Use mass-lumped FE matrices. */
+    bool mUseMassLumpingForPrecond;     /**< Use mass-lumped preconditioner. */
+    bool mUseFixedNumberIterations;     /**< Use fixed iteration count. */
+    unsigned mEvaluateNumItsEveryNSolves; /**< Re-evaluate iteration count every N solves. */
+    bool mUseStateVariableInterpolation; /**< Use state-variable interpolation. */
 
 
     /**
@@ -144,6 +156,30 @@ public:
      *  Destructor
      */
     virtual ~MonodomainSolver();
+
+    /**
+     * Configure the KSP solver settings.  Must be called before the first call to Solve().
+     * @param useAbsTol             use absolute (true) or relative (false) tolerance
+     * @param absTol                absolute tolerance value
+     * @param relTol                relative tolerance value
+     * @param rKspType              KSP solver type (e.g. "cg")
+     * @param rPcType               preconditioner type (e.g. "bjacobi")
+     * @param useMassLumping        use mass-lumped FE matrices
+     * @param useMassLumpingForPrecond  use mass-lumped preconditioner only
+     * @param useFixedIts           use fixed iteration count
+     * @param evalEvery             re-evaluate iteration count every N solves
+     * @param useStateVarInterp     use state-variable interpolation
+     */
+    void SetKspConfig(bool useAbsTol,
+                      double absTol,
+                      double relTol,
+                      const std::string& rKspType,
+                      const std::string& rPcType,
+                      bool useMassLumping,
+                      bool useMassLumpingForPrecond,
+                      bool useFixedIts,
+                      unsigned evalEvery,
+                      bool useStateVarInterp);
 };
 
 #endif /*MONODOMAINSOLVER_HPP_*/

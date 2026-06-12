@@ -79,22 +79,19 @@ public:
 
     void TestCompareRealisticGeometry()
     {
-        HeartConfig::Reset();
-        HeartConfig::Instance()->SetSimulationDuration(50); //ms
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,0.1);
-
         double spatial_step = 0.05;
-        HeartConfig::Instance()->SetMeshFileName("heart/test/data/UCSD_heart");
+
+        SmallBenchmarkStimulusHeartCellFactory<CellLuoRudy1991FromCellMLBackwardEuler> cell_factory;
 
         /*
          *  Standard solve
          */
-        HeartConfig::Instance()->SetOutputDirectory("CompareRealisticGeometryStandard");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("CompareRealisticGeometryStandard");
-
-        SmallBenchmarkStimulusHeartCellFactory<CellLuoRudy1991FromCellMLBackwardEuler> cell_factory;
-
         MonodomainProblem<3> monodomain_problem( &cell_factory );
+        monodomain_problem.SetSimulationDuration(50); //ms
+        monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 0.1);
+        monodomain_problem.SetMeshFileName("heart/test/data/UCSD_heart");
+        monodomain_problem.SetOutputDirectory("CompareRealisticGeometryStandard");
+        monodomain_problem.SetOutputFilenamePrefix("CompareRealisticGeometryStandard");
 
         monodomain_problem.Initialise();
         monodomain_problem.Solve();
@@ -109,11 +106,13 @@ public:
          *  Mass lumping solve
          */
         HeartEventHandler::Reset();
-        HeartConfig::Instance()->SetOutputDirectory("CompareRealisticGeometryMassLumping");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("CompareRealisticGeometryMassLumping");
-        HeartConfig::Instance()->SetUseMassLumping();
-
         MonodomainProblem<3> monodomain_problem_ml( &cell_factory );
+        monodomain_problem_ml.SetSimulationDuration(50); //ms
+        monodomain_problem_ml.SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 0.1);
+        monodomain_problem_ml.SetMeshFileName("heart/test/data/UCSD_heart");
+        monodomain_problem_ml.SetOutputDirectory("CompareRealisticGeometryMassLumping");
+        monodomain_problem_ml.SetOutputFilenamePrefix("CompareRealisticGeometryMassLumping");
+        monodomain_problem_ml.SetUseMassLumping(true);
 
         monodomain_problem_ml.Initialise();
         monodomain_problem_ml.Solve();

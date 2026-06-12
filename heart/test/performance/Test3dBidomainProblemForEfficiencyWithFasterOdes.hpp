@@ -88,14 +88,14 @@ public:
 
     void TestBidomain3d()
     {
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
-        HeartConfig::Instance()->SetSimulationDuration(150.0);
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_.5mm_1889_elements_irregular");
-
         BidomainFaceStimulusCellFactory bidomain_cell_factory;
 
         BidomainProblem<3> bidomain_problem( &bidomain_cell_factory );
+
+        bidomain_problem.SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
+        bidomain_problem.SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
+        bidomain_problem.SetSimulationDuration(150.0);
+        bidomain_problem.SetMeshFileName("mesh/test/data/3D_0_to_.5mm_1889_elements_irregular");
 
         bidomain_problem.PrintOutput(false);
 

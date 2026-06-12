@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BidomainProblem.hpp"
 #include "BidomainSolver.hpp"
-#include "HeartConfig.hpp"
 #include "Exception.hpp"
 #include "DistributedVector.hpp"
 #include "ReplicatableVector.hpp"
@@ -88,7 +87,7 @@ void BidomainProblem<DIM>::AnalyseMeshForBath()
     {
         // The problem hasn't been set up with a bath, so check that the user hasn't set any options
         // which would suggest they're expecting there to be a bath!
-        std::set<unsigned> bath_identifiers = HeartConfig::Instance()->rGetBathIdentifiers();
+        const std::set<unsigned>& bath_identifiers = this->rGetBathIdentifiers();
         if (!(bath_identifiers.size()==1 && bath_identifiers.find(1)==bath_identifiers.begin())) // IF NOT only 1 in the bath identifiers set
         {
             EXCEPTION("User has set bath identifiers, but the BidomainProblem isn't expecting a bath. Did you mean to use BidomainProblem(..., true)? Or alternatively, BidomainWithBathProblem(...)?");
@@ -125,7 +124,7 @@ template<unsigned DIM>
 AbstractCardiacTissue<DIM> * BidomainProblem<DIM>::CreateCardiacTissue()
 {
     AnalyseMeshForBath();
-    mpBidomainTissue = new BidomainTissue<DIM>(this->mpCellFactory, HeartConfig::Instance()->GetUseStateVariableInterpolation());
+    mpBidomainTissue = new BidomainTissue<DIM>(this->mpCellFactory, this->mUseStateVariableInterpolation);
     return mpBidomainTissue;
 }
 
@@ -145,6 +144,12 @@ AbstractDynamicLinearPdeSolver<DIM, DIM, 2>* BidomainProblem<DIM>::CreateSolver(
                                            this->mpMesh,
                                            mpBidomainTissue,
                                            this->mpBoundaryConditionsContainer.get());
+
+    mpSolver->SetKspConfig(this->mUseAbsoluteTolerance, this->mKspAbsoluteTolerance,
+                           this->mKspRelativeTolerance, this->mKspSolver, this->mKspPreconditioner,
+                           this->mUseMassLumping, this->mUseMassLumpingForPrecond,
+                           this->mUseFixedNumberIterations, this->mEvaluateNumItsEveryNSolves,
+                           this->mUseStateVariableInterpolation);
 
     try
     {
@@ -166,7 +171,13 @@ BidomainProblem<DIM>::BidomainProblem(
     : AbstractCardiacProblem<DIM,DIM, 2>(pCellFactory),
       mpBidomainTissue(NULL),
       mRowForAverageOfPhiZeroed(INT_MAX),
-      mHasBath(hasBath)
+      mHasBath(hasBath),
+      mHasElectrodeParameters(false),
+      mGroundSecondElectrode(false),
+      mElectrodeAxisIndex(0),
+      mElectrodeMagnitude(0.0),
+      mElectrodeStartTime(0.0),
+      mElectrodeDuration(0.0)
 {
     mFixedExtracellularPotentialNodes.resize(0);
 }
@@ -175,9 +186,30 @@ template<unsigned DIM>
 BidomainProblem<DIM>::BidomainProblem()
     : AbstractCardiacProblem<DIM, DIM, 2>(),
       mpBidomainTissue(NULL),
-      mRowForAverageOfPhiZeroed(INT_MAX)
+      mRowForAverageOfPhiZeroed(INT_MAX),
+      mHasElectrodeParameters(false),
+      mGroundSecondElectrode(false),
+      mElectrodeAxisIndex(0),
+      mElectrodeMagnitude(0.0),
+      mElectrodeStartTime(0.0),
+      mElectrodeDuration(0.0)
 {
     mFixedExtracellularPotentialNodes.resize(0);
+}
+
+template<unsigned DIM>
+void BidomainProblem<DIM>::SetElectrodeParameters(bool groundSecondElectrode,
+                                                  unsigned axisIndex,
+                                                  double magnitude,
+                                                  double startTime,
+                                                  double duration)
+{
+    mHasElectrodeParameters = true;
+    mGroundSecondElectrode = groundSecondElectrode;
+    mElectrodeAxisIndex = axisIndex;
+    mElectrodeMagnitude = magnitude;
+    mElectrodeStartTime = startTime;
+    mElectrodeDuration = duration;
 }
 
 template<unsigned DIM>
@@ -267,7 +299,7 @@ void BidomainProblem<DIM>::PreSolveChecks()
             // We're not using the constrain Average phi_e to 0 method, hence use a null space
             // Check that the KSP solver isn't going to do anything stupid:
             // phi_e is not bounded, so it'd be wrong to use a relative tolerance
-            if (HeartConfig::Instance()->GetUseRelativeTolerance())
+            if (!this->mUseAbsoluteTolerance)
             {
                 EXCEPTION("Bidomain external voltage is not bounded in this simulation - use KSP *absolute* tolerance");
             }
@@ -286,9 +318,14 @@ void BidomainProblem<DIM>::SetElectrodes()
 
     assert(this->mpMesh!=NULL);
 
-    if (HeartConfig::Instance()->IsElectrodesPresent())
+    if (mHasElectrodeParameters)
     {
-        mpElectrodes = (boost::shared_ptr<Electrodes<DIM> >) new Electrodes<DIM>(*(this->mpMesh));
+        mpElectrodes = (boost::shared_ptr<Electrodes<DIM> >) new Electrodes<DIM>(*(this->mpMesh),
+                                                                                  mGroundSecondElectrode,
+                                                                                  mElectrodeAxisIndex,
+                                                                                  mElectrodeMagnitude,
+                                                                                  mElectrodeStartTime,
+                                                                                  mElectrodeDuration);
     }
 }
 
@@ -357,7 +394,7 @@ void BidomainProblem<DIM>::OnEndOfTimestep(double time)
         {
             delete mpSolver;
             AbstractCardiacProblem<DIM,DIM,2>::mpSolver = CreateSolver();
-            mpSolver->SetTimeStep(HeartConfig::Instance()->GetPdeTimeStep());
+            mpSolver->SetTimeStep(this->mPdeTimeStep);
         }
 
         // Note, no point calling this->SetBoundaryConditionsContainer() as the

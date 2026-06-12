@@ -56,7 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ZeroStimulusCellFactory.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "SimpleBathProblemSetup.hpp"
-#include "HeartConfig.hpp"
 #include "NumericFileComparison.hpp"
 
 class TestBidomainWithBathProblem : public CxxTest::TestSuite
@@ -64,18 +63,16 @@ class TestBidomainWithBathProblem : public CxxTest::TestSuite
 public:
     void tearDown()
     {
-        HeartConfig::Reset();
     }
 
     void TestLabellingNodes()
     {
-        HeartConfig::Instance()->SetSimulationDuration(0.01);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes");
-        HeartConfig::Instance()->SetOutputDirectory("bidomain_bath");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
         BidomainWithBathProblem<1> bidomain_problem( &bidomain_cell_factory );
+        bidomain_problem.SetSimulationDuration(0.01);  //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes");
+        bidomain_problem.SetOutputDirectory("bidomain_bath");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
         bidomain_problem.Initialise();
 
         AbstractTetrahedralMesh<1,1>* p_mesh = &(bidomain_problem.rGetMesh());
@@ -108,13 +105,12 @@ public:
 
     void TestFailsIfNoBathElements()
     {
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
-        HeartConfig::Instance()->SetOutputDirectory("bidomain_bath");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
         BidomainWithBathProblem<1> bidomain_problem( &bidomain_cell_factory );
+        bidomain_problem.SetSimulationDuration(1.0);  //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
+        bidomain_problem.SetOutputDirectory("bidomain_bath");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
         // Fails because no bath
         TS_ASSERT_THROWS_THIS(bidomain_problem.Initialise(), "No bath element found");
 
@@ -124,12 +120,11 @@ public:
 
     void TestCheckForBathElementsNoDeadlock()
     {
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("bidomain_bath");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
         BidomainWithBathProblem<1> bidomain_problem( &bidomain_cell_factory );
+        bidomain_problem.SetSimulationDuration(1.0);  //ms
+        bidomain_problem.SetOutputDirectory("bidomain_bath");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
 
         TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
         DistributedTetrahedralMesh<1,1> mesh;
@@ -156,15 +151,14 @@ public:
 
     void TestBathIntracellularStimulation()
     {
-        HeartConfig::Instance()->SetSimulationDuration(10.0);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBath1d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_1d");
-
         c_vector<double,1> centre;
         centre(0) = 0.5;
         BathCellFactory<1> cell_factory(-1e6, centre); // stimulates x=0.5 node
 
         BidomainWithBathProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetSimulationDuration(10.0);  //ms
+        bidomain_problem.SetOutputDirectory("BidomainBath1d");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_1d");
 
         TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
         TetrahedralMesh<1,1> mesh;
@@ -217,10 +211,6 @@ public:
     // against.
     void Test1dProblemOnlyBathGroundedOneSide()
     {
-        HeartConfig::Instance()->SetSimulationDuration(0.5);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBathOnlyBath");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath");
-
         c_vector<double,1> centre;
         centre(0) = 0.5;
         BathCellFactory<1> cell_factory(-1e6, centre);
@@ -255,6 +245,9 @@ public:
         }
 
         BidomainWithBathProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetSimulationDuration(0.5);  //ms
+        bidomain_problem.SetOutputDirectory("BidomainBathOnlyBath");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain_bath");
 
         bidomain_problem.SetBoundaryConditionsContainer(p_bcc);
         bidomain_problem.SetMesh(&mesh);
@@ -273,7 +266,7 @@ public:
         // test phi = x*boundary_val/sigma (solution of phi''=0, phi(0)=0, sigma*phi'(1)=boundary_val
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            double bath_cond = HeartConfig::Instance()->GetBathConductivity();
+            double bath_cond = bidomain_problem.GetBathConductivity();
             double x = mesh.GetNode(i)->rGetLocation()[0];
             TS_ASSERT_DELTA(sol_repl[2*i],   0.0,   1e-12);               // V
             TS_ASSERT_DELTA(sol_repl[2*i+1], x*boundary_val/bath_cond, 1e-4);   // phi_e
@@ -282,16 +275,15 @@ public:
 
     void Test2dBathIntracellularStimulation()
     {
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBath2d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_2d");
-
         c_vector<double,2> centre;
         centre(0) = 0.05;
         centre(1) = 0.05;
         BathCellFactory<2> cell_factory(-5e6, centre); // stimulates x=0.05 node
 
         BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
+        bidomain_problem.SetSimulationDuration(1.0);  //ms
+        bidomain_problem.SetOutputDirectory("BidomainBath2d");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_2d");
 
         DistributedTetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<DistributedTetrahedralMesh<2,2> >(
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.04);
@@ -327,15 +319,6 @@ public:
 
     void Test2dBathInputFluxEqualsOutputFlux()
     {
-        HeartConfig::Instance()->SetSimulationDuration(3.0);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBath2dFluxCompare");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_2d_fluxes");
-
-        // Coverage of Hdf5ToCmguiConverter with bath
-        HeartConfig::Instance()->SetVisualizeWithCmgui(true);
-
-        HeartConfig::Instance()->SetOdeTimeStep(0.001);  //ms
-
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
         c_vector<double,2> centre;
@@ -344,6 +327,14 @@ public:
         BathCellFactory<2> cell_factory( 0.0, centre);
 
         BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
+        bidomain_problem.SetSimulationDuration(3.0);  //ms
+        bidomain_problem.SetOutputDirectory("BidomainBath2dFluxCompare");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_2d_fluxes");
+
+        // Coverage of Hdf5ToCmguiConverter with bath
+        bidomain_problem.SetVisualizeWithCmgui(true);
+
+        bidomain_problem.SetOdeTimeStep(0.001);  //ms
 
         // Coverage
         TS_ASSERT(bidomain_problem.GetHasBath());
@@ -356,8 +347,7 @@ public:
         double start_time = 0.5;
         double duration = 1.9; // of the stimulus, in ms
 
-        HeartConfig::Instance()->SetElectrodeParameters(false,0, boundary_flux, start_time, duration);
-
+        bidomain_problem.SetElectrodeParameters(false, 0, boundary_flux, start_time, duration);
 
         bidomain_problem.SetMesh(p_mesh);
         bidomain_problem.Initialise();
@@ -394,12 +384,6 @@ public:
 
     void Test2dBathMultipleBathConductivities()
     {
-        HeartConfig::Instance()->SetSimulationDuration(2.0);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBath2dMultipleBathConductivities");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_2d");
-
-        HeartConfig::Instance()->SetOdeTimeStep(0.001);  //ms ???
-
         std::set<unsigned> tissue_ids;
         tissue_ids.insert(0); // Same as default value defined in HeartConfig
 
@@ -407,7 +391,6 @@ public:
         bath_ids.insert(2);
         bath_ids.insert(3);
         bath_ids.insert(4);
-        HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
 
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
@@ -417,6 +400,11 @@ public:
         BathCellFactory<2> cell_factory( 0.0, centre);
 
         BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
+        bidomain_problem.SetSimulationDuration(2.0);  //ms
+        bidomain_problem.SetOutputDirectory("BidomainBath2dMultipleBathConductivities");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_2d");
+        bidomain_problem.SetOdeTimeStep(0.001);  //ms ???
+        bidomain_problem.SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
 
         DistributedTetrahedralMesh<2,2> mesh;
 
@@ -455,13 +443,13 @@ public:
         multiple_bath_conductivities[3] = 1.0;
         multiple_bath_conductivities[4] = 0.001;
 
-        HeartConfig::Instance()->SetBathMultipleConductivities(multiple_bath_conductivities);
+        bidomain_problem.SetBathMultipleConductivities(multiple_bath_conductivities);
 
         double boundary_flux = -3.0e3;
         double start_time = 0.0;
         double duration = 1.0; // of the stimulus, in ms
 
-        HeartConfig::Instance()->SetElectrodeParameters(false, 0, boundary_flux, start_time, duration);
+        bidomain_problem.SetElectrodeParameters(false, 0, boundary_flux, start_time, duration);
 
         bidomain_problem.SetMesh(&mesh);
         bidomain_problem.Initialise();
@@ -507,10 +495,9 @@ public:
         bath_ids.insert(1);
         bath_ids.insert(2); // non-default identifier!
 
-        HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
-
         BathCellFactory<2> cell_factory( 0.0, Create_c_vector(0.0, 0.0) );
         BidomainProblem<2> bidomain_problem( &cell_factory ); // non-bath problem, despite specifying bath stuff above!
+        bidomain_problem.SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
         bidomain_problem.SetMesh( &mesh );
         TS_ASSERT_THROWS_THIS( bidomain_problem.Initialise() , "User has set bath identifiers, but the BidomainProblem isn't expecting a bath. Did you mean to use BidomainProblem(..., true)? Or alternatively, BidomainWithBathProblem(...)?");
     }
@@ -519,10 +506,6 @@ public:
     void Test2dBathGroundedElectrodeStimulusSwitchesOnOff()
     {
         // Total execution time is 5 ms. Electrodes are on in [1.0, 3.0]
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBath2dGroundedOnOff");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_2d_grounded_on_off");
-        HeartConfig::Instance()->SetOdeTimeStep(0.001);  //ms
-
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
         c_vector<double,2> centre;
@@ -531,6 +514,9 @@ public:
         BathCellFactory<2> cell_factory( 0.0, centre);
 
         BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
+        bidomain_problem.SetOutputDirectory("BidomainBath2dGroundedOnOff");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_2d_grounded_on_off");
+        bidomain_problem.SetOdeTimeStep(0.001);  //ms
 
         TetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2,2> >(
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
@@ -540,8 +526,7 @@ public:
         double start_time = 1.0;
         double duration = 2.0; // of the stimulus, in ms
 
-        HeartConfig::Instance()->SetElectrodeParameters( true, 0, boundary_flux,start_time, duration );
-
+        bidomain_problem.SetElectrodeParameters(true, 0, boundary_flux, start_time, duration);
 
         bidomain_problem.SetMesh(p_mesh);
         bidomain_problem.Initialise();
@@ -550,7 +535,7 @@ public:
          *  While t in [0.0, 1.0) electrodes are off
          */
         {
-            HeartConfig::Instance()->SetSimulationDuration(0.5);  //ms
+            bidomain_problem.SetSimulationDuration(0.5);  //ms
             bidomain_problem.Solve();
 
             /// \todo: we don't need a ReplicatableVector here. Every processor can check locally
@@ -574,7 +559,7 @@ public:
          *  At the end of the simulation AP has been triggered
          */
         {
-            HeartConfig::Instance()->SetSimulationDuration(5.0);  //ms
+            bidomain_problem.SetSimulationDuration(5.0);  //ms
             bidomain_problem.Solve();
 
             Vec sol = bidomain_problem.GetSolution();
@@ -615,8 +600,6 @@ public:
 
     void TestMatrixBasedAssembledBath(void)
     {
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
-
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
         c_vector<double,2> centre;
@@ -634,12 +617,11 @@ public:
         ///////////////////////////////////////////////////////////////////
         // matrix based
         ///////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBathMatrixBased");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("matrix_based");
-
         BidomainWithBathProblem<2> matrix_based_bido( &cell_factory );
-
-        HeartConfig::Instance()->SetElectrodeParameters(true,0,boundary_flux, 0.0, duration);
+        matrix_based_bido.SetSimulationDuration(1.0);  //ms
+        matrix_based_bido.SetOutputDirectory("BidomainBathMatrixBased");
+        matrix_based_bido.SetOutputFilenamePrefix("matrix_based");
+        matrix_based_bido.SetElectrodeParameters(true, 0, boundary_flux, 0.0, duration);
 
         {
             Timer::Reset();
@@ -654,10 +636,11 @@ public:
         ///////////////////////////////////////////////////////////////////
         // non matrix based
         ///////////////////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBathNonMatrixBased");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("non_matrix_based");
-
         BidomainWithBathProblem<2> non_matrix_based_bido( &cell_factory);
+        non_matrix_based_bido.SetSimulationDuration(1.0);  //ms
+        non_matrix_based_bido.SetOutputDirectory("BidomainBathNonMatrixBased");
+        non_matrix_based_bido.SetOutputFilenamePrefix("non_matrix_based");
+        non_matrix_based_bido.SetElectrodeParameters(true, 0, boundary_flux, 0.0, duration);
 
         {
             Timer::Reset();
@@ -702,21 +685,20 @@ public:
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
 
         { // save
-            HeartConfig::Instance()->SetSimulationDuration(3.0);  // ms
-            HeartConfig::Instance()->SetOutputDirectory(archive_dir + "Output");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_2d_fluxes");
-            HeartConfig::Instance()->SetOdeTimeStep(0.001);  // ms
-
             // need to create a cell factory but don't want any intra stim.
             ZeroStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
 
             BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
+            bidomain_problem.SetSimulationDuration(3.0);  // ms
+            bidomain_problem.SetOutputDirectory(archive_dir + "Output");
+            bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_2d_fluxes");
+            bidomain_problem.SetOdeTimeStep(0.001);  // ms
 
             //boundary flux for Phi_e. -10e3 is under threshold, -14e3 crashes the cell model
             double boundary_flux = -11.0e3;
             double duration = 1.9; // of the stimulus, in ms
 
-            HeartConfig::Instance()->SetElectrodeParameters(false,0,boundary_flux, 0.0, duration);
+            bidomain_problem.SetElectrodeParameters(false, 0, boundary_flux, 0.0, duration);
 
             bidomain_problem.SetMesh(p_mesh);
             bidomain_problem.Initialise();
@@ -811,15 +793,14 @@ public:
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
 
         { // save
-            HeartConfig::Instance()->SetSimulationDuration(3.0);  // ms
-            HeartConfig::Instance()->SetOutputDirectory(archive_dir + "Output");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_2d_fluxes");
-            HeartConfig::Instance()->SetOdeTimeStep(0.001);  // ms
-
             // need to create a cell factory but don't want any intra stim.
             ZeroStimulusCellFactory<CellTenTusscher2006EpiFromCellMLBackwardEulerOpt, 2> cell_factory;
 
             BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
+            bidomain_problem.SetSimulationDuration(3.0);  // ms
+            bidomain_problem.SetOutputDirectory(archive_dir + "Output");
+            bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_2d_fluxes");
+            bidomain_problem.SetOdeTimeStep(0.001);  // ms
 
             bidomain_problem.SetMesh(p_mesh);
             bidomain_problem.Initialise();
@@ -840,7 +821,7 @@ public:
             double duration = 1.9; // of the stimulus, in ms
             double start_time = 0.5; // of the stimulus, in ms
 
-            HeartConfig::Instance()->SetElectrodeParameters(false,0,boundary_flux, start_time, duration);
+            static_cast<BidomainWithBathProblem<2>*>(p_abstract_problem)->SetElectrodeParameters(false, 0, boundary_flux, start_time, duration);
             p_abstract_problem->SetElectrodes();
 
             // This should only generate action potential if the electrodes were correctly saved and restored.
@@ -884,41 +865,38 @@ public:
         std::string archive_dir = "TestArchivingMeshFileWithAttributes";
 
         { // save...
-            HeartConfig::Instance()->SetSimulationDuration(0.01);  //ms
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_three_attributes");
-            HeartConfig::Instance()->SetOutputDirectory(archive_dir + "Output");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-
             std::set<unsigned> tissue_ids;
             tissue_ids.insert(0u); // (The default)
             std::set<unsigned> bath_ids;
             bath_ids.insert(1u); // (The default)
             bath_ids.insert(2u); // Some other type of bath
-            HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids,bath_ids);
 
             std::map<unsigned, double> multiple_bath_conductivities;
             multiple_bath_conductivities[1] = 3.14;
             multiple_bath_conductivities[2] = 2.72;
-            HeartConfig::Instance()->SetBathMultipleConductivities(multiple_bath_conductivities);
 
             ZeroStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
             BidomainWithBathProblem<1> bidomain_problem( &bidomain_cell_factory );
+            bidomain_problem.SetSimulationDuration(0.01);  //ms
+            bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_three_attributes");
+            bidomain_problem.SetOutputDirectory(archive_dir + "Output");
+            bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
+            bidomain_problem.SetTissueAndBathIdentifiers(tissue_ids,bath_ids);
+            bidomain_problem.SetBathMultipleConductivities(multiple_bath_conductivities);
             bidomain_problem.Initialise();
 
             // Save using helper class
             CardiacSimulationArchiver<BidomainWithBathProblem<1> >::Save(bidomain_problem, archive_dir, false);
         }
 
-        HeartConfig::Instance()->Reset(); // Forget these IDs/conductivities, they should be loaded from the archive.
-
         { // load...
             AbstractCardiacProblem<1,1,2>* p_abstract_problem = CardiacSimulationArchiver<BidomainWithBathProblem<1> >::Load(archive_dir);
 
             // Check the identifiers have made it
-            std::set<unsigned> tissue_ids = HeartConfig::Instance()->rGetTissueIdentifiers();
+            std::set<unsigned> tissue_ids = p_abstract_problem->rGetTissueIdentifiers();
             TS_ASSERT( tissue_ids.size() == 1u );
             TS_ASSERT( *(tissue_ids.begin()) == 0u );
-            std::set<unsigned> bath_ids = HeartConfig::Instance()->rGetBathIdentifiers();
+            std::set<unsigned> bath_ids = p_abstract_problem->rGetBathIdentifiers();
             TS_ASSERT( bath_ids.size() == 2u );
             TS_ASSERT( *bath_ids.begin() == 1u );
             TS_ASSERT( *(++bath_ids.begin()) == 2u );
@@ -942,12 +920,12 @@ public:
                 case 1:
                     TS_ASSERT_EQUALS( expected_element_regions[element_index], 1u);
                     TS_ASSERT(HeartRegionCode::IsRegionBath( element_attribute ));
-                    TS_ASSERT_DELTA(HeartConfig::Instance()->GetBathConductivity( element_attribute ), 3.14, 1e-9);
+                    TS_ASSERT_DELTA(p_abstract_problem->GetBathConductivity( element_attribute ), 3.14, 1e-9);
                     break;
                 case 2:
                     TS_ASSERT_EQUALS( expected_element_regions[element_index], 2u);
                     TS_ASSERT(HeartRegionCode::IsRegionBath( element_attribute ));
-                    TS_ASSERT_DELTA(HeartConfig::Instance()->GetBathConductivity( element_attribute ), 2.72, 1e-9);
+                    TS_ASSERT_DELTA(p_abstract_problem->GetBathConductivity( element_attribute ), 2.72, 1e-9);
                     break;
                 default:
                     NEVER_REACHED;
@@ -995,20 +973,20 @@ public:
         double start_time = 0.5;
         double duration = 2.001; // of the stimulus, in ms
 
-        HeartConfig::Instance()->SetOutputDirectory("ElectrodesSwitchOffAtCorrectTime");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-        HeartConfig::Instance()->SetSimulationDuration(5.0);  //ms
+        BidomainWithBathProblem<2> bidomain_problem1( &cell_factory );
+        bidomain_problem1.SetOutputDirectory("ElectrodesSwitchOffAtCorrectTime");
+        bidomain_problem1.SetOutputFilenamePrefix("results");
+        bidomain_problem1.SetSimulationDuration(5.0);  //ms
 
         //////////////////////////////////////////////////////
         // solve with printing_dt = 0.01
         //////////////////////////////////////////////////////
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.01, 0.01);  //ms
+        bidomain_problem1.SetOdePdeAndPrintingTimeSteps(0.001, 0.01, 0.01);  //ms
 
-        BidomainWithBathProblem<2> bidomain_problem1( &cell_factory );
         TetrahedralMesh<2,2>* p_mesh1 = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2,2> >(
            "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
 
-        HeartConfig::Instance()->SetElectrodeParameters(false, 0, boundary_flux, start_time, duration);
+        bidomain_problem1.SetElectrodeParameters(false, 0, boundary_flux, start_time, duration);
 
         bidomain_problem1.SetMesh(p_mesh1);
         bidomain_problem1.PrintOutput(false);
@@ -1021,24 +999,23 @@ public:
 
     void TestBidomainWithBathCanOutputVariables()
     {
-        HeartConfig::Instance()->SetSimulationDuration(0.01);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes");
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBathOutputVariables");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
-
         std::vector<std::string> output_variables;
         output_variables.push_back("cytosolic_calcium_concentration");
-        HeartConfig::Instance()->SetOutputVariables(output_variables);
 
         std::set<unsigned> tissue_ids;
         tissue_ids.insert(0); // Same as default value defined in HeartConfig
         std::set<unsigned> bath_ids;
         bath_ids.insert(1);
-        HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainWithBathProblem<1> bidomain_problem(&cell_factory);
+        bidomain_problem.SetSimulationDuration(0.01);  //ms
+        bidomain_problem.SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes");
+        bidomain_problem.SetOutputDirectory("BidomainBathOutputVariables");
+        bidomain_problem.SetOutputFilenamePrefix("BidomainLR91_1d");
+        bidomain_problem.SetVisualizeWithMeshalyzer(true);
+        bidomain_problem.SetOutputVariables(output_variables);
+        bidomain_problem.SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
 
         bidomain_problem.Initialise();
         bidomain_problem.Solve();

@@ -53,7 +53,13 @@ AbstractUntemplatedConvergenceTester::AbstractUntemplatedConvergenceTester()
       SimulateFullActionPotential(false),
       Converged(false),
       Stimulus(PLANE),
-      NeumannStimulus(4000)
+      NeumannStimulus(4000),
+      KspAbsoluteTolerance(2e-4),
+      UseKspAbsoluteTolerance(false),
+      KspRelativeTolerance(1e-6),
+      UseKspRelativeTolerance(false),
+      KspPreconditionerType(""),
+      KspSolverType("")
 {
 }
 

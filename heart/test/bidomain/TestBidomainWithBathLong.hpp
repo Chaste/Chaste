@@ -103,10 +103,6 @@ class TestBidomainWithBathLong : public CxxTest::TestSuite
 public:
     void Test3dBathIntracellularStimulation()
     {
-        HeartConfig::Instance()->SetSimulationDuration(1);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBath3d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_3d");
-
         c_vector<double,3> centre;
         centre(0) = 0.05;
         centre(1) = 0.05;
@@ -114,6 +110,9 @@ public:
         BathCellFactory<3> cell_factory(-2.5e7, centre); // stimulates x=0.05 node
 
         BidomainProblem<3> bidomain_problem( &cell_factory, true );
+        bidomain_problem.SetSimulationDuration(1);  //ms
+        bidomain_problem.SetOutputDirectory("BidomainBath3d");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_3d");
 
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructRegularSlabMesh(0.01, 0.1, 0.1, 0.1);
@@ -154,12 +153,6 @@ public:
 // see #1061
     void Test2dBathExtracellularStimulusOneEdgeGroundedOnOppositeEdge()
     {
-        HeartConfig::Instance()->SetSimulationDuration(40);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBath2dExtraStimGrounded");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_2d");
-
-        HeartConfig::Instance()->SetOdeTimeStep(0.005);  //ms
-
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
         c_vector<double,2> centre;
@@ -168,6 +161,10 @@ public:
         BathCellFactory<2> cell_factory( 0.0, centre);
 
         BidomainProblem<2> bidomain_problem( &cell_factory, true );
+        bidomain_problem.SetSimulationDuration(40);  //ms
+        bidomain_problem.SetOutputDirectory("BidomainBath2dExtraStimGrounded");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_2d");
+        bidomain_problem.SetOdeTimeStep(0.005);  //ms
 
         TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_400_elements");
         TetrahedralMesh<2,2> mesh;
@@ -191,7 +188,7 @@ public:
         double boundary_flux = -9e3;
         double duration = 2.5; //ms
 
-        HeartConfig::Instance()->SetElectrodeParameters(true,0,boundary_flux, 0.0, duration);
+        bidomain_problem.SetElectrodeParameters(true, 0, boundary_flux, 0.0, duration);
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
 
@@ -221,12 +218,6 @@ public:
 // see #1061
     void Test3dBathExtracellularStimulusOneEdgeGroundedOnOppositeEdge()
     {
-        HeartConfig::Instance()->SetSimulationDuration(6);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("BidomainBath3dExtraStimGrounded");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_3d");
-
-        HeartConfig::Instance()->SetOdeTimeStep(0.005);  //ms
-
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
         c_vector<double,3> centre;
@@ -236,6 +227,10 @@ public:
         BathCellFactory<3> cell_factory( 0.0, centre);
 
         BidomainProblem<3> bidomain_problem( &cell_factory, true );
+        bidomain_problem.SetSimulationDuration(6);  //ms
+        bidomain_problem.SetOutputDirectory("BidomainBath3dExtraStimGrounded");
+        bidomain_problem.SetOutputFilenamePrefix("bidomain_bath_3d");
+        bidomain_problem.SetOdeTimeStep(0.005);  //ms
 
         TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_1016_elements");
         TetrahedralMesh<3,3> mesh;
@@ -259,7 +254,7 @@ public:
         double boundary_flux = -4e3;
         double duration = 2.5; //ms
 
-        HeartConfig::Instance()->SetElectrodeParameters(true,0,boundary_flux, 0.0, duration);
+        bidomain_problem.SetElectrodeParameters(true, 0, boundary_flux, 0.0, duration);
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
 

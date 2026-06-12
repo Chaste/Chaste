@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "UblasCustomFunctions.hpp"
-#include "HeartConfig.hpp"
 #include "PostProcessingWriter.hpp"
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
@@ -58,7 +57,9 @@ PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::PostProcessingWriter(AbstractTetra
           mHdf5File(rHdf5FileName),
           mVoltageName(rVoltageName),
           mrMesh(rMesh),
-          mHdf5DataWriterChunkSize(hdf5DataWriterChunkSize)
+          mHdf5DataWriterChunkSize(hdf5DataWriterChunkSize),
+          mOutputDirectory(rDirectory.GetRelativePath(FileFinder("", RelativeTo::ChasteTestOutput))),
+          mOutputUsingOriginalNodeOrdering(false)
 {
     mLo = mrMesh.GetDistributedVectorFactory()->GetLow();
     mHi = mrMesh.GetDistributedVectorFactory()->GetHigh();
@@ -69,72 +70,56 @@ PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::PostProcessingWriter(AbstractTetra
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
+void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles(
+    const std::vector<std::pair<double,double> >& rApdMaps,
+    const std::vector<double>& rUpstrokeTimeMaps,
+    const std::vector<double>& rMaxUpstrokeVelocityMaps,
+    const std::vector<unsigned>& rConductionVelocityMaps,
+    const std::vector<unsigned>& rNodalTimeTraces,
+    const std::vector<ChastePoint<SPACE_DIM> >& rPseudoEcgElectrodes,
+    bool outputUsingOriginalNodeOrdering)
 {
-    //Check that post-processing is really needed
-    assert(HeartConfig::Instance()->IsPostProcessingRequested());
+    mOutputUsingOriginalNodeOrdering = outputUsingOriginalNodeOrdering;
 
     // Please note that only the master processor should write to file.
     // Each of the private methods called here takes care of checking.
-    if (HeartConfig::Instance()->IsApdMapsRequested())
+    for (unsigned i=0; i<rApdMaps.size(); i++)
     {
-        std::vector<std::pair<double,double> > apd_maps;
-        HeartConfig::Instance()->GetApdMaps(apd_maps);
-        for (unsigned i=0; i<apd_maps.size(); i++)
-        {
-            WriteApdMapFile(apd_maps[i].first, apd_maps[i].second);
-        }
+        WriteApdMapFile(rApdMaps[i].first, rApdMaps[i].second);
     }
 
-    if (HeartConfig::Instance()->IsUpstrokeTimeMapsRequested())
+    for (unsigned i=0; i<rUpstrokeTimeMaps.size(); i++)
     {
-        std::vector<double> upstroke_time_maps;
-        HeartConfig::Instance()->GetUpstrokeTimeMaps(upstroke_time_maps);
-        for (unsigned i=0; i<upstroke_time_maps.size(); i++)
-        {
-            WriteUpstrokeTimeMap(upstroke_time_maps[i]);
-        }
+        WriteUpstrokeTimeMap(rUpstrokeTimeMaps[i]);
     }
 
-    if (HeartConfig::Instance()->IsMaxUpstrokeVelocityMapRequested())
+    for (unsigned i=0; i<rMaxUpstrokeVelocityMaps.size(); i++)
     {
-        std::vector<double> upstroke_velocity_maps;
-        HeartConfig::Instance()->GetMaxUpstrokeVelocityMaps(upstroke_velocity_maps);
-        for (unsigned i=0; i<upstroke_velocity_maps.size(); i++)
-        {
-            WriteMaxUpstrokeVelocityMap(upstroke_velocity_maps[i]);
-        }
+        WriteMaxUpstrokeVelocityMap(rMaxUpstrokeVelocityMaps[i]);
     }
 
-    if (HeartConfig::Instance()->IsConductionVelocityMapsRequested())
+    if (!rConductionVelocityMaps.empty())
     {
-        std::vector<unsigned> conduction_velocity_maps;
-        HeartConfig::Instance()->GetConductionVelocityMaps(conduction_velocity_maps);
-
-        //get the mesh here
         DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM> dist_map_calculator(mrMesh);
 
-        for (unsigned i=0; i<conduction_velocity_maps.size(); i++)
+        for (unsigned i=0; i<rConductionVelocityMaps.size(); i++)
         {
             std::vector<double> distance_map;
             std::vector<unsigned> origin_surface;
-            origin_surface.push_back(conduction_velocity_maps[i]);
+            origin_surface.push_back(rConductionVelocityMaps[i]);
             dist_map_calculator.ComputeDistanceMap(origin_surface, distance_map);
-            WriteConductionVelocityMap(conduction_velocity_maps[i], distance_map);
+            WriteConductionVelocityMap(rConductionVelocityMaps[i], distance_map);
         }
     }
 
-    if (HeartConfig::Instance()->IsAnyNodalTimeTraceRequested())
+    if (!rNodalTimeTraces.empty())
     {
-        std::vector<unsigned> requested_nodes;
-        HeartConfig::Instance()->GetNodalTimeTraceRequested(requested_nodes);
-        WriteVariablesOverTimeAtNodes(requested_nodes);
+        WriteVariablesOverTimeAtNodes(rNodalTimeTraces);
     }
 
-    if (HeartConfig::Instance()->IsPseudoEcgCalculationRequested())
+    if (!rPseudoEcgElectrodes.empty())
     {
-        std::vector<ChastePoint<SPACE_DIM> > electrodes;
-        HeartConfig::Instance()->GetPseudoEcgElectrodePositions(electrodes);
+            const std::vector<ChastePoint<SPACE_DIM> >& electrodes = rPseudoEcgElectrodes;
 
         ///\todo #2359 work out how to get rid of this line
         /// needed because PseudoEcgCalculator makes its own Hdf5DataReader.
@@ -416,7 +401,7 @@ std::string PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::ConvertToHdf5FriendlyS
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes(std::vector<unsigned>& rNodeIndices)
+void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes(const std::vector<unsigned>& rNodeIndices)
 {
     std::vector<std::string> variable_names = mpDataReader->GetVariableNames();
 
@@ -439,7 +424,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
 
                 // Handle permutation, if any
                 if ((mrMesh.rGetNodePermutation().size() != 0) &&
-                    !HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering())
+                    !mOutputUsingOriginalNodeOrdering)
                 {
                     node_index = mrMesh.rGetNodePermutation()[ rNodeIndices[requested_index] ];
                 }
@@ -465,7 +450,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(std::vector<std::vector<double> >& rDataPayload, const std::string& rFolder, const std::string& rFileName)
 {
-    OutputFileHandler output_file_handler(HeartConfig::Instance()->GetOutputDirectory() + "/" + rFolder, false);
+    OutputFileHandler output_file_handler(mOutputDirectory + "/" + rFolder, false);
     PetscTools::BeginRoundRobin();
     {
         out_stream p_file=out_stream(NULL);

@@ -87,21 +87,20 @@ public:
     {
         // Run a simulation to generate a spiral wave in an h5 file.
         {
-            HeartConfig::Instance()->SetSimulationDuration(100); //ms
-            HeartConfig::Instance()->SetOutputDirectory("SpiralWaveAndPhase");
-            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 1);
-
             LuoRudySpiralWaveCellFactory cell_factory(mMeshWidth,mMeshWidth);
             MonodomainProblem<2> monodomain_problem( &cell_factory );
+            monodomain_problem.SetSimulationDuration(100); //ms
+            monodomain_problem.SetOutputDirectory("SpiralWaveAndPhase");
+            monodomain_problem.SetOutputFilenamePrefix("results");
+            monodomain_problem.SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 1);
             monodomain_problem.SetMesh(mpMesh);
             monodomain_problem.SetWriteInfo();
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
 
             // Get a shorter results file that is all 'spiral wave'.
-            HeartConfig::Instance()->SetOutputDirectory("SpiralWaveAndPhaseContinued");
-            HeartConfig::Instance()->SetSimulationDuration(110); //ms
+            monodomain_problem.SetOutputDirectory("SpiralWaveAndPhaseContinued");
+            monodomain_problem.SetSimulationDuration(110); //ms
             monodomain_problem.Solve();
         }
 

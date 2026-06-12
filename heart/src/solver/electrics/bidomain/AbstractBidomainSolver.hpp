@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractDynamicLinearPdeSolver.hpp"
 #include "BidomainTissue.hpp"
-#include "HeartConfig.hpp"
 
 /**
  *  Abstract Bidomain class containing some common functionality
@@ -61,8 +60,17 @@ protected:
     /** Used when intialising null-space solver to resolve singularity*/
     bool mNullSpaceCreated;
 
-    /** Local cache of the configuration singleton instance*/
-    HeartConfig* mpConfig;
+    // KSP configuration
+    bool mUseAbsoluteTolerance;
+    double mKspAbsoluteTolerance;
+    double mKspRelativeTolerance;
+    std::string mKspSolverType;
+    std::string mKspPreconditionerType;
+    bool mUseMassLumping;
+    bool mUseMassLumpingForPrecond;
+    bool mUseFixedNumberIterations;
+    unsigned mEvaluateNumItsEveryNSolves;
+    bool mUseStateVariableInterpolation;
 
     /** Used when pinning nodes to resolve singularity.
      * This vector indicates the global indices of the nodes to be pinned
@@ -165,6 +173,13 @@ public:
      *  Destructor
      */
     virtual ~AbstractBidomainSolver();
+
+    /** Configure KSP solver settings (must be called before Solve()). */
+    void SetKspConfig(bool useAbsTol, double absTol, double relTol,
+                      const std::string& rKspType, const std::string& rPcType,
+                      bool useMassLumping, bool useMassLumpingForPrecond,
+                      bool useFixedIts, unsigned evalEvery,
+                      bool useStateVarInterp);
 
     /**
      *  Set the nodes at which phi_e (the extracellular potential) is fixed to
