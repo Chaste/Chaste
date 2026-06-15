@@ -1948,7 +1948,7 @@ public:
          * Because every 8 K chunk will be aligned to 16 K boundaries the file
          * will be about twice the size it needs to be on disk.
          */
-        
+
         hsize_t data_storage_size = H5Dget_storage_size(dset);
         //TS_ASSERT_EQUALS(data_storage_size, 4896000u); //  HDF 1.10.7 size of data whatever the chunking and alignment are
         unsigned storage_size = std::filesystem::file_size(file.GetAbsolutePath().c_str());
