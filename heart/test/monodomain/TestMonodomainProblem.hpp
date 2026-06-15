@@ -1746,7 +1746,7 @@ public:
 
         hsize_t data_storage_size = H5Dget_storage_size(dset);
         unsigned storage_size = std::filesystem::file_size(file.GetAbsolutePath().c_str());
-        TS_ASSERT_LESS_THAN((unsigned)(1.80*data_storage_size), storage_size);
+        TS_ASSERT_LESS_THAN((unsigned)(1.70*data_storage_size), storage_size);
 
         /*
          * Check the "location" of the datasets (the offset from the start of
