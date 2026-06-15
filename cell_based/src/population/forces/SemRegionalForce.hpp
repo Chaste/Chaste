@@ -93,13 +93,16 @@ public:
     /**
      * Overridden CalculateForceBetweenNodes() method.
      *
-     * Calculates the force between two nodes.
+     * Calculates the force between two nodes using region-dependent spring
+     * constants and rest lengths.
      *
-     * Note that this assumes they are connected and is called by AddForceContribution()
+     * Note that this assumes the nodes are neighbours and is called by
+     * AddForceContribution().
      *
      * @param nodeAGlobalIndex index of one neighbouring node
      * @param nodeBGlobalIndex index of the other neighbouring node
      * @param rCellPopulation the cell population
+     *
      * @return The force exerted on Node A by Node B.
      */
     c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
