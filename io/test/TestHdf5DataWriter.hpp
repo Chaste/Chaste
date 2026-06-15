@@ -1944,6 +1944,17 @@ public:
         }
         H5Pclose(dcpl);
 
+        /*  Check that the file is bigger than expected.
+         * Because every 8 K chunk will be aligned to 16 K boundaries the file
+         * will be about twice the size it needs to be on disk.
+         */
+        
+        hsize_t data_storage_size = H5Dget_storage_size(dset);
+        //TS_ASSERT_EQUALS(data_storage_size, 4896000u); //  HDF 1.10.7 size of data whatever the chunking and alignment are
+        unsigned storage_size = std::filesystem::file_size(file.GetAbsolutePath().c_str());
+        //TS_ASSERT_EQUALS( storage_size,  4906824u); // HDF 1.10.7 size of file when chunking/alignment are *not* set
+        //TS_ASSERT_EQUALS( storage_size, 10159104u);  // HDF 1.10.7 size of file when chunking/alignment are set
+        TS_ASSERT_LESS_THAN(2*data_storage_size, storage_size);
         /*
          * Check the "location" of the datasets (the offset from the start of
          * file, a bit like a pointer to the start of the dataset) to confirm
