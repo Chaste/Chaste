@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -85,10 +85,10 @@ def print_stats(hash, date_line):
     rev_date = time.strftime('%Y-%m-%d', rev_time)
     epoch = time.mktime(rev_time) - rev1_epoch
     epoch_weeks = epoch / (3600*7*24.0)
-  
+
     source_dirs = glob.glob('*/src')
     test_dirs = glob.glob('*/test')+glob.glob('*/tests')
-  
+
     test_files = get_files(test_dirs)
     source_files = get_files(source_dirs)
 
@@ -128,7 +128,7 @@ def run(startDate):
 
     print_header()
     sys.stdout.flush()
-    
+
     step = 3
     date = startDate + datetime.timedelta(20)
     old_hash = 'No hash'
@@ -149,9 +149,9 @@ def run(startDate):
             sys.stdout.flush()
         date = date +datetime.timedelta(step)
         old_hash = hash
-    
-        
-    
+
+
+
 
 if __name__ == '__main__':
     start_date = datetime.date(2017, 2, 1)
@@ -163,13 +163,13 @@ if __name__ == '__main__':
 """ Cut'n'paste for gnuplot:
 
 *****************
-NB: 
-SEE notforrelease/docs/loc.gnu 
+NB:
+SEE notforrelease/docs/loc.gnu
 *****************
 
-set xlabel 'weeks'                                                                                                                    
-set term png                                                                                                                          
-set out 'loc.png'                                                                                                                     
+set xlabel 'weeks'
+set term png
+set out 'loc.png'
 plot 'loc.txt' u 2:4  w l title 'lines of source', 'loc.txt' u 2:6 w l title 'lines of tests', 'loc.txt' u 2:9 w l title 'total'
-exit      
+exit
 """

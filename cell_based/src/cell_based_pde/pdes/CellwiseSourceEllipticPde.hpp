@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Grad.(D Grad(u)) + a*u*rho(x) + b*rho(x) = 0,
  *
- * where the scalars a and b are specified by the members mLinearSourceCoefficient, 
+ * where the scalars a and b are specified by the members mLinearSourceCoefficient,
  * and mConstantSourceCoefficient respectively, whose value must
  * be set in the constructor.
  *
@@ -115,10 +115,10 @@ public:
      * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
      * @param scaleByCellVolume whether to scale by cell volume (defaults to)
      */
-    CellwiseSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, 
-                              double constantSourceCoefficient=0.0, 
+    CellwiseSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+                              double constantSourceCoefficient=0.0,
                               double linearSourceCoefficient=0.0,
-                              double diffusionCoefficient=1.0, 
+                              double diffusionCoefficient=1.0,
                               bool scaleByCellVolume=false);
 
     /**
@@ -135,7 +135,7 @@ public:
      * @return mLinearSourceCoefficient
      */
     double GetLinearCoefficient() const;
-        
+
     /**
      * @return mDiffusionCoefficient
      */

@@ -1,12 +1,12 @@
-# Copyright (c) 2005-2025, University of Oxford.
+# Copyright (c) 2005-2026, University of Oxford.
 # All rights reserved.
-# 
+#
 # University of Oxford means the Chancellor, Masters and Scholars of the
 # University of Oxford, having an administrative office at Wellington
 # Square, Oxford OX1 2JD, UK.
-# 
+#
 # This file is part of Chaste.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #  * Redistributions of source code must retain the above copyright notice,
@@ -17,7 +17,7 @@
 #  * Neither the name of the University of Oxford nor the names of its
 #    contributors may be used to endorse or promote products derived from this
 #    software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -52,9 +52,9 @@ message ("####################################\n")
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste VERSION 2024.2)
-set (Chaste_VERSION_MAJOR 2024 CACHE STRING "Chaste major version number")
-set (Chaste_VERSION_MINOR 2 CACHE STRING "Chaste minor version number")
+project (Chaste VERSION 2026.1)
+set (Chaste_VERSION_MAJOR 2026 CACHE STRING "Chaste major version number")
+set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
 
 message(STATUS "Linker: ${CMAKE_LINKER}")
 
@@ -451,7 +451,7 @@ endif ()
 ################################
 ####  Find Boost
 ################################
-find_package(Boost 1.71 REQUIRED COMPONENTS headers system serialization program_options CONFIG)
+find_package(Boost 1.71 REQUIRED COMPONENTS headers serialization program_options CONFIG)
 message(STATUS "Boost version: ${Boost_VERSION}")
 
 # Turn off boost auto-linking, which is not required when using CMake
@@ -465,7 +465,6 @@ endif ()
 # Link the Boost targets onto Chaste_COMMON_DEPS
 target_link_libraries(Chaste_COMMON_DEPS INTERFACE
         Boost::headers
-        Boost::system
         Boost::serialization
         Boost::program_options
 )
@@ -527,7 +526,7 @@ endif ()
 
 
 ################################
-####  Find ParMETIS and METIS
+####  Find ParMETIS
 ################################
 # If we're using PETSc's ParMETIS (ON by default, for more reliable MPI compatibility), override PARMETIS_ROOT accordingly
 if (Chaste_USE_PETSC_PARMETIS)
@@ -539,6 +538,8 @@ if (Chaste_USE_PETSC_PARMETIS)
 endif ()
 find_package (ParMETIS REQUIRED)
 list (APPEND Chaste_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
+# libscotchparmetis-dev has a parmetis.h adapter include which is in a subdirectory
+list (APPEND Chaste_INCLUDES "${PARMETIS_INCLUDE_DIR}")
 
 
 ################################
@@ -1070,6 +1071,12 @@ add_custom_target (infrastructure
                    WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
                    VERBATIM)
 
+add_custom_target (infrastructure_whitespace
+                   COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/utils/RemoveTabsAndTrailingWhitespace.py
+
+                   WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
+                   VERBATIM)
+
 
 ####################
 #    PACKAGING     #
@@ -1137,6 +1144,30 @@ foreach (component ${Chaste_COMPONENTS})
     endforeach (depend_component Chaste_DEPENDS_${component})
 
 endforeach (component ${Chaste_COMPONENTS})
+
+
+# CMake 4.1.0-4.1.4 and 4.2.0-4.2.1 emit spurious "Could not find a package configuration file provided by nvpl"
+# warnings while searching for BLAS/LAPACK (triggered when finding PETSc and SUNDIALS). These warnings are harmless and
+# can safely be ignored.
+# The issue was fixed in CMake 4.1.5 and 4.2.2 respectively:
+# https://gitlab.kitware.com/cmake/cmake/-/work_items/27451
+# https://github.com/Chaste/Chaste/issues/477
+if ((CMAKE_VERSION VERSION_GREATER_EQUAL "4.1.0" AND CMAKE_VERSION VERSION_LESS "4.1.5") OR
+(CMAKE_VERSION VERSION_GREATER_EQUAL "4.2.0" AND CMAKE_VERSION VERSION_LESS "4.2.2"))
+    message(STATUS "NOTE: CMake ${CMAKE_VERSION} is known to emit spurious warnings related to 'nvpl' when searching "
+            "for BLAS/LAPACK. These warnings are harmless and can safely be ignored. Upgrade to CMake >= 4.1.5 or >= "
+            "4.2.2 to suppress them.")
+endif ()
+
+
+message(STATUS "")
+message(STATUS "----------------------------------------------------------")
+message(STATUS "Chaste documentation and tutorials:")
+message(STATUS "    https://chaste.github.io/")
+message(STATUS "Ask questions and get help from the core development team:")
+message(STATUS "    https://github.com/Chaste/Chaste/discussions")
+message(STATUS "----------------------------------------------------------")
+message(STATUS "")
 
 
 set (CPACK_DEBIAN_PACKAGE_DEPENDS "cmake, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libboost-filesystem-dev, libparmetis-dev, libxerces-c3-dev, libsundials-serial-dev, libvtk5-dev, python-lxml, python-rdflib")

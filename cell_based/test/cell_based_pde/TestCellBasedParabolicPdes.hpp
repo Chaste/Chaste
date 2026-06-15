@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -189,15 +189,15 @@ public:
                 TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
             }
         }
-        
+
         // This node is attached to apoptotic cell so no source
         Node<2>* p_node_0 = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
         TS_ASSERT_DELTA(pde.ComputeSourceTermAtNode(*p_node_0,2.0), 0.0, 1e-6);
-        
+
         // This node is attached to non apoptotic cell
         Node<2>* p_node_1 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(1));
         TS_ASSERT_DELTA(pde.ComputeSourceTermAtNode(*p_node_1,2.0), 0.05 * 2.0 + 0.01, 1e-6);
-        
+
         // Create a scaled PDE object
         CellwiseSourceParabolicPde<2> scaled_pde(cell_population, 0.01, 0.05, 2.0, 0.001, true);
 
@@ -207,17 +207,17 @@ public:
         TS_ASSERT_DELTA(scaled_pde.GetLinearCoefficient(), 0.05, 1e-6);
         TS_ASSERT_DELTA(scaled_pde.GetDiffusionCoefficient(), 2.0, 1e-6);
         TS_ASSERT_DELTA(scaled_pde.GetDuDtCoefficient(), 0.001, 1e-6);
-        TS_ASSERT(scaled_pde.GetScaleByCellVolume()); 
+        TS_ASSERT(scaled_pde.GetScaleByCellVolume());
 
         // Test ComputeSourceTermAtNode() method
         // Node<2>* p_node_0 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(0));
         TS_ASSERT_DELTA(scaled_pde.ComputeSourceTermAtNode(*p_node_0, 2.0), 0.0, 1e-6);
-        
+
         // Checking internal node so has finite volume
         Node<2>* p_node_12 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(12));
         TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(12)), 0.5*sqrt(3), 1e-6);
         TS_ASSERT_DELTA(scaled_pde.ComputeSourceTermAtNode(*p_node_12, 2.0), (0.05 * 2.0 + 0.01)/0.5/sqrt(3), 1e-6);
-        
+
         // Test Exceptions
         Node<2>* p_node_24 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(24));
         TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(24)), 0.0, 1e-6);
@@ -270,15 +270,15 @@ public:
             ChastePoint<2> point;
 
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
-            
+
             TS_ASSERT_DELTA(p_static_cast_pde->GetConstantCoefficient(), 0.01, 1e-6);
             TS_ASSERT_DELTA(p_static_cast_pde->GetLinearCoefficient(), 0.05, 1e-6);
             TS_ASSERT_DELTA(p_static_cast_pde->GetDiffusionCoefficient(), 2.0, 1e-6);
             TS_ASSERT(!p_static_cast_pde->GetScaleByCellVolume());
             TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point), 0.001, 1e-6);
-            
+
             TS_ASSERT_EQUALS(p_static_cast_pde->mrCellPopulation.GetNumRealCells(), 25u);
-                        
+
             c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
             for (unsigned i=0; i<2; i++)
             {
@@ -294,7 +294,7 @@ public:
             }
 
             TS_ASSERT_DELTA(p_static_cast_pde->ComputeSourceTermAtNode(*p_node, 2.0), 0.05 * 2.0 + 0.01, 1e-6);
-            
+
             // Avoid memory leaks
             delete &(p_static_cast_pde->mrCellPopulation);
             delete p_pde;
@@ -379,7 +379,7 @@ public:
         TS_ASSERT_DELTA(pde.GetUptakeRateForElement(0), 0.5, 1e-6);
         TS_ASSERT_DELTA(pde.GetUptakeRateForElement(1), 0.0, 1e-6);
 
-        // Bound the voronoi tesselation so no zero cell areas and 
+        // Bound the voronoi tesselation so no zero cell areas and
         // create a scaled PDE object
         cell_population.SetBoundVoronoiTessellation(true);
         constant_coefficient = 0.01;
@@ -412,7 +412,7 @@ public:
         }
         TS_ASSERT_DELTA(tissue_area, 21.4620, 1e-4);
 
-        // The first element has area 0.5*10*10 = 50 and there are 5*5 = 25 cells with a total area of 21.4620, 
+        // The first element has area 0.5*10*10 = 50 and there are 5*5 = 25 cells with a total area of 21.4620,
         // so the cell density is 21.4620 /50 = 0.5.
         TS_ASSERT_DELTA(scaled_pde.mCellDensityOnCoarseElements[0], tissue_area/50.0, 1e-4);
 
@@ -421,7 +421,7 @@ public:
 
         // Test ComputeSourceTerm() method
         TS_ASSERT_DELTA(scaled_pde.ComputeSourceTerm(point, 2.0, fe_mesh.GetElement(0)), 0.05*tissue_area/50.0*2.0+0.01*tissue_area/50.0, 1e-6);
-      
+
         // Now unbound the voronoi mesh to allow zero cell volumes to catch exception
         cell_population.SetBoundVoronoiTessellation(false);
         cell_population.CreateVoronoiTessellation(); // To recalculate cell volumes
@@ -464,7 +464,7 @@ public:
             double linear_coefficient = 0.05;
             double diffusion_coefficient = 2.0;
             double rate_coefficient = 0.001;
-            bool scale_by_cell_volume = true;  
+            bool scale_by_cell_volume = true;
             AbstractLinearParabolicPde<2,2>* const p_pde = new AveragedSourceParabolicPde<2>(cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume);
 
             // Create output archive and archive PDE object

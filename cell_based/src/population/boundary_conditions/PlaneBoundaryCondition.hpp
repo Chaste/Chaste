@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A plane cell population boundary condition class, which stops nodes moving through
  * a specified plane in the domain. Although the name of this class suggests it is
  * specific to 3D, it is actually also implemented in 2D, for which it is
- * really a 'line' boundary condition. It's not currently implemented in 1D
+ * really a 'line' boundary condition, and in 1D, for which it is a 'point'
+ * boundary condition.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class PlaneBoundaryCondition : public AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>

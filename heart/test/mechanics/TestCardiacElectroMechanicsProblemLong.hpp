@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,7 +81,7 @@ public:
     }
 
     /*
-     * Note that this test (and others in the test-suite) are fragile.  They rely on an ancient, hand-coded non-linear solver which 
+     * Note that this test (and others in the test-suite) are fragile.  They rely on an ancient, hand-coded non-linear solver which
      * does not always converge.  It is intended that it should pass in release mode: cmake -DCMAKE_BUILD_TYPE=Release
      */
     void Test2dVariableFibres()
@@ -106,7 +106,7 @@ public:
         FileFinder finder("heart/test/data/fibre_tests/5by5mesh_curving_fibres.ortho",RelativeTo::ChasteSourceRoot);
         problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
-        // Test shortened from 125.0 ms because there is an issue with convergence at 120.0 ms 
+        // Test shortened from 125.0 ms because there is an issue with convergence at 120.0 ms
         HeartConfig::Instance()->SetSimulationDuration(120.0);
 
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,

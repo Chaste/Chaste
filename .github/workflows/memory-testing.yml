@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  
+
   build-and-test:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
@@ -45,7 +45,7 @@ jobs:
         if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
 
       - name: checkout Chaste
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -96,10 +96,28 @@ jobs:
             echo "Index file does not exist"
             echo "index=False"  >> $GITHUB_OUTPUT
           fi
+          if [ -e ${CHASTE_BUILD_DIR}/memtest/github_summary.md ]; then
+            echo "github_summary=True"  >> $GITHUB_OUTPUT
+          fi
+          if [ -e ${CHASTE_BUILD_DIR}/memtest/txt_summary.txt ]; then
+            echo "txt_summary=True"  >> $GITHUB_OUTPUT
+          fi
         if: always()
 
+      - name: display memtest summary in terminal
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+        run: |
+          cat memtest/txt_summary.txt
+        if: always() && steps.index-exists.outputs.txt_summary == 'True'
+
+      - name: display memtest summary in job summary
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+        run: |
+          cat memtest/github_summary.md >> $GITHUB_STEP_SUMMARY
+        if: always() && steps.index-exists.outputs.github_summary == 'True'
+
       - name: upload memtest artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: memtest-files
           path: ${{ env.CHASTE_BUILD_DIR }}/memtest
@@ -111,8 +129,8 @@ jobs:
     name: Publish results (non-fork PRs only)
     needs: build-and-test
     runs-on: ubuntu-latest
-    # only when index exists AND it's not a forked PR (or it's not a PR at all)
-    if: ${{ needs.build-and-test.outputs.index == 'True' && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
+    # only when index exists AND it's being run from the primary repo (Chaste/Chaste)
+    if: ${{ needs.build-and-test.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
 
     env:
       MEMTEST_DIR: ${{ github.workspace }}/memory-testing
@@ -120,13 +138,13 @@ jobs:
     steps:
 
       - name: download memtest artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: memtest-files
           path: ./memtest
 
       - name: checkout memory-testing
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/memory-testing
           path: memory-testing
@@ -139,7 +157,7 @@ jobs:
           cp ./memtest/* ${MEMTEST_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
 
       - name: setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 

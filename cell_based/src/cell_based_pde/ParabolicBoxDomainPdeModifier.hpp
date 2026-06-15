@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -94,7 +94,7 @@ private:
      * Map used to calculate displacement of cells if moving pde solution with cells
      */
     std::map<CellPtr, c_vector<double, DIM> > mOldCellLocations;
-    
+
 
 public:
 
@@ -153,7 +153,7 @@ public:
      * Helper method to initialise the PDE solution using the CellData.
      *
      * Here we assume a homogeneous initial condition.
-     * 
+     *
      * TODO use InterpolateSolutionFromCellMovement instead!
      *
      * @param rCellPopulation reference to the cell population
@@ -162,11 +162,11 @@ public:
 
     /**
      * Helper method to interpolate the PDE solution from cells using the CellData.
-     * Use the cells voronoi region as all fe nodes in a cell centre voronoi region are given the 
+     * Use the cells voronoi region as all fe nodes in a cell centre voronoi region are given the
      * value from cell data.
      *
      * @param rCellPopulation reference to the cell population
-     * 
+     *
      * @return the solution interpolated onto the FE Mesh
      */
     Vec InterpolateSolutionFromCellMovement(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
@@ -174,7 +174,7 @@ public:
     /**
      * Set mMoveSolutionWithCells.
      *
-     * @param moveSolutionWithCells whether to move the solution with cells. 
+     * @param moveSolutionWithCells whether to move the solution with cells.
      */
     void SetMoveSolutionWithCells(bool moveSolutionWithCells);
 

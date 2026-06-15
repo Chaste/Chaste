@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ import sys
 
 def CopyStrip(inFileName, outFileName, stripText):
     """Strip stripText from inFileName and write the result to outFileName.
-    
+
     This can be used to, for example, strip the XML Schema location path from
     XML configuration files.
     """
@@ -65,7 +65,7 @@ def GetArchBits():
 
 def CompileChaste(target, build='GccOpt'):
     """Compile the code and bail out if necessary.
-    
+
     target gives the target to build.
     """
     print('Compiling dynamically-linked executable')
@@ -90,7 +90,7 @@ def CopySharedLibraries(executablePath, librariesPath):
             if lib_pair[0] == 'libglobal.so':
                 found_chaste_libraries = True
             shutil.copy(lib_pair[1], librariesPath)
-    
+
     if not found_chaste_libraries:
       print('Could not find Chaste libraries (e.g. libglobal.so).  Please set LD_LIBRARY_PATH.')
       sys.exit(1)
@@ -144,7 +144,7 @@ export LD_LIBRARY_PATH="$script_dir/libs"
 if [ -z "$CHASTE_TEST_OUTPUT" ]; then
   echo "\$CHASTE_TEST_OUTPUT is currently unset.  Your output will appear in ./testoutput"
 else
-  echo "\$CHASTE_TEST_OUTPUT is currently set to " $CHASTE_TEST_OUTPUT. 
+  echo "\$CHASTE_TEST_OUTPUT is currently set to " $CHASTE_TEST_OUTPUT.
 fi
 
 # This line actually run Chaste with the given arguments

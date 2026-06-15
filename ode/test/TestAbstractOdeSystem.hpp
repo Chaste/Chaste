@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -57,6 +57,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Tolerance for tests
 const double tol = 0.01;
 
+class ZeroStateOde : public AbstractOdeSystem
+{
+public:
+    ZeroStateOde() : AbstractOdeSystem(0) // 0 here is the number of variables
+    {
+    }
+
+    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
+    {
+    }
+};
+
+template<>
+void OdeSystemInformation<ZeroStateOde>::Initialise()
+{
+    this->mInitialised = true;
+}
 
 class TestAbstractOdeSystem : public CxxTest::TestSuite
 {
@@ -220,6 +237,8 @@ public:
         TS_ASSERT_THROWS_THIS(p_info->GetParameterUnits(1u), "The index passed in must be less than the number of parameters.");
         TS_ASSERT_THROWS_THIS(p_info->GetStateVariableUnits(1u), "The index passed in must be less than the number of state variables.");
         TS_ASSERT_THROWS_THIS(p_info->GetAnyVariableUnits(3u), "Invalid index passed to GetAnyVariableUnits.");
+
+        TS_ASSERT_THROWS_THIS(ZeroStateOde(), "A system of equations must have some unknowns/state variables.");
     }
 
     void TestAttributes()

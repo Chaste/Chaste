@@ -1,12 +1,12 @@
-# Copyright (c) 2005-2025, University of Oxford.
+# Copyright (c) 2005-2026, University of Oxford.
 # All rights reserved.
-# 
+#
 # University of Oxford means the Chancellor, Masters and Scholars of the
 # University of Oxford, having an administrative office at Wellington
 # Square, Oxford OX1 2JD, UK.
-# 
+#
 # This file is part of Chaste.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #  * Redistributions of source code must retain the above copyright notice,
@@ -17,7 +17,7 @@
 #  * Neither the name of the University of Oxford nor the names of its
 #    contributors may be used to endorse or promote products derived from this
 #    software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -86,9 +86,9 @@ list(APPEND PYCHASTE_INCLUDE_DIRS ${_include_dirs})
 ####  Build Python module
 ################################
 # Creates a `_pychaste_all` shared library from the Python wrappers.
-# The library name `_pychaste_all` is the same as the module name in the main 
+# The library name `_pychaste_all` is the same as the module name in the main
 # module wrapper source file `wrappers/all/_pychaste_all.main.cppwg.cpp`.
-# When the shared library has been built, it can be used in Python code 
+# When the shared library has been built, it can be used in Python code
 # as `from chaste._pychaste_all import *`.
 
 file(GLOB_RECURSE PYCHASTE_WRAPPER_SOURCES

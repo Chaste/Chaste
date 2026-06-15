@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -97,9 +97,9 @@ public:
      * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
      * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
      * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
-     * 
+     *
      */
-    UniformSourceEllipticPde(double constantSourceCoefficient=0.0, 
+    UniformSourceEllipticPde(double constantSourceCoefficient=0.0,
                              double linearSourceCoefficient=0.0,
                              double diffusionCoefficient=1.0);
 

@@ -31,15 +31,13 @@ jobs:
             extra-build-args: ""
           - image: portability-05
             extra-build-args: ""
+          - image: portability-tip
+            extra-build-args: ""
           - image: portability-jammy
-            extra-build-args: ""
-          - image: portability-lunar
-            extra-build-args: ""
-          - image: portability-mantic
             extra-build-args: ""
           - image: portability-noble
             extra-build-args: ""
-          - image: portability-oracular
+          - image: portability-resolute
             extra-build-args: ""
 
     runs-on: ubuntu-latest
@@ -56,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Compiler version
         run: |

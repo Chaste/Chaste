@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -673,7 +673,7 @@ public:
             // Create and configure cell-based simulation
             OffLatticeSimulation<2> simulator(cell_population);
             simulator.SetOutputDirectory("TestDeltaNotchTrackingModifierSaveAndLoad");
-            
+
             simulator.SetEndTime(end_time);
 
             // Add Delta-Notch tracking modifier
@@ -703,7 +703,7 @@ public:
 
             SimulationTime::Destroy();
         }
-        
+
         SimulationTime::Instance()->SetStartTime(0.0);
 
         {
@@ -1014,10 +1014,10 @@ public:
         }
 
         SimulationTime::Instance()->SetStartTime(0.0);
-        
+
         {
             // Load simulation
-            OffLatticeSimulation<2>* p_simulator = 
+            OffLatticeSimulation<2>* p_simulator =
                 CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestDeltaNotchEdgeInteriorTrackingModifierSaveAndLoad", end_time);
 
             p_simulator->SetEndTime(0.2);

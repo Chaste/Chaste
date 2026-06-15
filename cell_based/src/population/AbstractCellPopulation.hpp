@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
-#include <boost/foreach.hpp>
 
 #include "AbstractMesh.hpp"
 #include "TetrahedralMesh.hpp"
@@ -895,7 +894,7 @@ public:
     bool HasWriter() const
     {
         typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> population_writer_t;
-        BOOST_FOREACH(boost::shared_ptr<population_writer_t> p_pop_writer, mCellPopulationWriters)
+        for (boost::shared_ptr<population_writer_t> p_pop_writer : mCellPopulationWriters)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_pop_writer.get()))
             {
@@ -903,7 +902,7 @@ public:
             }
         }
         typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
-        BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
+        for (boost::shared_ptr<cell_writer_t> p_cell_writer : mCellWriters)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_cell_writer.get()))
             {
@@ -911,7 +910,7 @@ public:
             }
         }
         typedef AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> count_writer_t;
-        BOOST_FOREACH(boost::shared_ptr<count_writer_t> p_count_writer, mCellPopulationCountWriters)
+        for (boost::shared_ptr<count_writer_t> p_count_writer : mCellPopulationCountWriters)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_count_writer.get()))
             {
@@ -919,7 +918,7 @@ public:
             }
         }
         typedef AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> event_writer_t;
-        BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
+        for (boost::shared_ptr<event_writer_t> p_event_writer : mCellPopulationEventWriters)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_event_writer.get()))
             {

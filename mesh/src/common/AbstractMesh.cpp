@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractMesh.hpp"
 #include "Exception.hpp"
 #include "UblasCustomFunctions.hpp"
+#include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -489,16 +490,15 @@ bool AbstractMesh<ELEMENT_DIM, SPACE_DIM>::IsMeshChanging() const
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumContainingElementsPerProcess() const
 {
-    unsigned max_num = 0u;
-    for (unsigned local_node_index = 0; local_node_index < mNodes.size(); local_node_index++)
+    if (mNodes.empty())
     {
-        unsigned num = mNodes[local_node_index]->GetNumContainingElements();
-        if (num > max_num)
-        {
-            max_num = num;
-        }
+        return 0u;
     }
-    return max_num;
+    return (*std::max_element(mNodes.begin(), mNodes.end(),
+                              [](const Node<SPACE_DIM>* a, const Node<SPACE_DIM>* b)
+                              {
+                                  return a->GetNumContainingElements() < b->GetNumContainingElements();
+                              }))->GetNumContainingElements();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
