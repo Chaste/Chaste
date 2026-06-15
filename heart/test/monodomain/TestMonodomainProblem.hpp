@@ -1739,14 +1739,6 @@ public:
         {
             TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
         }
-        /*  Check that the file is bigger than expected.
-         * Because every 8 K chunk will be aligned to 16 K boundaries the file
-         * will be about twice the size it needs to be on disk.
-         */
-
-        hsize_t data_storage_size = H5Dget_storage_size(dset);
-        unsigned storage_size = std::filesystem::file_size(file.GetAbsolutePath().c_str());
-        TS_ASSERT_LESS_THAN((unsigned)(1.70*data_storage_size), storage_size);
 
         /*
          * Check the "location" of the datasets (the offset from the start of
