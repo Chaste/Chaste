@@ -76,6 +76,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DefaultCellProliferativeType.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
 #include "SemBasedCellPopulation.hpp"
+#include "SemForce.hpp"
+#include "SemGaussianRandomForce.hpp"
+#include "SemSpatiallyCorrelatedRandomForce.hpp"
 #include "SemRegionalForce.hpp"
 #include "NoCellCycleModel.hpp"
 #include "NodeLocationWriter.hpp"
@@ -94,7 +97,7 @@ class TestSemBasedSimulation : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
-    void xTestSemBasedSimulationExample2D()
+    void TestSemBasedSimulationExample2D()
     {
         SemSingleElementMeshGenerator<2> generator({5,8}, 0.5);
         auto p_mesh = generator.GetMesh();
@@ -138,6 +141,10 @@ public:
         MAKE_PTR(SemRegionalForce<2>, p_sem_force);
         simulator.AddForce(p_sem_force);
 
+        MAKE_PTR(SemGaussianRandomForce<2>, p_random_force);
+        p_random_force->SetDiffusionConstant(1e-6);
+        simulator.AddForce(p_random_force);
+
         // Run the simulation
         simulator.Solve();
         
@@ -172,7 +179,8 @@ public:
         boxCollectionDomain[4] = -1.0;
         boxCollectionDomain[5] =  2.0;
 
-        p_mesh->SetUpBoxCollection(0.1, boxCollectionDomain);
+        const double interaction_cutoff = 0.15;
+        p_mesh->SetUpBoxCollection(interaction_cutoff, boxCollectionDomain);
 
         // Assertions
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 3);
@@ -203,8 +211,21 @@ public:
 
         std::cout << cell_population.GetNumRealCells() << std::endl;
         // Create some force laws and pass them to the simulation
-        MAKE_PTR(SemRegionalForce<3>, p_sem_force);
+        MAKE_PTR(SemForce<3>, p_sem_force);
+        p_sem_force->SetIntraWellDepth(1e-6);
+        p_sem_force->SetIntraEquilibriumDistance(0.1);
+        p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
+        p_sem_force->SetInterWellDepth(1e-6);
+        p_sem_force->SetInterEquilibriumDistance(0.1);
+        p_sem_force->SetInterCutOffDistance(interaction_cutoff);
         simulator.AddForce(p_sem_force);
+
+        MAKE_PTR(SemSpatiallyCorrelatedRandomForce<3>, p_random_force);
+        p_random_force->SetDiffusionConstant(0.1);
+        p_random_force->SetCorrelationLength(0.5);
+        p_random_force->SetLowerCorner({{-1.0, -1.0, -1.0}});
+        p_random_force->SetUpperCorner({{2.0, 2.0, 2.0}});
+        simulator.AddForce(p_random_force);
 
         // Run the simulation
         simulator.Solve();
