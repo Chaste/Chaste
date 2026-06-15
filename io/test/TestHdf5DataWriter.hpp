@@ -1960,11 +1960,12 @@ public:
          * file, a bit like a pointer to the start of the dataset) to confirm
          * alignment was switched on.
          * With alignment switched off, Data is usually located at 800 B. With
-         * alignment = 16 K it is at 64 K. For the Data_Unlimited dataset the
+         * alignment = 16 K it is at 64 K (v1) or 32K (v2). For the Data_Unlimited dataset the
          * numbers are 4935472 B (about 4.7 MB) and 10125312 B (about 9.7 MB),
          * respectively.
          * (These numbers might be machine-dependent!)
          */
+#if H5_VERS_MAJOR == 1
         H5O_info_t data_info;
         H5Oget_info(dset, &data_info);
         TS_ASSERT_EQUALS(data_info.addr, 0x10000u); // 64 KB
@@ -1973,7 +1974,16 @@ public:
         dset = H5Dopen(h5_file, "Data_Unlimited", H5P_DEFAULT);
         H5Oget_info(dset, &data_info);
         TS_ASSERT_EQUALS(data_info.addr, 0x9A8000u); // About 9.7 MB
+#else // H5_VERS_MAJOR == 2
+        H5O_info_t data_info;
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 0x8000u); // 32 KB in HDF 2.x
+        H5Dclose(dset);
 
+        dset = H5Dopen(h5_file, "Data_Unlimited", H5P_DEFAULT);
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 0x99C000u); // About 9.6 MB in HDF 2.x
+#endif // H5_VERS_MAJOR
         // Tidy up
         H5Dclose(dset);
         H5Fclose(h5_file);
