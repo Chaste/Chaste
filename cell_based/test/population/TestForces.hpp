@@ -58,6 +58,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DiffusionForce.hpp"
 #include "SemForce.hpp"
 #include "SemLinearForce.hpp"
+#include "SemGaussianRandomForce.hpp"
+#include "SemSpatiallyCorrelatedRandomForce.hpp"
 #include "SemSingleElementMeshGenerator.hpp"
 #include "SemMultiElementMeshGenerator.hpp"
 #include "SemBasedCellPopulation.hpp"
@@ -2836,6 +2838,105 @@ public:
     }
 
     /**
+     * Test that the SEM Gaussian random force uses the SEM Langevin scaling.
+     */
+    void TestSemGaussianRandomForceWithPopulation()
+    {
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+
+        SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        SemGaussianRandomForce<2> force;
+        force.SetDiffusionConstant(0.25);
+        TS_ASSERT_DELTA(force.GetDiffusionConstant(), 0.25, 1e-12);
+
+        RandomNumberGenerator::Instance()->Reseed(123u);
+        force.AddForceContribution(cell_population);
+
+        std::vector<c_vector<double, 2> > forces_with_lower_diffusion(cell_population.GetNumNodes());
+        for (unsigned node_index = 0; node_index < cell_population.GetNumNodes(); ++node_index)
+        {
+            forces_with_lower_diffusion[node_index] = cell_population.GetNode(node_index)->rGetAppliedForce();
+            cell_population.GetNode(node_index)->ClearAppliedForce();
+        }
+
+        force.SetDiffusionConstant(1.0);
+        RandomNumberGenerator::Instance()->Reseed(123u);
+        force.AddForceContribution(cell_population);
+
+        bool any_nonzero = false;
+        for (unsigned node_index = 0; node_index < cell_population.GetNumNodes(); ++node_index)
+        {
+            const c_vector<double, 2>& r_force_with_higher_diffusion = cell_population.GetNode(node_index)->rGetAppliedForce();
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                TS_ASSERT_DELTA(r_force_with_higher_diffusion[dim], 2.0 * forces_with_lower_diffusion[node_index][dim], 1e-12);
+                if (std::abs(r_force_with_higher_diffusion[dim]) > 1e-12)
+                {
+                    any_nonzero = true;
+                }
+            }
+        }
+        TS_ASSERT(any_nonzero);
+    }
+
+    /**
+     * Test the SEM spatially correlated random force with a real SEM population.
+     */
+    void TestSemSpatiallyCorrelatedRandomForceWithPopulation()
+    {
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+
+        SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetDampingConstantNormal(1.0);
+
+        SemSpatiallyCorrelatedRandomForce<2> force;
+        force.SetDiffusionConstant(0.25);
+        force.SetCorrelationLength(0.5);
+        force.SetLowerCorner({{-1.0, -1.0}});
+        force.SetUpperCorner({{1.0, 1.0}});
+        force.SetPeriodicity({{false, false}});
+        force.SetRandomSeed(123u);
+
+        TS_ASSERT_DELTA(force.GetDiffusionConstant(), 0.25, 1e-12);
+        TS_ASSERT_DELTA(force.GetCorrelationLength(), 0.5, 1e-12);
+        TS_ASSERT_EQUALS(force.GetLowerCorner()[0], -1.0);
+        TS_ASSERT_EQUALS(force.GetUpperCorner()[1], 1.0);
+        TS_ASSERT_EQUALS(force.GetPeriodicity()[0], false);
+
+        RandomNumberGenerator::Instance()->Reseed(123u);
+        force.AddForceContribution(cell_population);
+
+        bool any_nonzero = false;
+        for (unsigned node_index = 0; node_index < cell_population.GetNumNodes(); ++node_index)
+        {
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                const double force_component = cell_population.GetNode(node_index)->rGetAppliedForce()[dim];
+                TS_ASSERT(!std::isnan(force_component));
+                TS_ASSERT(!std::isinf(force_component));
+                if (std::abs(force_component) > 1e-12)
+                {
+                    any_nonzero = true;
+                }
+            }
+        }
+        TS_ASSERT(any_nonzero);
+    }
+
+    /**
      * Test that SemForce throws an exception when used with a non-SEM population.
      */
     void TestSemForceWithWrongPopulationType()
@@ -2861,6 +2962,14 @@ public:
         SemLinearForce<2> sem_linear_force;
         TS_ASSERT_THROWS_THIS(sem_linear_force.AddForceContribution(cell_population),
                 "SemLinearForce is to be used with a SemBasedCellPopulation only");
+
+        SemGaussianRandomForce<2> sem_gaussian_random_force;
+        TS_ASSERT_THROWS_THIS(sem_gaussian_random_force.AddForceContribution(cell_population),
+                "AbstractSemRandomForce is to be used with a SemBasedCellPopulation only");
+
+        SemSpatiallyCorrelatedRandomForce<2> sem_spatially_correlated_random_force;
+        TS_ASSERT_THROWS_THIS(sem_spatially_correlated_random_force.AddForceContribution(cell_population),
+                "AbstractSemRandomForce is to be used with a SemBasedCellPopulation only");
 
         for (unsigned i = 0; i < nodes.size(); i++)
         {
@@ -2967,6 +3076,85 @@ public:
 
             // Tidy up
             delete p_force;
+        }
+    }
+
+    /**
+     * Test archiving of SEM random forces.
+     */
+    void TestSemRandomForceArchiving()
+    {
+        EXIT_IF_PARALLEL;
+        OutputFileHandler handler("archive", false);
+
+        {
+            const std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SemGaussianRandomForce.arch";
+
+            {
+                SemGaussianRandomForce<2> force;
+                force.SetDiffusionConstant(0.25);
+
+                std::ofstream ofs(archive_filename.c_str());
+                boost::archive::text_oarchive output_arch(ofs);
+
+                AbstractForce<2>* const p_force = &force;
+                output_arch << p_force;
+            }
+
+            {
+                AbstractForce<2>* p_force;
+
+                std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+                boost::archive::text_iarchive input_arch(ifs);
+
+                input_arch >> p_force;
+
+                TS_ASSERT_DELTA((static_cast<SemGaussianRandomForce<2>*>(p_force))->GetDiffusionConstant(), 0.25, 1e-6);
+
+                delete p_force;
+            }
+        }
+
+        {
+            const std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SemSpatiallyCorrelatedRandomForce.arch";
+
+            {
+                SemSpatiallyCorrelatedRandomForce<2> force;
+                force.SetDiffusionConstant(0.5);
+                force.SetCorrelationLength(0.25);
+                force.SetLowerCorner({{-1.0, -2.0}});
+                force.SetUpperCorner({{3.0, 4.0}});
+                force.SetPeriodicity({{true, false}});
+                force.SetSmallCorrelationLengthWarningThreshold(1e-9);
+
+                std::ofstream ofs(archive_filename.c_str());
+                boost::archive::text_oarchive output_arch(ofs);
+
+                AbstractForce<2>* const p_force = &force;
+                output_arch << p_force;
+            }
+
+            {
+                AbstractForce<2>* p_force;
+
+                std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+                boost::archive::text_iarchive input_arch(ifs);
+
+                input_arch >> p_force;
+
+                auto p_random_force = static_cast<SemSpatiallyCorrelatedRandomForce<2>*>(p_force);
+                TS_ASSERT_DELTA(p_random_force->GetDiffusionConstant(), 0.5, 1e-6);
+                TS_ASSERT_DELTA(p_random_force->GetCorrelationLength(), 0.25, 1e-6);
+                TS_ASSERT_DELTA(p_random_force->GetLowerCorner()[0], -1.0, 1e-6);
+                TS_ASSERT_DELTA(p_random_force->GetLowerCorner()[1], -2.0, 1e-6);
+                TS_ASSERT_DELTA(p_random_force->GetUpperCorner()[0], 3.0, 1e-6);
+                TS_ASSERT_DELTA(p_random_force->GetUpperCorner()[1], 4.0, 1e-6);
+                TS_ASSERT_EQUALS(p_random_force->GetPeriodicity()[0], true);
+                TS_ASSERT_EQUALS(p_random_force->GetPeriodicity()[1], false);
+                TS_ASSERT_DELTA(p_random_force->GetSmallCorrelationLengthWarningThreshold(), 1e-9, 1e-12);
+
+                delete p_force;
+            }
         }
     }
 };
