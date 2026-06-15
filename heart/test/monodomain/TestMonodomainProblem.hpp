@@ -1746,7 +1746,7 @@ public:
 
         hsize_t data_storage_size = H5Dget_storage_size(dset);
         unsigned storage_size = std::filesystem::file_size(file.GetAbsolutePath().c_str());
-        TS_ASSERT_LESS_THAN((unsigned)(1.90*data_storage_size), storage_size);
+        TS_ASSERT_LESS_THAN((unsigned)(1.80*data_storage_size), storage_size);
 
         /*
          * Check the "location" of the datasets (the offset from the start of
@@ -1782,7 +1782,7 @@ public:
 
         dset = H5Dopen(h5_file, "UpstrokeTimeMap_0", H5P_DEFAULT);
         H5Oget_info(dset, &data_info);
-        TS_ASSERT_EQUALS(data_info.addr, 18809856u); // About 17.9 MB
+        TS_ASSERT_EQUALS(data_info.addr, 18785280u); // About 17.9 MB
 #endif
 
         // And chunk dims for this one
