@@ -201,6 +201,12 @@ void SemBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDire
     std::stringstream time;
     time << num_timesteps;
     mesh_writer.WriteVtkUsingMesh(*mpSemMesh, time.str());
+
+    *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
+    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 }
 
 template<unsigned DIM>
