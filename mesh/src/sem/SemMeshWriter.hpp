@@ -46,8 +46,7 @@ class SemMesh;
 #include <vtkDoubleArray.h>
 #include <vtkCellData.h>
 #include <vtkPointData.h>
-#include <vtkConvexPointSet.h>
-#include <vtkPolygon.h>
+#include <vtkPolyVertex.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>

@@ -254,15 +254,7 @@ void SemMeshWriter<DIM>::MakeVtkMesh(SemMesh<DIM>& rMesh)
          iter != rMesh.GetElementIteratorEnd();
          ++iter)
     {
-        vtkCell* p_cell;
-        if (DIM == 2)
-        {
-            p_cell = vtkPolygon::New();
-        }
-        else
-        {
-            p_cell = vtkConvexPointSet::New();
-        }
+        vtkCell* p_cell = vtkPolyVertex::New();
         vtkIdList* p_cell_id_list = p_cell->GetPointIds();
         p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
         for (unsigned j=0; j<iter->GetNumNodes(); ++j)
