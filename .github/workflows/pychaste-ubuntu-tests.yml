@@ -37,6 +37,17 @@ jobs:
           mkdir -p build
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
+      - name: Install basic system dependencies
+        run: |
+          apt-get update &&
+          apt-get install -y \
+            apt-transport-https \
+            apt-utils \
+            ca-certificates \
+            build-essential \
+            git \
+            wget
+
       - name: Install Chaste dependencies
         run: |
           codename=$(cat /etc/os-release | grep VERSION_CODENAME | cut -d= -f2)
