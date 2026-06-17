@@ -608,7 +608,7 @@ public:
         */
         DistributedVectorFactory factory(NUMBER_NODES);
 
-        Hdf5DataReader reader("io/test/data","hdf5_test_full_format_incomplete_v2", false);
+        Hdf5DataReader reader("io/test/data","hdf5_test_full_format_incomplete_v2.1.1", false);
 
         std::vector<std::string> variable_names = reader.GetVariableNames();
         TS_ASSERT_EQUALS(variable_names.size(), 3u);
@@ -674,7 +674,7 @@ public:
     /* Backward compatibility check - read a file that was written by a new(er) version of HDF5. Cut down version of test above. */
     void TestReadingExtraDataHdf5Version2()
     {
-        Hdf5DataReader reader("io/test/data","hdf5_test_adding_variables_v2", false, "Extra stuff");
+        Hdf5DataReader reader("io/test/data","hdf5_test_adding_variables_v2.1.1", false, "Extra stuff");
         std::vector<std::string> variable_names = reader.GetVariableNames();
         TS_ASSERT_EQUALS(variable_names[0], "Phase");
         TS_ASSERT_EQUALS(variable_names[1], "Plasma");
