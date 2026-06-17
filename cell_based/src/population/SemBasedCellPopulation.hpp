@@ -87,8 +87,12 @@ private:
     }
 
     /**
-     * Check the consistency of internal data structures.
-     * Each SemElement must have a CellPtr associated with it.
+     * Check the consistency of internal cell-to-element maps.
+     *
+     * A SEM population owns one biological cell per live SemElement.
+     * Validation checks that each live element has exactly one
+     * associated CellPtr, that no cell maps to a deleted element, and that no
+     * cell maps outside the mesh element range.
      */
     void Validate() override;
 
@@ -99,6 +103,8 @@ public:
      * CellPtrs.
      *
      * There must be precisely one CellPtr for each SemElement in the SemMesh.
+     * If locationIndices is supplied, it defines the element index associated
+     * with each cell; otherwise cells are attached to elements in order.
      *
      * @param rMesh reference to a SemMesh
      * @param rCells reference to a vector of CellPtrs
@@ -128,12 +134,12 @@ public:
     virtual ~SemBasedCellPopulation();
 
     /**
-     * @return reference to mpSemMesh.
+     * @return reference to the underlying SEM mesh.
      */
     SemMesh<DIM>& rGetMesh();
 
     /**
-     * @return const reference to mpSemMesh (used in archiving).
+     * @return const reference to the underlying SEM mesh, used when archiving.
      */
     const SemMesh<DIM>& rGetMesh() const;
 
@@ -156,7 +162,7 @@ public:
     /**
      * GetNumElements() method.
      *
-     * @return the number of nodes in the cell population.
+     * @return the number of SemElements in the cell population.
      */
     unsigned GetNumElements();
 
@@ -186,8 +192,11 @@ public:
     /**
      * Overridden GetNeighbouringLocationIndices() method.
      *
-     * Given a cell, returns the set of location indices corresponding to 
-     * neighbouring cells.
+     * Given a cell, returns the set of element location indices corresponding
+     * to neighbouring cells. SEM elements are treated as neighbours when
+     * their nodes appear in the current node-pair interaction
+     * list, so Update() should be called before this method is used for force
+     * or topology queries.
      *
      * @param pCell pointer to a cell in the population
      * @return the set of neighbouring location indices.
@@ -235,26 +244,189 @@ public:
     /**
      * Overridden OutputCellPopulationParameters() method.
      *
+     * Writes SEM population parameters and then delegates shared off-lattice
+     * parameters, such as damping constants, to the base class.
+     *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 
-    
+    /**
+     * Overridden WriteVtkResultsToFile() method.
+     *
+     * Writes the current SEM mesh as VTK point/element data for a
+     * simulation time step, including any registered node point data writers,
+     * and appends the generated file to the VTK meta-file.
+     *
+     * @param rDirectory output directory for the VTK files
+     */
     void WriteVtkResultsToFile(const std::string& rDirectory) override;
+
+    /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * SEM populations do not currently expose a tetrahedral mesh for PDE
+     * coupling, so this returns nullptr.
+     *
+     * @return a pointer to a PDE mesh, or nullptr when unsupported
+     */
     TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
-    double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,std::string& item, bool, double) override;
+
+    /**
+     * Overridden GetCellDataItemAtPdeNode() method.
+     *
+     * SEM PDE coupling is not currently implemented, so this returns a neutral
+     * value rather than interpolating cell data onto PDE nodes.
+     *
+     * @param pdeNodeIndex index of the PDE node
+     * @param item cell data item name
+     * @param averageOverNeighbours whether to average over neighbouring cells
+     * @param defaultValue default value for missing data
+     * @return the requested cell data value at the PDE node
+     */
+    double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex, std::string& item, bool averageOverNeighbours, double defaultValue) override;
+
+    /**
+     * Overridden IsCellAssociatedWithADeletedLocation() method.
+     *
+     * Checks whether the SemElement representing a cell has been
+     * marked deleted during population cleanup.
+     *
+     * @param pCell pointer to a cell in the population
+     * @return whether the cell maps to a deleted SemElement
+     */
     bool IsCellAssociatedWithADeletedLocation(CellPtr pCell) override;
+
+    /**
+     * Overridden AddCell() method.
+     *
+     * This would add a new biological cell by creating or
+     * dividing an SemElement. SEM element division is not currently implemented,
+     * so the method throws rather than creating an inconsistent map-only cell.
+     *
+     * @param pNewCell pointer to the new cell
+     * @param pParentCell pointer to the parent cell
+     * @return pointer to the created cell if addition is supported
+     */
     CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell) override;
+
+    /**
+     * Overridden GetDefaultTimeStep() method.
+     *
+     * @return the default mechanics time step for SEM simulations.
+     */
     double GetDefaultTimeStep() override;
+
+    /**
+     * Overridden RemoveDeadCells() method.
+     *
+     * Removes biological cells that have died, marks their
+     * associated SemElements deleted, unregisters those elements from their
+     * nodes, and removes the cell-to-element map entries.
+     *
+     * @return the number of cells removed
+     */
     unsigned RemoveDeadCells() override;
+
+    /**
+     * Overridden Update() method.
+     *
+     * Refreshes spatial search data for the current node
+     * positions, then rebuilds the node-pair interaction list used by SEM
+     * force and neighbour queries.
+     *
+     * @param hasHadBirthsOrDeaths whether the population changed size this step
+     */
     void Update(bool hasHadBirthsOrDeaths) override;
+
+    /**
+     * Overridden GetWidth() method.
+     *
+     * Delegates to the underlying mesh to measure the population extent in a
+     * coordinate direction.
+     *
+     * @param rDimension dimension over which to measure width
+     * @return width of the SEM mesh in that dimension
+     */
     double GetWidth(const unsigned& rDimension) override;
+
+    /**
+     * Overridden GetNeighbouringNodeIndices() method.
+     *
+     * Returns the nodes that are currently close enough to
+     * interact with the supplied node, using the node-pair list rebuilt by
+     * Update().
+     *
+     * @param index global node index
+     * @return set of neighbouring node indices
+     */
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index) override;
+
+    /**
+     * Accept a population writer.
+     *
+     * This is the visitor dispatch point used by output writers
+     * that operate on the whole SEM population.
+     *
+     * @param pPopulationWriter population writer to visit this population
+     */
     void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
+
+    /**
+     * Accept a population count writer.
+     *
+     * This is the visitor dispatch point used by writers that
+     * count cells or cell properties across the SEM population.
+     *
+     * @param pPopulationCountWriter population count writer to visit this population
+     */
     void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
+
+    /**
+     * Accept a population event writer.
+     *
+     * This is the visitor dispatch point used by writers that
+     * record population-level cell events.
+     *
+     * @param pPopulationEventWriter population event writer to visit this population
+     */
     void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter) override;
+
+    /**
+     * Accept a cell writer for a single cell.
+     *
+     * This dispatches cell-level output for a cell while providing
+     * the SEM population context needed to interpret its location.
+     *
+     * @param pCellWriter cell writer to visit the cell
+     * @param pCell cell to write
+     */
     void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) override;
+
+    /**
+     * Overridden CheckForStepSizeException() method.
+     *
+     * This is the hook where SEM-specific movement restrictions
+     * would reject a node displacement that is too large for the current time
+     * step. No SEM-specific restriction is currently applied here.
+     *
+     * @param nodeIndex index of the node being moved
+     * @param rDisplacement proposed node displacement
+     * @param dt current time step
+     */
     void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt) override;
+
+    /**
+     * Overridden GetDampingConstant() method.
+     *
+     * Returns the drag coefficient used when updating a SEM node.
+     * For nodes contained in multiple live elements, the damping constant is
+     * averaged over the cells associated with those elements, using mutant or
+     * normal damping according to each cell mutation state.
+     *
+     * @param nodeIndex global node index
+     * @return damping constant for the node
+     */
     double GetDampingConstant(unsigned nodeIndex) override;
 };
 
@@ -267,6 +439,9 @@ namespace serialization
 {
 /**
  * Serialize information required to construct a SemBasedCellPopulation.
+ *
+ * The population facade is reconstructed around its mesh on load, so the
+ * archive stores the mesh pointer needed by load_construct_data().
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
@@ -278,8 +453,11 @@ inline void save_construct_data(
 }
 
 /**
- * De-serialize constructor parameters and initialise a VertexBasedCellPopulation.
- * Loads the mesh from separate files.
+ * De-serialize constructor parameters and initialise a SemBasedCellPopulation.
+ *
+ * This retrieves the archived SEM mesh and invokes the serialization-only
+ * constructor in-place, after which Boost restores the base class cell and
+ * mapping state.
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(

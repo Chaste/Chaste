@@ -35,6 +35,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemBasedCellPopulation.hpp"
 #include "VtkMeshWriter.hpp"
+#include "WildTypeCellMutationState.hpp"
+
+#include <list>
+#include <set>
 
 template<unsigned DIM>
 SemBasedCellPopulation<DIM>::SemBasedCellPopulation(SemMesh<DIM>& rMesh,
@@ -46,11 +50,26 @@ SemBasedCellPopulation<DIM>::SemBasedCellPopulation(SemMesh<DIM>& rMesh,
       mDeleteMesh(deleteMesh)
 {
     mpSemMesh = static_cast<SemMesh<DIM>*>(&(this->mrMesh));
-    
-    unsigned index = 0;
-    for (auto cell_ptr : this->mCells) {
-        this->AddCellUsingLocationIndex(index, cell_ptr);
-        index++;
+
+    if (this->mCells.size() != mpSemMesh->GetNumElements())
+    {
+        EXCEPTION("There must be precisely one CellPtr for each SemElement");
+    }
+
+    std::set<unsigned> used_location_indices;
+    std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+    for (unsigned cell_index=0; cell_iter != this->mCells.end(); ++cell_iter, ++cell_index)
+    {
+        unsigned location_index = locationIndices.empty() ? cell_index : locationIndices[cell_index];
+        if (location_index >= mpSemMesh->GetNumElements())
+        {
+            EXCEPTION("A supplied location index does not correspond to a SemElement");
+        }
+        if (!used_location_indices.insert(location_index).second)
+        {
+            EXCEPTION("A SemElement location index is assigned to more than one cell");
+        }
+        this->AddCellUsingLocationIndex(location_index, *cell_iter);
     }
 
     if (validate)
@@ -70,6 +89,10 @@ SemBasedCellPopulation<DIM>::SemBasedCellPopulation(SemMesh<DIM>& rMesh)
 template<unsigned DIM>
 SemBasedCellPopulation<DIM>::~SemBasedCellPopulation()
 {
+    if (mDeleteMesh)
+    {
+        delete &this->mrMesh;
+    }
 }
 
 template<unsigned DIM>
@@ -118,8 +141,38 @@ Node<DIM>* SemBasedCellPopulation<DIM>::GetNode(unsigned index)
 template<unsigned DIM>
 std::set<unsigned> SemBasedCellPopulation<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
 {
-    //unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
-    return {}; //this->rGetMesh().GetNeighbouringElementIndices(elem_index);
+    unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
+    std::set<unsigned> neighbouring_element_indices;
+
+    for (const auto& r_node_pair : this->mNodePairs)
+    {
+        const std::set<unsigned>& r_first_element_indices = r_node_pair.first->rGetContainingElementIndices();
+        const std::set<unsigned>& r_second_element_indices = r_node_pair.second->rGetContainingElementIndices();
+
+        if (r_first_element_indices.find(elem_index) != r_first_element_indices.end())
+        {
+            for (unsigned candidate_index : r_second_element_indices)
+            {
+                if (candidate_index != elem_index && !this->GetElement(candidate_index)->IsDeleted())
+                {
+                    neighbouring_element_indices.insert(candidate_index);
+                }
+            }
+        }
+
+        if (r_second_element_indices.find(elem_index) != r_second_element_indices.end())
+        {
+            for (unsigned candidate_index : r_first_element_indices)
+            {
+                if (candidate_index != elem_index && !this->GetElement(candidate_index)->IsDeleted())
+                {
+                    neighbouring_element_indices.insert(candidate_index);
+                }
+            }
+        }
+    }
+
+    return neighbouring_element_indices;
 }
 
 template<unsigned DIM>
@@ -169,11 +222,24 @@ void SemBasedCellPopulation<DIM>::Validate()
          ++cell_iter)
     {
         unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+        if (elem_index >= this->GetNumElements())
+        {
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Cell is associated with element index " << elem_index << ", which is outside the SemMesh");
+        }
+        if (this->GetElement(elem_index)->IsDeleted())
+        {
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Cell is associated with deleted element " << elem_index);
+        }
         validated_element[elem_index]++;
     }
 
     for (unsigned i=0; i<validated_element.size(); i++)
     {
+        if (this->GetElement(i)->IsDeleted())
+        {
+            continue;
+        }
+
         if (validated_element[i] == 0)
         {
             EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Element " << i << " does not appear to have a cell associated with it");
@@ -224,36 +290,52 @@ double SemBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(unsigned pdeNodeInd
 template<unsigned DIM>
 bool SemBasedCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
 {
-    return false;
+    unsigned location_index = this->GetLocationIndexUsingCell(pCell);
+    return this->GetElement(location_index)->IsDeleted();
 }
 template<unsigned DIM>
 CellPtr SemBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-    auto node_index = this->mCells.size();
-
-    // Associate the new cell with the neighbouring node
-    this->mCells.push_back(pNewCell);
-
-    // Update location cell map
-    CellPtr p_created_cell = this->mCells.back();
-    this->AddCellUsingLocationIndex(node_index,p_created_cell);
-
-    return p_created_cell;
+    (void)pNewCell;
+    (void)pParentCell;
+    EXCEPTION("SemBasedCellPopulation does not support AddCell() because SEM element division is not implemented");
+    return CellPtr();
 }
 template<unsigned DIM>
 double SemBasedCellPopulation<DIM>::GetDefaultTimeStep()
 {
-    return 0.0;
+    return 0.002;
 }
 template<unsigned DIM>
 unsigned SemBasedCellPopulation<DIM>::RemoveDeadCells()
 {
-    return 0;
+    unsigned num_removed = 0;
+
+    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+         cell_iter != this->mCells.end();
+         )
+    {
+        if ((*cell_iter)->IsDead())
+        {
+            unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
+            this->GetElement(location_index)->MarkAsDeleted();
+            this->RemoveCellUsingLocationIndex(location_index, *cell_iter);
+            cell_iter = this->mCells.erase(cell_iter);
+            num_removed++;
+        }
+        else
+        {
+            ++cell_iter;
+        }
+    }
+
+    return num_removed;
 }
 
 template<unsigned DIM>
 void SemBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
+    this->mNodePairs.clear();
     mpSemMesh->UpdateBoxCollection();
     mpSemMesh->CalculateNodePairs(this->mNodePairs);
 }
@@ -261,12 +343,24 @@ void SemBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 template<unsigned DIM>
 double SemBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 {
-    return 0.0;
+    return this->mrMesh.GetWidth(rDimension);
 }
 template<unsigned DIM>
 std::set<unsigned> SemBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
-    return {};
+    std::set<unsigned> neighbouring_node_indices;
+    for (const auto& r_node_pair : this->mNodePairs)
+    {
+        if (r_node_pair.first->GetIndex() == index)
+        {
+            neighbouring_node_indices.insert(r_node_pair.second->GetIndex());
+        }
+        if (r_node_pair.second->GetIndex() == index)
+        {
+            neighbouring_node_indices.insert(r_node_pair.first->GetIndex());
+        }
+    }
+    return neighbouring_node_indices;
 }
 template<unsigned DIM>
 void SemBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
@@ -297,7 +391,27 @@ void SemBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, 
 template<unsigned DIM>
 double SemBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
 {
-    return 1.0;
+    std::set<unsigned> containing_elements = GetNode(nodeIndex)->rGetContainingElementIndices();
+    double damping_constant = 0.0;
+    unsigned num_live_containing_elements = 0u;
+
+    for (unsigned elem_index : containing_elements)
+    {
+        if (elem_index < this->GetNumElements() && !this->GetElement(elem_index)->IsDeleted())
+        {
+            CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+            bool cell_is_wild_type = p_cell->GetMutationState()->IsType<WildTypeCellMutationState>();
+            damping_constant += cell_is_wild_type ? this->GetDampingConstantNormal() : this->GetDampingConstantMutant();
+            num_live_containing_elements++;
+        }
+    }
+
+    if (num_live_containing_elements == 0u)
+    {
+        EXCEPTION("At time " << SimulationTime::Instance()->GetTime() << ", Node " << nodeIndex << " is not contained in any live SEM elements, so GetDampingConstant() returns zero");
+    }
+
+    return damping_constant/static_cast<double>(num_live_containing_elements);
 }
 
 // Explicit instantiation
