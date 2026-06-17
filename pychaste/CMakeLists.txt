@@ -47,7 +47,15 @@ get_target_property(PYCHASTE_INCLUDE_DIRS chaste_pychaste INCLUDE_DIRECTORIES)
 # Add includes for VTK 9+ (includes for VTK < 9 will already be in the list)
 if(TARGET VTK::CommonCore)
     get_target_property(_include_dirs VTK::CommonCore INTERFACE_INCLUDE_DIRECTORIES)
-    list(APPEND PYCHASTE_INCLUDE_DIRS ${_include_dirs})
+    foreach(_dir IN LISTS _include_dirs)
+        if(_dir MATCHES "^\\$<BUILD_INTERFACE:(.+)>$")
+            # VTK 9.5+ have $<BUILD_INTERFACE:path> generator expressions in their includes
+            list(APPEND PYCHASTE_INCLUDE_DIRS "${CMAKE_MATCH_1}")
+        elseif(NOT _dir MATCHES "^\\$<")
+            # VTK 9.0 to 9.4 have plain include paths, no generator expressions
+            list(APPEND PYCHASTE_INCLUDE_DIRS "${_dir}")
+        endif()
+    endforeach()
 endif()
 
 # Add PETSC4Py includes
