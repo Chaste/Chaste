@@ -44,6 +44,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * An element class for use in the SemMesh class.
+ *
+ * An SemElement represents the subcellular node collection for one
+ * biological cell. It records which mesh nodes belong to that cell, optional
+ * named interaction layers used by SEM forces, and the node membership
+ * bookkeeping needed for population lifecycle operations.
  */
 template<unsigned DIM>
 class SemElement : public AbstractElement<DIM, DIM>
@@ -51,15 +56,15 @@ class SemElement : public AbstractElement<DIM, DIM>
 private:
 
     /**
-     * The id of the cell
-    */
+     * The id of the biological cell represented by this SEM element.
+     */
     unsigned mCellId;
   
     /**
      * A collection of interaction layers. Each layer is identified by a name.
      * The map stores a vector containing the indices of the nodes which make up the layer.
      * SemForces produce interactions between or within named layers.
-    */
+     */
     std::map<std::string, std::vector<unsigned int>> mInteractionLayers;
 
     /** Needed for serialization. */
@@ -67,10 +72,9 @@ private:
     /**
      * Serialize the object and its member variables.
      *
-     * Note that serialization of the mesh and cells is handled by load/save_construct_data.
-     *
-     * Note also that member data related to writers is not saved - output must
-     * be set up again by the caller after a restart.
+     * This archives the base element state, including node membership and
+     * deletion state. Additional SEM-specific state such as
+     * interaction layers is currently not serialized here.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -86,12 +90,19 @@ public:
     /**
      * Default constructor, which doesn't add any nodes: they must be added later.
      *
+     * This creates an empty SEM element shell with a mesh element index. Nodes
+     * can then be added and registered once the element geometry is known.
+     *
      * @param index global index of the element
      */
     SemElement(unsigned index);
 
     /**
      * Constructor which takes in a vector of nodes.
+     *
+     * This creates a complete SEM element around an existing set of
+     * subcellular nodes and registers the element index with those nodes so
+     * later force, damping, and deletion queries can find containing elements.
      *
      * @param index global index of the element
      * @param rNodes vector of Nodes associated with the element
@@ -102,35 +113,83 @@ public:
 
     /**
      * Destructor.
+     *
+     * The element does not own its nodes; node memory is managed by SemMesh.
      */
     ~SemElement();
     
     /**
-     * Sets the cell id of the element
+     * Set the id of the biological cell represented by this element.
+     *
+     * This records an external cell identifier on the SEM element for force,
+     * output, or bookkeeping code that needs to associate element state with a
+     * cell id.
      * 
-     * @param id the new id
-    */
+     * @param id the new cell id
+     */
     void SetCellId(unsigned int id);
     
     /**
-     * Adds a new interaction layer
+     * Add or replace a named interaction layer.
+     *
+     * An interaction layer identifies a subset of this element's nodes that
+     * can be targeted by SEM force laws. Reusing an existing layer name
+     * replaces the stored node index list for that layer.
      * 
      * @param layerName the name of the layer
-     * @param nodes indices of the nodes which make up the layer
-    */
+     * @param nodeIndices indices of the nodes which make up the layer
+     */
     void AddInteractionLayer(const std::string layerName, std::vector<unsigned int>& nodeIndices);
     
     /**
-     * Gets a const reference to the interaction layers
+     * Get the interaction layers.
+     *
+     * This exposes the named node subsets used by SEM forces to decide which
+     * nodes should interact within or between elements.
      * 
      * @return a const reference to the interaction layers
-    */
+     */
     const std::map<std::string, std::vector<unsigned int>>& rGetInteractionLayers();
     
+    /**
+     * Get the element's node vector.
+     *
+     * This provides direct access to the subcellular nodes owned by the SEM
+     * element for code that needs to inspect or update the element geometry as
+     * a node collection.
+     *
+     * @return reference to the vector of node pointers
+     */
     std::vector<Node<DIM>*>& rGetNodes();
-    
+
+    /**
+     * Replace one node in the element.
+     *
+     * This keeps node-to-element membership consistent while swapping the node
+     * pointer at a local index: the old node is unregistered from this element
+     * and the new node is registered.
+     *
+     * @param rIndex local node index to update
+     * @param pNode replacement node
+     */
     void UpdateNode(const unsigned& rIndex, Node<DIM>* pNode) override;
+
+    /**
+     * Mark this element as deleted.
+     *
+     * This removes the SEM element from active population use and unregisters
+     * it from all of its nodes so later containing-element queries do not
+     * include deleted cells.
+     */
     void MarkAsDeleted() override;
+
+    /**
+     * Register this element with its nodes.
+     *
+     * This populates each node's containing-element set with this element
+     * index, enabling node-based damping, neighbour, force, and
+     * lifecycle queries to recover the SEM elements that contain a node.
+     */
     void RegisterWithNodes() override;
 };
 

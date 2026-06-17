@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemElement.hpp"
 
+#include <cassert>
+
 template<unsigned DIM>
 SemElement<DIM>::SemElement(unsigned index)
     : AbstractElement<DIM, DIM>(index)
@@ -46,6 +48,7 @@ SemElement<DIM>::SemElement(unsigned index,
                             const std::vector<Node<DIM>*>& rNodes)
     : AbstractElement<DIM, DIM>(index, rNodes)
 {
+    RegisterWithNodes();
 }
 
 template<unsigned DIM>
@@ -74,6 +77,11 @@ const std::map<std::string, std::vector<unsigned int>>& SemElement<DIM>::rGetInt
 template<unsigned DIM>    
 void SemElement<DIM>::UpdateNode(const unsigned& rIndex, Node<DIM>* pNode)
 {
+    assert(rIndex < this->mNodes.size());
+
+    this->mNodes[rIndex]->RemoveElement(this->mIndex);
+    this->mNodes[rIndex] = pNode;
+    this->mNodes[rIndex]->AddElement(this->mIndex);
 
 }
 
@@ -86,11 +94,19 @@ std::vector<Node<DIM>*>& SemElement<DIM>::rGetNodes()
 template<unsigned DIM>    
 void SemElement<DIM>::MarkAsDeleted()
 {
+    this->mIsDeleted = true;
+    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    {
+        this->mNodes[i]->RemoveElement(this->mIndex);
+    }
 }
 template<unsigned DIM>    
 void SemElement<DIM>::RegisterWithNodes()
 {
-
+    for (unsigned i=0; i<this->mNodes.size(); i++)
+    {
+        this->mNodes[i]->AddElement(this->mIndex);
+    }
 }
 
 // Explicit instantiation
