@@ -26,6 +26,7 @@ jobs:
       image: ${{ matrix.image }}
 
     env:
+      DEBIAN_FRONTEND: noninteractive
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/testoutput
 
     steps:
@@ -54,7 +55,7 @@ jobs:
           wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
           echo "deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${codename}/" \
             | tee -a /etc/apt/sources.list.d/chaste.list
-          apt-get update
+          apt-get update &&
           apt-get install -y chaste-dependencies
 
       - name: Get system VTK version
