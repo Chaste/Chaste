@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteBuildRoot.hpp"
 #include "Exception.hpp"
 #include "FileFinder.hpp"
+#include "FilesystemPermissions.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "PetscTools.hpp"
 
@@ -204,19 +205,21 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
         try
         {
             // If necessary make the ChasteTestOutputDirectory - don't make it deleteable by Chaste
-            fs::create_directories(output_root); // Note that this is a no-op if the folder exists already
+            FilesystemPermissions::CreateDirectoriesWithPermissions(output_root); // Note that this is a no-op if the folder exists already
 
             // Now make all the sub-folders requested one-by-one and add the .chaste_deletable_folder file to them
             fs::path next_folder(output_root);
             for (fs::path::iterator path_iter = rel_path.begin(); path_iter != rel_path.end(); ++path_iter)
             {
                 next_folder /= *path_iter;
-                bool created_dir = fs::create_directory(next_folder);
+                bool created_dir = FilesystemPermissions::CreateDirectoryWithPermissions(next_folder);
                 if (created_dir)
                 {
                     // Add the Chaste signature file
-                    std::ofstream sig_file(next_folder / SIG_FILE_NAME);
+                    fs::path sig_file_path(next_folder / SIG_FILE_NAME);
+                    std::ofstream sig_file(sig_file_path);
                     sig_file.close();
+                    FilesystemPermissions::SetFilePermissions(sig_file_path);
                 }
             }
         }
@@ -255,10 +258,20 @@ std::string OutputFileHandler::GetRelativePath() const
 out_stream OutputFileHandler::OpenOutputFile(const std::string& rFileName,
                                              std::ios_base::openmode mode) const
 {
-    out_stream p_output_file(new std::ofstream((mDirectory+rFileName).c_str(), mode));
+    fs::path output_file(mDirectory);
+    output_file /= rFileName;
+    out_stream p_output_file(new std::ofstream(output_file, mode));
     if (!p_output_file->is_open())
     {
         EXCEPTION("Could not open file \"" + rFileName + "\" in " + mDirectory);
+    }
+    try
+    {
+        FilesystemPermissions::SetFilePermissions(output_file);
+    }
+    catch (const fs::filesystem_error& e)
+    {
+        EXCEPTION("Could not set permissions on file \"" + output_file.string() + "\": " + e.what());
     }
     return p_output_file;
 }
@@ -301,7 +314,7 @@ FileFinder OutputFileHandler::CopyFileTo(const FileFinder& rSourceFile) const
     {
         try
         {
-            fs::copy_file(from_path, to_path);
+            FilesystemPermissions::CopyFileWithPermissions(from_path, to_path);
         }
         // LCOV_EXCL_START
         catch (const fs::filesystem_error& e)
