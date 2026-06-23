@@ -1,0 +1,113 @@
+name: PyChaste build conda package
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+    inputs:
+      python-version:
+        description: Python version to build for
+        required: true
+        type: choice
+        options:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
+        default: "3.12"
+      chaste-ref:
+        description: Chaste branch, tag, or commit ref to build
+        required: true
+        type: string
+        default: develop
+      upload:
+        description: Upload package to Anaconda
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build-conda-package:
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    runs-on: ubuntu-24.04
+
+    env:
+      PYTHON_VERSION: ${{ github.event_name == 'pull_request' && '3.12' || inputs.python-version }}
+      DO_UPLOAD: ${{ github.event_name != 'pull_request' && inputs.upload == true }}
+
+    defaults:
+      run:
+        shell: bash -el {0} # -l needed to activate conda
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.ref || inputs.chaste-ref }}
+          submodules: recursive
+          fetch-tags: true
+
+      - name: Determine package version
+        run: |
+          version=$(bash pychaste/infra/conda/package-version.sh "$GITHUB_WORKSPACE")
+          echo "CHASTE_VERSION=${version}" >> "$GITHUB_ENV"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y castxml libx11-dev xvfb
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v4
+        with:
+          auto-update-conda: true
+          use-mamba: true
+          miniforge-version: latest
+          channels: conda-forge,pychaste
+
+      - name: Install conda-build and anaconda-client
+        run: mamba install --yes conda-build anaconda-client
+
+      - name: Show conda configuration
+        run: |
+          conda info
+          conda list
+
+      - name: Build conda package
+        env:
+          CHASTE_SOURCE_DIR: ${{ github.workspace }}
+        run: |
+          conda build \
+            pychaste/infra/conda/recipe/ \
+            --variant-config-files pychaste/infra/conda/variants/linux_64_python${PYTHON_VERSION}_cpython.yaml \
+            --output-folder output/
+
+      - name: Smoke test
+        run: |
+          pkg=$(ls output/linux-64/chaste-*.tar.bz2 | head -1)
+          conda create -n smoke-test --yes --file "${pkg}"
+          conda run -n smoke-test python -c "
+          import chaste
+          import chaste.cell_based
+          import chaste.mesh
+          import chaste.ode
+          import chaste.pde
+          print('Smoke test passed')
+          "
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chaste-conda-py${{ env.PYTHON_VERSION }}
+          path: output/linux-64/chaste-*.tar.bz2
+          if-no-files-found: error
+
+      - name: Upload to Anaconda channel
+        if: ${{ env.DO_UPLOAD == 'true' }}
+        env:
+          ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+        run: |
+          anaconda --token "${ANACONDA_TOKEN}" upload -u pychaste output/linux-64/chaste-*.tar.bz2
