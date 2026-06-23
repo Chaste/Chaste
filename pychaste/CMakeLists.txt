@@ -98,10 +98,10 @@ list(APPEND PYCHASTE_INCLUDE_DIRS ${_include_dirs})
 ################################
 ####  Build Python module
 ################################
-# Creates a `_pychaste_all` shared library from the Python wrappers.
+# Creates a `_pychaste_all` library from the Python wrappers.
 # The library name `_pychaste_all` is the same as the module name in the main
 # module wrapper source file `wrappers/all/_pychaste_all.main.cppwg.cpp`.
-# When the shared library has been built, it can be used in Python code
+# When the library has been built, it can be used in Python code
 # as `from chaste._pychaste_all import *`.
 
 file(GLOB_RECURSE PYCHASTE_WRAPPER_SOURCES
@@ -118,7 +118,8 @@ target_link_libraries(_pychaste_all PRIVATE
 
 target_include_directories(_pychaste_all PRIVATE ${PYCHASTE_INCLUDE_DIRS})
 
-target_compile_options(_pychaste_all PRIVATE -flto=auto -Wno-unused-local-typedefs)
+# -g0: Disable debug symbols in the Python modules as they are not needed.
+target_compile_options(_pychaste_all PRIVATE -flto=auto -Wno-unused-local-typedefs -g0)
 
 set_target_properties(_pychaste_all PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/package/chaste
