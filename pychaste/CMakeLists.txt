@@ -66,7 +66,9 @@ header_dirs("${CMAKE_CURRENT_SOURCE_DIR}/dynamic" _include_dirs)
 list(APPEND PYCHASTE_INCLUDE_DIRS ${_include_dirs})
 
 # Expose the includes for user projects
-target_include_directories(chaste_pychaste INTERFACE ${PYCHASTE_INCLUDE_DIRS})
+foreach(_dir IN LISTS PYCHASTE_INCLUDE_DIRS)
+    target_include_directories(chaste_pychaste INTERFACE "$<BUILD_INTERFACE:${_dir}>")
+endforeach()
 
 # Command for generating wrappers
 set(PYCHASTE_WRAPPER_GENERATION_COMMAND
