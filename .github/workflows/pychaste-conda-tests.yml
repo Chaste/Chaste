@@ -49,7 +49,7 @@ jobs:
           auto-update-conda: true
           use-mamba: true
           miniforge-version: latest
-          environment-file: pychaste/src/py/conda/envs/env_python${{ matrix.python-version }}.yaml
+          environment-file: pychaste/infra/conda/envs/env_python${{ matrix.python-version }}.yaml
           python-version: ${{ matrix.python-version }}
           channels: conda-forge,pychaste
 

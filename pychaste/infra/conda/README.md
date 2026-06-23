@@ -11,7 +11,7 @@ The following instructions assume that [mamba](https://mamba.readthedocs.io) and
 Launch a docker container to build the package:
 
 ```bash
-cd /path/to/Chaste/pychaste/src/py/conda
+cd /path/to/Chaste/pychaste/infra/conda
 
 docker run -it --rm \
   -v $(pwd):/home/conda \
