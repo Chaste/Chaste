@@ -65,6 +65,9 @@ list(APPEND PYCHASTE_INCLUDE_DIRS ${PETSC4PY_INCLUDES})
 header_dirs("${CMAKE_CURRENT_SOURCE_DIR}/dynamic" _include_dirs)
 list(APPEND PYCHASTE_INCLUDE_DIRS ${_include_dirs})
 
+# Expose the includes for user projects
+target_include_directories(chaste_pychaste INTERFACE ${PYCHASTE_INCLUDE_DIRS})
+
 # Command for generating wrappers
 set(PYCHASTE_WRAPPER_GENERATION_COMMAND
     ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
@@ -77,7 +80,7 @@ set(PYCHASTE_WRAPPER_GENERATION_COMMAND
 
 # Generate wrappers if not already created
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/wrappers")
-    execute_process(COMMAND ${PYCHASTE_WRAPPER_GENERATION_COMMAND})
+    execute_process(COMMAND ${PYCHASTE_WRAPPER_GENERATION_COMMAND} COMMAND_ERROR_IS_FATAL ANY)
 endif()
 
 # Target for manually re-generating the wrappers
@@ -104,10 +107,9 @@ file(GLOB_RECURSE PYCHASTE_WRAPPER_SOURCES
     ${CMAKE_CURRENT_BINARY_DIR}/wrappers/all/*.hpp
 )
 
-pybind11_add_module(_pychaste_all SHARED ${PYCHASTE_WRAPPER_SOURCES})
+pybind11_add_module(_pychaste_all OPT_SIZE ${PYCHASTE_WRAPPER_SOURCES})
 
 target_link_libraries(_pychaste_all PRIVATE
-    ${Python3_LIBRARIES}
     Chaste_COMMON_DEPS
     chaste_pychaste
 )
@@ -126,32 +128,16 @@ add_dependencies(pychaste _pychaste_all)
 ####  Copy Python package
 ################################
 
-# Get list of files in the Python package directory: pychaste/src/py/
-set(package_file_paths "")
-file(
-    GLOB_RECURSE
-    package_file_paths
+file(GLOB_RECURSE package_file_paths
+    CONFIGURE_DEPENDS
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/src/py
     ${CMAKE_CURRENT_SOURCE_DIR}/src/py/*
 )
-
-# Exclude compiled files
 list(FILTER package_file_paths EXCLUDE REGEX ".*\\.(dll|dylib|pyc|so)$")
-
-# Copy files to the build directory
 foreach(file_path ${package_file_paths})
-    if(file_path MATCHES ".*\\.(cfg|in|js|py|toml)$")
-        # Copy file and track changes
-        configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/py/${file_path}
-            ${CMAKE_CURRENT_BINARY_DIR}/package/${file_path}
-            COPYONLY
-        )
-    else()
-        # Copy file, but don't track changes
-        file(
-            COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/py/${file_path}
-            DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/package/
-        )
-    endif()
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/py/${file_path}
+        ${CMAKE_CURRENT_BINARY_DIR}/package/${file_path}
+        COPYONLY
+    )
 endforeach()
