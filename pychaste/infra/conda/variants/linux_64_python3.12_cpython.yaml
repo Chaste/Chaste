@@ -29,6 +29,8 @@ petsc:
   - ">=3.12,<3.20"
 petsc4py:
   - ">=3.12,<3.20"
+numpy:
+  - "1.26"
 python:
   - 3.12.* *_cpython
 sundials:

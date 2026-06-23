@@ -1,20 +1,41 @@
 #!/bin/bash -e
 
-# Example usage:
-#   ./build-package.sh --variant=linux_64_python3.10_cpython --branch=2024.1 --parallel=4
+# Build a PyChaste conda package inside a conda-forge build container.
+#
+# Example usage (clone from GitHub):
+#   ./build-package.sh --variant=linux_64_python3.10_cpython --branch=2026.1 --parallel=4
+#
+# Example usage (local source):
+#   ./build-package.sh --variant=linux_64_python3.10_cpython --source-dir=/chaste
 #
 # Intended for use in a build container e.g.:
-#   docker run --rm -it quay.io/condaforge/linux-anvil-cos7-x86_64 /bin/bash
+#   docker run --rm -it \
+#     -v $(pwd):/home/conda \
+#     -e HOST_USER_ID="$(id -u)" \
+#     quay.io/condaforge/linux-anvil-cos7-x86_64 \
+#     ./build-package.sh --variant=linux_64_python3.10_cpython
+#
+# To use a local source tree, also mount it and pass --source-dir:
+#   docker run --rm -it \
+#     -v $(pwd):/home/conda \
+#     -v /path/to/Chaste:/chaste:ro \
+#     -e HOST_USER_ID="$(id -u)" \
+#     quay.io/condaforge/linux-anvil-cos7-x86_64 \
+#     ./build-package.sh --variant=linux_64_python3.10_cpython --source-dir=/chaste
 
 # Parse args
 variant=
-branch=
+branch=develop
 parallel=
+source_dir=
 
 for option; do
   case $option in
   --variant=*)
     variant=$(expr "x$option" : "x--variant=\(.*\)")
+    ;;
+  --source-dir=*)
+    source_dir=$(expr "x$option" : "x--source-dir=\(.*\)")
     ;;
   --branch=*)
     branch=$(expr "x$option" : "x--branch=\(.*\)")
@@ -29,8 +50,11 @@ for option; do
   esac
 done
 
-if [ -z "${variant}" ]; then usage; fi
-if [ -z "${branch}" ]; then branch=develop; fi
+if [ -z "${variant}" ]; then
+  echo "Error: --variant is required" 1>&2
+  echo "Usage: $(basename "$0") --variant=<name> [--branch=<branch>] [--parallel=<n>] [--source-dir=<path>]" 1>&2
+  exit 1
+fi
 
 set -x
 
@@ -39,64 +63,45 @@ export FEEDSTOCK_ROOT="$(pwd)"
 export RECIPE_ROOT="${FEEDSTOCK_ROOT}/recipe"
 export CONFIG_FILE="${FEEDSTOCK_ROOT}/variants/${variant}.yaml"
 export CONDA_BLD_PATH="${FEEDSTOCK_ROOT}/build_artifacts"
-
 export CPU_COUNT="${parallel:-$(nproc)}"
-
 export PYTHONUNBUFFERED=1
 
-# Configure conda build path
 mkdir -p "${CONDA_BLD_PATH}"
 
+# Configure conda
 cat >~/.condarc <<CONDARC
-
 conda-build:
   root-dir: ${CONDA_BLD_PATH}
 pkgs_dirs:
   - ${CONDA_BLD_PATH}/pkg_cache
   - /opt/conda/pkgs
+channels:
+  - conda-forge
+  - pychaste
+channel_priority: strict
 solver: libmamba
-
 CONDARC
 
-# Install conda build tools
-mamba install --update-specs --yes --quiet --channel conda-forge \
-  conda-build pip boa liblief conda-forge-ci-setup
-mamba update --update-specs --yes --quiet --channel conda-forge \
-  conda-build pip boa liblief conda-forge-ci-setup
+# Install conda-build
+mamba install --update-specs --yes --quiet conda-build
 
-# Configure conda channels
-conda config --add channels conda-forge
-conda config --add channels pychaste
-conda config --env --set show_channel_urls true
-conda config --env --set auto_update_conda false
-conda config --env --set add_pip_as_python_dependency false
-conda config --env --append aggressive_update_packages ca-certificates
-conda config --env --remove-key aggressive_update_packages
-conda config --env --append aggressive_update_packages ca-certificates
-conda config --env --append aggressive_update_packages certifi
-conda config --env --set channel_priority strict
-
-# Configure conda activation
-mkdir -p "${CONDA_PREFIX}/etc/conda/activate.d"
-cat >"${CONDA_PREFIX}"/etc/conda/activate.d/conda-forge-ci-setup-activate.sh <<CONDAACTIVATE
-export CONDA_BLD_PATH='${CONDA_BLD_PATH}'
-export CPU_COUNT='${CPU_COUNT:-}'
-export PYTHONUNBUFFERED='1'
-CONDAACTIVATE
-
-# Show conda build configuration
+# Show configuration
 cat "${CONFIG_FILE}"
-
 conda info
-conda config --env --show-sources
 conda list --show-channel-urls
 
 # Install system dependencies
 /usr/bin/sudo -n yum install -y libXt-devel mesa-libGLU-devel patch
 
 # Get source code
-# TODO: pre-generate wrappers outside the build container
-git clone --recursive --branch "${branch}" --depth 1 https://github.com/Chaste/Chaste.git /tmp/Chaste
+if [ -n "${source_dir}" ]; then
+  export CHASTE_SOURCE_DIR="${source_dir}"
+else
+  git clone --recursive --branch "${branch}" --depth 1 --tags https://github.com/Chaste/Chaste.git /tmp/Chaste
+  export CHASTE_SOURCE_DIR=/tmp/Chaste
+fi
 
-# Build conda package
-conda mambabuild "${RECIPE_ROOT}" --variant-config-files "${CONFIG_FILE}"
+# Determine package version from git tag or commit hash
+export CHASTE_VERSION=$(bash "${FEEDSTOCK_ROOT}/package-version.sh" "${CHASTE_SOURCE_DIR}")
+
+conda build "${RECIPE_ROOT}" --variant-config-files "${CONFIG_FILE}"

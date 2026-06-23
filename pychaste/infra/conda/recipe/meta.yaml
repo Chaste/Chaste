@@ -1,13 +1,14 @@
-{% set version = "2026.1" %}
+{% set version = environ.get('CHASTE_VERSION', '2026.1') %}
 {% set build = 1 %}
 {% set build_string = "py{}h{}_{}".format(CONDA_PY, PKG_HASH, build) %}
+{% set chaste_src = environ.get('CHASTE_SOURCE_DIR', '/tmp/Chaste') %}
 
 package:
   name: chaste
   version: {{ version }}
 
 source:
-  path: /tmp/Chaste
+  path: {{ chaste_src }}
 
 build:
   number: {{ build }}
@@ -23,7 +24,6 @@ requirements:
     - {{ cdt('libxt-devel') }}
     - boost-cpp
     - cmake
-    - distro
     - git
     - hdf5
     - hdf5 * mpi_mpich*
@@ -70,6 +70,8 @@ requirements:
     - boost-cpp
     - hdf5
     - hdf5 * mpi_mpich*
+    - libboost
+    - libopenblas
     - libtiff
     - matplotlib
     - metis
