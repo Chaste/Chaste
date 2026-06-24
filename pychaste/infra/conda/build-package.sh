@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
-# Build a PyChaste conda package inside a conda-forge build container.
+# Build a PyChaste conda package with rattler-build inside a conda-forge build
+# container.
 #
 # Example usage (clone from GitHub):
 #   ./build-package.sh --variant=linux_64_python3.10_cpython --branch=2026.1 --parallel=4
@@ -26,7 +27,7 @@
 # Parse args
 variant=
 branch=develop
-parallel=
+cpu_count=
 source_dir=
 
 for option; do
@@ -40,8 +41,8 @@ for option; do
   --branch=*)
     branch=$(expr "x$option" : "x--branch=\(.*\)")
     ;;
-  --parallel=*)
-    parallel=$(expr "x$option" : "x--parallel=\(.*\)")
+  --cpu-count=*)
+    cpu_count=$(expr "x$option" : "x--cpu-count=\(.*\)")
     ;;
   *)
     echo "Unknown option: $option" 1>&2
@@ -52,43 +53,49 @@ done
 
 if [ -z "${variant}" ]; then
   echo "Error: --variant is required" 1>&2
-  echo "Usage: $(basename "$0") --variant=<name> [--branch=<branch>] [--parallel=<n>] [--source-dir=<path>]" 1>&2
+  echo "Usage: $(basename "$0") --variant=<name> [--branch=<branch>] [--cpu-count=<n>] [--source-dir=<path>]" 1>&2
   exit 1
 fi
 
 set -x
 
+# The container entrypoint runs useradd with the mounted source tree as the home
+# directory, which drops bash profile files into it. Move them and redirect HOME
+# to a temp path so subsequent writes also stay off the source tree.
+OLD_HOME="${HOME}"
+export HOME=/tmp/conda_home
+mkdir -p "${HOME}"
+mv -f "${OLD_HOME}/.bash_logout" "${OLD_HOME}/.bash_profile" "${OLD_HOME}/.bashrc" \
+      "${OLD_HOME}/.profile" "${OLD_HOME}/.condarc" "${HOME}/" 2>/dev/null || true
+
 # Configure environment
 export FEEDSTOCK_ROOT="$(pwd)"
 export RECIPE_ROOT="${FEEDSTOCK_ROOT}/recipe"
 export CONFIG_FILE="${FEEDSTOCK_ROOT}/variants/${variant}.yaml"
-export CONDA_BLD_PATH="${FEEDSTOCK_ROOT}/build_artifacts"
-export CPU_COUNT="${parallel:-$(nproc)}"
+# CPU_COUNT bounds parallelism for both rattler-build and the C++ compile
+# (make -j). Keep it low on memory-constrained machines: the pychaste wrapper
+# translation units and their LTO link consume roughly 3 GB each, so building
+# with all cores can exhaust RAM. It is forwarded into the sanitized build
+# script environment via recipe.yaml.
+export CPU_COUNT="${cpu_count:-$(nproc)}"
 export PYTHONUNBUFFERED=1
 
-mkdir -p "${CONDA_BLD_PATH}"
+# Keep all build artefacts on the container's own filesystem to avoid
+# case-sensitivity issues on macOS hosts (e.g. ncurses terminfo entries that
+# differ only by case are collapsed on APFS, breaking package verification).
+export OUTPUT_DIR=/tmp/rattler_output
+mkdir -p "${OUTPUT_DIR}"
 
-# Configure conda
-cat >~/.condarc <<CONDARC
-conda-build:
-  root-dir: ${CONDA_BLD_PATH}
-pkgs_dirs:
-  - ${CONDA_BLD_PATH}/pkg_cache
-  - /opt/conda/pkgs
-channels:
-  - conda-forge
-  - pychaste
-channel_priority: strict
-solver: libmamba
-CONDARC
-
-# Install conda-build
-mamba install --update-specs --yes --quiet conda-build
+# Install rattler-build as a self-contained static binary (no conda solve).
+curl -fsSL \
+  https://github.com/prefix-dev/rattler-build/releases/latest/download/rattler-build-x86_64-unknown-linux-musl \
+  -o /tmp/rattler-build
+chmod +x /tmp/rattler-build
+export PATH="/tmp:${PATH}"
 
 # Show configuration
 cat "${CONFIG_FILE}"
-conda info
-conda list --show-channel-urls
+rattler-build --version
 
 # Install system dependencies
 /usr/bin/sudo -n yum install -y libXt-devel mesa-libGLU-devel patch
@@ -104,4 +111,14 @@ fi
 # Determine package version from git tag or commit hash
 export CHASTE_VERSION=$(bash "${FEEDSTOCK_ROOT}/package-version.sh" "${CHASTE_SOURCE_DIR}")
 
-conda build "${RECIPE_ROOT}" --variant-config-files "${CONFIG_FILE}"
+rattler-build build \
+  --recipe "${RECIPE_ROOT}/recipe.yaml" \
+  --variant-config "${CONFIG_FILE}" \
+  --target-platform linux-64 \
+  --output-dir "${OUTPUT_DIR}" \
+  --channel conda-forge \
+  --channel pychaste
+
+# Copy the built package to the mounted host directory
+mkdir -p "${FEEDSTOCK_ROOT}/build_artifacts/linux-64"
+cp "${OUTPUT_DIR}"/linux-64/chaste-*.conda "${FEEDSTOCK_ROOT}/build_artifacts/linux-64/"
