@@ -1,10 +1,5 @@
 cdt_name:
   - cos7
-channel_sources:
-  - conda-forge
-  - pychaste
-channel_targets:
-  - pychaste main
 cxx_compiler:
   - gxx
 cxx_compiler_version:
@@ -18,7 +13,7 @@ fortran_compiler_version:
 boostcpp:
   - ">=1.70,<1.84"
 hdf5:
-  - ">=1.10,<1.14"
+  - ">=1.10,<1.15"
 metis:
   - ">=4.0,<6.0"
 mpich:
@@ -26,9 +21,9 @@ mpich:
 parmetis:
   - ">=4.0,<6.0"
 petsc:
-  - ">=3.12,<3.20"
+  - ">=3.19,<3.26"
 petsc4py:
-  - ">=3.12,<3.20"
+  - ">=3.19,<3.26"
 numpy:
   - "2.0"
 python:
