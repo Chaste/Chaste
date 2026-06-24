@@ -70,14 +70,37 @@ foreach(_dir IN LISTS PYCHASTE_INCLUDE_DIRS)
     target_include_directories(chaste_pychaste INTERFACE "$<BUILD_INTERFACE:${_dir}>")
 endforeach()
 
-# Command for generating wrappers
+# Make GCC's exclusive internal headers available to castxml during wrapper
+# generation. When emulating GCC, castxml uses the internal includes of its 
+# bundled Clang instead of using GCC's internal includes, which can lead to
+# missing GCC-only headers such as quadmath.h.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    execute_process(
+        COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=include
+        OUTPUT_VARIABLE GCC_INTERNAL_INCLUDE_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(EXISTS "${GCC_INTERNAL_INCLUDE_DIR}/quadmath.h")
+        set(CASTXML_EXTRA_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/castxml_extra_include)
+        file(COPY "${GCC_INTERNAL_INCLUDE_DIR}/quadmath.h"
+            DESTINATION "${CASTXML_EXTRA_INCLUDE_DIR}")
+        list(APPEND PYCHASTE_INCLUDE_DIRS "${CASTXML_EXTRA_INCLUDE_DIR}")
+    endif()
+endif()
+
+# Command for generating wrappers.
+# castxml/LLVM 20 reports use of the template keyword without a following
+# argument list as an error, which can cause problems with some boost headers.
+# This is silenced by the -Wno-missing-template-arg-list-after-template-kw flag. 
+# Also, gnu++17 is set rather than c++17 because it is less strict about this.
 set(PYCHASTE_WRAPPER_GENERATION_COMMAND
     ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
         -w ${CMAKE_CURRENT_BINARY_DIR}/wrappers
         -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/config.yaml
         -i ${PYCHASTE_INCLUDE_DIRS}
         -l ${CMAKE_CURRENT_BINARY_DIR}/cppwg.log
-        --std c++17
+        --std "gnu++17 -Wno-missing-template-arg-list-after-template-kw"
+        --castxml_compiler ${CMAKE_CXX_COMPILER}
 )
 
 # Generate wrappers if not already created
