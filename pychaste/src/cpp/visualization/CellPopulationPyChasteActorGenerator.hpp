@@ -37,9 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELLPOPULATIONPYCHASTEACTORGENERATOR_HPP_
 
 #include <vector>
+
 #include <vtkLookupTable.h>
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
+
 #include "AbstractCellPopulation.hpp"
 #include "AbstractPyChasteActorGenerator.hpp"
 #include "MeshBasedCellPopulation.hpp"

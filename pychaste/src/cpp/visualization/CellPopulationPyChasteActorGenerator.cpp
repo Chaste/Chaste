@@ -34,7 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellPopulationPyChasteActorGenerator.hpp"
+
 #include <algorithm>
+
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
 #include <vtkCell.h>
@@ -64,6 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkVoxel.h>
+
 #include "CaBasedCellPopulation.hpp"
 #include "CellLabel.hpp"
 #include "Exception.hpp"
@@ -561,7 +564,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddPottsBasedCellPopulationActor
             double color[3];
             if (mColorByCellData)
             {
-                this->mpColorTransferFunction->GetColor(double(idx) / 255.0, color);
+                this->mpContinuousColorTransferFunction->GetColor(double(idx) / 255.0, color);
             }
             else
             {
@@ -887,7 +890,7 @@ vtkSmartPointer<vtkColorTransferFunction> CellPopulationPyChasteActorGenerator<D
         double color[3];
         if (mColorByCellData)
         {
-            this->mpColorTransferFunction->GetColor(double(idx) / 255.0, color);
+            this->mpContinuousColorTransferFunction->GetColor(double(idx) / 255.0, color);
         }
         else
         {
