@@ -68,8 +68,8 @@ jobs:
           miniforge-version: latest
           channels: conda-forge,pychaste
 
-      - name: Install conda-build and anaconda-client
-        run: mamba install --yes conda-build anaconda-client
+      - name: Install rattler-build and anaconda-client
+        run: mamba install --yes -c conda-forge rattler-build anaconda-client
 
       - name: Show conda configuration
         run: |
@@ -80,15 +80,17 @@ jobs:
         env:
           CHASTE_SOURCE_DIR: ${{ github.workspace }}
         run: |
-          conda build \
-            pychaste/infra/conda/recipe/ \
-            --variant-config-files pychaste/infra/conda/variants/linux_64_python${PYTHON_VERSION}_cpython.yaml \
-            --output-folder output/
+          export CPU_COUNT=$(nproc)
+          rattler-build build \
+            --recipe pychaste/infra/conda/recipe/recipe.yaml \
+            --variant-config pychaste/infra/conda/variants/linux_64_python${PYTHON_VERSION}_cpython.yaml \
+            --output-dir output/ \
+            --channel conda-forge \
+            --channel pychaste
 
       - name: Smoke test
         run: |
-          pkg=$(ls output/linux-64/chaste-*.tar.bz2 | head -1)
-          conda create -n smoke-test --yes --file "${pkg}"
+          conda create -n smoke-test --yes -c ./output -c conda-forge -c pychaste chaste
           conda run -n smoke-test python -c "
           import chaste
           import chaste.cell_based
@@ -102,7 +104,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: chaste-conda-py${{ env.PYTHON_VERSION }}
-          path: output/linux-64/chaste-*.tar.bz2
+          path: output/linux-64/chaste-*.conda
           if-no-files-found: error
 
       - name: Upload to Anaconda channel
@@ -110,4 +112,4 @@ jobs:
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
-          anaconda --token "${ANACONDA_TOKEN}" upload -u pychaste output/linux-64/chaste-*.tar.bz2
+          anaconda --token "${ANACONDA_TOKEN}" upload -u pychaste output/linux-64/chaste-*.conda
