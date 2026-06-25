@@ -18,7 +18,7 @@
 		<BoundVoronoiTessellation>0</BoundVoronoiTessellation>
 		<HasVariableRestLength>0</HasVariableRestLength>
 		<ScaleBoundByEdgeLength>0</ScaleBoundByEdgeLength>
-		<BoundedVoroniTesselationLengthCutoff>1.79769e+308</BoundedVoroniTesselationLengthCutoff>
+		<BoundedVoronoiTessellationLengthCutoff>1.79769e+308</BoundedVoronoiTessellationLengthCutoff>
 		<OffsetNewBoundaryNodes>0</OffsetNewBoundaryNodes>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<CentreBasedDivisionRule>

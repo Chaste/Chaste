@@ -1201,7 +1201,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParamet
     *rParamsFile << "\t\t<BoundVoronoiTessellation>" << mBoundVoronoiTessellation << "</BoundVoronoiTessellation>\n";
     *rParamsFile << "\t\t<HasVariableRestLength>" << mHasVariableRestLength << "</HasVariableRestLength>\n";
     *rParamsFile << "\t\t<ScaleBoundByEdgeLength>" << mScaleBoundByEdgeLength << "</ScaleBoundByEdgeLength>\n";
-    *rParamsFile << "\t\t<BoundedVoroniTesselationLengthCutoff>" << mBoundedVoroniTesselationLengthCutoff << "</BoundedVoroniTesselationLengthCutoff>\n";
+    *rParamsFile << "\t\t<BoundedVoronoiTessellationLengthCutoff>" << mBoundedVoroniTesselationLengthCutoff << "</BoundedVoronoiTessellationLengthCutoff>\n";
     *rParamsFile << "\t\t<OffsetNewBoundaryNodes>" << mOffsetNewBoundaryNodes << "</OffsetNewBoundaryNodes>\n";
 
     // Call method on direct parent class
