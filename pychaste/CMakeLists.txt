@@ -70,36 +70,19 @@ foreach(_dir IN LISTS PYCHASTE_INCLUDE_DIRS)
     target_include_directories(chaste_pychaste INTERFACE "$<BUILD_INTERFACE:${_dir}>")
 endforeach()
 
-# Make GCC's exclusive internal headers available to castxml during wrapper
-# generation. When emulating GCC, castxml uses the internal includes of its 
-# bundled Clang instead of using GCC's internal includes, which can lead to
-# missing GCC-only headers such as quadmath.h.
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=include
-        OUTPUT_VARIABLE GCC_INTERNAL_INCLUDE_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if(EXISTS "${GCC_INTERNAL_INCLUDE_DIR}/quadmath.h")
-        set(CASTXML_EXTRA_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/castxml_extra_include)
-        file(COPY "${GCC_INTERNAL_INCLUDE_DIR}/quadmath.h"
-            DESTINATION "${CASTXML_EXTRA_INCLUDE_DIR}")
-        list(APPEND PYCHASTE_INCLUDE_DIRS "${CASTXML_EXTRA_INCLUDE_DIR}")
-    endif()
-endif()
-
 # Command for generating wrappers.
-# castxml/LLVM 20 reports use of the template keyword without a following
-# argument list as an error, which can cause problems with some boost headers.
-# This is silenced by the -Wno-missing-template-arg-list-after-template-kw flag. 
-# Also, gnu++17 is set rather than c++17 because it is less strict about this.
+#  - gnu++17 (rather than c++17) and -Wno-missing-template-arg-list-after-template-kw
+#    silence a castxml/LLVM error on use of the template keyword without a
+#    following argument list, which appears in some boost headers.
+#  - -U__SIZEOF_FLOAT128__ stops boost.multiprecision from including quadmath.h,
+#    a GCC-only header that castxml's bundled Clang cannot find.
 set(PYCHASTE_WRAPPER_GENERATION_COMMAND
     ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
         -w ${CMAKE_CURRENT_BINARY_DIR}/wrappers
         -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/config.yaml
         -i ${PYCHASTE_INCLUDE_DIRS}
         -l ${CMAKE_CURRENT_BINARY_DIR}/cppwg.log
-        --std "gnu++17 -Wno-missing-template-arg-list-after-template-kw"
+        --std "gnu++17 -Wno-missing-template-arg-list-after-template-kw -U__SIZEOF_FLOAT128__"
         --castxml_compiler ${CMAKE_CXX_COMPILER}
 )
 
