@@ -1,4 +1,3 @@
-		<InteractionDistance>0.0139</InteractionDistance>
 		<ReMeshFrequency>4294967295</ReMeshFrequency>
 		<ThrowStepSizeException>1</ThrowStepSizeException>
 		<CellRearrangementThreshold>0.5</CellRearrangementThreshold>

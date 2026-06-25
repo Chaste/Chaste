@@ -811,7 +811,6 @@ template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::OutputCellPopulationParameters(
     out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<InteractionDistance>" << mInteractionDistance << "</InteractionDistance>\n";
     *rParamsFile << "\t\t<ReMeshFrequency>" << mReMeshFrequency << "</ReMeshFrequency>\n";
     *rParamsFile << "\t\t<ThrowStepSizeException>" << mThrowStepSizeException << "</ThrowStepSizeException>\n";
     *rParamsFile << "\t\t<CellRearrangementThreshold>" << mCellRearrangementThreshold << "</CellRearrangementThreshold>\n";

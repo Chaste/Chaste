@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Chaste xmlns="https://chaste.comlab.ox.ac.uk/nss/cell_based">
+<Chaste xmlns="https://chaste.github.io/nss/cell_based">
 
 	<OffLatticeSimulation-2-2>
 		<Dt>0.00833333</Dt>
