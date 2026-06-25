@@ -3,6 +3,7 @@ channels:
   - pychaste
 dependencies:
   - boost-cpp>=1.80,<1.84
+  - castxml
   - hdf5>=1.12,<1.13=*mpich*
   - jupyterlab
   - matplotlib

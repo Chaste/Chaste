@@ -41,7 +41,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y castxml clang cmake libosmesa6-dev libpthread-stubs0-dev libx11-dev pkg-config xvfb
+          sudo apt-get install -y cmake libosmesa6-dev libpthread-stubs0-dev libx11-dev pkg-config xvfb
 
       - name: Setup Miniconda Python ${{ matrix.python-version }}
         uses: conda-incubator/setup-miniconda@v4
