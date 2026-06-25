@@ -43,7 +43,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkScene.hpp"
 
 /**
- * Update a vtk scene at each simulation time step.
+ * A cell-based simulation modifier that renders the simulation with a VtkScene.
+ *
+ * Holds a VtkScene and, at each time step that is a multiple of the update
+ * frequency, has the scene render the current cell population, writing a
+ * per-step image/animation frame and/or updating an interactive window.
+ * 1D simulations are not rendered.
  */
 template<unsigned DIM>
 class VtkSceneModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
@@ -64,12 +69,12 @@ class VtkSceneModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
     }
 
     /**
-     * The scene
+     * The scene that renders the cell population
      */
     boost::shared_ptr<VtkScene<DIM> > mpScene;
 
     /**
-     * The scene update frequency
+     * The scene is rendered every mUpdateFrequency time steps
      */
     unsigned mUpdateFrequency;
 
@@ -83,49 +88,12 @@ public:
     /**
      * Destructor.
      */
-    virtual ~VtkSceneModifier();
+    virtual ~VtkSceneModifier() = default;
 
     /**
-     * Get the scene
-     * @return the scene
+     * @return the scene used to render the cell population
      */
     boost::shared_ptr<VtkScene<DIM> > GetVtkScene();
-
-    /**
-     * Overridden UpdateAtEndOfTimeStep() method.
-     *
-     * Specifies what to do in the simulation at the end of each time step.
-     *
-     * @param rCellPopulation reference to the cell population
-     */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
-
-    /**
-     * Overridden SetupSolve() method.
-     *
-     * Specifies what to do in the simulation before the start of the time loop.
-     *
-     * @param rCellPopulation reference to the cell population
-     * @param outputDirectory the output directory, relative to where Chaste output is stored
-     */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
-
-    /**
-     * Set the scene
-     * @param pScene the scene
-     */
-    void SetVtkScene(boost::shared_ptr<VtkScene<DIM> > pScene);
-
-    /**
-     * Helper method to compute the mean level of Delta in each cell's neighbours and store these in the CellData.
-     *
-     * Note: If using a CaBasedCellPopulation, we assume a Moore neighbourhood and unit carrying capacity.
-     * If a cell has no neighbours (such as an isolated cell in a CaBasedCellPopulation), we store the
-     * value -1 in the CellData.
-     *
-     * @param rCellPopulation reference to the cell population
-     */
-    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -136,10 +104,51 @@ public:
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 
     /**
-     * Set the frequency of output
-     * @param frequency the frequency of output
+     * Set how often the scene is rendered.
+     * @param frequency the number of time steps between renders
      */
     void SetUpdateFrequency(unsigned frequency);
+
+    /**
+     * Set the scene used to render the cell population.
+     * @param pScene the scene
+     */
+    void SetVtkScene(boost::shared_ptr<VtkScene<DIM> > pScene);
+
+    /**
+     * Overridden SetupSolve() method.
+     *
+     * Called before the time loop: updates the cell population and renders the
+     * initial scene.
+     *
+     * @param rCellPopulation reference to the cell population
+     * @param outputDirectory the output directory, relative to where Chaste output is stored
+     */
+    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+
+    /**
+     * Overridden UpdateAtEndOfTimeStep() method.
+     *
+     * Updates the cell population and, if the step is due, renders the scene.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Ensure the cell population is up to date before the scene is rendered.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+private:
+
+    /**
+     * Render the scene for the current time step, if a scene has been set and
+     * the step is a multiple of the update frequency.
+     */
+    void RenderSceneIfDue();
 };
 
 #include "SerializationExportWrapper.hpp"
