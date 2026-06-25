@@ -44,6 +44,12 @@ VtkSceneModifier<DIM>::VtkSceneModifier()
 }
 
 template<unsigned DIM>
+unsigned VtkSceneModifier<DIM>::GetUpdateFrequency() const
+{
+    return mUpdateFrequency;
+}
+
+template<unsigned DIM>
 boost::shared_ptr<VtkScene<DIM> > VtkSceneModifier<DIM>::GetVtkScene()
 {
     return mpScene;

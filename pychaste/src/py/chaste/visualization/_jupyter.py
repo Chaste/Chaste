@@ -46,7 +46,7 @@ from io import StringIO
 import vtk
 import xvfbwrapper
 
-from chaste.cell_based import VtkSceneModifier_2, VtkSceneModifier_3
+from chaste.cell_based import SimulationTime, VtkSceneModifier_2, VtkSceneModifier_3
 
 
 class JupyterNotebookManager:
@@ -165,33 +165,45 @@ def JupyterSceneModifierFactory(VtkSceneModifier):
 
     class JupyterSceneModifier(VtkSceneModifier):
         """
-        Class for real time plotting of output
+        Simulation modifier that renders the scene into the active Jupyter
+        notebook cell at the end of each time step, for real-time plotting.
         """
 
-        def __init__(self, plotting_manager):
-            self.output_format = "png"
-            self.plotting_manager = plotting_manager
+        def __init__(self, plotting_manager, output_format="png"):
             super().__init__()
+            self.plotting_manager = plotting_manager
+            self.output_format = output_format
 
         def UpdateAtEndOfTimeStep(self, cell_population):
             """
             Update the Jupyter notebook plot with the new scene
             """
 
-            super().UpdateAtEndOfTimeStep(cell_population)
+            # Update the population directly rather than via the base class: its
+            # render-if-due path only writes file output (unused here) and would
+            # rebuild the scene redundantly before vtk_show renders it below.
+            self.UpdateCellData(cell_population)
+
+            # Refresh the plot at the configured update frequency.
+            time_step = SimulationTime.Instance().GetTimeStepsElapsed()
+            if time_step % self.GetUpdateFrequency() != 0:
+                return
 
             IPython.display.clear_output(wait=True)
 
-            if self.output_format == "png":
-                IPython.display.display(
-                    self.plotting_manager.vtk_show(
-                        self.GetVtkScene(), output_format=self.output_format
-                    )
-                )
-            else:
-                self.plotting_manager.vtk_show(
-                    self.GetVtkScene(), output_format=self.output_format
-                )
+            # vtk_show returns an Image for "png" (displayed here), and displays
+            # the plot itself for "wrl" (returning None).
+            image = self.plotting_manager.vtk_show(
+                self.GetVtkScene(), output_format=self.output_format
+            )
+            if image is not None:
+                IPython.display.display(image)
+
+    # Give each dimension's class a distinct, informative name.
+    JupyterSceneModifier.__name__ = VtkSceneModifier.__name__.replace(
+        "VtkSceneModifier", "JupyterSceneModifier"
+    )
+    JupyterSceneModifier.__qualname__ = JupyterSceneModifier.__name__
 
     return JupyterSceneModifier
 

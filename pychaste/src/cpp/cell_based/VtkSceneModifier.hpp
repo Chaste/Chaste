@@ -91,6 +91,11 @@ public:
     virtual ~VtkSceneModifier() = default;
 
     /**
+     * @return the number of time steps between scene renders
+     */
+    unsigned GetUpdateFrequency() const;
+
+    /**
      * @return the scene used to render the cell population
      */
     boost::shared_ptr<VtkScene<DIM> > GetVtkScene();
