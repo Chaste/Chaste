@@ -144,11 +144,11 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRend
         auto p_polydata = vtkSmartPointer<vtkPolyData>::New();
 
         // Collect a point at each cell's centre, tagged with its colour value
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
+        for (auto cell_iter = mpCellPopulation->Begin();
              cell_iter != mpCellPopulation->End(); ++cell_iter)
         {
             c_vector<double, DIM> centre = mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
-            if (DIM == 3)
+            if constexpr (DIM == 3)
             {
                 p_points->InsertNextPoint(centre[0], centre[1], centre[2]);
             }
@@ -242,7 +242,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddCaBasedCellPopulationActor(vt
         unsigned counter = 0;
         c_vector<double, DIM> old_loc = zero_vector<double>(DIM);
         double spacing = 1.0;
-        for (typename PottsMesh<DIM>::NodeIterator node_iter = p_ca_population->rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = p_ca_population->rGetMesh().GetNodeIteratorBegin();
              node_iter != p_ca_population->rGetMesh().GetNodeIteratorEnd(); ++node_iter)
         {
             c_vector<double, DIM> current_item = node_iter->rGetLocation();
@@ -325,14 +325,14 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
         auto p_cell_color_reference_data = vtkSmartPointer<vtkDoubleArray>::New();
         p_cell_color_reference_data->SetName("CellColors");
 
-        if (p_cell_population->GetVoronoiTessellation() != NULL)
+        if (p_cell_population->GetVoronoiTessellation() != nullptr)
         {
             auto p_points = vtkSmartPointer<vtkPoints>::New();
             p_points->GetData()->SetName("Vertex positions");
             for (unsigned node_num = 0; node_num < p_cell_population->GetVoronoiTessellation()->GetNumNodes(); node_num++)
             {
                 c_vector<double, DIM> position = p_cell_population->GetVoronoiTessellation()->GetNode(node_num)->rGetLocation();
-                if (DIM == 2)
+                if constexpr (DIM == 2)
                 {
                     p_points->InsertPoint(node_num, position[0], position[1], 0.0);
                 }
@@ -345,11 +345,11 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
 
             // One polygon per Voronoi cell, coloured by its biological cell; ghost
             // cells are tagged -1 so AddColouredVoronoiGrid can threshold them out
-            for (typename VertexMesh<DIM, DIM>::VertexElementIterator iter = p_cell_population->GetVoronoiTessellation()->GetElementIteratorBegin();
+            for (auto iter = p_cell_population->GetVoronoiTessellation()->GetElementIteratorBegin();
                  iter != p_cell_population->GetVoronoiTessellation()->GetElementIteratorEnd(); ++iter)
             {
                 vtkSmartPointer<vtkCell> p_cell;
-                if (DIM == 2)
+                if constexpr (DIM == 2)
                 {
                     p_cell = vtkSmartPointer<vtkPolygon>::New();
                 }
@@ -400,7 +400,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
         auto p_points = vtkSmartPointer<vtkPoints>::New();
         p_points->GetData()->SetName("Vertex positions");
 
-        for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = p_cell_population->rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = p_cell_population->rGetMesh().GetNodeIteratorBegin();
              node_iter != p_cell_population->rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -410,17 +410,17 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
 
         p_mutable_grid->SetPoints(p_points);
 
-        for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator elem_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
+        for (auto elem_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
              elem_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
              ++elem_iter)
         {
 
             vtkSmartPointer<vtkCell> p_cell;
-            if (DIM == 3)
+            if constexpr (DIM == 3)
             {
                 p_cell = vtkSmartPointer<vtkTetra>::New();
             }
-            else if (DIM == 2)
+            else if constexpr (DIM == 2)
             {
                 p_cell = vtkSmartPointer<vtkTriangle>::New();
             }
@@ -480,7 +480,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddPottsBasedCellPopulationActor
         c_vector<double, DIM> old_loc = zero_vector<double>(DIM);
         double spacing = 1.0;
 
-        for (typename PottsMesh<DIM>::NodeIterator node_iter = p_potts_population->rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = p_potts_population->rGetMesh().GetNodeIteratorBegin();
              node_iter != p_potts_population->rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -525,10 +525,10 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddPottsBasedCellPopulationActor
         }
 
         // Fill in each cell's lattice sites with its colour value
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
+        for (auto cell_iter = mpCellPopulation->Begin();
              cell_iter != mpCellPopulation->End(); ++cell_iter)
         {
-            PottsElement<DIM>* p_element = p_potts_population->GetElementCorrespondingToCell(*cell_iter);
+            auto* p_element = p_potts_population->GetElementCorrespondingToCell(*cell_iter);
 
             for (unsigned idx = 0; idx < p_element->GetNumNodes(); idx++)
             {
@@ -802,11 +802,11 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddColouredVoronoiGrid(
 template <unsigned DIM>
 void CellPopulationPyChasteActorGenerator<DIM>::AppendPoint(vtkPoints* pPoints, const c_vector<double, DIM>& rLocation) const
 {
-    if (DIM == 3)
+    if constexpr (DIM == 3)
     {
         pPoints->InsertNextPoint(rLocation[0], rLocation[1], rLocation[2]);
     }
-    else if (DIM == 2)
+    else if constexpr (DIM == 2)
     {
         pPoints->InsertNextPoint(rLocation[0], rLocation[1], 0.0);
     }
@@ -830,7 +830,7 @@ vtkSmartPointer<vtkUnstructuredGrid> CellPopulationPyChasteActorGenerator<DIM>::
     for (unsigned node_num = 0; node_num < pPopulation->rGetMesh().GetNumNodes(); node_num++)
     {
         c_vector<double, DIM> position = pPopulation->rGetMesh().GetNode(node_num)->rGetLocation();
-        if (DIM == 2)
+        if constexpr (DIM == 2)
         {
             p_points->InsertPoint(node_num, position[0], position[1], 0.0);
         }
@@ -846,7 +846,7 @@ vtkSmartPointer<vtkUnstructuredGrid> CellPopulationPyChasteActorGenerator<DIM>::
          iter != pPopulation->rGetMesh().GetElementIteratorEnd(); ++iter)
     {
         vtkSmartPointer<vtkCell> p_cell;
-        if (DIM == 2)
+        if constexpr (DIM == 2)
         {
             p_cell = vtkSmartPointer<vtkPolygon>::New();
         }
