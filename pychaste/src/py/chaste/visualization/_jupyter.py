@@ -138,15 +138,15 @@ class JupyterNotebookManager:
         Takes vtkRenderer instance and returns an IPython Image with the rendering.
         """
 
-        scene.ResetRenderer(0)
-        renderer = scene.GetRenderer()
-
-        self.renderWindow.SetOffScreenRendering(1)
-        self.renderWindow.AddRenderer(renderer)
-        self.renderWindow.SetSize(width, height)
-        self.renderWindow.Render()
-
         if output_format == "wrl":
+            scene.RenderFrame(0)
+            renderer = scene.GetRenderer()
+
+            self.renderWindow.SetOffScreenRendering(1)
+            self.renderWindow.AddRenderer(renderer)
+            self.renderWindow.SetSize(width, height)
+            self.renderWindow.Render()
+
             exporter = vtk.vtkVRMLExporter()
             exporter.SetInput(self.renderWindow)
             exporter.SetFileName(os.getcwd() + "/temp_scene.wrl")
@@ -155,17 +155,9 @@ class JupyterNotebookManager:
             self.renderWindow.RemoveRenderer(renderer)
 
         else:
-            windowToImageFilter = vtk.vtkWindowToImageFilter()
-            windowToImageFilter.SetInput(self.renderWindow)
-            windowToImageFilter.Update()
-
-            writer = vtk.vtkPNGWriter()
-            writer.SetWriteToMemory(1)
-            writer.SetInputConnection(windowToImageFilter.GetOutputPort())
-            writer.Write()
-            data = memoryview(writer.GetResult())
-            self.renderWindow.RemoveRenderer(renderer)
-
+            # Render and capture the scene as a PNG in C++ (VtkScene), rather than
+            # duplicating the window-to-image / PNG-writer pipeline here.
+            data = memoryview(scene.GetSceneAsCharBuffer())
             return IPython.display.Image(data)
 
 

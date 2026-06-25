@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include <vtkAutoInit.h>
 #include <vtkLookupTable.h>
 #include <vtkOggTheoraWriter.h>
 #include <vtkRenderWindow.h>
@@ -46,23 +45,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnsignedCharArray.h>
-#include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
-
-#if VTK_MAJOR_VERSION <= 6
-VTK_MODULE_INIT(vtkRenderingOpenGL);
-#else
-VTK_MODULE_INIT(vtkRenderingOpenGL2);
-#endif
-VTK_MODULE_INIT(vtkRenderingFreeType);
 
 #include "AbstractCellPopulation.hpp"
 #include "CellPopulationPyChasteActorGenerator.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "SmartPointers.hpp"
 
+class vtkPNGWriter;
+
 /**
- * A simple VTK renderer for cell populations
+ * Renders a Chaste cell population with VTK for visualisation.
+ *
+ * A population is supplied via SetCellPopulation(), and its actors are built
+ * by a CellPopulationPyChasteActorGenerator. The scene can be captured to an
+ * in-memory PNG (GetSceneAsCharBuffer()) or, during a simulation, driven by a
+ * VtkSceneModifier that calls RenderFrame() at each output step to write a
+ * per-step PNG and/or an Ogg/Theora animation. The output mode is chosen with
+ * SetSaveAsImages() / SetSaveAsAnimation() / SetIsInteractive().
  */
 template <unsigned DIM>
 class VtkScene
@@ -100,32 +100,22 @@ class VtkScene
     /**
      * Is the rendering interactive
      */
-    bool mIsInteractive;
+    bool mIsInteractive = false;
 
     /**
      * Save as an animation
      */
-    bool mSaveAsAnimation;
+    bool mSaveAsAnimation = false;
 
     /**
      * Save as an image
      */
-    bool mSaveAsImages;
+    bool mSaveAsImages = false;
 
     /**
      * Has the renderer started
      */
-    bool mHasStarted;
-
-    /**
-     * Add annotation
-     */
-    bool mAddAnnotations;
-
-    /**
-     * How often to update the renderer during a simulation
-     */
-    unsigned mOutputFrequency;
+    bool mHasStarted = false;
 
     /**
      * The cell population
@@ -133,50 +123,48 @@ class VtkScene
     boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > mpCellPopulationGenerator;
 
 public:
+
     /**
-     * Constructor
+     * Constructor. Creates the renderer, render window and interactor, with a
+     * white background and a trackball-camera interactor style.
      */
     VtkScene();
 
     /**
      * Destructor
      */
-    virtual ~VtkScene();
+    virtual ~VtkScene() = default;
 
     /**
-     * Shut down the scene and close the animation
+     * Finalise and close the animation file, if one is being written.
      */
     void End();
-
-    /**
-     * Render the current scene and return it as a char array that can be passed
-     * into a Python buffer for display.
-     * @return the scene as a char array
-     */
-    vtkSmartPointer<vtkUnsignedCharArray> GetSceneAsCharBuffer();
-
-    /**
-     * Return the renderer
-     * @return the vtk renderer
-     */
-    vtkSmartPointer<vtkRenderer> GetRenderer();
 
     /**
      * Get the cell population actor generator
      * @return the cell population actor generator
      */
-    boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > GetCellPopulationActorGenerator();
+    boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > GetCellPopulationActorGenerator() const;
 
     /**
-     * Update the renderer, this will update the population actor and write output images
-     * @param timeStep the curren time step, for annotating output files
+     * Return the renderer
+     * @return the vtk renderer
      */
-    virtual void ResetRenderer(unsigned timeStep = 0);
+    vtkSmartPointer<vtkRenderer> GetRenderer() const;
 
     /**
-     * Render the scene
+     * Rebuild and render the scene off-screen and return it as an in-memory PNG,
+     * for inline display (e.g. in a Jupyter notebook). Writes no output files.
+     * @return the rendered scene as PNG bytes
      */
-    void Start();
+    vtkSmartPointer<vtkUnsignedCharArray> GetSceneAsCharBuffer();
+
+    /**
+     * Update the scene and write output: refreshes the actors via UpdateScene(),
+     * then renders and writes an image/animation frame if enabled.
+     * @param timeStep the current time step, for annotating output files
+     */
+    virtual void RenderFrame(unsigned timeStep = 0);
 
     /**
      * Set the cell population
@@ -185,33 +173,65 @@ public:
     void SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation);
 
     /**
-     * Set the path for output
-     * @param rPath the path for output
-     */
-    void SetOutputFilePath(const std::string& rPath);
-
-    /**
-     * Set run as an interactive window
-     * @param isInteractive run as an interactive window
+     * Set whether to render to an interactive on-screen window (rather than
+     * off-screen).
+     * @param isInteractive whether to render interactively
      */
     void SetIsInteractive(bool isInteractive);
 
     /**
-     * Whether to save as an animation
-     * @param saveAsAnimation save as an animation
+     * Set the output file path prefix for saved images/animations.
+     * @param rPath the output path prefix
+     */
+    void SetOutputFilePath(const std::string& rPath);
+
+    /**
+     * Set whether to write the scene to an Ogg/Theora animation, one frame per
+     * RenderFrame() call (the output path sets the .ogg file name).
+     * @param saveAsAnimation whether to save an animation
      */
     void SetSaveAsAnimation(bool saveAsAnimation);
 
     /**
-     * Whether to save as images (default)
-     * @param saveAsImages save as images
+     * Set whether to write a PNG image per RenderFrame() call, named from the
+     * output path and time step.
+     * @param saveAsImages whether to save per-step images
      */
     void SetSaveAsImages(bool saveAsImages);
 
     /**
-     * Start the event handler for window interaction
+     * Perform the one-time scene setup: build the actors, select off-screen
+     * rendering, and (if enabled) initialise the image/animation output pipeline.
+     * Called automatically by RenderFrame() / GetSceneAsCharBuffer() on first use.
+     */
+    void Start();
+
+    /**
+     * Start the interactor's event loop to handle window interaction; blocks
+     * until the window is closed. Only meaningful in interactive mode.
      */
     void StartInteractiveEventHandler();
+
+    /**
+     * Rebuild the scene's actors to reflect the current cell population, and
+     * reset the camera. Does not render or write any output (see RenderFrame).
+     */
+    void UpdateScene();
+
+private:
+
+    /**
+     * Create a PNG writer connected to the window-to-image filter, configured to
+     * write the rendered frame to an in-memory buffer.
+     * @return the configured writer
+     */
+    vtkSmartPointer<vtkPNGWriter> MakePngWriter();
+
+    /**
+     * Render the current frame off-screen and flag the window-to-image filter,
+     * leaving it ready to be captured by a PNG/animation writer.
+     */
+    void RenderForCapture();
 };
 
 #endif // VTKSCENE_HPP_

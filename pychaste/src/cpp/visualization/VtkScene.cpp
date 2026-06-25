@@ -33,202 +33,157 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include "VtkScene.hpp"
+
 #include <boost/lexical_cast.hpp>
 #include <boost/smart_ptr/make_shared.hpp>
 
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
+#include <vtkAutoInit.h>
 #include <vtkCamera.h>
-#include <vtkCell.h>
-#include <vtkConvexPointSet.h>
-#include <vtkCubeAxesActor2D.h>
-#include <vtkExtractEdges.h>
-#include <vtkFeatureEdges.h>
-#include <vtkGeometryFilter.h>
-#include <vtkGlyph2D.h>
-#include <vtkGlyph3D.h>
-#include <vtkIdList.h>
-#include <vtkImageData.h>
 #include <vtkInteractorStyleTrackballCamera.h>
-#include <vtkLine.h>
-#include <vtkNamedColors.h>
-#include <vtkObjectFactory.h>
 #include <vtkPNGWriter.h>
-#include <vtkPoints.h>
-#include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkPolygon.h>
-#include <vtkProperty.h>
-#include <vtkSphereSource.h>
-#include <vtkTetra.h>
-#include <vtkTriangle.h>
-#include <vtkTubeFilter.h>
 #include <vtkUnsignedCharArray.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkVertexGlyphFilter.h>
+#include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
 
-#include "Exception.hpp"
-#include "UblasIncludes.hpp"
-#include "UblasVectorInclude.hpp"
+// Initialise the VTK rendering backend's object factories. VTK_MODULE_INIT
+// defines a static initialiser, so it must live in exactly one translation
+// unit (here, not in a header) to register the modules once for the library.
+VTK_MODULE_INIT(vtkRenderingOpenGL2);
+VTK_MODULE_INIT(vtkRenderingFreeType);
 
-#include "VtkScene.hpp"
-
-// For some reason an explicit interactor style is needed capture mouse events
-class customMouseInteractorStyle : public vtkInteractorStyleTrackballCamera
+namespace
 {
-public:
-    static customMouseInteractorStyle* New();
-    vtkTypeMacro(customMouseInteractorStyle, vtkInteractorStyleTrackballCamera);
+/** Default render window dimensions, in pixels. */
+constexpr int WINDOW_WIDTH = 800;
+constexpr int WINDOW_HEIGHT = 600;
 
-    virtual void OnLeftButtonDown()
-    {
-        // Forward events
-        vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
-    }
+/** Camera azimuth applied to 3D scenes, in degrees. */
+constexpr double DEFAULT_3D_AZIMUTH_DEGREES = 45.0;
 
-    virtual void OnMiddleButtonDown()
-    {
-        // Forward events
-        vtkInteractorStyleTrackballCamera::OnMiddleButtonDown();
-    }
-
-    virtual void OnRightButtonDown()
-    {
-        // Forward events
-        vtkInteractorStyleTrackballCamera::OnRightButtonDown();
-    }
-};
-
-vtkStandardNewMacro(customMouseInteractorStyle);
+/** Animation frame rate, in frames per second. */
+constexpr double ANIMATION_FRAME_RATE = 1.0;
+} // namespace
 
 template <unsigned DIM>
 VtkScene<DIM>::VtkScene()
         : mpRenderer(vtkSmartPointer<vtkRenderer>::New()),
           mpRenderWindow(vtkSmartPointer<vtkRenderWindow>::New()),
           mpRenderWindowInteractor(vtkSmartPointer<vtkRenderWindowInteractor>::New()),
-          mOutputFilePath(),
           mAnimationWriter(vtkSmartPointer<vtkOggTheoraWriter>::New()),
           mWindowToImageFilter(vtkSmartPointer<vtkWindowToImageFilter>::New()),
-          mIsInteractive(false),
-          mSaveAsAnimation(false),
-          mSaveAsImages(false),
-          mHasStarted(false),
-          mAddAnnotations(false),
-          mOutputFrequency(1),
           mpCellPopulationGenerator(boost::make_shared<CellPopulationPyChasteActorGenerator<DIM> >())
 {
-    mpRenderer->SetBackground(1.0, 1.0, 1.0);
+    mpRenderer->SetBackground(1.0, 1.0, 1.0); // white
     mpRenderWindow->AddRenderer(mpRenderer);
-    mpRenderWindow->SetSize(800.0, 600.0);
+    mpRenderWindow->SetSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     mpRenderWindowInteractor->SetRenderWindow(mpRenderWindow);
 
-    auto style = vtkSmartPointer<customMouseInteractorStyle>::New();
+    // An explicit interactor style is needed to capture mouse events
+    auto style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     mpRenderWindowInteractor->SetInteractorStyle(style);
 }
 
 template <unsigned DIM>
-VtkScene<DIM>::~VtkScene()
+void VtkScene<DIM>::End()
 {
+    if (mSaveAsAnimation && mHasStarted)
+    {
+        mAnimationWriter->End();
+    }
 }
 
 template <unsigned DIM>
-boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > VtkScene<DIM>::GetCellPopulationActorGenerator()
+boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > VtkScene<DIM>::GetCellPopulationActorGenerator() const
 {
     return mpCellPopulationGenerator;
 }
 
 template <unsigned DIM>
-void VtkScene<DIM>::SetIsInteractive(bool isInteractive)
-{
-    mIsInteractive = isInteractive;
-}
-
-template <unsigned DIM>
-vtkSmartPointer<vtkRenderer> VtkScene<DIM>::GetRenderer()
+vtkSmartPointer<vtkRenderer> VtkScene<DIM>::GetRenderer() const
 {
     return mpRenderer;
 }
 
 template <unsigned DIM>
-void VtkScene<DIM>::SetSaveAsImages(bool saveAsImages)
-{
-    mSaveAsImages = saveAsImages;
-}
-
-template <unsigned DIM>
 vtkSmartPointer<vtkUnsignedCharArray> VtkScene<DIM>::GetSceneAsCharBuffer()
 {
-    ResetRenderer(0);
+    // Rebuild and render the scene to an in-memory PNG, without writing any
+    // output files (unlike RenderFrame).
+    if (!mHasStarted)
+    {
+        Start();
+    }
+    else
+    {
+        UpdateScene();
+    }
 
-    mpRenderWindow->SetOffScreenRendering(1);
-    mpRenderWindow->Render();
-    mWindowToImageFilter->Modified();
+    RenderForCapture();
 
-    auto p_writer = vtkSmartPointer<vtkPNGWriter>::New();
-    p_writer->SetWriteToMemory(1);
-    p_writer->SetInputConnection(mWindowToImageFilter->GetOutputPort());
+    auto p_writer = MakePngWriter();
     p_writer->Write();
 
     return p_writer->GetResult();
 }
 
 template <unsigned DIM>
-void VtkScene<DIM>::ResetRenderer(unsigned time_step)
+void VtkScene<DIM>::RenderFrame(unsigned timeStep)
 {
+    // The first call lazily runs Start() (which builds the scene); later calls
+    // just rebuild the actors to reflect the current cell population.
     if (!mHasStarted)
     {
         Start();
     }
-
-    vtkSmartPointer<vtkActor> p_actor;
-    vtkSmartPointer<vtkActorCollection> p_actors = mpRenderer->GetActors();
-
-    for (p_actors->InitTraversal(); (p_actor = p_actors->GetNextItem()) != NULL;)
+    else
     {
-        mpRenderer->RemoveActor(p_actor);
+        UpdateScene();
     }
 
-    if (mpCellPopulationGenerator)
+    // Write this step's output: a numbered PNG (images) and/or an animation frame.
+    if (mSaveAsImages || mSaveAsAnimation)
     {
-        mpCellPopulationGenerator->AddActor(mpRenderer);
-    }
-    mpRenderer->ResetCamera();
+        RenderForCapture();
 
-    if (mSaveAsImages)
-    {
-        mpRenderWindow->SetOffScreenRendering(1);
-        mpRenderWindow->Render();
-        mWindowToImageFilter->Modified();
-
-        auto p_writer = vtkSmartPointer<vtkPNGWriter>::New();
-        p_writer->SetWriteToMemory(1);
-        p_writer->SetInputConnection(mWindowToImageFilter->GetOutputPort());
-
-        if (!mOutputFilePath.empty())
+        if (mSaveAsImages)
         {
-            p_writer->SetWriteToMemory(0);
-            p_writer->SetFileName((mOutputFilePath + "_" + boost::lexical_cast<std::string>(time_step) + ".png").c_str());
-            p_writer->Write();
+            // Redirect the writer from its in-memory buffer to a per-step file.
+            auto p_writer = MakePngWriter();
+            if (!mOutputFilePath.empty())
+            {
+                p_writer->SetWriteToMemory(0);
+                p_writer->SetFileName((mOutputFilePath + "_" + boost::lexical_cast<std::string>(timeStep) + ".png").c_str());
+                p_writer->Write();
+            }
+        }
+
+        if (mSaveAsAnimation)
+        {
+            mAnimationWriter->Write();
         }
     }
 
-    if (mSaveAsAnimation)
-    {
-        if (!mSaveAsImages)
-        {
-            mpRenderWindow->SetOffScreenRendering(1);
-            mpRenderWindow->Render();
-            mWindowToImageFilter->Modified();
-        }
-        mAnimationWriter->Write();
-    }
-
+    // Interactive mode: show the freshly-rebuilt scene in the on-screen window.
     if (mIsInteractive)
     {
         mpRenderWindow->SetOffScreenRendering(0);
         mpRenderWindow->Render();
     }
+}
+
+template <unsigned DIM>
+void VtkScene<DIM>::SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation)
+{
+    mpCellPopulationGenerator->SetCellPopulation(pCellPopulation);
+}
+
+template <unsigned DIM>
+void VtkScene<DIM>::SetIsInteractive(bool isInteractive)
+{
+    mIsInteractive = isInteractive;
 }
 
 template <unsigned DIM>
@@ -244,52 +199,45 @@ void VtkScene<DIM>::SetSaveAsAnimation(bool saveAsAnimation)
 }
 
 template <unsigned DIM>
-void VtkScene<DIM>::SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation)
+void VtkScene<DIM>::SetSaveAsImages(bool saveAsImages)
 {
-    mpCellPopulationGenerator->SetCellPopulation(pCellPopulation);
-}
-
-template <unsigned DIM>
-void VtkScene<DIM>::End()
-{
-    if (mSaveAsAnimation and mHasStarted)
-    {
-        mAnimationWriter->End();
-    }
+    mSaveAsImages = saveAsImages;
 }
 
 template <unsigned DIM>
 void VtkScene<DIM>::Start()
 {
-    mpRenderer->ResetCamera();
-    if (DIM == 3)
+    // Build the scene before the setup render below, so the window-to-image
+    // filter and animation writer are initialised from a populated frame.
+    UpdateScene();
+    if constexpr (DIM == 3)
     {
-        mpRenderer->GetActiveCamera()->Azimuth(45.0);
+        mpRenderer->GetActiveCamera()->Azimuth(DEFAULT_3D_AZIMUTH_DEGREES);
     }
 
-    if (!mIsInteractive)
+    // Render off-screen for non-interactive display and whenever writing output.
+    if (!mIsInteractive || mSaveAsImages || mSaveAsAnimation)
     {
         mpRenderWindow->SetOffScreenRendering(1);
-    }
 
-    if (mSaveAsImages || mSaveAsAnimation)
-    {
-        mpRenderWindow->SetOffScreenRendering(1);
-        mpRenderWindow->Render();
-        mWindowToImageFilter->SetInput(mpRenderWindow);
-        mWindowToImageFilter->Update();
-    }
-
-    if (mSaveAsAnimation)
-    {
-        mAnimationWriter->SetInputConnection(mWindowToImageFilter->GetOutputPort());
-        mAnimationWriter->SetFileName((mOutputFilePath + ".ogg").c_str());
-        mAnimationWriter->SetRate(1.0);
-        mAnimationWriter->Start();
+        if (mSaveAsImages || mSaveAsAnimation)
+        {
+            // One-time wiring of the window-to-image capture (and animation) pipeline.
+            mpRenderWindow->Render();
+            mWindowToImageFilter->SetInput(mpRenderWindow);
+            mWindowToImageFilter->Update();
+            
+            if (mSaveAsAnimation)
+            {
+                mAnimationWriter->SetInputConnection(mWindowToImageFilter->GetOutputPort());
+                mAnimationWriter->SetFileName((mOutputFilePath + ".ogg").c_str());
+                mAnimationWriter->SetRate(ANIMATION_FRAME_RATE);
+                mAnimationWriter->Start();
+            }
+        }
     }
 
     mHasStarted = true;
-    ResetRenderer();
 
     if (mIsInteractive)
     {
@@ -301,6 +249,43 @@ template <unsigned DIM>
 void VtkScene<DIM>::StartInteractiveEventHandler()
 {
     mpRenderWindowInteractor->Start();
+}
+
+template <unsigned DIM>
+void VtkScene<DIM>::UpdateScene()
+{
+    // Rebuild the scene's actors to reflect the current cell population, and
+    // reset the camera. Unlike RenderFrame(), this writes no output.
+    vtkSmartPointer<vtkActor> p_actor;
+    vtkSmartPointer<vtkActorCollection> p_actors = mpRenderer->GetActors();
+
+    for (p_actors->InitTraversal(); (p_actor = p_actors->GetNextItem()) != nullptr;)
+    {
+        mpRenderer->RemoveActor(p_actor);
+    }
+
+    if (mpCellPopulationGenerator)
+    {
+        mpCellPopulationGenerator->AddActor(mpRenderer);
+    }
+    mpRenderer->ResetCamera();
+}
+
+template <unsigned DIM>
+vtkSmartPointer<vtkPNGWriter> VtkScene<DIM>::MakePngWriter()
+{
+    auto p_writer = vtkSmartPointer<vtkPNGWriter>::New();
+    p_writer->SetWriteToMemory(1);
+    p_writer->SetInputConnection(mWindowToImageFilter->GetOutputPort());
+    return p_writer;
+}
+
+template <unsigned DIM>
+void VtkScene<DIM>::RenderForCapture()
+{
+    mpRenderWindow->SetOffScreenRendering(1);
+    mpRenderWindow->Render();
+    mWindowToImageFilter->Modified();
 }
 
 template class VtkScene<2>;

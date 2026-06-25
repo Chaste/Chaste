@@ -64,7 +64,7 @@ void VtkSceneModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM
     {
         if(mpScene and SimulationTime::Instance()->GetTimeStepsElapsed()%mUpdateFrequency==0)
         {
-            mpScene->ResetRenderer(SimulationTime::Instance()->GetTimeStepsElapsed());
+            mpScene->RenderFrame(SimulationTime::Instance()->GetTimeStepsElapsed());
         }
     }
 }
@@ -102,7 +102,7 @@ void VtkSceneModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPop
     UpdateCellData(rCellPopulation);
     if(mpScene and SimulationTime::Instance()->GetTimeStepsElapsed()%mUpdateFrequency==0)
     {
-        mpScene->ResetRenderer(SimulationTime::Instance()->GetTimeStepsElapsed());
+        mpScene->RenderFrame(SimulationTime::Instance()->GetTimeStepsElapsed());
     }
 }
 
