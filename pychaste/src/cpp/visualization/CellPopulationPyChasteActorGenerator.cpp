@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellPopulationPyChasteActorGenerator.hpp"
 #include <algorithm>
-#include <boost/lexical_cast.hpp>
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
 #include <vtkCell.h>
@@ -67,7 +66,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkVoxel.h>
 #include "CaBasedCellPopulation.hpp"
 #include "CellLabel.hpp"
-#include "Debug.hpp"
 #include "Exception.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -77,325 +75,57 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasVectorInclude.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
-template <unsigned DIM>
-CellPopulationPyChasteActorGenerator<DIM>::CellPopulationPyChasteActorGenerator()
-        : AbstractPyChasteActorGenerator<DIM>(),
-          mpCellPopulation(),
-          mShowMutableMeshEdges(false),
-          mShowVoronoiMeshEdges(true),
-          mShowPottsMeshEdges(false),
-          mShowPottsMeshOutlines(false),
-          mColorByCellType(false),
-          mColorByCellData(false),
-          mColorByCellMutationState(false),
-          mColorByCellLabel(false),
-          mShowCellCentres(false),
-          mColorCellByUserDefined(false)
+namespace
 {
-}
+/** Sphere tessellation resolution for cell-centre glyphs. */
+constexpr int CELL_CENTRE_SPHERE_RESOLUTION = 16;
 
-template <unsigned DIM>
-CellPopulationPyChasteActorGenerator<DIM>::~CellPopulationPyChasteActorGenerator()
+/** Number of sides used by the tube filters that render mesh edges. */
+constexpr int EDGE_TUBE_NUM_SIDES = 12;
+
+/** Opacity of the lattice grid drawn for CA-based populations. */
+constexpr double CA_LATTICE_OPACITY = 0.6;
+
+/** Tube radius for mutable-mesh edges (kept fixed, independent of mEdgeSize). */
+constexpr double MUTABLE_MESH_EDGE_RADIUS = 0.02;
+
+/**
+ * Configure a vtkThreshold to keep cells whose scalar value is >= the given
+ * value. VTK 9.1 deprecated the single-call ThresholdByUpper() in favour of
+ * SetThresholdFunction()/SetUpperThreshold(), so select the API by version.
+ *
+ * @param pThreshold the threshold filter to configure
+ * @param value the lower bound of the values to keep
+ */
+void SetThresholdAbove(vtkThreshold* pThreshold, double value)
 {
-}
-
-template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::AddCaBasedCellPopulationActor(vtkSmartPointer<vtkRenderer> pRenderer)
-{
-    auto p_potts_grid = vtkSmartPointer<vtkImageData>::New();
-    auto p_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
-
-    boost::shared_ptr<CaBasedCellPopulation<DIM> > p_ca_population = boost::dynamic_pointer_cast<CaBasedCellPopulation<DIM> >(mpCellPopulation);
-
-    if (p_ca_population && mShowPottsMeshEdges)
-    {
-        auto p_points = vtkSmartPointer<vtkPoints>::New();
-        p_points->GetData()->SetName("Vertex positions");
-
-        unsigned counter = 0;
-        c_vector<double, DIM> old_loc = zero_vector<double>(DIM);
-        double spacing = 1.0;
-        for (typename PottsMesh<DIM>::NodeIterator node_iter = p_ca_population->rGetMesh().GetNodeIteratorBegin();
-             node_iter != p_ca_population->rGetMesh().GetNodeIteratorEnd(); ++node_iter)
-        {
-            c_vector<double, DIM> current_item = node_iter->rGetLocation();
-            if (DIM == 3)
-            {
-                p_points->InsertNextPoint(current_item[0], current_item[1], current_item[2]);
-            }
-            else if (DIM == 2)
-            {
-                p_points->InsertNextPoint(current_item[0], current_item[1], 0.0);
-            }
-            else // (DIM == 1)
-            {
-                p_points->InsertNextPoint(current_item[0], 0.0, 0.0);
-            }
-
-            if (counter == 0)
-            {
-                old_loc = current_item;
-            }
-            if (counter == 1)
-            {
-                spacing = norm_2(current_item - old_loc);
-            }
-            counter++;
-        }
-
-        auto p_temp_polydata = vtkSmartPointer<vtkPolyData>::New();
-        p_temp_polydata->SetPoints(p_points);
-
-        double bounds[6];
-        p_temp_polydata->GetBounds(bounds);
-        auto p_ca_image = vtkSmartPointer<vtkImageData>::New();
-        p_ca_image->SetDimensions(std::floor((bounds[1] - bounds[0]) / spacing) + 1,
-                                  std::floor((bounds[3] - bounds[2]) / spacing) + 1,
-                                  std::floor((bounds[5] - bounds[4]) / spacing) + 1);
-        p_ca_image->SetOrigin(bounds[0], bounds[2], bounds[4]);
-        p_ca_image->SetSpacing(spacing, spacing, spacing);
-
-        p_geom_filter->SetInputData(p_ca_image);
-
-        auto p_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        p_mapper->SetInputConnection(p_geom_filter->GetOutputPort());
-
-        auto p_volume_actor = vtkSmartPointer<vtkActor>::New();
-        p_volume_actor->SetMapper(p_mapper);
-        p_volume_actor->GetProperty()->SetEdgeVisibility(this->mShowEdges);
-        p_volume_actor->GetProperty()->SetLineWidth(this->mEdgeSize);
-        p_volume_actor->GetProperty()->SetOpacity(0.6);
-        pRenderer->AddActor(p_volume_actor);
-    }
-}
-
-template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::AddPottsBasedCellPopulationActor(vtkSmartPointer<vtkRenderer> pRenderer)
-{
-    auto p_potts_grid = vtkSmartPointer<vtkImageData>::New();
-
-    boost::shared_ptr<PottsBasedCellPopulation<DIM> > p_potts_population = boost::dynamic_pointer_cast<PottsBasedCellPopulation<DIM> >(mpCellPopulation);
-
-    if (p_potts_population && mShowPottsMeshEdges)
-    {
-        auto p_points = vtkSmartPointer<vtkPoints>::New();
-        p_points->GetData()->SetName("Vertex positions");
-
-        unsigned counter = 0;
-        c_vector<double, DIM> old_loc = zero_vector<double>(DIM);
-        double spacing = 1.0;
-
-        for (typename PottsMesh<DIM>::NodeIterator node_iter = p_potts_population->rGetMesh().GetNodeIteratorBegin();
-             node_iter != p_potts_population->rGetMesh().GetNodeIteratorEnd();
-             ++node_iter)
-        {
-            c_vector<double, DIM> current_item = node_iter->rGetLocation();
-            if (DIM == 3)
-            {
-                p_points->InsertNextPoint(current_item[0], current_item[1], current_item[2]);
-            }
-            else if (DIM == 2)
-            {
-                p_points->InsertNextPoint(current_item[0], current_item[1], 0.0);
-            }
-            else // (DIM == 1)
-            {
-                p_points->InsertNextPoint(current_item[0], 0.0, 0.0);
-            }
-            if (counter == 0)
-            {
-                old_loc = current_item;
-            }
-            if (counter == 1)
-            {
-                spacing = norm_2(current_item - old_loc);
-            }
-            counter++;
-        }
-
-        auto p_temp_polydata = vtkSmartPointer<vtkPolyData>::New();
-        p_temp_polydata->SetPoints(p_points);
-
-        double bounds[6];
-        p_temp_polydata->GetBounds(bounds);
-        p_potts_grid = vtkSmartPointer<vtkImageData>::New();
-
-        // Important: We color VTK cells, not points. We add a VTK cell for each Chaste node.
-        p_potts_grid->SetDimensions(std::floor((bounds[1] - bounds[0]) / spacing) + 2,
-                                    std::floor((bounds[3] - bounds[2]) / spacing) + 2,
-                                    std::floor((bounds[5] - bounds[4]) / spacing) + 2);
-        p_potts_grid->SetOrigin(bounds[0] - spacing / 2.0, bounds[2] - spacing / 2.0, bounds[4] - spacing / 2.0);
-        p_potts_grid->SetSpacing(spacing, spacing, spacing);
-
-        auto p_element_ids = vtkSmartPointer<vtkDoubleArray>::New();
-        p_element_ids->SetNumberOfTuples(p_potts_grid->GetNumberOfPoints());
-        p_element_ids->SetName("Cell Id");
-
-        auto p_element_base_ids = vtkSmartPointer<vtkDoubleArray>::New();
-        p_element_base_ids->SetNumberOfTuples(p_potts_grid->GetNumberOfPoints());
-        p_element_base_ids->SetName("Cell Base Id");
-        for (unsigned idx = 0; idx < p_potts_grid->GetNumberOfPoints(); idx++)
-        {
-            p_element_ids->SetTuple1(idx, -1.0);
-        }
-
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
-             cell_iter != mpCellPopulation->End(); ++cell_iter)
-        {
-            PottsElement<DIM>* p_element = p_potts_population->GetElementCorrespondingToCell(*cell_iter);
-
-            for (unsigned idx = 0; idx < p_element->GetNumNodes(); idx++)
-            {
-                unsigned node_index = p_element->GetNode(idx)->GetIndex();
-
-                if (mColorByCellType)
-                {
-                    p_element_ids->InsertNextTuple1((*cell_iter)->GetCellProliferativeType()->GetColour());
-                }
-                else if (mColorByCellData && !this->mDataLabel.empty())
-                {
-                    std::vector<std::string> keys = (*cell_iter)->GetCellData()->GetKeys();
-                    if (std::find(keys.begin(), keys.end(), this->mDataLabel) != keys.end())
-                    {
-                        p_element_ids->InsertNextTuple1((*cell_iter)->GetCellData()->GetItem(this->mDataLabel));
-                    }
-                    else
-                    {
-                        p_element_ids->InsertNextTuple1(0.0);
-                    }
-                }
-
-                else if (mColorByCellMutationState)
-                {
-                    double mutation_state = (*cell_iter)->GetMutationState()->GetColour();
-                    CellPropertyCollection collection = (*cell_iter)->rGetCellPropertyCollection();
-                    CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
-
-                    if (label_collection.GetSize() == 1)
-                    {
-                        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
-                        mutation_state = p_label->GetColour();
-                    }
-                    p_element_ids->InsertNextTuple1(mutation_state);
-                }
-                else if (mColorByCellLabel)
-                {
-                    double label = 0.0;
-                    if ((*cell_iter)->template HasCellProperty<CellLabel>())
-                    {
-                        CellPropertyCollection collection = (*cell_iter)->rGetCellPropertyCollection().template GetProperties<CellLabel>();
-                        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
-                        label = p_label->GetColour();
-                    }
-                    p_element_ids->InsertNextTuple1(label);
-                }
-                else
-                {
-                    p_element_ids->SetTuple1(node_index, double((*cell_iter)->GetCellId() + 1));
-                }
-                p_element_base_ids->SetTuple1(node_index, double((*cell_iter)->GetCellId() + 1));
-            }
-        }
-        p_potts_grid->GetCellData()->SetScalars(p_element_ids);
-        p_potts_grid->GetCellData()->AddArray(p_element_ids);
-        p_potts_grid->GetCellData()->AddArray(p_element_base_ids);
-
-        auto p_scaled_ctf = vtkSmartPointer<vtkColorTransferFunction>::New();
-        if (!mColorByCellData)
-        {
-            double range[2];
-            p_potts_grid->GetCellData()->GetArray("Cell Id")->GetRange(range);
-            for (unsigned idx = 0; idx < 255; idx++)
-            {
-                double color[3];
-                this->mpDiscreteColorTransferFunction->GetColor(double(idx) / 255.0, color);
-                p_scaled_ctf->AddRGBPoint(double(idx) * range[1] / 255.0, color[0], color[1], color[2]);
-            }
-        }
-
-        auto p_geometry_filter_pre = vtkSmartPointer<vtkGeometryFilter>::New();
-        p_geometry_filter_pre->SetInputData(p_potts_grid);
-
-        auto p_threshold = vtkSmartPointer<vtkThreshold>::New();
-        p_threshold->SetInputConnection(p_geometry_filter_pre->GetOutputPort());
-
 #if (VTK_MAJOR_VERSION < 9 || (VTK_MAJOR_VERSION == 9 && VTK_MINOR_VERSION < 1)) // VTK < 9.1
-        p_threshold->ThresholdByUpper(0.0);
+    pThreshold->ThresholdByUpper(value);
 #else
-        p_threshold->SetUpperThreshold(0.0);
-        p_threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_UPPER);
+    pThreshold->SetUpperThreshold(value);
+    pThreshold->SetThresholdFunction(vtkThreshold::THRESHOLD_UPPER);
 #endif
-        p_threshold->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS, "Cell Id");
-
-        auto p_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
-        p_geom_filter->SetInputConnection(p_threshold->GetOutputPort());
-
-        auto p_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        p_mapper->SetInputConnection(p_geom_filter->GetOutputPort());
-        p_mapper->SetLookupTable(p_scaled_ctf);
-        p_mapper->ScalarVisibilityOn();
-        p_mapper->SelectColorArray("Cell Id");
-        p_mapper->SetScalarModeToUseCellData();
-        p_mapper->SetColorModeToMapScalars();
-
-        auto p_volume_actor = vtkSmartPointer<vtkActor>::New();
-        p_volume_actor->SetMapper(p_mapper);
-        // p_volume_actor->GetProperty()->SetEdgeVisibility(this->mShowEdges);
-        p_volume_actor->GetProperty()->SetLineWidth(this->mEdgeSize);
-        p_volume_actor->GetProperty()->SetOpacity(this->mVolumeOpacity);
-        if (mColorCellByUserDefined)
-        {
-            p_volume_actor->GetProperty()->SetColor(this->mPointColor[0], this->mPointColor[1], this->mPointColor[2]);
-        }
-        pRenderer->AddActor(p_volume_actor);
-
-        if (mShowPottsMeshOutlines)
-        {
-            auto p_bounds = vtkSmartPointer<vtkPolyData>::New();
-
-            for (unsigned idx = 0; idx < p_potts_grid->GetNumberOfCells(); idx++)
-            {
-                auto p_local_threshold = vtkSmartPointer<vtkThreshold>::New();
-                p_local_threshold->SetInputData(p_geom_filter->GetOutput());
-
-#if (VTK_MAJOR_VERSION < 9 || (VTK_MAJOR_VERSION == 9 && VTK_MINOR_VERSION < 1)) // VTK < 9.1
-                p_local_threshold->ThresholdBetween(p_element_base_ids->GetTuple1(idx),
-                                                    p_element_base_ids->GetTuple1(idx));
-#else
-                p_local_threshold->SetLowerThreshold(p_element_base_ids->GetTuple1(idx));
-                p_local_threshold->SetUpperThreshold(p_element_base_ids->GetTuple1(idx));
-                p_local_threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_BETWEEN);
-#endif
-
-                p_local_threshold->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS, "Cell Base Id");
-
-                auto p_local_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
-                p_local_geom_filter->SetInputConnection(p_local_threshold->GetOutputPort());
-
-                auto p_features = vtkSmartPointer<vtkFeatureEdges>::New();
-                p_features->SetInputConnection(p_local_geom_filter->GetOutputPort());
-                p_features->Update();
-
-                auto p_append = vtkSmartPointer<vtkAppendPolyData>::New();
-                p_append->AddInputData(p_bounds);
-                p_append->AddInputData(p_features->GetOutput());
-                p_append->Update();
-                p_bounds = p_append->GetOutput();
-            }
-
-            auto p_mapper2 = vtkSmartPointer<vtkPolyDataMapper>::New();
-            p_mapper2->SetInputData(p_bounds);
-
-            auto p_volume_actor2 = vtkSmartPointer<vtkActor>::New();
-            p_volume_actor2->SetMapper(p_mapper2);
-            p_volume_actor2->GetProperty()->SetEdgeVisibility(this->mShowEdges);
-            p_volume_actor2->GetProperty()->SetLineWidth(this->mEdgeSize);
-            p_volume_actor2->GetProperty()->SetColor(this->mEdgeColor[0], this->mEdgeColor[1], this->mEdgeColor[2]);
-            p_volume_actor2->GetProperty()->SetOpacity(this->mVolumeOpacity);
-            pRenderer->AddActor(p_volume_actor2);
-        }
-    }
 }
+
+/**
+ * Configure a vtkThreshold to keep cells whose scalar value lies in
+ * [lower, upper], selecting the API by VTK version (see SetThresholdAbove()).
+ *
+ * @param pThreshold the threshold filter to configure
+ * @param lower the lower bound of the values to keep
+ * @param upper the upper bound of the values to keep
+ */
+void SetThresholdBetween(vtkThreshold* pThreshold, double lower, double upper)
+{
+#if (VTK_MAJOR_VERSION < 9 || (VTK_MAJOR_VERSION == 9 && VTK_MINOR_VERSION < 1)) // VTK < 9.1
+    pThreshold->ThresholdBetween(lower, upper);
+#else
+    pThreshold->SetLowerThreshold(lower);
+    pThreshold->SetUpperThreshold(upper);
+    pThreshold->SetThresholdFunction(vtkThreshold::THRESHOLD_BETWEEN);
+#endif
+}
+} // namespace
 
 template <unsigned DIM>
 void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRenderer> pRenderer)
@@ -413,6 +143,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRend
         p_cell_color_reference_data->SetName("CellColors");
         auto p_polydata = vtkSmartPointer<vtkPolyData>::New();
 
+        // Collect a point at each cell's centre, tagged with its colour value
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
              cell_iter != mpCellPopulation->End(); ++cell_iter)
         {
@@ -426,83 +157,18 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRend
                 p_points->InsertNextPoint(centre[0], centre[1], 0.0);
             }
 
-            if (mColorByCellType)
-            {
-                p_cell_color_reference_data->InsertNextTuple1((*cell_iter)->GetCellProliferativeType()->GetColour());
-            }
-            else if (mColorByCellData && !this->mDataLabel.empty())
-            {
-                std::vector<std::string> keys = (*cell_iter)->GetCellData()->GetKeys();
-                if (std::find(keys.begin(), keys.end(), this->mDataLabel) != keys.end())
-                {
-                    p_cell_color_reference_data->InsertNextTuple1((*cell_iter)->GetCellData()->GetItem(this->mDataLabel));
-                }
-                else
-                {
-                    p_cell_color_reference_data->InsertNextTuple1(0.0);
-                }
-            }
-            else if (mColorByCellMutationState)
-            {
-                double mutation_state = (*cell_iter)->GetMutationState()->GetColour();
-
-                CellPropertyCollection collection = (*cell_iter)->rGetCellPropertyCollection();
-                CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
-
-                if (label_collection.GetSize() == 1)
-                {
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
-                    mutation_state = p_label->GetColour();
-                }
-                p_cell_color_reference_data->InsertNextTuple1(mutation_state);
-            }
-            else if (mColorByCellLabel)
-            {
-                double label = 0.0;
-                if ((*cell_iter)->template HasCellProperty<CellLabel>())
-                {
-                    CellPropertyCollection collection = (*cell_iter)->rGetCellPropertyCollection().template GetProperties<CellLabel>();
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
-                    label = p_label->GetColour();
-                }
-                p_cell_color_reference_data->InsertNextTuple1(label);
-            }
-            else
-            {
-                p_cell_color_reference_data->InsertNextTuple1((*cell_iter)->GetCellId());
-            }
+            p_cell_color_reference_data->InsertNextTuple1(GetCellColour(*cell_iter));
         }
         p_polydata->SetPoints(p_points);
         p_polydata->GetPointData()->AddArray(p_cell_color_reference_data);
 
-        auto p_scaled_ctf = vtkSmartPointer<vtkColorTransferFunction>::New();
-        if (!mColorByCellData)
-        {
-            double range[2];
-            p_polydata->GetPointData()->GetArray("CellColors")->GetRange(range);
-            for (unsigned idx = 0; idx < 255; idx++)
-            {
-                double color[3];
-                this->mpDiscreteColorTransferFunction->GetColor((255.0 - double(idx)) / 255.0, color);
-                p_scaled_ctf->AddRGBPoint(range[0] + double(idx) * (range[1] - range[0]) / 255.0, color[0], color[1], color[2]);
-            }
-        }
-        else
-        {
-            double range[2];
-            p_polydata->GetPointData()->GetArray("CellColors")->GetRange(range);
-            for (unsigned idx = 0; idx < 255; idx++)
-            {
-                double color[3];
-                this->mpColorTransferFunction->GetColor(double(idx) / 255.0, color);
-                p_scaled_ctf->AddRGBPoint(range[0] + double(idx) * (range[1] - range[0]) / 255.0, color[0], color[1], color[2]);
-            }
-        }
+        auto p_scaled_ctf = BuildScaledColourLookup(p_polydata->GetPointData()->GetArray("CellColors"));
 
+        // Draw each centre as a sphere glyph, colour-mapped through the lookup table
         auto p_spheres = vtkSmartPointer<vtkSphereSource>::New();
         p_spheres->SetRadius(this->mPointSize);
-        p_spheres->SetPhiResolution(16);
-        p_spheres->SetThetaResolution(16);
+        p_spheres->SetPhiResolution(CELL_CENTRE_SPHERE_RESOLUTION);
+        p_spheres->SetThetaResolution(CELL_CENTRE_SPHERE_RESOLUTION);
 
         auto p_glyph = vtkSmartPointer<vtkGlyph3D>::New();
         p_glyph->SetInputData(p_polydata);
@@ -537,6 +203,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRend
         }
     }
 
+    // Add the population-type-specific actors (mesh/lattice edges and outlines)
     if (boost::dynamic_pointer_cast<MeshBasedCellPopulation<DIM> >(mpCellPopulation) && (mShowMutableMeshEdges || mShowVoronoiMeshEdges))
     {
         AddMeshBasedCellPopulationActor(pRenderer);
@@ -560,184 +227,64 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRend
 }
 
 template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::AddVertexBasedCellPopulationActor(vtkSmartPointer<vtkRenderer> pRenderer)
+void CellPopulationPyChasteActorGenerator<DIM>::AddCaBasedCellPopulationActor(vtkSmartPointer<vtkRenderer> pRenderer)
 {
-    boost::shared_ptr<VertexBasedCellPopulation<DIM> > p_cell_population = boost::dynamic_pointer_cast<VertexBasedCellPopulation<DIM> >(mpCellPopulation);
+    auto p_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
 
-    if (!p_cell_population)
+    boost::shared_ptr<CaBasedCellPopulation<DIM> > p_ca_population = boost::dynamic_pointer_cast<CaBasedCellPopulation<DIM> >(mpCellPopulation);
+
+    if (p_ca_population && mShowPottsMeshEdges)
     {
-        EXCEPTION("Could not cast mesh to Vertex Based type.");
-    }
-
-    if (mShowVoronoiMeshEdges)
-    {
-        auto p_voronoi_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-        auto p_cell_color_reference_data = vtkSmartPointer<vtkDoubleArray>::New();
-        p_cell_color_reference_data->SetName("CellColors");
-
         auto p_points = vtkSmartPointer<vtkPoints>::New();
         p_points->GetData()->SetName("Vertex positions");
-        for (unsigned node_num = 0; node_num < p_cell_population->rGetMesh().GetNumNodes(); node_num++)
+
+        // Collect the lattice node positions, inferring the spacing from the first two nodes
+        unsigned counter = 0;
+        c_vector<double, DIM> old_loc = zero_vector<double>(DIM);
+        double spacing = 1.0;
+        for (typename PottsMesh<DIM>::NodeIterator node_iter = p_ca_population->rGetMesh().GetNodeIteratorBegin();
+             node_iter != p_ca_population->rGetMesh().GetNodeIteratorEnd(); ++node_iter)
         {
-            c_vector<double, DIM> position = p_cell_population->rGetMesh().GetNode(node_num)->rGetLocation();
-            if (DIM == 2)
-            {
-                p_points->InsertPoint(node_num, position[0], position[1], 0.0);
-            }
-            else
-            {
-                p_points->InsertPoint(node_num, position[0], position[1], position[2]);
-            }
-        }
-        p_voronoi_grid->SetPoints(p_points);
+            c_vector<double, DIM> current_item = node_iter->rGetLocation();
+            AppendPoint(p_points, current_item);
 
-        for (typename VertexMesh<DIM, DIM>::VertexElementIterator iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
-             iter != p_cell_population->rGetMesh().GetElementIteratorEnd(); ++iter)
-        {
-            vtkSmartPointer<vtkCell> p_cell;
-            if (DIM == 2)
+            if (counter == 0)
             {
-                p_cell = vtkSmartPointer<vtkPolygon>::New();
+                old_loc = current_item;
             }
-            else
+            if (counter == 1)
             {
-                p_cell = vtkSmartPointer<vtkConvexPointSet>::New();
+                spacing = norm_2(current_item - old_loc);
             }
-            vtkSmartPointer<vtkIdList> p_cell_id_list = p_cell->GetPointIds();
-            p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
-            for (unsigned j = 0; j < iter->GetNumNodes(); ++j)
-            {
-                p_cell_id_list->SetId(j, iter->GetNodeGlobalIndex(j));
-            }
-            p_voronoi_grid->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-
-            unsigned element_index = iter->GetIndex();
-            CellPtr p_biological_cell = p_cell_population->GetCellUsingLocationIndex(element_index);
-
-            if (mColorByCellType)
-            {
-                p_cell_color_reference_data->InsertNextTuple1(p_biological_cell->GetCellProliferativeType()->GetColour());
-            }
-
-            else if (mColorByCellData && !this->mDataLabel.empty())
-            {
-                std::vector<std::string> keys = p_biological_cell->GetCellData()->GetKeys();
-                if (std::find(keys.begin(), keys.end(), this->mDataLabel) != keys.end())
-                {
-                    p_cell_color_reference_data->InsertNextTuple1(p_biological_cell->GetCellData()->GetItem(this->mDataLabel));
-                }
-                else
-                {
-                    p_cell_color_reference_data->InsertNextTuple1(0.0);
-                }
-            }
-
-            else if (mColorByCellMutationState)
-            {
-                double mutation_state = p_biological_cell->GetMutationState()->GetColour();
-
-                CellPropertyCollection collection = p_biological_cell->rGetCellPropertyCollection();
-                CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
-
-                if (label_collection.GetSize() == 1)
-                {
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
-                    mutation_state = p_label->GetColour();
-                }
-                p_cell_color_reference_data->InsertNextTuple1(mutation_state);
-            }
-            else if (mColorByCellLabel)
-            {
-                double label = 0.0;
-                if (p_biological_cell->HasCellProperty<CellLabel>())
-                {
-                    CellPropertyCollection collection = p_biological_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
-                    label = p_label->GetColour();
-                }
-                p_cell_color_reference_data->InsertNextTuple1(label);
-            }
-            else
-            {
-                p_cell_color_reference_data->InsertNextTuple1(p_biological_cell->GetCellId());
-            }
+            counter++;
         }
 
-        p_voronoi_grid->GetCellData()->AddArray(p_cell_color_reference_data);
-        p_voronoi_grid->GetCellData()->SetScalars(p_cell_color_reference_data);
+        auto p_temp_polydata = vtkSmartPointer<vtkPolyData>::New();
+        p_temp_polydata->SetPoints(p_points);
 
-        auto p_scaled_ctf = vtkSmartPointer<vtkColorTransferFunction>::New();
-        if (!mColorByCellData)
-        {
-            double range[2];
-            p_voronoi_grid->GetCellData()->GetArray("CellColors")->GetRange(range);
-            for (unsigned idx = 0; idx < 255; idx++)
-            {
-                double color[3];
-                this->mpDiscreteColorTransferFunction->GetColor((255.0 - double(idx)) / 255.0, color);
-                p_scaled_ctf->AddRGBPoint(range[0] + double(idx) * (range[1] - range[0]) / 255.0, color[0], color[1], color[2]);
-            }
-        }
-        else
-        {
-            double range[2];
-            p_voronoi_grid->GetCellData()->GetArray("CellColors")->GetRange(range);
-            for (unsigned idx = 0; idx < 255; idx++)
-            {
-                double color[3];
-                this->mpColorTransferFunction->GetColor(double(idx) / 255.0, color);
-                p_scaled_ctf->AddRGBPoint(range[0] + double(idx) * (range[1] - range[0]) / 255.0, color[0], color[1], color[2]);
-            }
-        }
-        p_scaled_ctf->Build();
+        double bounds[6];
+        p_temp_polydata->GetBounds(bounds);
 
-        auto p_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
-        p_geom_filter->SetInputData(p_voronoi_grid);
+        // Build a uniform image grid spanning the lattice bounds
+        auto p_ca_image = vtkSmartPointer<vtkImageData>::New();
+        p_ca_image->SetDimensions(std::floor((bounds[1] - bounds[0]) / spacing) + 1,
+                                  std::floor((bounds[3] - bounds[2]) / spacing) + 1,
+                                  std::floor((bounds[5] - bounds[4]) / spacing) + 1);
+        p_ca_image->SetOrigin(bounds[0], bounds[2], bounds[4]);
+        p_ca_image->SetSpacing(spacing, spacing, spacing);
+
+        // Render the lattice as a translucent grey volume (cells are drawn as centres by AddActor)
+        p_geom_filter->SetInputData(p_ca_image);
 
         auto p_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         p_mapper->SetInputConnection(p_geom_filter->GetOutputPort());
-        p_mapper->SetLookupTable(p_scaled_ctf);
-        p_mapper->ScalarVisibilityOn();
-        p_mapper->SelectColorArray("CellColors");
-        p_mapper->SetScalarModeToUseCellData();
-        p_mapper->SetColorModeToMapScalars();
 
-        auto p_actor = vtkSmartPointer<vtkActor>::New();
-        p_actor->SetMapper(p_mapper);
-        p_actor->GetProperty()->SetOpacity(this->mVolumeOpacity);
-        if (mColorCellByUserDefined)
-        {
-            p_actor->GetProperty()->SetColor(this->mPointColor[0], this->mPointColor[1], this->mPointColor[2]);
-        }
-        pRenderer->AddActor(p_actor);
-
-        auto p_voronoi_extract_edges = vtkSmartPointer<vtkFeatureEdges>::New();
-        p_voronoi_extract_edges->SetInputConnection(p_geom_filter->GetOutputPort());
-        p_voronoi_extract_edges->SetFeatureEdges(false);
-        p_voronoi_extract_edges->SetBoundaryEdges(true);
-        p_voronoi_extract_edges->SetManifoldEdges(true);
-        p_voronoi_extract_edges->SetNonManifoldEdges(false);
-
-        auto p_voronoi_tubes = vtkSmartPointer<vtkTubeFilter>::New();
-        p_voronoi_tubes->SetInputConnection(p_voronoi_extract_edges->GetOutputPort());
-        p_voronoi_tubes->SetRadius(this->mEdgeSize);
-        p_voronoi_tubes->SetNumberOfSides(12);
-
-        auto p_voronoi_tube_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        p_voronoi_tube_mapper->SetInputConnection(p_voronoi_tubes->GetOutputPort());
-        p_voronoi_tube_mapper->ScalarVisibilityOff();
-
-        auto p_voronoi_tube_actor = vtkSmartPointer<vtkActor>::New();
-        p_voronoi_tube_actor->SetMapper(p_voronoi_tube_mapper);
-        p_voronoi_tube_actor->GetProperty()->SetColor(this->mEdgeColor[0], this->mEdgeColor[1], this->mEdgeColor[2]);
-        pRenderer->AddActor(p_voronoi_tube_actor);
-
-        if (!this->mDataLabel.empty() && this->mShowScaleBar)
-        {
-            this->mpScaleBar->SetLookupTable(p_scaled_ctf);
-            this->mpScaleBar->SetTitle(this->mDataLabel.c_str());
-            pRenderer->AddActor(this->mpScaleBar);
-        }
+        auto p_volume_actor = vtkSmartPointer<vtkActor>::New();
+        p_volume_actor->SetMapper(p_mapper);
+        p_volume_actor->GetProperty()->SetEdgeVisibility(this->mShowEdges);
+        p_volume_actor->GetProperty()->SetLineWidth(this->mEdgeSize);
+        p_volume_actor->GetProperty()->SetOpacity(CA_LATTICE_OPACITY);
+        pRenderer->AddActor(p_volume_actor);
     }
 }
 
@@ -753,173 +300,9 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddImmersedBoundaryCellPopulatio
 
     if (mShowVoronoiMeshEdges)
     {
-        auto p_voronoi_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-        auto p_cell_color_reference_data = vtkSmartPointer<vtkDoubleArray>::New();
-        p_cell_color_reference_data->SetName("CellColors");
+        auto p_voronoi_grid = BuildMeshElementGrid(p_cell_population);
 
-        auto p_points = vtkSmartPointer<vtkPoints>::New();
-        p_points->GetData()->SetName("Vertex positions");
-        for (unsigned node_num = 0; node_num < p_cell_population->rGetMesh().GetNumNodes(); node_num++)
-        {
-            c_vector<double, DIM> position = p_cell_population->rGetMesh().GetNode(node_num)->rGetLocation();
-            if (DIM == 2)
-            {
-                p_points->InsertPoint(node_num, position[0], position[1], 0.0);
-            }
-            else
-            {
-                p_points->InsertPoint(node_num, position[0], position[1], position[2]);
-            }
-        }
-        p_voronoi_grid->SetPoints(p_points);
-
-        for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
-             iter != p_cell_population->rGetMesh().GetElementIteratorEnd(); ++iter)
-        {
-            vtkSmartPointer<vtkCell> p_cell;
-            if (DIM == 2)
-            {
-                p_cell = vtkSmartPointer<vtkPolygon>::New();
-            }
-            else
-            {
-                p_cell = vtkSmartPointer<vtkConvexPointSet>::New();
-            }
-            vtkSmartPointer<vtkIdList> p_cell_id_list = p_cell->GetPointIds();
-            p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
-            for (unsigned j = 0; j < iter->GetNumNodes(); ++j)
-            {
-                p_cell_id_list->SetId(j, iter->GetNodeGlobalIndex(j));
-            }
-            p_voronoi_grid->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-
-            unsigned element_index = iter->GetIndex();
-            CellPtr p_biological_cell = p_cell_population->GetCellUsingLocationIndex(element_index);
-
-            if (mColorByCellType)
-            {
-                p_cell_color_reference_data->InsertNextTuple1(p_biological_cell->GetCellProliferativeType()->GetColour());
-            }
-
-            else if (mColorByCellData && !this->mDataLabel.empty())
-            {
-                std::vector<std::string> keys = p_biological_cell->GetCellData()->GetKeys();
-                if (std::find(keys.begin(), keys.end(), this->mDataLabel) != keys.end())
-                {
-                    p_cell_color_reference_data->InsertNextTuple1(p_biological_cell->GetCellData()->GetItem(this->mDataLabel));
-                }
-                else
-                {
-                    p_cell_color_reference_data->InsertNextTuple1(0.0);
-                }
-            }
-
-            else if (mColorByCellMutationState)
-            {
-                double mutation_state = p_biological_cell->GetMutationState()->GetColour();
-
-                CellPropertyCollection collection = p_biological_cell->rGetCellPropertyCollection();
-                CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
-
-                if (label_collection.GetSize() == 1)
-                {
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
-                    mutation_state = p_label->GetColour();
-                }
-                p_cell_color_reference_data->InsertNextTuple1(mutation_state);
-            }
-            else if (mColorByCellLabel)
-            {
-                double label = 0.0;
-                if (p_biological_cell->HasCellProperty<CellLabel>())
-                {
-                    CellPropertyCollection collection = p_biological_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
-                    label = p_label->GetColour();
-                }
-                p_cell_color_reference_data->InsertNextTuple1(label);
-            }
-            else
-            {
-                p_cell_color_reference_data->InsertNextTuple1(p_biological_cell->GetCellId());
-            }
-        }
-
-        p_voronoi_grid->GetCellData()->AddArray(p_cell_color_reference_data);
-        p_voronoi_grid->GetCellData()->SetScalars(p_cell_color_reference_data);
-
-        auto p_scaled_ctf = vtkSmartPointer<vtkColorTransferFunction>::New();
-        if (!mColorByCellData)
-        {
-            double range[2];
-            p_voronoi_grid->GetCellData()->GetArray("CellColors")->GetRange(range);
-            for (unsigned idx = 0; idx < 255; idx++)
-            {
-                double color[3];
-                this->mpDiscreteColorTransferFunction->GetColor((255.0 - double(idx)) / 255.0, color);
-                p_scaled_ctf->AddRGBPoint(range[0] + double(idx) * (range[1] - range[0]) / 255.0, color[0], color[1], color[2]);
-            }
-        }
-        else
-        {
-            double range[2];
-            p_voronoi_grid->GetCellData()->GetArray("CellColors")->GetRange(range);
-            for (unsigned idx = 0; idx < 255; idx++)
-            {
-                double color[3];
-                this->mpColorTransferFunction->GetColor(double(idx) / 255.0, color);
-                p_scaled_ctf->AddRGBPoint(range[0] + double(idx) * (range[1] - range[0]) / 255.0, color[0], color[1], color[2]);
-            }
-        }
-        p_scaled_ctf->Build();
-
-        auto p_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
-        p_geom_filter->SetInputData(p_voronoi_grid);
-
-        auto p_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        p_mapper->SetInputConnection(p_geom_filter->GetOutputPort());
-        p_mapper->SetLookupTable(p_scaled_ctf);
-        p_mapper->ScalarVisibilityOn();
-        p_mapper->SelectColorArray("CellColors");
-        p_mapper->SetScalarModeToUseCellData();
-        p_mapper->SetColorModeToMapScalars();
-
-        auto p_actor = vtkSmartPointer<vtkActor>::New();
-        p_actor->SetMapper(p_mapper);
-        p_actor->GetProperty()->SetOpacity(this->mVolumeOpacity);
-        if (mColorCellByUserDefined)
-        {
-            p_actor->GetProperty()->SetColor(this->mPointColor[0], this->mPointColor[1], this->mPointColor[2]);
-        }
-        pRenderer->AddActor(p_actor);
-
-        auto p_voronoi_extract_edges = vtkSmartPointer<vtkFeatureEdges>::New();
-        p_voronoi_extract_edges->SetInputConnection(p_geom_filter->GetOutputPort());
-        p_voronoi_extract_edges->SetFeatureEdges(false);
-        p_voronoi_extract_edges->SetBoundaryEdges(true);
-        p_voronoi_extract_edges->SetManifoldEdges(true);
-        p_voronoi_extract_edges->SetNonManifoldEdges(false);
-
-        auto p_voronoi_tubes = vtkSmartPointer<vtkTubeFilter>::New();
-        p_voronoi_tubes->SetInputConnection(p_voronoi_extract_edges->GetOutputPort());
-        p_voronoi_tubes->SetRadius(this->mEdgeSize);
-        p_voronoi_tubes->SetNumberOfSides(12);
-
-        auto p_voronoi_tube_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        p_voronoi_tube_mapper->SetInputConnection(p_voronoi_tubes->GetOutputPort());
-        p_voronoi_tube_mapper->ScalarVisibilityOff();
-
-        auto p_voronoi_tube_actor = vtkSmartPointer<vtkActor>::New();
-        p_voronoi_tube_actor->SetMapper(p_voronoi_tube_mapper);
-        p_voronoi_tube_actor->GetProperty()->SetColor(this->mEdgeColor[0], this->mEdgeColor[1], this->mEdgeColor[2]);
-        pRenderer->AddActor(p_voronoi_tube_actor);
-
-        if (!this->mDataLabel.empty() && this->mShowScaleBar)
-        {
-            this->mpScaleBar->SetLookupTable(p_scaled_ctf);
-            this->mpScaleBar->SetTitle(this->mDataLabel.c_str());
-            pRenderer->AddActor(this->mpScaleBar);
-        }
+        AddColouredVoronoiGrid(pRenderer, p_voronoi_grid, false);
     }
 }
 
@@ -960,6 +343,8 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
             }
             p_voronoi_grid->SetPoints(p_points);
 
+            // One polygon per Voronoi cell, coloured by its biological cell; ghost
+            // cells are tagged -1 so AddColouredVoronoiGrid can threshold them out
             for (typename VertexMesh<DIM, DIM>::VertexElementIterator iter = p_cell_population->GetVoronoiTessellation()->GetElementIteratorBegin();
                  iter != p_cell_population->GetVoronoiTessellation()->GetElementIteratorEnd(); ++iter)
             {
@@ -992,52 +377,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
                 {
                     CellPtr p_biological_cell = p_cell_population->GetCellUsingLocationIndex(node_index);
 
-                    if (mColorByCellType)
-                    {
-                        p_cell_color_reference_data->InsertNextTuple1(p_biological_cell->GetCellProliferativeType()->GetColour());
-                    }
-
-                    else if (mColorByCellData && !this->mDataLabel.empty())
-                    {
-                        std::vector<std::string> keys = p_biological_cell->GetCellData()->GetKeys();
-                        if (std::find(keys.begin(), keys.end(), this->mDataLabel) != keys.end())
-                        {
-                            p_cell_color_reference_data->InsertNextTuple1(p_biological_cell->GetCellData()->GetItem(this->mDataLabel));
-                        }
-                        else
-                        {
-                            p_cell_color_reference_data->InsertNextTuple1(0.0);
-                        }
-                    }
-                    else if (mColorByCellMutationState)
-                    {
-                        double mutation_state = p_biological_cell->GetMutationState()->GetColour();
-
-                        CellPropertyCollection collection = p_biological_cell->rGetCellPropertyCollection();
-                        CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
-
-                        if (label_collection.GetSize() == 1)
-                        {
-                            boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
-                            mutation_state = p_label->GetColour();
-                        }
-                        p_cell_color_reference_data->InsertNextTuple1(mutation_state);
-                    }
-                    else if (mColorByCellLabel)
-                    {
-                        double label = 0.0;
-                        if (p_biological_cell->HasCellProperty<CellLabel>())
-                        {
-                            CellPropertyCollection collection = p_biological_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-                            boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
-                            label = p_label->GetColour();
-                        }
-                        p_cell_color_reference_data->InsertNextTuple1(label);
-                    }
-                    else
-                    {
-                        p_cell_color_reference_data->InsertNextTuple1(p_biological_cell->GetCellId());
-                    }
+                    p_cell_color_reference_data->InsertNextTuple1(GetCellColour(p_biological_cell));
                 }
                 else
                 {
@@ -1049,95 +389,13 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
         p_voronoi_grid->GetCellData()->AddArray(p_cell_color_reference_data);
         p_voronoi_grid->GetCellData()->SetScalars(p_cell_color_reference_data);
 
-        auto p_scaled_ctf = vtkSmartPointer<vtkColorTransferFunction>::New();
-        if (!mColorByCellData)
-        {
-            double range[2];
-            p_voronoi_grid->GetCellData()->GetArray("CellColors")->GetRange(range);
-            for (unsigned idx = 0; idx < 255; idx++)
-            {
-                double color[3];
-                this->mpDiscreteColorTransferFunction->GetColor((255.0 - double(idx)) / 255.0, color);
-                p_scaled_ctf->AddRGBPoint(range[0] + double(idx) * (range[1] - range[0]) / 255.0, color[0], color[1], color[2]);
-            }
-        }
-        else
-        {
-            double range[2];
-            p_voronoi_grid->GetCellData()->GetArray("CellColors")->GetRange(range);
-            for (unsigned idx = 0; idx < 255; idx++)
-            {
-                double color[3];
-                this->mpColorTransferFunction->GetColor(double(idx) / 255.0, color);
-                p_scaled_ctf->AddRGBPoint(range[0] + double(idx) * (range[1] - range[0]) / 255.0, color[0], color[1], color[2]);
-            }
-        }
-        p_scaled_ctf->Build();
-
-        auto p_threshold = vtkSmartPointer<vtkThreshold>::New();
-        p_threshold->SetInputData(p_voronoi_grid);
-#if (VTK_MAJOR_VERSION < 9 || (VTK_MAJOR_VERSION == 9 && VTK_MINOR_VERSION < 1)) // VTK < 9.1
-        p_threshold->ThresholdByUpper(0.0);
-#else
-        p_threshold->SetUpperThreshold(0.0);
-        p_threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_UPPER);
-#endif
-        p_threshold->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS, "CellColors");
-
-        auto p_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
-        p_geom_filter->SetInputConnection(p_threshold->GetOutputPort());
-
-        auto p_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        p_mapper->SetInputConnection(p_geom_filter->GetOutputPort());
-        p_mapper->SetLookupTable(p_scaled_ctf);
-        p_mapper->ScalarVisibilityOn();
-        // p_grid_mapper->InterpolateScalarsBeforeMappingOn();
-        p_mapper->SelectColorArray("CellColors");
-        p_mapper->SetScalarModeToUseCellData();
-        p_mapper->SetColorModeToMapScalars();
-
-        auto p_actor = vtkSmartPointer<vtkActor>::New();
-        p_actor->SetMapper(p_mapper);
-        p_actor->GetProperty()->SetOpacity(this->mVolumeOpacity);
-        if (mColorCellByUserDefined)
-        {
-            p_actor->GetProperty()->SetColor(this->mPointColor[0], this->mPointColor[1], this->mPointColor[2]);
-        }
-        pRenderer->AddActor(p_actor);
-
-        auto p_voronoi_extract_edges = vtkSmartPointer<vtkFeatureEdges>::New();
-        p_voronoi_extract_edges->SetInputConnection(p_geom_filter->GetOutputPort());
-        p_voronoi_extract_edges->SetFeatureEdges(false);
-        p_voronoi_extract_edges->SetBoundaryEdges(true);
-        p_voronoi_extract_edges->SetManifoldEdges(true);
-        p_voronoi_extract_edges->SetNonManifoldEdges(false);
-
-        auto p_voronoi_tubes = vtkSmartPointer<vtkTubeFilter>::New();
-        p_voronoi_tubes->SetInputConnection(p_voronoi_extract_edges->GetOutputPort());
-        p_voronoi_tubes->SetRadius(this->mEdgeSize);
-        p_voronoi_tubes->SetNumberOfSides(12);
-
-        auto p_voronoi_tube_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        p_voronoi_tube_mapper->SetInputConnection(p_voronoi_tubes->GetOutputPort());
-        p_voronoi_tube_mapper->ScalarVisibilityOff();
-
-        auto p_voronoi_tube_actor = vtkSmartPointer<vtkActor>::New();
-        p_voronoi_tube_actor->SetMapper(p_voronoi_tube_mapper);
-        p_voronoi_tube_actor->GetProperty()->SetColor(this->mEdgeColor[0], this->mEdgeColor[1], this->mEdgeColor[2]);
-        pRenderer->AddActor(p_voronoi_tube_actor);
-
-        if (!this->mDataLabel.empty() && this->mShowScaleBar)
-        {
-            this->mpScaleBar->SetLookupTable(p_scaled_ctf);
-            this->mpScaleBar->SetTitle(this->mDataLabel.c_str());
-            pRenderer->AddActor(this->mpScaleBar);
-        }
+        AddColouredVoronoiGrid(pRenderer, p_voronoi_grid, true);
     }
 
     if (mShowMutableMeshEdges)
     {
-        // Do the mutable mesh
-        // Make the local mesh into a VtkMesh
+        // Draw the underlying (Delaunay) simplicial mesh as white tube edges.
+        // Build a VTK grid (lines/triangles/tetrahedra) from the Chaste mesh.
         auto p_mutable_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
         auto p_points = vtkSmartPointer<vtkPoints>::New();
         p_points->GetData()->SetName("Vertex positions");
@@ -1147,18 +405,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
              ++node_iter)
         {
             c_vector<double, DIM> current_item = node_iter->rGetLocation();
-            if (DIM == 3)
-            {
-                p_points->InsertNextPoint(current_item[0], current_item[1], current_item[2]);
-            }
-            else if (DIM == 2)
-            {
-                p_points->InsertNextPoint(current_item[0], current_item[1], 0.0);
-            }
-            else // (DIM == 1)
-            {
-                p_points->InsertNextPoint(current_item[0], 0.0, 0.0);
-            }
+            AppendPoint(p_points, current_item);
         }
 
         p_mutable_grid->SetPoints(p_points);
@@ -1190,6 +437,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
             p_mutable_grid->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
         }
 
+        // Extract the mesh boundary edges and render them as thin white tubes
         auto p_mutable_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
         p_mutable_geom_filter->SetInputData(p_mutable_grid);
 
@@ -1202,8 +450,8 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
 
         auto p_mutable_tubes = vtkSmartPointer<vtkTubeFilter>::New();
         p_mutable_tubes->SetInputConnection(p_extract_edges->GetOutputPort());
-        p_mutable_tubes->SetRadius(0.02);
-        p_mutable_tubes->SetNumberOfSides(12);
+        p_mutable_tubes->SetRadius(MUTABLE_MESH_EDGE_RADIUS);
+        p_mutable_tubes->SetNumberOfSides(EDGE_TUBE_NUM_SIDES);
 
         auto p_mutable_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         p_mutable_mapper->SetInputConnection(p_mutable_tubes->GetOutputPort());
@@ -1216,57 +464,207 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
 }
 
 template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::AddPottsBasedCellPopulationActor(vtkSmartPointer<vtkRenderer> pRenderer)
+{
+    auto p_potts_grid = vtkSmartPointer<vtkImageData>::New();
+
+    boost::shared_ptr<PottsBasedCellPopulation<DIM> > p_potts_population = boost::dynamic_pointer_cast<PottsBasedCellPopulation<DIM> >(mpCellPopulation);
+
+    if (p_potts_population && mShowPottsMeshEdges)
+    {
+        auto p_points = vtkSmartPointer<vtkPoints>::New();
+        p_points->GetData()->SetName("Vertex positions");
+
+        // Collect lattice node positions and infer the spacing from the first two nodes
+        unsigned counter = 0;
+        c_vector<double, DIM> old_loc = zero_vector<double>(DIM);
+        double spacing = 1.0;
+
+        for (typename PottsMesh<DIM>::NodeIterator node_iter = p_potts_population->rGetMesh().GetNodeIteratorBegin();
+             node_iter != p_potts_population->rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            c_vector<double, DIM> current_item = node_iter->rGetLocation();
+            AppendPoint(p_points, current_item);
+            if (counter == 0)
+            {
+                old_loc = current_item;
+            }
+            if (counter == 1)
+            {
+                spacing = norm_2(current_item - old_loc);
+            }
+            counter++;
+        }
+
+        auto p_temp_polydata = vtkSmartPointer<vtkPolyData>::New();
+        p_temp_polydata->SetPoints(p_points);
+
+        double bounds[6];
+        p_temp_polydata->GetBounds(bounds);
+        p_potts_grid = vtkSmartPointer<vtkImageData>::New();
+
+        // Important: We color VTK cells, not points. We add a VTK cell for each Chaste node.
+        p_potts_grid->SetDimensions(std::floor((bounds[1] - bounds[0]) / spacing) + 2,
+                                    std::floor((bounds[3] - bounds[2]) / spacing) + 2,
+                                    std::floor((bounds[5] - bounds[4]) / spacing) + 2);
+        p_potts_grid->SetOrigin(bounds[0] - spacing / 2.0, bounds[2] - spacing / 2.0, bounds[4] - spacing / 2.0);
+        p_potts_grid->SetSpacing(spacing, spacing, spacing);
+
+        // One scalar per lattice site holding its cell's colour value; -1 marks empty sites
+        auto p_element_ids = vtkSmartPointer<vtkDoubleArray>::New();
+        p_element_ids->SetNumberOfTuples(p_potts_grid->GetNumberOfPoints());
+        p_element_ids->SetName("Cell Id");
+
+        auto p_element_base_ids = vtkSmartPointer<vtkDoubleArray>::New();
+        p_element_base_ids->SetNumberOfTuples(p_potts_grid->GetNumberOfPoints());
+        p_element_base_ids->SetName("Cell Base Id");
+        for (unsigned idx = 0; idx < p_potts_grid->GetNumberOfPoints(); idx++)
+        {
+            p_element_ids->SetTuple1(idx, -1.0);
+        }
+
+        // Fill in each cell's lattice sites with its colour value
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
+             cell_iter != mpCellPopulation->End(); ++cell_iter)
+        {
+            PottsElement<DIM>* p_element = p_potts_population->GetElementCorrespondingToCell(*cell_iter);
+
+            for (unsigned idx = 0; idx < p_element->GetNumNodes(); idx++)
+            {
+                unsigned node_index = p_element->GetNode(idx)->GetIndex();
+
+                // The colour array is pre-sized to the number of grid points and
+                // indexed by node, so set the value at node_index
+                if (mColorByCellType || (mColorByCellData && !this->mDataLabel.empty())
+                    || mColorByCellMutationState || mColorByCellLabel)
+                {
+                    p_element_ids->SetTuple1(node_index, GetCellColour(*cell_iter));
+                }
+                else
+                {
+                    p_element_ids->SetTuple1(node_index, double((*cell_iter)->GetCellId() + 1));
+                }
+                p_element_base_ids->SetTuple1(node_index, double((*cell_iter)->GetCellId() + 1));
+            }
+        }
+        p_potts_grid->GetCellData()->SetScalars(p_element_ids);
+        p_potts_grid->GetCellData()->AddArray(p_element_ids);
+        p_potts_grid->GetCellData()->AddArray(p_element_base_ids);
+
+        // Scale a colour lookup table to the range of cell values
+        auto p_scaled_ctf = vtkSmartPointer<vtkColorTransferFunction>::New();
+        double range[2];
+        p_potts_grid->GetCellData()->GetArray("Cell Id")->GetRange(range);
+        for (unsigned idx = 0; idx < 255; idx++)
+        {
+            double color[3];
+            if (mColorByCellData)
+            {
+                this->mpColorTransferFunction->GetColor(double(idx) / 255.0, color);
+            }
+            else
+            {
+                this->mpDiscreteColorTransferFunction->GetColor(double(idx) / 255.0, color);
+            }
+            p_scaled_ctf->AddRGBPoint(double(idx) * range[1] / 255.0, color[0], color[1], color[2]);
+        }
+
+        // Threshold out empty sites (-1) and colour-map the occupied lattice
+        auto p_geometry_filter_pre = vtkSmartPointer<vtkGeometryFilter>::New();
+        p_geometry_filter_pre->SetInputData(p_potts_grid);
+
+        auto p_threshold = vtkSmartPointer<vtkThreshold>::New();
+        p_threshold->SetInputConnection(p_geometry_filter_pre->GetOutputPort());
+
+        SetThresholdAbove(p_threshold, 0.0);
+        p_threshold->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS, "Cell Id");
+
+        auto p_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
+        p_geom_filter->SetInputConnection(p_threshold->GetOutputPort());
+
+        auto p_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        p_mapper->SetInputConnection(p_geom_filter->GetOutputPort());
+        p_mapper->SetLookupTable(p_scaled_ctf);
+        p_mapper->ScalarVisibilityOn();
+        p_mapper->SelectColorArray("Cell Id");
+        p_mapper->SetScalarModeToUseCellData();
+        p_mapper->SetColorModeToMapScalars();
+
+        auto p_volume_actor = vtkSmartPointer<vtkActor>::New();
+        p_volume_actor->SetMapper(p_mapper);
+        // p_volume_actor->GetProperty()->SetEdgeVisibility(this->mShowEdges);
+        p_volume_actor->GetProperty()->SetLineWidth(this->mEdgeSize);
+        p_volume_actor->GetProperty()->SetOpacity(this->mVolumeOpacity);
+        if (mColorCellByUserDefined)
+        {
+            p_volume_actor->GetProperty()->SetColor(this->mPointColor[0], this->mPointColor[1], this->mPointColor[2]);
+        }
+        pRenderer->AddActor(p_volume_actor);
+
+        if (mShowPottsMeshOutlines)
+        {
+            // Outline each cell: extract the boundary edges of its sites and
+            // accumulate them into a single appender, updated once at the end
+            auto p_append = vtkSmartPointer<vtkAppendPolyData>::New();
+
+            for (unsigned idx = 0; idx < p_potts_grid->GetNumberOfCells(); idx++)
+            {
+                auto p_local_threshold = vtkSmartPointer<vtkThreshold>::New();
+                p_local_threshold->SetInputData(p_geom_filter->GetOutput());
+
+                SetThresholdBetween(p_local_threshold, p_element_base_ids->GetTuple1(idx),
+                                    p_element_base_ids->GetTuple1(idx));
+
+                p_local_threshold->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS, "Cell Base Id");
+
+                auto p_local_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
+                p_local_geom_filter->SetInputConnection(p_local_threshold->GetOutputPort());
+
+                auto p_features = vtkSmartPointer<vtkFeatureEdges>::New();
+                p_features->SetInputConnection(p_local_geom_filter->GetOutputPort());
+                p_features->Update();
+
+                p_append->AddInputData(p_features->GetOutput());
+            }
+            p_append->Update();
+
+            auto p_mapper2 = vtkSmartPointer<vtkPolyDataMapper>::New();
+            p_mapper2->SetInputData(p_append->GetOutput());
+
+            auto p_volume_actor2 = vtkSmartPointer<vtkActor>::New();
+            p_volume_actor2->SetMapper(p_mapper2);
+            p_volume_actor2->GetProperty()->SetEdgeVisibility(this->mShowEdges);
+            p_volume_actor2->GetProperty()->SetLineWidth(this->mEdgeSize);
+            p_volume_actor2->GetProperty()->SetColor(this->mEdgeColor[0], this->mEdgeColor[1], this->mEdgeColor[2]);
+            p_volume_actor2->GetProperty()->SetOpacity(this->mVolumeOpacity);
+            pRenderer->AddActor(p_volume_actor2);
+        }
+    }
+}
+
+template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::AddVertexBasedCellPopulationActor(vtkSmartPointer<vtkRenderer> pRenderer)
+{
+    boost::shared_ptr<VertexBasedCellPopulation<DIM> > p_cell_population = boost::dynamic_pointer_cast<VertexBasedCellPopulation<DIM> >(mpCellPopulation);
+
+    if (!p_cell_population)
+    {
+        EXCEPTION("Could not cast mesh to Vertex Based type.");
+    }
+
+    if (mShowVoronoiMeshEdges)
+    {
+        auto p_voronoi_grid = BuildMeshElementGrid(p_cell_population);
+
+        AddColouredVoronoiGrid(pRenderer, p_voronoi_grid, false);
+    }
+}
+
+template <unsigned DIM>
 void CellPopulationPyChasteActorGenerator<DIM>::SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation)
 {
     this->mpCellPopulation = pCellPopulation;
-}
-
-template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::SetShowMutableMeshEdges(bool showEdges)
-{
-    mShowMutableMeshEdges = showEdges;
-}
-
-template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::SetShowVoronoiMeshEdges(bool showEdges)
-{
-    mShowVoronoiMeshEdges = showEdges;
-}
-
-template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::SetColorByUserDefined(bool colorByCellUserDefined)
-{
-    mColorCellByUserDefined = colorByCellUserDefined;
-}
-
-template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::SetShowPottsMeshEdges(bool showEdges)
-{
-    mShowPottsMeshEdges = showEdges;
-}
-
-template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::SetColorByCellMutationState(bool colorByCellMutationState)
-{
-    mColorByCellMutationState = colorByCellMutationState;
-}
-
-template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::SetColorByCellLabel(bool colorByCellLabel)
-{
-    mColorByCellLabel = colorByCellLabel;
-}
-
-template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::SetShowPottsMeshOutlines(bool showEdges)
-{
-    mShowPottsMeshOutlines = showEdges;
-}
-
-template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::SetColorByCellType(bool colorByCellType)
-{
-    mColorByCellType = colorByCellType;
 }
 
 template <unsigned DIM>
@@ -1276,9 +674,267 @@ void CellPopulationPyChasteActorGenerator<DIM>::SetColorByCellData(bool colorByC
 }
 
 template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::SetColorByCellLabel(bool colorByCellLabel)
+{
+    mColorByCellLabel = colorByCellLabel;
+}
+
+template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::SetColorByCellMutationState(bool colorByCellMutationState)
+{
+    mColorByCellMutationState = colorByCellMutationState;
+}
+
+template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::SetColorByCellType(bool colorByCellType)
+{
+    mColorByCellType = colorByCellType;
+}
+
+template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::SetColorByUserDefined(bool colorByCellUserDefined)
+{
+    mColorCellByUserDefined = colorByCellUserDefined;
+}
+
+template <unsigned DIM>
 void CellPopulationPyChasteActorGenerator<DIM>::SetShowCellCentres(bool showCentres)
 {
     mShowCellCentres = showCentres;
+}
+
+template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::SetShowMutableMeshEdges(bool showEdges)
+{
+    mShowMutableMeshEdges = showEdges;
+}
+
+template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::SetShowPottsMeshEdges(bool showEdges)
+{
+    mShowPottsMeshEdges = showEdges;
+}
+
+template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::SetShowPottsMeshOutlines(bool showEdges)
+{
+    mShowPottsMeshOutlines = showEdges;
+}
+
+template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::SetShowVoronoiMeshEdges(bool showEdges)
+{
+    mShowVoronoiMeshEdges = showEdges;
+}
+
+template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::AddColouredVoronoiGrid(
+    vtkSmartPointer<vtkRenderer> pRenderer,
+    vtkSmartPointer<vtkUnstructuredGrid> pGrid,
+    bool thresholdGhosts)
+{
+    auto p_scaled_ctf = BuildScaledColourLookup(pGrid->GetCellData()->GetArray("CellColors"));
+
+    auto p_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
+    if (thresholdGhosts)
+    {
+        // Ghost cells are tagged with a negative colour value; threshold them out.
+        auto p_threshold = vtkSmartPointer<vtkThreshold>::New();
+        p_threshold->SetInputData(pGrid);
+        SetThresholdAbove(p_threshold, 0.0);
+        p_threshold->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS, "CellColors");
+        p_geom_filter->SetInputConnection(p_threshold->GetOutputPort());
+    }
+    else
+    {
+        p_geom_filter->SetInputData(pGrid);
+    }
+
+    // Surface actor, colour-mapped per cell through the lookup table
+    auto p_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    p_mapper->SetInputConnection(p_geom_filter->GetOutputPort());
+    p_mapper->SetLookupTable(p_scaled_ctf);
+    p_mapper->ScalarVisibilityOn();
+    p_mapper->SelectColorArray("CellColors");
+    p_mapper->SetScalarModeToUseCellData();
+    p_mapper->SetColorModeToMapScalars();
+
+    auto p_actor = vtkSmartPointer<vtkActor>::New();
+    p_actor->SetMapper(p_mapper);
+    p_actor->GetProperty()->SetOpacity(this->mVolumeOpacity);
+    if (mColorCellByUserDefined)
+    {
+        p_actor->GetProperty()->SetColor(this->mPointColor[0], this->mPointColor[1], this->mPointColor[2]);
+    }
+    pRenderer->AddActor(p_actor);
+
+    // Draw the cell boundaries as tubes along the grid's feature edges
+    auto p_voronoi_extract_edges = vtkSmartPointer<vtkFeatureEdges>::New();
+    p_voronoi_extract_edges->SetInputConnection(p_geom_filter->GetOutputPort());
+    p_voronoi_extract_edges->SetFeatureEdges(false);
+    p_voronoi_extract_edges->SetBoundaryEdges(true);
+    p_voronoi_extract_edges->SetManifoldEdges(true);
+    p_voronoi_extract_edges->SetNonManifoldEdges(false);
+
+    auto p_voronoi_tubes = vtkSmartPointer<vtkTubeFilter>::New();
+    p_voronoi_tubes->SetInputConnection(p_voronoi_extract_edges->GetOutputPort());
+    p_voronoi_tubes->SetRadius(this->mEdgeSize);
+    p_voronoi_tubes->SetNumberOfSides(EDGE_TUBE_NUM_SIDES);
+
+    auto p_voronoi_tube_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    p_voronoi_tube_mapper->SetInputConnection(p_voronoi_tubes->GetOutputPort());
+    p_voronoi_tube_mapper->ScalarVisibilityOff();
+
+    auto p_voronoi_tube_actor = vtkSmartPointer<vtkActor>::New();
+    p_voronoi_tube_actor->SetMapper(p_voronoi_tube_mapper);
+    p_voronoi_tube_actor->GetProperty()->SetColor(this->mEdgeColor[0], this->mEdgeColor[1], this->mEdgeColor[2]);
+    pRenderer->AddActor(p_voronoi_tube_actor);
+
+    // Show a scale bar when colouring by a continuous data field
+    if (!this->mDataLabel.empty() && this->mShowScaleBar)
+    {
+        this->mpScaleBar->SetLookupTable(p_scaled_ctf);
+        this->mpScaleBar->SetTitle(this->mDataLabel.c_str());
+        pRenderer->AddActor(this->mpScaleBar);
+    }
+}
+
+template <unsigned DIM>
+void CellPopulationPyChasteActorGenerator<DIM>::AppendPoint(vtkPoints* pPoints, const c_vector<double, DIM>& rLocation) const
+{
+    if (DIM == 3)
+    {
+        pPoints->InsertNextPoint(rLocation[0], rLocation[1], rLocation[2]);
+    }
+    else if (DIM == 2)
+    {
+        pPoints->InsertNextPoint(rLocation[0], rLocation[1], 0.0);
+    }
+    else // (DIM == 1)
+    {
+        pPoints->InsertNextPoint(rLocation[0], 0.0, 0.0);
+    }
+}
+
+template <unsigned DIM>
+template <typename PopulationType>
+vtkSmartPointer<vtkUnstructuredGrid> CellPopulationPyChasteActorGenerator<DIM>::BuildMeshElementGrid(boost::shared_ptr<PopulationType> pPopulation)
+{
+    auto p_voronoi_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    auto p_cell_color_reference_data = vtkSmartPointer<vtkDoubleArray>::New();
+    p_cell_color_reference_data->SetName("CellColors");
+
+    // One VTK point per mesh node
+    auto p_points = vtkSmartPointer<vtkPoints>::New();
+    p_points->GetData()->SetName("Vertex positions");
+    for (unsigned node_num = 0; node_num < pPopulation->rGetMesh().GetNumNodes(); node_num++)
+    {
+        c_vector<double, DIM> position = pPopulation->rGetMesh().GetNode(node_num)->rGetLocation();
+        if (DIM == 2)
+        {
+            p_points->InsertPoint(node_num, position[0], position[1], 0.0);
+        }
+        else
+        {
+            p_points->InsertPoint(node_num, position[0], position[1], position[2]);
+        }
+    }
+    p_voronoi_grid->SetPoints(p_points);
+
+    // One VTK cell per mesh element, coloured by its biological cell
+    for (auto iter = pPopulation->rGetMesh().GetElementIteratorBegin();
+         iter != pPopulation->rGetMesh().GetElementIteratorEnd(); ++iter)
+    {
+        vtkSmartPointer<vtkCell> p_cell;
+        if (DIM == 2)
+        {
+            p_cell = vtkSmartPointer<vtkPolygon>::New();
+        }
+        else
+        {
+            p_cell = vtkSmartPointer<vtkConvexPointSet>::New();
+        }
+        vtkSmartPointer<vtkIdList> p_cell_id_list = p_cell->GetPointIds();
+        p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
+        for (unsigned j = 0; j < iter->GetNumNodes(); ++j)
+        {
+            p_cell_id_list->SetId(j, iter->GetNodeGlobalIndex(j));
+        }
+        p_voronoi_grid->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+
+        unsigned element_index = iter->GetIndex();
+        CellPtr p_biological_cell = pPopulation->GetCellUsingLocationIndex(element_index);
+
+        p_cell_color_reference_data->InsertNextTuple1(GetCellColour(p_biological_cell));
+    }
+
+    p_voronoi_grid->GetCellData()->AddArray(p_cell_color_reference_data);
+    p_voronoi_grid->GetCellData()->SetScalars(p_cell_color_reference_data);
+
+    return p_voronoi_grid;
+}
+
+template <unsigned DIM>
+vtkSmartPointer<vtkColorTransferFunction> CellPopulationPyChasteActorGenerator<DIM>::BuildScaledColourLookup(vtkDataArray* pArray) const
+{
+    double range[2];
+    pArray->GetRange(range);
+
+    // Sample the (continuous or discrete) transfer function across the data range
+    auto p_scaled_ctf = vtkSmartPointer<vtkColorTransferFunction>::New();
+    for (unsigned idx = 0; idx < 255; idx++)
+    {
+        double color[3];
+        if (mColorByCellData)
+        {
+            this->mpColorTransferFunction->GetColor(double(idx) / 255.0, color);
+        }
+        else
+        {
+            this->mpDiscreteColorTransferFunction->GetColor((255.0 - double(idx)) / 255.0, color);
+        }
+        p_scaled_ctf->AddRGBPoint(range[0] + double(idx) * (range[1] - range[0]) / 255.0, color[0], color[1], color[2]);
+    }
+    p_scaled_ctf->Build();
+    return p_scaled_ctf;
+}
+
+template <unsigned DIM>
+double CellPopulationPyChasteActorGenerator<DIM>::GetCellColour(const CellPtr& pCell) const
+{
+    if (mColorByCellType)
+    {
+        return pCell->GetCellProliferativeType()->GetColour();
+    }
+    if (mColorByCellData && !this->mDataLabel.empty())
+    {
+        std::vector<std::string> keys = pCell->GetCellData()->GetKeys();
+        if (std::find(keys.begin(), keys.end(), this->mDataLabel) != keys.end())
+        {
+            return pCell->GetCellData()->GetItem(this->mDataLabel);
+        }
+        return 0.0;
+    }
+    if (mColorByCellMutationState)
+    {
+        double mutation_state = pCell->GetMutationState()->GetColour();
+        CellPropertyCollection label_collection = pCell->rGetCellPropertyCollection().template GetProperties<CellLabel>();
+        if (label_collection.GetSize() == 1)
+        {
+            mutation_state = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty())->GetColour();
+        }
+        return mutation_state;
+    }
+    if (mColorByCellLabel)
+    {
+        if (pCell->template HasCellProperty<CellLabel>())
+        {
+            CellPropertyCollection label_collection = pCell->rGetCellPropertyCollection().template GetProperties<CellLabel>();
+            return boost::static_pointer_cast<CellLabel>(label_collection.GetProperty())->GetColour();
+        }
+        return 0.0;
+    }
+    return pCell->GetCellId();
 }
 
 template class CellPopulationPyChasteActorGenerator<2>;
