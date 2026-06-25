@@ -290,6 +290,8 @@ void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rP
 {
     *rParamsFile << "\t\t<MechanicsCutOffLength>" << mpNodesOnlyMesh->GetMaximumInteractionDistance() << "</MechanicsCutOffLength>\n";
     *rParamsFile << "\t\t<UseVariableRadii>" << mUseVariableRadii << "</UseVariableRadii>\n";
+    *rParamsFile << "\t\t<LoadBalanceMesh>" << mLoadBalanceMesh << "</LoadBalanceMesh>\n";
+    *rParamsFile << "\t\t<LoadBalanceFrequency>" << mLoadBalanceFrequency << "</LoadBalanceFrequency>\n";
 
     // Call method on direct parent class
     AbstractCentreBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);

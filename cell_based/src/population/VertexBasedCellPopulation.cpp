@@ -854,6 +854,8 @@ void VertexBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& 
     *rParamsFile << "\t\t<T2Threshold>" <<  mpMutableVertexMesh->GetT2Threshold() << "</T2Threshold>\n";
     *rParamsFile << "\t\t<CellRearrangementRatio>" << mpMutableVertexMesh->GetCellRearrangementRatio() << "</CellRearrangementRatio>\n";
     *rParamsFile << "\t\t<OutputCellRearrangementLocations>" << mOutputCellRearrangementLocations << "</OutputCellRearrangementLocations>\n";
+    *rParamsFile << "\t\t<RestrictVertexMovement>" << mRestrictVertexMovement << "</RestrictVertexMovement>\n";
+    *rParamsFile << "\t\t<WriteCellVtkResults>" << mWriteCellVtkResults << "</WriteCellVtkResults>\n";
 
     // Add the division rule parameters
     *rParamsFile << "\t\t<VertexBasedDivisionRule>\n";

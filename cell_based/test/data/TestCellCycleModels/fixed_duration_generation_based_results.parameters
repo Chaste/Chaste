@@ -4,3 +4,4 @@
 			<SDuration>5</SDuration>
 			<G2Duration>4</G2Duration>
 			<MDuration>1</MDuration>
+			<MinimumGapDuration>0.01</MinimumGapDuration>

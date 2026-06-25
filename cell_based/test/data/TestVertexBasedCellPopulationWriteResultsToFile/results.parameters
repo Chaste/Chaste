@@ -2,10 +2,13 @@
 		<T2Threshold>0.001</T2Threshold>
 		<CellRearrangementRatio>1.5</CellRearrangementRatio>
 		<OutputCellRearrangementLocations>1</OutputCellRearrangementLocations>
+		<RestrictVertexMovement>1</RestrictVertexMovement>
+		<WriteCellVtkResults>1</WriteCellVtkResults>
 		<VertexBasedDivisionRule>
 			<ShortAxisVertexBasedDivisionRule-2>
 			</ShortAxisVertexBasedDivisionRule-2>
 		</VertexBasedDivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
+		<AbsoluteMovementThreshold>2</AbsoluteMovementThreshold>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>

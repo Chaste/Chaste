@@ -195,6 +195,9 @@ template <unsigned DIM>
 void ImmersedBoundarySvgWriter<DIM>::OutputSimulationModifierParameters(
     out_stream& rParamsFile)
 {
+    *rParamsFile << "\t\t\t<SamplingMultiple>" << mSamplingMultiple << "</SamplingMultiple>\n";
+    *rParamsFile << "\t\t\t<SvgSize>" << mSvgSize << "</SvgSize>\n";
+
     // Call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }

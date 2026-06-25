@@ -192,6 +192,7 @@ void AbstractPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream
     *rParamsFile << "\t\t\t<SDuration>" << mSDuration << "</SDuration>\n";
     *rParamsFile << "\t\t\t<G2Duration>" << mG2Duration << "</G2Duration>\n";
     *rParamsFile << "\t\t\t<MDuration>" << mMDuration << "</MDuration>\n";
+    *rParamsFile << "\t\t\t<MinimumGapDuration>" << mMinimumGapDuration << "</MinimumGapDuration>\n";
 
     // Call method on direct parent class
     AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

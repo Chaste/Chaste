@@ -97,7 +97,15 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::OutputSimulationModifierParameters(
     out_stream& rParamsFile)
 {
-    // No parameters to output, so just call method on direct parent class
+    *rParamsFile << "\t\t\t<NodeNeighbourUpdateFrequency>" << mNodeNeighbourUpdateFrequency << "</NodeNeighbourUpdateFrequency>\n";
+    *rParamsFile << "\t\t\t<ReynoldsNumber>" << mReynoldsNumber << "</ReynoldsNumber>\n";
+    *rParamsFile << "\t\t\t<AdditiveNormalNoise>" << mAdditiveNormalNoise << "</AdditiveNormalNoise>\n";
+    *rParamsFile << "\t\t\t<NoiseStrength>" << mNoiseStrength << "</NoiseStrength>\n";
+    *rParamsFile << "\t\t\t<NoiseSkip>" << mNoiseSkip << "</NoiseSkip>\n";
+    *rParamsFile << "\t\t\t<NoiseLengthScale>" << mNoiseLengthScale << "</NoiseLengthScale>\n";
+    *rParamsFile << "\t\t\t<ZeroFieldSums>" << mZeroFieldSums << "</ZeroFieldSums>\n";
+
+    // Call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 

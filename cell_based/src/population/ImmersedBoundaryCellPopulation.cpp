@@ -811,6 +811,13 @@ template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::OutputCellPopulationParameters(
     out_stream& rParamsFile)
 {
+    *rParamsFile << "\t\t<InteractionDistance>" << mInteractionDistance << "</InteractionDistance>\n";
+    *rParamsFile << "\t\t<ReMeshFrequency>" << mReMeshFrequency << "</ReMeshFrequency>\n";
+    *rParamsFile << "\t\t<ThrowStepSizeException>" << mThrowStepSizeException << "</ThrowStepSizeException>\n";
+    *rParamsFile << "\t\t<CellRearrangementThreshold>" << mCellRearrangementThreshold << "</CellRearrangementThreshold>\n";
+    *rParamsFile << "\t\t<PopulationHasActiveSources>" << mPopulationHasActiveSources << "</PopulationHasActiveSources>\n";
+    *rParamsFile << "\t\t<OutputNodeRegionToVtk>" << mOutputNodeRegionToVtk << "</OutputNodeRegionToVtk>\n";
+
     // Add the division rule parameters
     *rParamsFile << "\t\t<ImmersedBoundaryDivisionRule>\n";
     mpImmersedBoundaryDivisionRule->OutputCellImmersedBoundaryDivisionRuleInfo(rParamsFile);

@@ -116,6 +116,7 @@ void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulat
 {
     *rParamsFile << "\t\t<DampingConstantNormal>" << mDampingConstantNormal << "</DampingConstantNormal>\n";
     *rParamsFile << "\t\t<DampingConstantMutant>" << mDampingConstantMutant << "</DampingConstantMutant>\n";
+    *rParamsFile << "\t\t<AbsoluteMovementThreshold>" << mAbsoluteMovementThreshold << "</AbsoluteMovementThreshold>\n";
 
     // Call method on direct parent class
     AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(rParamsFile);
