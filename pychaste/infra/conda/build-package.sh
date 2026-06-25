@@ -100,16 +100,21 @@ rattler-build --version
 # Install system dependencies
 /usr/bin/sudo -n yum install -y libXt-devel mesa-libGLU-devel patch
 
-# Get source code
+# Get source code as a shallow (depth 1) clone so the full git history is not
+# dragged into the build.
 if [ -n "${source_dir}" ]; then
-  export CHASTE_SOURCE_DIR="${source_dir}"
+  # The mounted source tree is owned by the host user; mark it safe so git works.
+  git config --global --add safe.directory "${source_dir}"
+  # Determine the version from the full local repo (it has the tags and history
+  # the shallow clone lacks) before making the shallow clone. file:// is required
+  # for git to honour --depth when cloning a local path.
+  export CHASTE_VERSION=$(bash "${FEEDSTOCK_ROOT}/package-version.sh" "${source_dir}")
+  git clone --recurse-submodules --depth 1 "file://${source_dir}" /tmp/Chaste
 else
   git clone --recursive --branch "${branch}" --depth 1 --tags https://github.com/Chaste/Chaste.git /tmp/Chaste
-  export CHASTE_SOURCE_DIR=/tmp/Chaste
+  export CHASTE_VERSION=$(bash "${FEEDSTOCK_ROOT}/package-version.sh" /tmp/Chaste)
 fi
-
-# Determine package version from git tag or commit hash
-export CHASTE_VERSION=$(bash "${FEEDSTOCK_ROOT}/package-version.sh" "${CHASTE_SOURCE_DIR}")
+export CHASTE_SOURCE_DIR=/tmp/Chaste
 
 rattler-build build \
   --recipe "${RECIPE_ROOT}/recipe.yaml" \

@@ -8,11 +8,12 @@ package:
   version: ${{ version }}
 
 source:
+  # CHASTE_SOURCE_DIR is a shallow (depth 1) clone made by build-package.sh, so
+  # this copies the source without the full git history. use_gitignore: false is
+  # required so the git-tracked */test/tutorials/ directories (which match the
+  # "tutorials" .gitignore pattern) are included; otherwise their test targets
+  # fail to configure with "No SOURCES given to target".
   path: ${{ env.get("CHASTE_SOURCE_DIR", default="/tmp/Chaste") }}
-  # Copy the whole tree, including git-tracked files that also match a
-  # .gitignore pattern (e.g. the */test/tutorials/ directories vs the ignored
-  # "tutorials" pattern). Without this rattler-build omits them and their test
-  # targets fail to configure with "No SOURCES given to target".
   use_gitignore: false
 
 build:
