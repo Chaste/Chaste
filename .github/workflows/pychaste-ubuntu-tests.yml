@@ -86,6 +86,15 @@ jobs:
             python3-xvfbwrapper \
             xvfb
 
+      - name: Install CastXML superbuild on Ubuntu 24.04
+        if: ${{ matrix.image == 'ubuntu:24.04' }}
+        run: |
+          # The apt castxml (0.6.3) cannot parse Ubuntu 24.04's gcc-13
+          # system headers, so install a newer castxml binary instead.
+          wget -qO- https://github.com/CastXML/CastXMLSuperbuild/releases/download/v2026.01.30/castxml-ubuntu-24.04-x86_64.tar.gz \
+            | tar -xz -C /opt
+          echo "/opt/castxml/bin" >> "${GITHUB_PATH}"
+
       - name: Configure PyChaste
         run: |
           cmake -DCMAKE_BUILD_TYPE=Release -DChaste_ENABLE_PYCHASTE=ON ..
