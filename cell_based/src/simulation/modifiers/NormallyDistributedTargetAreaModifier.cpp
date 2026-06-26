@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NormallyDistributedTargetAreaModifier.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "AbstractPhaseBasedCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -152,7 +153,8 @@ void NormallyDistributedTargetAreaModifier<DIM>::SetGrowthDuration(double growth
 template<unsigned DIM>
 void NormallyDistributedTargetAreaModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<GrowthDuration>" << mGrowthDuration << "</GrowthDuration>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mGrowthDuration);
 
     // Next, call method on direct parent class
     AbstractTargetAreaModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryMorseInteractionForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "ImmersedBoundaryEnumerations.hpp"
 
 template <unsigned DIM>
@@ -133,11 +134,12 @@ template <unsigned DIM>
 void ImmersedBoundaryMorseInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(
     out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<WellDepth>" << mWellDepth << "</WellDepth>\n";
-    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
-    *rParamsFile << "\t\t\t<LaminaWellDepthMult>" << mLaminaWellDepthMult << "</LaminaWellDepthMult>\n";
-    *rParamsFile << "\t\t\t<LaminaRestLengthMult>" << mLaminaRestLengthMult << "</LaminaRestLengthMult>\n";
-    *rParamsFile << "\t\t\t<WellWidth>" << mWellWidth << "</WellWidth>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mWellDepth);
+    CHASTE_PARAM(rParamsFile, level, mRestLength);
+    CHASTE_PARAM(rParamsFile, level, mLaminaWellDepthMult);
+    CHASTE_PARAM(rParamsFile, level, mLaminaRestLengthMult);
+    CHASTE_PARAM(rParamsFile, level, mWellWidth);
 
     // Call method on direct parent class
     AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryLinearDifferentialAdhesionForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 #include "CellLabel.hpp"
 
@@ -123,10 +124,11 @@ template<unsigned DIM>
 void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::OutputImmersedBoundaryForceParameters(
     out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<LabelledCellToLabelledCellSpringConst>" << mLabelledCellToLabelledCellSpringConst << "</LabelledCellToLabelledCellSpringConst>\n";
-    *rParamsFile << "\t\t\t<LabelledCellToCellSpringConst>" << mLabelledCellToCellSpringConst << "</LabelledCellToCellSpringConst>\n";
-    *rParamsFile << "\t\t\t<CellToCellSpringConst>" << mCellToCellSpringConst << "</CellToCellSpringConst>\n";
-    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mLabelledCellToLabelledCellSpringConst);
+    CHASTE_PARAM(rParamsFile, level, mLabelledCellToCellSpringConst);
+    CHASTE_PARAM(rParamsFile, level, mCellToCellSpringConst);
+    CHASTE_PARAM(rParamsFile, level, mRestLength);
 
     // Call method on direct parent class
     AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);

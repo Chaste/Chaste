@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "RandomCaSwitchingUpdateRule.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 RandomCaSwitchingUpdateRule<DIM>::RandomCaSwitchingUpdateRule()
@@ -72,7 +73,8 @@ void RandomCaSwitchingUpdateRule<DIM>::SetSwitchingParameter(double switchingPar
 template<unsigned DIM>
 void RandomCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<SwitchingParameter>" << mSwitchingParameter << "</SwitchingParameter>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mSwitchingParameter);
 
     // Call method on direct parent class
     AbstractCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);

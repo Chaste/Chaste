@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ExtrinsicPullModifier.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 ExtrinsicPullModifier<DIM>::ExtrinsicPullModifier()
@@ -120,8 +121,9 @@ double ExtrinsicPullModifier<DIM>::GetSpeed()
 template<unsigned DIM>
 void ExtrinsicPullModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<ApplyExtrinsicPullToAllNodes>" << mApplyExtrinsicPullToAllNodes << "</ApplyExtrinsicPullToAllNodes>\n";
-    *rParamsFile << "\t\t\t<Speed>" << mSpeed << "</Speed>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mApplyExtrinsicPullToAllNodes);
+    CHASTE_PARAM(rParamsFile, level, mSpeed);
 
     // Next, call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);

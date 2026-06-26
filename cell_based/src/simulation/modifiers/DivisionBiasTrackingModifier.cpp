@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DivisionBiasTrackingModifier.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "MeshBasedCellPopulation.hpp"
 
 template<unsigned DIM>
@@ -132,12 +133,8 @@ void DivisionBiasTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 template<unsigned DIM>
 void DivisionBiasTrackingModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<DivisionBiasVector>";
-    for (unsigned index=0; index != DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
-    {
-        *rParamsFile << mDivisionBiasVector[index] << ",";
-    }
-    *rParamsFile << mDivisionBiasVector[DIM-1] << "</DivisionBiasVector>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM_CVECTOR(rParamsFile, level, mDivisionBiasVector);
 
     // Call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);

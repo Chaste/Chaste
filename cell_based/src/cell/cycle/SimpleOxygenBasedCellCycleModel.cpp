@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel()
     : mCurrentHypoxicDuration(0.0),
@@ -194,9 +195,10 @@ void SimpleOxygenBasedCellCycleModel::SetCurrentHypoxiaOnsetTime(double currentH
 
 void SimpleOxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<HypoxicConcentration>" << mHypoxicConcentration << "</HypoxicConcentration>\n";
-    *rParamsFile << "\t\t\t<QuiescentConcentration>" << mQuiescentConcentration << "</QuiescentConcentration>\n";
-    *rParamsFile << "\t\t\t<CriticalHypoxicDuration>" << mCriticalHypoxicDuration << "</CriticalHypoxicDuration>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mHypoxicConcentration);
+    CHASTE_PARAM(rParamsFile, level, mQuiescentConcentration);
+    CHASTE_PARAM(rParamsFile, level, mCriticalHypoxicDuration);
 
     // Call method on direct parent class
     AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

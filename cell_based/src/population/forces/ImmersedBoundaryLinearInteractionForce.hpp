@@ -67,7 +67,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
-        archive & mSpringConst;
+        archive & mSpringConstant;
         archive & mRestLength;
         archive & mLaminaSpringConstMult;
         archive & mLaminaRestLengthMult;
@@ -77,7 +77,7 @@ private:
      * The basic spring constant associated with interactions. Initialised to
      * 1e3 in constructor.
      */
-    double mSpringConst;
+    double mSpringConstant;
 
     /**
      * The basic rest length associated with interactions, as a fraction of cell
@@ -129,13 +129,13 @@ public:
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
 
-    /** @return mSpringConst */
+    /** @return mSpringConstant */
     double GetSpringConst() const;
 
     /**
-     * Set mSpringConst.
+     * Set mSpringConstant.
      *
-     * @param springConst the new value of mSpringConst
+     * @param springConst the new value of mSpringConstant
      */
     void SetSpringConst(double springConst);
 

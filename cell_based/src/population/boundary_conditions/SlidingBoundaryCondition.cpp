@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SlidingBoundaryCondition.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
@@ -92,7 +93,8 @@ bool SlidingBoundaryCondition<DIM>::VerifyBoundaryCondition()
 template<unsigned DIM>
 void SlidingBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<Threshold>" << mThreshold << "</Threshold>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mThreshold);
 
     // Call method on direct parent class
     AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractNumericalMethod.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "StepSizeException.hpp"
 #include "Warnings.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
@@ -247,9 +248,10 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodInfo(o
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<UseAdaptiveTimestep>" << mUseAdaptiveTimestep << "</UseAdaptiveTimestep> \n";
-    *rParamsFile << "\t\t\t<UseUpdateNodeLocation>" << mUseUpdateNodeLocation << "</UseUpdateNodeLocation> \n";
-    *rParamsFile << "\t\t\t<GhostNodeForcesEnabled>" << mGhostNodeForcesEnabled << "</GhostNodeForcesEnabled> \n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mUseAdaptiveTimestep);
+    CHASTE_PARAM(rParamsFile, level, mUseUpdateNodeLocation);
+    CHASTE_PARAM(rParamsFile, level, mGhostNodeForcesEnabled);
 }
 
 // Explicit instantiation

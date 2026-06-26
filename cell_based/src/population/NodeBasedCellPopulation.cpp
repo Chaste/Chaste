@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NodeBasedCellPopulation.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "VtkMeshWriter.hpp"
 
@@ -288,8 +289,11 @@ void NodeBasedCellPopulation<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<MechanicsCutOffLength>" << mpNodesOnlyMesh->GetMaximumInteractionDistance() << "</MechanicsCutOffLength>\n";
-    *rParamsFile << "\t\t<UseVariableRadii>" << mUseVariableRadii << "</UseVariableRadii>\n";
+    const unsigned level = 2;
+    // TODO (#552): MechanicsCutOffLength is a property of the NodesOnlyMesh, not this class.
+    // Consider moving this output to NodesOnlyMesh::OutputMeshParameters() and removing it here.
+    CHASTE_PARAM_EXPR(rParamsFile, level, MechanicsCutOffLength, mpNodesOnlyMesh->GetMaximumInteractionDistance());
+    CHASTE_PARAM(rParamsFile, level, mUseVariableRadii);
 
     // Call method on direct parent class
     AbstractCentreBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
