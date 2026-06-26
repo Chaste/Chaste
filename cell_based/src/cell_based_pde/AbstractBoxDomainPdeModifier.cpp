@@ -537,7 +537,13 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellPdeElementMap(AbstractCellPopu
 template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    // No parameters to output, so just call method on direct parent class
+    *rParamsFile << "\t\t\t<StepSize>" << mStepSize << "</StepSize>\n";
+    *rParamsFile << "\t\t\t<SetBcsOnBoxBoundary>" << mSetBcsOnBoxBoundary << "</SetBcsOnBoxBoundary>\n";
+    *rParamsFile << "\t\t\t<SetBcsOnBoundingSphere>" << mSetBcsOnBoundingSphere << "</SetBcsOnBoundingSphere>\n";
+    *rParamsFile << "\t\t\t<UseVoronoiCellsForInterpolation>" << mUseVoronoiCellsForInterpolation << "</UseVoronoiCellsForInterpolation>\n";
+    *rParamsFile << "\t\t\t<TypicalCellRadius>" << mTypicalCellRadius << "</TypicalCellRadius>\n";
+
+    // Call method on direct parent class
     AbstractPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 

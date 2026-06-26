@@ -612,6 +612,8 @@ void CaBasedCellPopulation<DIM>::SetCaBasedDivisionRule(boost::shared_ptr<Abstra
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
+    *rParamsFile << "\t\t<LatticeCarryingCapacity>" << mLatticeCarryingCapacity << "</LatticeCarryingCapacity>\n";
+
     // Add the division rule parameters
     *rParamsFile << "\t\t<CaBasedDivisionRule>\n";
     mpCaBasedDivisionRule->OutputCellCaBasedDivisionRuleInfo(rParamsFile);

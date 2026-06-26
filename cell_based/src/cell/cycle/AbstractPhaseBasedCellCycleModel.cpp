@@ -194,6 +194,7 @@ void AbstractPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream
     CHASTE_PARAM(rParamsFile, level, mSDuration);
     CHASTE_PARAM(rParamsFile, level, mG2Duration);
     CHASTE_PARAM(rParamsFile, level, mMDuration);
+    CHASTE_PARAM(rParamsFile, level, mMinimumGapDuration);
 
     // Call method on direct parent class
     AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

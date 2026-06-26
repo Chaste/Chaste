@@ -859,6 +859,8 @@ void VertexBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& 
     CHASTE_PARAM_EXPR(rParamsFile, level, T2Threshold, mpMutableVertexMesh->GetT2Threshold());
     CHASTE_PARAM_EXPR(rParamsFile, level, CellRearrangementRatio, mpMutableVertexMesh->GetCellRearrangementRatio());
     CHASTE_PARAM(rParamsFile, level, mOutputCellRearrangementLocations);
+    CHASTE_PARAM(rParamsFile, level, mRestrictVertexMovement);
+    CHASTE_PARAM(rParamsFile, level, mWriteCellVtkResults);
 
     // Add the division rule parameters
     *rParamsFile << "\t\t<VertexBasedDivisionRule>\n";

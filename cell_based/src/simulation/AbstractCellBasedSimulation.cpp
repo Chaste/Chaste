@@ -698,7 +698,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
         // Output simulation details
         std::string simulation_type = GetIdentifier();
 
-        *parameter_file << "<Chaste>\n";
+        *parameter_file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        *parameter_file << "<Chaste xmlns=\"https://chaste.github.io/\">\n";
         *parameter_file << "\n\t<" << simulation_type << ">\n";
         OutputSimulationParameters(parameter_file);
         *parameter_file << "\t</" << simulation_type << ">\n";
@@ -740,6 +741,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
+<<<<<<< HEAD
     const unsigned level = 2;
     CHASTE_PARAM(rParamsFile, level, mDt);
     CHASTE_PARAM(rParamsFile, level, mEndTime);
@@ -748,6 +750,16 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
     CHASTE_PARAM(rParamsFile, level, mUpdatingTimestepMultiple);
     CHASTE_PARAM(rParamsFile, level, mOutputDivisionLocations);
     CHASTE_PARAM(rParamsFile, level, mOutputCellVelocities);
+=======
+    *rParamsFile << "\t\t<Dt>" << mDt << "</Dt>\n";
+    *rParamsFile << "\t\t<EndTime>" << mEndTime << "</EndTime>\n";
+    *rParamsFile << "\t\t<NoBirth>" << mNoBirth << "</NoBirth>\n";
+    *rParamsFile << "\t\t<UpdateCellPopulation>" << mUpdateCellPopulation << "</UpdateCellPopulation>\n";
+    *rParamsFile << "\t\t<SamplingTimestepMultiple>" << mSamplingTimestepMultiple << "</SamplingTimestepMultiple>\n";
+    *rParamsFile << "\t\t<UpdatingTimestepMultiple>" << mUpdatingTimestepMultiple << "</UpdatingTimestepMultiple>\n";
+    *rParamsFile << "\t\t<OutputDivisionLocations>" << mOutputDivisionLocations << "</OutputDivisionLocations>\n";
+    *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
+>>>>>>> origin/552-scope
 }
 
 // Explicit instantiation

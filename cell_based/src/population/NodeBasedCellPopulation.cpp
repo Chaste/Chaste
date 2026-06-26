@@ -294,6 +294,8 @@ void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rP
     // Consider moving this output to NodesOnlyMesh::OutputMeshParameters() and removing it here.
     CHASTE_PARAM_EXPR(rParamsFile, level, MechanicsCutOffLength, mpNodesOnlyMesh->GetMaximumInteractionDistance());
     CHASTE_PARAM(rParamsFile, level, mUseVariableRadii);
+    CHASTE_PARAM(rParamsFile, level, mLoadBalanceMesh);
+    CHASTE_PARAM(rParamsFile, level, mLoadBalanceFrequency);
 
     // Call method on direct parent class
     AbstractCentreBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
