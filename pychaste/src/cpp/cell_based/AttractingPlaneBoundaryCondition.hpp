@@ -38,9 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulationBoundaryCondition.hpp"
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
+#include "ChasteSerialization.hpp"
 
 /**
  * A plane cell population boundary condition class, which pulls nodes toward a specified plane.
@@ -85,7 +85,8 @@ private:
     void serialize(Archive& archive, const unsigned int version)
     {
         archive& boost::serialization::base_object<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> >(*this);
-        // archive & mUseJiggledNodesOnPlane;
+        archive & mUseJiggledNodesOnPlane;
+        archive & mAttractionThreshold;
     }
 
 public:
@@ -99,25 +100,8 @@ public:
     AttractingPlaneBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation,
                                      c_vector<double, SPACE_DIM> point, c_vector<double, SPACE_DIM> normal);
 
-    /**
-     * @return #mPointOnPlane.
-     */
-    const c_vector<double, SPACE_DIM>& rGetPointOnPlane() const;
-
-    /**
-     * @return #mNormalToPlane.
-     */
-    const c_vector<double, SPACE_DIM>& rGetNormalToPlane() const;
-
-    /**
-     * Set method for mUseJiggledNodesOnPlane
-     *
-     * @param useJiggledNodesOnPlane whether to jiggle the nodes on the surface of the plane, can help stop overcrowding on plane.
-     */
-    void SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane);
-
     /** @return #mUseJiggledNodesOnPlane. */
-    bool GetUseJiggledNodesOnPlane();
+    bool GetUseJiggledNodesOnPlane() const;
 
     /**
      * Overridden ImposeBoundaryCondition() method.
@@ -126,7 +110,46 @@ public:
      *
      * @param rOldLocations the node locations before any boundary conditions are applied
      */
-    void ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations);
+    void ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations) override;
+
+    /**
+     * Overridden OutputCellPopulationBoundaryConditionParameters() method.
+     * Output cell population boundary condition parameters to file.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile) override;
+
+    /**
+     * @return #mNormalToPlane.
+     */
+    const c_vector<double, SPACE_DIM>& rGetNormalToPlane() const;
+
+    /**
+     * @return #mPointOnPlane.
+     */
+    const c_vector<double, SPACE_DIM>& rGetPointOnPlane() const;
+
+    /**
+     * Specify the distance to the plane for cell attraction
+     *
+     * @param attractionThreshold the distance to the plane for cell attraction
+     */
+    void SetAttractionThreshold(double attractionThreshold);
+
+    /**
+     * Give a new value to the point describing the plane, can be used for time varying boundary conditions
+     *
+     * @param rPoint a point on the boundary plane
+     */
+    void SetPointOnPlane(const c_vector<double, SPACE_DIM>& rPoint);
+
+    /**
+     * Set method for mUseJiggledNodesOnPlane
+     *
+     * @param useJiggledNodesOnPlane whether to jiggle the nodes on the surface of the plane, can help stop overcrowding on plane.
+     */
+    void SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane);
 
     /**
      * Overridden VerifyBoundaryCondition() method.
@@ -135,29 +158,7 @@ public:
      *
      * @return whether the boundary conditions are satisfied.
      */
-    bool VerifyBoundaryCondition();
-
-    /**
-     * Overridden OutputCellPopulationBoundaryConditionParameters() method.
-     * Output cell population boundary condition parameters to file.
-     *
-     * @param rParamsFile the file stream to which the parameters are output
-     */
-    void OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile);
-
-    /**
-     * Give a new value to the point describing the plane, can be used for time varying boundary conditions
-     *
-     * @param point a point on the boundary plane
-     */
-    void SetPointOnPlane(const c_vector<double, SPACE_DIM>& rPoint);
-
-    /**
-     * Specify the distance to the plane for cell attraction
-     *
-     * @param attractionThreshold the distance to the plane for cell attraction
-     */
-    void SetAttractionThreshold(double attractionThreshold);
+    bool VerifyBoundaryCondition() override;
 };
 
 #include "SerializationExportWrapper.hpp"
