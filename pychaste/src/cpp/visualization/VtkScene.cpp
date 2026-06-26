@@ -102,6 +102,12 @@ boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > VtkScene<DIM>::Get
 }
 
 template <unsigned DIM>
+vtkSmartPointer<vtkRenderWindow> VtkScene<DIM>::GetRenderWindow() const
+{
+    return mpRenderWindow;
+}
+
+template <unsigned DIM>
 vtkSmartPointer<vtkRenderer> VtkScene<DIM>::GetRenderer() const
 {
     return mpRenderer;
@@ -215,6 +221,11 @@ void VtkScene<DIM>::Start()
         mpRenderer->GetActiveCamera()->Azimuth(DEFAULT_3D_AZIMUTH_DEGREES);
     }
 
+    // The window-to-image filter feeds every capture path (the in-memory PNG
+    // buffer as well as saved images/animation), so wire it to the render
+    // window unconditionally, not only when saving output.
+    mWindowToImageFilter->SetInput(mpRenderWindow);
+
     // Render off-screen for non-interactive display and whenever writing output.
     if (!mIsInteractive || mSaveAsImages || mSaveAsAnimation)
     {
@@ -222,11 +233,10 @@ void VtkScene<DIM>::Start()
 
         if (mSaveAsImages || mSaveAsAnimation)
         {
-            // One-time wiring of the window-to-image capture (and animation) pipeline.
+            // One-time priming of the animation pipeline from a populated frame.
             mpRenderWindow->Render();
-            mWindowToImageFilter->SetInput(mpRenderWindow);
             mWindowToImageFilter->Update();
-            
+
             if (mSaveAsAnimation)
             {
                 mAnimationWriter->SetInputConnection(mWindowToImageFilter->GetOutputPort());

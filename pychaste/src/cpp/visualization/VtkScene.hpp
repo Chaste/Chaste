@@ -147,6 +147,12 @@ public:
     boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > GetCellPopulationActorGenerator() const;
 
     /**
+     * Return the render window (e.g. to set its size before capturing a frame)
+     * @return the vtk render window
+     */
+    vtkSmartPointer<vtkRenderWindow> GetRenderWindow() const;
+
+    /**
      * Return the renderer
      * @return the vtk renderer
      */
