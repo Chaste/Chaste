@@ -48,8 +48,23 @@ AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::AttractingPlaneBoundar
           mUseJiggledNodesOnPlane(false),
           mAttractionThreshold(0.1)
 {
+    // This condition moves node locations directly, so it only applies to
+    // off-lattice populations (centre- or vertex-based), not lattice-based ones.
+    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation) == nullptr)
+    {
+        EXCEPTION("AttractingPlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
+    }
+
+    // Store the normal as a unit vector so signed distances to the plane are
+    // measured in real length units; the caller may pass any non-zero normal.
     assert(norm_2(normal) > 0.0);
     mNormalToPlane = normal / norm_2(normal);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::GetAttractionThreshold() const
+{
+    return mAttractionThreshold;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -61,22 +76,20 @@ bool AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::GetUseJiggledNode
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)
 {
-    ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
-    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation) == nullptr)
-    {
-        EXCEPTION("AttractingPlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
-    }
-
+    // The population type was validated in the constructor; only centre-based and
+    // (same-dimension) vertex-based populations reach the branches below.
     assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation))
            || (SPACE_DIM == ELEMENT_DIM && (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation))));
 
-    // This is a magic number
+    // Maximum random perturbation applied along the normal when jiggling a
+    // snapped node (see mUseJiggledNodesOnPlane).
     double max_jiggle = 1e-4;
 
     if (SPACE_DIM != 1)
     {
         if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation))
         {
+            // Centre-based populations have one node per cell, reached via the cell iterator.
             for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
                  cell_iter != this->mpCellPopulation->End();
                  ++cell_iter)
@@ -86,10 +99,14 @@ void AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCon
 
                 c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
 
+                // Signed distance to the plane: positive on the outward side.
                 double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
+
+                // Act on the node if it has crossed to the outward side, or is
+                // within the attraction band on the inward side.
                 if (signed_distance > 0.0 or std::abs(signed_distance) < mAttractionThreshold)
                 {
-                    // For the closest point on the plane we travel from node_location the signed_distance in the direction of -mNormalToPlane
+                    // The nearest point on the plane lies signed_distance away along -mNormalToPlane.
                     c_vector<double, SPACE_DIM> nearest_point;
                     if (mUseJiggledNodesOnPlane)
                     {
@@ -108,17 +125,21 @@ void AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCon
             assert(SPACE_DIM == ELEMENT_DIM); // LCOV_EXCL_LINE
             assert(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation));
 
-            // Iterate over all nodes and update their positions according to the boundary conditions
+            // Vertex-based populations: act on every vertex node directly.
             unsigned num_nodes = this->mpCellPopulation->GetNumNodes();
             for (unsigned node_index = 0; node_index < num_nodes; node_index++)
             {
                 Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
                 c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
 
+                // Signed distance to the plane: positive on the outward side.
                 double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
+
+                // Act on the node if it has crossed to the outward side, or is
+                // within the attraction band on the inward side.
                 if (signed_distance > 0.0 or std::abs(signed_distance) < mAttractionThreshold)
                 {
-                    // For the closest point on the plane we travel from node_location the signed_distance in the direction of -mNormalToPlane
+                    // The nearest point on the plane lies signed_distance away along -mNormalToPlane.
                     c_vector<double, SPACE_DIM> nearest_point;
                     if (mUseJiggledNodesOnPlane)
                     {
