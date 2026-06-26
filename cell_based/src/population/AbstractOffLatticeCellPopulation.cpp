@@ -115,6 +115,7 @@ std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& AbstractOffLatticeC
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
+    const unsigned level = 2;
     CHASTE_PARAM(rParamsFile, level, mDampingConstantNormal);
     CHASTE_PARAM(rParamsFile, level, mDampingConstantMutant);
 

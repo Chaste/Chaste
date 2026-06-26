@@ -290,6 +290,7 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetCentreBasedDi
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
+    const unsigned level = 2;
     CHASTE_PARAM(rParamsFile, level, mMeinekeDivisionSeparation);
 
     // Add the division rule parameters

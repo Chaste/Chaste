@@ -803,6 +803,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
+    const unsigned level = 2;
     CHASTE_PARAM(rParamsFile, level, mOutputResultsForChasteVisualizer);
 }
 

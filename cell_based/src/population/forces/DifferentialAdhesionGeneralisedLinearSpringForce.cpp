@@ -116,6 +116,7 @@ void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::S
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
+    const unsigned level = 3;
     CHASTE_PARAM(rParamsFile, level, mHomotypicLabelledSpringConstantMultiplier);
     CHASTE_PARAM(rParamsFile, level, mHeterotypicSpringConstantMultiplier);
 
