@@ -1,3 +1,8 @@
+		<ReMeshFrequency>4294967295</ReMeshFrequency>
+		<ThrowStepSizeException>1</ThrowStepSizeException>
+		<CellRearrangementThreshold>0.5</CellRearrangementThreshold>
+		<PopulationHasActiveSources>0</PopulationHasActiveSources>
+		<OutputNodeRegionToVtk>1</OutputNodeRegionToVtk>
 		<ImmersedBoundaryDivisionRule>
 			<ShortAxisImmersedBoundaryDivisionRule-2>
 			</ShortAxisImmersedBoundaryDivisionRule-2>
