@@ -35,48 +35,48 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VtkSceneModifier.hpp"
 
-template<unsigned DIM>
+template <unsigned DIM>
 VtkSceneModifier<DIM>::VtkSceneModifier()
-    : AbstractCellBasedSimulationModifier<DIM>(),
-      mpScene(),
-      mUpdateFrequency(1)
+        : AbstractCellBasedSimulationModifier<DIM>(),
+          mpScene(),
+          mUpdateFrequency(1)
 {
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 unsigned VtkSceneModifier<DIM>::GetUpdateFrequency() const
 {
     return mUpdateFrequency;
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 boost::shared_ptr<VtkScene<DIM> > VtkSceneModifier<DIM>::GetVtkScene()
 {
     return mpScene;
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 void VtkSceneModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 void VtkSceneModifier<DIM>::SetUpdateFrequency(unsigned frequency)
 {
     mUpdateFrequency = frequency;
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 void VtkSceneModifier<DIM>::SetVtkScene(boost::shared_ptr<VtkScene<DIM> > pScene)
 {
     mpScene = pScene;
 }
 
 // As above, the 1D overload only updates the cell data and does not render.
-template<>
-void VtkSceneModifier<1>::SetupSolve(AbstractCellPopulation<1,1>& rCellPopulation, std::string outputDirectory)
+template <>
+void VtkSceneModifier<1>::SetupSolve(AbstractCellPopulation<1, 1>& rCellPopulation, std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
@@ -85,8 +85,8 @@ void VtkSceneModifier<1>::SetupSolve(AbstractCellPopulation<1,1>& rCellPopulatio
     UpdateCellData(rCellPopulation);
 }
 
-template<unsigned DIM>
-void VtkSceneModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+template <unsigned DIM>
+void VtkSceneModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
@@ -98,28 +98,28 @@ void VtkSceneModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPop
 
 // VtkScene renders only 2D/3D populations, so this 1D overload updates the
 // cell data but skips rendering.
-template<>
-void VtkSceneModifier<1>::UpdateAtEndOfTimeStep(AbstractCellPopulation<1,1>& rCellPopulation)
+template <>
+void VtkSceneModifier<1>::UpdateAtEndOfTimeStep(AbstractCellPopulation<1, 1>& rCellPopulation)
 {
     UpdateCellData(rCellPopulation);
 }
 
-template<unsigned DIM>
-void VtkSceneModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM>
+void VtkSceneModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     UpdateCellData(rCellPopulation);
     RenderSceneIfDue();
 }
 
-template<unsigned DIM>
-void VtkSceneModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM>
+void VtkSceneModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Bring the population's internal state up to date so the scene renders the
     // current configuration.
     rCellPopulation.Update();
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 void VtkSceneModifier<DIM>::RenderSceneIfDue()
 {
     // Nothing to render until a scene has been attached.

@@ -53,7 +53,7 @@ class vtkPoints;
 class vtkUnstructuredGrid;
 
 /**
- * Generates VTK actors that render a Chaste cell population for visualisation. 
+ * Generates VTK actors that render a Chaste cell population for visualisation.
  *
  * Given a population set via SetCellPopulation(), AddActor() builds the actors
  * appropriate to the population type (mesh-, vertex-, Potts-, CA-, node- or
@@ -121,7 +121,6 @@ class CellPopulationPyChasteActorGenerator : public AbstractPyChasteActorGenerat
     bool mColorCellByUserDefined = false;
 
 public:
-
     /**
      * Constructor
      */
@@ -253,7 +252,6 @@ public:
     void SetShowVoronoiMeshEdges(bool showEdges);
 
 private:
-
     /**
      * Render a coloured cell grid: adds a colour-mapped surface actor and
      * tube-filtered boundary edges to the renderer, plus a scale bar when

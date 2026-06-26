@@ -101,9 +101,7 @@ class JupyterNotebookManager:
         data = memoryview(scene.GetSceneAsCharBuffer())
         IPython.display.display(IPython.display.Image(data))
 
-    def _display_interactive(
-        self, scene: Any, width: int, height: int, increment: bool = True
-    ) -> None:
+    def _display_interactive(self, scene: Any, width: int, height: int, increment: bool = True) -> None:
         """
         Export the scene to VRML and display it as an interactive three.js plot.
         """
@@ -130,7 +128,7 @@ class JupyterNotebookManager:
         # A unique container id per plot, so each output's script
         # targets its own <div> rather than another plot's.
         container = f"pychaste_plotting_container_{self.container_id}"
-        
+
         # Each plot's output is self-contained. It loads the plotting libraries
         # itself if they are not already on the page, then renders.
         head = (
@@ -206,9 +204,7 @@ def JupyterSceneModifierFactory(VtkSceneModifier: type) -> type:
         notebook cell at the end of each time step, for real-time plotting.
         """
 
-        def __init__(
-            self, plotting_manager: JupyterNotebookManager, output_format: str = "png"
-        ) -> None:
+        def __init__(self, plotting_manager: JupyterNotebookManager, output_format: str = "png") -> None:
             """
             Create the modifier with the manager that displays each frame and
             the output format ("png" for a static image, "wrl" for interactive).
@@ -235,9 +231,7 @@ def JupyterSceneModifierFactory(VtkSceneModifier: type) -> type:
 
             # Clear the previous frame so this one replaces it in the same cell.
             IPython.display.clear_output(wait=True)
-            self.plotting_manager.vtk_show(
-                self.GetVtkScene(), output_format=self.output_format
-            )
+            self.plotting_manager.vtk_show(self.GetVtkScene(), output_format=self.output_format)
 
     # Give each dimension's class a distinct, informative name.
     JupyterSceneModifier.__name__ = VtkSceneModifier.__name__.replace("VtkSceneModifier", "JupyterSceneModifier")

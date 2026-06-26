@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VTKSCENEMODIFIER_HPP_
 #define VTKSCENEMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include "ChasteSerialization.hpp"
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "VtkScene.hpp"
@@ -50,8 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * per-step image/animation frame and/or updating an interactive window.
  * 1D simulations are not rendered.
  */
-template<unsigned DIM>
-class VtkSceneModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+template <unsigned DIM>
+class VtkSceneModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -62,10 +62,10 @@ class VtkSceneModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
      * @param archive  The boost archive.
      * @param version  The current version of this class.
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+        archive& boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM, DIM> >(*this);
     }
 
     /**
@@ -79,7 +79,6 @@ class VtkSceneModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
     unsigned mUpdateFrequency;
 
 public:
-
     /**
      * Default constructor.
      */
@@ -129,7 +128,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    virtual void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -138,17 +137,16 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Ensure the cell population is up to date before the scene is rendered.
      *
      * @param rCellPopulation reference to the cell population
      */
-    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
 private:
-
     /**
      * Render the scene for the current time step, if a scene has been set and
      * the step is a multiple of the update frequency.
