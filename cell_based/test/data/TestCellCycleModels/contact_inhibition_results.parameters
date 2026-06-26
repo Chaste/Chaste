@@ -1,5 +1,6 @@
 			<QuiescentVolumeFraction>0.5</QuiescentVolumeFraction>
 			<EquilibriumVolume>1</EquilibriumVolume>
+			<MinimumGapDuration>0.01</MinimumGapDuration>
 			<StemCellG1Duration>14</StemCellG1Duration>
 			<TransitCellG1Duration>2</TransitCellG1Duration>
 			<SDuration>5</SDuration>

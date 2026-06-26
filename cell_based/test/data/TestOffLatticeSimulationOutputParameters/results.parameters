@@ -34,6 +34,7 @@
 	<CellCycleModels>
 		<FixedG1GenerationalCellCycleModel>
 			<MaxTransitGenerations>3</MaxTransitGenerations>
+			<MinimumGapDuration>0.01</MinimumGapDuration>
 			<StemCellG1Duration>14</StemCellG1Duration>
 			<TransitCellG1Duration>2</TransitCellG1Duration>
 			<SDuration>5</SDuration>
