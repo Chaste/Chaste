@@ -697,7 +697,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
         // Output simulation details
         std::string simulation_type = GetIdentifier();
 
-        *parameter_file << "<Chaste>\n";
+        *parameter_file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        *parameter_file << "<Chaste xmlns=\"https://chaste.github.io/\">\n";
         *parameter_file << "\n\t<" << simulation_type << ">\n";
         OutputSimulationParameters(parameter_file);
         *parameter_file << "\t</" << simulation_type << ">\n";
@@ -741,6 +742,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
 {
     *rParamsFile << "\t\t<Dt>" << mDt << "</Dt>\n";
     *rParamsFile << "\t\t<EndTime>" << mEndTime << "</EndTime>\n";
+    *rParamsFile << "\t\t<NoBirth>" << mNoBirth << "</NoBirth>\n";
     *rParamsFile << "\t\t<UpdateCellPopulation>" << mUpdateCellPopulation << "</UpdateCellPopulation>\n";
     *rParamsFile << "\t\t<SamplingTimestepMultiple>" << mSamplingTimestepMultiple << "</SamplingTimestepMultiple>\n";
     *rParamsFile << "\t\t<UpdatingTimestepMultiple>" << mUpdatingTimestepMultiple << "</UpdatingTimestepMultiple>\n";

@@ -1,0 +1,9 @@
+			<StepSize>2</StepSize>
+			<SetBcsOnBoxBoundary>1</SetBcsOnBoxBoundary>
+			<SetBcsOnBoundingSphere>0</SetBcsOnBoundingSphere>
+			<UseVoronoiCellsForInterpolation>0</UseVoronoiCellsForInterpolation>
+			<TypicalCellRadius>0.5</TypicalCellRadius>
+			<DependentVariableName>u</DependentVariableName>
+			<IsNeumannBoundaryCondition>0</IsNeumannBoundaryCondition>
+			<OutputGradient>0</OutputGradient>
+			<OutputSolutionAtPdeNodes>0</OutputSolutionAtPdeNodes>

@@ -342,7 +342,9 @@ bool ParabolicBoxDomainPdeModifier<DIM>::GetMoveSolutionWithCells() const
 template<unsigned DIM>
 void ParabolicBoxDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    // No parameters to output, so just call method on direct parent class
+    *rParamsFile << "\t\t\t<MoveSolutionWithCells>" << mMoveSolutionWithCells << "</MoveSolutionWithCells>\n";
+
+    // Call method on direct parent class
     AbstractBoxDomainPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 

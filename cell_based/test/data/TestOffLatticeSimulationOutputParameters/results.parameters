@@ -1,8 +1,10 @@
-<Chaste>
+<?xml version="1.0" encoding="UTF-8"?>
+<Chaste xmlns="https://chaste.github.io/">
 
 	<OffLatticeSimulation-2-2>
 		<Dt>0.00833333</Dt>
 		<EndTime>0.5</EndTime>
+		<NoBirth>0</NoBirth>
 		<UpdateCellPopulation>1</UpdateCellPopulation>
 		<SamplingTimestepMultiple>2</SamplingTimestepMultiple>
 		<UpdatingTimestepMultiple>2</UpdatingTimestepMultiple>
@@ -16,6 +18,9 @@
 		<WriteVtkAsPoints>0</WriteVtkAsPoints>
 		<BoundVoronoiTessellation>0</BoundVoronoiTessellation>
 		<HasVariableRestLength>0</HasVariableRestLength>
+		<ScaleBoundByEdgeLength>0</ScaleBoundByEdgeLength>
+		<BoundedVoronoiTessellationLengthCutoff>1.79769e+308</BoundedVoronoiTessellationLengthCutoff>
+		<OffsetNewBoundaryNodes>0</OffsetNewBoundaryNodes>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<CentreBasedDivisionRule>
 			<RandomDirectionCentreBasedDivisionRule-2-2>
@@ -23,6 +28,7 @@
 		</CentreBasedDivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
+		<AbsoluteMovementThreshold>2</AbsoluteMovementThreshold>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
 	</MeshBasedCellPopulation-2-2>
 
@@ -34,6 +40,7 @@
 			<SDuration>5</SDuration>
 			<G2Duration>4</G2Duration>
 			<MDuration>1</MDuration>
+			<MinimumGapDuration>0.01</MinimumGapDuration>
 		</FixedG1GenerationalCellCycleModel>
 	</CellCycleModels>
 

@@ -134,6 +134,7 @@ double LabelDependentBernoulliTrialCellCycleModel::GetAverageStemCellCycleTime()
 void LabelDependentBernoulliTrialCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<DivisionProbability>" << mDivisionProbability << "</DivisionProbability>\n";
+    *rParamsFile << "\t\t\t<LabelledDivisionProbability>" << mLabelledDivisionProbability << "</LabelledDivisionProbability>\n";
     *rParamsFile << "\t\t\t<MinimumDivisionAge>" << mMinimumDivisionAge << "</MinimumDivisionAge>\n";
 
     // Call method on direct parent class

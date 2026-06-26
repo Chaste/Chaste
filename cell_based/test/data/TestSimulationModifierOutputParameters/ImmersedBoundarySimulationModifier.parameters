@@ -1,0 +1,7 @@
+			<NodeNeighbourUpdateFrequency>1</NodeNeighbourUpdateFrequency>
+			<ReynoldsNumber>0.0001</ReynoldsNumber>
+			<AdditiveNormalNoise>0</AdditiveNormalNoise>
+			<NoiseStrength>0</NoiseStrength>
+			<NoiseSkip>1</NoiseSkip>
+			<NoiseLengthScale>0.1</NoiseLengthScale>
+			<ZeroFieldSums>0</ZeroFieldSums>
