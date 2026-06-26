@@ -698,7 +698,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
         std::string simulation_type = GetIdentifier();
 
         *parameter_file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        *parameter_file << "<Chaste xmlns=\"https://chaste.github.io/nss/cell_based\">\n";
+        *parameter_file << "<Chaste xmlns=\"https://chaste.github.io/\">\n";
         *parameter_file << "\n\t<" << simulation_type << ">\n";
         OutputSimulationParameters(parameter_file);
         *parameter_file << "\t</" << simulation_type << ">\n";
