@@ -1,4 +1,5 @@
-<Chaste>
+<?xml version="1.0" encoding="UTF-8"?>
+<Chaste xmlns="https://chaste.github.io/">
 
 	<CryptSimulation2d>
 		<CryptCircumference>16</CryptCircumference>
