@@ -1201,6 +1201,9 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParamet
     CHASTE_PARAM(rParamsFile, level, mAreaBasedDampingConstantParameter);
     CHASTE_PARAM(rParamsFile, level, mWriteVtkAsPoints);
     CHASTE_PARAM(rParamsFile, level, mBoundVoronoiTessellation);
+    CHASTE_PARAM(rParamsFile, level, mScaleBoundByEdgeLength);
+    CHASTE_PARAM_EXPR(rParamsFile, level, BoundedVoronoiTessellationLengthCutoff, mBoundedVoroniTesselationLengthCutoff);
+    CHASTE_PARAM(rParamsFile, level, mOffsetNewBoundaryNodes);
     CHASTE_PARAM(rParamsFile, level, mHasVariableRestLength);
 
     // Call method on direct parent class

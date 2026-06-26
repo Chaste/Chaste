@@ -3,6 +3,7 @@
 	<OffLatticeSimulation-2-2>
 		<Dt>0.00833333</Dt>
 		<EndTime>0.5</EndTime>
+		<NoBirth>0</NoBirth>
 		<UpdateCellPopulation>1</UpdateCellPopulation>
 		<SamplingTimestepMultiple>2</SamplingTimestepMultiple>
 		<UpdatingTimestepMultiple>2</UpdatingTimestepMultiple>
@@ -15,6 +16,9 @@
 		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
 		<WriteVtkAsPoints>0</WriteVtkAsPoints>
 		<BoundVoronoiTessellation>0</BoundVoronoiTessellation>
+		<ScaleBoundByEdgeLength>0</ScaleBoundByEdgeLength>
+		<BoundedVoronoiTessellationLengthCutoff>1.79769e+308</BoundedVoronoiTessellationLengthCutoff>
+		<OffsetNewBoundaryNodes>0</OffsetNewBoundaryNodes>
 		<HasVariableRestLength>0</HasVariableRestLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<CentreBasedDivisionRule>
@@ -23,6 +27,7 @@
 		</CentreBasedDivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
+		<AbsoluteMovementThreshold>2</AbsoluteMovementThreshold>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
 	</MeshBasedCellPopulation-2-2>
 
@@ -56,9 +61,9 @@
 
 	<NumericalMethod>
 		<ForwardEulerNumericalMethod-2-2>
-			<UseAdaptiveTimestep>0</UseAdaptiveTimestep> 
-			<UseUpdateNodeLocation>0</UseUpdateNodeLocation> 
-			<GhostNodeForcesEnabled>0</GhostNodeForcesEnabled> 
+			<UseAdaptiveTimestep>0</UseAdaptiveTimestep>
+			<UseUpdateNodeLocation>0</UseUpdateNodeLocation>
+			<GhostNodeForcesEnabled>0</GhostNodeForcesEnabled>
 		</ForwardEulerNumericalMethod-2-2>
 	</NumericalMethod>
 

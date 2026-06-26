@@ -743,6 +743,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
     const unsigned level = 2;
     CHASTE_PARAM(rParamsFile, level, mDt);
     CHASTE_PARAM(rParamsFile, level, mEndTime);
+    CHASTE_PARAM(rParamsFile, level, mNoBirth);
     CHASTE_PARAM(rParamsFile, level, mUpdateCellPopulation);
     CHASTE_PARAM(rParamsFile, level, mSamplingTimestepMultiple);
     CHASTE_PARAM(rParamsFile, level, mUpdatingTimestepMultiple);

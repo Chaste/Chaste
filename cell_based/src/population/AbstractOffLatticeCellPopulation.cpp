@@ -118,6 +118,7 @@ void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulat
     const unsigned level = 2;
     CHASTE_PARAM(rParamsFile, level, mDampingConstantNormal);
     CHASTE_PARAM(rParamsFile, level, mDampingConstantMutant);
+    CHASTE_PARAM(rParamsFile, level, mAbsoluteMovementThreshold);
 
     // Call method on direct parent class
     AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(rParamsFile);

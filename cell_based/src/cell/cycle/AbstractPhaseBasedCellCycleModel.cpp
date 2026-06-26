@@ -189,6 +189,7 @@ void AbstractPhaseBasedCellCycleModel::SetMinimumGapDuration(double minimumGapDu
 void AbstractPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mMinimumGapDuration);
     CHASTE_PARAM(rParamsFile, level, mStemCellG1Duration);
     CHASTE_PARAM(rParamsFile, level, mTransitCellG1Duration);
     CHASTE_PARAM(rParamsFile, level, mSDuration);

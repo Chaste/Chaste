@@ -136,6 +136,7 @@ void LabelDependentBernoulliTrialCellCycleModel::OutputCellCycleModelParameters(
 {
     const unsigned level = 3;
     CHASTE_PARAM(rParamsFile, level, mDivisionProbability);
+    CHASTE_PARAM(rParamsFile, level, mLabelledDivisionProbability);
     CHASTE_PARAM(rParamsFile, level, mMinimumDivisionAge);
 
     // Call method on direct parent class
