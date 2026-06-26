@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "WelikyOsterForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 WelikyOsterForce<DIM>::WelikyOsterForce()
@@ -155,8 +156,9 @@ void WelikyOsterForce<DIM>::SetWelikyOsterPerimeterParameter(double welikyOsterP
 template<unsigned DIM>
 void WelikyOsterForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<WelikyOsterAreaParameter>" << mWelikyOsterAreaParameter << "</WelikyOsterAreaParameter>\n";
-    *rParamsFile << "\t\t\t<WelikyOsterPerimeterParameter>" << mWelikyOsterPerimeterParameter << "</WelikyOsterPerimeterParameter>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mWelikyOsterAreaParameter);
+    CHASTE_PARAM(rParamsFile, level, mWelikyOsterPerimeterParameter);
 
     // Call method on direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);

@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <random>
 
 #include "AbstractImmersedBoundaryForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template <unsigned DIM>
 AbstractImmersedBoundaryForce<DIM>::AbstractImmersedBoundaryForce()
@@ -186,9 +187,10 @@ template<unsigned DIM>
 void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(
     out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<AdditiveNormalNoise>" << mAdditiveNormalNoise << "</AdditiveNormalNoise>\n";
-    *rParamsFile << "\t\t\t<NormalNoiseMean>" << mNormalNoiseMean << "</NormalNoiseMean>\n";
-    *rParamsFile << "\t\t\t<NormalNoiseStdDev>" << mNormalNoiseStdDev << "</NormalNoiseStdDev>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mAdditiveNormalNoise);
+    CHASTE_PARAM(rParamsFile, level, mNormalNoiseMean);
+    CHASTE_PARAM(rParamsFile, level, mNormalNoiseStdDev);
 }
 
 // Explicit instantiation

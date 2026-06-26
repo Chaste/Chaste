@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "BuskeElasticForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 #include "NodeBasedCellPopulation.hpp"
 
@@ -129,7 +130,8 @@ double BuskeElasticForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, 
 template<unsigned DIM>
 void BuskeElasticForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<DeformationEnergyParameter>" << mDeformationEnergyParameter << "</DeformationEnergyParameter>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mDeformationEnergyParameter);
 
     // Call method on direct parent class
     AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);

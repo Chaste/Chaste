@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "BuskeAdhesiveForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 #include "NodeBasedCellPopulation.hpp"
 
@@ -125,7 +126,8 @@ double BuskeAdhesiveForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes,
 template<unsigned DIM>
 void BuskeAdhesiveForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<AdhesionEnergyParameter>" << mAdhesionEnergyParameter << "</AdhesionEnergyParameter>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mAdhesionEnergyParameter);
 
     // Call method on direct parent class
     AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);

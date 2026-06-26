@@ -6,6 +6,7 @@
 		<UseJiggledBottomCells>1</UseJiggledBottomCells>
 		<Dt>0.00833333</Dt>
 		<EndTime>20</EndTime>
+		<NoBirth>0</NoBirth>
 		<UpdateCellPopulation>1</UpdateCellPopulation>
 		<SamplingTimestepMultiple>10</SamplingTimestepMultiple>
 		<UpdatingTimestepMultiple>1</UpdatingTimestepMultiple>
@@ -18,6 +19,9 @@
 		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
 		<WriteVtkAsPoints>0</WriteVtkAsPoints>
 		<BoundVoronoiTessellation>0</BoundVoronoiTessellation>
+		<ScaleBoundByEdgeLength>0</ScaleBoundByEdgeLength>
+		<BoundedVoronoiTessellationLengthCutoff>1.79769e+308</BoundedVoronoiTessellationLengthCutoff>
+		<OffsetNewBoundaryNodes>0</OffsetNewBoundaryNodes>
 		<HasVariableRestLength>0</HasVariableRestLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<CentreBasedDivisionRule>
@@ -26,6 +30,7 @@
 		</CentreBasedDivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
+		<AbsoluteMovementThreshold>2</AbsoluteMovementThreshold>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
 	</MeshBasedCellPopulation-2-2>
 
@@ -35,6 +40,7 @@
 			<WntStemThreshold>0.8</WntStemThreshold>
 			<WntTransitThreshold>0.65</WntTransitThreshold>
 			<WntLabelledThreshold>0.65</WntLabelledThreshold>
+			<MinimumGapDuration>0.01</MinimumGapDuration>
 			<StemCellG1Duration>9.4</StemCellG1Duration>
 			<TransitCellG1Duration>9.4</TransitCellG1Duration>
 			<SDuration>7.4</SDuration>
@@ -77,9 +83,9 @@
 
 	<NumericalMethod>
 		<ForwardEulerNumericalMethod-2-2>
-			<UseAdaptiveTimestep>0</UseAdaptiveTimestep> 
-			<UseUpdateNodeLocation>0</UseUpdateNodeLocation> 
-			<GhostNodeForcesEnabled>0</GhostNodeForcesEnabled> 
+			<UseAdaptiveTimestep>0</UseAdaptiveTimestep>
+			<UseUpdateNodeLocation>0</UseUpdateNodeLocation>
+			<GhostNodeForcesEnabled>0</GhostNodeForcesEnabled>
 		</ForwardEulerNumericalMethod-2-2>
 	</NumericalMethod>
 

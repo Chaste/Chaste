@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "GeneralisedLinearSpringForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
@@ -276,9 +277,10 @@ void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::SetMeinekeSpringGrowth
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<MeinekeSpringStiffness>" << mMeinekeSpringStiffness << "</MeinekeSpringStiffness>\n";
-    *rParamsFile << "\t\t\t<MeinekeDivisionRestingSpringLength>" << mMeinekeDivisionRestingSpringLength << "</MeinekeDivisionRestingSpringLength>\n";
-    *rParamsFile << "\t\t\t<MeinekeSpringGrowthDuration>" << mMeinekeSpringGrowthDuration << "</MeinekeSpringGrowthDuration>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mMeinekeSpringStiffness);
+    CHASTE_PARAM(rParamsFile, level, mMeinekeDivisionRestingSpringLength);
+    CHASTE_PARAM(rParamsFile, level, mMeinekeSpringGrowthDuration);
 
     // Call method on direct parent class
     AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);

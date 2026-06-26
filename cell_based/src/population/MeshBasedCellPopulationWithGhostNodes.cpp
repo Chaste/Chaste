@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "CellLocationIndexWriter.hpp"
 #include "VtkMeshWriter.hpp"
 
@@ -497,9 +498,10 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<GhostCellSpringStiffness>" << mGhostCellSpringStiffness << "</GhostCellSpringStiffness>\n";
-    *rParamsFile << "\t\t<GhostGhostSpringStiffness>" << mGhostGhostSpringStiffness << "</GhostGhostSpringStiffness>\n";
-    *rParamsFile << "\t\t<GhostSpringRestLength>" << mGhostSpringRestLength << "</GhostSpringRestLength>\n";
+    const unsigned level = 2;
+    CHASTE_PARAM(rParamsFile, level, mGhostCellSpringStiffness);
+    CHASTE_PARAM(rParamsFile, level, mGhostGhostSpringStiffness);
+    CHASTE_PARAM(rParamsFile, level, mGhostSpringRestLength);
 
     // Call method on direct parent class
     MeshBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);

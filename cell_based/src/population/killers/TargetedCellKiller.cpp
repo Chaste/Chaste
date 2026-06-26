@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "TargetedCellKiller.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 TargetedCellKiller<DIM>::TargetedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation, unsigned targetedIndex, bool bloodLust)
@@ -70,8 +71,9 @@ void TargetedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 template<unsigned DIM>
 void TargetedCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<TargetIndex>" << mTargetIndex << "</TargetIndex>\n";
-    *rParamsFile << "\t\t\t<BloodLust>" << mBloodLust << "</BloodLust>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mTargetIndex);
+    CHASTE_PARAM(rParamsFile, level, mBloodLust);
 
     // Call method on direct parent class
     AbstractCellKiller<DIM>::OutputCellKillerParameters(rParamsFile);

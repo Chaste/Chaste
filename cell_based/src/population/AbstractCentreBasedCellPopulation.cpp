@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractCentreBasedCellPopulation.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 #include "RandomDirectionCentreBasedDivisionRule.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -289,7 +290,8 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetCentreBasedDi
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<MeinekeDivisionSeparation>" << mMeinekeDivisionSeparation << "</MeinekeDivisionSeparation>\n";
+    const unsigned level = 2;
+    CHASTE_PARAM(rParamsFile, level, mMeinekeDivisionSeparation);
 
     // Add the division rule parameters
     *rParamsFile << "\t\t<CentreBasedDivisionRule>\n";

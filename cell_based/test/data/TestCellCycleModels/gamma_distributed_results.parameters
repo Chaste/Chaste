@@ -1,8 +1,8 @@
 			<Shape>0.85</Shape>
 			<Scale>1.23</Scale>
+			<MinimumGapDuration>0.01</MinimumGapDuration>
 			<StemCellG1Duration>14</StemCellG1Duration>
 			<TransitCellG1Duration>2</TransitCellG1Duration>
 			<SDuration>5</SDuration>
 			<G2Duration>4</G2Duration>
 			<MDuration>1</MDuration>
-			<MinimumGapDuration>0.01</MinimumGapDuration>

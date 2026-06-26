@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractTwoBodyInteractionForce.hpp"
 
 #include "AbstractOffLatticeCellPopulation.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "Warnings.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -98,8 +99,9 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::AddForceContributi
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<UseCutOffLength>" << mUseCutOffLength << "</UseCutOffLength>\n";
-    *rParamsFile << "\t\t\t<CutOffLength>" << mMechanicsCutOffLength << "</CutOffLength>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mUseCutOffLength);
+    CHASTE_PARAM(rParamsFile, level, mMechanicsCutOffLength);
 
     // Call method on direct parent class
     AbstractForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);

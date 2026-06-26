@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PlaneBasedCellKiller.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 PlaneBasedCellKiller<DIM>::PlaneBasedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation,
@@ -78,19 +79,9 @@ void PlaneBasedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 template<unsigned DIM>
 void PlaneBasedCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<PointOnPlane>";
-    for (unsigned index=0; index != DIM-1U; index++) //Note: inequality avoids testing index < 0U when DIM=1
-    {
-        *rParamsFile << mPointOnPlane[index] << ",";
-    }
-    *rParamsFile << mPointOnPlane[DIM-1] << "</PointOnPlane>\n";
-
-    *rParamsFile << "\t\t\t<NormalToPlane>";
-     for (unsigned index=0; index != DIM-1U; index++) //Note: inequality avoids testing index < 0U when DIM=1
-     {
-         *rParamsFile << mNormalToPlane[index] << ",";
-     }
-     *rParamsFile << mNormalToPlane[DIM-1] << "</NormalToPlane>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM_CVECTOR(rParamsFile, level, mPointOnPlane);
+    CHASTE_PARAM_CVECTOR(rParamsFile, level, mNormalToPlane);
 
     // Call method on direct parent class
     AbstractCellKiller<DIM>::OutputCellKillerParameters(rParamsFile);

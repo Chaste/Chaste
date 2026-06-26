@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "BuskeCompressionForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
 template<unsigned DIM>
@@ -141,7 +142,8 @@ void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM
 template<unsigned DIM>
 void BuskeCompressionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<CompressionEnergyParameter>" << mCompressionEnergyParameter << "</CompressionEnergyParameter>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mCompressionEnergyParameter);
 
     // Call method on direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);

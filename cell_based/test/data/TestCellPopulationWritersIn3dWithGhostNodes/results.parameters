@@ -5,10 +5,10 @@
 		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
 		<WriteVtkAsPoints>0</WriteVtkAsPoints>
 		<BoundVoronoiTessellation>0</BoundVoronoiTessellation>
-		<HasVariableRestLength>0</HasVariableRestLength>
 		<ScaleBoundByEdgeLength>0</ScaleBoundByEdgeLength>
 		<BoundedVoronoiTessellationLengthCutoff>1.79769e+308</BoundedVoronoiTessellationLengthCutoff>
 		<OffsetNewBoundaryNodes>0</OffsetNewBoundaryNodes>
+		<HasVariableRestLength>0</HasVariableRestLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<CentreBasedDivisionRule>
 			<RandomDirectionCentreBasedDivisionRule-3-3>
@@ -16,4 +16,5 @@
 		</CentreBasedDivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
+		<AbsoluteMovementThreshold>2</AbsoluteMovementThreshold>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>

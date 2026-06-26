@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 ExponentialG1GenerationalCellCycleModel::ExponentialG1GenerationalCellCycleModel()
     : AbstractSimpleGenerationalCellCycleModel(),
@@ -122,7 +123,8 @@ void ExponentialG1GenerationalCellCycleModel::SetTransitCellG1Duration(double tr
 
 void ExponentialG1GenerationalCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-     *rParamsFile << "\t\t\t<Rate>" << mRate << "</Rate>\n";
+    const unsigned level = 3;
+     CHASTE_PARAM(rParamsFile, level, mRate);
 
     // Call method on direct parent class
     AbstractSimpleGenerationalCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

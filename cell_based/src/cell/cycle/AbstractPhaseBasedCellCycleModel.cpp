@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractPhaseBasedCellCycleModel.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 AbstractPhaseBasedCellCycleModel::AbstractPhaseBasedCellCycleModel()
     :   AbstractCellCycleModel(),
@@ -187,12 +188,13 @@ void AbstractPhaseBasedCellCycleModel::SetMinimumGapDuration(double minimumGapDu
 
 void AbstractPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<StemCellG1Duration>" << mStemCellG1Duration << "</StemCellG1Duration>\n";
-    *rParamsFile << "\t\t\t<TransitCellG1Duration>" << mTransitCellG1Duration << "</TransitCellG1Duration>\n";
-    *rParamsFile << "\t\t\t<SDuration>" << mSDuration << "</SDuration>\n";
-    *rParamsFile << "\t\t\t<G2Duration>" << mG2Duration << "</G2Duration>\n";
-    *rParamsFile << "\t\t\t<MDuration>" << mMDuration << "</MDuration>\n";
-    *rParamsFile << "\t\t\t<MinimumGapDuration>" << mMinimumGapDuration << "</MinimumGapDuration>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mMinimumGapDuration);
+    CHASTE_PARAM(rParamsFile, level, mStemCellG1Duration);
+    CHASTE_PARAM(rParamsFile, level, mTransitCellG1Duration);
+    CHASTE_PARAM(rParamsFile, level, mSDuration);
+    CHASTE_PARAM(rParamsFile, level, mG2Duration);
+    CHASTE_PARAM(rParamsFile, level, mMDuration);
 
     // Call method on direct parent class
     AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
