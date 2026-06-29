@@ -94,6 +94,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SemGaussianRandomForce.hpp"
 #include "SemSpatiallyCorrelatedRandomForce.hpp"
 
+/* `SemParameterScaling.hpp` provides `SemComputeNScaledParameters<DIM>()`, which computes
+ * a physically consistent parameter set (equilibrium distance, well depth, spring constant,
+ * damping constant) from the number of nodes N, cell radius, and reference spring constant
+ * κ₀, following the N-scaling laws in Sandersius & Newman (2008) Section 2. The two
+ * convenience methods `ApplyNScaledIntraParameters()` and `ApplyNScaledInterParameters()`
+ * on `SemForce` call this function and set the corresponding member variables directly. */
+#include "SemParameterScaling.hpp"
+
 /* Output writers that label each VTK point by the SEM element it belongs to and by its
  * region within that element. These are useful for visualizing cell boundaries in Paraview. */
 #include "ElementIdNodePointDataWriter.hpp"
@@ -169,16 +177,27 @@ public:
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2>>());
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
-        /* We add the `SemForce`, which implements the modified Morse potential. The
-         * equilibrium distance is taken directly from the mesh as the actual distance
-         * between adjacent nodes (nodes 0 and 1). For a single cell only the
-         * intra-cellular parameters are relevant. */
-        const double well_depth = 0.001;
-        const double equilibrium_distance = p_mesh->GetDistanceBetweenNodes(0u, 1u);
+        /* We add `SemForce` and configure its parameters using the N-dependent scaling
+         * from Sandersius & Newman (2008) Section 2. `ApplyNScaledIntraParameters`
+         * computes the equilibrium distance r_eq = 2 R_cell (p/N)^{1/DIM} and the Morse
+         * well depth u₀ = κ r_eq² / (8 ρ²) from three physical inputs: the number of
+         * subcellular nodes N, the cell radius R_cell, and a reference spring constant κ₀.
+         * This ensures that if N is later changed to improve resolution, the macroscopic
+         * cell stiffness is preserved automatically. For a single cell only the intra-cellular
+         * parameters are relevant. The cut-off distance is set separately.
+         *
+         * The cell radius R_cell is half the scale factor (the half-width of the cell).
+         * Passing packingDensity=1.0 tells the formula to treat the nodes as a regular
+         * square grid — the correct packing for the generators used here. This choice
+         * gives r_eq = scaleFactor / numNodes[0], which exactly matches the inter-node
+         * spacing produced by SemSingleElementMeshGenerator. The reference spring constant
+         * κ₀ controls the overall stiffness. */
+        const double cell_radius = 0.25;   // half the scale factor
+        const double kappa0 = 20.0;
+        const double packing = 1.0;        // regular square grid
 
         MAKE_PTR(SemForce<2>, p_sem_force);
-        p_sem_force->SetIntraWellDepth(well_depth);
-        p_sem_force->SetIntraEquilibriumDistance(equilibrium_distance);
+        p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), cell_radius, kappa0, 0.0, packing);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
         simulator.AddForce(p_sem_force);
 
@@ -254,28 +273,30 @@ public:
 
         /* For a multi-cell simulation we set both intra-cellular (nodes within the same
          * element) and inter-cellular (nodes in different elements) force parameters.
-         * Here we use the same well depth and equilibrium distance for both, but they
-         * can be tuned independently to model different adhesion strengths. */
-        const double well_depth = 0.001;
-        const double equilibrium_distance = p_mesh->GetDistanceBetweenNodes(0u, 1u);
+         * N-scaling is applied per-cell: N is the number of nodes per cell, not the total
+         * node count across the mesh. `ApplyNScaledInterParameters` uses the same scaling
+         * formula as for intra-cellular interactions; in practice the inter-cellular κ₀
+         * can be reduced independently to model weaker cell-cell adhesion. */
+        const unsigned nodes_per_cell = p_mesh->GetNumNodes() / p_mesh->GetNumElements();
+        const double cell_radius = 0.25;   // half the scale factor
+        const double kappa0 = 20.0;
+        const double packing = 1.0;        // regular square grid
 
         MAKE_PTR(SemForce<2>, p_sem_force);
-        p_sem_force->SetIntraWellDepth(well_depth);
-        p_sem_force->SetIntraEquilibriumDistance(equilibrium_distance);
+        p_sem_force->ApplyNScaledIntraParameters(nodes_per_cell, cell_radius, kappa0, 0.0, packing);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
-        p_sem_force->SetInterWellDepth(well_depth);
-        p_sem_force->SetInterEquilibriumDistance(equilibrium_distance);
+        p_sem_force->ApplyNScaledInterParameters(nodes_per_cell, cell_radius, kappa0, 0.0, packing);
         p_sem_force->SetInterCutOffDistance(interaction_cutoff);
         simulator.AddForce(p_sem_force);
 
         /* `SemSpatiallyCorrelatedRandomForce` requires the domain bounds and a correlation
          * length. Nodes closer together than `correlationLength` will receive similar noise
          * vectors at each step, causing coherent fluctuations within and between cells.
-         * Setting `correlationLength` comparable to the node spacing correlates nearest
-         * neighbours; using a larger value produces longer-range coherence. */
+         * Setting `correlationLength` to the N-scaled equilibrium distance correlates
+         * nearest neighbours; using a larger value produces longer-range coherence. */
         MAKE_PTR(SemSpatiallyCorrelatedRandomForce<2>, p_noise);
         p_noise->SetDiffusionConstant(1e-5);
-        p_noise->SetCorrelationLength(equilibrium_distance);
+        p_noise->SetCorrelationLength(p_sem_force->GetIntraEquilibriumDistance());
         p_noise->SetLowerCorner({{-1.0, -1.0}});
         p_noise->SetUpperCorner({{ 2.0,  2.0}});
         simulator.AddForce(p_noise);
@@ -318,12 +339,30 @@ public:
         box_domain[5] =  2.0;
         p_mesh->SetUpBoxCollection(interaction_cutoff, box_domain);
 
+        /* We compute the full N-scaled parameter set using `SemComputeNScaledParameters`.
+         * This returns all four N-dependent quantities at once: the equilibrium distance
+         * r_eq, the Morse well depth u₀, the harmonic spring constant κ, and the damping
+         * constant η = η₀ N. Setting the cell population's damping constant to the N-scaled
+         * value η ensures that the Langevin equation η ẋ = F_det + ξ is correctly balanced
+         * as N changes. The rho parameter must match the force's scaling factor (default 5.0);
+         * η₀ is the per-node reference damping. Here we choose η₀ = 1/N so that the
+         * total damping η = η₀ N = 1 is independent of N; different N values can then be
+         * compared directly without re-tuning the diffusion constant. */
+        const unsigned num_nodes = p_mesh->GetNumNodes();
+        const double cell_radius = 0.25;   // half the scale factor
+        const double kappa0 = 20.0;
+        const double rho = 5.0;
+        const double packing = 1.0;        // regular cubic grid
+        const double eta0 = 1.0 / static_cast<double>(num_nodes);
+        const SemNScaledParameters nscaled =
+            SemComputeNScaledParameters<3>(num_nodes, cell_radius, kappa0, rho, 0.0, eta0, packing);
+
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
 
         SemBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        cell_population.SetDampingConstantNormal(1.0);
+        cell_population.SetDampingConstantNormal(nscaled.DampingConstant);
         cell_population.AddNodePointDataWriter<ElementIdNodePointDataWriter>();
         cell_population.AddNodePointDataWriter<NodeRegionPointDataWriter>();
 
@@ -336,21 +375,22 @@ public:
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<3>>());
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
-        const double well_depth = 0.001;
-        const double equilibrium_distance = p_mesh->GetDistanceBetweenNodes(0u, 1u);
-
+        /* We configure the force using the same N-scaling parameters. Setting
+         * `IntraScalingFactor` to `rho` before calling `ApplyNScaledIntraParameters`
+         * ensures both the force and the damping calculation use the same ρ. For a
+         * single cell only intra-cellular interactions are relevant. */
         MAKE_PTR(SemForce<3>, p_sem_force);
-        p_sem_force->SetIntraWellDepth(well_depth);
-        p_sem_force->SetIntraEquilibriumDistance(equilibrium_distance);
+        p_sem_force->SetIntraScalingFactor(rho);
+        p_sem_force->ApplyNScaledIntraParameters(num_nodes, cell_radius, kappa0, 0.0, packing);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
         simulator.AddForce(p_sem_force);
 
         /* For the 3D spatially correlated noise we must supply 3D corners. The
-         * correlation length is again set to the node spacing, producing coherent
-         * noise between nearest neighbours. */
+         * correlation length is set to the N-scaled equilibrium distance, so coherent
+         * fluctuations couple nearest-neighbour nodes. */
         MAKE_PTR(SemSpatiallyCorrelatedRandomForce<3>, p_noise);
         p_noise->SetDiffusionConstant(1e-5);
-        p_noise->SetCorrelationLength(equilibrium_distance);
+        p_noise->SetCorrelationLength(nscaled.EquilibriumDistance);
         p_noise->SetLowerCorner({{-1.0, -1.0, -1.0}});
         p_noise->SetUpperCorner({{ 2.0,  2.0,  2.0}});
         simulator.AddForce(p_noise);

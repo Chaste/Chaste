@@ -192,20 +192,17 @@ public:
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         // Create some force laws and pass them to the simulation.
-        const double sem_well_depth = 0.001;
-        const double sem_equilibrium_distance = p_mesh->GetDistanceBetweenNodes(0u, 1u);
+        // R_cell = scaleFactor/2, packing=1 (regular cubic grid), kappa0 chosen to match well_depth~0.001
         MAKE_PTR(SemForce<3>, p_sem_force);
-        p_sem_force->SetIntraWellDepth(sem_well_depth);
-        p_sem_force->SetIntraEquilibriumDistance(sem_equilibrium_distance);
+        p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
-        p_sem_force->SetInterWellDepth(sem_well_depth);
-        p_sem_force->SetInterEquilibriumDistance(sem_equilibrium_distance);
+        p_sem_force->ApplyNScaledInterParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
         p_sem_force->SetInterCutOffDistance(interaction_cutoff);
         simulator.AddForce(p_sem_force);
 
         MAKE_PTR(SemSpatiallyCorrelatedRandomForce<3>, p_random_force);
         p_random_force->SetDiffusionConstant(1 * 1e-5);
-        p_random_force->SetCorrelationLength(sem_equilibrium_distance);
+        p_random_force->SetCorrelationLength(p_sem_force->GetIntraEquilibriumDistance());
         p_random_force->SetLowerCorner({{-1.0, -1.0, -1.0}});
         p_random_force->SetUpperCorner({{3.0, 3.0, 3.0}});
         simulator.AddForce(p_random_force);
