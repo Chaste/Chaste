@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractTwoBodyInteractionForce.hpp"
 #include "SemBasedCellPopulation.hpp"
+#include "SemParameterScaling.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -58,11 +59,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The harmonic spring constant near equilibrium is kappa = 8*rho^2*u0/r_eq^2.
  *
- * N-dependent scaling (Sandersius 2008 Section 2):
- *   r_eq(N) = 2*R_cell*(p_3/N)^(1/3)
- *   kappa   = kappa_0 * N^(-1/3) * (1 - lambda*N^(-1/3))
- *   eta     = eta_0 * N
- * These are left as user-configurable via the parameter setters.
+ * N-dependent parameter scaling (Sandersius 2008 Section 2) can be applied via
+ * ApplyNScaledIntraParameters() / ApplyNScaledInterParameters(), which compute
+ * r_eq and u0 consistent with N, R_cell, kappa0 and lambda. The resulting damping
+ * constant eta = eta0*N should be set on the population separately via
+ * SetDampingConstantNormal(). See SemComputeNScaledParameters() for the full
+ * parameter set.
  */
 template <unsigned DIM>
 class SemForce : public AbstractTwoBodyInteractionForce<DIM>
@@ -260,6 +262,48 @@ public:
      * @param cutOffDistance the new inter-cellular cut-off distance
      */
     void SetInterCutOffDistance(double cutOffDistance);
+
+    /**
+     * Apply N-dependent scaling (Sandersius 2008 Section 2) to the intra-cellular
+     * parameters, using the current mIntraScalingFactor (rho) together with the
+     * supplied physical inputs. Sets mIntraEquilibriumDistance and mIntraWellDepth.
+     *
+     * The cut-off distance is not modified; set it separately to a suitable
+     * multiple of the new equilibrium distance (typically 1.5–2.5 × r_eq).
+     *
+     * To obtain the corresponding damping constant eta = eta0*N, call
+     * SemComputeNScaledParameters<DIM>(numNodes, cellRadius, kappa0,
+     *     mIntraScalingFactor, lambda, eta0, packingDensity).DampingConstant
+     * and pass it to SetDampingConstantNormal() on the cell population.
+     *
+     * @param numNodes       number of subcellular nodes N
+     * @param cellRadius     cell radius R_cell
+     * @param kappa0         reference spring constant κ₀
+     * @param lambda         correction factor λ (default 0)
+     * @param packingDensity packing density p (0 → dimension-specific default)
+     */
+    void ApplyNScaledIntraParameters(unsigned numNodes,
+                                     double cellRadius,
+                                     double kappa0,
+                                     double lambda = 0.0,
+                                     double packingDensity = 0.0);
+
+    /**
+     * Apply N-dependent scaling (Sandersius 2008 Section 2) to the inter-cellular
+     * parameters, using the current mInterScalingFactor (rho). Sets
+     * mInterEquilibriumDistance and mInterWellDepth.
+     *
+     * @param numNodes       number of subcellular nodes N
+     * @param cellRadius     cell radius R_cell
+     * @param kappa0         reference spring constant κ₀
+     * @param lambda         correction factor λ (default 0)
+     * @param packingDensity packing density p (0 → dimension-specific default)
+     */
+    void ApplyNScaledInterParameters(unsigned numNodes,
+                                     double cellRadius,
+                                     double kappa0,
+                                     double lambda = 0.0,
+                                     double packingDensity = 0.0);
 };
 
 #include "SerializationExportWrapper.hpp"

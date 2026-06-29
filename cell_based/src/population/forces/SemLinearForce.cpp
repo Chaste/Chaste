@@ -211,6 +211,26 @@ double SemLinearForce<DIM>::GetInterCutOffDistance() const { return mInterCutOff
 template<unsigned DIM>
 void SemLinearForce<DIM>::SetInterCutOffDistance(double cutOffDistance) { mInterCutOffDistance = cutOffDistance; }
 
+template<unsigned DIM>
+void SemLinearForce<DIM>::ApplyNScaledIntraParameters(
+    unsigned numNodes, double cellRadius, double kappa0, double lambda, double packingDensity)
+{
+    const SemNScaledParameters params = SemComputeNScaledParameters<DIM>(
+        numNodes, cellRadius, kappa0, mIntraScalingFactor, lambda, 1.0, packingDensity);
+    mIntraEquilibriumDistance = params.EquilibriumDistance;
+    mIntraWellDepth = params.WellDepth;
+}
+
+template<unsigned DIM>
+void SemLinearForce<DIM>::ApplyNScaledInterParameters(
+    unsigned numNodes, double cellRadius, double kappa0, double lambda, double packingDensity)
+{
+    const SemNScaledParameters params = SemComputeNScaledParameters<DIM>(
+        numNodes, cellRadius, kappa0, mInterScalingFactor, lambda, 1.0, packingDensity);
+    mInterEquilibriumDistance = params.EquilibriumDistance;
+    mInterWellDepth = params.WellDepth;
+}
+
 // Explicit instantiation
 template class SemLinearForce<1>;
 template class SemLinearForce<2>;

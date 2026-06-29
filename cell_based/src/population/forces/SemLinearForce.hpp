@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractTwoBodyInteractionForce.hpp"
 #include "SemBasedCellPopulation.hpp"
+#include "SemParameterScaling.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -259,6 +260,40 @@ public:
      * @param cutOffDistance the new inter-cellular cut-off distance
      */
     void SetInterCutOffDistance(double cutOffDistance);
+
+    /**
+     * Apply N-dependent scaling (Sandersius 2008 Section 2) to the intra-cellular
+     * parameters, using the current mIntraScalingFactor (rho). Sets
+     * mIntraEquilibriumDistance and mIntraWellDepth.
+     *
+     * @param numNodes       number of subcellular nodes N
+     * @param cellRadius     cell radius R_cell
+     * @param kappa0         reference spring constant κ₀
+     * @param lambda         correction factor λ (default 0)
+     * @param packingDensity packing density p (0 → dimension-specific default)
+     */
+    void ApplyNScaledIntraParameters(unsigned numNodes,
+                                     double cellRadius,
+                                     double kappa0,
+                                     double lambda = 0.0,
+                                     double packingDensity = 0.0);
+
+    /**
+     * Apply N-dependent scaling (Sandersius 2008 Section 2) to the inter-cellular
+     * parameters, using the current mInterScalingFactor (rho). Sets
+     * mInterEquilibriumDistance and mInterWellDepth.
+     *
+     * @param numNodes       number of subcellular nodes N
+     * @param cellRadius     cell radius R_cell
+     * @param kappa0         reference spring constant κ₀
+     * @param lambda         correction factor λ (default 0)
+     * @param packingDensity packing density p (0 → dimension-specific default)
+     */
+    void ApplyNScaledInterParameters(unsigned numNodes,
+                                     double cellRadius,
+                                     double kappa0,
+                                     double lambda = 0.0,
+                                     double packingDensity = 0.0);
 };
 
 #include "SerializationExportWrapper.hpp"
