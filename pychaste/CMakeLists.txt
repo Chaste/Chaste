@@ -82,7 +82,8 @@ set(PYCHASTE_WRAPPER_GENERATION_COMMAND
         -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/config.yaml
         -i ${PYCHASTE_INCLUDE_DIRS}
         -l ${CMAKE_CURRENT_BINARY_DIR}/cppwg.log
-        --std "gnu++17 -Wno-missing-template-arg-list-after-template-kw -U__SIZEOF_FLOAT128__"
+        --std "gnu++17"
+        --castxml_cflags="-Wno-missing-template-arg-list-after-template-kw -U__SIZEOF_FLOAT128__"
         --castxml_compiler ${CMAKE_CXX_COMPILER}
 )
 

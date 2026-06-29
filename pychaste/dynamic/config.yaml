@@ -59,6 +59,11 @@ template_substitutions:
       - [UniformG1GenerationalCellCycleModel, 2]
       - [UniformG1GenerationalCellCycleModel, 3]
 
+# Translate C++ exception into Python exceptions.
+exceptions:
+  - name: Exception
+    message_method: GetMessage
+
 modules:
   - name: all
     source_locations:
