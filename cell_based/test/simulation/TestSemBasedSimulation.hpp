@@ -99,7 +99,7 @@ public:
 
     void TestSemBasedSimulationExample2D()
     {
-        SemSingleElementMeshGenerator<2> generator({5,8}, 0.5);
+        SemSingleElementMeshGenerator<2> generator({3,3}, 0.5);
         auto p_mesh = generator.GetMesh();
 
         c_vector<double, 4> boxCollectionDomain{};
@@ -112,7 +112,7 @@ public:
 
         // Assertions
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 1);
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 9);
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 2> cells_generator;
@@ -121,22 +121,20 @@ public:
         cell_population.SetDampingConstantNormal(1.0);
 
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), 1);
-        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 40);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 9);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1);
 
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1);
-        std::cout << cell_population.GetNumRealCells() << std::endl;
         simulator.SetOutputDirectory("TestSemBasedSimulation");
         simulator.SetDt(0.01);
         simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(2.5);
+        simulator.SetEndTime(0.03);
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2>>());
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
-        std::cout << cell_population.GetNumRealCells() << std::endl;
         // Create some force laws and pass them to the simulation
         MAKE_PTR(SemRegionalForce<2>, p_sem_force);
         simulator.AddForce(p_sem_force);
@@ -147,29 +145,12 @@ public:
 
         // Run the simulation
         simulator.Solve();
-        
-        std::cout << cell_population.GetNumRealCells() << std::endl;
-
     }
 
     void TestSemBasedSimulationExample3D()
     {
-        SemMultiElementMeshGenerator<3> generator({ 5, 8, 5 }, {3, 1, 1}, 0.5);
+        SemMultiElementMeshGenerator<3> generator({ 3, 3, 3 }, {1, 1, 1}, 0.5);
         auto p_mesh = generator.GetMesh();
-
-        // Set the most central nodes to region 1
-        {
-            c_vector<double, 3> centroid = p_mesh->GetCentroidOfElement(0u);
-            auto p_elem_0 = p_mesh->GetElement(0);
-            for (unsigned i = 0; i < p_elem_0->GetNumNodes(); ++i)
-            {
-                auto p_node = p_elem_0->GetNode(i);
-                if (norm_2(p_mesh->GetVectorFromAtoB(centroid, p_node->rGetLocation())) < 0.2)
-                {
-                    p_node->SetRegion(1u);
-                }
-            }
-        }
 
         c_vector<double, 6> boxCollectionDomain{};
         boxCollectionDomain[0] = -1.0;
@@ -179,12 +160,14 @@ public:
         boxCollectionDomain[4] = -1.0;
         boxCollectionDomain[5] =  2.0;
 
-        const double interaction_cutoff = 0.15;
+        const double interaction_cutoff = 0.25;
         p_mesh->SetUpBoxCollection(interaction_cutoff, boxCollectionDomain);
 
         // Assertions
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 3);
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 600);
+        const unsigned expected_num_elements = 1u;
+        const unsigned expected_num_nodes = expected_num_elements * 3u * 3u * 3u;
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), expected_num_elements);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), expected_num_nodes);
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
@@ -194,43 +177,41 @@ public:
         cell_population.AddNodePointDataWriter<NodeRegionPointDataWriter>();
         cell_population.AddNodePointDataWriter<ElementIdNodePointDataWriter>();
 
-        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 3);
-        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 600);
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 3);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), expected_num_elements);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), expected_num_nodes);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), expected_num_elements);
 
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(cell_population);
-        std::cout << cell_population.GetNumRealCells() << std::endl;
         simulator.SetOutputDirectory("TestSemBasedSimulation3D");
         simulator.SetDt(0.01);
         simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(2.5);
+        simulator.SetEndTime(0.03);
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<3>>());
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
-        std::cout << cell_population.GetNumRealCells() << std::endl;
-        // Create some force laws and pass them to the simulation
+        // Create some force laws and pass them to the simulation.
+        const double sem_well_depth = 0.001;
+        const double sem_equilibrium_distance = p_mesh->GetDistanceBetweenNodes(0u, 1u);
         MAKE_PTR(SemForce<3>, p_sem_force);
-        p_sem_force->SetIntraWellDepth(1e-6);
-        p_sem_force->SetIntraEquilibriumDistance(0.1);
+        p_sem_force->SetIntraWellDepth(sem_well_depth);
+        p_sem_force->SetIntraEquilibriumDistance(sem_equilibrium_distance);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
-        p_sem_force->SetInterWellDepth(1e-6);
-        p_sem_force->SetInterEquilibriumDistance(0.1);
+        p_sem_force->SetInterWellDepth(sem_well_depth);
+        p_sem_force->SetInterEquilibriumDistance(sem_equilibrium_distance);
         p_sem_force->SetInterCutOffDistance(interaction_cutoff);
         simulator.AddForce(p_sem_force);
 
         MAKE_PTR(SemSpatiallyCorrelatedRandomForce<3>, p_random_force);
-        p_random_force->SetDiffusionConstant(0.1);
-        p_random_force->SetCorrelationLength(0.5);
+        p_random_force->SetDiffusionConstant(1 * 1e-5);
+        p_random_force->SetCorrelationLength(sem_equilibrium_distance);
         p_random_force->SetLowerCorner({{-1.0, -1.0, -1.0}});
-        p_random_force->SetUpperCorner({{2.0, 2.0, 2.0}});
+        p_random_force->SetUpperCorner({{3.0, 3.0, 3.0}});
         simulator.AddForce(p_random_force);
 
         // Run the simulation
         simulator.Solve();
-
-        std::cout << cell_population.GetNumRealCells() << std::endl;
     }
 
 };
