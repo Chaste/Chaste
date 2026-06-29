@@ -164,6 +164,17 @@ public:
         mesh_2d.SetUseExpandedSemSurfaceForVolume(false);
         mesh_2d.SetSemSurfaceExpansionMultiplier(0.0);
         TS_ASSERT_DELTA(mesh_2d.GetVolumeOfElement(0), 1.0, 1e-6);
+#else
+        std::vector<Node<2>*> nodes_2d;
+        nodes_2d.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes_2d.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes_2d.push_back(new Node<2>(2, false, 1.0, 1.0));
+        nodes_2d.push_back(new Node<2>(3, false, 0.0, 1.0));
+        std::vector<Node<2>*> element_nodes_2d = nodes_2d;
+        std::vector<SemElement<2>*> elements_2d;
+        elements_2d.push_back(new SemElement<2>(0, element_nodes_2d));
+        SemMesh<2> mesh_2d(nodes_2d, elements_2d);
+        TS_ASSERT_THROWS_CONTAINS(mesh_2d.GetVolumeOfElement(0), "require Chaste to be compiled with VTK");
 #endif // CHASTE_VTK
     }
 

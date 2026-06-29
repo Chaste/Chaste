@@ -159,11 +159,7 @@ void SemMeshWriter<DIM>::WriteVtkUsingMesh(SemMesh<DIM>& rMesh, std::string stam
     // Now write VTK mesh to file
     assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
     vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
-#if VTK_MAJOR_VERSION >= 6
     p_writer->SetInputData(mpVtkUnstructedMesh);
-#else
-    p_writer->SetInput(mpVtkUnstructedMesh);
-#endif
     // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
     // **** REMOVE WITH CAUTION *****
     p_writer->SetCompressor(nullptr);
@@ -180,6 +176,10 @@ void SemMeshWriter<DIM>::WriteVtkUsingMesh(SemMesh<DIM>& rMesh, std::string stam
     //p_writer->PrintSelf(std::cout, vtkIndent());
     p_writer->Write();
     p_writer->Delete(); // Reference counted
+#else
+    (void)rMesh;
+    (void)stamp;
+    EXCEPTION("SEM VTK output requires Chaste to be compiled with VTK");
 #endif //CHASTE_VTK
 }
 
@@ -200,11 +200,7 @@ void SemMeshWriter<2>::WriteVtkUsingMesh(SemMesh<2>& rMesh, std::string stamp)
     // Now write VTK mesh to file
     assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
     vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
-#if VTK_MAJOR_VERSION >= 6
     p_writer->SetInputData(mpVtkUnstructedMesh);
-#else
-    p_writer->SetInput(mpVtkUnstructedMesh);
-#endif
     // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
     // **** REMOVE WITH CAUTION *****
     p_writer->SetCompressor(nullptr);
@@ -221,6 +217,10 @@ void SemMeshWriter<2>::WriteVtkUsingMesh(SemMesh<2>& rMesh, std::string stamp)
     //p_writer->PrintSelf(std::cout, vtkIndent());
     p_writer->Write();
     p_writer->Delete(); // Reference counted
+#else
+    (void)rMesh;
+    (void)stamp;
+    EXCEPTION("SEM VTK output requires Chaste to be compiled with VTK");
 #endif //CHASTE_VTK
 }
 
@@ -360,6 +360,9 @@ void SemMeshWriter<DIM>::MakeVtkMesh(SemMesh<DIM>& rMesh)
     p_cell_data->AddArray(p_sem_output_kinds);
     p_sem_element_indices->Delete(); // Reference counted
     p_sem_output_kinds->Delete(); // Reference counted
+#else
+    (void)rMesh;
+    EXCEPTION("SEM VTK output requires Chaste to be compiled with VTK");
 #endif //CHASTE_VTK
 }
 
@@ -400,6 +403,10 @@ void SemMeshWriter<DIM>::AddCellData(std::string dataName, std::vector<double> d
     vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
     p_cell_data->AddArray(p_scalars);
     p_scalars->Delete(); // Reference counted
+#else
+    (void)dataName;
+    (void)dataPayload;
+    EXCEPTION("SEM VTK output requires Chaste to be compiled with VTK");
 #endif //CHASTE_VTK
 }
 
@@ -417,6 +424,10 @@ void SemMeshWriter<DIM>::AddPointData(std::string dataName, std::vector<double> 
     vtkPointData* p_point_data = mpVtkUnstructedMesh->GetPointData();
     p_point_data->AddArray(p_scalars);
     p_scalars->Delete(); // Reference counted
+#else
+    (void)dataName;
+    (void)dataPayload;
+    EXCEPTION("SEM VTK output requires Chaste to be compiled with VTK");
 #endif //CHASTE_VTK
 }
 

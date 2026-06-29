@@ -62,7 +62,6 @@ class SemMesh;
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkTriangleFilter.h>
-#include <vtkVersion.h>
 #endif // CHASTE_VTK
 
 /**
@@ -341,19 +340,11 @@ private:
         vtkSmartPointer<vtkDelaunay2D> p_delaunay = vtkSmartPointer<vtkDelaunay2D>::New();
         p_delaunay->SetAlpha(alpha);
         p_delaunay->BoundingTriangulationOff();
-#if VTK_MAJOR_VERSION >= 6
         p_delaunay->SetInputData(p_input);
-#else
-        p_delaunay->SetInput(p_input);
-#endif
         p_delaunay->Update();
 
         vtkSmartPointer<vtkTriangleFilter> p_triangle_filter = vtkSmartPointer<vtkTriangleFilter>::New();
-#if VTK_MAJOR_VERSION >= 6
         p_triangle_filter->SetInputData(p_delaunay->GetOutput());
-#else
-        p_triangle_filter->SetInput(p_delaunay->GetOutput());
-#endif
         p_triangle_filter->Update();
 
         vtkPolyData* p_output = p_triangle_filter->GetOutput();
@@ -426,27 +417,15 @@ private:
         p_delaunay->AlphaTrisOff();
         p_delaunay->AlphaLinesOff();
         p_delaunay->AlphaVertsOff();
-#if VTK_MAJOR_VERSION >= 6
         p_delaunay->SetInputData(p_input);
-#else
-        p_delaunay->SetInput(p_input);
-#endif
         p_delaunay->Update();
 
         vtkSmartPointer<vtkDataSetSurfaceFilter> p_surface_filter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-#if VTK_MAJOR_VERSION >= 6
         p_surface_filter->SetInputData(p_delaunay->GetOutput());
-#else
-        p_surface_filter->SetInput(p_delaunay->GetOutput());
-#endif
         p_surface_filter->Update();
 
         vtkSmartPointer<vtkTriangleFilter> p_triangle_filter = vtkSmartPointer<vtkTriangleFilter>::New();
-#if VTK_MAJOR_VERSION >= 6
         p_triangle_filter->SetInputData(p_surface_filter->GetOutput());
-#else
-        p_triangle_filter->SetInput(p_surface_filter->GetOutput());
-#endif
         p_triangle_filter->Update();
 
         vtkPolyData* p_output = p_triangle_filter->GetOutput();
@@ -478,11 +457,7 @@ private:
         }
 
         vtkSmartPointer<vtkMassProperties> p_mass_properties = vtkSmartPointer<vtkMassProperties>::New();
-#if VTK_MAJOR_VERSION >= 6
         p_mass_properties->SetInputData(p_output);
-#else
-        p_mass_properties->SetInput(p_output);
-#endif
         surface.Measure = p_mass_properties->GetVolume();
 
         if (surface.Measure <= 0.0)

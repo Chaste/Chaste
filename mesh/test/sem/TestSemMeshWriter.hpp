@@ -53,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDataArray.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkVersion.h>
 #include <vtkXMLUnstructuredGridReader.h>
 #endif
 
@@ -107,6 +106,25 @@ public:
         vtkDataArray* p_point_data = p_grid->GetPointData()->GetArray("test point data");
         TS_ASSERT(p_point_data != nullptr);
         TS_ASSERT_EQUALS(p_point_data->GetNumberOfTuples(), 8u);
+#else
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+
+        std::vector<Node<2>*> element_nodes = nodes;
+        std::vector<SemElement<2>*> elements;
+        elements.push_back(new SemElement<2>(0, element_nodes));
+        SemMesh<2> mesh(nodes, elements);
+
+        SemMeshWriter<2> writer("TestSemMeshWriter", "surface_results", false);
+        std::vector<double> data;
+        data.push_back(1.0);
+
+        TS_ASSERT_THROWS_CONTAINS(writer.AddPointData("test point data", data), "requires Chaste to be compiled with VTK");
+        TS_ASSERT_THROWS_CONTAINS(writer.AddCellData("test cell data", data), "requires Chaste to be compiled with VTK");
+        TS_ASSERT_THROWS_CONTAINS(writer.WriteVtkUsingMesh(mesh), "requires Chaste to be compiled with VTK");
 #endif // CHASTE_VTK
     }
 };

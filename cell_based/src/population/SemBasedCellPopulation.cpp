@@ -256,6 +256,7 @@ void SemBasedCellPopulation<DIM>::Validate()
 template<unsigned DIM>
 void SemBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
+#ifdef CHASTE_VTK
     SemMeshWriter<DIM> mesh_writer(rDirectory, "results", false);
 
     for (const auto& p_writer : this->mNodePointDataWriters)
@@ -273,6 +274,9 @@ void SemBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDire
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+#else
+    (void)rDirectory;
+#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>
