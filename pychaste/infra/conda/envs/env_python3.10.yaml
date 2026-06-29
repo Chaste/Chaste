@@ -4,6 +4,8 @@ channels:
 dependencies:
   - boost-cpp>=1.80,<1.86
   - castxml
+  - clangxx  # clang++ for castxml wrapper generation (see pychaste/CMakeLists.txt)
+  - lld      # clang ThinLTO linker (Release builds with clang)
   - eigen>=3.0,<4.0
   - hdf5>=1.14,<1.15=*mpich*
   - jupyterlab

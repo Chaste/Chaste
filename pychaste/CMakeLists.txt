@@ -76,8 +76,8 @@ endforeach()
 find_program(Chaste_CASTXML_COMPILER NAMES clang++ clang)
 if(NOT Chaste_CASTXML_COMPILER)
     set(Chaste_CASTXML_COMPILER ${CMAKE_CXX_COMPILER})
-    message(WARNING "clang not found. Using ${CMAKE_CXX_COMPILER} as the castxml compiler."
-                    "Wrapper generation may fail")
+    message(WARNING "clang not found. Using ${CMAKE_CXX_COMPILER} as the castxml"
+                    " compiler. Wrapper generation may fail")
 endif()
 
 # Command for generating wrappers.
@@ -134,7 +134,18 @@ target_link_libraries(_pychaste_all PRIVATE
 target_include_directories(_pychaste_all PRIVATE ${PYCHASTE_INCLUDE_DIRS})
 
 # -g0: Disable debug symbols in the Python modules as they are not needed.
-target_compile_options(_pychaste_all PRIVATE -flto=auto -Wno-unused-local-typedefs -g0)
+target_compile_options(_pychaste_all PRIVATE -Wno-unused-local-typedefs -g0)
+
+# Perform link-time optimization for Release builds only.
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(_pychaste_all PRIVATE -flto=auto)
+        target_link_options(_pychaste_all PRIVATE -flto=auto)
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(_pychaste_all PRIVATE -flto=thin)
+        target_link_options(_pychaste_all PRIVATE -fuse-ld=lld -flto=thin)
+    endif()
+endif()
 
 set_target_properties(_pychaste_all PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/package/chaste
