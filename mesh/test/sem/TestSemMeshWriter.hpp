@@ -42,13 +42,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemMeshWriter.hpp"
 #include "FileComparison.hpp"
+#include "OutputFileHandler.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
+#include <vtkCellData.h>
+#include <vtkDataArray.h>
+#include <vtkSmartPointer.h>
+#include <vtkUnstructuredGrid.h>
 #include <vtkVersion.h>
+#include <vtkXMLUnstructuredGridReader.h>
 #endif
 
 class TestSemMeshWriter : public CxxTest::TestSuite
@@ -57,7 +63,51 @@ public:
 
     void TestSemMeshWriterIn2d()
     {
-        ///\todo
+#ifdef CHASTE_VTK
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+
+        std::vector<Node<2>*> element_nodes = nodes;
+        std::vector<SemElement<2>*> elements;
+        elements.push_back(new SemElement<2>(0, element_nodes));
+        SemMesh<2> mesh(nodes, elements);
+        TS_ASSERT(mesh.GetOutputElementSurfacesToVtk());
+
+        SemMeshWriter<2> writer("TestSemMeshWriter", "surface_results", false);
+        std::vector<double> point_data;
+        point_data.push_back(1.0);
+        point_data.push_back(2.0);
+        point_data.push_back(3.0);
+        point_data.push_back(4.0);
+        writer.AddPointData("test point data", point_data);
+        writer.WriteVtkUsingMesh(mesh);
+
+        std::string results_file = OutputFileHandler::GetChasteTestOutputDirectory()
+                                   + "TestSemMeshWriter/surface_results.vtu";
+        vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+        p_reader->SetFileName(results_file.c_str());
+        p_reader->Update();
+        vtkUnstructuredGrid* p_grid = p_reader->GetOutput();
+
+        TS_ASSERT_EQUALS(p_grid->GetNumberOfCells(), 5u);
+        TS_ASSERT_EQUALS(p_grid->GetNumberOfPoints(), 8u);
+
+        vtkDataArray* p_output_kind = p_grid->GetCellData()->GetArray("SemOutputKind");
+        TS_ASSERT(p_output_kind != nullptr);
+        TS_ASSERT_EQUALS(p_output_kind->GetNumberOfTuples(), 5u);
+        TS_ASSERT_DELTA(p_output_kind->GetTuple1(0), 0.0, 1e-12);
+        for (unsigned i = 1u; i < 5u; ++i)
+        {
+            TS_ASSERT_DELTA(p_output_kind->GetTuple1(i), 1.0, 1e-12);
+        }
+
+        vtkDataArray* p_point_data = p_grid->GetPointData()->GetArray("test point data");
+        TS_ASSERT(p_point_data != nullptr);
+        TS_ASSERT_EQUALS(p_point_data->GetNumberOfTuples(), 8u);
+#endif // CHASTE_VTK
     }
 };
 

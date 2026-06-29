@@ -45,8 +45,12 @@ class SemMesh;
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkDoubleArray.h>
 #include <vtkCellData.h>
+#include <vtkDataArray.h>
+#include <vtkDataSetAttributes.h>
+#include <vtkLine.h>
 #include <vtkPointData.h>
 #include <vtkPolyVertex.h>
+#include <vtkTriangle.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
@@ -90,6 +94,14 @@ private:
 //Requires  "sudo aptitude install libvtk5-dev" or similar
 ///\todo Merge into VtkMeshWriter (#1076)
     vtkUnstructuredGrid* mpVtkUnstructedMesh;
+
+    /**
+     * Pad VTK data arrays to match the number of points or cells now present.
+     *
+     * @param pAttributes point or cell data attributes
+     * @param numTuples required number of tuples
+     */
+    void PadVtkDataArrays(vtkDataSetAttributes* pAttributes, unsigned numTuples);
 #endif //CHASTE_VTK
 
 public:
