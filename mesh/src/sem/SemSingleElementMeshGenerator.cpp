@@ -129,35 +129,48 @@ std::vector<c_vector<double, DIM>> SemSingleElementMeshGenerator<DIM>::GenerateN
     return positions;
 }
 
+template <unsigned DIM>
+bool SemSingleElementMeshGenerator<DIM>::IsBoundaryNode(unsigned flatIndex) const
+{
+    if constexpr (DIM == 1)
+    {
+        return (flatIndex == 0u) || (flatIndex == mNumNodes[0] - 1u);
+    }
+    else if constexpr (DIM == 2)
+    {
+        const unsigned i = flatIndex % mNumNodes[0];
+        const unsigned j = flatIndex / mNumNodes[0];
+        return (i == 0u) || (i == mNumNodes[0] - 1u) || (j == 0u) || (j == mNumNodes[1] - 1u);
+    }
+    else
+    {
+        const unsigned i = flatIndex % mNumNodes[0];
+        const unsigned j = (flatIndex / mNumNodes[0]) % mNumNodes[1];
+        const unsigned k = flatIndex / (mNumNodes[0] * mNumNodes[1]);
+        return (i == 0u) || (i == mNumNodes[0] - 1u) ||
+               (j == 0u) || (j == mNumNodes[1] - 1u) ||
+               (k == 0u) || (k == mNumNodes[2] - 1u);
+    }
+}
+
 template <unsigned DIM> void SemSingleElementMeshGenerator<DIM>::GenerateMesh(std::vector<c_vector<double, DIM>> positions)
 {
     unsigned int new_element_id = mpMesh->GetNumElements();
     auto new_element = new SemElement<DIM>(new_element_id, {});
     new_element->SetCellId(new_element_id);
 
-    std::vector<unsigned> all_node_indices;
-    all_node_indices.reserve(mNumAllNodes);
-
     for (unsigned i = 0; i < positions.size(); ++i)
     {
         unsigned new_node_index = mpMesh->GetNumNodes();
         Node<DIM>* new_node = new Node<DIM>(new_node_index, positions[i]);
-        new_node->SetRegion(0u);
+        new_node->SetRegion(IsBoundaryNode(i) ? 1u : 0u);
         new_node->SetRadius(0.05);
         new_node->AddElement(new_element_id);
 
-        // Add the node to the mesh
         mpMesh->AddNode(new_node);
         new_element->AddNode(new_node);
-
-        // Add the node indices to the relevant layer groups
-        all_node_indices.push_back(new_node_index);
     }
 
-    // Add the layer groups to the element
-    new_element->AddInteractionLayer("all-nodes", all_node_indices);
-
-    // Add the element to the mesh
     mpMesh->AddElement(new_element);
     NodeMap map(mpMesh->GetNumNodes());
     mpMesh->ReMesh(map);

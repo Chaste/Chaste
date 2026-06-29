@@ -312,60 +312,32 @@ void SemMeshGenerator::GenerateSingleCell(std::array<double, 2> center, std::arr
     auto new_element = new SemElement<2>(new_element_id, {});
     new_element->SetCellId(new_element_id);
     
-    std::vector<unsigned int> all_node_indices;
-    std::vector<unsigned int> boundary_node_indices;
-
     // Generate the nodes
     for (unsigned x = 0; x < num_nodes_on_axis[0]; x++) {
         for (unsigned y = 0; y < num_nodes_on_axis[1]; y++) {
             double x_location_normed = double(x) / double(num_nodes_on_axis[0]);
             double y_location_normed = double(y) / double(num_nodes_on_axis[1]);
-            
+
             // Compute the node location
             double x_location = center[0] + (x_location_normed - 0.5) * dimensions[0];
             double y_location = center[1] + (y_location_normed - 0.5) * dimensions[1];
-            
-            // Determine if this a boundary node
-            unsigned max_x_index = num_nodes_on_axis[0] - 1;
-            unsigned max_y_index = num_nodes_on_axis[1] - 1;
 
-            bool is_boundary_node = x == 0 or y == 0 or x == max_x_index or y == max_y_index;
-            
-            // Create the node
+            const unsigned max_x_index = num_nodes_on_axis[0] - 1;
+            const unsigned max_y_index = num_nodes_on_axis[1] - 1;
+            const bool is_boundary_node = x == 0 || y == 0 || x == max_x_index || y == max_y_index;
+
             unsigned int new_node_index = mpMesh->GetNumNodes();
             std::vector<double> node_location = {x_location, y_location};
             Node<2>* new_node = new Node<2>(new_node_index, node_location, is_boundary_node);
 
-            new_node->SetRegion(0u);
-
-            if(node_location[0] > 0.0)
-            {
-                new_node->SetRegion(1u);
-            }
-
-            if(node_location[1] > 0.0)
-            {
-                new_node->SetRegion(2u);
-            }
-
+            new_node->SetRegion(is_boundary_node ? 1u : 0u);
             new_node->SetRadius(0.05);
-            
-            // Add the node to the mesh
+
             mpMesh->AddNode(new_node);
             new_element->AddNode(new_node);
-            
-            // Add the node indices to the relevant layer groups
-            all_node_indices.push_back(new_node_index);
-
-            if (is_boundary_node) {
-                boundary_node_indices.push_back(new_node_index);
-            }
         }
     }
 
-    // Add the layer groups to the element
-    new_element->AddInteractionLayer("all-nodes", all_node_indices);
-    new_element->AddInteractionLayer("boundary", boundary_node_indices);
     new_element->RegisterWithNodes();
     
     // Add the element to the mesh

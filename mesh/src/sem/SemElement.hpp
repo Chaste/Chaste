@@ -39,16 +39,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/vector.hpp>
-#include <map>
 
 /**
  * An element class for use in the SemMesh class.
  *
  * An SemElement represents the subcellular node collection for one
- * biological cell. It records which mesh nodes belong to that cell, optional
- * named interaction layers used by SEM forces, and the node membership
- * bookkeeping needed for population lifecycle operations.
+ * biological cell. It records which mesh nodes belong to that cell and the
+ * node membership bookkeeping needed for population lifecycle operations.
+ * Each node carries a region label (0 = interior, 1 = boundary) set by the
+ * mesh generator; forces such as SemRegionalForce read this via Node::GetRegion().
  */
 template<unsigned DIM>
 class SemElement : public AbstractElement<DIM, DIM>
@@ -59,22 +58,11 @@ private:
      * The id of the biological cell represented by this SEM element.
      */
     unsigned mCellId;
-  
-    /**
-     * A collection of interaction layers. Each layer is identified by a name.
-     * The map stores a vector containing the indices of the nodes which make up the layer.
-     * SemForces produce interactions between or within named layers.
-     */
-    std::map<std::string, std::vector<unsigned int>> mInteractionLayers;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
-     *
-     * This archives the base element state, including node membership and
-     * deletion state. Additional SEM-specific state such as
-     * interaction layers is currently not serialized here.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -128,28 +116,6 @@ public:
      * @param id the new cell id
      */
     void SetCellId(unsigned int id);
-    
-    /**
-     * Add or replace a named interaction layer.
-     *
-     * An interaction layer identifies a subset of this element's nodes that
-     * can be targeted by SEM force laws. Reusing an existing layer name
-     * replaces the stored node index list for that layer.
-     * 
-     * @param layerName the name of the layer
-     * @param nodeIndices indices of the nodes which make up the layer
-     */
-    void AddInteractionLayer(const std::string layerName, std::vector<unsigned int>& nodeIndices);
-    
-    /**
-     * Get the interaction layers.
-     *
-     * This exposes the named node subsets used by SEM forces to decide which
-     * nodes should interact within or between elements.
-     * 
-     * @return a const reference to the interaction layers
-     */
-    const std::map<std::string, std::vector<unsigned int>>& rGetInteractionLayers();
     
     /**
      * Get the element's node vector.

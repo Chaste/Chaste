@@ -100,6 +100,14 @@ private:
      */
     void GenerateMesh(std::vector<c_vector<double, DIM>> positions, std::vector<c_vector<double, DIM>> offsets);
 
+    /**
+     * Return whether the node at the given flat grid index is on the boundary
+     * of the per-element node grid. Region 0 = interior, 1 = boundary.
+     *
+     * @param flatIndex linear index into the per-element node array
+     */
+    bool IsBoundaryNode(unsigned flatIndex) const;
+
 public:
     /**
      * Constructor.

@@ -63,18 +63,6 @@ void SemElement<DIM>::SetCellId(unsigned int cellId)
 }
 
 template<unsigned DIM>
-void SemElement<DIM>::AddInteractionLayer(const std::string layerName, std::vector<unsigned int>& nodeIndices)
-{
-  mInteractionLayers[layerName] = nodeIndices;
-}
-
-template<unsigned DIM>
-const std::map<std::string, std::vector<unsigned int>>& SemElement<DIM>::rGetInteractionLayers() 
-{
-  return mInteractionLayers;
-}
-
-template<unsigned DIM>    
 void SemElement<DIM>::UpdateNode(const unsigned& rIndex, Node<DIM>* pNode)
 {
     assert(rIndex < this->mNodes.size());
