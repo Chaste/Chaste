@@ -402,6 +402,7 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
     }
 };
+
 /*
  * To visualize the 3D results, use Paraview. See the
  * [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
