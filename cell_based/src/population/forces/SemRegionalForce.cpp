@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemRegionalForce.hpp"
 
+#include "SemEnumerations.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -64,8 +65,8 @@ c_vector<double, SPACE_DIM> SemRegionalForce<ELEMENT_DIM,SPACE_DIM>::CalculateFo
     const c_vector<double, SPACE_DIM>& r_node_a_location = p_node_a->rGetLocation();
     const c_vector<double, SPACE_DIM>& r_node_b_location = p_node_b->rGetLocation();
 
-    const unsigned node_a_region = p_node_a->GetRegion();
-    const unsigned node_b_region = p_node_b->GetRegion();
+    const SemNodeRegion node_a_region = static_cast<SemNodeRegion>(p_node_a->GetRegion());
+    const SemNodeRegion node_b_region = static_cast<SemNodeRegion>(p_node_b->GetRegion());
 
     if (distance < 0.5)
     {

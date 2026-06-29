@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SemSingleElementMeshGenerator.hpp"
 
 #include "Exception.hpp"
+#include "SemEnumerations.hpp"
 #include "SemMesh.hpp"
 
 
@@ -163,7 +164,7 @@ template <unsigned DIM> void SemSingleElementMeshGenerator<DIM>::GenerateMesh(st
     {
         unsigned new_node_index = mpMesh->GetNumNodes();
         Node<DIM>* new_node = new Node<DIM>(new_node_index, positions[i]);
-        new_node->SetRegion(IsBoundaryNode(i) ? 1u : 0u);
+        new_node->SetRegion(IsBoundaryNode(i) ? SEM_BOUNDARY_REGION : SEM_INTERIOR_REGION);
         new_node->SetRadius(0.05);
         new_node->AddElement(new_element_id);
 

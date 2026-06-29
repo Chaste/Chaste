@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemMeshGenerator.hpp"
 
+#include "SemEnumerations.hpp"
 #include <boost/foreach.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
@@ -330,7 +331,7 @@ void SemMeshGenerator::GenerateSingleCell(std::array<double, 2> center, std::arr
             std::vector<double> node_location = {x_location, y_location};
             Node<2>* new_node = new Node<2>(new_node_index, node_location, is_boundary_node);
 
-            new_node->SetRegion(is_boundary_node ? 1u : 0u);
+            new_node->SetRegion(is_boundary_node ? SEM_BOUNDARY_REGION : SEM_INTERIOR_REGION);
             new_node->SetRadius(0.05);
 
             mpMesh->AddNode(new_node);
