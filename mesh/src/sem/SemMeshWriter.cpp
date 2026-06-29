@@ -173,7 +173,6 @@ void SemMeshWriter<DIM>::WriteVtkUsingMesh(SemMesh<DIM>& rMesh, std::string stam
     vtk_file_name += ".vtu";
 
     p_writer->SetFileName(vtk_file_name.c_str());
-    //p_writer->PrintSelf(std::cout, vtkIndent());
     p_writer->Write();
     p_writer->Delete(); // Reference counted
 #else
@@ -214,7 +213,6 @@ void SemMeshWriter<2>::WriteVtkUsingMesh(SemMesh<2>& rMesh, std::string stamp)
     vtk_file_name += ".vtu";
 
     p_writer->SetFileName(vtk_file_name.c_str());
-    //p_writer->PrintSelf(std::cout, vtkIndent());
     p_writer->Write();
     p_writer->Delete(); // Reference counted
 #else
@@ -431,7 +429,6 @@ void SemMeshWriter<DIM>::AddPointData(std::string dataName, std::vector<double> 
 #endif //CHASTE_VTK
 }
 
-///\todo Mesh should be const (#1076)
 template<unsigned DIM>
 void SemMeshWriter<DIM>::WriteFilesUsingMesh(SemMesh<DIM>& rMesh)
 {

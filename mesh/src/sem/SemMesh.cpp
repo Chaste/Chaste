@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemMesh.hpp"
 #include "SemElementGeometry.hpp"
+#include "Exception.hpp"
 
 #include <cmath>
 
@@ -478,12 +479,15 @@ unsigned SemMesh<DIM>::AddElement(SemElement<DIM>* pNewElement)
 template<unsigned DIM>
 void SemMesh<DIM>::DeleteNodePriorToReMesh(unsigned int node)
 {
-
+    (void)node;
+    EXCEPTION("DeleteNodePriorToReMesh is not supported for SemMesh. "
+              "Element removal is managed via SemBasedCellPopulation::RemoveDeadCells().");
 }
+
 template<unsigned DIM>
 void SemMesh<DIM>::ReMesh(NodeMap map)
 {
-
+    (void)map;
 }
 
 // Explicit instantiation

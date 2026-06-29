@@ -36,11 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SemRegionalForce.hpp"
 
 #include "SemEnumerations.hpp"
-#include "AbstractCentreBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "NodeBasedCellPopulation.hpp"
-
-#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 SemRegionalForce<ELEMENT_DIM,SPACE_DIM>::SemRegionalForce()
@@ -87,11 +82,10 @@ c_vector<double, SPACE_DIM> SemRegionalForce<ELEMENT_DIM,SPACE_DIM>::CalculateFo
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void SemRegionalForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    // *rParamsFile << "\t\t\t<MeinekeSpringStiffness>" << mMeinekeSpringStiffness << "</MeinekeSpringStiffness>\n";
-    // *rParamsFile << "\t\t\t<MeinekeDivisionRestingSpringLength>" << mMeinekeDivisionRestingSpringLength << "</MeinekeDivisionRestingSpringLength>\n";
-    // *rParamsFile << "\t\t\t<MeinekeSpringGrowthDuration>" << mMeinekeSpringGrowthDuration << "</MeinekeSpringGrowthDuration>\n";
-
-    // Call method on direct parent class
+    *rParamsFile << "\t\t\t<SpringConstantInterior>" << mSpringConstants[SEM_INTERIOR_REGION] << "</SpringConstantInterior>\n";
+    *rParamsFile << "\t\t\t<SpringConstantBoundary>" << mSpringConstants[SEM_BOUNDARY_REGION] << "</SpringConstantBoundary>\n";
+    *rParamsFile << "\t\t\t<RestLengthInterior>" << mRestLengths[SEM_INTERIOR_REGION] << "</RestLengthInterior>\n";
+    *rParamsFile << "\t\t\t<RestLengthBoundary>" << mRestLengths[SEM_BOUNDARY_REGION] << "</RestLengthBoundary>\n";
     AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);
 }
 

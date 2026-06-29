@@ -133,7 +133,18 @@ public:
      */
     double GetDomainWidth();
     
-    void GenerateSingleCell(std::array<double, 2> center, std::array<double, 2> dimensions, std::array<double, 2> num_nodes_on_axis); 
+    /**
+     * Generate a single rectangular SEM element and add it to the mesh.
+     *
+     * Nodes are placed on a regular Cartesian grid covering the given extent.
+     * Boundary nodes (those on the outer edge of the grid) receive region
+     * SEM_BOUNDARY_REGION; interior nodes receive SEM_INTERIOR_REGION.
+     *
+     * @param center            2D coordinates of the element centre
+     * @param dimensions        half-extents [half-width, half-height] of the element
+     * @param num_nodes_on_axis number of nodes along [x-axis, y-axis]
+     */
+    void GenerateSingleCell(std::array<double, 2> center, std::array<double, 2> dimensions, std::array<double, 2> num_nodes_on_axis);
 };
 
 #endif /*SEMMESHGENERATOR_HPP_*/

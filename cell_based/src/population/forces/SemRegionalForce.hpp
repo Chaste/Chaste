@@ -42,8 +42,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A force law representing a general interaction between nodes in a Subcellular Element simulation,
- * where the mechanical properties of the force depend on the node region.
+ * A linear spring force for Subcellular Element (SEM) simulations in which the spring constant
+ * and rest length depend on the region label of the interacting nodes.
+ *
+ * Node regions are set by the mesh generator using the SemNodeRegion enum:
+ *   SEM_INTERIOR_REGION (= 0): subcellular nodes in the cell interior
+ *   SEM_BOUNDARY_REGION (= 1): subcellular nodes on the cell surface / cortex
+ *
+ * The effective spring constant and rest length for a pair of interacting nodes is the arithmetic
+ * mean of each node's per-region value, allowing smooth transitions at interior-boundary contacts.
+ *
+ * Forces are applied to node pairs whose separation is less than 0.5 (in mesh units). The force
+ * is zero beyond that distance.
  */
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class SemRegionalForce : public AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
@@ -64,17 +74,16 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
-        // archive & mSpringConstant;
+        archive & mSpringConstants;
+        archive & mRestLengths;
     }
 
 protected:
 
-
-    /**
-     * The basic interaction strength.
-     */
+    /** Spring constants indexed by SemNodeRegion: [SEM_INTERIOR_REGION, SEM_BOUNDARY_REGION, ...]. */
     std::vector<double> mSpringConstants = {1.0, 2.0, 3.0};
 
+    /** Rest lengths indexed by SemNodeRegion: [SEM_INTERIOR_REGION, SEM_BOUNDARY_REGION, ...]. */
     std::vector<double> mRestLengths = {0.2, 0.15, 0.1};
 
 

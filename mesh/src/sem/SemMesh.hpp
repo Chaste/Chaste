@@ -40,7 +40,6 @@ template<unsigned DIM>
 class SemMeshWriter;
 
 #include <algorithm>
-#include <iostream>
 #include <map>
 #include <memory>
 
@@ -59,7 +58,18 @@ class SemMeshWriter;
 #include "NodeMap.hpp"
 
 /**
- * \todo Document class
+ * A mesh of subcellular element (SEM) nodes, where each SemElement represents one biological cell.
+ *
+ * Each cell is made up of a collection of subcellular nodes. Nodes belonging to the same element
+ * interact via intra-cellular forces; nodes in different elements interact via inter-cellular forces.
+ * A DistributedBoxCollection partitions the domain so that only potentially-interacting node pairs
+ * (those within mMaximumInteractionDistance) are evaluated.
+ *
+ * Node regions are set by the generator using the SemNodeRegion enum (see SemEnumerations.hpp):
+ * SEM_INTERIOR_REGION (0) for interior nodes, SEM_BOUNDARY_REGION (1) for surface/cortex nodes.
+ *
+ * Mesh topology changes (DeleteNodePriorToReMesh, ReMesh with node deletion) are not supported.
+ * Cell removal is managed through SemBasedCellPopulation::RemoveDeadCells().
  */
 template<unsigned DIM>
 class SemMesh : public AbstractMesh<DIM, DIM>
@@ -382,7 +392,26 @@ public:
      */
     bool GetUseExpandedSemSurfaceForVolume() const;
 
+    /**
+     * Not supported for SemMesh.
+     *
+     * Individual node deletion is not implemented; element removal is managed through
+     * SemBasedCellPopulation::RemoveDeadCells(), which marks the SemElement deleted and
+     * unregisters all of its nodes in one operation.
+     *
+     * @param node global index of the node to delete (unused)
+     */
     void DeleteNodePriorToReMesh(unsigned int node);
+
+    /**
+     * No-op for SemMesh.
+     *
+     * SEM meshes have no triangulation; this method is required by the AbstractMesh
+     * interface and is called by generators after element construction, but it performs
+     * no work. The supplied NodeMap is ignored.
+     *
+     * @param map node index map (ignored)
+     */
     void ReMesh(NodeMap map);
 
     /**

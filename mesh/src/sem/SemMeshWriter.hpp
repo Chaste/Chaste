@@ -91,8 +91,6 @@ private:
     unsigned mNodeMapCurrentIndex;
 
 #ifdef CHASTE_VTK
-//Requires  "sudo aptitude install libvtk5-dev" or similar
-///\todo Merge into VtkMeshWriter (#1076)
     vtkUnstructuredGrid* mpVtkUnstructedMesh;
 
     /**
@@ -124,7 +122,6 @@ public:
      */
     ~SemMeshWriter();
 
-    ///\todo Mesh should be const
     /**
      * Write files using a mesh.
      *
