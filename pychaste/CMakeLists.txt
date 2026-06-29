@@ -70,12 +70,20 @@ foreach(_dir IN LISTS PYCHASTE_INCLUDE_DIRS)
     target_include_directories(chaste_pychaste INTERFACE "$<BUILD_INTERFACE:${_dir}>")
 endforeach()
 
+# To parse C++ headers, castxml mimics a compiler. We point it specifically at
+# clang rather than the build compiler as that is better supported across
+# castxml versions. The library itself is still built with the normal compiler.
+find_program(Chaste_CASTXML_COMPILER NAMES clang++ clang)
+if(NOT Chaste_CASTXML_COMPILER)
+    set(Chaste_CASTXML_COMPILER ${CMAKE_CXX_COMPILER})
+    message(WARNING "clang not found. Using ${CMAKE_CXX_COMPILER} as the castxml compiler."
+                    "Wrapper generation may fail")
+endif()
+
 # Command for generating wrappers.
 #  - gnu++17 (rather than c++17) and -Wno-missing-template-arg-list-after-template-kw
 #    silence a castxml/LLVM error on use of the template keyword without a
 #    following argument list, which appears in some boost headers.
-#  - -U__SIZEOF_FLOAT128__ stops boost.multiprecision from including quadmath.h,
-#    a GCC-only header that castxml's bundled Clang cannot find.
 set(PYCHASTE_WRAPPER_GENERATION_COMMAND
     ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
         -w ${CMAKE_CURRENT_BINARY_DIR}/wrappers
@@ -83,8 +91,8 @@ set(PYCHASTE_WRAPPER_GENERATION_COMMAND
         -i ${PYCHASTE_INCLUDE_DIRS}
         -l ${CMAKE_CURRENT_BINARY_DIR}/cppwg.log
         --std "gnu++17"
-        --castxml_cflags="-Wno-missing-template-arg-list-after-template-kw -U__SIZEOF_FLOAT128__"
-        --castxml_compiler ${CMAKE_CXX_COMPILER}
+        --castxml_cflags="-Wno-missing-template-arg-list-after-template-kw"
+        --castxml_compiler ${Chaste_CASTXML_COMPILER}
 )
 
 # Generate wrappers if not already created
