@@ -34,12 +34,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SemMesh.hpp"
+#include "SemElementGeometry.hpp"
 
 #include <cmath>
 
 template<unsigned DIM>
 SemMesh<DIM>::SemMesh(std::vector<Node<DIM>*> nodes,
                       std::vector<SemElement<DIM>*> semElements)
+    : mMaximumInteractionDistance(1.0),
+      mOutputElementSurfacesToVtk(true),
+      mSemSurfaceAlphaMultiplier(2.0),
+      mSemSurfaceExpansionMultiplier(0.5),
+      mUseExpandedSemSurfaceForVolume(true)
 {
     // Reset member variables and clear mNodes and mElements
     Clear();
@@ -59,6 +65,11 @@ SemMesh<DIM>::SemMesh(std::vector<Node<DIM>*> nodes,
 
 template<unsigned DIM>
 SemMesh<DIM>::SemMesh()
+    : mMaximumInteractionDistance(1.0),
+      mOutputElementSurfacesToVtk(true),
+      mSemSurfaceAlphaMultiplier(2.0),
+      mSemSurfaceExpansionMultiplier(0.5),
+      mUseExpandedSemSurfaceForVolume(true)
 {
     // Reset member variables and clear mNodes and mElements
     Clear();
@@ -120,6 +131,13 @@ c_vector<double, DIM> SemMesh<DIM>::GetCentroidOfElement(unsigned index)
     displacement /= static_cast<double>(num_nodes);
 
     return reference_location + displacement;
+}
+
+template <unsigned DIM>
+ChasteCuboid<DIM> SemMesh<DIM>::CalculateBoundingBoxOfElement(unsigned index)
+{
+    SemElement<DIM>* p_element = GetElement(index);
+    return this->CalculateBoundingBox(p_element->rGetNodes());
 }
 
 template<unsigned DIM>
@@ -232,6 +250,62 @@ template<unsigned DIM>
 double SemMesh<DIM>::GetMaximumInteractionDistance() const
 {
     return mMaximumInteractionDistance;
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::SetOutputElementSurfacesToVtk(bool outputElementSurfacesToVtk)
+{
+    mOutputElementSurfacesToVtk = outputElementSurfacesToVtk;
+}
+
+template<unsigned DIM>
+bool SemMesh<DIM>::GetOutputElementSurfacesToVtk() const
+{
+    return mOutputElementSurfacesToVtk;
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::SetSemSurfaceAlphaMultiplier(double semSurfaceAlphaMultiplier)
+{
+    if (semSurfaceAlphaMultiplier <= 0.0)
+    {
+        EXCEPTION("SEM surface alpha multiplier must be positive");
+    }
+    mSemSurfaceAlphaMultiplier = semSurfaceAlphaMultiplier;
+}
+
+template<unsigned DIM>
+double SemMesh<DIM>::GetSemSurfaceAlphaMultiplier() const
+{
+    return mSemSurfaceAlphaMultiplier;
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::SetSemSurfaceExpansionMultiplier(double semSurfaceExpansionMultiplier)
+{
+    if (semSurfaceExpansionMultiplier < 0.0)
+    {
+        EXCEPTION("SEM surface expansion multiplier must be non-negative");
+    }
+    mSemSurfaceExpansionMultiplier = semSurfaceExpansionMultiplier;
+}
+
+template<unsigned DIM>
+double SemMesh<DIM>::GetSemSurfaceExpansionMultiplier() const
+{
+    return mSemSurfaceExpansionMultiplier;
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::SetUseExpandedSemSurfaceForVolume(bool useExpandedSemSurfaceForVolume)
+{
+    mUseExpandedSemSurfaceForVolume = useExpandedSemSurfaceForVolume;
+}
+
+template<unsigned DIM>
+bool SemMesh<DIM>::GetUseExpandedSemSurfaceForVolume() const
+{
+    return mUseExpandedSemSurfaceForVolume;
 }
 
 template<unsigned DIM>
@@ -363,8 +437,12 @@ void SemMesh<DIM>::Clear()
 template<unsigned DIM>
 double SemMesh<DIM>::GetVolumeOfElement(unsigned index)
 {
-    ///\todo
-    return 0.0;
+    SemElementSurface<DIM> surface = SemElementGeometry<DIM>::GenerateSurface(*this,
+                                                                              index,
+                                                                              mSemSurfaceAlphaMultiplier,
+                                                                              mSemSurfaceExpansionMultiplier,
+                                                                              mUseExpandedSemSurfaceForVolume);
+    return surface.Measure;
 }
 
 template<unsigned DIM>

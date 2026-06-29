@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "SemMesh.hpp"
+#include "SemElementGeometry.hpp"
 #include "ArchiveOpener.hpp"
 #include "SemSingleElementMeshGenerator.hpp"
 
@@ -135,7 +136,86 @@ public:
 
     void TestGetVolumeOfElement()
     {
-        ///\todo
+        std::vector<Node<1>*> nodes;
+        nodes.push_back(new Node<1>(0, false, 0.0));
+        nodes.push_back(new Node<1>(1, false, 1.0));
+        std::vector<Node<1>*> element_nodes = nodes;
+        std::vector<SemElement<1>*> elements;
+        elements.push_back(new SemElement<1>(0, element_nodes));
+        SemMesh<1> mesh(nodes, elements);
+
+        mesh.SetUseExpandedSemSurfaceForVolume(false);
+        TS_ASSERT_DELTA(mesh.GetVolumeOfElement(0), 1.0, 1e-6);
+
+        mesh.SetUseExpandedSemSurfaceForVolume(true);
+        mesh.SetSemSurfaceExpansionMultiplier(0.5);
+        TS_ASSERT_DELTA(mesh.GetVolumeOfElement(0), 2.0, 1e-6);
+
+#ifdef CHASTE_VTK
+        std::vector<Node<2>*> nodes_2d;
+        nodes_2d.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes_2d.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes_2d.push_back(new Node<2>(2, false, 1.0, 1.0));
+        nodes_2d.push_back(new Node<2>(3, false, 0.0, 1.0));
+        std::vector<Node<2>*> element_nodes_2d = nodes_2d;
+        std::vector<SemElement<2>*> elements_2d;
+        elements_2d.push_back(new SemElement<2>(0, element_nodes_2d));
+        SemMesh<2> mesh_2d(nodes_2d, elements_2d);
+        mesh_2d.SetUseExpandedSemSurfaceForVolume(false);
+        mesh_2d.SetSemSurfaceExpansionMultiplier(0.0);
+        TS_ASSERT_DELTA(mesh_2d.GetVolumeOfElement(0), 1.0, 1e-6);
+#endif // CHASTE_VTK
+    }
+
+    void TestGetVolumeOfElementThrowsForUnderDefinedElement()
+    {
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        std::vector<Node<2>*> element_nodes = nodes;
+        std::vector<SemElement<2>*> elements;
+        elements.push_back(new SemElement<2>(0, element_nodes));
+        SemMesh<2> mesh(nodes, elements);
+
+        TS_ASSERT_THROWS_CONTAINS(mesh.GetVolumeOfElement(0), "requires at least three distinct nodes");
+    }
+
+    void TestLocalSpacingUsesBoundingBoxEstimate()
+    {
+        std::vector<Node<1>*> nodes;
+        nodes.push_back(new Node<1>(0, false, 0.0));
+        nodes.push_back(new Node<1>(1, false, 1.0));
+        nodes.push_back(new Node<1>(2, false, 3.0));
+        std::vector<Node<1>*> element_nodes = nodes;
+        std::vector<SemElement<1>*> elements;
+        elements.push_back(new SemElement<1>(0, element_nodes));
+        SemMesh<1> mesh(nodes, elements);
+
+        SemElementSurface<1> surface = SemElementGeometry<1>::GenerateSurface(mesh, 0, 2.0, 0.0, false);
+        TS_ASSERT_DELTA(surface.LocalSpacing, 1.5, 1e-6);
+        TS_ASSERT_DELTA(surface.Alpha, 3.0, 1e-6);
+    }
+
+    void TestLocalSpacingUsesBoundingBoxEstimateIn2d()
+    {
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 4.0, 0.0));
+        nodes.push_back(new Node<2>(3, false, 0.0, 0.5));
+        nodes.push_back(new Node<2>(4, false, 2.0, 0.5));
+        nodes.push_back(new Node<2>(5, false, 4.0, 0.5));
+        nodes.push_back(new Node<2>(6, false, 0.0, 1.0));
+        nodes.push_back(new Node<2>(7, false, 2.0, 1.0));
+        nodes.push_back(new Node<2>(8, false, 4.0, 1.0));
+
+        std::vector<Node<2>*> element_nodes = nodes;
+        std::vector<SemElement<2>*> elements;
+        elements.push_back(new SemElement<2>(0, element_nodes));
+
+        SemMesh<2> mesh(nodes, elements);
+
+        TS_ASSERT_DELTA(SemElementGeometry<2>::CalculateLocalSpacing(mesh, 0), 1.0, 1e-6);
     }
     void TestGetMeshForVtk()
     {

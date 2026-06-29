@@ -74,6 +74,18 @@ private:
     /** Nodes separated by a distance less than mMaximumInteractionDistance are neighbours. */
     double mMaximumInteractionDistance;
 
+    /** Whether generated SEM element surfaces are included in VTK output. */
+    bool mOutputElementSurfacesToVtk;
+
+    /** Multiplier applied to the local SEM element node spacing to set alpha-shape alpha. */
+    double mSemSurfaceAlphaMultiplier;
+
+    /** Multiplier applied to local SEM element node spacing for radial surface expansion. */
+    double mSemSurfaceExpansionMultiplier;
+
+    /** Whether GetVolumeOfElement() uses the expanded SEM surface. */
+    bool mUseExpandedSemSurfaceForVolume;
+
     /**
      * Set up a DistributedBoxCollection by calculating the correct domain size from the node locations.
      *
@@ -266,6 +278,15 @@ public:
     virtual c_vector<double, DIM> GetCentroidOfElement(unsigned index);
 
     /**
+     * Compute the bounding box of an element.
+     *
+     * @param index the global index of a specified SemElement
+     *
+     * @return bounding box of the element nodes
+     */
+    ChasteCuboid<DIM> CalculateBoundingBoxOfElement(unsigned index);
+
+    /**
      * Construct the mesh using a MeshReader.
      *
      * @param rMeshReader the mesh reader
@@ -312,6 +333,54 @@ public:
      * @return mMaximumInteractionDistance.
      */
     double GetMaximumInteractionDistance() const;
+
+    /**
+     * Set whether generated SEM element surfaces are included in VTK output.
+     *
+     * @param outputElementSurfacesToVtk whether to include element surfaces
+     */
+    void SetOutputElementSurfacesToVtk(bool outputElementSurfacesToVtk);
+
+    /**
+     * @return whether generated SEM element surfaces are included in VTK output.
+     */
+    bool GetOutputElementSurfacesToVtk() const;
+
+    /**
+     * Set the alpha multiplier used for SEM element alpha-shape generation.
+     *
+     * @param semSurfaceAlphaMultiplier multiplier applied to local node spacing
+     */
+    void SetSemSurfaceAlphaMultiplier(double semSurfaceAlphaMultiplier);
+
+    /**
+     * @return the alpha multiplier used for SEM element alpha-shape generation.
+     */
+    double GetSemSurfaceAlphaMultiplier() const;
+
+    /**
+     * Set the outward expansion multiplier used for SEM element surfaces.
+     *
+     * @param semSurfaceExpansionMultiplier multiplier applied to local node spacing
+     */
+    void SetSemSurfaceExpansionMultiplier(double semSurfaceExpansionMultiplier);
+
+    /**
+     * @return the outward expansion multiplier used for SEM element surfaces.
+     */
+    double GetSemSurfaceExpansionMultiplier() const;
+
+    /**
+     * Set whether GetVolumeOfElement() uses the expanded SEM surface.
+     *
+     * @param useExpandedSemSurfaceForVolume whether to use expanded surfaces
+     */
+    void SetUseExpandedSemSurfaceForVolume(bool useExpandedSemSurfaceForVolume);
+
+    /**
+     * @return whether GetVolumeOfElement() uses the expanded SEM surface.
+     */
+    bool GetUseExpandedSemSurfaceForVolume() const;
 
     void DeleteNodePriorToReMesh(unsigned int node);
     void ReMesh(NodeMap map);
