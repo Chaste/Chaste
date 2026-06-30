@@ -2556,6 +2556,7 @@ public:
      */
     void TestSemForceCalculateForceBetweenNodesUsesIntraParametersIn3d()
     {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, false, 0.18, 0.24, 0.0));
@@ -2601,6 +2602,7 @@ public:
      */
     void TestSemForceCalculateForceBetweenNodesUsesInterParametersIn3d()
     {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, false, 0.18, 0.24, 0.0));
@@ -2649,6 +2651,7 @@ public:
      */
     void TestSemForceCalculateForceBetweenNodesCutoffsIn3d()
     {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, false, 0.18, 0.24, 0.0));
@@ -2711,6 +2714,7 @@ public:
      */
     void TestSemForceWithPopulation()
     {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
         // Create a single-element SEM mesh with nodes on a 5x5 grid, diameter 0.5
         SemSingleElementMeshGenerator<2> generator({5, 5}, 0.5);
         auto p_mesh = generator.GetMesh();
@@ -2781,6 +2785,7 @@ public:
      */
     void TestSemForceWithMultiElementPopulation()
     {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
         // Create a 2-element SEM mesh: two cells side by side
         SemMultiElementMeshGenerator<2> generator({5, 5}, {2, 1}, 0.5);
         auto p_mesh = generator.GetMesh();
@@ -2842,6 +2847,7 @@ public:
      */
     void TestSemGaussianRandomForceWithPopulation()
     {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
@@ -2891,6 +2897,7 @@ public:
      */
     void TestSemSpatiallyCorrelatedRandomForceWithPopulation()
     {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
