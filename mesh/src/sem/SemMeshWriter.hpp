@@ -66,7 +66,7 @@ template<unsigned DIM>
 class SemMesh;
 
 template<unsigned SPACE_DIM, unsigned ELEMENT_DIM>
-class MeshWriterIterators;
+struct MeshWriterIterators;
 
 /**
  * A mesh writer class for the SemMesh class.

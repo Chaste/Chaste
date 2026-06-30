@@ -146,33 +146,33 @@ public:
     /**
      * @return the number of elements in the mesh.
      */
-    unsigned GetNumElements() const;
+    unsigned GetNumElements() const override;
 
     /**
      * @return the number of nodes in the mesh.
      */
-    unsigned GetNumNodes() const;
+    unsigned GetNumNodes() const override;
 
     /**
      * @return the number of attributes in the mesh.
      */
-    unsigned GetNumElementAttributes() const;
+    unsigned GetNumElementAttributes() const override;
 
     /**
      * Reset pointers to beginning.
      */
-    void Reset();
+    void Reset() override;
 
     /**
      * @return the coordinates of each node in turn.
      */
-    std::vector<double> GetNextNode();
+    std::vector<double> GetNextNode() override;
 
     /**
-     * @return the nodes of each element (and any attribute information, if 
+     * @return the nodes of each element (and any attribute information, if
      *         there is any) in turn.
      */
-    ElementData GetNextElementData();
+    ElementData GetNextElementData() override;
     
     /**
      * @return the number of faces (always 0 — SEM files do not store face data).
