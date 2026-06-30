@@ -76,7 +76,9 @@ private:
     std::vector<c_vector<double, DIM>> GenerateNodePositions() const;
 
     /**
-     * Generate the mesh from the node positions
+     * Generate the mesh from the node positions.
+     *
+     * @param positions vector of node coordinates produced by GenerateNodePositions()
      */
     void GenerateMesh(std::vector<c_vector<double, DIM>> positions);
 
@@ -85,6 +87,7 @@ private:
      * (i.e. has index 0 or max in any dimension). Region 0 = interior, 1 = boundary.
      *
      * @param flatIndex linear index into the node array produced by GenerateNodePositions()
+     * @return true if the node lies on any face of the grid, false otherwise
      */
     bool IsBoundaryNode(unsigned flatIndex) const;
 

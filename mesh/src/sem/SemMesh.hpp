@@ -244,11 +244,13 @@ public:
     void CalculateNodePairs(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
-     * Adds a node to the mesh
-     * 
+     * Adds a node to the mesh.
+     *
      * @param pNewNode a pointer to the node to add
-    */
-   virtual unsigned AddNode(Node<DIM>* pNewNode);
+     *
+     * @return the index of the new node within the mesh
+     */
+    virtual unsigned AddNode(Node<DIM>* pNewNode);
 
     /**
      * @return the number of SemElements in the mesh.
@@ -268,12 +270,12 @@ public:
     virtual SemElement<DIM>* GetElement(unsigned index) const;
 
     /**
-     * Add a node to the mesh
-     * 
-     * @param pNewNode a pointer to the node to add to the mesh
-     * 
-     * @return the id of the node within the mesh
-    */
+     * Add an element to the mesh.
+     *
+     * @param pNewElement a pointer to the SemElement to add to the mesh
+     *
+     * @return the index of the new element within the mesh
+     */
     virtual unsigned AddElement(SemElement<DIM>* pNewElement);
     
     /**
@@ -335,7 +337,7 @@ public:
     /**
      * Set the maximum node interaction distance.
      *
-     * @param maxDistance the new maximum distance.
+     * @param maximumInteractionDistance the new maximum interaction distance
      */
     void SetMaximumInteractionDistance(double maximumInteractionDistance);
 

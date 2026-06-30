@@ -105,6 +105,7 @@ private:
      * of the per-element node grid. Region 0 = interior, 1 = boundary.
      *
      * @param flatIndex linear index into the per-element node array
+     * @return true if the node lies on any face of the per-element grid, false otherwise
      */
     bool IsBoundaryNode(unsigned flatIndex) const;
 

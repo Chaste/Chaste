@@ -72,13 +72,13 @@ class SemMesh;
 template<unsigned DIM>
 struct SemElementSurface
 {
-    std::vector<c_vector<double, DIM> > Points;
-    std::vector<std::array<unsigned, 2> > Lines;
-    std::vector<std::array<unsigned, 3> > Triangles;
-    double Measure = 0.0;
-    double LocalSpacing = 0.0;
-    double Alpha = 0.0;
-    double ExpansionRadius = 0.0;
+    std::vector<c_vector<double, DIM> > Points;        /**< Surface point coordinates. */
+    std::vector<std::array<unsigned, 2> > Lines;       /**< Line segments (pairs of point indices). */
+    std::vector<std::array<unsigned, 3> > Triangles;   /**< Triangular faces (triples of point indices). */
+    double Measure = 0.0;                              /**< Length (1D), area (2D), or volume (3D). */
+    double LocalSpacing = 0.0;                         /**< Characteristic inter-node spacing. */
+    double Alpha = 0.0;                                /**< Alpha parameter used for surface generation. */
+    double ExpansionRadius = 0.0;                      /**< Outward expansion radius applied to surface points. */
 };
 
 /**
@@ -200,6 +200,13 @@ public:
     }
 
 private:
+    /**
+     * Collect node positions of a SEM element into a vector.
+     *
+     * @param rMesh the SEM mesh
+     * @param elementIndex the SEM element index
+     * @return vector of node locations for the element
+     */
     static std::vector<c_vector<double, DIM> > GetNodeLocations(SemMesh<DIM>& rMesh, unsigned elementIndex)
     {
         auto p_element = rMesh.GetElement(elementIndex);
@@ -212,6 +219,13 @@ private:
         return points;
     }
 
+    /**
+     * Expand each point outward from the centroid by a fixed radius.
+     *
+     * @param rPoints the point cloud to modify in place
+     * @param rCentroid centroid of the point cloud
+     * @param expansionRadius outward displacement to apply (no-op if <= 0)
+     */
     static void ExpandPoints(std::vector<c_vector<double, DIM> >& rPoints,
                              const c_vector<double, DIM>& rCentroid,
                              double expansionRadius)
@@ -232,6 +246,15 @@ private:
         }
     }
 
+    /**
+     * Generate a surface for a 1D SEM element (an interval with two endpoints).
+     *
+     * @param rPoints node positions of the element
+     * @param localSpacing characteristic inter-node spacing
+     * @param alpha alpha parameter (stored in the result)
+     * @param expansionRadius outward expansion applied to the interval endpoints
+     * @return generated surface data for the 1D element
+     */
     static SemElementSurface<DIM> GenerateSurface1d(std::vector<c_vector<double, DIM> >& rPoints,
                                                     double localSpacing,
                                                     double alpha,
@@ -269,6 +292,12 @@ private:
         return surface;
     }
 
+    /**
+     * Check that the point cloud has enough points for alpha-shape surface generation.
+     * Throws an exception if there are too few points (< 3 in 2D, < 4 in 3D).
+     *
+     * @param rPoints the point cloud to validate
+     */
     static void EnsureSufficientPoints(const std::vector<c_vector<double, DIM> >& rPoints)
     {
         if constexpr (DIM == 2)

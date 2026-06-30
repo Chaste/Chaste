@@ -174,7 +174,14 @@ public:
      */
     ElementData GetNextElementData();
     
+    /**
+     * @return the number of faces (always 0 — SEM files do not store face data).
+     */
     unsigned int GetNumFaces() const override;
+
+    /**
+     * @return an empty ElementData record (SEM files do not store face data).
+     */
     ElementData GetNextFaceData() override;
 };
 
