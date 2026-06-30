@@ -317,6 +317,14 @@ private:
     }
 
 #ifdef CHASTE_VTK
+    /**
+     * Build a VTK polydata object containing the SEM node locations, for use as
+     * input to the VTK Delaunay filters. In 2D the z-coordinate is set to zero.
+     *
+     * @param rPoints the node locations to copy into the polydata
+     *
+     * @return a VTK polydata object holding the points
+     */
     static vtkSmartPointer<vtkPolyData> MakeInputPolyData(const std::vector<c_vector<double, DIM> >& rPoints)
     {
         vtkSmartPointer<vtkPoints> p_points = vtkSmartPointer<vtkPoints>::New();
@@ -339,6 +347,13 @@ private:
         return p_poly_data;
     }
 
+    /**
+     * Copy the points held by a VTK points object into the Points member of a
+     * SemElementSurface. Throws an exception if there are no points.
+     *
+     * @param pVtkPoints the VTK points to copy from
+     * @param rSurface the surface whose Points member is populated
+     */
     static void CopyVtkPoints(vtkPoints* pVtkPoints, SemElementSurface<DIM>& rSurface)
     {
         if (pVtkPoints == nullptr || pVtkPoints->GetNumberOfPoints() == 0)
@@ -360,6 +375,18 @@ private:
         }
     }
 
+    /**
+     * Generate a 2D alpha-shape surface (boundary polygon) from a point cloud
+     * using a VTK Delaunay triangulation. Populates the surface points, boundary
+     * lines and enclosed area.
+     *
+     * @param rPoints the node locations forming the point cloud
+     * @param localSpacing the local node spacing, stored on the surface
+     * @param alpha the alpha value passed to the Delaunay filter
+     * @param expansionRadius the expansion radius, stored on the surface
+     *
+     * @return the generated 2D surface
+     */
     static SemElementSurface<DIM> GenerateSurface2d(const std::vector<c_vector<double, DIM> >& rPoints,
                                                     double localSpacing,
                                                     double alpha,
@@ -434,6 +461,18 @@ private:
         return surface;
     }
 
+    /**
+     * Generate a 3D alpha-shape surface (boundary triangulation) from a point
+     * cloud using a VTK Delaunay triangulation. Populates the surface points,
+     * boundary faces and enclosed volume.
+     *
+     * @param rPoints the node locations forming the point cloud
+     * @param localSpacing the local node spacing, stored on the surface
+     * @param alpha the alpha value passed to the Delaunay filter
+     * @param expansionRadius the expansion radius, stored on the surface
+     *
+     * @return the generated 3D surface
+     */
     static SemElementSurface<DIM> GenerateSurface3d(const std::vector<c_vector<double, DIM> >& rPoints,
                                                     double localSpacing,
                                                     double alpha,

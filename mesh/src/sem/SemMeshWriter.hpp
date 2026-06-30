@@ -91,6 +91,7 @@ private:
     unsigned mNodeMapCurrentIndex;
 
 #ifdef CHASTE_VTK
+    /** A VTK unstructured grid holding the mesh for VTK output. */
     vtkUnstructuredGrid* mpVtkUnstructedMesh;
 
     /**
