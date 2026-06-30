@@ -223,27 +223,28 @@ void VtkScene<DIM>::Start()
 
     // The window-to-image filter feeds every capture path (the in-memory PNG
     // buffer as well as saved images/animation), so wire it to the render
-    // window unconditionally, not only when saving output.
+    // window unconditionally, not only when saving output. Read the back buffer,
+    // which is where off-screen rendering draws.
     mWindowToImageFilter->SetInput(mpRenderWindow);
+    mWindowToImageFilter->SetReadFrontBuffer(0);
 
     // Render off-screen for non-interactive display and whenever writing output.
     if (!mIsInteractive || mSaveAsImages || mSaveAsAnimation)
     {
         mpRenderWindow->SetOffScreenRendering(1);
 
-        if (mSaveAsImages || mSaveAsAnimation)
-        {
-            // One-time priming of the animation pipeline from a populated frame.
-            mpRenderWindow->Render();
-            mWindowToImageFilter->Update();
+        // Prime the window-to-image filter from a populated, realized frame. Every
+        // off-screen capture path needs this, including GetSceneAsCharBuffer()
+        // (vtk_show): on VTK 7 capturing an unprimed off-screen window segfaults.
+        mpRenderWindow->Render();
+        mWindowToImageFilter->Update();
 
-            if (mSaveAsAnimation)
-            {
-                mAnimationWriter->SetInputConnection(mWindowToImageFilter->GetOutputPort());
-                mAnimationWriter->SetFileName((mOutputFilePath + ".ogg").c_str());
-                mAnimationWriter->SetRate(ANIMATION_FRAME_RATE);
-                mAnimationWriter->Start();
-            }
+        if (mSaveAsAnimation)
+        {
+            mAnimationWriter->SetInputConnection(mWindowToImageFilter->GetOutputPort());
+            mAnimationWriter->SetFileName((mOutputFilePath + ".ogg").c_str());
+            mAnimationWriter->SetRate(ANIMATION_FRAME_RATE);
+            mAnimationWriter->Start();
         }
     }
 
