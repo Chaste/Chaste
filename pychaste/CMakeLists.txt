@@ -137,14 +137,10 @@ target_include_directories(_pychaste_all PRIVATE ${PYCHASTE_INCLUDE_DIRS})
 target_compile_options(_pychaste_all PRIVATE -Wno-unused-local-typedefs -g0)
 
 # Perform link-time optimization for Release builds only.
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(_pychaste_all PRIVATE -flto=auto)
-        target_link_options(_pychaste_all PRIVATE -flto=auto)
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        target_compile_options(_pychaste_all PRIVATE -flto=thin)
-        target_link_options(_pychaste_all PRIVATE -fuse-ld=lld -flto=thin)
-    endif()
+set_target_properties(_pychaste_all PROPERTIES INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # clang ThinLTO needs lld.
+    target_link_options(_pychaste_all PRIVATE -fuse-ld=lld)
 endif()
 
 set_target_properties(_pychaste_all PROPERTIES
