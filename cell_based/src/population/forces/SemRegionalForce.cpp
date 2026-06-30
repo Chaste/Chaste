@@ -70,7 +70,7 @@ c_vector<double, SPACE_DIM> SemRegionalForce<ELEMENT_DIM,SPACE_DIM>::CalculateFo
 
         const double overlap = distance - rest_length;
         c_vector<double, SPACE_DIM> calculated_force = rCellPopulation.rGetMesh().GetVectorFromAtoB(r_node_a_location, r_node_b_location) * (spring_const * overlap / distance);
-        
+
         return calculated_force;
     }
     else

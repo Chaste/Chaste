@@ -104,21 +104,21 @@ private:
     void SetUpBoxCollection(const std::vector<Node<DIM>*>& rNodes);
 
     /**
-     * Solve node mapping method. This overridden method is required as it is 
+     * Solve node mapping method. This overridden method is required as it is
      * pure virtual in the base class.
      *
      * @param index the global index of the node
-     * 
+     *
      * @return local index
      */
     unsigned SolveNodeMapping(unsigned index) const;
 
     /**
-     * Solve element mapping method. This overridden method is required as it is 
+     * Solve element mapping method. This overridden method is required as it is
      * pure virtual in the base class.
      *
      * @param index the global index of the element
-     * 
+     *
      * @return local index
      */
     unsigned SolveElementMapping(unsigned index) const;
@@ -128,7 +128,7 @@ private:
      * as it is pure virtual in the base class.
      *
      * @param index the global index of the boundary element
-     * 
+     *
      * @return local index
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
@@ -137,7 +137,7 @@ private:
     friend class boost::serialization::access;
 
     /**
-     * Archive the SemMesh and its member variables. Note that this will write 
+     * Archive the SemMesh and its member variables. Note that this will write
      * out a SemMeshWriter file to wherever ArchiveLocationInfo has specified.
      *
      * @param archive the archive
@@ -166,7 +166,7 @@ private:
     {
         archive& boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
 
-        SemMeshReader<DIM> reader(ArchiveLocationInfo::GetArchiveDirectory() 
+        SemMeshReader<DIM> reader(ArchiveLocationInfo::GetArchiveDirectory()
                                   + ArchiveLocationInfo::GetMeshFilename());
         this->ConstructFromMeshReader(reader);
     }
@@ -214,7 +214,7 @@ public:
      * Default constructor for use by serializer.
      */
     SemMesh();
-    
+
 
     /**
      * Destructor.
@@ -277,7 +277,7 @@ public:
      * @return the index of the new element within the mesh
      */
     virtual unsigned AddElement(SemElement<DIM>* pNewElement);
-    
+
     /**
      * Compute the centroid of an element.
      *
@@ -423,33 +423,33 @@ public:
     {
     public:
         /**
-         * Dereference the iterator giving you a *reference* to the current 
-         * element. Make sure to use a reference for the result to avoid 
+         * Dereference the iterator giving you a *reference* to the current
+         * element. Make sure to use a reference for the result to avoid
          * copying elements unnecessarily.
-         * 
+         *
          * @return reference to the current SemElement.
          */
         inline SemElement<DIM>& operator*();
 
         /**
          * Member access from a pointer.
-         * 
+         *
          * @return pointer to the current SemElement
          */
         inline SemElement<DIM>* operator->();
 
         /**
          * Comparison not-equal-to.
-         * 
+         *
          * @param rOther iterator with which comparison is made
-         * 
+         *
          * @return true if not equal.
          */
         inline bool operator!=(const typename SemMesh<DIM>::SemElementIterator& rOther);
 
         /**
          * Prefix increment operator.
-         * 
+         *
          * @return reference to incremented object.
          */
         inline SemElementIterator& operator++();
@@ -458,7 +458,7 @@ public:
          * Constructor for a new iterator.
          *
          * This should not be called directly by user code; use the mesh methods
-         * SemMesh::GetElementIteratorBegin() and 
+         * SemMesh::GetElementIteratorBegin() and
          * SemMesh::GetElementIteratorEnd() instead.
          *
          * @param rMesh the mesh to iterator over
@@ -481,14 +481,14 @@ public:
 
         /**
          * Helper method to say when we're at the end.
-         * 
+         *
          * @return true if at end.
          */
         inline bool IsAtEnd();
 
         /**
          * Helper method to say if we're allowed to point at this element.
-         * 
+         *
          * @return true if allowed.
          */
         inline bool IsAllowedElement();

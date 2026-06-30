@@ -45,14 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractMeshReader.hpp"
 
 /**
- * Helper structure that stores the nodes and any attribute value associated 
+ * Helper structure that stores the nodes and any attribute value associated
  * with a SemElement.
  */
 struct SemElementData
 {
     /** Vector of Node indices owned by the SemElement. */
     std::vector<unsigned> NodeIndices;
-    
+
     /** Attribute value associated with the SemElement. */
     unsigned AttributeValue;
 };
@@ -173,7 +173,7 @@ public:
      *         there is any) in turn.
      */
     ElementData GetNextElementData() override;
-    
+
     /**
      * @return the number of faces (always 0 — SEM files do not store face data).
      */

@@ -132,7 +132,7 @@ public:
      * @return #mDomainWidth
      */
     double GetDomainWidth();
-    
+
     /**
      * Generate a single rectangular SEM element and add it to the mesh.
      *

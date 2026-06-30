@@ -62,7 +62,7 @@ public:
     {
         ///\todo
     }
-    
+
     void TestSolveBoundaryElementMapping()
     {
         ///\todo
@@ -77,22 +77,22 @@ public:
     {
         ///\todo
     }
-    
+
     void TestGetNumElements()
     {
         ///\todo
     }
-    
+
     void TestGetNumAllElements()
     {
         ///\todo
     }
-    
+
     void TestGetElementMethods()
     {
         ///\todo
     }
-    
+
     void TestGetCentroidOfElement()
     {
         // 1D

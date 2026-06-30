@@ -280,7 +280,7 @@ void SemBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDire
 }
 
 template<unsigned DIM>
-TetrahedralMesh<DIM, DIM>* SemBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier() 
+TetrahedralMesh<DIM, DIM>* SemBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     return nullptr;
 }
@@ -382,14 +382,14 @@ void SemBasedCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<
     pPopulationEventWriter->Visit(this);
 }
 template<unsigned DIM>
-void SemBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) 
+void SemBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
 template<unsigned DIM>
 void SemBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt)
 {
-    
+
 }
 
 template<unsigned DIM>

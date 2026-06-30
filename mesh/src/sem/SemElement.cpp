@@ -79,7 +79,7 @@ std::vector<Node<DIM>*>& SemElement<DIM>::rGetNodes()
   return this->mNodes;
 }
 
-template<unsigned DIM>    
+template<unsigned DIM>
 void SemElement<DIM>::MarkAsDeleted()
 {
     this->mIsDeleted = true;
@@ -88,7 +88,7 @@ void SemElement<DIM>::MarkAsDeleted()
         this->mNodes[i]->RemoveElement(this->mIndex);
     }
 }
-template<unsigned DIM>    
+template<unsigned DIM>
 void SemElement<DIM>::RegisterWithNodes()
 {
     for (unsigned i=0; i<this->mNodes.size(); i++)

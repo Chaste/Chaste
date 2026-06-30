@@ -251,7 +251,7 @@ void SemMeshReader<DIM>::GetNextLineFromStream(std::ifstream& fileStream, std::s
 template<unsigned DIM>
 unsigned int SemMeshReader<DIM>::GetNumFaces() const
 {
-   return 0; 
+   return 0;
 }
 
 template<unsigned DIM>

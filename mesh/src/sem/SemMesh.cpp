@@ -468,7 +468,7 @@ unsigned SemMesh<DIM>::SolveBoundaryElementMapping(unsigned index) const
 
 
 template<unsigned DIM>
-unsigned SemMesh<DIM>::AddElement(SemElement<DIM>* pNewElement) 
+unsigned SemMesh<DIM>::AddElement(SemElement<DIM>* pNewElement)
 {
     unsigned int new_element_index = mElements.size();
     mElements.push_back(pNewElement);

@@ -44,10 +44,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A facade class encapsulating a subcellular element method (SEM) based 
+ * A facade class encapsulating a subcellular element method (SEM) based
  * cell population.
  *
- * Contains a group of cells and maintains the associations between CellPtrs and 
+ * Contains a group of cells and maintains the associations between CellPtrs and
  * SemElements in the SemMesh.
  */
 template<unsigned DIM>
@@ -62,16 +62,16 @@ private:
     bool mDeleteMesh;
 
     /**
-     * A static cast of the AbstractMesh from AbstractCellPopulation for use in 
+     * A static cast of the AbstractMesh from AbstractCellPopulation for use in
      * this class.
      */
     SemMesh<DIM>* mpSemMesh;
-    
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
      *
-     * Note that serialization of the mesh and cells is handled by 
+     * Note that serialization of the mesh and cells is handled by
      * load/save_construct_data.
      *
      * Note also that member data related to writers is not saved - output must
@@ -99,7 +99,7 @@ private:
 public:
 
     /**
-     * Create a new cell population facade from a SemMesh and collection of 
+     * Create a new cell population facade from a SemMesh and collection of
      * CellPtrs.
      *
      * There must be precisely one CellPtr for each SemElement in the SemMesh.
@@ -108,11 +108,11 @@ public:
      *
      * @param rMesh reference to a SemMesh
      * @param rCells reference to a vector of CellPtrs
-     * @param deleteMesh set to true if you want the cell population to free the 
+     * @param deleteMesh set to true if you want the cell population to free the
      *                   mesh memory on destruction (defaults to false)
-     * @param validate whether to validate the cell population when it is 
+     * @param validate whether to validate the cell population when it is
      *                 created (defaults to true)
-     * @param locationIndices an optional vector of location indices that 
+     * @param locationIndices an optional vector of location indices that
      *                        correspond to real cells
      */
     SemBasedCellPopulation(SemMesh<DIM>& rMesh,
@@ -158,7 +158,7 @@ public:
      * @return the number of nodes in the cell population.
      */
     unsigned GetNumNodes() override;
-    
+
     /**
      * GetNumElements() method.
      *
@@ -175,7 +175,7 @@ public:
      *
      * @param pCell pointer to a cell in the population
      *
-     * @return the location of the centre of mass of the SemElement 
+     * @return the location of the centre of mass of the SemElement
      *         corresponding to this cell.
      */
     c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell) override;
@@ -236,7 +236,7 @@ public:
      * Overridden GetVolumeOfCell() method.
      *
      * @param pCell pointer to a cell in the population
-     * 
+     *
      * @return volume via associated SemElement.
      */
     double GetVolumeOfCell(CellPtr pCell) override;

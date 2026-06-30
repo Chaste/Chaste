@@ -107,10 +107,10 @@ public:
     /**
      * Constructor.
      *
-     * @param rDirectory reference to the output directory, relative to where 
+     * @param rDirectory reference to the output directory, relative to where
      *                   Chaste output is stored
      * @param rBaseName reference to the base name for results files
-     * @param clearOutputDir whether to clear the output directory prior to 
+     * @param clearOutputDir whether to clear the output directory prior to
      *                       riting files
      */
     SemMeshWriter(const std::string& rDirectory,
@@ -167,7 +167,7 @@ public:
     std::vector<double> GetNextNode();
 
     /**
-     * @return the data (indices/attributes) of the next element to be written 
+     * @return the data (indices/attributes) of the next element to be written
      *         to file.
      */
     ElementData GetNextElement();
