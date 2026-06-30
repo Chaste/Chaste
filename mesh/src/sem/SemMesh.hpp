@@ -111,7 +111,7 @@ private:
      *
      * @return local index
      */
-    unsigned SolveNodeMapping(unsigned index) const;
+    unsigned SolveNodeMapping(unsigned index) const override;
 
     /**
      * Solve element mapping method. This overridden method is required as it is

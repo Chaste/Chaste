@@ -116,7 +116,7 @@ public:
      */
     c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
                                                      unsigned nodeBGlobalIndex,
-                                                     AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
+                                                     AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation) override;
 
     /**
      * Overridden OutputForceParameters() method.
