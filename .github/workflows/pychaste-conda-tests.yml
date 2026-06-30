@@ -25,6 +25,9 @@ jobs:
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/testoutput
+      # Force mesa software rendering (llvmpipe) so VTK off-screen rendering
+      # does not pick up an unstable GPU/DRI path on the runner.
+      LIBGL_ALWAYS_SOFTWARE: "1"
 
     defaults:
       run:
