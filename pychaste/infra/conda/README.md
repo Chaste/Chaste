@@ -56,6 +56,7 @@ anaconda upload -u pychaste ./build_artifacts/linux-64/chaste-<version>-<hash>.t
 
 ```
 ├── build-package.sh        Docker-based local build script
+├── package-version.sh      Derives the package version from the source tree's git tags/history
 ├── envs/                   Conda environment specs for each Python version (used by CI tests)
 │   ├── env_python3.10.yaml
 │   ├── env_python3.11.yaml
@@ -63,9 +64,9 @@ anaconda upload -u pychaste ./build_artifacts/linux-64/chaste-<version>-<hash>.t
 │   ├── env_python3.13.yaml
 │   └── env_python3.14.yaml
 ├── recipe/
-│   ├── build.sh            Build script executed by conda-build (configure + make + pip install)
-│   └── meta.yaml           Package metadata (dependencies, version, source path)
-└── variants/               Per-Python-version build configuration for conda-build
+│   ├── build.sh            Build script executed by rattler-build (configure + make + pip install)
+│   └── recipe.yaml         Package metadata (dependencies, version, source path)
+└── variants/               Per-Python-version build configuration for rattler-build
     ├── linux_64_python3.10_cpython.yaml
     ├── linux_64_python3.11_cpython.yaml
     ├── linux_64_python3.12_cpython.yaml
@@ -73,8 +74,9 @@ anaconda upload -u pychaste ./build_artifacts/linux-64/chaste-<version>-<hash>.t
     └── linux_64_python3.14_cpython.yaml
 ```
 
-- `build-package.sh`: Sets up the build environment and runs `conda build` to create the package.
-- `recipe/build.sh`: Used by `conda build` to compile the source. See the [conda-build script documentation](https://docs.conda.io/projects/conda-build/en/latest/resources/build-scripts.html).
-- `recipe/meta.yaml`: Package metadata used by `conda build`. The source path is read from the `CHASTE_SOURCE_DIR` environment variable (defaults to `/tmp/Chaste` for Docker builds). See the [conda-build metadata documentation](https://docs.conda.io/projects/conda-build/en/latest/resources/define-metadata.html).
-- `variants/`: Per-Python-version dependency pinning added on top of `meta.yaml`. See the [conda-build variant documentation](https://docs.conda.io/projects/conda-build/en/stable/resources/variants.html).
+- `build-package.sh`: Sets up the build environment and runs `rattler-build` to create the package.
+- `package-version.sh`: Prints the package version derived from the source tree's git tags and commit history (used by `build-package.sh` to set `CHASTE_VERSION`).
+- `recipe/build.sh`: Used by `rattler-build` to compile the source. See the [rattler-build script documentation](https://rattler.build/latest/build_script/).
+- `recipe/recipe.yaml`: Package metadata used by `rattler-build`. The source path is read from the `CHASTE_SOURCE_DIR` environment variable (defaults to `/tmp/Chaste` for Docker builds). See the [rattler-build recipe documentation](https://rattler.build/latest/reference/recipe_file/).
+- `variants/`: Per-Python-version dependency pinning added on top of `recipe.yaml`. See the [rattler-build variant documentation](https://rattler.build/latest/variants/).
 - `envs/`: Conda environment files used by the [PyChaste conda tests](../../../.github/workflows/pychaste-conda-tests.yml) CI workflow.
