@@ -390,6 +390,28 @@ modules:
       - name: PottsElementData
         excluded: True
 
+      #=== mesh: Chaste/mesh/src/sem
+      - name: SemElement
+
+      - name: SemMesh
+        excluded_methods:
+          - SetUpBoxCollection # boost::numeric::ublas::zero_vector default argument
+          - CalculateNodePairs # std::vector<std::pair<Node*, Node*>>
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: SemMeshGenerator
+
+      - name: SemSingleElementMeshGenerator
+
+      - name: SemMultiElementMeshGenerator
+
+      - name: SemMeshReader
+        excluded: True
+
+      - name: SemMeshWriter
+        excluded: True
+
       ##=== cell_based: Chaste/cell_based/src/cell
       - name: Cell
         excluded_methods:
@@ -625,6 +647,15 @@ modules:
         custom_generator: *population_template
         source_includes: *population_includes
 
+      - name: SemBasedCellPopulation
+        excluded_methods:
+          - GetElementCorrespondingToCell
+          - GetElement
+          - GetTetrahedralMeshForPdeModifier
+          - rGetMesh
+        custom_generator: *population_template
+        source_includes: *population_includes
+
       - name: CellwiseDataGradient
         excluded: True
 
@@ -724,6 +755,30 @@ modules:
       - name: ImmersedBoundaryLinearMembraneForce
       - name: ImmersedBoundaryMorseInteractionForce
       - name: ImmersedBoundaryMorseMembraneForce
+
+      - name: SemForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: SemLinearForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: SemRegionalForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: AbstractSemRandomForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: SemGaussianRandomForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: SemSpatiallyCorrelatedRandomForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
 
       - name: NagaiHondaForce
       - name: RepulsionForce
@@ -938,6 +993,7 @@ modules:
           - CaBasedCellPopulation.hpp
           - ImmersedBoundaryCellPopulation.hpp
           - NodeBasedCellPopulation.hpp
+          - SemBasedCellPopulation.hpp
           - VertexBasedCellPopulation.hpp
 
       - name: BoundaryNodeWriter

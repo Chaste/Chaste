@@ -266,6 +266,18 @@ from chaste._pychaste_all import (
     RandomDirectionVertexBasedDivisionRule_3,
     RepulsionForce_2,
     RepulsionForce_3,
+    SemBasedCellPopulation_2,
+    SemBasedCellPopulation_3,
+    SemForce_2,
+    SemForce_3,
+    SemGaussianRandomForce_2,
+    SemGaussianRandomForce_3,
+    SemLinearForce_2,
+    SemLinearForce_3,
+    SemRegionalForce_2_2,
+    SemRegionalForce_3_3,
+    SemSpatiallyCorrelatedRandomForce_2,
+    SemSpatiallyCorrelatedRandomForce_3,
     ShortAxisImmersedBoundaryDivisionRule_2,
     ShortAxisImmersedBoundaryDivisionRule_3,
     ShortAxisVertexBasedDivisionRule_2,
@@ -1116,6 +1128,50 @@ RepulsionForce = TemplateClassDict(
     {
         ("2",): RepulsionForce_2,
         ("3",): RepulsionForce_3,
+    }
+)
+
+SemBasedCellPopulation = TemplateClassDict(
+    {
+        ("2",): SemBasedCellPopulation_2,
+        ("3",): SemBasedCellPopulation_3,
+    }
+)
+
+SemForce = TemplateClassDict(
+    {
+        ("2",): SemForce_2,
+        ("3",): SemForce_3,
+    }
+)
+
+SemGaussianRandomForce = TemplateClassDict(
+    {
+        ("2",): SemGaussianRandomForce_2,
+        ("3",): SemGaussianRandomForce_3,
+    }
+)
+
+SemLinearForce = TemplateClassDict(
+    {
+        ("2",): SemLinearForce_2,
+        ("3",): SemLinearForce_3,
+    }
+)
+
+SemRegionalForce = TemplateClassDict(
+    {
+        ("2",): SemRegionalForce_2_2,
+        ("2", "2"): SemRegionalForce_2_2,
+        ("3",): SemRegionalForce_3_3,
+        ("3", "3"): SemRegionalForce_3_3,
+    }
+)
+
+SemSpatiallyCorrelatedRandomForce = TemplateClassDict(
+    {
+        ("2",): SemSpatiallyCorrelatedRandomForce_2,
+        ("3",): SemSpatiallyCorrelatedRandomForce_3,
     }
 )
 
