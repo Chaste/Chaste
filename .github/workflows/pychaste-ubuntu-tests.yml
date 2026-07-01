@@ -18,11 +18,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-22.04", "ubuntu-24.04"]
+        image: ["ubuntu:22.04", "ubuntu:24.04", "ubuntu:26.04"]
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    container:
+      image: ${{ matrix.image }}
 
     env:
+      DEBIAN_FRONTEND: noninteractive
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/testoutput
 
     steps:
@@ -34,26 +38,42 @@ jobs:
           mkdir -p build
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
+      - name: Install basic system dependencies
+        run: |
+          apt-get update &&
+          apt-get install -y \
+            apt-transport-https \
+            apt-utils \
+            ca-certificates \
+            build-essential \
+            git \
+            wget
+
       - name: Install Chaste dependencies
         run: |
           codename=$(cat /etc/os-release | grep VERSION_CODENAME | cut -d= -f2)
-          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
           echo "deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${codename}/" \
-            | sudo tee -a /etc/apt/sources.list.d/chaste.list
-          sudo apt-get update
-          sudo apt-get install -y chaste-dependencies
+            | tee -a /etc/apt/sources.list.d/chaste.list
+          apt-get update &&
+          apt-get install -y chaste-dependencies
 
-      - name: Install extra PyChaste dependencies
+      - name: Get system VTK version
         run: |
-          for vtk_ver in $(seq 7 9); do
-            installed=1
-            dpkg -s "libvtk${vtk_ver}-dev" || installed=0
-            if [ "${installed}" -eq 1 ]; then
+          vtk_ver=
+          for candidate in $(seq 7 99); do
+            vtk_pkg="$(apt-cache search --names-only ^libvtk${candidate}-dev$)"
+            if [ -n "${vtk_pkg}" ]; then
+              vtk_ver="${candidate}"
               break
             fi
           done
+          echo "VTK version: ${vtk_ver}"
+          echo "VTK_VERSION=${vtk_ver}" >> $GITHUB_ENV
 
-          sudo apt-get install -y \
+      - name: Install extra PyChaste dependencies
+        run: |
+          apt-get install -y \
             castxml \
             clang \
             python3-matplotlib \
@@ -62,7 +82,7 @@ jobs:
             python3-numpy \
             python3-petsc4py-real \
             python3-pip \
-            python3-vtk${vtk_ver} \
+            python3-vtk${{ env.VTK_VERSION }} \
             python3-xvfbwrapper \
             xvfb
 
