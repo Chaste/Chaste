@@ -4,13 +4,13 @@ The conda [pychaste](https://anaconda.org/pychaste) channel hosts the `chaste` a
 
 ## Building packages via GitHub Actions (recommended)
 
-The easiest way to build a new conda package is to use the [PyChaste build conda package](../../../.github/workflows/pychaste-build-conda-package.yml) workflow. This can be triggered from the GitHub Actions tab with the following inputs:
+The easiest way to build new conda packages is to run the [PyChaste build conda package](../../../.github/workflows/pychaste-build-conda-package.yml) workflow manually (`workflow_dispatch`) from the GitHub Actions tab, with the following inputs:
 
 - **python-version**: The Python version to build for (3.10–3.14).
-- **chaste-branch**: The Chaste branch or tag to build (default: `develop`).
-- **upload**: Whether to upload the built package to the `pychaste` Anaconda channel (default: `false`).
+- **chaste-ref**: The Chaste branch, tag, or commit ref to build (default: `develop`).
+- **upload**: Whether to upload the built packages to the `pychaste` Anaconda channel (default: `false`).
 
-The workflow builds the package, runs a smoke test to verify that imports work, and uploads the built package as a GitHub Actions artifact. If `upload` is checked, it also pushes the package to the Anaconda channel.
+The workflow builds a matrix of platforms, each natively on a matching-architecture runner — `linux-64` (`ubuntu-24.04`), `linux-aarch64` (`ubuntu-24.04-arm`), and `osx-arm64` (`macos-15`) — running a smoke test on each and uploading each package as a GitHub Actions artifact. If `upload` is checked, it also pushes them to the Anaconda channel. Intel macOS (`osx-64`) is not built in CI (it needs a paid larger runner); build it locally instead (see below).
 
 ## Building packages locally with Docker
 
@@ -37,6 +37,8 @@ The optional `--branch` argument specifies the Chaste branch or tag to build; th
 The optional `--cpu-count` argument specifies the maximum number of parallel build processes.
 
 To build from a local Chaste checkout instead of cloning from GitHub, mount it into the container and pass `--source-dir` (see the comments at the top of `build-package-linux.sh`).
+
+To build for `linux-aarch64`, run the aarch64 container image (`quay.io/condaforge/linux-anvil-cos7-aarch64`, on an arm64 host) and pass `--target=linux-aarch64` with the matching `linux_aarch64_*` variant.
 
 After the build completes, verify that the package was created:
 
@@ -91,8 +93,8 @@ The other arguments match `build-package-linux.sh` (`--variant`, `--branch`,
 ## Directory structure
 
 ```
-├── build-package-linux.sh  Docker-based local build script (linux-64)
-├── build-package-osx.sh    Native local build script (osx-64, run on macOS)
+├── build-package-linux.sh  Docker-based local build script (linux-64/linux-aarch64)
+├── build-package-osx.sh    Native local build script (osx-64/osx-arm64, run on macOS)
 ├── package-version.sh      Derives the package version from the source tree's git tags/history
 ├── envs/                   Conda environment specs for each Python version (used by CI tests)
 │   ├── env_python3.10.yaml
@@ -126,10 +128,10 @@ The other arguments match `build-package-linux.sh` (`--variant`, `--branch`,
     └── osx_arm64_python3.14_cpython.yaml
 ```
 
-- `build-package-linux.sh`: Sets up the build environment and runs `rattler-build` to create the linux-64 package inside a Docker container.
-- `build-package-osx.sh`: Builds the osx-64 package natively on a macOS host (no Docker); fetches `rattler-build` and the macOS 10.13 SDK.
+- `build-package-linux.sh`: Sets up the build environment and runs `rattler-build` to create a Linux package (`linux-64` or `linux-aarch64`, selected with `--target`) inside a Docker container.
+- `build-package-osx.sh`: Builds a macOS package (`osx-64` or `osx-arm64`, selected with `--target`) natively on a macOS host (no Docker); fetches `rattler-build` and the matching macOS SDK.
 - `package-version.sh`: Prints the package version derived from the source tree's git tags and commit history (used by the `build-package-*` scripts to set `CHASTE_VERSION`).
 - `recipe/build.sh`: Used by `rattler-build` to compile the source. See the [rattler-build script documentation](https://rattler.build/latest/build_script/).
 - `recipe/recipe.yaml`: Package metadata used by `rattler-build`. The source path is read from the `CHASTE_SOURCE_DIR` environment variable (defaults to `/tmp/Chaste` for Docker builds). See the [rattler-build recipe documentation](https://rattler.build/latest/reference/recipe_file/).
-- `variants/`: Per-Python-version dependency pinning added on top of `recipe.yaml`. See the [rattler-build variant documentation](https://rattler.build/latest/variants/).
+- `variants/`: Per-platform, per-Python dependency pinning added on top of `recipe.yaml`. See the [rattler-build variant documentation](https://rattler.build/latest/variants/).
 - `envs/`: Conda environment files used by the [PyChaste conda tests](../../../.github/workflows/pychaste-conda-tests.yml) CI workflow.
