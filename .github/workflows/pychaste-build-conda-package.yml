@@ -43,9 +43,10 @@ jobs:
           - target: linux-aarch64
             runner: ubuntu-24.04-arm
             variant-prefix: linux_aarch64
-          # macos-13 is Intel; macos-14/15 are Apple Silicon (arm64).
+          # Plain macos-14/15/26 runners are Apple Silicon (arm64); Intel is only
+          # available via the -intel/-large labels (macos-13 has been retired).
           - target: osx-64
-            runner: macos-13
+            runner: macos-15-intel
             variant-prefix: osx_64
           - target: osx-arm64
             runner: macos-15
