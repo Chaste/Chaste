@@ -8,7 +8,7 @@ package:
   version: ${{ version }}
 
 source:
-  # CHASTE_SOURCE_DIR is a shallow (depth 1) clone made by build-package.sh, so
+  # CHASTE_SOURCE_DIR is a shallow (depth 1) clone made by the build-package-* scripts, so
   # this copies the source without the full git history. use_gitignore: false is
   # required so the git-tracked */test/tutorials/ directories (which match the
   # "tutorials" .gitignore pattern) are included; otherwise their test targets
@@ -19,12 +19,16 @@ source:
 build:
   number: 1
   # rattler-build sanitizes the build environment and otherwise defaults
-  # CPU_COUNT to the logical CPU count; forward the value set by
-  # build-package.sh so the C++ compile (make -j) stays within the chosen bound.
+  # CPU_COUNT to the logical CPU count; forward the value set by the
+  # build-package-* scripts so the C++ compile (make -j) stays within the chosen bound.
   script:
     file: build.sh
     env:
       CPU_COUNT: ${{ env.get("CPU_COUNT", default="") }}
+      # Forwarded into the sanitized build environment for macOS (osx-64) builds;
+      # empty and harmless on Linux. Set by build-package-osx.sh.
+      CONDA_BUILD_SYSROOT: ${{ env.get("CONDA_BUILD_SYSROOT", default="") }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ env.get("MACOSX_DEPLOYMENT_TARGET", default="") }}
 
 requirements:
   build:
@@ -66,12 +70,15 @@ requirements:
     # X11 libraries (provide the headers VTK's find_package(X11) needs at
     # configure time). These replace the legacy cdt() CDT packages, which
     # rattler-build installs outside the sysroot that cmake's FindX11 searches.
-    - xorg-libice
-    - xorg-libsm
-    - xorg-libx11
-    - xorg-libxext
-    - xorg-libxt
-    - xorg-xorgproto
+    # Linux only: VTK on macOS renders through Cocoa, not X11.
+    - if: linux
+      then:
+        - xorg-libice
+        - xorg-libsm
+        - xorg-libx11
+        - xorg-libxext
+        - xorg-libxt
+        - xorg-xorgproto
     - matplotlib
     - metis
     - mpi4py

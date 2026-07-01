@@ -1,20 +1,20 @@
 #!/bin/bash -e
 
-# Build a PyChaste conda package with rattler-build inside a conda-forge build
-# container.
+# Build a PyChaste conda package for linux-64 with rattler-build inside a
+# conda-forge build container. For macOS (osx-64), use build-package-osx.sh.
 #
 # Example usage (clone from GitHub):
-#   ./build-package.sh --variant=linux_64_python3.10_cpython --branch=2026.1 --parallel=4
+#   ./build-package-linux.sh --variant=linux_64_python3.10_cpython --branch=2026.1 --cpu-count=4
 #
 # Example usage (local source):
-#   ./build-package.sh --variant=linux_64_python3.10_cpython --source-dir=/chaste
+#   ./build-package-linux.sh --variant=linux_64_python3.10_cpython --source-dir=/chaste
 #
 # Intended for use in a build container e.g.:
 #   docker run --rm -it \
 #     -v $(pwd):/home/conda \
 #     -e HOST_USER_ID="$(id -u)" \
 #     quay.io/condaforge/linux-anvil-cos7-x86_64 \
-#     ./build-package.sh --variant=linux_64_python3.10_cpython
+#     ./build-package-linux.sh --variant=linux_64_python3.10_cpython
 #
 # To use a local source tree, also mount it and pass --source-dir:
 #   docker run --rm -it \
@@ -22,7 +22,7 @@
 #     -v /path/to/Chaste:/chaste:ro \
 #     -e HOST_USER_ID="$(id -u)" \
 #     quay.io/condaforge/linux-anvil-cos7-x86_64 \
-#     ./build-package.sh --variant=linux_64_python3.10_cpython --source-dir=/chaste
+#     ./build-package-linux.sh --variant=linux_64_python3.10_cpython --source-dir=/chaste
 
 # Parse args
 variant=

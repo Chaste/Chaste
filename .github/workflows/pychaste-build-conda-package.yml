@@ -32,7 +32,19 @@ jobs:
   build-conda-package:
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-64
+            runner: ubuntu-24.04
+            variant-prefix: linux_64
+          # osx-64 must be built on an Intel macOS runner (macos-14/15 are arm64).
+          - target: osx-64
+            runner: macos-13
+            variant-prefix: osx_64
+
+    runs-on: ${{ matrix.runner }}
 
     env:
       PYTHON_VERSION: ${{ github.event_name == 'pull_request' && '3.12' || inputs.python-version }}
@@ -55,10 +67,27 @@ jobs:
           version=$(bash pychaste/infra/conda/package-version.sh "$GITHUB_WORKSPACE")
           echo "CHASTE_VERSION=${version}" >> "$GITHUB_ENV"
 
-      - name: Install system dependencies
+      - name: Install system dependencies (linux-64)
+        if: ${{ matrix.target == 'linux-64' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y castxml libx11-dev xvfb
+
+      - name: Set up macOS SDK (osx-64)
+        if: ${{ matrix.target == 'osx-64' }}
+        run: |
+          # conda-forge's clang activation expects an older macOS SDK than the
+          # runner ships. Download the 10.15 SDK (the minimum that provides
+          # aligned_alloc, used by bundled pocketfft) and expose it as
+          # CONDA_BUILD_SYSROOT. These are forwarded into the build by recipe.yaml.
+          sdk_dir="${RUNNER_TEMP}/MacOSX-SDKs"
+          mkdir -p "${sdk_dir}"
+          curl -fsSL \
+            https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.15.sdk.tar.xz \
+            | tar -xJ -C "${sdk_dir}"
+          echo "CONDA_BUILD_SYSROOT=${sdk_dir}/MacOSX10.15.sdk" >> "$GITHUB_ENV"
+          echo "MACOSX_DEPLOYMENT_TARGET=10.15" >> "$GITHUB_ENV"
+          echo "MACOSX_SDK_VERSION=10.15" >> "$GITHUB_ENV"
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v4
@@ -80,10 +109,11 @@ jobs:
         env:
           CHASTE_SOURCE_DIR: ${{ github.workspace }}
         run: |
-          export CPU_COUNT=$(nproc)
+          export CPU_COUNT=$(getconf _NPROCESSORS_ONLN)
           rattler-build build \
             --recipe pychaste/infra/conda/recipe/recipe.yaml \
-            --variant-config pychaste/infra/conda/variants/linux_64_python${PYTHON_VERSION}_cpython.yaml \
+            --variant-config pychaste/infra/conda/variants/${{ matrix.variant-prefix }}_python${PYTHON_VERSION}_cpython.yaml \
+            --target-platform ${{ matrix.target }} \
             --output-dir output/ \
             --channel conda-forge \
             --channel pychaste
@@ -103,8 +133,8 @@ jobs:
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chaste-conda-py${{ env.PYTHON_VERSION }}
-          path: output/linux-64/chaste-*.conda
+          name: chaste-conda-${{ matrix.target }}-py${{ env.PYTHON_VERSION }}
+          path: output/${{ matrix.target }}/chaste-*.conda
           if-no-files-found: error
 
       - name: Upload to Anaconda channel
@@ -112,4 +142,4 @@ jobs:
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
         run: |
-          anaconda --token "${ANACONDA_TOKEN}" upload -u pychaste output/linux-64/chaste-*.conda
+          anaconda --token "${ANACONDA_TOKEN}" upload -u pychaste output/${{ matrix.target }}/chaste-*.conda

@@ -1,0 +1,63 @@
+target_platform:
+  - osx-64
+# macOS deployment target and SDK. CONDA_BUILD_SYSROOT (the path to the matching
+# SDK) is supplied at build time by build-package-osx.sh, which downloads the
+# 10.15 SDK if it is not already present. 10.15 is the minimum: bundled
+# third-party code (pocketfft) calls aligned_alloc, which the macOS C library
+# only provides from 10.15 onwards.
+MACOSX_DEPLOYMENT_TARGET:
+  - "10.15"
+MACOSX_SDK_VERSION:
+  - "10.15"
+c_compiler:
+  - clang
+cxx_compiler:
+  - clangxx
+fortran_compiler:
+  - gfortran
+boostcpp:
+  - ">=1.70,<1.84"
+hdf5:
+  - ">=1.10,<1.15"
+metis:
+  - ">=4.0,<6.0"
+mpich:
+  - ">=4.0,<5.0"
+parmetis:
+  - ">=4.0,<6.0"
+petsc:
+  - ">=3.19,<3.26"
+petsc4py:
+  - ">=3.19,<3.26"
+numpy:
+  - "1.26"
+python:
+  - 3.12.* *_cpython
+sundials:
+  - ">=3.0,<7.0"
+vtk:
+  - ">=7.1,<9.4"
+xercesc:
+  - ">=3.0,<4.0"
+pin_run_as_build:
+  boost-cpp:
+    min_pin: x.x
+    max_pin: x.x
+  libtiff:
+    min_pin: x.x
+    max_pin: x.x
+  petsc:
+    min_pin: x.x
+    max_pin: x.x
+  petsc4py:
+    min_pin: x.x
+    max_pin: x.x
+  python:
+    min_pin: x.x
+    max_pin: x.x
+  sundials:
+    min_pin: x.x
+    max_pin: x.x
+  vtk:
+    min_pin: x.x
+    max_pin: x.x

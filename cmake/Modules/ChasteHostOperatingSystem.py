@@ -68,7 +68,8 @@ def main():
         return f"{name} {version}"
 
     # Mac
-    elif platform_name.lower().startswith('darwin'):
+    # platform.platform() has 'macOS-' on modern Python, 'Darwin-' on older.
+    elif platform_name.lower().startswith(('darwin', 'macos')):
         mac_ver = platform.mac_ver()
         mac_name = get_mac_name_from_darwin_version(mac_ver[0])
         return f"{mac_name} ({mac_ver[0]})"
@@ -124,6 +125,12 @@ def get_mac_name_from_darwin_version(version_str):
         return 'macOS Monterey'
     elif version_str.startswith('13.'):
         return 'macOS Ventura'
+    elif version_str.startswith('14.'):
+        return 'macOS Sonoma'
+    elif version_str.startswith('15.'):
+        return 'macOS Sequoia'
+    elif version_str.startswith('26.'):
+        return 'macOS Tahoe'
     else:
         return 'Unknown Mac Version'
 
