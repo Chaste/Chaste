@@ -67,7 +67,10 @@ jobs:
         with:
           ref: ${{ github.event_name == 'pull_request' && github.ref || inputs.chaste-ref }}
           submodules: recursive
-          fetch-tags: true
+          # Full history (not a shallow clone) so package-version.sh's
+          # `git describe --tags` can reach the latest tag; otherwise the version
+          # falls back to 0 (e.g. chaste-0.devN...).
+          fetch-depth: 0
 
       - name: Determine package version
         run: |
