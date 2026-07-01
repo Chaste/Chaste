@@ -109,6 +109,11 @@ The other arguments match `build-package-linux.sh` (`--variant`, `--branch`,
     ├── linux_64_python3.12_cpython.yaml
     ├── linux_64_python3.13_cpython.yaml
     ├── linux_64_python3.14_cpython.yaml
+    ├── linux_aarch64_python3.10_cpython.yaml
+    ├── linux_aarch64_python3.11_cpython.yaml
+    ├── linux_aarch64_python3.12_cpython.yaml
+    ├── linux_aarch64_python3.13_cpython.yaml
+    ├── linux_aarch64_python3.14_cpython.yaml
     ├── osx_64_python3.10_cpython.yaml
     ├── osx_64_python3.11_cpython.yaml
     ├── osx_64_python3.12_cpython.yaml

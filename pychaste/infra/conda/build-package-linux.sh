@@ -1,7 +1,11 @@
 #!/bin/bash -e
 
-# Build a PyChaste conda package for linux-64 with rattler-build inside a
-# conda-forge build container. For macOS (osx-64), use build-package-osx.sh.
+# Build a PyChaste conda package for Linux with rattler-build inside a conda-forge
+# build container. For macOS, use build-package-osx.sh.
+#
+# --target selects the architecture (default linux-64), and must match the
+# container: use the x86_64 conda-forge container for linux-64 and the aarch64
+# container for linux-aarch64.
 #
 # Example usage (clone from GitHub):
 #   ./build-package-linux.sh --variant=linux_64_python3.10_cpython --branch=2026.1 --cpu-count=4
@@ -23,12 +27,22 @@
 #     -e HOST_USER_ID="$(id -u)" \
 #     quay.io/condaforge/linux-anvil-cos7-x86_64 \
 #     ./build-package-linux.sh --variant=linux_64_python3.10_cpython --source-dir=/chaste
+#
+# Build linux-aarch64 natively (in the aarch64 container, on an arm64 host):
+#   docker run --rm -it \
+#     -v $(pwd):/home/conda \
+#     -v /path/to/Chaste:/chaste:ro \
+#     -e HOST_USER_ID="$(id -u)" \
+#     quay.io/condaforge/linux-anvil-cos7-aarch64 \
+#     ./build-package-linux.sh --variant=linux_aarch64_python3.12_cpython \
+#       --target=linux-aarch64 --source-dir=/chaste
 
 # Parse args
 variant=
 branch=develop
 cpu_count=
 source_dir=
+target=linux-64
 
 for option; do
   case $option in
@@ -44,6 +58,9 @@ for option; do
   --cpu-count=*)
     cpu_count=$(expr "x$option" : "x--cpu-count=\(.*\)")
     ;;
+  --target=*)
+    target=$(expr "x$option" : "x--target=\(.*\)")
+    ;;
   *)
     echo "Unknown option: $option" 1>&2
     exit 1
@@ -53,9 +70,17 @@ done
 
 if [ -z "${variant}" ]; then
   echo "Error: --variant is required" 1>&2
-  echo "Usage: $(basename "$0") --variant=<name> [--branch=<branch>] [--cpu-count=<n>] [--source-dir=<path>]" 1>&2
+  echo "Usage: $(basename "$0") --variant=<name> [--target=linux-64|linux-aarch64] [--branch=<branch>] [--cpu-count=<n>] [--source-dir=<path>]" 1>&2
   exit 1
 fi
+
+case "${target}" in
+  linux-64 | linux-aarch64) ;;
+  *)
+    echo "Error: --target must be linux-64 or linux-aarch64 (got '${target}')" 1>&2
+    exit 1
+    ;;
+esac
 
 set -x
 
@@ -86,9 +111,14 @@ export PYTHONUNBUFFERED=1
 export OUTPUT_DIR=/tmp/rattler_output
 mkdir -p "${OUTPUT_DIR}"
 
-# Install rattler-build as a self-contained static binary (no conda solve).
+# Install rattler-build as a self-contained static binary (no conda solve),
+# matching the container architecture (aarch64 or x86_64).
+case "$(uname -m)" in
+  aarch64 | arm64) rb_arch=aarch64 ;;
+  *)               rb_arch=x86_64  ;;
+esac
 curl -fsSL \
-  https://github.com/prefix-dev/rattler-build/releases/latest/download/rattler-build-x86_64-unknown-linux-musl \
+  "https://github.com/prefix-dev/rattler-build/releases/latest/download/rattler-build-${rb_arch}-unknown-linux-musl" \
   -o /tmp/rattler-build
 chmod +x /tmp/rattler-build
 export PATH="/tmp:${PATH}"
@@ -119,11 +149,11 @@ export CHASTE_SOURCE_DIR=/tmp/Chaste
 rattler-build build \
   --recipe "${RECIPE_ROOT}/recipe.yaml" \
   --variant-config "${CONFIG_FILE}" \
-  --target-platform linux-64 \
+  --target-platform "${target}" \
   --output-dir "${OUTPUT_DIR}" \
   --channel conda-forge \
   --channel pychaste
 
 # Copy the built package to the mounted host directory
-mkdir -p "${FEEDSTOCK_ROOT}/build_artifacts/linux-64"
-cp "${OUTPUT_DIR}"/linux-64/chaste-*.conda "${FEEDSTOCK_ROOT}/build_artifacts/linux-64/"
+mkdir -p "${FEEDSTOCK_ROOT}/build_artifacts/${target}"
+cp "${OUTPUT_DIR}/${target}"/chaste-*.conda "${FEEDSTOCK_ROOT}/build_artifacts/${target}/"

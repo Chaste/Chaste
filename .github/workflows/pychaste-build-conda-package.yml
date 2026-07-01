@@ -36,11 +36,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Each target is built natively on a runner of the matching architecture.
           - target: linux-64
             runner: ubuntu-24.04
             variant-prefix: linux_64
-          # osx-64 is built natively on an Intel runner; osx-arm64 natively on an
-          # Apple Silicon runner (macos-13 is Intel; macos-14/15 are arm64).
+          - target: linux-aarch64
+            runner: ubuntu-24.04-arm
+            variant-prefix: linux_aarch64
+          # macos-13 is Intel; macos-14/15 are Apple Silicon (arm64).
           - target: osx-64
             runner: macos-13
             variant-prefix: osx_64
@@ -71,8 +74,8 @@ jobs:
           version=$(bash pychaste/infra/conda/package-version.sh "$GITHUB_WORKSPACE")
           echo "CHASTE_VERSION=${version}" >> "$GITHUB_ENV"
 
-      - name: Install system dependencies (linux-64)
-        if: ${{ matrix.target == 'linux-64' }}
+      - name: Install system dependencies (Linux)
+        if: ${{ startsWith(matrix.target, 'linux') }}
         run: |
           sudo apt-get update
           sudo apt-get install -y castxml libx11-dev xvfb
