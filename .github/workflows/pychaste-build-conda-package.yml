@@ -39,10 +39,14 @@ jobs:
           - target: linux-64
             runner: ubuntu-24.04
             variant-prefix: linux_64
-          # osx-64 must be built on an Intel macOS runner (macos-14/15 are arm64).
+          # osx-64 is built natively on an Intel runner; osx-arm64 natively on an
+          # Apple Silicon runner (macos-13 is Intel; macos-14/15 are arm64).
           - target: osx-64
             runner: macos-13
             variant-prefix: osx_64
+          - target: osx-arm64
+            runner: macos-15
+            variant-prefix: osx_arm64
 
     runs-on: ${{ matrix.runner }}
 
@@ -73,21 +77,29 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y castxml libx11-dev xvfb
 
-      - name: Set up macOS SDK (osx-64)
-        if: ${{ matrix.target == 'osx-64' }}
+      - name: Set up macOS SDK
+        if: ${{ startsWith(matrix.target, 'osx') }}
         run: |
           # conda-forge's clang activation expects an older macOS SDK than the
-          # runner ships. Download the 10.15 SDK (the minimum that provides
-          # aligned_alloc, used by bundled pocketfft) and expose it as
-          # CONDA_BUILD_SYSROOT. These are forwarded into the build by recipe.yaml.
+          # runner ships, matching the deployment target. osx-64 uses 10.15 (the
+          # minimum providing aligned_alloc, used by bundled pocketfft); osx-arm64
+          # uses 11.0, the floor for Apple Silicon. The SDK is exposed as
+          # CONDA_BUILD_SYSROOT and forwarded into the build by recipe.yaml.
+          if [ "${{ matrix.target }}" = "osx-arm64" ]; then
+            sdk_name=MacOSX11.3.sdk
+            deployment=11.0
+          else
+            sdk_name=MacOSX10.15.sdk
+            deployment=10.15
+          fi
           sdk_dir="${RUNNER_TEMP}/MacOSX-SDKs"
           mkdir -p "${sdk_dir}"
           curl -fsSL \
-            https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.15.sdk.tar.xz \
+            "https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/${sdk_name}.tar.xz" \
             | tar -xJ -C "${sdk_dir}"
-          echo "CONDA_BUILD_SYSROOT=${sdk_dir}/MacOSX10.15.sdk" >> "$GITHUB_ENV"
-          echo "MACOSX_DEPLOYMENT_TARGET=10.15" >> "$GITHUB_ENV"
-          echo "MACOSX_SDK_VERSION=10.15" >> "$GITHUB_ENV"
+          echo "CONDA_BUILD_SYSROOT=${sdk_dir}/${sdk_name}" >> "$GITHUB_ENV"
+          echo "MACOSX_DEPLOYMENT_TARGET=${deployment}" >> "$GITHUB_ENV"
+          echo "MACOSX_SDK_VERSION=${deployment}" >> "$GITHUB_ENV"
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v4

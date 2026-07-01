@@ -1,15 +1,22 @@
 #!/bin/bash -e
 
-# Build a PyChaste conda package for macOS (osx-64) natively with rattler-build.
+# Build a PyChaste conda package for macOS natively with rattler-build.
 #
 # Unlike build-package-linux.sh, which builds linux-64 inside a conda-forge Docker
-# container, this script runs directly on a macOS host: cross-building macOS
-# conda packages requires the macOS SDK and the host toolchain, so there is no
+# container, this script runs directly on a macOS host: building macOS conda
+# packages requires the macOS SDK and the host toolchain, so there is no
 # container to run it in.
 #
-# Example usage (local source):
+# --target selects the macOS architecture and must match the host: use
+# --target=osx-64 on an Intel Mac and --target=osx-arm64 on an Apple Silicon Mac.
+#
+# Example usage (local source, osx-64 on an Intel Mac):
 #   ./build-package-osx.sh --variant=osx_64_python3.12_cpython \
-#       --source-dir=/path/to/Chaste --cpu-count=4
+#       --target=osx-64 --source-dir=/path/to/Chaste --cpu-count=4
+#
+# Example usage (local source, osx-arm64 on an Apple Silicon Mac):
+#   ./build-package-osx.sh --variant=osx_arm64_python3.12_cpython \
+#       --target=osx-arm64 --source-dir=/path/to/Chaste --cpu-count=4
 #
 # Example usage (clone from GitHub):
 #   ./build-package-osx.sh --variant=osx_64_python3.12_cpython --branch=2026.1
@@ -19,6 +26,7 @@ variant=
 branch=develop
 cpu_count=
 source_dir=
+target=osx-64
 
 for option; do
   case $option in
@@ -34,6 +42,9 @@ for option; do
   --cpu-count=*)
     cpu_count=$(expr "x$option" : "x--cpu-count=\(.*\)")
     ;;
+  --target=*)
+    target=$(expr "x$option" : "x--target=\(.*\)")
+    ;;
   *)
     echo "Unknown option: $option" 1>&2
     exit 1
@@ -43,9 +54,17 @@ done
 
 if [ -z "${variant}" ]; then
   echo "Error: --variant is required" 1>&2
-  echo "Usage: $(basename "$0") --variant=<name> [--branch=<branch>] [--cpu-count=<n>] [--source-dir=<path>]" 1>&2
+  echo "Usage: $(basename "$0") --variant=<name> [--target=osx-64|osx-arm64] [--branch=<branch>] [--cpu-count=<n>] [--source-dir=<path>]" 1>&2
   exit 1
 fi
+
+case "${target}" in
+  osx-64 | osx-arm64) ;;
+  *)
+    echo "Error: --target must be osx-64 or osx-arm64 (got '${target}')" 1>&2
+    exit 1
+    ;;
+esac
 
 if [ "$(uname)" != "Darwin" ]; then
   echo "Error: build-package-osx.sh must be run on macOS; use build-package-linux.sh for linux-64." 1>&2
@@ -67,25 +86,36 @@ export PYTHONUNBUFFERED=1
 
 OUTPUT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/rattler_output.XXXXXX")"
 
-# Install rattler-build as a self-contained static binary (no conda solve).
+# Install rattler-build as a self-contained static binary (no conda solve),
+# matching the host architecture (arm64 on Apple Silicon, x86_64 on Intel).
+case "$(uname -m)" in
+  arm64 | aarch64) rb_arch=aarch64 ;;
+  *)               rb_arch=x86_64  ;;
+esac
 RATTLER_BUILD=/tmp/rattler-build-osx
 curl -fsSL \
-  https://github.com/prefix-dev/rattler-build/releases/latest/download/rattler-build-x86_64-apple-darwin \
+  "https://github.com/prefix-dev/rattler-build/releases/latest/download/rattler-build-${rb_arch}-apple-darwin" \
   -o "${RATTLER_BUILD}"
 chmod +x "${RATTLER_BUILD}"
 
 # macOS SDK. conda-forge's clang activation expects CONDA_BUILD_SYSROOT to point
-# at the SDK matching MACOSX_SDK_VERSION (10.13, pinned in the variant). The host
-# only ships current SDKs, so download and cache the 10.13 SDK if it is absent.
-# Both variables are exported here (for rattler-build's environment activation)
-# and forwarded into the build script via recipe.yaml.
+# at an SDK matching the deployment target pinned in the variant. The host only
+# ships current SDKs, so download and cache the required SDK if it is absent.
+# osx-64 targets 10.15 (the minimum providing aligned_alloc, used by pocketfft);
+# osx-arm64 targets 11.0, the floor for Apple Silicon. Both variables are
+# exported here (for rattler-build's environment activation) and forwarded into
+# the build script via recipe.yaml.
+case "${target}" in
+  osx-64)    sdk_version=10.15; deployment=10.15 ;;
+  osx-arm64) sdk_version=11.3;  deployment=11.0  ;;
+esac
 SDK_CACHE="${FEEDSTOCK_ROOT}/.osx-sdk"
-export CONDA_BUILD_SYSROOT="${SDK_CACHE}/MacOSX10.15.sdk"
-export MACOSX_DEPLOYMENT_TARGET=10.15
+export CONDA_BUILD_SYSROOT="${SDK_CACHE}/MacOSX${sdk_version}.sdk"
+export MACOSX_DEPLOYMENT_TARGET="${deployment}"
 if [ ! -d "${CONDA_BUILD_SYSROOT}" ]; then
   mkdir -p "${SDK_CACHE}"
   curl -fsSL \
-    https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.15.sdk.tar.xz \
+    "https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX${sdk_version}.sdk.tar.xz" \
     | tar -xJ -C "${SDK_CACHE}"
 fi
 
@@ -114,11 +144,11 @@ export CHASTE_SOURCE_DIR=/tmp/Chaste
 "${RATTLER_BUILD}" build \
   --recipe "${RECIPE_ROOT}/recipe.yaml" \
   --variant-config "${CONFIG_FILE}" \
-  --target-platform osx-64 \
+  --target-platform "${target}" \
   --output-dir "${OUTPUT_DIR}" \
   --channel conda-forge \
   --channel pychaste
 
 # Copy the built package to the host build_artifacts directory
-mkdir -p "${FEEDSTOCK_ROOT}/build_artifacts/osx-64"
-cp "${OUTPUT_DIR}"/osx-64/chaste-*.conda "${FEEDSTOCK_ROOT}/build_artifacts/osx-64/"
+mkdir -p "${FEEDSTOCK_ROOT}/build_artifacts/${target}"
+cp "${OUTPUT_DIR}/${target}"/chaste-*.conda "${FEEDSTOCK_ROOT}/build_artifacts/${target}/"

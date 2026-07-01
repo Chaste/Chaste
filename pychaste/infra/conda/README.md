@@ -54,25 +54,39 @@ anaconda login
 anaconda upload -u pychaste ./build_artifacts/linux-64/chaste-<version>-<hash>.conda
 ```
 
-## Building macOS (osx-64) packages locally
+## Building macOS packages locally
 
 macOS packages cannot be built in the Linux container; they must be built
 natively on a macOS host with `build-package-osx.sh`, which runs `rattler-build`
 directly (no Docker). It downloads the macOS `rattler-build` binary and, because
 conda-forge pins an older macOS SDK than recent Xcode ships, downloads and caches
-the matching 10.13 SDK (into `.osx-sdk/`) to use as `CONDA_BUILD_SYSROOT`.
+the matching SDK (into `.osx-sdk/`) to use as `CONDA_BUILD_SYSROOT`.
+
+`--target` must match the host architecture: `osx-64` on an Intel Mac (SDK 10.15,
+the minimum providing `aligned_alloc`) or `osx-arm64` on an Apple Silicon Mac
+(SDK 11.0, the floor for Apple Silicon).
 
 ```bash
 cd /path/to/Chaste/pychaste/infra/conda
 
+# On an Intel Mac:
 ./build-package-osx.sh \
   --variant=osx_64_python3.12_cpython \
+  --target=osx-64 \
+  --source-dir=/path/to/Chaste \
+  --cpu-count=<num-cpus>
+
+# On an Apple Silicon Mac:
+./build-package-osx.sh \
+  --variant=osx_arm64_python3.12_cpython \
+  --target=osx-arm64 \
   --source-dir=/path/to/Chaste \
   --cpu-count=<num-cpus>
 ```
 
-The arguments match `build-package-linux.sh` (`--variant`, `--branch`, `--source-dir`,
-`--cpu-count`). The built package is placed in `./build_artifacts/osx-64`.
+The other arguments match `build-package-linux.sh` (`--variant`, `--branch`,
+`--source-dir`, `--cpu-count`). The built package is placed in
+`./build_artifacts/<target>`.
 
 ## Directory structure
 
@@ -99,7 +113,12 @@ The arguments match `build-package-linux.sh` (`--variant`, `--branch`, `--source
     ├── osx_64_python3.11_cpython.yaml
     ├── osx_64_python3.12_cpython.yaml
     ├── osx_64_python3.13_cpython.yaml
-    └── osx_64_python3.14_cpython.yaml
+    ├── osx_64_python3.14_cpython.yaml
+    ├── osx_arm64_python3.10_cpython.yaml
+    ├── osx_arm64_python3.11_cpython.yaml
+    ├── osx_arm64_python3.12_cpython.yaml
+    ├── osx_arm64_python3.13_cpython.yaml
+    └── osx_arm64_python3.14_cpython.yaml
 ```
 
 - `build-package-linux.sh`: Sets up the build environment and runs `rattler-build` to create the linux-64 package inside a Docker container.
