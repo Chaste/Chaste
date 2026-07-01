@@ -1,0 +1,11 @@
+{
+    "name": "Chaste/Minimal",
+    "image": "chaste/base",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/chaste/src,type=bind",
+    "workspaceFolder": "/home/chaste/src",
+    "hostRequirements": {
+        "cpus": 2,
+        "memory": "4gb",
+        "storage": "8gb"
+    }
+}
