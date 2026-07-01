@@ -95,7 +95,10 @@ requirements:
     - xsd
     - xvfbwrapper
   run:
-    - boost-cpp
+    # Pin boost to the build version. Like petsc, boost-cpp carries no version
+    # run-export, so without this the runtime libboost soname could drift from
+    # the one the extension was linked against.
+    - ${{ pin_compatible('boost-cpp', upper_bound='x.x') }}
     - hdf5
     - hdf5 * mpi_mpich_*
     - libboost
@@ -107,8 +110,14 @@ requirements:
     - mpich
     - numpy
     - parmetis
-    - petsc
-    - petsc4py
+    # Pin petsc/petsc4py to the version resolved at build time so the runtime
+    # matches the libpetsc soname the extension was compiled against. rattler-build
+    # ignores the variants' pin_run_as_build, and conda-forge's petsc run-export
+    # only pins the real/complex build string (not the version), so without this
+    # the runtime petsc can drift (e.g. to 3.21 or 3.25) and break `import chaste`
+    # with "libpetsc.so.3.22: cannot open shared object file".
+    - ${{ pin_compatible('petsc', upper_bound='x.x') }}
+    - ${{ pin_compatible('petsc4py', upper_bound='x.x') }}
     - python
     - sundials
     - vtk
