@@ -1,9 +1,6 @@
 name: PyChaste build conda package
 
 on:
-  pull_request:
-    branches:
-      - "**"
   workflow_dispatch:
     inputs:
       python-version:
@@ -30,8 +27,6 @@ on:
 
 jobs:
   build-conda-package:
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
-
     strategy:
       fail-fast: false
       matrix:
@@ -52,8 +47,8 @@ jobs:
     runs-on: ${{ matrix.runner }}
 
     env:
-      PYTHON_VERSION: ${{ github.event_name == 'pull_request' && '3.12' || inputs.python-version }}
-      DO_UPLOAD: ${{ github.event_name != 'pull_request' && inputs.upload == true }}
+      PYTHON_VERSION: ${{ inputs.python-version }}
+      DO_UPLOAD: ${{ inputs.upload }}
 
     defaults:
       run:
@@ -63,7 +58,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.ref || inputs.chaste-ref }}
+          ref: ${{ inputs.chaste-ref }}
           submodules: recursive
           # Full history (not a shallow clone) so package-version.sh's
           # `git describe --tags` can reach the latest tag; otherwise the version
