@@ -67,7 +67,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkVoxel.h>
 #include "CaBasedCellPopulation.hpp"
 #include "CellLabel.hpp"
-#include "Debug.hpp"
 #include "Exception.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
