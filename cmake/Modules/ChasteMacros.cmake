@@ -196,10 +196,13 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             set(env_var_value ${profile_file})
             # GPERFTOOLS_PPROF_EXE must be the Go pprof (github.com/google/pprof): flags are single-dash
             set(post_command ${GPERFTOOLS_PPROF_EXE})
-            set(post_args "-text $<TARGET_FILE:${exeTargetName}> ${profile_file}")
+            # text report sorted by cumulative time; svg call graph with low-level library
+            # frames hidden, so their time is attributed to the calling Chaste methods.
+            # Note the hide regex must not contain spaces, as post_args is split on them.
+            set(post_args "-text -cum $<TARGET_FILE:${exeTargetName}> ${profile_file}")
             set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.txt)
             set(post_command2 ${GPERFTOOLS_PPROF_EXE})
-            set(post_args2 "-svg $<TARGET_FILE:${exeTargetName}> ${profile_file}")
+            set(post_args2 "-svg -hide=^std::|^__gnu|^operator\\snew|^operator\\sdelete|cxxabi $<TARGET_FILE:${exeTargetName}> ${profile_file}")
             set(output_file2 ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.svg)
         else()
             set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.txt)
