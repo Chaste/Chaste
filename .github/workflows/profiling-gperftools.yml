@@ -170,9 +170,11 @@ jobs:
           path: profiling-gperftools
 
       - name: copy results
+        # raw .prof files are deliberately not published: they are only useful with the
+        # matching test binaries, and remain available in the workflow artifact
         run: |
           mkdir ${GPERFTOOLS_RESULTS_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}
-          cp ./profile/* ${GPERFTOOLS_RESULTS_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
+          cp ./profile/*.txt ./profile/*.svg ./profile/index.html ${GPERFTOOLS_RESULTS_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
 
       - name: setup python
         uses: actions/setup-python@v6
