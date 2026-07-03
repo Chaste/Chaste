@@ -1038,7 +1038,7 @@ endif ()
 
 if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     if (Chaste_PROFILE_GPERFTOOLS)
-        set (extension svg)
+        set (extension "txt;svg")
         set (NUM_CPUS ${Chaste_PROFILE_GPERFTOOLS_CPUS})
     else ()
         set (extension txt)

@@ -31,25 +31,39 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import os, sys, inspect
+import os, sys
 import glob
-import re
+
+LINK_TEXT = {
+    'txt': 'text report',
+    'svg': 'call graph',
+}
 
 if __name__ == "__main__":
     if (len(sys.argv) < 3):
-        print("Usage: %s <profile_dir> <extension>" % sys.argv[0], file=sys.stderr)
+        print("Usage: %s <profile_dir> <extension> [extension ...]" % sys.argv[0], file=sys.stderr)
         sys.exit(1)
-    files = glob.glob(sys.argv[1]+'/*.'+sys.argv[2])
-    index_file = open(sys.argv[1]+'/index.html','w')
+    profile_dir = sys.argv[1]
+    extensions = sys.argv[2:]
+
+    # map test name -> {extension: filename} for each output found
+    tests = {}
+    for extension in extensions:
+        for file in glob.glob(profile_dir + '/*.' + extension):
+            filename = os.path.basename(file)
+            testname = filename[:-len('.' + extension)]
+            tests.setdefault(testname, {})[extension] = filename
+
+    index_file = open(profile_dir + '/index.html', 'w')
     index_file.write('<!DOCTYPE html>\n')
     index_file.write('<html>\n')
     index_file.write('<body>\n')
-    for file in files:
-        filename = os.path.basename(file)
-        testname = re.match('(.*).'+sys.argv[2],filename).group(1)
+    for testname in sorted(tests):
         color = 'green'
         display_status = 'OK'
-        index_file.write('<p> <font color="%s">%s: %s <a href="%s">(test output)</a>\n'%(color,testname,display_status,filename))
+        links = ' '.join('<a href="%s">(%s)</a>' % (filename, LINK_TEXT.get(extension, 'test output'))
+                         for extension, filename in sorted(tests[testname].items()))
+        index_file.write('<p> <font color="%s">%s: %s %s\n' % (color, testname, display_status, links))
     index_file.write('</body>\n')
     index_file.write('</html>\n')
 
