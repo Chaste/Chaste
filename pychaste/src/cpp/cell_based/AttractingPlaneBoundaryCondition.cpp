@@ -179,6 +179,7 @@ void AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulat
     }
     *rParamsFile << mNormalToPlane[SPACE_DIM - 1] << "</NormalToPlane>\n";
     *rParamsFile << "\t\t\t<UseJiggledNodesOnPlane>" << mUseJiggledNodesOnPlane << "</UseJiggledNodesOnPlane>\n";
+    *rParamsFile << "\t\t\t<AttractionThreshold>" << mAttractionThreshold << "</AttractionThreshold>\n";
 
     // Call method on direct parent class
     AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
