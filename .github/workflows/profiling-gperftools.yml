@@ -24,6 +24,7 @@ jobs:
       GPERFTOOLS_VERSION: gperftools-2.18.1
       GPERFTOOLS_PREFIX: ${{ github.workspace }}/gperftools-install
       GO_PPROF_VERSION: v0.0.0-20260604005048-7023385849c0
+      CPUPROFILE_FREQUENCY: 1000
 
     outputs:
       index: ${{ steps.index-exists.outputs.index }}
@@ -97,7 +98,7 @@ jobs:
           cmake
           -DCMAKE_BUILD_TYPE=Debug
           -DChaste_ERROR_ON_WARNING=OFF
-          -DChaste_PROFILE_GPERFTOOLS_CPUS=4
+          -DChaste_PROFILE_GPERFTOOLS=ON
           -DGperftools_ROOT_DIR=${GPERFTOOLS_PREFIX}
           -DCMAKE_PREFIX_PATH=${GPERFTOOLS_PREFIX}
           ..
