@@ -54,17 +54,17 @@ if __name__ == "__main__":
             testname = filename[:-len('.' + extension)]
             tests.setdefault(testname, {})[extension] = filename
 
-    index_file = open(profile_dir + '/index.html', 'w')
-    index_file.write('<!DOCTYPE html>\n')
-    index_file.write('<html>\n')
-    index_file.write('<body>\n')
-    for testname in sorted(tests):
-        color = 'green'
-        display_status = 'OK'
-        links = ' '.join('<a href="%s">(%s)</a>' % (filename, LINK_TEXT.get(extension, 'test output'))
-                         for extension, filename in sorted(tests[testname].items()))
-        index_file.write('<p> <font color="%s">%s: %s %s\n' % (color, testname, display_status, links))
-    index_file.write('</body>\n')
-    index_file.write('</html>\n')
+    with open(profile_dir + '/index.html', 'w') as index_file:
+        index_file.write('<!DOCTYPE html>\n')
+        index_file.write('<html>\n')
+        index_file.write('<body>\n')
+        for testname in sorted(tests):
+            color = 'green'
+            display_status = 'OK'
+            links = ' '.join('<a href="%s">(%s)</a>' % (filename, LINK_TEXT.get(extension, 'test output'))
+                             for extension, filename in sorted(tests[testname].items()))
+            index_file.write('<p> <font color="%s">%s: %s %s\n' % (color, testname, display_status, links))
+        index_file.write('</body>\n')
+        index_file.write('</html>\n')
 
 
