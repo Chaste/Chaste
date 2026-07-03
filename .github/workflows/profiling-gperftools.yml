@@ -155,13 +155,17 @@ jobs:
           name: profile-files
           path: ./profile
 
-      - name: checkout profiling-gperftools
+      # DRY RUN: Chaste/profiling-gperftools does not exist yet, so check out
+      # Chaste/profiling-gprof as a stand-in (public, no token needed).
+      # Once the real repo exists, switch to:
+      #   repository: Chaste/profiling-gperftools
+      #   token: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
+      #   fetch-depth: 0
+      - name: checkout results repo (dry run)
         uses: actions/checkout@v6
         with:
-          repository: Chaste/profiling-gperftools
+          repository: Chaste/profiling-gprof
           path: profiling-gperftools
-          fetch-depth: 0
-          token: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
 
       - name: copy results
         run: |
@@ -180,13 +184,17 @@ jobs:
           python write_index.py
         working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
 
-      - name: commit and push results
+      # DRY RUN: commit locally and show what would be pushed, but do not push.
+      # Once the real repo exists, replace the last two lines with:
+      #   git push
+      - name: commit results (dry run, no push)
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
           git add --all
           git commit -m "upload gperftools profiling results" || echo "No changes to commit"
-          git push
+          echo "DRY RUN: skipping git push; the commit that would be pushed is:"
+          git show --stat HEAD
         working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
 
       - name: results URL on chaste.github.io
