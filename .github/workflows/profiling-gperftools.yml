@@ -37,7 +37,7 @@ jobs:
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
       - name: checkout Chaste
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -53,13 +53,13 @@ jobs:
         run: sudo apt install autoconf automake libtool libunwind-dev graphviz
 
       - name: setup go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: 'stable'
 
       - name: cache go pprof
         id: cache-pprof
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/go/bin/pprof
           key: go-pprof-${{ runner.os }}-${{ env.GO_PPROF_VERSION }}
@@ -73,7 +73,7 @@ jobs:
 
       - name: cache gperftools
         id: cache-gperftools
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ env.GPERFTOOLS_PREFIX }}
           key: gperftools-${{ runner.os }}-${{ env.GPERFTOOLS_VERSION }}
@@ -164,7 +164,7 @@ jobs:
       #   token: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
       #   fetch-depth: 0
       - name: checkout results repo (dry run)
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Chaste/profiling-gprof
           path: profiling-gperftools
