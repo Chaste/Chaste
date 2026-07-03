@@ -249,7 +249,9 @@ endif ()
 ################################
 if (Chaste_PROFILE_GPERFTOOLS)
     find_package (Gperftools REQUIRED)
-    list (APPEND Chaste_LINK_LIBRARIES "-Wl,--no-as-needed ${GPERFTOOLS_PROFILER} -Wl,--as-needed")
+    # rpath so that binaries can find libprofiler at runtime when gperftools is in a non-system prefix
+    get_filename_component (GPERFTOOLS_LIBRARY_DIR ${GPERFTOOLS_PROFILER} DIRECTORY)
+    list (APPEND Chaste_LINK_LIBRARIES "-Wl,--no-as-needed ${GPERFTOOLS_PROFILER} -Wl,--as-needed -Wl,-rpath,${GPERFTOOLS_LIBRARY_DIR}")
 endif ()
 
 #Gprof executable
