@@ -198,11 +198,19 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             set(post_command ${GPERFTOOLS_PPROF_EXE})
             # text report sorted by cumulative time; svg call graph with low-level library
             # frames hidden, so their time is attributed to the calling Chaste methods.
+            # External C libraries (PETSc, MPI, HDF5, ...) are matched by prefix plus the
+            # absence of '::', which keeps Chaste's own PETSc-style names visible
+            # (e.g. PetscTools::Destroy, PCBlockDiagonalApply).
             # Note the hide regex must not contain spaces, as post_args is split on them.
+            set(pprof_hide "^std::|^__|^operator\\snew|^operator\\sdelete")
+            set(pprof_hide "${pprof_hide}|^boost::|^vtk")
+            set(pprof_hide "${pprof_hide}|^(Petsc|Mat|Vec|KSP|SNES|DM|IS)[A-Z][^:]*$")
+            set(pprof_hide "${pprof_hide}|^MPI_|^PMPI_|^ompi_|^opal_|^mca_")
+            set(pprof_hide "${pprof_hide}|^H5|^CVode[^:]*$|^N_V|^SUN[A-Z]")
             set(post_args "-text -cum $<TARGET_FILE:${exeTargetName}> ${profile_file}")
             set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.txt)
             set(post_command2 ${GPERFTOOLS_PPROF_EXE})
-            set(post_args2 "-svg -hide=^std::|^__|^operator\\snew|^operator\\sdelete $<TARGET_FILE:${exeTargetName}> ${profile_file}")
+            set(post_args2 "-svg -hide=${pprof_hide} $<TARGET_FILE:${exeTargetName}> ${profile_file}")
             set(output_file2 ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.svg)
         else()
             set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.txt)
