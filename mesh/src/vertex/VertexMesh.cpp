@@ -857,12 +857,6 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllFaces() const
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllFaces() const
-{
-    return mFaces.size();
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElement(unsigned index) const
 {
     assert(index < mElements.size());
@@ -877,7 +871,7 @@ VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::G
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfElement(unsigned index)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfElement(unsigned index) const
 {
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
     unsigned num_nodes = p_element->GetNumNodes();
@@ -1579,7 +1573,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement([[maybe_unused]] unsigned index)
+c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement([[maybe_unused]] unsigned index) const
 {
     if constexpr (SPACE_DIM == 2)
     {
@@ -1638,7 +1632,7 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement([[maybe_unused]] unsigned index)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement([[maybe_unused]] unsigned index) const
 {
     if constexpr (SPACE_DIM == 2)
     {
@@ -1803,7 +1797,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGrad
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(
     [[maybe_unused]] VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace,
-    [[maybe_unused]] c_vector<double, SPACE_DIM>& rNormal)
+    [[maybe_unused]] c_vector<double, SPACE_DIM>& rNormal) const
 {
     if constexpr (SPACE_DIM == 3)
     {

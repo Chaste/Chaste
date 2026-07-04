@@ -712,7 +712,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCellRearrangementThresho
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2)
+c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2) const
 {
     // This code currently assumes the grid is precisely [0,1)x[0,1)
     c_vector<double, SPACE_DIM> vector = rLocation2 - rLocation1;

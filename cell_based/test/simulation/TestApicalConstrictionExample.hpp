@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestApicalConstrictionExample : public AbstractCellBasedTestSuite
 {
 public:
-    void TestApicalConstriction() throw(Exception)
+    void TestApicalConstriction()
     {
         // Make a mesh of 10x10
         const double z_height = 1;
@@ -123,7 +123,7 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
-    void TestApicalConstrictionVoronoi() throw(Exception)
+    void TestApicalConstrictionVoronoi()
     {
         // Make a mesh of 10x10
         const double z_height = 1;

@@ -128,7 +128,7 @@ public:
      * @param rMesh reference to the vertex-based mesh
      * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
      */
-    void WriteVtkUsingMesh(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="");
+    void WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="");
 
     /**
      * Populate mpVtkUnstructedMesh using a vertex-based mesh.

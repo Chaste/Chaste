@@ -210,7 +210,7 @@ ElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElement()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
 {
 #ifdef CHASTE_VTK
     assert(SPACE_DIM==3 || SPACE_DIM == 2);    // LCOV_EXCL_LINE
@@ -270,7 +270,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(const VertexMes
  * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
  */
 template<>
-void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(const VertexMesh<2, 2>& rMesh, std::string stamp)
+void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::string stamp)
 {
 #ifdef CHASTE_VTK
     // Create VTK mesh

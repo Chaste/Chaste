@@ -81,7 +81,7 @@ void VoronoiPrism3dVertexMeshGenerator::GenerateVoronoiMesh()
 {
     VoronoiVertexMeshGenerator generator2(mNumElementsX, mNumElementsY, mNumRelaxationSteps,
                                           mElementTargetApicalArea);
-    MutableVertexMesh<2, 2>* p_mesh2 = generator2.GetMesh();
+    boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh2 = generator2.GetMesh();
     MonolayerVertexMeshGenerator generator("", false);
     mpMesh = generator.MakeMeshUsing2dMesh(*p_mesh2, mElementHeightZ);
 }

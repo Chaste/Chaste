@@ -178,7 +178,7 @@ unsigned PeriodicNodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 }
 
 template<unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> PeriodicNodesOnlyMesh<SPACE_DIM>::GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2)
+c_vector<double, SPACE_DIM> PeriodicNodesOnlyMesh<SPACE_DIM>::GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2) const
 {
     c_vector<double, SPACE_DIM> vector = rLocation2 - rLocation1;
 

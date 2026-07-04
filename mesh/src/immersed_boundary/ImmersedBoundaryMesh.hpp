@@ -354,7 +354,7 @@ public:
      * @param rLocation2 the x and y co-ordinates of point 2
      * @return the vector from location1 to location2
      */
-    c_vector<double, SPACE_DIM> GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2);
+    c_vector<double, SPACE_DIM> GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2) const;
 
     /**
      * Move the node with a particular index to a new point in space.

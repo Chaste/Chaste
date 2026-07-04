@@ -33,7 +33,7 @@ private:
     static const double end_time = 10;
 
 public:
-    void TestOnSphere1() throw(Exception)
+    void TestOnSphere1()
     {
         /*
         const std::string output_filename = "TestMonolayerSphericalMeshExample/Sphere1_12cells";
@@ -78,7 +78,7 @@ public:
         */
     }
 
-    void TestOnSphere2() throw(Exception)
+    void TestOnSphere2()
     {
         /*
         const std::string output_filename = "TestMonolayerSphericalMeshExample/Sphere2_42cells";
@@ -124,7 +124,7 @@ public:
         */
     }
 
-    void TestOnSphere3() throw(Exception)
+    void TestOnSphere3()
     {
         const std::string output_filename = "TestMonolayerSphericalMeshExample/Sphere3_162cells";
         GeodesicSphere23Generator builder;

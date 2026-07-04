@@ -2313,7 +2313,7 @@ public:
         }
     }
 
-    void TestMisraForceMethods() throw(Exception)
+    void TestMisraForceMethods()
     {
         // This is the same test as for other vertex based forces. It comprises a sanity check that forces point in the right direction.
         // Construct a 3D vertex mesh consisting of a single element
@@ -2453,7 +2453,7 @@ public:
         TS_ASSERT_DELTA(force.mTargetVolume, 1234, 1e-12);
     }
 
-    void TestMisraForceArchiving() throw(Exception)
+    void TestMisraForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -2499,7 +2499,7 @@ public:
         }
     }
 
-    void TestGeneralMonolayerVertexMeshForceArchiving() throw(Exception)
+    void TestGeneralMonolayerVertexMeshForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);

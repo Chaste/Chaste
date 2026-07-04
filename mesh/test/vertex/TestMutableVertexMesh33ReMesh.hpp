@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestMutableVertexMesh33ReMesh : public CxxTest::TestSuite
 {
 public:
-    void TestPerformNodeMerge() throw(Exception)
+    void TestPerformNodeMerge()
     {
         /*
          * Create a mesh comprising a single triangular element, as shown below.
@@ -116,7 +116,7 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2 + sqrt(2.0) + 1.0, 1e-6);
     }
 
-    void TestPerformNodeMergeWhenLowIndexNodeMustBeAddedToElement() throw(Exception)
+    void TestPerformNodeMergeWhenLowIndexNodeMustBeAddedToElement()
     {
         /**
          * Create a mesh comprising two square elements, as shown below. We will test that the
@@ -190,7 +190,7 @@ public:
         }
     }
 
-    void TestCheckForSwapsAndIdentifySwapType() throw(Exception)
+    void TestCheckForSwapsAndIdentifySwapType()
     {
         /*
          * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
@@ -292,7 +292,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 17u);
     }
 
-    void TestT1SwapAsynchronous() throw(Exception)
+    void TestT1SwapAsynchronous()
     {
         /*
          * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
@@ -348,7 +348,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.23);
     }
 
-    void TestT1SwapNonEvenFace() throw(Exception)
+    void TestT1SwapNonEvenFace()
     {
         /*
          * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
@@ -398,7 +398,7 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], -0.0055, 1e-4);
     }
 
-    void TestPerformT1SwapOnBoundary() throw(Exception)
+    void TestPerformT1SwapOnBoundary()
     {
         /*
          * Create a mesh comprising six nodes contained in three elements such that all nodes are
@@ -489,7 +489,7 @@ public:
         }
     }
 
-    void TestPerformT1SwapOnBoundary2() throw(Exception)
+    void TestPerformT1SwapOnBoundary2()
     {
         /*
          * Create a mesh comprising six nodes contained in three elements such that all but one node
@@ -584,7 +584,7 @@ public:
         }
     }
 
-    void TestPerformT1SwapWhenVoidForms() throw(Exception)
+    void TestPerformT1SwapWhenVoidForms()
     {
         /*
          * Create a mesh containing six nodes containing in two elements. We will test that
@@ -667,7 +667,7 @@ public:
         }
     }
 
-    void TestPerformT1SwapExceptions() throw(Exception)
+    void TestPerformT1SwapExceptions()
     {
         /*
          * Create a mesh comprising six nodes containing in two triangle and two rhomboid elements,
@@ -702,7 +702,7 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5)), "Nodes(5&4) are too close together, this shouldn't happen");
     }
 
-    void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement() throw(Exception)
+    void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement()
     {
         /**
          * In this test we check that a T1 swap does not occur if one of the elements is triangular
@@ -759,7 +759,7 @@ public:
         }
     }
 
-    void TestExceptionForVoidRemovalWithRemovingEdgeFromTriangularElement() throw(Exception)
+    void TestExceptionForVoidRemovalWithRemovingEdgeFromTriangularElement()
     {
         /**
          * In this test we check that void removal does not occur if one of the adjacent elements is triangular
@@ -801,7 +801,7 @@ public:
                               "Triangular element next to triangular void, not implemented yet.");
     }
 
-    void TestReMeshForT1Swaps() throw(Exception)
+    void TestReMeshForT1Swaps()
     {
         /*
          * Read in a vertex mesh that contains several pairs of nodes that are close enough for
@@ -856,7 +856,7 @@ public:
         TS_ASSERT(comparer2.CompareFiles());
     }
 
-    void TestPerformT2Swap() throw(Exception)
+    void TestPerformT2Swap()
     {
         /*
          * Create a mesh comprising six nodes contained in three trapezium element and
@@ -942,7 +942,7 @@ public:
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "AfterRemove");
     }
 
-    void TestPerformT2SwapOnBoundary() throw(Exception)
+    void TestPerformT2SwapOnBoundary()
     {
         /*
          * Create a mesh comprising six nodes contained in two trapezium elements
@@ -1014,7 +1014,7 @@ public:
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "AfterRemove");
     }
 
-    void TestPerformT2OnBoundary2() throw(Exception)
+    void TestPerformT2OnBoundary2()
     {
         /*
          *  Make one trapezium element with a central triangular element out of these nodes
@@ -1083,7 +1083,7 @@ public:
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "AfterRemove");
     }
 
-    void TestT2SwapsDontOccurWithTriangularNeighbours() throw(Exception)
+    void TestT2SwapsDontOccurWithTriangularNeighbours()
     {
         // Make 6 nodes to assign to four elements
         std::vector<Node<3>*> nodes;
@@ -1117,7 +1117,7 @@ public:
                               "dealing with this has not been implemented yet");
     }
 
-    void TestPerformT2SwapWithRosettes() throw(Exception)
+    void TestPerformT2SwapWithRosettes()
     {
         /* Create a mesh containing a smaller triangular element, each of whose nodes are
          * 'rosette' nodes. Test that a T2 swap correctly removes the triangular element
@@ -1207,7 +1207,7 @@ public:
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "AfterRemove");
     }
 
-    void TestDivideElement() throw(Exception)
+    void TestDivideElement()
     {
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
@@ -1244,7 +1244,7 @@ public:
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After");
     }
 
-    void TestDivideElement2() throw(Exception)
+    void TestDivideElement2()
     {
         HexagonalPrism3dVertexMeshGenerator generator(1, 1);
         MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
@@ -1276,7 +1276,7 @@ public:
 
     // // Commented this test as T2 Swap should only happen to triangular prism
     // // element in vertex model
-    // void TestPerformT2SwapWithRosettes2() throw(Exception)
+    // void TestPerformT2SwapWithRosettes2()
     // {
     //     /* Create a mesh containing a smaller square element.
     //         * Test that a T2 swap correctly removes the triangular element

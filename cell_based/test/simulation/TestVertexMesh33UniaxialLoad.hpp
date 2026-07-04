@@ -68,7 +68,7 @@ private:
     static const double end_time = 15;
 
 public:
-    void TestOnHexagonalMesh() throw(Exception)
+    void TestOnHexagonalMesh()
     {
         std::string output_filename = "TestUniaxialLoad/HoneyTest" + boost::lexical_cast<std::string>(num_cells_x)
             + "x" + boost::lexical_cast<std::string>(num_cells_y);
@@ -253,7 +253,7 @@ public:
         }
     }
 
-    void TestOnVoronoiMesh() throw(Exception)
+    void TestOnVoronoiMesh()
     {
         std::string output_filename = "TestUniaxialLoad/VoronoiTest" + boost::lexical_cast<std::string>(num_cells_x)
             + "x" + boost::lexical_cast<std::string>(num_cells_y);
@@ -287,7 +287,7 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
-    void TestCellGrowth() throw(Exception)
+    void TestCellGrowth()
     {
         // Make a mesh of 10x10
         //        const double z_height = 1;

@@ -613,7 +613,7 @@ public:
      *
      * @return the area
      */
-    double CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal);
+    double CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal) const;
 
     /**
      * Get the area of a given face in 3D.  Uses CalculateUnitNormalToFaceWithArea

@@ -55,7 +55,7 @@ using boost::assign::list_of;
 class TestVoronoiPrism3dVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
-    void TestSimplestMeshForRelaxation() throw(Exception)
+    void TestSimplestMeshForRelaxation()
     {
         //test to visualise relaxation
         const std::vector<unsigned> relax_steps = list_of(0)(2)(6)(15);
@@ -76,7 +76,7 @@ public:
         }
     }
 
-    void TestSimpleMesh() throw(Exception)
+    void TestSimpleMesh()
     {
         // Generate a mesh that is 20 cells wide in x, 12 cells wide in y, 2 unit high in Z,
         // with 4 Lloyd's relaxation steps and target average element apical area 1.23
@@ -102,7 +102,7 @@ public:
         vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
     }
 
-    void TestBoundaryNodes() throw(Exception)
+    void TestBoundaryNodes()
     {
         // Generate a mesh that is 3 cells wide in x, 2 cells wide in y, 1 unit high in z, with 3 Lloyd's
         // relaxation steps and target average element area 100.0
@@ -133,7 +133,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNode(36)->IsBoundaryNode(), false);
     }
 
-    void TestConstructorExceptions() throw(Exception)
+    void TestConstructorExceptions()
     {
         // Throws because first parameter < 2
         TS_ASSERT_THROWS_THIS(VoronoiPrism3dVertexMeshGenerator generator(1, 9, 2, 1.23),
@@ -152,7 +152,7 @@ public:
                               "Specified target apical area must be strictly positive");
     }
 
-    void TestGetPolygonDistributionAndAreaVariation() throw(Exception)
+    void TestGetPolygonDistributionAndAreaVariation()
     {
         RESEED;
         unsigned num_x = 3;
@@ -191,7 +191,7 @@ public:
         TS_ASSERT_DELTA(area_variation, generator2.GetApicalAreaCoefficientOfVariation(), 1e-6);
     }
 
-    void TestSetAndGetMethods() throw(Exception)
+    void TestSetAndGetMethods()
     {
         unsigned num_x = 3;
         unsigned num_y = 4;

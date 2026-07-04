@@ -2086,12 +2086,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformAsynchronousT1Swap(Node<S
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2);					// LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == SPACE_DIM);		// LCOV_EXCL_LINE
-
-
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
-    unsigned num_nodes = p_element->GetNumNodes();
+    if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
+    {
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
+        unsigned num_nodes = p_element->GetNumNodes();
 
         std::set<unsigned> elements_containing_intersecting_node;
 
@@ -4612,7 +4610,9 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     }
 
     // Compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
-    mLocationsOfT1Swaps.push_back(mid_ab);
+    T1SwapInfo<3> swap_info;
+    swap_info.mLocation = mid_ab;
+    mOperationRecorder.RecordT1Swap(swap_info);
 
     // Find and store the elements involved in T1 Swap
     std::vector<VertexElement<3, 3>*> elems(5, NULL);
@@ -4904,8 +4904,11 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     }
 
     // Compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
-    mLocationsOfT1Swaps.push_back(mid_ab);
-    mLocationsOfT1Swaps.push_back(mid_xy);
+    T1SwapInfo<3> swap_info;
+    swap_info.mLocation = mid_ab;
+    mOperationRecorder.RecordT1Swap(swap_info);
+    swap_info.mLocation = mid_xy;
+    mOperationRecorder.RecordT1Swap(swap_info);
 
     // Find and store the elements involved in T1 Swap
     std::vector<VertexElement<3, 3>*> elems(5, NULL);

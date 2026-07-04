@@ -49,7 +49,7 @@ HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigne
     assert(elementHeight > 0.0);
 
     HoneycombVertexMeshGenerator generator2(numElementsInXDirection, numElementsInYDirection, false, 1, 1, elementApicalArea);
-    MutableVertexMesh<2, 2>* p_mesh2 = generator2.GetMesh();
+    boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh2 = generator2.GetMesh();
     MonolayerVertexMeshGenerator generator("", false);
     mpMesh = generator.MakeMeshUsing2dMesh(*p_mesh2, elementHeight);
 }

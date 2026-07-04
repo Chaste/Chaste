@@ -717,7 +717,7 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
     }
 }
 
-c_vector<double, 2> Toroidal2dMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
+c_vector<double, 2> Toroidal2dMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2) const
 {
     assert(mWidth > 0.0);
     assert(mHeight > 0.0);

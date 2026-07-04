@@ -116,7 +116,7 @@ public:
      * @param rLocation2 the x y and z co-ordinates of point 2
      * @return the vector from location1 to location2
      */
-    c_vector<double, SPACE_DIM> GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2);
+    c_vector<double, SPACE_DIM> GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2) const;
 
     /**
      * Overridden GetWidth() method.

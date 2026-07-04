@@ -196,7 +196,7 @@ public:
             Writer.WriteVtkUsingMesh(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            [[maybe_unused]] MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
             sBuilder.WriteVtk("SphericalMesh", "0");
 
             //            delete pp_mesh;
@@ -247,7 +247,7 @@ public:
             Writer.WriteVtkUsingMesh(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            [[maybe_unused]] MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
             sBuilder.WriteVtk("SphericalMesh", "1");
 
             //            delete pp_mesh;
@@ -294,7 +294,7 @@ public:
             Writer.WriteVtkUsingMesh(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            [[maybe_unused]] MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
             sBuilder.WriteVtk("SphericalMesh", "2");
 
             //            delete pp_mesh;
@@ -343,7 +343,7 @@ public:
             Writer.WriteVtkUsingMesh(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            [[maybe_unused]] MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
             sBuilder.WriteVtk("SphericalMesh", "3");
 
             //            delete pp_mesh;
@@ -411,7 +411,7 @@ public:
     {
         const double z_height(3.14);
         HoneycombVertexMeshGenerator generator2(5, 5, false, 1, 1, 7);
-        MutableVertexMesh<2, 2>* p_mesh2 = generator2.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh2 = generator2.GetMesh();
         MonolayerVertexMeshGenerator generator;
         MutableVertexMesh<3, 3>* p_mesh = generator.MakeMeshUsing2dMesh(*p_mesh2, z_height);
 
