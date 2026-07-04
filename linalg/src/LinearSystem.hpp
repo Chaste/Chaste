@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PCLDUFactorisation.hpp"
 #include "PCTwoLevelsBlockDiagonal.hpp"
 #include "ArchiveLocationInfo.hpp"
-//#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 #include <petscvec.h>
 #include <petscmat.h>
@@ -420,7 +420,7 @@ public:
      * @return the solution vector
      * @param lhsGuess  an optional initial guess for the solution (defaults to NULL)
      */
-    Vec Solve(Vec lhsGuess=NULL);
+    Vec Solve(Vec lhsGuess=nullptr);
 
     /**
      * Set an element of the right-hand side vector to a given value.
@@ -498,10 +498,10 @@ public:
 
     // DEBUGGING CODE:
     /**
-     * @return this process's ownership range of the contents of the system.
+     * Return this process's ownership range of the contents of the system via arguments.
      *
-     * @param lo  lowest index owned by this process
-     * @param hi  highest index owned by this process
+     * @param lo  lowest index owned by this process (returned)
+     * @param hi  highest index owned by this process (returned)
      */
     void GetOwnershipRange(PetscInt& lo, PetscInt& hi);
 

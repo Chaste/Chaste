@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -130,7 +130,7 @@ public:
 class TestMonodomainTissue : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomainTissueBasic() throw(Exception)
+    void TestMonodomainTissueBasic()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -150,12 +150,12 @@ public:
         boost::shared_ptr<AbstractIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         MyCardiacCellFactory cell_factory;
         cell_factory.SetMesh(&mesh);
-        
+
         // Coverage
         TS_ASSERT_THROWS_THIS(cell_factory.FillInCellularTransmuralAreas(),
               "To get here you have probably asked for Epi/Mid/Endo CellularHeterogeneities in your HeartConfig "
-			  "options or configuration .xml file, to use this you will need to provide a method"
-			  " `FillInCellularTransmuralAreas()` in your cell factory to override this one.");
+              "options or configuration .xml file, to use this you will need to provide a method"
+              " `FillInCellularTransmuralAreas()` in your cell factory to override this one.");
 
         // Stimulus function to use at node 0. Node 1 is not stimulated.
         boost::shared_ptr<SimpleStimulus> p_stimulus = cell_factory.GetStimulus();
@@ -165,7 +165,7 @@ public:
 
         // check the purkinje cells vector is empty
         TS_ASSERT(!monodomain_tissue.HasPurkinje());
-        TS_ASSERT_THROWS_ANYTHING(monodomain_tissue.rGetPurkinjeCellsDistributed().size());
+        TS_ASSERT_THROWS_ANYTHING(monodomain_tissue.rGetPurkinjeCellsDistributed());
         TS_ASSERT_THROWS_ANYTHING(monodomain_tissue.rGetPurkinjeIionicCacheReplicated().GetSize());
 
         // voltage that gets passed in solving ode
@@ -236,7 +236,7 @@ public:
         PetscTools::Destroy(voltage);
     }
 
-    void TestMonodomainTissueGetCardiacCell() throw(Exception)
+    void TestMonodomainTissueGetCardiacCell()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -266,7 +266,7 @@ public:
         }
     }
 
-    void TestSolveCellSystemsInclUpdateVoltage() throw(Exception)
+    void TestSolveCellSystemsInclUpdateVoltage()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -322,7 +322,7 @@ public:
         PetscTools::Destroy(voltage2);
     }
 
-    void TestNodeExchange() throw(Exception)
+    void TestNodeExchange()
     {
         HeartConfig::Instance()->Reset();
 
@@ -373,7 +373,7 @@ public:
         }
     }
 
-    void TestSolveCellSystemsInclUpdateVoltageWithNodeExchange() throw(Exception)
+    void TestSolveCellSystemsInclUpdateVoltageWithNodeExchange()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -447,7 +447,7 @@ public:
         PetscTools::Destroy(voltage2);
     }
 
-    void TestSaveAndLoadCardiacTissue() throw (Exception)
+    void TestSaveAndLoadCardiacTissue()
     {
         HeartConfig::Instance()->Reset();
         // Archive settings
@@ -530,7 +530,7 @@ public:
         }
     }
 
-    void TestMonodomainTissueUsingPurkinjeCellFactory() throw(Exception)
+    void TestMonodomainTissueUsingPurkinjeCellFactory()
     {
         HeartConfig::Instance()->Reset();
 
@@ -634,11 +634,6 @@ public:
             // Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
             // The earliest version of Boost supported in 1.34
 
-            // Run the test with b=_hostconfig,boost=1-34_5 to save
-            /*
-               scons b=_hostconfig,boost=1-34_5 ts=heart/test/monodomain/TestMonodomainTissue.hpp
-             *
-             */
             MonodomainProblem<2> monodomain_problem( &cell_factory );
             monodomain_problem.SetMesh(&mixed_mesh);
             monodomain_problem.Initialise();

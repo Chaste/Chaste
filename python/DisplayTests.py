@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ import time
 import itertools
 import re
 
-# Compatibility with Python 2.3
+# Compatibility with Python 3.5+
 try:
     set = set
 except NameError:
@@ -60,7 +60,7 @@ _db_module = None
 
 def index(req):
     """The main test display page.
-    
+
     This displays a summary of the most recent tests.
     """
     output = [_header()]
@@ -71,10 +71,10 @@ def index(req):
     </p>
     <ul>""")
     tests_types = os.listdir(_tests_dir)
-    tests_types = filter(lambda s: s[0] != '.', tests_types)
+    tests_types = [s for s in tests_types if s[0] != '.']
     tests_types.sort()
-    main_types = filter(lambda s: '-' not in s, tests_types)
-    branch_types = filter(lambda s: '-' in s, tests_types)
+    main_types = [s for s in tests_types if '-' not in s]
+    branch_types = [s for s in tests_types if '-' in s]
     for tests_type in main_types:
         if tests_type.endswith('_old'):
             text = 'Old %s builds.' % tests_type[:-4]
@@ -93,26 +93,26 @@ def index(req):
     for tests_type in branch_types:
         output.append('\n    <li><a href="%s/recent?type=%s">Recent %s builds.</a></li>' % (_our_url, tests_type, tests_type))
     output.append("""</ul>
-    
+
     <p>
     <a href="%s/profileHistory?n=100">Run time variation of profiled tests.</a>
     <br />
     <a href="%s/profileHistory?n=100&buildTypes=IntelProductionParallel4_onlytests_Weekly&buildTypes=IntelProduction_onlytests_Weekly">Run time variation of weekly tests.</a>
     </p>
-    
+
     <h2>Latest continuous build</h2>
 """ % (_our_url, _our_url))
 
     # Look for the latest revision present.
     type = 'continuous'
     revision_and_timestamps = os.listdir(os.path.join(_tests_dir, type))
-    latest_revision = str(max(itertools.imap(lambda rts: int(rts[:rts.find('~')]) if '~' in rts else int(rts), revision_and_timestamps)))
+    latest_revision = str(max(map(lambda rts: int(rts[:rts.find('~')]) if '~' in rts else int(rts), revision_and_timestamps)))
     # Display summary of each build of this revision
     test_set_dirs = _getResultsParentDirs(type, latest_revision, timestamp=None)
     builds = []
     for test_set_dir in test_set_dirs:
         revision_and_timestamp = os.path.basename(test_set_dir)
-        builds.extend(map(lambda machine_and_buildtype: (revision_and_timestamp, machine_and_buildtype), os.listdir(test_set_dir)))
+        builds.extend([(revision_and_timestamp, machine_and_buildtype) for machine_and_buildtype in os.listdir(test_set_dir)])
     if len(builds) < 1:
         output.append(_error('No test set found for revision '+latest_revision+'. Probably the build is still in progress.'))
         output.append('<p><a href="/out/latest">Latest build log.</a></p>')
@@ -181,7 +181,7 @@ def recent(req, type='', start=0, n_per_page=30, **filters):
 
 def _recent(req, type='', start=0, n_per_page=30, **filters):
     """Display brief summaries of recent builds of the given type.
-    
+
     Returns a string representing part of a webpage.
     """
     if not type:
@@ -201,7 +201,7 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
         params = []
         where = []
         if filters:
-            for filter_name, filter_value in filters.items():
+            for filter_name, filter_value in list(filters.items()):
                 if filter_name in poss_filters:
                     if len(filter_value) > 0 and filter_value[0] == '!':
                         filter_value = filter_value[1:]
@@ -314,7 +314,7 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
         output.append('<p><a href="/out/latest-nightly">Latest nightly build log.</a></p>')
     elif type == 'continuous':
         output.append('<p><a href="/out/latest">Latest continuous build log.</a></p>')
-    
+
     return ''.join(output)
 
 
@@ -325,10 +325,10 @@ def summary(req, type, revision, machine, buildType, timestamp=None):
     <h1>Build Summary</h1>
 """ +  _summary(req, type, revision, machine, buildType, timestamp)
     return _header('Test Summary') + page_body + _footer()
-    
+
 def _summary(req, type, revision, machine=None, buildType=None, timestamp=None):
     """Display a summary of a build.
-    
+
     Returns a string representing part of a webpage.
     """
     output = []
@@ -341,7 +341,7 @@ def _summary(req, type, revision, machine=None, buildType=None, timestamp=None):
         test_set_dir = _dir
     else:
         test_set_dir = _testResultsDir(type, revision, machine, buildType, timestamp)
-    
+
     # Now test_set_dir should be the directory containing the test results
     # to summarise. Extract summary info from the filenames.
     if type == 'standalone':
@@ -373,15 +373,14 @@ def _summary(req, type, revision, machine=None, buildType=None, timestamp=None):
         logurl = logpath[8:]
         if logurl:
             build_log = "Build log: <a href=\"%s\">%s</a></p>" % (logurl, logurl)
-            timings = _parseBuildTimings(logpath).items()
+            timings = list(_parseBuildTimings(logpath).items())
             timings.sort(key=operator.itemgetter(1)) # Sort by time
             timings.reverse()
             build_log += "\nTimings (for entire build log): <table><tr><th>Activity</th><th>Time (minutes)</th></tr>\n"
             build_log += "\n".join(
-                map(lambda row: '<tr><td>%s</td><td>%d:%f</td></tr>' % (row[0], row[1]//60, row[1]%60),
-                    timings))
+                ['<tr><td>%s</td><td>%d:%f</td></tr>' % (row[0], row[1]//60, row[1]%60) for row in timings])
             build_log += "\n</table>\n"
-    
+
     # Produce output HTML
     if graphs:
         extra_cols = '<th>Extras</th>'
@@ -405,9 +404,9 @@ def _summary(req, type, revision, machine=None, buildType=None, timestamp=None):
         </tr>
 """ % (_linkRevision(revision, changes=True), date, _colourText(overall_status, colour),
        _linkBuildType(buildType, revision), machine, targets, build_log, extra_cols))
-    
+
     # Display the status of each test suite, in alphabetical order
-    testsuites = testsuite_status.keys()
+    testsuites = list(testsuite_status.keys())
     testsuites.sort()
     bgcols = ["white", "#eedd82"]
     bgcol_index = 0
@@ -432,13 +431,13 @@ def _summary(req, type, revision, machine=None, buildType=None, timestamp=None):
 """ % subs)
 
     output.append("  </table>\n")
-    
+
     return ''.join(output)
 
 
 def buildType(req, buildType, revision=None):
     """Display information on the compiler settings, etc. used to build a set of tests.
-    buildType is the user-friendly name describing these settings, such as can be passed to scons build=buildType.
+    buildType is the user-friendly name describing these settings, such as can be passed to build=buildType.
     revision is the code revision of the set of tests, in case the definition of buildType has changed since.
     """
     if revision is None:
@@ -477,7 +476,7 @@ def buildType(req, buildType, revision=None):
     <p>Library/tool versions requested:</p>
     <ul>
 """
-        for lib, version in prefs.iteritems():
+        for lib, version in list(prefs.items()):
             page_body += "    <li>%s: %s</li>\n" % (lib, version)
     page_body += "\n  </ul>\n"
     return _header() + page_body + _footer()
@@ -487,7 +486,7 @@ class FakeBuildType(object):
     """Fake build type.  Provides just enough for the profile history pages."""
     def GetInfoFromResultsFileName(self, leafname):
         """Extract the metadata held within the name of a results file.
-        
+
         This returns a dictionary, with keys 'testsuite', 'status' and 'runtime'.
         testsuite is the name of the test suite.
         status is the encoded status string.
@@ -505,14 +504,14 @@ class FakeBuildType(object):
         return {'testsuite': leafname[:i1],
                 'status': leafname[i1+1:i2],
                 'runtime': runtime}
-    
+
     def ParseGraphFilename(self, leafname):
         """Return the test suite a graph file is associated with.
-        
+
         Removes the string 'Runner.gif' from the end of the filename.
         """
         return leafname[:-10]
-    
+
     def StatusColour(self, status):
         """
         Return a colour string indicating whether the given status string
@@ -606,7 +605,7 @@ def _profileHistory(req, n=20, buildTypes=None):
     output.append('<table border="1">\n  <tr><th>Revision</th>\n')
     revbts = []
     for revision in revisions:
-        cols = sum(map(lambda bt: len(builds.get((revision, bt), [])), buildTypes))
+        cols = sum([len(builds.get((revision, bt), [])) for bt in buildTypes])
         if cols > 0:
             output.append('    <th colspan="%d">%s</th>\n'
                           % (cols, _linkChangeset(revision)))
@@ -614,7 +613,7 @@ def _profileHistory(req, n=20, buildTypes=None):
             revbts.append((revision, bt))
     output.append('  </tr>\n  <tr><th>Build</th>\n')
     for rev, bt in revbts:
-        if builds.has_key((rev, bt)):
+        if (rev, bt) in builds:
             output.append('    <th colspan="%d">%s</th>\n'
                           % (len(builds[(rev, bt)]), _linkBuildType(bt, rev, wrappableText=True)))
     output.append('  </tr>\n  <tr><th>Machine</th>\n')
@@ -625,7 +624,7 @@ def _profileHistory(req, n=20, buildTypes=None):
     output.append('  </tr>\n')
     # Display the run times
     _handle_renamed_test_suites(run_times)
-    test_suites = run_times.keys()
+    test_suites = list(run_times.keys())
     test_suites.sort()
     for test_suite in test_suites:
         output.append('  <tr><th>%s</th>\n' % test_suite)
@@ -649,10 +648,10 @@ def _profileHistory(req, n=20, buildTypes=None):
                     output.append('    <td></td>\n')
         output.append('  </tr>\n')
     output.append('</table>\n')
-    
+
     # Graphs
     machines = set()
-    for ms in builds.itervalues():
+    for ms in builds.values():
         machines.update(ms)
     gurl = '%s/profileHistoryGraph' % _our_url
     for machine in machines:
@@ -665,14 +664,14 @@ def _profileHistory(req, n=20, buildTypes=None):
                         graph_data.append((r, run_times[test_suite][(r, build_type, machine)][0]))
                     except KeyError:
                         pass
-                graph_data_str = '|'.join(map(lambda p: ','.join(map(str, p)), graph_data))
+                graph_data_str = '|'.join([','.join(map(str, p)) for p in graph_data])
                 img_url = '%s?machine=%s&amp;buildType=%s&amp;testSuite=%s&amp;data=%s' % (gurl, machine, build_type, test_suite, graph_data_str)
                 if len(img_url) > 2048:
                     # Internet Explorer will complain
                     img_url = '%s?machine=%s&amp;buildType=%s&amp;testSuite=%s&amp;n=%d' % (gurl, machine, build_type, test_suite, n)
                 output.append('<h4>%s.%s on %s</h4>\n' % (build_type, test_suite, machine))
                 output.append('<img src="%s" />\n' % img_url)
-    
+
     return ''.join(output)
 
 def _canonical_machine_name(machine):
@@ -688,19 +687,19 @@ def _machine_name_aliases(machine):
 
 def _handle_renamed_test_suites(runTimes, graphs={}):
     """Cope with the test result naming convention change in #2195.
-    
+
     Test suite results files used to be named after just the leaf name of the test file.  They
     now use the full path.  In an attempt to make the history display still useful across this
     change, we change test suite names that have no path info to match one with the same leaf
     name but full path info.
     """
     name_map = {}
-    for suite_name in runTimes.iterkeys():
+    for suite_name in runTimes.keys():
         if '-' in suite_name:
             leaf_name = suite_name[1+suite_name.rfind('-'):]
             if not leaf_name in name_map and (leaf_name in runTimes or leaf_name in graphs):
                 name_map[leaf_name] = suite_name
-    for leaf_name, full_name in name_map.iteritems():
+    for leaf_name, full_name in list(name_map.items()):
         if leaf_name in runTimes:
             runTimes[full_name].update(runTimes[leaf_name])
             del runTimes[leaf_name]
@@ -710,7 +709,7 @@ def _handle_renamed_test_suites(runTimes, graphs={}):
 
 def _test_suite_name_aliases(suiteName):
     """Cope with the test result naming convention change in #2195.
-    
+
     If the given suiteName has path info, return it and its leaf name.  Otherwise just return
     suiteName.
     """
@@ -737,8 +736,8 @@ def profileHistoryGraph(req, buildType, machine, testSuite, data='', n=''):
         run_times.reverse()
     else:
         for item in data.split('|'):
-            run_times.append(map(float, item.split(',')))
-    
+            run_times.append(list(map(float, item.split(','))))
+
     # Draw graph and send to browser
     req.content_type = 'image/png'
     from pychart import theme, axis, area, line_style, line_plot, canvas, category_coord, color
@@ -756,7 +755,7 @@ def profileHistoryGraph(req, buildType, machine, testSuite, data='', n=''):
     c = canvas.init(req, format='png')
     ar.draw(c)
     c.close()
- 
+
 #####################################################################
 ##                    Helper functions.                            ##
 #####################################################################
@@ -802,24 +801,24 @@ def _importCode(code, name, add_to_sys_modules=0):
     name will return this module. If it is not added to sys.modules
     import will try to load it in the normal fashion.
     Code from the Python Cookbook.
-    
+
     import foo
-    
+
     is equivalent to
-    
+
     foofile = open("/path/to/foo.py")
     foo = importCode(foofile,"foo",1)
-    
+
     Returns a newly generated module.
     """
     import sys, imp
-    
+
     module = imp.new_module(name)
-    
-    exec code in module.__dict__
+
+    exec((code), module.__dict__)
     if add_to_sys_modules:
         sys.modules[name] = module
-        
+
     return module
 
 def _getBuildObject(buildTypesModule, buildType):
@@ -846,7 +845,7 @@ def _extractDotSeparatedPair(string):
 
 def _extractTildeSeparatedPair(string):
     """Extract both parts from a string of the form revision~timestamp, where the ~timestamp component is optional.
-    
+
     If no timestamp is present, returns (revision, None).
     """
     i = string.find('~')
@@ -857,7 +856,7 @@ def _extractTildeSeparatedPair(string):
 
 def _getResultsParentDirs(type, revision, timestamp=None):
     """Get the folder(s) holding test results for this test type, revision, and optionally timestamp.
-    
+
     This deals with legacy results where the timestamp information is not included in the path, and
     the new style where we have revision~timestamp folders.
     If timestamp is None, a list of all folders for the given revision will be returned, newest first.
@@ -922,7 +921,7 @@ def _getTestSummary(test_set_dir, build):
 
 def _getBuildTargets(resultsDir):
     """Get the targets that were requested on the build command line, if known.
-    
+
     It parses the info.log file, if present, to obtain them.
     """
     targets = ''
@@ -939,7 +938,6 @@ def _getBuildTargets(resultsDir):
     return targets
 
 
-_sconstruct_traceback_re = re.compile(r'  File ".*SConstruct", line ')
 def _checkBuildFailure(test_set_dir, overall_status, colour):
     """Check whether the build failed, and return a new status if it did."""
     found_semget = False
@@ -949,12 +947,6 @@ def _checkBuildFailure(test_set_dir, overall_status, colour):
         if 'Windows' in test_set_dir:
             return _checkWinBuildFailure(log, overall_status, colour)
         for line in log:
-            if (line.startswith('scons: building terminated because of errors.')
-                or line.strip().endswith('(errors occurred during build).')
-                or _sconstruct_traceback_re.match(line)):
-                overall_status = 'Build failed (check build log for ": ***").  ' + overall_status
-                colour = 'red'
-                break
             if line.startswith('Error validating server certificate') and colour == 'green':
                 overall_status = 'Probably failed svn update.  ' + overall_status
                 colour = 'orange'
@@ -963,8 +955,6 @@ def _checkBuildFailure(test_set_dir, overall_status, colour):
                 if colour == 'green':
                     colour = 'orange'
                 found_semget = True
-            if not found_done_building and line.startswith('scons: done building targets.'):
-                found_done_building = True
         else:
             if not found_done_building:
                 # Something went wrong that we didn't spot
@@ -1014,7 +1004,7 @@ def _getTestStatus(test_set_dir, build, summary=False):
     the overall status, the third is the colour in which to display
     the overall status, the fourth is a dictionary of run times, and the fifth
     is a dictionary of graphical files (used for graphical profiling).
-    
+
     If summary is given as True, don't generate or return the dictionaries.
     """
     if _isWindows(build):
@@ -1040,7 +1030,7 @@ def _getTestStatus(test_set_dir, build, summary=False):
 
     # Check for build failure
     overall_status, colour = _checkBuildFailure(test_set_dir, overall_status, colour)
-    
+
     if summary:
         return overall_status, colour
     else:
@@ -1048,7 +1038,7 @@ def _getTestStatus(test_set_dir, build, summary=False):
 
 def _getWinTestStatus(testSetDir, build, summary=False):
     """Equivalent of _getTestStatus for Windows CMake-based builds.
-    
+
     In CMake setups, we expect only three files in the results folder: info.log, build.log, and a ctest output text file.
     The latter contains all the test results, including the test output for those tests which didn't pass.
     It will be named like: ${TestPack}TestOutputs_${DateTime}.txt{,.tmp}
@@ -1071,7 +1061,7 @@ The following tests FAILED:
           9 - TestExceptionRunner (Failed)
     """
     ctest_results = glob.glob(os.path.join(testSetDir, '*TestOutputs_*.txt*'))
-    # Regular expressions matching the key lines in the output 
+    # Regular expressions matching the key lines in the output
     start_re = re.compile(r'\s+Start\s+\d+: ')
     test_re = re.compile(r'\s*(\d+)/(\d+) Test\s+#\d+: (\S+) \.*\s*(Passed|\*\*\*\D+)\s*([0-9.]+) sec')
     summary_re = re.compile(r'\d+% tests passed, (\d+) tests failed out of (\d+)')
@@ -1122,7 +1112,7 @@ def _overallStatus(statuses, build):
     total = len(statuses)
     failed, warnings = 0, 0
     components = set()
-    for testsuite, status in statuses.iteritems():
+    for testsuite, status in list(statuses.items()):
         colour = _statusColour(status, build)
         if colour == 'red':
             failed += 1
@@ -1172,26 +1162,25 @@ def _statusColour(status, build):
 # Regexprs and state strings for _parseBuildTimings
 #Command execution time: heart/build/debug/src/io/ChasteParameters_3_3.hpp: 0.737745 seconds
 _time_re = re.compile(r"Command execution time:(?: ([^:]+):)? ([0-9.]+) seconds")
-_states = ['Other', 'Compile', 'Object dependency analysis', 'CxxTest generation', 'PyCml execution', 'Test running']
-# For older scons versions we need to parse the line before a timing output to determine what happened.
+_states = ['Other', 'Compile', 'Object dependency analysis', 'CxxTest generation', 'chaste_codegen execution', 'Test running']
 # Note that the order must match the _states list, except that we skip the 'Other' state.
-_state_res = map(re.compile,
+_state_res = list(map(re.compile,
                  [r"[^ ]*mpicxx ",
                   r"BuildTest\(\[",
                   r"cxxtest/cxxtestgen.py",
-                  r"RunPyCml\(\[",
-                  r"(r|R)unning '(.*/build/.*/Test.*Runner|python/test/.*\.py)'"])
-# For newer scons versions the timing line includes the target that was created, so we parse that instead
+                  r"RunCodegen\(\[",
+                  r"(r|R)unning '(.*/build/.*/Test.*Runner|python/test/.*\.py)'"]))
+
 _target_state_map = [lambda t, ext: ext in ['.so', '.o', '.os'] or t.endswith('Runner'), # Compile
                      lambda t, ext: ext == '.dummy',                                     # Obj dep analysis
                      lambda t, ext: t.endswith('Runner.cpp'),                            # CxxTest
-                     lambda t, ext: ext in ['.hpp', '.cpp'] and 'cellml' in t,           # PyCml
+                     lambda t, ext: ext in ['.hpp', '.cpp'] and 'cellml' in t,           # chaste_codegen
                      lambda t, ext: ext == '.log'                                        # Test running
                      ]
 
 def _parseBuildTimings(logfilepath):
     """Parse a build log file to determine timings.
-    
+
     Returns a dictionary mapping activity to time (in seconds).
     """
     times = [0] * len(_states)
@@ -1223,7 +1212,7 @@ def _parseBuildTimings(logfilepath):
                         break
         logfile.close()
 
-        result = dict(zip(_states, times))
+        result = dict(list(zip(_states, times)))
     except IOError:
         result = dict.fromkeys(_states, -1.0)
     result['Total'] = sum(times)
@@ -1235,7 +1224,7 @@ def _parseWinBuildTimings(logfile):
            'Test running': re.compile(r'.*?\.+.*?([0-9.]+) sec')}
     times = dict([(k, 0.0) for k in res])
     for line in logfile:
-        for key, regexp in res.iteritems():
+        for key, regexp in list(res.items()):
             m = regexp.match(line)
             if m:
                 multiplier = 1
@@ -1249,7 +1238,7 @@ def _parseWinBuildTimings(logfile):
 
 def _getCcFlags(build):
     """A wrapper for BuildType.CcFlags that copes with ValueError being raised.
-    
+
     This happens with the GccOptNative build type, since the compile flags are machine-specific.
     """
     try:
@@ -1264,7 +1253,7 @@ def _getCcFlags(build):
 
 def _buildLinkQuery(**parameters):
     """Build the query string for a hyperlink using the given key-value parameters."""
-    return '&amp;'.join('%s=%s' % pair for pair in sorted(parameters.iteritems()))
+    return '&amp;'.join('%s=%s' % pair for pair in sorted(parameters.items()))
 
 def _linkRecent(text, type, start, **filters):
     """Return a link tag to the recent tests page, starting at the given position."""
@@ -1404,8 +1393,8 @@ if __name__ == '__main__':
     _standalone = True
     import sys, BuildTypes, socket
     if len(sys.argv) < 2:
-        print "Syntax error."
-        print "Usage:",sys.argv[0],"<test output dir> [<build type>]"
+        print("Syntax error.")
+        print(("Usage: %s <test output dir> [<build type>]" % sys.argv[0]))
         sys.exit(1)
     _dir = sys.argv[1]
     if len(sys.argv) > 2:
@@ -1421,15 +1410,15 @@ if __name__ == '__main__':
     _trac_url = 'https://chaste.cs.ox.ac.uk/trac/'
     _our_url = 'https://chaste.cs.ox.ac.uk/tests.py'
 
-    _fp = file(os.path.join(_dir, 'index.html'), 'w')
+    _fp = open(os.path.join(_dir, 'index.html'), 'w')
 
-    print >>_fp,_header('Test Summary For Local ' + _build_type + ' Build')
-    print >>_fp,'<h1>Test Summary For Local Build</h1>'
-    print >>_fp,'<p>Displaying info for tests with output stored in',_dir,'</p>'
-    print >>_fp,_summary(None, 'standalone', 'working copy', _machine, _build_type)
-    print >>_fp,_footer()
+    _fp.write(_header('Test Summary For Local ' + _build_type + ' Build'))
+    _fp.write('<h1>Test Summary For Local Build</h1>')
+    _fp.write('<p>Displaying info for tests with output stored in '+_dir+'</p>')
+    _fp.write(_summary(None, 'standalone', 'working copy', _machine, _build_type))
+    _fp.write(_footer())
     _fp.close()
 
-    print "Test summary generated in", 'file://' + os.path.abspath(os.path.join(_dir, 'index.html'))
-    print "Overall test status:", _overall_status
+    print(("Test summary generated in file://%s" % os.path.abspath(os.path.join(_dir, 'index.html'))))
+    print(("Overall test status: %s" % _overall_status))
 

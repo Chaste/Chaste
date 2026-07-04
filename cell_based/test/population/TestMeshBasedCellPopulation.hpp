@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,6 +81,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeVelocityWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 
+// Cell Populaton Event Write
+#include "CellDivisionLocationsWriter.hpp"
+
 #include "PetscSetupAndFinalize.hpp"
 
 class TestMeshBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -141,7 +144,7 @@ private:
 public:
 
     // Test construction, accessors and Iterator
-    void TestSmallMeshBasedCellPopulation1d2d3d() throw(Exception)
+    void TestSmallMeshBasedCellPopulation1d2d3d()
     {
         TestSmallMeshBasedCellPopulation<1,1>("mesh/test/data/1D_0_to_1_10_elements");
         TestSmallMeshBasedCellPopulation<2,2>("mesh/test/data/square_4_elements");
@@ -149,14 +152,14 @@ public:
     }
 
     // Test construction, accessors and Iterator
-    void TestSmallMeshBasedCellPopulation2dIn3d() throw(Exception)
+    void TestSmallMeshBasedCellPopulation2dIn3d()
     {
         TestSmallMeshBasedCellPopulation<2,3>("cell_based/test/data/Simple2dMeshIn3d/Simple2dMeshIn3d");
         TestSmallMeshBasedCellPopulation<2,3>("mesh/test/data/disk_in_3d");
     }
 
     // Test get centroid
-    void TestGetCentroidOfCellPopulation() throw(Exception)
+    void TestGetCentroidOfCellPopulation()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -164,7 +167,7 @@ public:
         unsigned num_cells_depth = 2;
         unsigned num_cells_width = 2;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells, one for each node.
         std::vector<CellPtr> cells;
@@ -262,7 +265,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -327,7 +330,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells, one for each node. Give each a birth time of -node_index,
         // so the age = node_index
@@ -843,15 +846,28 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-2-2");
 
         // Test set/get methods
-        TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), false);
+        TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), false); //Default
+        TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), false); //Default
+        TS_ASSERT_EQUALS(cell_population.GetScaleBoundByEdgeLength(), false); //Default
+        TS_ASSERT_EQUALS(cell_population.GetBoundedVoroniTesselationLengthCutoff(), DBL_MAX); //Default
+        TS_ASSERT_EQUALS(cell_population.GetOffsetNewBoundaryNodes(), false); //Default
 
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
-        cell_population.SetOutputMeshInVtk(true);
+        cell_population.SetBoundVoronoiTessellation(true);
+        cell_population.SetScaleBoundByEdgeLength(true);
+        cell_population.SetBoundedVoroniTesselationLengthCutoff(1.0);
+        cell_population.SetOffsetNewBoundaryNodes(true);
 
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
-        TS_ASSERT_EQUALS(cell_population.GetOutputMeshInVtk(), true);
+        TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), true);
+        TS_ASSERT_EQUALS(cell_population.GetScaleBoundByEdgeLength(), true);
+        TS_ASSERT_EQUALS(cell_population.GetBoundedVoroniTesselationLengthCutoff(), 1.0);
+        TS_ASSERT_EQUALS(cell_population.GetOffsetNewBoundaryNodes(), true);
+
+        // All presaved data uses infinite VT
+        cell_population.SetBoundVoronoiTessellation(false);
 
         // Coverage of writing CellData to VTK
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -947,18 +963,18 @@ public:
         // Test that VTK writer has produced some files
 
         // Initial condition files
-        FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_file.Exists());
+        FileFinder vtk_file1(results_dir + "voronoi_results_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file1.Exists());
 
-        FileFinder vtk_mesh_file(results_dir + "mesh_0.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_mesh_file.Exists());
-
-        // Final files
-        FileFinder vtk_file2(results_dir + "results_1.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "mesh_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 
-        FileFinder vtk_mesh_file2(results_dir + "mesh_1.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_mesh_file2.Exists());
+        // Final files
+        FileFinder vtk_file3(results_dir + "voronoi_results_1.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file3.Exists());
+
+        FileFinder vtk_file4(results_dir + "mesh_results_1.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file4.Exists());
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
@@ -1032,7 +1048,6 @@ public:
 
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
-        cell_population.SetOutputMeshInVtk(true);
 
         // Test set methods
         cell_population.SetOutputResultsForChasteVisualizer(true);
@@ -1041,6 +1056,11 @@ public:
         MAKE_PTR(MutWriter, p_count_writer);
         p_count_writer->SetFileName("new_cellmutationstates.dat");
         cell_population.AddCellPopulationCountWriter(p_count_writer);
+
+        typedef CellDivisionLocationsWriter<2, 2> DivWriter;
+        MAKE_PTR(DivWriter, p_event_writer);
+        p_event_writer->SetFileName("new_divisions.dat");
+        cell_population.AddCellPopulationEventWriter(p_event_writer);
 
         typedef CellAgesWriter<2, 2> AgWriter;
         MAKE_PTR(AgWriter, p_ages_writer);
@@ -1076,29 +1096,30 @@ public:
         FileComparison(results_dir + "new_voronoi.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/voronoi.dat").CompareFiles();
         FileComparison(results_dir + "new_cellmutationstates.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/cellmutationstates.dat").CompareFiles();
         FileComparison(results_dir + "new_cellages.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/cellages.dat").CompareFiles();
+        FileComparison(results_dir + "new_divisions.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/divisions.dat").CompareFiles();
 
 #ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
 
         // Initial condition files
-        FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
-        FileFinder vtk_mesh_file(results_dir + "mesh_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_mesh_file(results_dir + "mesh_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_mesh_file.Exists());
 
         // Final files
-        FileFinder vtk_file2(results_dir + "results_1.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "voronoi_results_1.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 
-        FileFinder vtk_mesh_file2(results_dir + "mesh_1.vtu", RelativeTo::Absolute);
+        FileFinder vtk_mesh_file2(results_dir + "mesh_results_1.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_mesh_file2.Exists());
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
 
         // Read VTK file and check it doesn't cause any problems
-        VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
+        VtkMeshReader<2,2> vtk_reader(results_dir + "/mesh_results_0.vtu");
 
         std::vector<double> ages_data;
         vtk_reader.GetPointData("New Ages", ages_data);
@@ -1108,7 +1129,7 @@ public:
         TS_ASSERT_DELTA(ages_data[2], 2.0, 1e-9);
         TS_ASSERT_DELTA(ages_data[3], 3.0, 1e-9);
         TS_ASSERT_DELTA(ages_data[4], 4.0, 1e-9);
- #endif //CHASTE_VTK
+#endif //CHASTE_VTK
     }
 
     void TestCellPopulationWritersIn3d()
@@ -1214,7 +1235,7 @@ public:
         }
     }
 
-    void TestGetLocationOfCellCentreAndGetNodeCorrespondingToCellAndGetWidth() throw (Exception)
+    void TestGetLocationOfCellCentreAndGetNodeCorrespondingToCellAndGetWidth()
     {
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -1296,7 +1317,7 @@ public:
     }
 
     // This test checks that the cells and nodes are correctly archived.
-    void TestArchivingMeshBasedCellPopulation() throw (Exception)
+    void TestArchivingMeshBasedCellPopulation()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "mesh_based_cell_population.arch";
@@ -1477,7 +1498,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.IsMarkedSpring(cell_pair_1_2), false);
     }
 
-    void TestSettingCellAncestors() throw (Exception)
+    void TestSettingCellAncestors()
     {
         // Create a small mesh-based cell population
         std::vector<Node<2>*> nodes;
@@ -1526,13 +1547,13 @@ public:
         TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
     }
 
-    void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
+    void TestIsCellAssociatedWithADeletedLocation()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(4, 4, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1561,12 +1582,12 @@ public:
         }
     }
 
-    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    void TestGetTetrahedralMeshForPdeModifier()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         HoneycombMeshGenerator generator(2, 2);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1587,6 +1608,41 @@ public:
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(1)->rGetLocation()[1], 0.0, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[1], 0.5*sqrt(3.0), 1e-6);
+    }
+
+    void TestGetNodePairs()
+    {
+        // Create a simple mesh
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Set up cells, one for each node. Give each a birth time of -node_index,
+        // so the age = node_index
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create cell population
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+
+        const auto& r_node_pairs = cell_population.rGetNodePairs();
+        TS_ASSERT_EQUALS(r_node_pairs.size(), 8ul);
+
+        auto vec_idx = 0ul;
+        for (auto spring_it = cell_population.SpringsBegin(); spring_it != cell_population.SpringsEnd(); ++spring_it)
+        {
+            const unsigned spring_it_node_a_idx = spring_it.GetNodeA()->GetIndex();
+            const unsigned spring_it_node_b_idx = spring_it.GetNodeB()->GetIndex();
+
+            const unsigned vec_node_a_idx = r_node_pairs[vec_idx].first->GetIndex();
+            const unsigned vec_node_b_idx = r_node_pairs[vec_idx].second->GetIndex();
+
+            TS_ASSERT_EQUALS(spring_it_node_a_idx, vec_node_a_idx);
+            TS_ASSERT_EQUALS(spring_it_node_b_idx, vec_node_b_idx);
+
+            vec_idx++;
+        }
     }
 };
 

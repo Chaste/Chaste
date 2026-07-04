@@ -6,7 +6,7 @@ Copyright (C) Fujitsu Laboratories of Europe, 2009
 
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #ifdef CHASTE_VTK
+
+#include <vtkCellTypes.h>
 
 #include "VtkMeshReader.hpp"
 #include "Exception.hpp"
@@ -101,11 +103,16 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         mVtkCellType = VTK_LINE;
     }
 
-    //Determine if we have multiple cell types - such as cable elements in addition to tets/triangles
+#if (VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION >= 2)
+    const auto num_distinct_cell_types = static_cast<unsigned>(mpVtkUnstructuredGrid->GetDistinctCellTypesArray()->GetNumberOfTuples());
+#else  // VTK older than 9.2
     vtkCellTypes* cell_types = vtkCellTypes::New();
     mpVtkUnstructuredGrid->GetCellTypes(cell_types);
+    const auto num_distinct_cell_types = static_cast<unsigned>(cell_types->GetNumberOfTypes());
+    cell_types->Delete();
+#endif
 
-    if (cell_types->GetNumberOfTypes() > 1)
+    if (num_distinct_cell_types > 1u)
     {
         mNumCableElementAttributes = 1;
         for (unsigned cell_id = 0; cell_id < num_cells; ++cell_id)
@@ -131,9 +138,6 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         mNumElements = num_cells;
     }
 
-    cell_types->Delete();
-
-
     // Extract the surface faces
     if (ELEMENT_DIM == 2u)
     {
@@ -157,6 +161,11 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         mpVtkGeometryFilter->SetInputData(mpVtkUnstructuredGrid);
 #else
         mpVtkGeometryFilter->SetInput(mpVtkUnstructuredGrid);
+#endif
+
+#if (VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION >= 1)
+        // Change to indexing in vtkGeometryFilter happened in VTK 9.1
+        mpVtkGeometryFilter->SetPassThroughPointIds(1);
 #endif
         mpVtkGeometryFilter->Update();
 
@@ -372,16 +381,25 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
     }
 
     ElementData next_face_data;
-
     if (ELEMENT_DIM == 3u)
     {
+#if (VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION >= 1)
+        // Change to indexing in vtkGeometryFilter happened in VTK 9.1
+        vtkDataArray *original_ids = mpVtkGeometryFilter->GetOutput()->GetPointData()->GetArray("vtkOriginalPointIds");
+#endif
         while (mpVtkGeometryFilter->GetOutput()->GetCellType(mBoundaryFacesRead + mBoundaryFacesSkipped) == VTK_LINE)
         {
             mBoundaryFacesSkipped++;
         }
         for (unsigned i = 0; i < (mNodesPerElement-1); i++)
         {
-            next_face_data.NodeIndices.push_back(mpVtkGeometryFilter->GetOutput()->GetCell(mBoundaryFacesRead + mBoundaryFacesSkipped)->GetPointId(i));
+            unsigned id = mpVtkGeometryFilter->GetOutput()->GetCell(mBoundaryFacesRead + mBoundaryFacesSkipped)->GetPointId(i);
+#if (VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION >= 1)
+            // Change to indexing in vtkGeometryFilter happened in VTK 9.1
+            next_face_data.NodeIndices.push_back(original_ids->GetTuple1(id));
+#else
+            next_face_data.NodeIndices.push_back(id);
+#endif
         }
     }
     else if (ELEMENT_DIM == 2u)

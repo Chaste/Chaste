@@ -20,14 +20,16 @@ If you publish results based on this computation please cite the following:
   Publisher = {Birkh{\"{a}}user Press},
   Year = {1997}
 }
-@article{mirams2013chaste,
-  author    = {Mirams, G.R. and Arthurs, C.J. and Bernabeu, M.O. and Bordas, R. and Cooper, J. and Corrias, A. and Davit, Y. and Dunn, S-J. and Fletcher, A.G. and Harvey, D.G. and Marsh, M.E. and Osborne, J.M. and Pathmanathan, P. and Pitt-Francis, J. and Southern, J. and Zemzemi, N. and Gavaghan, D.J.},
-  title     = {Chaste: an open source C++ library for computational physiology and biology},
-  journal   = {PLoS computational biology},
-  volume    = {9},
-  number    = {3},
-  pages     = {e1002970},
-  year      = {2013},
-  publisher = {Public Library of Science}
+@article{Cooper2020Chaste,
+  doi = {10.21105/joss.01848},
+  url = {https://doi.org/10.21105/joss.01848},
+  year = {2020},
+  publisher = {The Open Journal},
+  volume = {5},
+  number = {47},
+  pages = {1848},
+  author = {Fergus R. Cooper and Ruth E. Baker and Miguel O. Bernabeu and Rafel Bordas and Louise Bowler and Alfonso Bueno-Orovio and Helen M. Byrne and Valentina Carapella and Louie Cardone-Noott and Jonathan Cooper and Sara Dutta and Benjamin D. Evans and Alexander G. Fletcher and James A. Grogan and Wenxian Guo and Daniel G. Harvey and Maurice Hendrix and David Kay and Jochen Kursawe and Philip K. Maini and Beth McMillan and Gary R. Mirams and James M. Osborne and Pras Pathmanathan and Joe M. Pitt-Francis and Martin Robinson and Blanca Rodriguez and Raymond J. Spiteri and David J. Gavaghan},
+  title = {Chaste: Cancer, Heart and Soft Tissue Environment},
+  journal = {Journal of Open Source Software}
 }
 ===========================================================================

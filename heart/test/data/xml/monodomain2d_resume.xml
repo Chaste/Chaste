@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0">
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1">
 
 	<ResumeSimulation>
-        <ArchiveDirectory>SaveMono2D_checkpoints/0.1ms/SaveMono2D_0.1ms</ArchiveDirectory>
+        <ArchiveDirectory relative_to="chaste_test_output">SaveMono2D_checkpoints/0.1ms/SaveMono2D_0.1ms</ArchiveDirectory>
         <SpaceDimension>2</SpaceDimension>
 	    <SimulationDuration unit="ms">0.2</SimulationDuration>
 	    <Domain>Mono</Domain>
@@ -11,6 +11,6 @@
 	
 	<!-- These elements must exist, but their contents are ignored -->
 	<Physiological/>
-	<Numerical/>		
-		    
+	<Numerical/>
+
 </ChasteParameters>

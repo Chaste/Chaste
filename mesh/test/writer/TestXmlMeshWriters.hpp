@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,11 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _TESTXMLMESHWRITERS_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include "UblasCustomFunctions.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "OutputFileHandler.hpp"
 #include "TetrahedralMesh.hpp"
 #include "VtkMeshWriter.hpp"
+#include "VtkDeformedMeshWriter.hpp"
 #include "XdmfMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "MixedDimensionMesh.hpp"
@@ -59,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestXmlMeshWriters : public CxxTest::TestSuite
 {
 public:
-    void TestBasicVtkMeshWriter() throw(Exception)
+    void TestBasicVtkMeshWriter()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -94,7 +96,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestSequentialMeshCannotWriteParallelFiles() throw(Exception)
+    void TestSequentialMeshCannotWriteParallelFiles()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -112,7 +114,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestParallelVtkMeshWriter() throw(Exception)
+    void TestParallelVtkMeshWriter()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -242,7 +244,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestParallelVtkMeshWriter2d() throw(Exception)
+    void TestParallelVtkMeshWriter2d()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -307,7 +309,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVtkMeshWriter2D() throw(Exception)
+    void TestVtkMeshWriter2D()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -359,7 +361,9 @@ public:
             mesh.GetElement(i)->CalculateJacobian(element_jacobian, element_jacobian_determinant);
             jacobian.push_back(element_jacobian);
 
-            c_matrix<double, 2, 2> squared_element_jacobian = prod(element_jacobian, element_jacobian);
+            c_matrix<double, 2, 2> squared_element_jacobian;
+            squared_element_jacobian = prod(element_jacobian, element_jacobian);
+
             c_vector<double, 3> tri_squared_element_jacobian;
             //We store [T00 T01 T02 T11 T12 T22]
             tri_squared_element_jacobian(0) = squared_element_jacobian(0, 0);
@@ -430,7 +434,140 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestParallelVtkMeshWriter1d() throw(Exception)
+    void TestDeformedVtkMeshWriter2D()
+    {
+#ifdef CHASTE_VTK
+// Requires  "sudo aptitude install libvtk5-dev" or similar
+        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(reader);
+
+        std::string base_name = "2Dmesh";
+        //First, we test "standard functionality" with an undeformed mesh
+        VtkDeformedMeshWriter<2> writer(&mesh,"TestDeformedVtkMeshWriter", base_name, true);
+
+        // Add distance from origin into the node "point" data
+        std::vector<double> distance;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            distance.push_back(norm_2(mesh.GetNode(i)->rGetLocation()));
+        }
+        writer.AddPointData("Distance from origin", distance);
+
+
+        // Add element quality into the element "cell" data
+        std::vector<double> quality;
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            quality.push_back(mesh.GetElement(i)->CalculateQuality());
+        }
+        writer.AddCellData("Quality", quality);
+
+        writer.WriteDeformedFiles();
+
+        {
+            // Check that the reader can see it
+            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestDeformedVtkMeshWriter/"+base_name+".vtu");
+            TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
+
+            // Check that it has the correct data
+            std::vector<double> distance_read;
+            vtk_reader.GetPointData("Distance from origin", distance_read);
+            for (unsigned i=0; i<distance_read.size(); i++)
+            {
+                TS_ASSERT_EQUALS(distance[i], distance_read[i]);
+            }
+
+            std::vector<double> quality_read;
+            vtk_reader.GetCellData("Quality", quality_read);
+            for (unsigned i=0; i<quality_read.size(); i++)
+            {
+                TS_ASSERT_EQUALS(quality[i], quality_read[i]);
+            }
+        }
+
+        //Next, we apply a deformation
+        std::vector<c_vector<double,2> > deformed_positions;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            deformed_positions.push_back(mesh.GetNode(i)->rGetLocation());
+        }
+        //We change the location of the first node -> deformed to -1, -0.5
+        deformed_positions[0] = Create_c_vector(-1.0,-0.5);
+        writer.ApplyDeformation(deformed_positions);
+        writer.SetOutputBaseFileName(base_name+"_1");//do not overwrite the previous file
+        //Write already called. No need to write cells any longer
+        //without the line below, the test fails as the cells accummulate (VTK error and assertion trip)
+        writer.SetWriteMeshCells(false);
+
+        // Add some different data on the deformed mesh
+        std::vector<double> distance_2;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            distance_2.push_back(norm_2(mesh.GetNode(i)->rGetLocation())+1.0);//adding +1.0 to make it different
+        }
+        writer.AddPointData("Distance from origin", distance_2);
+
+        // Add element quality into the element "cell" data, but different from the previous file
+        std::vector<double> quality_2;
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            quality_2.push_back(mesh.GetElement(i)->CalculateQuality()+1.0);//adding +1.0 to make it different
+        }
+        writer.AddCellData("Quality", quality_2);
+
+        writer.WriteDeformedFiles();
+
+        PetscTools::Barrier("Wait for files to be written");
+
+        {
+            // Check that the reader can see it
+            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestDeformedVtkMeshWriter/"+base_name+"_1.vtu");
+            TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
+
+            //check the deformed node (the first)...
+            std::vector<double> first_node = vtk_reader.GetNextNode();
+            TS_ASSERT_EQUALS(first_node.size(),3);//the GetNextNode always fills up 3 coordinates regardless of SPACE_DIM (not sure why)
+            TS_ASSERT_DELTA(first_node[0],-1.0,1e-9);//node was moved to -1,-0.5
+            TS_ASSERT_DELTA(first_node[1],-0.5,1e-9);//node was moved to -1,-0.5
+
+            //...others untouched, start the loop at 1
+            for (unsigned i = 1u; i < mesh.GetNumNodes(); ++i)
+            {
+                std::vector<double> next_node = vtk_reader.GetNextNode();
+                TS_ASSERT_EQUALS(next_node.size(),3);//the GetNextNode always fills up 3 coordinates regardless of SPACE_DIM (not sure why)
+                TS_ASSERT_DELTA(next_node[0],mesh.GetNode(i)->rGetLocation()[0],1e-9);
+                TS_ASSERT_DELTA(next_node[1],mesh.GetNode(i)->rGetLocation()[1],1e-9);
+            }
+
+            // Check that it has the correct data
+            std::vector<double> distance_read;
+            vtk_reader.GetPointData("Distance from origin", distance_read);
+            for (unsigned i=0; i<distance_read.size(); i++)
+            {
+                TS_ASSERT_EQUALS(distance_2[i], distance_read[i]);
+            }
+
+            std::vector<double> quality_read;
+            vtk_reader.GetCellData("Quality", quality_read);
+            for (unsigned i=0; i<quality_read.size(); i++)
+            {
+                TS_ASSERT_EQUALS(quality_2[i], quality_read[i]);
+            }
+        }
+        //coverage. Try apply a deformed vector with wrong size (empty in tis case)
+        std::vector<c_vector<double,2> > empty = {};
+        TS_ASSERT_THROWS_THIS(writer.ApplyDeformation(empty),
+        "Deformed positions vector has 0 elements. The mesh has 121 nodes. The two must be the same.");
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_VTK
+    }
+
+    void TestParallelVtkMeshWriter1d()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -494,7 +631,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVtkMeshWriter1D() throw(Exception)
+    void TestVtkMeshWriter1D()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -525,7 +662,7 @@ public:
     }
 
 
-    void TestVtkMeshWriterWithData() throw(Exception)
+    void TestVtkMeshWriterWithData()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -637,7 +774,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVtkMeshWriterForCables() throw(Exception)
+    void TestVtkMeshWriterForCables()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -678,7 +815,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVtkMeshWriterForQuadraticMesh2D() throw(Exception)
+    void TestVtkMeshWriterForQuadraticMesh2D()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -767,7 +904,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestBasicQuadraticVtkMeshWriter() throw(Exception)
+    void TestBasicQuadraticVtkMeshWriter()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -798,7 +935,7 @@ public:
     }
 
     //Test that the vtk mesh writer can output a 1D mesh embedded in 3D space
-    void TestVtkMeshWriter1Din3D() throw(Exception)
+    void TestVtkMeshWriter1Din3D()
     {
 #ifdef CHASTE_VTK
         TrianglesMeshReader<1,3> reader("mesh/test/data/branched_1d_in_3d_mesh");
@@ -827,7 +964,7 @@ public:
     }
 
     //Test that the vtk mesh writer can output a 2D mesh embedded in 3D space
-    void TestVtkMeshWriterWithSurfaceMesh() throw(Exception)
+    void TestVtkMeshWriterWithSurfaceMesh()
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<2,3> mesh_reader("mesh/test/data/cylinder.vtu");
@@ -931,7 +1068,7 @@ public:
     {
 #ifndef _MSC_VER
         TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
         XdmfMeshWriter<3,3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_dist", false);

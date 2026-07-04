@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -380,13 +380,13 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Abstract
     : mrQuadMesh(rQuadMesh),
       mrProblemDefinition(rProblemDefinition),
       mOutputDirectory(outputDirectory),
-      mpOutputFileHandler(NULL),
-      mpQuadratureRule(NULL),
-      mpBoundaryQuadratureRule(NULL),
+      mpOutputFileHandler(nullptr),
+      mpQuadratureRule(nullptr),
+      mpBoundaryQuadratureRule(nullptr),
       mCompressibilityType(compressibilityType),
-      mResidualVector(NULL),
-      mSystemLhsMatrix(NULL),
-      mPreconditionMatrix(NULL)
+      mResidualVector(nullptr),
+      mSystemLhsMatrix(nullptr),
+      mPreconditionMatrix(nullptr)
 {
     assert(DIM==2 || DIM==3);
 
@@ -394,7 +394,7 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Abstract
     QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(&rQuadMesh);
     DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(&rQuadMesh);
 
-    if ((p_quad_mesh == NULL) && (p_distributed_quad_mesh == NULL))
+    if ((p_quad_mesh == nullptr) && (p_distributed_quad_mesh == nullptr))
     {
         EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
     }
@@ -500,37 +500,36 @@ template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int counterToAppend)
 {
     // Only write output if the flag mWriteOutput has been set
-    if (!mWriteOutput)
+    if (mWriteOutput)
     {
-        return;
-    }
-
-    if (PetscTools::AmMaster())
-    {
-        std::stringstream file_name;
-
-        file_name << "pressure";
-        if (counterToAppend >= 0)
+        // Only the master writes
+        if (PetscTools::AmMaster() && mWriteOutput)
         {
-            file_name << "_" << counterToAppend;
-        }
-        file_name << ".txt";
+            std::stringstream file_name;
 
-        out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
-
-        std::vector<double>& r_pressure = rGetPressures();
-        for (unsigned i=0; i<r_pressure.size(); i++)
-        {
-            for (unsigned j=0; j<DIM; j++)
+            file_name << "pressure";
+            if (counterToAppend >= 0)
             {
-                *p_file << mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
+                file_name << "_" << counterToAppend;
             }
+            file_name << ".txt";
 
-            *p_file << r_pressure[i] << "\n";
+            out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
+
+            std::vector<double> &r_pressure = rGetPressures();
+            for (unsigned i = 0; i < r_pressure.size(); i++)
+            {
+                for (unsigned j = 0; j < DIM; j++)
+                {
+                    *p_file << mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
+                }
+
+                *p_file << r_pressure[i] << "\n";
+            }
+            p_file->close();
         }
-        p_file->close();
+        PetscTools::Barrier("WritePressure");
     }
-    PetscTools::Barrier("WritePressure");
 }
 
 template<unsigned DIM>
@@ -680,7 +679,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
 
     if (applySymmetrically)
     {
-        if (mDirichletBoundaryConditionsVector == NULL)
+        if (mDirichletBoundaryConditionsVector == nullptr)
         {
             VecDuplicate(mResidualVector, &mDirichletBoundaryConditionsVector);
         }
@@ -751,6 +750,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
             // E.g. for a boundary node at the zeroth node (x_0 = value), this is equal to
             //   -value*[0 a_21 a_31 .. a_N1]
             // and will be added to the RHS.
+            PetscVecTools::Finalise(matrix_col); //PETSc 3.19 doesn't like mixing "set" mode (above) with "add" mode
             PetscVecTools::AddScaledVector(mDirichletBoundaryConditionsVector, matrix_col, minus_value);
             PetscTools::Destroy(matrix_col);
         }
@@ -767,6 +767,8 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
             PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(mPreconditionMatrix, rows, 1.0);
 
             // Apply the RHS boundary conditions modification if required.
+            // (AddScaledVector now needs assembly to be finalised.)
+            PetscVecTools::Finalise(mLinearSystemRhsVector);
             PetscVecTools::AddScaledVector(mLinearSystemRhsVector, mDirichletBoundaryConditionsVector, 1.0);
         }
         else
@@ -837,7 +839,7 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
     VecDuplicate(mResidualVector, &mLinearSystemRhsVector);
     // the one is only allocated if it will be needed (in ApplyDirichletBoundaryConditions),
     // depending on whether the matrix is kept symmetric.
-    mDirichletBoundaryConditionsVector = NULL;
+    mDirichletBoundaryConditionsVector = nullptr;
     PetscTools::Destroy(template_vec);
 
     ///////////////////////////

@@ -1,0 +1,7 @@
+			<SpringConstant>1.23</SpringConstant>
+			<RestLength>2.34</RestLength>
+			<LaminaSpringConstMult>3.45</LaminaSpringConstMult>
+			<LaminaRestLengthMult>4.56</LaminaRestLengthMult>
+			<AdditiveNormalNoise>1</AdditiveNormalNoise>
+			<NormalNoiseMean>5.67</NormalNoiseMean>
+			<NormalNoiseStdDev>6.78</NormalNoiseStdDev>

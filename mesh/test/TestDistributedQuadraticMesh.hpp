@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestDistributedQuadraticMesh : public CxxTest::TestSuite
 {
 public:
-    void TestDumbMeshPartitioning() throw (Exception)
+    void TestDumbMeshPartitioning()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
         QuadraticMesh<2> mesh;
@@ -97,7 +97,7 @@ public:
         }
     }
 
-    void TestPetscMatrixPartitioning() throw (Exception)
+    void TestPetscMatrixPartitioning()
     {
         EXIT_IF_SEQUENTIAL //Doesn't make sense to try and partition in sequential
 
@@ -114,7 +114,8 @@ public:
         //QuadraticMesh<2> mesh0(0.01,1.0,1.0);
         //TrianglesMeshWriter<2,2> writer("", "quad_mesh");
         //writer.WriteFilesUsingMesh(mesh0);
-        //TrianglesMeshReader<2,2> mesh_reader("../../../../tmp/rafb/testoutput/quad_mesh",2,1,false);
+        //std::string results_path = OutputFileHandler::GetChasteTestOutputDirectory() + "quad_mesh";
+        //TrianglesMeshReader<2,2> mesh_reader(results_path,2,1,false);
 
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
 
@@ -191,7 +192,7 @@ public:
     }
 
 
-    void TestConstructFromMeshReader2D() throw (Exception)
+    void TestConstructFromMeshReader2D()
     {
         /*
          * Note that these mesh files have
@@ -295,7 +296,7 @@ public:
             }
         }
     }
-    void TestConstructFromMeshReader2DWithPetscSupport() throw (Exception)
+    void TestConstructFromMeshReader2DWithPetscSupport()
     {
         EXIT_IF_SEQUENTIAL;
         if (!PetscTools::HasParMetis())
@@ -322,7 +323,7 @@ public:
         }
     }
 
-    void TestConstructFromMeshReader3DElementHintsInFile() throw (Exception)
+    void TestConstructFromMeshReader3DElementHintsInFile()
     {
         /*
          * Note that these mesh files have
@@ -353,7 +354,7 @@ public:
         }
     }
 
-    void TestConstructFromMeshReader3DFullyQuadratic() throw(Exception)
+    void TestConstructFromMeshReader3DFullyQuadratic()
     {
         // Read in the same quadratic mesh with /quadratic/ boundary elements
         DistributedQuadraticMesh<3> mesh; // PARMETIS_LIBRARY
@@ -376,7 +377,7 @@ public:
         TS_ASSERT_EQUALS(p_face->GetNumNodes(), 6u);
     }
 
-    void TestConstructFromLinearMeshReaderException() throw(Exception)
+    void TestConstructFromLinearMeshReaderException()
     {
         // Read in the same quadratic mesh with /quadratic/ boundary elements
         DistributedQuadraticMesh<3> mesh; // PARMETIS_LIBRARY
@@ -386,7 +387,7 @@ public:
 
     }
 
-    void TestArchiveOfReadMesh() throw(Exception)
+    void TestArchiveOfReadMesh()
     {
         FileFinder archive_dir("distributed_quadratic_mesh_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "distributed_rectangle.arch";

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,8 +66,19 @@ public:
         nodes.push_back(new Node<3>(6, false, 0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
+        // For coverage, give an attribute to one of the nodes
+        nodes[0]->AddNodeAttribute(9.81);
+
         NodesOnlyMesh<3> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        if (PetscTools::IsSequential())
+        {
+            // Check that node 0 has the correct attribute
+            TS_ASSERT_EQUALS(mesh.GetNode(0)->HasNodeAttributes(), true);
+            TS_ASSERT_EQUALS(mesh.GetNode(0)->rGetNodeAttributes().size(), 1u);
+            TS_ASSERT_DELTA(mesh.GetNode(0)->rGetNodeAttributes()[0], 9.81, 1e-4);
+        }
 
         unsigned num_nodes = PetscTools::AmMaster() ? 8 : 0;    // All nodes will lie on the master process.
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_nodes);
@@ -82,6 +93,25 @@ public:
             {
                 TS_ASSERT(!(mesh.mNodesMapping.find(i) == mesh.mNodesMapping.end()));
                 TS_ASSERT_EQUALS(mesh.SolveNodeMapping(i), mesh.mNodesMapping[i]);
+            }
+        }
+
+        if (PetscTools::IsSequential())
+        {
+            /*
+             * Check that other nodes do not have attributes.
+             *
+             * Note: since the radius of each node is set to 0.5 in
+             * NodesOnlyMesh::ConstructNodesWithoutMesh(), this means
+             * that every node in a NodeBasedCellPopulaton has called
+             * ConstructNodeAttributes(); however, rGetNodeAttributes()
+             * will return an empty vector unless any attributes have
+             * been set by the user.
+             */
+            for (unsigned i=1; i<7; i++)
+            {
+                TS_ASSERT_EQUALS(mesh.GetNode(i)->HasNodeAttributes(), true);
+                TS_ASSERT_EQUALS(mesh.GetNode(i)->rGetNodeAttributes().size(), 0u);
             }
         }
 
@@ -135,7 +165,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetMaximumInteractionDistance(), 5.0, 1e-4);
     }
 
-    void TestCalculateBoundingBox() throw (Exception)
+    void TestCalculateBoundingBox()
     {
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, false, -1.0, 0.0, 0.0));
@@ -171,7 +201,7 @@ public:
         }
     }
 
-    void TestSetInitialBoxCollection() throw (Exception)
+    void TestSetInitialBoxCollection()
     {
         double cut_off = 1.0;
 
@@ -208,8 +238,39 @@ public:
             TS_ASSERT(mesh.IsOwned(location));
         }
     }
+    void TestConstuctingLargerMesh()
+    {
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 2.0, 2.0));
+        nodes.push_back(new Node<2>(1, false, 2.0, 200.0));
+        nodes.push_back(new Node<2>(2, false, 200.0, 2.0));
+        nodes.push_back(new Node<2>(3, false, 200.0, 200.0));
 
-    void TestConstuctingAndEnlargingInitialBoxCollection() throw (Exception)
+        NodesOnlyMesh<2> mesh;
+        ChasteCuboid<2> bounding_cuboid = mesh.CalculateBoundingBox(nodes);
+
+        TS_ASSERT_DELTA(bounding_cuboid.rGetUpperCorner()[0], 200.0, 1e-16);
+        TS_ASSERT_DELTA(bounding_cuboid.rGetUpperCorner()[1], 200.0, 1e-16);
+
+        TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[0], 2.0, 1e-16);
+        TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[1], 2.0, 1e-16);
+
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        c_vector<double,4> swollen_box = mesh.GetBoxCollection()->rGetDomainSize();
+
+        TS_ASSERT_DELTA(swollen_box(0), 2, 1e-11);
+        TS_ASSERT_DELTA(swollen_box(1),  201.5, 1e-11);
+        TS_ASSERT_DELTA(swollen_box(2), 2, 1e-11);
+        TS_ASSERT_DELTA(swollen_box(3), 201.5,1e-11);
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+
+    }
+    void TestConstuctingAndEnlargingInitialBoxCollection()
     {
         double cut_off = 0.5;
 
@@ -260,7 +321,7 @@ public:
         }
     }
 
-    void TestBoxCollectionSizeAndSwelling() throw (Exception)
+    void TestBoxCollectionSizeAndSwelling()
     {
         double cut_off = 0.5;
 
@@ -304,7 +365,7 @@ public:
         }
     }
 
-    void TestMovingNodesInBoxCollection() throw (Exception)
+    void TestMovingNodesInBoxCollection()
     {
         EXIT_IF_PARALLEL;    // This wont work until nodes can be re-assigned on re-mesh. #2260
 
@@ -576,7 +637,7 @@ public:
         }
     }
 
-    void TestAddNode() throw (Exception)
+    void TestAddNode()
     {
         std::vector<Node<2>*> nodes;
         Node<2> node0(0, true, 0.0, 0.0);
@@ -616,7 +677,7 @@ public:
         }
     }
 
-    void TestDeleteNodesAndRemesh() throw (Exception)
+    void TestDeleteNodesAndRemesh()
     {
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -647,7 +708,7 @@ public:
         }
 
         // Delete from interior
-        unsigned node_index;
+        unsigned node_index {};
         if (mesh.mpBoxCollection->IsOwned(nodes[0]))
         {
             AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
@@ -702,7 +763,7 @@ public:
         }
     }
 
-    void TestCleanDeleteAndAddNode()    throw(Exception)
+    void TestCleanDeleteAndAddNode()
     {
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -739,7 +800,7 @@ public:
         }
     }
 
-    void TestHaloNodes()    throw (Exception)
+    void TestHaloNodes()
     {
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -762,7 +823,7 @@ public:
         delete nodes[1];
     }
 
-    void TestGetNodesOutsideLocalDomain()   throw (Exception)
+    void TestGetNodesOutsideLocalDomain()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -810,7 +871,7 @@ public:
         }
     }
 
-    void TestAddAndGetHaloNodes()    throw (Exception)
+    void TestAddAndGetHaloNodes()
     {
         std::vector<Node<2>* > nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
@@ -836,7 +897,7 @@ public:
         delete nodes[0];
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         EXIT_IF_PARALLEL;    ///\todo parallel archiving not yet possible.
 
@@ -853,8 +914,17 @@ public:
             NodesOnlyMesh<2> mesh;
             mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 543u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices().size(), 543u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices()[2], 2u);
             mesh.GetNode(0)->SetRadius(1.12);
             mesh.GetNode(1)->SetRadius(2.34);
+
+            // Delete a node in order to test re-indexing (nodes 3,4,5... should still be named 3,4,5...)
+            mesh.DeleteNode(2);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 542u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices().size(), 542u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices()[2], 3u);
 
             TS_ASSERT_DELTA(mesh.GetNode(0)->GetRadius(), 1.12, 1e-6);
             TS_ASSERT_DELTA(mesh.GetNode(1)->GetRadius(), 2.34, 1e-6);
@@ -886,7 +956,7 @@ public:
             NodesOnlyMesh<2>* p_nodes_only_mesh = dynamic_cast<NodesOnlyMesh<2>*>(p_mesh2);
 
             // Check we have the right number of nodes & elements
-            TS_ASSERT_EQUALS(p_nodes_only_mesh->GetNumNodes(), 543u);
+            TS_ASSERT_EQUALS(p_nodes_only_mesh->GetNumNodes(), 543u - 1u);
             TS_ASSERT_EQUALS(p_nodes_only_mesh->GetNumElements(), 0u);
 
             // Check some node co-ordinates
@@ -895,16 +965,29 @@ public:
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetPoint()[0], 1.0, 1e-6);
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetPoint()[1], 0.0, 1e-6);
 
+            // Node with index 2 is not available
+            TS_ASSERT_THROWS_CONTAINS(p_nodes_only_mesh->GetNode(2), "Requested node 2 does not belong to process ");
+            // Test re-indexing - Node with index 3 still has index 3
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(3)->GetPoint()[0], 0.992114, 1e-6);
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(3)->GetPoint()[1], 0.125333, 1e-6);
+
             // Check some cell radii
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(0)->GetRadius(), 1.12, 1e-6);
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetRadius(), 2.34, 1e-6);
 
+            // Test that a newly added node gets the correct index (543)
+            TS_ASSERT_THROWS_CONTAINS(p_nodes_only_mesh->GetNode(543), "Requested node 543 does not belong to process ");
+            // Node that the index "2" here is fake.  The new node gets a fresh index
+            p_nodes_only_mesh->AddNode(new Node<2>(2, true, 0.12345678, 2.0)); // This node pointer is added to the mesh and deleted by the destructor
+            // Node with index 2 is still not available
+            TS_ASSERT_THROWS_CONTAINS(p_nodes_only_mesh->GetNode(2), "Requested node 2 does not belong to process ");
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(543)->GetPoint()[0], 0.12345678, 1e-8);
             // Tidy up
             delete p_mesh2;
         }
     }
 
-    void TestArchiveNodesOnlyMeshWithNodeAttributes() throw (Exception)
+    void TestArchiveNodesOnlyMeshWithNodeAttributes()
     {
         EXIT_IF_PARALLEL;    ///\todo parallel archiving not yet possible.
 
@@ -964,7 +1047,7 @@ public:
         }
     }
 
-    void TestLoadBalanceMesh()  throw (Exception)
+    void TestLoadBalanceMesh()
     {
         // Test designed for np=2
         if (PetscTools::GetNumProcs() == 2)

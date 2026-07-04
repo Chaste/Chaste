@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -299,7 +299,7 @@ public:
         TS_ASSERT_EQUALS(int(num_nonzeros),6);
     }
 
-    void TestZeroMatrixRowsAndColumnsWithValueOnDiagonal() throw(Exception)
+    void TestZeroMatrixRowsAndColumnsWithValueOnDiagonal()
     {
         LinearSystem ls(5);
         for (int i=0; i<5; i++)
@@ -413,6 +413,71 @@ public:
             if (lo<=global_index && global_index<hi)
             {
                 TS_ASSERT_DELTA(p_solution_elements_array[local_index], 1.0, 0.000001);
+            }
+        }
+        VecRestoreArray(solution_vector, &p_solution_elements_array);
+
+        PetscTools::Destroy(solution_vector);
+    }
+
+    void TestLinearSystem3()
+    {
+        LinearSystem ls(7);
+        ls.SetMatrixIsConstant(true);
+
+        for (unsigned i = 0; i < 7; ++i)
+        {
+            ls.SetMatrixElement(i, i, static_cast<double>(i + 1));
+        }
+
+        ls.AssembleIntermediateLinearSystem();
+
+        ls.AddToMatrixElement(3, 1, sqrt(5.0));
+
+        /*
+         * Matrix looks like:
+         *  1 0 0 0 0 0 0
+         *  0 2 0 0 0 0 0
+         *  0 0 3 0 0 0 0
+         *  0 x 0 4 0 0 0
+         *  0 0 0 0 5 0 0
+         *  0 0 0 0 0 6 0
+         *  0 0 0 0 0 0 7  where x = sqrt(5)
+         */
+
+        ls.SetRhsVectorElement(0, 1.23);
+        ls.SetRhsVectorElement(1, 2.34);
+        ls.SetRhsVectorElement(2, 3.45);
+        ls.SetRhsVectorElement(3, 4.56);
+        ls.SetRhsVectorElement(4, 5.67);
+        ls.SetRhsVectorElement(5, 6.78);
+        ls.SetRhsVectorElement(6, 7.89);
+        ls.AssembleFinalLinearSystem();
+
+        Vec solution_vector;
+        solution_vector = ls.Solve();
+
+        std::vector<double> hand_cooked_solution(7, 0.0);
+        hand_cooked_solution[0] = 1.23;
+        hand_cooked_solution[1] = 1.17;
+        hand_cooked_solution[2] = 1.15;
+        hand_cooked_solution[3] = 0.485950116581311;
+        hand_cooked_solution[4] = 1.134;
+        hand_cooked_solution[5] = 1.13;
+        hand_cooked_solution[6] = 1.127142857142857;
+
+        int lo;
+        int hi;
+        VecGetOwnershipRange(solution_vector,&lo,&hi);
+        PetscScalar* p_solution_elements_array;
+        VecGetArray(solution_vector, &p_solution_elements_array);
+
+        for (int global_index=0; global_index<7; global_index++)
+        {
+            int local_index = global_index-lo;
+            if (lo<=global_index && global_index<hi)
+            {
+                TS_ASSERT_DELTA(p_solution_elements_array[local_index], hand_cooked_solution[global_index], 1e-8);
             }
         }
         VecRestoreArray(solution_vector, &p_solution_elements_array);
@@ -843,7 +908,7 @@ public:
         PetscTools::Destroy(solution_vector);
     }
 
-    void TestGetSetKSP() throw (Exception)
+    void TestGetSetKSP()
     {
         {
             // Test that small systems don't have preconditioning
@@ -1008,10 +1073,9 @@ public:
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             VecCreate(PETSC_COMM_WORLD, &new_vec);
-            VecSetType(new_vec, PETSC_NULL);
             VecLoad(new_vec, vec_viewer);
 #else
-            VecLoad(vec_viewer, PETSC_NULL, &new_vec);
+            VecLoad(vec_viewer, CHASTE_PETSC_NULLPTR, &new_vec);
 #endif
             PetscViewerDestroy(PETSC_DESTROY_PARAM(vec_viewer));
 
@@ -1038,10 +1102,9 @@ public:
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             MatCreate(PETSC_COMM_WORLD, &new_mat);
-            MatSetType(new_mat, PETSC_NULL);
             MatLoad(new_mat, mat_viewer);
 #else
-            MatLoad(mat_viewer, PETSC_NULL, &new_mat);
+            MatLoad(mat_viewer, CHASTE_PETSC_NULLPTR, &new_mat);
 #endif
 
             PetscViewerDestroy(PETSC_DESTROY_PARAM(mat_viewer));
@@ -1110,12 +1173,13 @@ public:
                     ls.SetMatrixElement(row, col, (row == col)?(row+1.0):0.0);
                 }
             }
-            ls.AssembleFinalLinearSystem();
 
             for (unsigned i=0; i<size; i++)
             {
                 ls.SetRhsVectorElement(i, rhs_values[i]);
             }
+            ls.AssembleFinalLinearSystem();
+
             ls.SetKspType("cg");
             ls.SetPcType("none");
 
@@ -1247,7 +1311,7 @@ public:
         PetscTools::Destroy(system_rhs);
     }
 
-//    void TestSingularSolves() throw(Exception)
+//    void TestSingularSolves()
 //    {
 //        LinearSystem ls(2);
 //
@@ -1309,6 +1373,7 @@ public:
             TS_ASSERT_THROWS_THIS(ls_diff_precond.rGetPrecondMatrix(), "LHS matrix used for preconditioner construction");
 
             ls_diff_precond.SetPrecondMatrixIsDifferentFromLhs();
+            PetscMatTools::Finalise(ls_diff_precond.rGetPrecondMatrix());
             MatCopy(ls_diff_precond.GetLhsMatrix(), ls_diff_precond.rGetPrecondMatrix(), DIFFERENT_NONZERO_PATTERN);
 
             Vec solution = ls_diff_precond.Solve();
@@ -1348,7 +1413,7 @@ public:
         PetscTools::Destroy(system_matrix);
     }
 
-    void TestFixedNumberOfIterations() throw (Exception)
+    void TestFixedNumberOfIterations()
     {
         unsigned num_nodes = 1331;
         DistributedVectorFactory factory(num_nodes);
@@ -1468,7 +1533,7 @@ public:
         PetscTools::Destroy(guess);
     }
 
-    void TestFixedNumberOfIterationsRelativeToleranceCoverage() throw (Exception)
+    void TestFixedNumberOfIterationsRelativeToleranceCoverage()
     {
         unsigned num_nodes = 1331;
         DistributedVectorFactory factory(num_nodes);
@@ -1537,7 +1602,7 @@ public:
         PetscTools::Destroy(guess);
     }
 
-    void TestSolveZerosInitialGuessForSmallRhs() throw(Exception)
+    void TestSolveZerosInitialGuessForSmallRhs()
     {
         LinearSystem ls(2);
 
@@ -1551,6 +1616,7 @@ public:
 
         Vec init_cond = PetscTools::CreateAndSetVec(2, 0.0);
         PetscVecTools::SetElement(init_cond, 0, 0.01);
+        PetscVecTools::Finalise(init_cond);
 
         ls.AssembleFinalLinearSystem();
 
@@ -1566,7 +1632,7 @@ public:
     }
 
     /** See #1834 */
-    void xxxxTestSolveShowingPetscRubbishInEvenMoreWays() throw(Exception)
+    void xxxxTestSolveShowingPetscRubbishInEvenMoreWays()
     {
         LinearSystem ls(2);
 

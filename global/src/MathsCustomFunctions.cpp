@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MathsCustomFunctions.hpp"
 
+#include <cassert>
 #include <cmath>
 #include <iostream>
 
@@ -52,25 +53,19 @@ double SmallPow(double x, unsigned exponent)
         }
         case 2:
         {
-            return x*x;
+            return x * x;
         }
         case 3:
         {
-            return x*x*x;
+            return x * x * x;
+        }
+        case 4:
+        {
+            return x * x * x * x;
         }
         default:
         {
-            if (exponent % 2 == 0)
-            {
-                // Even power
-                double partial_answer = SmallPow(x, exponent/2);
-                return partial_answer*partial_answer;
-            }
-            else
-            {
-                // Odd power
-                return SmallPow(x, exponent-1)*x;
-            }
+            return std::pow(x, static_cast<double>(exponent));
         }
     }
 }
@@ -172,6 +167,33 @@ double SafeDivide(double numerator, double divisor)
     }
 
     return numerator/divisor;
+}
+
+unsigned AdvanceMod(const unsigned currentLocation, const int increment, const std::size_t range) noexcept
+{
+    int new_pos = currentLocation + increment;
+
+    while (new_pos < 0)
+    {
+        new_pos += range;
+    }
+    while (new_pos >= static_cast<int>(range))
+    {
+        new_pos -= range;
+    }
+
+    return static_cast<unsigned>(new_pos);
+}
+
+unsigned SmallDifferenceMod(const unsigned idxA, const unsigned idxB, const std::size_t range) noexcept
+{
+    assert(idxA < range);
+    assert(idxB < range);
+
+    const unsigned min = idxA < idxB ? idxA : idxB;
+    const unsigned max = idxA < idxB ? idxB : idxA;
+
+    return std::min<unsigned>(max - min, (range + min) - max);
 }
 
 bool CompareDoubles::WithinRelativeTolerance(double number1, double number2, double tolerance)

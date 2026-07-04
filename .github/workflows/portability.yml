@@ -1,0 +1,148 @@
+name: Portability
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - develop
+  schedule:
+    - cron: "22 22 * * 0"
+
+jobs:
+  build-and-test:
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: portability-01
+            extra-build-args: ""
+          - image: portability-01
+            extra-build-args: "-DChaste_USE_CVODE=OFF -DChaste_USE_VTK=OFF"
+          - image: portability-02
+            extra-build-args: ""
+          - image: portability-03
+            extra-build-args: ""
+          - image: portability-04
+            extra-build-args: ""
+          - image: portability-05
+            extra-build-args: ""
+          - image: portability-tip
+            extra-build-args: ""
+          - image: portability-jammy
+            extra-build-args: ""
+          - image: portability-noble
+            extra-build-args: ""
+          - image: portability-resolute
+            extra-build-args: ""
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: chaste/runner:${{ matrix.image }}
+      env:
+        RUNNER_OFF: 1
+      options: --user 0
+
+    env:
+      CC: gcc
+      CXX: g++
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Compiler version
+        run: |
+          ${CXX} --version
+
+      - name: Make build and test directories
+        run: |
+          mkdir -p chaste-build-dir
+          mkdir -p chaste-test-dir
+          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
+
+      - name: Create module loading script
+        run: |
+          cat > load_modules.sh << 'EOF'
+          #!/bin/bash
+          source /etc/profile.d/modules.sh
+          module use /home/runner/modules/modulefiles
+          module avail
+          module load boost petsc_hdf5 sundials vtk xercesc xsd
+          module list
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Authorize runner user
+        run: |
+          chown -R runner:runner .
+
+      - name: Configure
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake -DCMAKE_BUILD_TYPE=Release ${{ matrix.extra-build-args }} ..
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: TestChasteBuildInfo
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target TestChasteBuildInfo --parallel $(nproc)
+          ctest -V -R TestChasteBuildInfo$
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Build Continuous
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target Continuous --parallel $(nproc)
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Build Nightly
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target Nightly --parallel $(nproc)
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Build Parallel
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target Parallel --parallel $(nproc)
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Run Continuous
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          ctest -j $(nproc) -L Continuous --output-on-failure
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Run Nightly
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          ctest -j $(nproc) -L Nightly --output-on-failure
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Run Parallel
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          ctest -L Parallel --output-on-failure
+          EOF
+        working-directory: chaste-build-dir

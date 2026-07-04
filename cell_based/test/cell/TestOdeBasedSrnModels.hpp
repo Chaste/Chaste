@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,7 @@ class TestOdeBasedSrnModels : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestDeltaNotchSrnCorrectBehaviour() throw(Exception)
+    void TestDeltaNotchSrnCorrectBehaviour()
     {
         TS_ASSERT_THROWS_NOTHING(DeltaNotchSrnModel srn_model);
 
@@ -151,7 +151,7 @@ public:
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
             MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
-            // We must create a cell to be able to initialise the cell srn model's ODE system
+            // We must create a cell to be able to initialise the cell SRN model's ODE system
             CellPtr p_cell(new Cell(p_healthy_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->GetCellData()->SetItem("mean delta", 10.0);
@@ -168,7 +168,7 @@ public:
 
             output_arch << p_srn_model;
 
-            // Note that here, deletion of the cell-cycle model and srn is handled by the cell destructor
+            // Note that here, deletion of the cell-cycle model and SRN is handled by the cell destructor
             SimulationTime::Destroy();
         }
 
@@ -189,7 +189,7 @@ public:
         }
     }
 
-    void TestGoldbeter1991SrnCorrectBehaviour() throw(Exception)
+    void TestGoldbeter1991SrnCorrectBehaviour()
     {
         TS_ASSERT_THROWS_NOTHING(Goldbeter1991SrnModel srn_model);
 
@@ -281,7 +281,7 @@ public:
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
             MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
-            // We must create a cell to be able to initialise the cell srn model's ODE system
+            // We must create a cell to be able to initialise the cell SRN model's ODE system
             CellPtr p_cell(new Cell(p_healthy_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->InitialiseCellCycleModel();
@@ -304,7 +304,7 @@ public:
 
             output_arch << p_srn_model;
 
-            // Note that here, deletion of the cell-cycle model and srn is handled by the cell destructor
+            // Note that here, deletion of the cell-cycle model and SRN is handled by the cell destructor
             SimulationTime::Destroy();
         }
 

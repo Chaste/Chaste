@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,7 +32,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
 #include "CellMLToSharedLibraryConverter.hpp"
 
 #include <sstream>
@@ -42,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring> // For strerror()
 #include <cerrno> // For errno
 
-#include <boost/foreach.hpp>
 
 #include "ChasteSyscalls.hpp"
 #include "Exception.hpp"
@@ -80,8 +78,9 @@ DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFind
     std::string absolute_path = rFilePath.GetAbsolutePath();
     // Find out whether rFilePath is a .cellml or .so
     size_t dot_position = absolute_path.find_last_of(".");
-    if (dot_position == std::string::npos)
+    if (dot_position == std::string::npos || absolute_path[dot_position+1] =='/')
     {
+        // Either there is no dot in the absolute path or there is one along the path (/home/user/chaste/../temp/stuff)
         EXCEPTION("File does not have an extension: " + absolute_path);
     }
     std::string extension = absolute_path.substr(dot_position+1);
@@ -146,6 +145,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
     std::string old_cwd = GetCurrentWorkingDirectory();
     // Check that the Chaste build tree exists
     FileFinder chaste_root("", RelativeTo::ChasteBuildRoot);
+    FileFinder chaste_source("", RelativeTo::ChasteSourceRoot);
 
     if (!chaste_root.IsDir())
     {
@@ -183,31 +183,38 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                           << strerror(errno));
             }
 
+
             // Copy the .cellml file (and any relevant others) into the temporary folder
             FileFinder cellml_file(rCellmlFullPath, RelativeTo::Absolute);
             FileFinder cellml_folder = cellml_file.GetParent();
             std::string cellml_leaf_name = cellml_file.GetLeafNameNoExtension();
             std::vector<FileFinder> cellml_files = cellml_folder.FindMatches(cellml_leaf_name + "*");
 
-            BOOST_FOREACH(const FileFinder& r_cellml_file, cellml_files)
+            for (const FileFinder& r_cellml_file : cellml_files)
             {
                 r_cellml_file.CopyTo(tmp_folder);
             }
 
-#ifdef CHASTE_CMAKE
             std::string cmake_lists_filename = tmp_folder.GetAbsolutePath() + "/CMakeLists.txt";
             std::ofstream cmake_lists_filestream(cmake_lists_filename.c_str());
-            cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.10)\n" <<
+            cmake_lists_filestream << "cmake_minimum_required(VERSION 3.16.3)\n" <<
+                                      "set(CMAKE_CXX_STANDARD 17)\n" <<
+                                      "set(CMAKE_CXX_STANDARD_REQUIRED ON)\n" <<
+                                      "set(CMAKE_CXX_EXTENSIONS OFF)\n" <<
+                                      "project (ChasteCellMLToSharedLibraryConverter)\n" <<
+                                      "find_package(Python3 3.5 REQUIRED)\n" <<
+                                      "set(chaste_python3_venv " + chaste_root.GetAbsolutePath() + "/chaste_python3_venv/bin)\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
-                                      "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON)\n" <<
+                                      "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON " << codegen_args << ")\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
                                       "include_directories(${Chaste_THIRD_PARTY_INCLUDE_DIRS} ${Chaste_INCLUDE_DIRS})\n" <<
                                       "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n" <<
                                       "if (${CMAKE_SYSTEM_NAME} MATCHES \"Darwin\")\n" <<
                                       "   target_link_libraries(" << cellml_leaf_name << " \"-Wl,-undefined,dynamic_lookup\")\n" <<
-                                      "endif()\n"
-                                      //"target_link_libraries(" << cellml_leaf_name << " ${Chaste_LIBRARIES})\n"
-                                      ;
+                                      "endif()\n" <<
+                                      "if (${CMAKE_CXX_COMPILER_ID} STREQUAL \"IntelLLVM\")\n" <<
+                                      "   set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -fp-model precise\")\n" <<
+                                      "endif()\n";
             cmake_lists_filestream.close();
             std::string cmake_args = " -DCMAKE_PREFIX_PATH=" + chaste_root.GetAbsolutePath() +
                                      " -DCMAKE_BUILD_TYPE=" + ChasteBuildType() +
@@ -216,26 +223,9 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             EXPECT0(chdir, tmp_folder.GetAbsolutePath());
             EXPECT0(system, "cmake" + cmake_args + " .");
             EXPECT0(system, "cmake --build . --config " + ChasteBuildType());
-#else
-            // Change to Chaste source folder
-            EXPECT0(chdir, chaste_root.GetAbsolutePath());
-            // Run scons to generate C++ code and compile it to a .so
-            EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
-            if (mPreserveGeneratedSources)
-            {
-                // Copy the generated source (.hpp and .cpp) to the same place as the .so file is going.
-                // NB. CMake does this by default
-                FileFinder destination_folder_for_sources(rCellmlFolder, RelativeTo::Absolute);
-                // Copy generated source code as well
-                std::vector<FileFinder> generated_files = build_folder.FindMatches("*.?pp");
-                BOOST_FOREACH(const FileFinder& r_generated_file, generated_files)
-                {
-                    r_generated_file.CopyTo(destination_folder_for_sources);
-                }
-            }
-#endif
 
             FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix, RelativeTo::Absolute);
+std::cout<< "so file: "<< tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix <<std::endl;
             EXCEPT_IF_NOT(so_file.Exists());
             // CD back
             EXPECT0(chdir, old_cwd);
@@ -272,27 +262,9 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
     PetscTools::ReplicateException(false);
 }
 
-void CellMLToSharedLibraryConverter::CreateOptionsFile(const OutputFileHandler& rHandler,
-                                                       const std::string& rModelName,
-                                                       const std::vector<std::string>& rArgs,
-                                                       const std::string& rExtraXml)
+void CellMLToSharedLibraryConverter::SetOptions(const std::vector<std::string>& rArgs)
 {
-    if (PetscTools::AmMaster())
-    {
-        out_stream p_optfile = rHandler.OpenOutputFile(rModelName + "-conf.xml");
-        (*p_optfile) << "<?xml version='1.0'?>" << std::endl
-                     << "<pycml_config>" << std::endl;
-        if (!rArgs.empty())
-        {
-            (*p_optfile) << "<command_line_args>" << std::endl;
-            for (unsigned i=0; i<rArgs.size(); i++)
-            {
-                (*p_optfile) << "<arg>" << rArgs[i] << "</arg>" << std::endl;
-            }
-            (*p_optfile) << "</command_line_args>" << std::endl;
-        }
-        (*p_optfile) << rExtraXml << "</pycml_config>" << std::endl;
-        p_optfile->close();
-    }
-    PetscTools::Barrier("CellMLToSharedLibraryConverter::CreateOptionsFile");
+    std::stringstream args_stream;
+    copy(rArgs.begin(), rArgs.end(), std::ostream_iterator<std::string>(args_stream, " "));
+    codegen_args = args_stream.str();
 }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Note: the obtain the results in this paper, the simulations are run with 'state-variable interpolation'
  * (SVI) switched on (which is not true by default). For full details on SVI, see the documentation page:
- * ChasteGuides -> Advanced -> StateVariableInterpolation
+ * [User Guides -> State Variable Interpolation](/docs/user-guides/state-variable-interpolation/)
  *
  * Also, a follow-up paper
  *
@@ -277,7 +277,7 @@ private:
     }
 
 public:
-    void TestRunOnCoarsestMesh() throw(Exception)
+    void TestRunOnCoarsestMesh()
     {
         // run with h=0.05 and dt=0.01.  SVI is turned on
         Run(0.05, 0.01, 40, true);
@@ -290,7 +290,7 @@ public:
         NumericFileComparison num_comp(output_file, base_file);
         TS_ASSERT(num_comp.CompareFiles(1.5e-3)); //Absolute difference of 1.5 microsecond is tolerated
     }
-    void donotTestRunOtherSvi() throw(Exception)
+    void donotTestRunOtherSvi()
     {
         /* To reproduce Code A panel of
          *  Figure 1 Pathmanathan et al. == Figure 2 Niederer et al.
@@ -309,7 +309,7 @@ public:
         Run(0.01, 0.01, 50, true);
     }
 
-    void donotTestRunAllIci() throw(Exception)
+    void donotTestRunAllIci()
     {
         /* This produces Pathmanathan et al. Figure 1 panel B "ICI"
          *

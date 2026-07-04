@@ -1,0 +1,87 @@
+# Documentation for this file specification:
+# https://docs.codecov.com/docs/codecovyml-reference
+
+# Check if this file is valid by running in bash:
+# curl -X POST --data-binary @.codecov.yml https://codecov.io/validate
+
+codecov:
+  require_ci_to_pass: no
+  branch: develop              # default branch on codecov
+  strict_yaml_branch: develop  # only use this file on develop
+
+coverage:
+  status:
+    project:
+      default: false
+      core:
+        target: 100%
+        threshold: 0%
+        paths:
+          - "continuum_mechanics/"
+          - "global/"
+          - "io/"
+          - "linalg/"
+          - "mesh/"
+          - "ode/"
+          - "pde/"
+      cell_based:
+        target: 100%
+        threshold: 0%
+        paths:
+          - "cell_based/"
+      crypt:
+        target: 100%
+        threshold: 0%
+        paths:
+          - "crypt/"
+      heart:
+        target: 100%
+        threshold: 0%
+        paths:
+          - "heart/"
+      lung:
+        target: 100%
+        threshold: 0%
+        paths:
+          - "lung/"
+    patch:
+      default: false
+      core:
+        target: 100%
+        threshold: 0%
+        paths:
+          - "continuum_mechanics/"
+          - "global/"
+          - "io/"
+          - "linalg/"
+          - "mesh/"
+          - "ode/"
+          - "pde/"
+      cell_based:
+        target: 100%
+        threshold: 0%
+        paths:
+          - "cell_based/"
+      crypt:
+        target: 100%
+        threshold: 0%
+        paths:
+          - "crypt/"
+      heart:
+        target: 100%
+        threshold: 0%
+        paths:
+          - "heart/"
+      lung:
+        target: 100%
+        threshold: 0%
+        paths:
+          - "lung/"
+  range: 100..100     # This affects the colour: yelow...green
+  round: down         # up, down, or nearest
+  precision: 2        # Number of decimal places, between 0 and 5
+
+# If necessary can ignore files here, but these should also be filtered
+# out by lcov in the coverage.yml workflow
+ignore:
+  - "*/cxxtest/.*"

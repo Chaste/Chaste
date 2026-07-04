@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,14 +36,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTTIMER_HPP_
 #define _TESTTIMER_HPP_
 
+#include <cmath>
+
 #include <cxxtest/TestSuite.h>
-#include "Timer.hpp"
+
 #include "PetscSetupAndFinalize.hpp"
+#include "Timer.hpp"
 
 class TestTimer : public CxxTest::TestSuite
 {
 public:
-
     // Can't really test the timer, this is just for coverage and to illustrate usage
     void TestTheTimer()
     {
@@ -60,10 +62,24 @@ public:
         double elapsed_time = Timer::GetElapsedTime();
         TS_ASSERT_LESS_THAN_EQUALS(0, elapsed_time);
 
+        // Small amount of work in a loop that can't be optimized by unrolling.
+        // Updated 2023-06-20 to make it even less likely the compiler will optimize this work away.
+        volatile double number = 0.0;
+        for (unsigned i = 1; i < 10'000; ++i)
+        {
+            number += std::asinh(0.001 * i);
+        }
+        TS_ASSERT_LESS_THAN(20'930.0, number);
+
+        double elapsed_time2 = Timer::GetElapsedTime();
+        TS_ASSERT_LESS_THAN(elapsed_time, elapsed_time2);
+
         double current_time = Timer::GetWallTime();
         // Note: on some systems this is seconds since the epoch, on others
         // it is seconds since last reboot!  So it might be quite small...
-        TS_ASSERT_LESS_THAN(10.0, current_time);
+        // On OpenMPI version 4 it appears to be seconds since the time of the first call
+        // i.e. a very small number
+        TS_ASSERT_LESS_THAN(elapsed_time, current_time);
     }
 };
 

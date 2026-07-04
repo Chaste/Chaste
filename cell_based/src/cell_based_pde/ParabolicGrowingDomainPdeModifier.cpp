@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,9 +43,9 @@ ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost:
                                                                           bool isNeumannBoundaryCondition,
                                                                           Vec solution)
     : AbstractGrowingDomainPdeModifier<DIM>(pPde,
-    		                                pBoundaryCondition,
-    		                                isNeumannBoundaryCondition,
-    		                                solution)
+                                            pBoundaryCondition,
+                                            isNeumannBoundaryCondition,
+                                            solution)
 {
 }
 
@@ -60,7 +60,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
     this->GenerateFeMesh(rCellPopulation);
 
     // Set up boundary conditions
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer();
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer();
 
     // Construct the solution vector from cell data (takes care of cells dividing);
     UpdateSolutionVector(rCellPopulation);
@@ -109,9 +109,9 @@ void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<D
 }
 
 template<unsigned DIM>
-std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
+std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
 {
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     if (this->IsNeumannBoundaryCondition())
     {
@@ -131,6 +131,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
              ++node_iter)
         {
             p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
+            this->mIsDirichletBoundaryNode[(*node_iter)->GetIndex()] = 1.0;
         }
     }
 
@@ -149,23 +150,18 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
 
     std::string& variable_name = this->mDependentVariableName;
 
+    // Loop over nodes of the finite element mesh and get appropriate solution values from CellData
     for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
-         node_iter != this->mpFeMesh->GetNodeIteratorEnd();
-         ++node_iter)
+            node_iter != this->mpFeMesh->GetNodeIteratorEnd();
+            ++node_iter)
     {
-        // Loop over nodes of the finite element mesh and get appropriate solution values from CellData
-        for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
-             node_iter != this->mpFeMesh->GetNodeIteratorEnd();
-             ++node_iter)
-        {
-            unsigned node_index = node_iter->GetIndex();
-            bool dirichlet_bc_applies = (node_iter->IsBoundaryNode()) && (!(this->IsNeumannBoundaryCondition()));
-            double boundary_value = this->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
+        unsigned node_index = node_iter->GetIndex();
+        bool dirichlet_bc_applies = (node_iter->IsBoundaryNode()) && (!(this->IsNeumannBoundaryCondition()));
+        double boundary_value = this->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
 
-            double solution_at_node = rCellPopulation.GetCellDataItemAtPdeNode(node_index, variable_name, dirichlet_bc_applies, boundary_value);
+        double solution_at_node = rCellPopulation.GetCellDataItemAtPdeNode(node_index, variable_name, dirichlet_bc_applies, boundary_value);
 
-            PetscVecTools::SetElement(this->mSolution, node_index, solution_at_node);
-        }
+        PetscVecTools::SetElement(this->mSolution, node_index, solution_at_node);
     }
 }
 

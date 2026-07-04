@@ -1,0 +1,7 @@
+			<LabelledCellToLabelledCellSpringConst>1000</LabelledCellToLabelledCellSpringConst>
+			<LabelledCellToCellSpringConst>1000</LabelledCellToCellSpringConst>
+			<CellToCellSpringConst>1000</CellToCellSpringConst>
+			<RestLength>2.34</RestLength>
+			<AdditiveNormalNoise>1</AdditiveNormalNoise>
+			<NormalNoiseMean>5.67</NormalNoiseMean>
+			<NormalNoiseStdDev>6.78</NormalNoiseStdDev>

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -79,7 +79,7 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
     AbstractCardiacCell* mpGeneralizedRushLarsenCell;
 //    AbstractCardiacCell* mpGeneralizedRushLarsenCellOpt;
 
-    void GenerateCells() throw (Exception)
+    void GenerateCells()
     {
         // Do the conversions preserving generated sources
         CellMLToSharedLibraryConverter converter(true);
@@ -98,13 +98,13 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
             FileFinder copied_file = handler.CopyFileTo(cellml_file);
 
             // Create options file & convert
-            converter.CreateOptionsFile(handler, model, args);
+            converter.SetOptions(args);
             DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
             mpGeneralizedRushLarsenCell = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         }
     }
 
-    void GenerateCells2() throw (Exception)
+    void GenerateCells2()
     {
         // Do the conversions preserving generated sources
         CellMLToSharedLibraryConverter converter(true);
@@ -123,7 +123,7 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
             FileFinder copied_file = handler.CopyFileTo(cellml_file);
 
             // Create options file & convert
-            converter.CreateOptionsFile(handler, model, args);
+            converter.SetOptions(args);
             DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
             mpGeneralizedRushLarsenCell = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         }

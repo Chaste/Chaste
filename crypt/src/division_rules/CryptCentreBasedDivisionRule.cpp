@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,9 @@ std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CryptCentre
     // Make a random direction vector of the required length
     c_vector<double, SPACE_DIM> random_vector;
 
-    c_vector<double, SPACE_DIM> parent_coords = rCellPopulation.GetLocationOfCellCentre(pParentCell);
+    c_vector<double, SPACE_DIM> parent_coords;
+    parent_coords = rCellPopulation.GetLocationOfCellCentre(pParentCell);
+
     c_vector<double, SPACE_DIM> daughter_coords;
 
     switch (SPACE_DIM)
@@ -57,8 +59,11 @@ std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CryptCentre
         {
             double random_direction = -1.0 + 2.0*(RandomNumberGenerator::Instance()->ranf() < 0.5);
             random_vector(0) = 0.5*separation*random_direction;
-            c_vector<double, SPACE_DIM> proposed_new_parent_coords = parent_coords - random_vector;
-            c_vector<double, SPACE_DIM> proposed_new_daughter_coords = parent_coords + random_vector;
+            c_vector<double, SPACE_DIM> proposed_new_parent_coords;
+            //proposed_new_parent_coords = parent_coords - random_vector;
+            proposed_new_parent_coords(0) = parent_coords(0) - random_vector(0);
+            c_vector<double, SPACE_DIM> proposed_new_daughter_coords = zero_vector<double>(SPACE_DIM);
+            proposed_new_daughter_coords = parent_coords + random_vector;
 
             if ((proposed_new_parent_coords(0) >= 0.0) && (proposed_new_daughter_coords(0) >= 0.0))
             {
@@ -97,8 +102,10 @@ std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CryptCentre
             random_vector(0) = 0.5*separation*cos(random_angle);
             random_vector(1) = 0.5*separation*sin(random_angle);
 
-            c_vector<double, 2> proposed_new_parent_coords = parent_coords - random_vector;
-            c_vector<double, 2> proposed_new_daughter_coords = parent_coords + random_vector;
+            c_vector<double, SPACE_DIM> proposed_new_parent_coords = zero_vector<double>(SPACE_DIM);
+            proposed_new_parent_coords = parent_coords - random_vector;
+            c_vector<double, SPACE_DIM> proposed_new_daughter_coords;
+            proposed_new_daughter_coords = parent_coords + random_vector;
 
             if ((proposed_new_parent_coords(1) >= 0.0) && (proposed_new_daughter_coords(1) >= 0.0))
             {

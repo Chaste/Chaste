@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -71,7 +71,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  Also allows state variable interpolation (SVI) to be used on elements for which it
  *  will be needed, if the appropriate HeartConfig boolean is set.
- *  See wiki page ChasteGuides/StateVariableInterpolation for more details on this. In this
+ *  See https://chaste.github.io/docs/user-guides/state-variable-interpolation/ for more details on this. In this
  *  case the vector [c_correction, 0] is added to the above, and another assembler is
  *  used to create the c_correction.
  *
@@ -104,12 +104,7 @@ private:
     BidomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>* mpBidomainCorrectionTermAssembler;
 
 
-    /** Overloaded InitialiseForSolve() which calls base version but also
-     *  initialises mMassMatrix and mVecForConstructingRhs
-     *
-     *  @param initialSolution initial solution
-     */
-    void InitialiseForSolve(Vec initialSolution);
+
 
     /**
      *  Implementation of SetupLinearSystem() which uses the assembler to compute the
@@ -136,6 +131,13 @@ public:
                    BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions);
 
     ~BidomainSolver();
+
+    /** Overloaded InitialiseForSolve() which calls base version but also
+     *  initialises mMassMatrix and mVecForConstructingRhs
+     *
+     *  @param initialSolution initial solution
+     */
+    void InitialiseForSolve(Vec initialSolution);
 };
 
 

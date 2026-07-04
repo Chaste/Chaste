@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,29 +37,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTPARABOLICBOXDOMAINPDEMODIFIER_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <boost/archive/text_oarchive.hpp>
+
 #include <boost/archive/text_iarchive.hpp>
-#include "CheckpointArchiveTypes.hpp"
-#include <boost/math/special_functions/bessel.hpp>
-#include "ArchiveOpener.hpp"
-#include "SmartPointers.hpp"
+#include <boost/archive/text_oarchive.hpp>
+
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
-#include "ParabolicBoxDomainPdeModifier.hpp"
-#include "AveragedSourceParabolicPde.hpp"
-#include "UniformCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
+#include "ArchiveOpener.hpp"
+#include "AveragedSourceParabolicPde.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
+#include "CheckpointArchiveTypes.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "ParabolicBoxDomainPdeModifier.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
-#include "CaBasedCellPopulation.hpp"
-#include "UniformSourceParabolicPde.hpp"
 #include "ReplicatableVector.hpp"
+#include "SmartPointers.hpp"
+#include "UniformCellCycleModel.hpp"
+#include "UniformSourceParabolicPde.hpp"
+#include "VertexBasedCellPopulation.hpp"
+#include "VtkMeshWriter.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -74,10 +76,14 @@ class TestParabolicBoxDomainPdeModifier : public AbstractCellBasedWithTimingsTes
 {
 public:
 
-    void TestParabolicConstructor() throw(Exception)
+    void TestParabolicConstructor()
     {
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (-0.1));
+        double constant_coefficient = -0.1;
+        double linear_coefficient = -0.2;
+        double diffusion_coefficient = 0.1;
+        double rate_coefficient = 0.1;
+        MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -91,6 +97,10 @@ public:
 
         // Test that member variables are initialised correctly
         TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true); //default
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoundingSphere(), false); //default
+        TS_ASSERT_EQUALS(p_pde_modifier->GetUseVoronoiCellsForInterpolation(), false); //default
+        TS_ASSERT_EQUALS(p_pde_modifier->GetMoveSolutionWithCells(), false); //default
 
         // Check mesh
         TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumNodes(),121u);
@@ -104,13 +114,29 @@ public:
         TS_ASSERT_DELTA(bounding_box.rGetLowerCorner()[0],-10,1e-5);
         TS_ASSERT_DELTA(bounding_box.rGetLowerCorner()[1],-10,1e-5);
 
-        // Coverage
+        // Coverage of member varible methods
         TS_ASSERT_EQUALS(p_pde_modifier->GetOutputGradient(),false); // Defaults to false
         p_pde_modifier->SetOutputGradient(true);
         TS_ASSERT_EQUALS(p_pde_modifier->GetOutputGradient(),true);
+
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true); // Defaults to true
+        p_pde_modifier->SetBcsOnBoxBoundary(false);
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(),false);
+
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoundingSphere(),false); // Defaults to false
+        p_pde_modifier->SetBcsOnBoundingSphere(true);
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoundingSphere(),true);
+
+        TS_ASSERT_EQUALS(p_pde_modifier->GetUseVoronoiCellsForInterpolation(),false); // Defaults to false
+        p_pde_modifier->SetUseVoronoiCellsForInterpolation(true);
+        TS_ASSERT_EQUALS(p_pde_modifier->GetUseVoronoiCellsForInterpolation(),true);
+
+        TS_ASSERT_EQUALS(p_pde_modifier->GetMoveSolutionWithCells(),false); // Defaults to false
+        p_pde_modifier->SetMoveSolutionWithCells(true);
+        TS_ASSERT_EQUALS(p_pde_modifier->GetMoveSolutionWithCells(),true);
     }
 
-    void TestArchiveParabolicBoxDomainPdeModifier() throw(Exception)
+    void TestArchiveParabolicBoxDomainPdeModifier()
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
@@ -119,8 +145,13 @@ public:
 
         // Separate scope to write the archive
         {
+
             // Create PDE and boundary condition objects
-            MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (-0.1));
+            double constant_coefficient = -0.1;
+            double linear_coefficient = -0.2;
+            double diffusion_coefficient = 0.1;
+            double rate_coefficient = 0.1;
+            MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
             MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
             // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -137,6 +168,9 @@ public:
             Vec vector = PetscTools::CreateVec(data);
             ParabolicBoxDomainPdeModifier<2> modifier(p_pde, p_bc, false, p_cuboid, 2.0, vector);
             modifier.SetDependentVariableName("averaged quantity");
+            modifier.SetMoveSolutionWithCells(true);
+            modifier.SetBcsOnBoundingSphere(true);
+            modifier.SetUseVoronoiCellsForInterpolation(true);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -161,6 +195,9 @@ public:
             TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName(), "averaged quantity");
             TS_ASSERT_DELTA((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetStepSize(), 2.0, 1e-5);
             TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->AreBcsSetOnBoxBoundary(), true);
+            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->AreBcsSetOnBoundingSphere(), true);
+            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetUseVoronoiCellsForInterpolation(), true);
+            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetMoveSolutionWithCells(),true);
 
             Vec solution = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
             ReplicatableVector solution_repl(solution);
@@ -175,10 +212,10 @@ public:
         }
     }
 
-    void TestMeshBasedSquareMonolayer() throw (Exception)
+    void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -207,7 +244,12 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1.0, -1.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        bool scale_by_cell_volume = false;
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -232,27 +274,193 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4);
+        CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
 
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_x"), -0.0505, 1e-4);
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_y"), -0.0175, 1e-4);
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0799, 1e-4);
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_x"), -0.0734, 1e-4);
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_y"), -0.001, 1e-4);
 
+        // Check this was for bcs on box boundary
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
+    }
+
+    void TestMeshBasedSquareMonolayerWithBCsOnCells()
+    {
+        HoneycombMeshGenerator generator(10,10,0);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
+
+        // Make cells with x<5.0 apoptotic (so no source term)
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+                       cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0) < 5.0)
+            {
+                cells[i]->AddCellProperty(p_apoptotic_property);
+            }
+            // Set initial condition for PDE
+            cells[i]->GetCellData()->SetItem("variable",1.0);
+        }
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 50u);
+
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+
+        // Create PDE and boundary condition objects
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        bool scale_by_cell_volume = false;
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        ChastePoint<2> lower(-5.0, -5.0);
+        ChastePoint<2> upper(15.0, 15.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("variable");
+
+        // Change where BCS are appied here we want the bcs applied on the boundary of the cells.
+        // Good for compact tissues
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
         p_pde_modifier->SetBcsOnBoxBoundary(false);
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), false);
 
-        TS_ASSERT_THROWS_THIS(p_pde_modifier->UpdateAtEndOfTimeStep(cell_population),
-            "Boundary conditions cannot yet be set on the cell population boundary for a ParabolicBoxDomainPdeModifier");
+        // Note we also set the radius to be 0.8 so have a confluent PDE domain.
+        TS_ASSERT_EQUALS(p_pde_modifier->GetTypicalCellRadius(), 0.5);
+        p_pde_modifier->SetTypicalCellRadius(0.8);
+        TS_ASSERT_EQUALS(p_pde_modifier->GetTypicalCellRadius(), 0.8);
+
+        // For coverage, output the solution gradient
+        p_pde_modifier->SetOutputGradient(true);
+
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithMeshOnSquareBcsOnCells");
+
+        // Run for 10 time steps
+        for (unsigned i=0; i<10; i++)
+        {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+            p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+            p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+        }
+
+        // Test the solution at some fixed points to compare with other cell populations
+        CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
+
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.1028, 1e-4);
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_x"), -0.0819, 1e-4);
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_y"), 0.0008, 1e-4);
+
     }
 
-    // Only difference from above test is the use of Neuman BCs here
-    void TestMeshBasedSquareMonolayerWithNeumanBcs() throw (Exception)
+void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
     {
         HoneycombMeshGenerator generator(10,10,0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
+
+        // Make cells with x<5.0 apoptotic (so no source term)
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+                       cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0) < 5.0)
+            {
+                cells[i]->AddCellProperty(p_apoptotic_property);
+            }
+            // Set initial condition for PDE
+            cells[i]->GetCellData()->SetItem("variable",1.0);
+        }
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 50u);
+
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+
+        // Create PDE and boundary condition objects
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        bool scale_by_cell_volume = false;
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        ChastePoint<2> lower(-5.0, -5.0);
+        ChastePoint<2> upper(15.0, 15.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("variable");
+
+        // Change where BCS are appied here we want the bcs applied on the boundary of the cells.
+        // Good for compact tissues
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
+        p_pde_modifier->SetBcsOnBoxBoundary(false);
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), false);
+
+        // Apply BCs on the bounding sphere.
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoundingSphere(), false);
+        p_pde_modifier->SetBcsOnBoundingSphere(true);
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoundingSphere(), true);
+
+        // For coverage, output the solution gradient
+        p_pde_modifier->SetOutputGradient(true);
+
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithMeshOnSquareBcsOnBoundingSphere");
+
+        // Run for 10 time steps
+        for (unsigned i=0; i<10; i++)
+        {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+            p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+            p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+        }
+
+        // Test the solution at some fixed points to compare with other cell populations
+        CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
+
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0914, 1e-4);
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_x"), -0.0764, 1e-4);
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_y"), 0.0004, 1e-4);
+
+    }
+
+
+    // Only difference from above tests (TestMeshBasedSquareMonolayer) is the use of Neuman BCs here.
+    // Note we can only do this on the box not on the cells or the bounding sphere
+    void TestMeshBasedSquareMonolayerWithNeumanBcs()
+    {
+        HoneycombMeshGenerator generator(10,10,0);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -282,7 +490,12 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1.0, -1.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        bool scale_by_cell_volume = false;
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -307,19 +520,19 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 2.0029, 1e-4);
+        CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
 
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_x"), -0.3783, 1e-4);
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_y"), -0.2981, 1e-4);
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.121, 1e-4);
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_x"), -0.1028, 1e-4);
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_y"), -0.0053, 1e-4);
     }
 
-    void TestNodeBasedSquareMonolayer() throw (Exception)
+    void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -350,7 +563,12 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1.0, -1.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        bool scale_by_cell_volume = false;
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -375,19 +593,21 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4);
+        CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
+
+        // Exactly the same as all Off Lattice models as same cell cetres
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0799, 1e-4);
 
         // Clear memory
         delete p_mesh;
     }
 
-    void TestVertexBasedSquareMonolayer() throw (Exception)
+    void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(10,10);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre based tests
 
@@ -419,7 +639,12 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1.0, -1.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        bool scale_by_cell_volume = false;
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -433,7 +658,7 @@ public:
 
         // For coverage, output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
-        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithVertexOnSquare");
 
         // Run for 10 timesteps
         for (unsigned i=0; i<10; i++)
@@ -444,16 +669,18 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4);
+        CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
+
+        // Exactly the same as all Off Lattice models as same cell cetres
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0799, 1e-4);
     }
 
-    void TestPottsBasedSquareMonolayer() throw (Exception)
+    void TestPottsBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(100, 10, 4, 100, 10, 4);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Translate and scale so cells are on top of those in the above centre based tests.
         p_mesh->Translate(-31.5,-31.5);
@@ -487,7 +714,12 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1.0, -1.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        bool scale_by_cell_volume = false;
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -501,7 +733,7 @@ public:
 
         // For coverage, output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
-        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithPottsOnSquare");
 
         // Run for 10 timesteps
         for (unsigned i=0; i<10; i++)
@@ -512,19 +744,21 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 2e-2); // Low tolerance as mesh is slightly larger than for off-lattice models
+        CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5, 1e-4); //5.5 in Off Lattice
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
 
-        // Checking it doesn't change for this cell population
-        TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8343, 1e-4);
+        // Similar to all Off Lattice models as different cell cetres
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0799, 1e-2);
+
+        // Exactly the same as all On Lattice models as same cell cetres
+        TS_ASSERT_DELTA(p_cell_55->GetCellData()->GetItem("variable"), 0.0848, 1e-4);
     }
 
-    void TestCaBasedSquareMonolayer() throw (Exception)
+    void TestCaBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Scale so cells are on top of those in the above centre based tests
         p_mesh->Scale(1.0,sqrt(3.0)*0.5);
@@ -563,7 +797,12 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1.0, -1.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        bool scale_by_cell_volume = false;
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -577,7 +816,7 @@ public:
 
         // For coverage, output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
-        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithCaOnSquare");
 
         // Run for 10 time steps
         for (unsigned i=0; i<10; i++)
@@ -588,13 +827,15 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 2e-2); // Low tolerance as mesh is slightly larger than for off-lattice models
+        CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5, 1e-4); //5.5 in Off Lattice
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
 
-        // Checking it doesn't change for this cell population
-        TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8343, 1e-4);
+        // Similar to all Off Lattice models as different cell cetres
+        TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0799, 1e-2);
+
+        // Exactly the same as all On Lattice models as same cell cetres
+        TS_ASSERT_DELTA(p_cell_55->GetCellData()->GetItem("variable"), 0.0848, 1e-4);
     }
 };
 

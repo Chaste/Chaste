@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,6 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "PetscTools.hpp"
 #include "VectorHelperFunctions.hpp"
+
+#if CHASTE_SUNDIALS_VERSION >= 60000
+#include "CvodeContextManager.hpp"  // access to shared SUNContext object required by Sundials 6.0+
+#endif
 
 OdeSolution::OdeSolution()
     : mNumberOfTimeSteps(0u),
@@ -158,7 +162,7 @@ std::vector<double>& OdeSolution::rGetParameters(AbstractParameterisedSystem<VEC
 
 std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractParameterisedSystem<std::vector<double> >* pOdeSystem)
 {
-    assert(pOdeSystem != NULL);
+    assert(pOdeSystem != nullptr);
     if (mDerivedQuantities.empty() && pOdeSystem->GetNumberOfDerivedQuantities() > 0)
     {
         assert(mTimes.size() == mSolutions.size()); // Paranoia
@@ -174,13 +178,17 @@ std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractPa
 #ifdef CHASTE_CVODE
 std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractParameterisedSystem<N_Vector>* pOdeSystem)
 {
-    assert(pOdeSystem != NULL);
+    assert(pOdeSystem != nullptr);
     if (mDerivedQuantities.empty() && pOdeSystem->GetNumberOfDerivedQuantities() > 0)
     {
         const unsigned num_solutions = mSolutions.size();
         assert(mTimes.size() == num_solutions); // Paranoia
         mDerivedQuantities.resize(mTimes.size());
-        N_Vector state_vars = num_solutions > 0 ? N_VNew_Serial(mSolutions[0].size()) : NULL;
+#if CHASTE_SUNDIALS_VERSION >= 60000
+        N_Vector state_vars = num_solutions > 0 ? N_VNew_Serial(mSolutions[0].size(), CvodeContextManager::Instance()->GetSundialsContext()) : nullptr;
+#else
+        N_Vector state_vars = num_solutions > 0 ? N_VNew_Serial(mSolutions[0].size()) : nullptr;
+#endif
         for (unsigned i=0; i<num_solutions; i++)
         {
             CopyFromStdVector(mSolutions[i], state_vars);
@@ -207,7 +215,7 @@ void OdeSolution::WriteToFile(std::string directoryName,
     assert(stepsPerRow > 0);
     assert(mTimes.size() > 0);
     assert(mTimes.size() == mSolutions.size());
-    assert(mpOdeSystemInformation.get() != NULL);
+    assert(mpOdeSystemInformation.get() != nullptr);
     if (mpOdeSystemInformation->GetNumberOfParameters()==0 && mpOdeSystemInformation->GetNumberOfDerivedQuantities() == 0)
     {
         includeDerivedQuantities = false;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement(unsigned index, Node<SPACE_DIM>* pNode)
     : AbstractTetrahedralElement<ELEMENT_DIM,SPACE_DIM>(index)
 {
-    assert(ELEMENT_DIM == 0); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 0);     // LCOV_EXCL_LINE
 
     // Store Node pointer
     this->mNodes.push_back(pNode);

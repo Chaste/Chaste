@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,17 +38,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CvodeAdaptor.hpp"
 
 #include "Exception.hpp"
+#include "MathsCustomFunctions.hpp" // For tolerance check.
 #include "TimeStepper.hpp"
 #include "VectorHelperFunctions.hpp"
-#include "MathsCustomFunctions.hpp" // For tolerance check.
 
 #include <iostream>
 #include <sstream>
 
 // CVODE headers
 #include <sundials/sundials_nvector.h>
-#include <cvode/cvode_dense.h>
 
+#if CHASTE_SUNDIALS_VERSION >= 30000
+#if CHASTE_SUNDIALS_VERSION < 70000
+#include <cvode/cvode_direct.h> /* access to CVDls interface            */
+#endif
+#include <sundials/sundials_types.h> /* defs. of realtype, sunindextype      */
+#include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
+#include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
+#else
+#include <cvode/cvode_dense.h>
+#endif
+
+#if CHASTE_SUNDIALS_VERSION >= 60000
+#include "CvodeContextManager.hpp"  // access to shared SUNContext object required by Sundials 6.0+
+#endif
 
 /**
  * CVODE right-hand-side function adaptor.
@@ -68,8 +81,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 int CvodeRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void* pData)
 {
-    assert(pData != NULL);
-    CvodeData* p_data = (CvodeData*) pData;
+    assert(pData != nullptr);
+    CvodeData* p_data = (CvodeData*)pData;
     // Get y, ydot into std::vector<>s
     static std::vector<realtype> ydot_vec;
     CopyToStdVector(y, *p_data->pY);
@@ -79,9 +92,10 @@ int CvodeRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void* pData)
     {
         p_data->pSystem->EvaluateYDerivatives(t, *(p_data->pY), ydot_vec);
     }
-    catch (const Exception &e)
+    catch (const Exception& e)
     {
-        std::cerr << "CVODE RHS Exception: " << e.GetMessage() << std::endl << std::flush;
+        std::cerr << "CVODE RHS Exception: " << e.GetMessage() << std::endl
+                  << std::flush;
         return -1;
     }
     // Copy derivative back
@@ -111,8 +125,8 @@ int CvodeRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void* pData)
  */
 int CvodeRootAdaptor(realtype t, N_Vector y, realtype* pGOut, void* pData)
 {
-    assert(pData != NULL);
-    CvodeData* p_data = (CvodeData*) pData;
+    assert(pData != nullptr);
+    CvodeData* p_data = (CvodeData*)pData;
     // Get y into a std::vector
     CopyToStdVector(y, *p_data->pY);
     // Call our function
@@ -120,9 +134,10 @@ int CvodeRootAdaptor(realtype t, N_Vector y, realtype* pGOut, void* pData)
     {
         *pGOut = p_data->pSystem->CalculateRootFunction(t, *p_data->pY);
     }
-    catch (const Exception &e)
+    catch (const Exception& e)
     {
-        std::cerr << "CVODE Root Exception: " << e.GetMessage() << std::endl << std::flush;
+        std::cerr << "CVODE Root Exception: " << e.GetMessage() << std::endl
+                  << std::flush;
         return -1;
     }
     return 0;
@@ -163,18 +178,22 @@ int CvodeRootAdaptor(realtype t, N_Vector y, realtype* pGOut, void* pData)
 //     return 0;
 // }
 
-
-void CvodeErrorHandler(int errorCode, const char *module, const char *function,
-                       char *message, void* pData)
+#if CHASTE_SUNDIALS_VERSION >= 70000
+void CvodeErrorHandler(int errorCode, const char* module, const char* function,
+                       const char* message, SUNErrCode errCode, void* pData, SUNContext sunContext)
+#else
+void CvodeErrorHandler(int errorCode, const char* module, const char* function,
+                       char* message, void* pData)
+#endif
 {
     std::stringstream err;
     err << "CVODE Error " << errorCode << " in module " << module
         << " function " << function << ": " << message;
-    std::cerr << "*" << err.str() << std::endl << std::flush;
+    std::cerr << "*" << err.str() << std::endl
+              << std::flush;
     // Throwing the exception here causes termination on Maverick (g++ 4.4)
     //EXCEPTION(err.str());
 }
-
 
 void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
                               std::vector<double>& rInitialY,
@@ -185,19 +204,23 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
     assert(maxStep > 0.0);
 
     /** Initial conditions for the ODE solver. */
+#if CHASTE_SUNDIALS_VERSION >= 60000
+    N_Vector initial_values = N_VMake_Serial(rInitialY.size(), &(rInitialY[0]), CvodeContextManager::Instance()->GetSundialsContext());
+#else
     N_Vector initial_values = N_VMake_Serial(rInitialY.size(), &(rInitialY[0]));
+#endif
     assert(NV_DATA_S(initial_values) == &(rInitialY[0]));
     assert(!NV_OWN_DATA_S(initial_values));
-//    std::cout << " Initial values: "; N_VPrint_Serial(initial_values);
-//    std::cout << " Rtol: " << mRelTol << ", Atol: " << mAbsTol << std::endl;
-//    std::cout << " Start: " << startTime << " max dt=" << maxStep << std::endl << std::flush;
+    //    std::cout << " Initial values: "; N_VPrint_Serial(initial_values);
+    //    std::cout << " Rtol: " << mRelTol << ", Atol: " << mAbsTol << std::endl;
+    //    std::cout << " Start: " << startTime << " max dt=" << maxStep << std::endl << std::flush;
 
     // Find out if we need to (re-)initialise
     bool reinit = !mpCvodeMem || mForceReset || !mLastSolutionState || !CompareDoubles::WithinAnyTolerance(startTime, mLastSolutionTime);
     if (!reinit && !mForceMinimalReset)
     {
         const unsigned size = GetVectorSize(rInitialY);
-        for (unsigned i=0; i<size; i++)
+        for (unsigned i = 0; i < size; i++)
         {
             if (!CompareDoubles::WithinAnyTolerance(GetVectorComponent(mLastSolutionState, i), GetVectorComponent(rInitialY, i)))
             {
@@ -210,61 +233,144 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
     if (!mpCvodeMem) // First run of this solver, set up CVODE memory
     {
         // Set up CVODE's memory.
+#if CHASTE_SUNDIALS_VERSION >= 60000
+        mpCvodeMem = CVodeCreate(CV_BDF, CvodeContextManager::Instance()->GetSundialsContext());
+#elif CHASTE_SUNDIALS_VERSION >= 40000
+        //  v4.0.0 release notes: instead of specifying the nonlinear iteration type when creating the CVODE(S) memory structure,
+        //  CVODE(S) uses the SUNNONLINSOL_NEWTON module implementation of a Newton iteration by default.
+        mpCvodeMem = CVodeCreate(CV_BDF);
+#else
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == NULL) EXCEPTION("Failed to SetupCvode CVODE"); // In one line to avoid coverage problem!
+#endif
+
+        if (mpCvodeMem == nullptr)
+            EXCEPTION("Failed to SetupCvode CVODE"); // LCOV_EXCL_LINE
         // Set error handler
-        CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, NULL);
+#if CHASTE_SUNDIALS_VERSION >= 70000
+        SUNContext_PushErrHandler(CvodeContextManager::Instance()->GetSundialsContext(),  CvodeErrorHandler, nullptr);
+#else
+        CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
+#endif
         // Set the user data
         mData.pSystem = pOdeSystem;
         mData.pY = &rInitialY;
-        #if CHASTE_SUNDIALS_VERSION >= 20400
-            CVodeSetUserData(mpCvodeMem, (void*)(&mData));
-        #else
-            CVodeSetFdata(mpCvodeMem, (void*)(&mData));
-        #endif
+#if CHASTE_SUNDIALS_VERSION >= 20400
+        CVodeSetUserData(mpCvodeMem, (void*)(&mData));
+#else
+        CVodeSetFdata(mpCvodeMem, (void*)(&mData));
+#endif
 
-        // Setup CVODE
-        #if CHASTE_SUNDIALS_VERSION >= 20400
-            CVodeInit(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values);
-            CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
-        #else
-            CVodeMalloc(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values,
-                        CV_SS, mRelTol, &mAbsTol);
-        #endif
+// Setup CVODE
+#if CHASTE_SUNDIALS_VERSION >= 20400
+        CVodeInit(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values);
+        CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
+#else
+        CVodeMalloc(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values,
+                    CV_SS, mRelTol, &mAbsTol);
+#endif
 
         // Set the rootfinder function if wanted
         if (mCheckForRoots)
         {
-            #if CHASTE_SUNDIALS_VERSION >= 20400
-                CVodeRootInit(mpCvodeMem, 1, CvodeRootAdaptor);
-            #else
-                CVodeRootInit(mpCvodeMem, 1, CvodeRootAdaptor, (void*)(&mData));
-            #endif
+#if CHASTE_SUNDIALS_VERSION >= 20400
+            CVodeRootInit(mpCvodeMem, 1, CvodeRootAdaptor);
+#else
+            CVodeRootInit(mpCvodeMem, 1, CvodeRootAdaptor, (void*)(&mData));
+#endif
         }
+
+        /* Create dense SUNMatrix for use in linear solves */
+#if CHASTE_SUNDIALS_VERSION >= 60000
+        mpSundialsDenseMatrix = SUNDenseMatrix(rInitialY.size(), rInitialY.size(), CvodeContextManager::Instance()->GetSundialsContext());
+#elif CHASTE_SUNDIALS_VERSION >= 30000
+        mpSundialsDenseMatrix = SUNDenseMatrix(rInitialY.size(), rInitialY.size());
+#endif
+
+#if CHASTE_SUNDIALS_VERSION >= 60000
+        /* Create dense SUNLinearSolver object for use by CVode */
+        mpSundialsLinearSolver = SUNLinSol_Dense(initial_values, mpSundialsDenseMatrix, CvodeContextManager::Instance()->GetSundialsContext());
+
+        /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
+        CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#elif CHASTE_SUNDIALS_VERSION >= 40000
+        /* Create dense SUNLinearSolver object for use by CVode */
+        mpSundialsLinearSolver = SUNLinSol_Dense(initial_values, mpSundialsDenseMatrix);
+
+        /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
+        CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#elif CHASTE_SUNDIALS_VERSION >= 30000
+        /* Create dense SUNLinearSolver object for use by CVode */
+        mpSundialsLinearSolver = SUNDenseLinearSolver(initial_values, mpSundialsDenseMatrix);
+
+        /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
+        CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#else
+        // CVODE < v3.0.0
         // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, rInitialY.size());
+#endif
     }
     else if (reinit) // Could be new ODE system, or new Y values
     {
         // Set the user data
         mData.pSystem = pOdeSystem; // stays the same on a re-initialize
         mData.pY = &rInitialY; // changes on a re-initialize
-        #if CHASTE_SUNDIALS_VERSION >= 20400
-            CVodeSetUserData(mpCvodeMem, (void*)(&mData));
-        #else
-            CVodeSetFdata(mpCvodeMem, (void*)(&mData));
-        #endif
+#if CHASTE_SUNDIALS_VERSION >= 20400
+        CVodeSetUserData(mpCvodeMem, (void*)(&mData));
+#else
+        CVodeSetFdata(mpCvodeMem, (void*)(&mData));
+#endif
 
-        #if CHASTE_SUNDIALS_VERSION >= 20400
-            CVodeReInit(mpCvodeMem, startTime, initial_values);
-            CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
-        #else
-            CVodeReInit(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values,
-                        CV_SS, mRelTol, &mAbsTol);
-        #endif
+#if CHASTE_SUNDIALS_VERSION >= 20400
+        CVodeReInit(mpCvodeMem, startTime, initial_values);
+        CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
+#else
+        CVodeReInit(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values,
+                    CV_SS, mRelTol, &mAbsTol);
+#endif
 
+#if CHASTE_SUNDIALS_VERSION >= 30000
+        if (mpSundialsLinearSolver)
+        {
+            /* Free the linear solver memory */
+            SUNLinSolFree(mpSundialsLinearSolver);
+        }
+        if (mpSundialsDenseMatrix)
+        {
+            /* Free the matrix memory */
+            SUNMatDestroy(mpSundialsDenseMatrix);
+        }
+
+        /* Create dense matrix of type SUNDenseMatrix for use in linear solves */
+#if CHASTE_SUNDIALS_VERSION >= 60000
+        mpSundialsDenseMatrix = SUNDenseMatrix(rInitialY.size(), rInitialY.size(), CvodeContextManager::Instance()->GetSundialsContext());
+#else
+        mpSundialsDenseMatrix = SUNDenseMatrix(rInitialY.size(), rInitialY.size());
+#endif
+
+#if CHASTE_SUNDIALS_VERSION >= 60000
+        /* Create dense SUNLinSol_Dense object for use by CVode */
+        mpSundialsLinearSolver = SUNLinSol_Dense(initial_values, mpSundialsDenseMatrix, CvodeContextManager::Instance()->GetSundialsContext());
+
+        /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
+        CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#elif CHASTE_SUNDIALS_VERSION >= 40000
+        /* Create dense SUNLinSol_Dense object for use by CVode */
+        mpSundialsLinearSolver = SUNLinSol_Dense(initial_values, mpSundialsDenseMatrix);
+
+        /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
+        CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#else
+        /* Create dense SUNLinearSolver object for use by CVode */
+        mpSundialsLinearSolver = SUNDenseLinearSolver(initial_values, mpSundialsDenseMatrix);
+
+        /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
+        CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#endif
+#else
         // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, rInitialY.size());
+#endif
     }
 
     CVodeSetMaxStep(mpCvodeMem, maxStep);
@@ -283,9 +389,24 @@ void CvodeAdaptor::FreeCvodeMemory()
     {
         CVodeFree(&mpCvodeMem);
     }
-    mpCvodeMem = NULL;
-}
+    mpCvodeMem = nullptr;
 
+#if CHASTE_SUNDIALS_VERSION >= 30000
+    if (mpSundialsLinearSolver)
+    {
+        /* Free the linear solver memory */
+        SUNLinSolFree(mpSundialsLinearSolver);
+    }
+    mpSundialsLinearSolver = nullptr;
+
+    if (mpSundialsDenseMatrix)
+    {
+        /* Free the matrix memory */
+        SUNMatDestroy(mpSundialsDenseMatrix);
+    }
+    mpSundialsDenseMatrix = nullptr;
+#endif
+}
 
 void CvodeAdaptor::SetForceReset(bool autoReset)
 {
@@ -312,16 +433,16 @@ void CvodeAdaptor::ResetSolver()
     DeleteVector(mLastSolutionState);
 }
 
-void CvodeAdaptor::CvodeError(int flag, const char * msg)
+void CvodeAdaptor::CvodeError(int flag, const char* msg)
 {
     std::stringstream err;
     char* p_flag_name = CVodeGetReturnFlagName(flag);
     err << msg << ": " << p_flag_name;
     free(p_flag_name);
-    std::cerr << err.str() << std::endl << std::flush;
+    std::cerr << err.str() << std::endl
+              << std::flush;
     EXCEPTION(err.str());
 }
-
 
 OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
                                 std::vector<double>& rYValues,
@@ -342,7 +463,11 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     SetupCvode(pOdeSystem, rYValues, startTime, maxStep);
 
     TimeStepper stepper(startTime, endTime, timeSampling);
+#if CHASTE_SUNDIALS_VERSION >= 60000
+    N_Vector yout = N_VMake_Serial(rYValues.size(), &(rYValues[0]), CvodeContextManager::Instance()->GetSundialsContext());
+#else
     N_Vector yout = N_VMake_Serial(rYValues.size(), &(rYValues[0]));
+#endif
 
     // Set up ODE solution
     OdeSolution solutions;
@@ -356,11 +481,12 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     {
         // This should stop CVODE going past the end of where we wanted and interpolating back.
         int ierr = CVodeSetStopTime(mpCvodeMem, stepper.GetNextTime());
-        assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+        assert(ierr == CV_SUCCESS);
+        UNUSED_OPT(ierr); // avoid unused var warning
 
         double tend;
         ierr = CVode(mpCvodeMem, stepper.GetNextTime(), yout, &tend, CV_NORMAL);
-        if (ierr<0)
+        if (ierr < 0)
         {
             FreeCvodeMemory();
             DeleteVector(yout);
@@ -383,13 +509,13 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     solutions.SetNumberOfTimeSteps(stepper.GetTotalTimeStepsTaken());
 
     int ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
-    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+    assert(ierr == CV_SUCCESS);
+    UNUSED_OPT(ierr); // avoid unused var warning
     RecordStoppingPoint(mLastSolutionTime, yout);
     DeleteVector(yout);
 
     return solutions;
 }
-
 
 void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
                          std::vector<double>& rYValues,
@@ -407,15 +533,20 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
 
     SetupCvode(pOdeSystem, rYValues, startTime, maxStep);
 
+#if CHASTE_SUNDIALS_VERSION >= 60000
+    N_Vector yout = N_VMake_Serial(rYValues.size(), &(rYValues[0]), CvodeContextManager::Instance()->GetSundialsContext());
+#else
     N_Vector yout = N_VMake_Serial(rYValues.size(), &(rYValues[0]));
+#endif
 
     // This should stop CVODE going past the end of where we wanted and interpolating back.
     int ierr = CVodeSetStopTime(mpCvodeMem, endTime);
-    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+    assert(ierr == CV_SUCCESS);
+    UNUSED_OPT(ierr); // avoid unused var warning
 
     double tend;
     ierr = CVode(mpCvodeMem, endTime, yout, &tend, CV_NORMAL);
-    if (ierr<0)
+    if (ierr < 0)
     {
         FreeCvodeMemory();
         DeleteVector(yout);
@@ -430,32 +561,38 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     assert(NV_DATA_S(yout) == &(rYValues[0]));
     assert(!NV_OWN_DATA_S(yout));
 
-//    long int steps;
-//    CVodeGetNumSteps(mpCvodeMem, &steps);
-//    std::cout << " Solved to " << endTime << " in " << steps << " steps.\n";
+    //    long int steps;
+    //    CVodeGetNumSteps(mpCvodeMem, &steps);
+    //    std::cout << " Solved to " << endTime << " in " << steps << " steps.\n";
 
     ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
-    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+    assert(ierr == CV_SUCCESS);
+    UNUSED_OPT(ierr); // avoid unused var warning
     RecordStoppingPoint(tend, yout);
     DeleteVector(yout);
 }
 
 CvodeAdaptor::CvodeAdaptor(double relTol, double absTol)
-    : AbstractIvpOdeSolver(),
-      mpCvodeMem(NULL),
-      mRelTol(relTol),
-      mAbsTol(absTol),
-      mLastInternalStepSize(-0.0),
-      mMaxSteps(0),
-      mCheckForRoots(false),
-      mLastSolutionState(NULL),
-      mLastSolutionTime(0.0),
+        : AbstractIvpOdeSolver(),
+          mpCvodeMem(nullptr),
+          mRelTol(relTol),
+          mAbsTol(absTol),
+          mLastInternalStepSize(-0.0),
+          mMaxSteps(0),
+          mCheckForRoots(false),
+          mLastSolutionState(nullptr),
+          mLastSolutionTime(0.0),
 #if CHASTE_SUNDIALS_VERSION >= 20400
-      mForceReset(false),
+          mForceReset(false),
 #else
-      mForceReset(true),
+          mForceReset(true),
 #endif
-      mForceMinimalReset(false)
+          mForceMinimalReset(false)
+#if CHASTE_SUNDIALS_VERSION >= 30000
+          ,
+          mpSundialsDenseMatrix(nullptr),
+          mpSundialsLinearSolver(nullptr)
+#endif
 {
 }
 
@@ -471,7 +608,7 @@ void CvodeAdaptor::RecordStoppingPoint(double stopTime, N_Vector yEnd)
     {
         const unsigned size = GetVectorSize(yEnd);
         CreateVectorIfEmpty(mLastSolutionState, size);
-        for (unsigned i=0; i<size; i++)
+        for (unsigned i = 0; i < size; i++)
         {
             SetVectorComponent(mLastSolutionState, i, GetVectorComponent(yEnd, i));
         }

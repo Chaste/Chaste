@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,23 +32,23 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "Exception.hpp"
+
 #include "CmguiMeshWriter.hpp"
-#include "Version.hpp"
+
+#include <string>
+
 #include <boost/shared_ptr.hpp>
 
 #include "AbstractTetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
+#include "Exception.hpp"
+#include "Version.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////
-// Implementation
-///////////////////////////////////////////////////////////////////////////////////
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::CmguiMeshWriter(const std::string& rDirectory,
-                                                        const std::string& rBaseName,
-                                                        bool cleanDirectory)
-        : AbstractTetrahedralMeshWriter<ELEMENT_DIM,SPACE_DIM>(rDirectory, rBaseName, cleanDirectory)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::CmguiMeshWriter(const std::string& rDirectory,
+                                                         const std::string& rBaseName,
+                                                         bool cleanDirectory)
+        : AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, cleanDirectory)
 {
     this->mIndexFromZero = false;
     mGroupName = this->mBaseName;
@@ -195,7 +195,7 @@ std::vector<boost::shared_ptr<std::ofstream> > CmguiMeshWriter<ELEMENT_DIM, SPAC
         //
         // elem_files[region_index]  = this->mpOutputFileHandler->OpenOutputFile(elem_file_name, GetOpenMode(append));
         //
-        // but that implies automatic conversion between std::auto_ptr to boost::shared_ptr.
+        // but that implies automatic conversion between std::shared_ptr to boost::shared_ptr.
         // That is OK with most compilers, but the combination of gcc 4.1 and boost 1.33 complains about that
         elem_files[region_index]  = p_output_file;
     }

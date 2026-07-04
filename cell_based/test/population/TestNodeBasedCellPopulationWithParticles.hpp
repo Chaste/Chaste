@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,7 +80,7 @@ public:
      * 0 to be associated with node 1 instead of node 0, and Validate() throws an
      * exception. We then set node 0 to be a particle node, and Validate() passes.
      */
-    void TestValidateNodeBasedCellPopulationWithParticles() throw(Exception)
+    void TestValidateNodeBasedCellPopulationWithParticles()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -135,14 +135,14 @@ public:
     }
 
     // Test with particles, checking that the Iterator doesn't loop over particles
-    void TestNodeBasedCellPopulationWithParticlesSetup() throw(Exception)
+    void TestNodeBasedCellPopulationWithParticlesSetup()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
         unsigned num_cells_depth = 11;
         unsigned num_cells_width = 6;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -205,7 +205,7 @@ public:
         TS_ASSERT_EQUALS(counter + particle_indices.size(), mesh.GetNumNodes());
     }
 
-    void TestCellPopulationIteratorWithNoCells() throw(Exception)
+    void TestCellPopulationIteratorWithNoCells()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -442,7 +442,7 @@ public:
     }
 
 
-    void TestCellPopulationWritersIn3dWithParticles() throw(Exception)
+    void TestCellPopulationWritersIn3dWithParticles()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -562,7 +562,7 @@ public:
         }
     }
 
-    void TestArchivingCellPopulation() throw (Exception)
+    void TestArchivingCellPopulation()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 

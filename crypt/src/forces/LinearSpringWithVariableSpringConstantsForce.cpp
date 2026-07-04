@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -223,7 +223,7 @@ template<unsigned DIM>
 void LinearSpringWithVariableSpringConstantsForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a MeshBasedCellPopulation
-    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("LinearSpringWithVariableSpringConstantsForce is to be used with a subclass of MeshBasedCellPopulation only");
     }

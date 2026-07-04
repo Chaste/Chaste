@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,7 +49,7 @@ bool NoCellCycleModel::ReadyToDivide()
 AbstractCellCycleModel* NoCellCycleModel::CreateCellCycleModel()
 {
     NEVER_REACHED;
-    return NULL;
+    return nullptr;
 }
 // LCOV_EXCL_STOP
 

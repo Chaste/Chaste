@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,14 +68,14 @@ private:
 
 public:
 
-    void TestConstructor1d2d3d() throw (Exception)
+    void TestConstructor1d2d3d()
     {
         TestConstructNodeAttributes<1>(1e-4);
         TestConstructNodeAttributes<2>(1e-4);
         TestConstructNodeAttributes<3>(1e-4);
     }
 
-    void TestAttributesContainer() throw (Exception)
+    void TestAttributesContainer()
     {
         NodeAttributes<3> node_attributes;
 
@@ -89,7 +89,7 @@ public:
         TS_ASSERT_DELTA(node_attributes.rGetAttributes()[1], 2.0, 1e-4);
     }
 
-    void TestRegion() throw (Exception)
+    void TestRegion()
     {
         NodeAttributes<3> node_attributes;
 
@@ -102,7 +102,7 @@ public:
         TS_ASSERT_EQUALS(node_attributes.GetRegion(), 2u);
     }
 
-    void TestAppliedForce() throw (Exception)
+    void TestAppliedForce()
     {
         NodeAttributes<3> node_attributes;
 
@@ -134,7 +134,7 @@ public:
         TS_ASSERT_DELTA(node_attributes.rGetAppliedForce()[2], 0.0, 1e-4);
     }
 
-    void TestIsParticle() throw (Exception)
+    void TestIsParticle()
     {
         NodeAttributes<2> node_attributes;
 
@@ -147,7 +147,7 @@ public:
         TS_ASSERT(!node_attributes.IsParticle());
     }
 
-    void TestRadius() throw (Exception)
+    void TestRadius()
     {
         NodeAttributes<3> node_attributes;
 
@@ -159,7 +159,7 @@ public:
         TS_ASSERT_DELTA(node_attributes.GetRadius(), 2.6, 1e-4);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         EXIT_IF_PARALLEL;
 
@@ -214,7 +214,7 @@ public:
         }
     }
 
-    void TestArchivingNullPointer() throw (Exception)
+    void TestArchivingNullPointer()
     {
         EXIT_IF_PARALLEL;
 
@@ -225,11 +225,12 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            NodeAttributes<3>* const p_node_attributes = NULL;
+            NodeAttributes<3>* const p_node_attributes = nullptr;
 
             output_arch << p_node_attributes;
 
-            delete p_node_attributes;
+            // This is an unnecessary delete and GCC 11 does not like it
+            // delete p_node_attributes;
         }
 
         {

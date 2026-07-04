@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -144,7 +144,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -179,7 +179,7 @@ public:
      * and the spring system will resemble a parallelogram. However we keep
      * the simulation time at 1.0 in order to keep the test short.
      */
-    void Test2DSpringSystem() throw (Exception)
+    void Test2DSpringSystem()
     {
         EXIT_IF_PARALLEL;    // Writing mesh based in parallel causes duplicated results.
 
@@ -241,7 +241,7 @@ public:
         FileComparison( elem_results_file, "crypt/test/data/Crypt2DSpringsResults/results.vizelements").CompareFiles();
     }
 
-    void TestWithMultipleCellKillers() throw (Exception)
+    void TestWithMultipleCellKillers()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -250,13 +250,13 @@ public:
        unsigned thickness_of_ghost_layer = 4;
 
        HoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer);
-       MutableMesh<2,2>* p_mesh = generator.GetMesh();
+       boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
        // Set up cells
        std::vector<CellPtr> cells;
        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-       cells_generator.Generate(cells, p_mesh, location_indices, true);
+       cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
        // Create cell population
        MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -309,19 +309,19 @@ public:
        }
 
        // Check no nodes have been created
-       TS_ASSERT_EQUALS(num_ghosts_after, num_ghosts_after);
+       TS_ASSERT_EQUALS(num_ghosts_before, num_ghosts_after);
 
        // All cells should have been removed in this time
        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), num_cells-2u);
     }
 
-    void TestUpdatePositions() throw (Exception)
+    void TestUpdatePositions()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
         // Create mesh
         HoneycombMeshGenerator generator(3, 3, 1);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -329,7 +329,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
@@ -397,7 +397,7 @@ public:
         }
     }
 
-    void Test2DCylindrical() throw (Exception)
+    void Test2DCylindrical()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -409,7 +409,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -417,7 +417,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);// true = mature cells
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -463,7 +463,7 @@ public:
         CellBasedEventHandler::Reset(); // otherwise event handler left in bad state after throw
     }
 
-    void Test2DCylindricalMultipleDivisions() throw (Exception)
+    void Test2DCylindricalMultipleDivisions()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -482,7 +482,7 @@ public:
                                                     thickness_of_ghost_layer,
                                                     crypt_width/cells_across);
 
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         double crypt_length = cells_up*(sqrt(3.0)/2)*crypt_width/cells_across;
 
         // Get location indices corresponding to real cells
@@ -491,7 +491,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true); // true = mature cells
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true); // true = mature cells
 
         for (unsigned i=0; i<cells.size(); i++)
         {
@@ -556,7 +556,7 @@ public:
      *
      * Note - if the previous test is changed we need to update the file this test refers to.
      */
-    void TestVisualizerOutput() throw (Exception)
+    void TestVisualizerOutput()
     {
         EXIT_IF_PARALLEL;
 
@@ -582,7 +582,7 @@ public:
      * But at least it uses Wnt cell cycle and runs reasonably quickly...
      * For a better test with more randomly distributed cell ages see the Nightly test pack.
      */
-    void TestWithWntDependentCells() throw (Exception)
+    void TestWithWntDependentCells()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -593,7 +593,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -601,7 +601,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<WntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), false);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), false);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -640,7 +640,7 @@ public:
     }
 
     // A better check that the loaded mesh is the same as that saved
-    void TestMeshSurvivesSaveLoad() throw (Exception)
+    void TestMeshSurvivesSaveLoad()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -651,7 +651,7 @@ public:
         unsigned thickness_of_ghost_layer = 4;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -659,7 +659,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<WntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -705,7 +705,7 @@ public:
     }
 
     // A check that save and load works when a Voronoi tessellation is involved
-    void TestMeshSurvivesSaveLoadWithVoronoiTessellation() throw (Exception)
+    void TestMeshSurvivesSaveLoadWithVoronoiTessellation()
     {
         EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
@@ -716,7 +716,7 @@ public:
         unsigned thickness_of_ghost_layer = 4;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -724,7 +724,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<WntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -764,7 +764,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -774,7 +774,7 @@ public:
         unsigned thickness_of_ghost_layer = 4;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         double crypt_length = cells_up*(sqrt(3.0)/2);
 
         // Get location indices corresponding to real cells
@@ -783,7 +783,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -839,7 +839,7 @@ public:
     }
 
     // Testing Save
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -849,7 +849,7 @@ public:
         unsigned thickness_of_ghost_layer = 4;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         double crypt_length = cells_up*(sqrt(3.0)/2);
 
         // Get location indices corresponding to real cells
@@ -858,7 +858,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -896,7 +896,7 @@ public:
     }
 
     // Testing Load (based on previous two tests)
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         EXIT_IF_PARALLEL;    // Cell-based archiving doesn't work in parallel.
 
@@ -964,7 +964,7 @@ public:
      * to be 'mature' cells which won't shrink together.
      * Limited this by using only four cells of minimum age.
      */
-    void TestWntCellsCannotMoveAcrossYEqualsZero() throw (Exception)
+    void TestWntCellsCannotMoveAcrossYEqualsZero()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -976,7 +976,7 @@ public:
         unsigned thickness_of_ghost_layer = 1;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -984,7 +984,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<WntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -1074,7 +1074,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestCellIdOutput() throw (Exception)
+    void TestCellIdOutput()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1089,7 +1089,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -1097,7 +1097,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);// true = mature cells
 
         for (unsigned i=0; i<cells.size(); i++)
         {
@@ -1135,7 +1135,7 @@ public:
 
     // This is a strange test -- all cells divide within a quick time, it gives
     // good testing of the periodic boundaries though... [comment no longer valid?]
-    void TestWithTysonNovakCells() throw (Exception)
+    void TestWithTysonNovakCells()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1145,7 +1145,7 @@ public:
         unsigned thickness_of_ghost_layer = 4;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         double crypt_length = cells_up*(sqrt(3.0)/2);
 
         // Get location indices corresponding to real cells
@@ -1154,7 +1154,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<TysonNovakCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -1199,7 +1199,7 @@ public:
         TS_ASSERT_EQUALS(number_of_nodes, 123u);
     }
 
-    void TestAddCellKiller() throw (Exception)
+    void TestAddCellKiller()
     {
         EXIT_IF_PARALLEL;
 
@@ -1238,7 +1238,7 @@ public:
         TS_ASSERT_EQUALS(num_deaths, 11u);
     }
 
-    void TestCalculateCellDivisionVectorConfMesh() throw (Exception)
+    void TestCalculateCellDivisionVectorConfMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -1280,7 +1280,7 @@ public:
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), conf_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
-    void TestCalculateCellDivisionVectorConfMeshStemCell() throw (Exception)
+    void TestCalculateCellDivisionVectorConfMeshStemCell()
     {
         EXIT_IF_PARALLEL;
 
@@ -1325,7 +1325,7 @@ public:
        }
     }
 
-    void TestCalculateCellDivisionVectorCylindricalMesh() throw (Exception)
+    void TestCalculateCellDivisionVectorCylindricalMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -1360,7 +1360,7 @@ public:
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), cyl_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
-    void TestCalculateCellDivisionVectorCylindricalMeshStemCell() throw (Exception)
+    void TestCalculateCellDivisionVectorCylindricalMeshStemCell()
     {
         EXIT_IF_PARALLEL;
 
@@ -1399,7 +1399,7 @@ public:
     }
 
     // Short test which sets mNoBirth for coverage
-    void TestNoBirth() throw (Exception)
+    void TestNoBirth()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1413,7 +1413,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -1421,7 +1421,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);// true = mature cells
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);// true = mature cells
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -1457,7 +1457,7 @@ public:
     }
 
     // Test death on a non-periodic mesh. Note that birth does occur too.
-    void TestRandomDeathOnNonPeriodicCrypt() throw (Exception)
+    void TestRandomDeathOnNonPeriodicCrypt()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1467,7 +1467,7 @@ public:
         unsigned thickness_of_ghost_layer = 1;
 
         HoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -1475,7 +1475,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -1507,7 +1507,7 @@ public:
 
         // Create mesh
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -1515,7 +1515,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -1557,7 +1557,7 @@ public:
 
         // Create mesh
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -1565,7 +1565,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
         TS_ASSERT_EQUALS(cells.size(), 16u);
 
         // Bestow mutations on some cells
@@ -1760,7 +1760,7 @@ public:
         delete p_simulator;
     }
 
-    void TestWriteBetaCatenin() throw (Exception)
+    void TestWriteBetaCatenin()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1770,7 +1770,7 @@ public:
         unsigned thickness_of_ghost_layer = 1;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         double crypt_length = cells_up*(sqrt(3.0)/2);
 
         // Get location indices corresponding to real cells
@@ -1779,7 +1779,7 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -1816,7 +1816,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestCryptSimulation2DParameterOutput() throw (Exception)
+    void TestCryptSimulation2DParameterOutput()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1827,7 +1827,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -1835,7 +1835,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);// true = mature cells
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -1862,7 +1862,7 @@ public:
         ///\todo check output of simulator.OutputSimulationSetup();
     }
 
-    void TestAncestorCryptSimulations() throw (Exception)
+    void TestAncestorCryptSimulations()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1876,7 +1876,7 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -1884,7 +1884,7 @@ public:
         // Set up cells
         std::vector<CellPtr> temp_cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(temp_cells, p_mesh, std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
+        cells_generator.Generate(temp_cells, p_mesh.get(), std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
 
         // This awkward way of setting up the cells is a result of #430
         std::vector<CellPtr> cells;
@@ -1894,7 +1894,7 @@ public:
         }
 
         // Set up crypt
-        MeshBasedCellPopulationWithGhostNodes<2>* p_crypt = new MeshBasedCellPopulationWithGhostNodes<2>(*p_mesh, cells, location_indices, false, 30.0); // Last parameter adjusts Ghost spring stiffness in line with the linear_force later on
+        MeshBasedCellPopulationWithGhostNodes<2>* p_crypt = new MeshBasedCellPopulationWithGhostNodes<2>(*p_mesh, cells, location_indices, false, 30.0, 30.0); // Last parameter adjusts Ghost spring stiffness in line with the linear_force later on
 
         // Set simulation to output cell types and cell ancestors
         p_crypt->AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
@@ -1948,13 +1948,13 @@ public:
         // Create mesh
         double crypt_length = 1.1*12.0*sqrt(3.0)/2.0;
         CylindricalHoneycombMeshGenerator generator(6, 12, 0, 1.1);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells,location_indices);

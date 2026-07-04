@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "UblasVectorInclude.hpp"
 
@@ -50,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "CryptProjectionForce.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "WntConcentration.hpp"
 #include "SimulationTime.hpp"
 #include "MutableMesh.hpp"
@@ -67,7 +69,7 @@ class TestCryptProjectionForce : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCryptProjectionForceMethods() throw (Exception)
+    void TestCryptProjectionForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
 
@@ -79,7 +81,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Centre the mesh at (0,0)
         ChasteCuboid<2> bounding_box=p_mesh->CalculateBoundingBox();
@@ -244,7 +246,7 @@ public:
      * \todo WntBasedChemotaxis should be possible in other force laws. If/when
      * this is implemented, this test should be moved to somewhere more appropriate.
      */
-    void TestCryptProjectionForceWithWntBasedChemotaxis() throw (Exception)
+    void TestCryptProjectionForceWithWntBasedChemotaxis()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
 
@@ -258,7 +260,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Centre the mesh at (0,0)
         ChasteCuboid<2> bounding_box=p_mesh->CalculateBoundingBox();
@@ -333,7 +335,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestCryptProjectionForceWithArchiving() throw (Exception)
+    void TestCryptProjectionForceWithArchiving()
     {
         EXIT_IF_PARALLEL;    // Cell-based archiving doesn't work in parallel.
 
@@ -461,7 +463,7 @@ private:
 
 public:
 
-    void TestForceCollection() throw (Exception)
+    void TestForceCollection()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
 
@@ -472,7 +474,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
@@ -550,7 +552,7 @@ public:
         FileComparison( projection_force_results_dir + "projection_results.parameters", "crypt/test/data/TestForcesForCrypt/projection_results.parameters").CompareFiles();
     }
 
-    void TestCryptProjectionForceWithNodeBasedCellPopulation() throw (Exception)
+    void TestCryptProjectionForceWithNodeBasedCellPopulation()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;

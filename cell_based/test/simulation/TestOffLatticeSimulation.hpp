@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
+#include "ToroidalHoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "UniformCellCycleModel.hpp"
@@ -85,13 +86,13 @@ class TestOffLatticeSimulation : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
-    void TestOutputNodeAndCellVelocitiesAndDivisionLocations() throw(Exception)
+    void TestOutputNodeAndCellVelocitiesAndDivisionLocations()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
         // Create a simple 2D MeshBasedCellPopulation
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -113,16 +114,25 @@ public:
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
+        // Add a cell killer to remove a cell
+        c_vector<double, 2> point = zero_vector<double>(2);
+        point[1] = 3.5;
+        c_vector<double, 2> normal = zero_vector<double>(2);
+        normal[1] = 1.0;
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal)); // y>3.5
+        simulator.AddCellKiller(p_killer);
+
         // Record node velocities
         cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
-        // Record division locations
+        // Record division and removal locations
         TS_ASSERT_EQUALS(simulator.GetOutputDivisionLocations(), false);
         simulator.SetOutputDivisionLocations(true);
 
         // Record cell velocities
         TS_ASSERT_EQUALS(simulator.GetOutputCellVelocities(), false);
         simulator.SetOutputCellVelocities(true);
+        simulator.SetSamplingTimestepMultiple(12.0); // To test outputting every 12 steps ie 0.1 hours
 
         // Run simulation
         simulator.Solve();
@@ -139,6 +149,11 @@ public:
         NumericFileComparison division_locations(division_locations_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/divisions.dat");
         TS_ASSERT(division_locations.CompareFiles(1e-2));
 
+        // Check removal locations file
+        std::string removal_locations_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/removals.dat";
+        NumericFileComparison removal_locations(removal_locations_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/removals.dat");
+        TS_ASSERT(removal_locations.CompareFiles(1e-2));
+
         // Check cell velocities file
         std::string cell_velocities_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellvelocities.dat";
         NumericFileComparison cell_velocities(cell_velocities_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/cellvelocities.dat");
@@ -149,22 +164,22 @@ public:
         std::string results_dir = handler.GetOutputDirectoryFullPath();
 
         // Initial condition file
-        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "results_from_time_0/voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
         // Final file
-        FileFinder vtk_file2(results_dir + "results_from_time_0/results_60.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "results_from_time_0/voronoi_results_60.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 #endif //CHASTE_VTK
     }
 
-    void TestOutputNodeVelocitiesWithGhostNodes() throw(Exception)
+    void TestOutputNodeVelocitiesWithGhostNodes()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
         // Create a simple mesh with a surrounding layer of ghost nodes
         HoneycombMeshGenerator generator(3, 3, 1);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -215,11 +230,11 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Initial condition file
-        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "results_from_time_0/voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
         // Final file
-        FileFinder vtk_file2(results_dir + "results_from_time_0/results_60.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "results_from_time_0/voronoi_results_60.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 #endif //CHASTE_VTK
     }
@@ -231,7 +246,7 @@ public:
      * check that the numbers of nodes and cells match at the end of the
      * simulation.
      */
-    void TestOffLatticeSimulationWithCellDeath() throw (Exception)
+    void TestOffLatticeSimulationWithCellDeath()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -239,7 +254,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -261,12 +276,6 @@ public:
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.997877574));
         simulator.AddCellKiller(p_killer);
 
-        // For coverage of an exception.
-        simulator.SetUpdateCellPopulationRule(false);
-        TS_ASSERT_THROWS_THIS(simulator.Solve(),"CellPopulation has had births or deaths but mUpdateCellPopulation is set to false, please set it to true.");
-        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
-
-        simulator.SetUpdateCellPopulationRule(true);
         simulator.Solve();
 
         // Check that the number of nodes is equal to the number of cells
@@ -281,10 +290,15 @@ public:
         TS_ASSERT_EQUALS(SimulationTime::Instance()->GetTime(), 0.5);
     }
 
+
     /**
-     * Test a cell-based simulation with multiple cell killers.
+     * Test some cell-based simulation exceptions.
+     *
+     * In this test, we attempt to solve a cell-based simulation without ghost nodes and
+     * check that the numbers of nodes and cells match at the end of the
+     * simulation.
      */
-    void TestOffLatticeSimulationWithMultipleCellKillers() throw (Exception)
+    void TestOffLatticeSimulationExceptions()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -292,7 +306,54 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationExceptions");
+        simulator.SetEndTime(0.5);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
+
+        // Add cell killer
+        MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.997877574));
+        simulator.AddCellKiller(p_killer);
+
+        // For coverage of two exceptions.
+        simulator.SetUpdateCellPopulationRule(false);
+        TS_ASSERT_THROWS_THIS(simulator.Solve(),"CellPopulation has had births or deaths but mUpdateCellPopulation is set to false, please set it to true.");
+        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
+        simulator.SetUpdateCellPopulationRule(true);
+
+        simulator.SetUpdatingTimestepMultiple(60); // Son only look for births and deaths at start and end
+        TS_ASSERT_THROWS_THIS(simulator.Solve(),"CellPopulation has had births or deaths but you were on a non update step, make sure your cell cycle model and killer only operate on update steps.");
+
+        // Note that this test used to take an extra time step
+        TS_ASSERT_EQUALS(SimulationTime::Instance()->GetTime(), 0.5);
+    }
+
+
+    /**
+     * Test a cell-based simulation with multiple cell killers.
+     */
+    void TestOffLatticeSimulationWithMultipleCellKillers()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
+
+        // Create a simple 2D MeshBasedCellPopulation
+        int num_cells_depth = 5;
+        int num_cells_width = 5;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -344,7 +405,7 @@ public:
     /**
      * Test a cell-based simulation with multiple forces.
      */
-    void TestOffLatticeSimulationWithMultipleForces() throw (Exception)
+    void TestOffLatticeSimulationWithMultipleForces()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -352,7 +413,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -401,9 +462,9 @@ public:
     }
 
     /**
-     * Test a cell-based simulation with variabe rest lengths forces.
+     * Test a cell-based simulation with variable rest lengths forces.
      */
-    void TestOffLatticeSimulationWithVariableRestLengths() throw (Exception)
+    void TestOffLatticeSimulationWithVariableRestLengths()
     {
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
@@ -498,7 +559,7 @@ public:
     /**
      * This tests running a simulation in 3d with a 2d mesh (see #2112)
      */
-    void TestOffLatticeSimulationWith2dMeshIn3d() throw (Exception)
+    void TestOffLatticeSimulationWith2dMeshIn3d()
     {
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
@@ -542,62 +603,67 @@ public:
     /**
      * This tests archiving a simulation in 3d with a 2d mesh (see #2112)
      */
-    void TestArchivingOffLatticeSimulationWith2dMeshIn3d() throw (Exception)
+    void TestArchivingOffLatticeSimulationWith2dMeshIn3d()
     {
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
-        // Load mesh
-        TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
-        MutableMesh<2,3> mesh;
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        // Create cells (we use a NoCellCycleModel here for simplicity, since there is no proliferation)
-        std::vector<CellPtr> cells;
-        CellsGenerator<NoCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
-
-        // Create a cell population
-        MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
-        cell_population.SetWriteVtkAsPoints(true);
-
-        // Add a writer
-        cell_population.AddCellWriter<CellIdWriter>();
-
-        // Set up cell-based simulation
-        OffLatticeSimulation<2,3> simulator(cell_population);
         std::string output_dir = "TestOffLatticeSimulationWith2dMeshIn3dArchive";
-        simulator.SetOutputDirectory(output_dir);
-        simulator.SetEndTime(1.0);
 
-        // Create a force law and pass it to the simulation
-        typedef GeneralisedLinearSpringForce<2,3> Force;
-        MAKE_PTR(Force, p_force);
-        p_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_force);
+        {
+            // Load mesh
+            TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
+            MutableMesh<2,3> mesh;
+            mesh.ConstructFromMeshReader(mesh_reader);
 
-        // Stop remeshing, as this is not possible for 2d in 3d meshes
-        simulator.SetUpdateCellPopulationRule(false);
+            // Create cells (we use a NoCellCycleModel here for simplicity, since there is no proliferation)
+            std::vector<CellPtr> cells;
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
-        CellBasedSimulationArchiver<2,OffLatticeSimulation<2,3>, 3>::Save(&simulator);
+            // Create a cell population
+            MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
+            cell_population.SetWriteVtkAsPoints(true);
 
-        double start_time = 0.;
-        OffLatticeSimulation<2,3>* p_simulator = CellBasedSimulationArchiver<2, OffLatticeSimulation<2,3>, 3 >::Load(output_dir, start_time);
+            // Add a writer
+            cell_population.AddCellWriter<CellIdWriter>();
 
-        p_simulator->Solve();
+            // Set up cell-based simulation
+            OffLatticeSimulation<2,3> simulator(cell_population);
 
-        // Check that nodes are all sat at resting length  (1.0) apart.
-        TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()),1.0,1e-5);
-        TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
-        TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
+            simulator.SetOutputDirectory(output_dir);
+            simulator.SetEndTime(1.0);
 
-        // Avoid memory leak
-        delete p_simulator;
+            // Create a force law and pass it to the simulation
+            typedef GeneralisedLinearSpringForce<2,3> Force;
+            MAKE_PTR(Force, p_force);
+            p_force->SetCutOffLength(1.5);
+            simulator.AddForce(p_force);
+
+            // Stop remeshing, as this is not possible for 2d in 3d meshes
+            simulator.SetUpdateCellPopulationRule(false);
+
+            CellBasedSimulationArchiver<2,OffLatticeSimulation<2,3>, 3>::Save(&simulator);
+        }
+        {
+            double start_time = 0;
+            OffLatticeSimulation<2,3>* p_simulator = CellBasedSimulationArchiver<2, OffLatticeSimulation<2,3>, 3 >::Load(output_dir, start_time);
+
+            p_simulator->Solve();
+
+            // Check that nodes are all sat at resting length  (1.0) apart.
+            TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()),1.0,1e-5);
+            TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
+            TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
+
+            // Avoid memory leak
+            delete p_simulator;
+        }
     }
 
     /**
-     * Test a cell-based simulation with a periodic mesh.
+     * Test a cell-based simulation with a cylindrical mesh.
      */
-    void TestOffLatticeSimulationWithPeriodicMesh() throw (Exception)
+    void TestOffLatticeSimulationWithCylindricalMesh()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -606,7 +672,7 @@ public:
         int cells_across = 6;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, 0);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -616,9 +682,13 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
+        // Output Voronoi for visualisation
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population.SetWriteVtkAsPoints(true);
+
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestOffLatticeSimulationWithPeriodicMesh");
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithCylindricalMesh");
         simulator.SetEndTime(0.5);
 
         // Create some force laws and pass them to the simulation
@@ -631,16 +701,64 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
         // Check that the setup file is written correctly
-        std::string output_directory = "TestOffLatticeSimulationWithPeriodicMesh/results_from_time_0/";
+        std::string output_directory = "TestOffLatticeSimulationWithCylindricalMesh/results_from_time_0/";
         OutputFileHandler output_file_handler(output_directory, false);
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        FileComparison( results_dir + "results.vizsetup", "cell_based/test/data/TestOffLatticeSimulationWithPeriodicMesh/results.vizsetup").CompareFiles();
+        FileComparison( results_dir + "results.vizsetup", "cell_based/test/data/TestOffLatticeSimulationWithCylindricalMesh/results.vizsetup").CompareFiles();
     }
+
+    /**
+     * Test a cell-based simulation with a Toroidal mesh.
+     */
+    void TestOffLatticeSimulationWithToroidalMesh()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
+
+        // Create a simple mesh
+        int cells_up = 6;
+        int cells_across = 6;
+
+        ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+
+        // Create a cell population
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Output Voronoi for visualisation
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population.SetWriteVtkAsPoints(true);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithToroidalMesh");
+        simulator.SetEndTime(0.5);
+
+        // Create some force laws and pass them to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        simulator.AddForce(p_linear_force);
+
+        simulator.Solve();
+
+        // Check that the number of nodes is equal to the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
+
+        // Check that the setup file is written correctly
+        std::string output_directory = "TestOffLatticeSimulationWithToroidalMesh/results_from_time_0/";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        FileComparison( results_dir + "results.vizsetup", "cell_based/test/data/TestOffLatticeSimulationWithToroidalMesh/results.vizsetup").CompareFiles();
+    }
+
 
     /**
      * Test a cell-based simulation with multiple boundary conditions. y<2 and y>0
      */
-    void TestOffLatticeSimulationWithMultipleCellBoundaryConditions() throw (Exception)
+    void TestOffLatticeSimulationWithMultipleCellBoundaryConditions()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -648,7 +766,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -696,12 +814,12 @@ public:
         CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
     }
 
-    void TestOffLatticeSimulationWithStoppingEvent() throw (Exception)
+    void TestOffLatticeSimulationWithStoppingEvent()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
         HoneycombMeshGenerator generator(2, 2, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         CellPropertyRegistry::Instance()->Clear();
@@ -809,7 +927,7 @@ public:
         TS_ASSERT_LESS_THAN(3.1415, time);
     }
 
-    void TestApoptosisSpringLengths() throw (Exception)
+    void TestApoptosisSpringLengths()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -817,7 +935,7 @@ public:
         unsigned num_cells_width = 2;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create cells
@@ -901,13 +1019,13 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
     }
 
-    void TestOffLatticeSimulationParameterOutputMethods() throw (Exception)
+    void TestOffLatticeSimulationParameterOutputMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -920,6 +1038,17 @@ public:
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetEndTime(0.5);
+
+
+        // Test SetSamplingTimestepMultiple method
+        TS_ASSERT_EQUALS(simulator.mSamplingTimestepMultiple, 1u);
+        simulator.SetSamplingTimestepMultiple(2);
+        TS_ASSERT_EQUALS(simulator.mSamplingTimestepMultiple, 2u);
+
+        // Test SetUpdatingTimestepMultiple method
+        TS_ASSERT_EQUALS(simulator.mUpdatingTimestepMultiple, 1u);
+        simulator.SetUpdatingTimestepMultiple(2);
+        TS_ASSERT_EQUALS(simulator.mUpdatingTimestepMultiple, 2u);
 
         // We call SetupSolve() here to set up the default numerical method, which is otherwise NULL
         simulator.SetupSolve();
@@ -964,7 +1093,7 @@ public:
      * The purpose of this test is to check that it is possible to construct and run
      * a short 1D cell-based simulation without throwing any exceptions.
      */
-    void Test1dOffLatticeSimulation() throw (Exception)
+    void Test1dOffLatticeSimulation()
     {
         // Create a 1D MeshBasedCellPopulation
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -1004,14 +1133,14 @@ public:
         TS_ASSERT_EQUALS((static_cast<MeshBasedCellPopulation<1>* >(&(simulator.rGetCellPopulation())))->rGetMesh().GetNumElements(), initial_num_elements + 1);
     }
 
-    void TestSettingEndTimeIssue() throw(Exception)
+    void TestSettingEndTimeIssue()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.1, 1);
 
         HoneycombMeshGenerator generator(2, 2, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create some cells
         std::vector<CellPtr> cells;
@@ -1032,13 +1161,13 @@ public:
             "End time and number of timesteps already setup. You should not use SimulationTime::SetEndTimeAndNumberOfTimeSteps in cell-based tests.");
     }
 
-    void TestCellProliferativeTypeCounts() throw(Exception)
+    void TestCellProliferativeTypeCounts()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
         // Create a simple 2D MeshBasedCellPopulation
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1119,7 +1248,7 @@ public:
      *
      * Test to check we can add and remove them
      */
-    void TestOffLatticeSimulationWithModifiers() throw (Exception)
+    void TestOffLatticeSimulationWithModifiers()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -1127,7 +1256,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1159,7 +1288,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
     }
 
-    void TestWriterIteratorsWithCellDeath() throw(Exception)
+    void TestWriterIteratorsWithCellDeath()
     {
         /*
          * This test was added because of the issue raised by #2422 and #2689,
@@ -1174,7 +1303,7 @@ public:
         EXIT_IF_PARALLEL;
 
         HoneycombMeshGenerator generator(10,10);
-        MutableMesh<2,2>* p_mesh = generator.GetCircularMesh(5);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(5);
 
         MAKE_PTR(ApcOneHitCellMutationState, p_mute_state);
         MAKE_PTR(WildTypeCellMutationState, p_wild_state);
@@ -1224,13 +1353,13 @@ public:
         TS_ASSERT(node_files.CompareFiles());
     }
 
-    void TestOffLatticeSimulationWithAdaptiveTimestep() throw(Exception)
+    void TestOffLatticeSimulationWithAdaptiveTimestep()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
         // Create a simple 2D MeshBasedCellPopulation
         HoneycombMeshGenerator generator(3, 3, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -1240,12 +1369,13 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Use smaller movement threshold to maintain smooth motion
-        cell_population.SetAbsoluteMovementThreshold(0.1); 
+        cell_population.SetAbsoluteMovementThreshold(0.1);
 
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithAdaptivity");
         simulator.SetEndTime(5.0);
         simulator.SetDt(0.1);
+        simulator.SetMaxAdaptiveTimeStep(3u);
 
         // Pass an adaptive numerical method to the simulation
         boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
@@ -1264,11 +1394,12 @@ public:
         simulator.Solve();
 
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 14u);
+        TS_ASSERT_EQUALS(simulator.GetMaxAdaptiveTimeStep(), 3u);
 
-        // Check cells have moved to the correct location 
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3906,1e-4);
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[1], -0.1782,1e-4);
-    } 
+        // Check cells have moved to the correct location
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3169,1e-4);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[1], 0.0592,1e-4);
+    }
 };
 
 #endif /*TESTOFFLATTICESIMULATION_HPP_*/

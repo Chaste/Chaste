@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "HoneycombMeshGenerator.hpp"
 
-#include <boost/foreach.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 #include "TrianglesMeshReader.hpp"
 #include "OutputFileHandler.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -44,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSyscalls.hpp"
 
 HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongLength, unsigned ghosts, double scaleFactor)
-  : mpMesh(NULL),
+  : mpMesh(nullptr),
     mMeshFilename("mesh"),
     mDomainWidth(numNodesAlongWidth*scaleFactor),
     mNumCellWidth(numNodesAlongWidth), //*1 because cells are considered to be size one
@@ -111,7 +112,8 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
                 boundary = 1;
             }
 
-            double x = x0 + horizontal_spacing*((double)j + 0.25*(1.0+ SmallPow(-1.0,i+1)));
+            const double adjustment = i % 2 != 0 ? 0.5 : 0.0;
+            double x = x0 + horizontal_spacing*((double)j + adjustment);
             double y = y0 + vertical_spacing*(double)i;
 
             // Avoid floating point errors which upset OffLatticeSimulation
@@ -214,7 +216,7 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     // Nested scope so the reader closes files before we try deleting them below the scope.
     {
         TrianglesMeshReader<2,2> mesh_reader(output_dir + mMeshFilename);
-        mpMesh = new MutableMesh<2,2>;
+        mpMesh = boost::make_shared<MutableMesh<2,2> >();
         mpMesh->ConstructFromMeshReader(mesh_reader);
     }
 
@@ -225,12 +227,7 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     mpMesh->SetMeshHasChangedSinceLoading();
 }
 
-HoneycombMeshGenerator::~HoneycombMeshGenerator()
-{
-    delete mpMesh;
-}
-
-MutableMesh<2,2>* HoneycombMeshGenerator::GetMesh()
+boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetMesh()
 {
     return mpMesh;
 }
@@ -249,7 +246,7 @@ std::vector<unsigned> HoneycombMeshGenerator::GetCellLocationIndices()
     return location_indices;
 }
 
-MutableMesh<2,2>* HoneycombMeshGenerator::GetCircularMesh(double radius)
+boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetCircularMesh(double radius)
 {
     if (!mGhostNodeIndices.empty())
     {

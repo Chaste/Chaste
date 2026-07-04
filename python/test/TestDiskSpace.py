@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,15 +33,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
 Check that there's enough disk space for regular Chaste building.
+
+GitHub actions runners do something clever with their containerised disk
+partitions, so we skip this test in that context.
 """
 
 import os
 import unittest
 
+
+def IsRunningOnGitHubActions():
+    return os.environ.get('GITHUB_ACTIONS') == 'true'
+
+
 class TestDiskSpace(unittest.TestCase):
     """Test that there is plenty of disk available for Chaste."""
     def TestDiskSpace(self):
         """Test that there is plenty of disk available for Chaste."""
+
+        if IsRunningOnGitHubActions():
+            self.skipTest('Skipping disk space test on GitHub Actions environment')
+
         try:
             import psutil
             du = psutil.disk_usage
@@ -49,11 +61,11 @@ class TestDiskSpace(unittest.TestCase):
             # psutil 0.3.0 or newer is needed for this test to work
             return
         gb = 1024*1024*1024
-        
+
         source_free_gb = du(__file__).free / gb
-        print "Free space on Chaste source partition: %dGB" % source_free_gb
-        self.failIf(source_free_gb < 10,
-                    "The disk containing the Chaste source tree has less than 10GB of space left.")
+        print("Free space on Chaste source partition: %sGB" % source_free_gb)
+        self.assertFalse(source_free_gb < 5,
+                         "The disk containing the Chaste source tree has less than 5GB of space left.")
 
         test_output_dir = os.path.abspath(os.getenv('CHASTE_TEST_OUTPUT', os.curdir))
         if not os.path.exists(test_output_dir):
@@ -63,6 +75,6 @@ class TestDiskSpace(unittest.TestCase):
                 self.fail("Unable to create test output folder '%s'" % test_output_dir)
                 return
         test_free_gb = du(test_output_dir).free / gb
-        print "Free space on Chaste test output partition: %dGB" % test_free_gb 
-        self.failIf(test_free_gb < 10,
-                    "The disk containing the Chaste test output has less than 10GB of space left.")
+        print("Free space on Chaste test output partition: %sGB" % test_free_gb)
+        self.assertFalse(test_free_gb < 5,
+                    "The disk containing the Chaste test output has less than 5GB of space left.")

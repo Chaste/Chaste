@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_4">
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1">
 
 	<Simulation>       
 		<!-- 

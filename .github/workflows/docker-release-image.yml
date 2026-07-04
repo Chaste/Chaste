@@ -1,0 +1,54 @@
+name: Build chaste/release
+
+on:
+  release:
+    types: [ published ]
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - '*' # 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  # Schedule a weekly build on Sunday at 3am after rebuilding the base image
+  schedule:
+    - cron: '0 3 * * 0'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: docker/github-builder/.github/workflows/build.yml@v1
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      meta-images: |
+        chaste/release
+      meta-flavor: latest=true
+      meta-tags: |
+        type=schedule,pattern={{date 'YYYYMMDD'}}
+        type=semver,pattern={{version}}
+        type=ref,event=tag
+      labels: |
+        org.opencontainers.image.title=Chaste Release Image
+        org.opencontainers.image.description=Docker Release Image for Chaste: Cancer, Heart and Soft Tissue Environment
+        org.opencontainers.image.url=https://hub.docker.com/repository/docker/chaste/releases
+        org.opencontainers.image.source=https://github.com/Chaste/chaste-docker
+      context: .
+      file: docker/Dockerfile
+      build-args: |
+        'GIT_TAG=.'
+        'CMAKE_BUILD_TYPE="Release"'
+        'Chaste_ERROR_ON_WARNING="OFF"'
+        'Chaste_UPDATE_PROVENANCE="ON"'
+      platforms: linux/amd64,linux/arm64
+      output: image
+      push: true
+      distribute: true
+      sign: auto
+    secrets:
+      registry-auths: |
+        - registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}

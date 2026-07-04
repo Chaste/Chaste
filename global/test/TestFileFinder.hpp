@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "FileFinder.hpp"
-#include "BoostFilesystem.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "OutputFileHandler.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
@@ -50,7 +49,7 @@ class TestFileFinder : public CxxTest::TestSuite
 {
 public:
 
-    void TestFileFinderOpening() throw(Exception)
+    void TestFileFinderOpening()
     {
         {
             // Can we find our own source file?
@@ -68,7 +67,7 @@ public:
 
             // CWD should be the Chaste source root
             FileFinder file_finder2(file_name, RelativeTo::CWD);
-            std::cout << file_finder2.GetAbsolutePath();
+            //std::cout << file_finder2.GetAbsolutePath();
             TS_ASSERT(file_finder2.Exists());
             TS_ASSERT(file_finder2.IsFile());
             TS_ASSERT(!file_finder2.IsDir());
@@ -226,7 +225,6 @@ public:
 
         // We can also compute relative paths
         TS_ASSERT_EQUALS(child.GetRelativePath(dir), "src/");
-        TS_ASSERT_EQUALS(FileFinder("SConscript", dir).GetRelativePath(dir), "SConscript");
         TS_ASSERT_THROWS_CONTAINS(child.GetRelativePath(new_dir), "' is not relative to '");
     }
 
@@ -310,7 +308,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(obscure_file.DangerousRemove(), ", the Chaste source folder");
     }
 
-    void TestFindMatches() throw (Exception)
+    void TestFindMatches()
     {
         std::string dirname("TestFileFinder_TestFindMatches");
         OutputFileHandler handler(dirname);
@@ -360,7 +358,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(file.FindMatches("*"), "as it is not a directory.");
     }
 
-    void TestCopying() throw (Exception)
+    void TestCopying()
     {
         FileFinder source("global/test/TestFileFinder.hpp", RelativeTo::ChasteSourceRoot);
         std::string dest_dir_name("TestFileFinder_TestCopying");
@@ -428,7 +426,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(source.CopyTo(dest_dir), "as it would overwrite an existing file.");
     }
 
-    void TestDefaultConstructor() throw (Exception)
+    void TestDefaultConstructor()
     {
         FileFinder unset;
         TS_ASSERT(!unset.IsPathSet());

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "BuskeAdhesiveForce.hpp"
 #include "BuskeElasticForce.hpp"
@@ -58,7 +59,7 @@ class TestBuskeForces : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestBuskeAdhesiveForceMethods() throw (Exception)
+    void TestBuskeAdhesiveForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -142,7 +143,7 @@ public:
         }
     }
 
-    void TestBuskeElasticForceMethods() throw (Exception)
+    void TestBuskeElasticForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -227,7 +228,7 @@ public:
         }
     }
 
-    void TestBuskeMixedForceMethods() throw (Exception)
+    void TestBuskeMixedForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -235,7 +236,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(2, 1, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -289,7 +290,7 @@ public:
         }
     }
 
-    void TestBuskeCompressionForceMethods() throw (Exception)
+    void TestBuskeCompressionForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -297,7 +298,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(2, 1, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -355,7 +356,7 @@ public:
         }
     }
 
-    void TestBuskeCompressionForceWithMultipleCells() throw (Exception)
+    void TestBuskeCompressionForceWithMultipleCells()
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -466,7 +467,7 @@ public:
         }
     }
 
-    void TestBuskeAdhesiveForceArchiving() throw (Exception)
+    void TestBuskeAdhesiveForceArchiving()
     {
         EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);
@@ -508,7 +509,7 @@ public:
         }
     }
 
-    void TestBuskeElasticForceArchiving() throw (Exception)
+    void TestBuskeElasticForceArchiving()
     {
         EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);
@@ -550,7 +551,7 @@ public:
         }
     }
 
-    void TestBuskeCompressionForceArchiving() throw (Exception)
+    void TestBuskeCompressionForceArchiving()
     {
         EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);

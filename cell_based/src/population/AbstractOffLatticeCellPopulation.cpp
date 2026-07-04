@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -97,6 +97,18 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetAbsoluteMovementThreshold()
 {
     return mAbsoluteMovementThreshold;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::rGetNodePairs() const
+{
+    return mNodePairs;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::rGetModifiableNodePairs()
+{
+    return mNodePairs;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

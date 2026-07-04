@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ class TestPetscTools : public CxxTest::TestSuite
 {
 public:
 
-    void TestMostOfPetscTools() throw (Exception)
+    void TestMostOfPetscTools()
     {
         TS_ASSERT(PetscTools::IsInitialised());
         PetscInt my_rank;
@@ -131,10 +131,10 @@ public:
 
         // Test SetupMatrix with non-default preallocation
         Mat mat2;
-        PetscTools::SetupMat(mat2, 12, 10, 4, PETSC_DECIDE, PETSC_DECIDE, false, false);
+        PetscTools::SetupMat(mat2, 11, 11, 4, PETSC_DECIDE, PETSC_DECIDE, false, false);
         MatGetSize(mat2, &m, &n);
-        TS_ASSERT_EQUALS(m, 12);
-        TS_ASSERT_EQUALS(n, 10);
+        TS_ASSERT_EQUALS(m, 11);
+        TS_ASSERT_EQUALS(n, 11);
 
         MatGetType(mat2,&type);
         if (PetscTools::IsSequential())
@@ -154,16 +154,23 @@ public:
 
         if (PetscTools::IsSequential())
         {
-            TS_ASSERT_EQUALS( nonzeros_allocated, 4*12u );
+            TS_ASSERT_EQUALS( nonzeros_allocated, 4*11u );
         }
         else
         {
-            // Total number of nozeros that should be allocated is 36 (4*12 (12 = number of rows) in diagonal part,
-            // plus 4*12 in the off-diagonal part. These are then split between the number of processors. So, a
-            // processor that owns n rows should have 8*n nonzeros allocated.
+            /* Maximum number of nonzeros that should be allocated is 44 (11 = number of rows) in diagonal part,
+               plus 4*11 in the off-diagonal part. These are then split between the number of processes. So, a
+               process that owns n rows should have no more than 8*n nonzeros allocated.
+               In PETSc 3.11 onwards the number of non-zeros in the diagonal part is capped to the number of entries
+               in the block diagonal part.  That means a process that owns n rows will allocate at most n*n diagonal non-zero.
+             */
             PetscInt lo, hi;
             MatGetOwnershipRange(mat2, &lo, &hi);
-            TS_ASSERT_EQUALS( nonzeros_allocated, (unsigned)(2*4*(hi-lo)) );
+            unsigned expected_nz_per_row = std::min(4, hi-lo) + 4;
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR <= 10)
+            expected_nz_per_row = 4 + 4; // Older PETSc versions could over-allocate the blockdiagonal
+#endif
+            TS_ASSERT_EQUALS( nonzeros_allocated, (unsigned)(expected_nz_per_row*(hi-lo)) );
         }
 
         PetscTools::Destroy(mat2);
@@ -178,7 +185,7 @@ public:
         PetscTools::Destroy(mat3);
     }
 
-    void TestBarrier() throw (Exception)
+    void TestBarrier()
     {
         /*
          * Testing the barrier method is kind of tricky, since we really want to check
@@ -187,7 +194,7 @@ public:
         PetscTools::Barrier("TestBarrier");
     }
 
-    void TestReplicateBool() throw (Exception)
+    void TestReplicateBool()
     {
         bool my_flag = false;
         if (PetscTools::AmMaster())
@@ -198,7 +205,7 @@ public:
         TS_ASSERT(PetscTools::ReplicateBool(my_flag));
     }
 
-    void TestReplicateException() throw (Exception)
+    void TestReplicateException()
     {
         DistributedVectorFactory factory(1);
         if (factory.IsGlobalIndexLocal(0))
@@ -211,7 +218,7 @@ public:
         }
     }
 
-    void TestProcessIsolation() throw (Exception)
+    void TestProcessIsolation()
     {
         TS_ASSERT_EQUALS(PetscTools::GetWorld(), PETSC_COMM_WORLD); // No isolation at first
         TS_ASSERT(!PetscTools::IsIsolated());
@@ -248,7 +255,7 @@ public:
         TS_ASSERT(!PetscTools::IsIsolated());
     }
 
-    void TestDumpPetscObjects() throw (Exception)
+    void TestDumpPetscObjects()
     {
         Mat matrix;
         Vec vector;
@@ -324,7 +331,7 @@ public:
      * back in with a different parallel layout. For p=2 it is partitioned in 6 and 4 rows,
      * for p=3 4, 4, and 2.
      */
-    void TestReadWithNonDefaultParallelLayout() throw (Exception)
+    void TestReadWithNonDefaultParallelLayout()
     {
         DistributedVectorFactory factory(5);
 
@@ -372,7 +379,7 @@ public:
         PetscTools::Destroy(parallel_layout);
     }
 
-    void TestUnevenCreation() throw (Exception)
+    void TestUnevenCreation()
     {
         /*
          * Uneven test (as in TestDistributedVectorFactory).
@@ -396,14 +403,14 @@ public:
         PetscTools::Destroy(petsc_vec_uneven);
     }
 
-    void TestHasParMetis() throw (Exception)
+    void TestHasParMetis()
     {
         //This just covers the method, as there is no other way to test if ParMetis is available.
         std::cout << "Testing to see if Petsc is configured with ParMetis support. " << std::endl;
         PetscTools::HasParMetis();
     }
 
-    void TestExceptionMacros() throw (Exception)
+    void TestExceptionMacros()
     {
         // Should not throw
         TS_ASSERT_THROWS_NOTHING(TRY_IF_MASTER(std::cout << "No exception\n"));
@@ -414,6 +421,12 @@ public:
         // Should get thrown by all processes as exception is replicated.
         TS_ASSERT_THROWS_CONTAINS(TRY_IF_MASTER(EXCEPTION("master; bailing out")),
                 "; bailing out"); // both the replicated and original should contain this phrase
+    }
+
+    void TestSetOptionWithLogging()
+    {
+        // See #2933: we need to cover either PetscLogBegin() or PetscLogDefaultBegin()
+        PetscTools::SetOption("-log_summary", "");
     }
 };
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -57,6 +57,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Tolerance for tests
 const double tol = 0.01;
 
+class ZeroStateOde : public AbstractOdeSystem
+{
+public:
+    ZeroStateOde() : AbstractOdeSystem(0) // 0 here is the number of variables
+    {
+    }
+
+    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
+    {
+    }
+};
+
+template<>
+void OdeSystemInformation<ZeroStateOde>::Initialise()
+{
+    this->mInitialised = true;
+}
 
 class TestAbstractOdeSystem : public CxxTest::TestSuite
 {
@@ -220,9 +237,11 @@ public:
         TS_ASSERT_THROWS_THIS(p_info->GetParameterUnits(1u), "The index passed in must be less than the number of parameters.");
         TS_ASSERT_THROWS_THIS(p_info->GetStateVariableUnits(1u), "The index passed in must be less than the number of state variables.");
         TS_ASSERT_THROWS_THIS(p_info->GetAnyVariableUnits(3u), "Invalid index passed to GetAnyVariableUnits.");
+
+        TS_ASSERT_THROWS_THIS(ZeroStateOde(), "A system of equations must have some unknowns/state variables.");
     }
 
-    void TestAttributes() throw (Exception)
+    void TestAttributes()
     {
         ParameterisedOde ode;
         TS_ASSERT_EQUALS(ode.GetNumberOfAttributes(), 1u);
@@ -240,7 +259,7 @@ public:
     }
 
 
-    void TestArchivingOfParameters() throw (Exception)
+    void TestArchivingOfParameters()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename;
@@ -282,10 +301,14 @@ public:
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-            AbstractOdeSystem* p_ode;
+            AbstractOdeSystem* p_ode = NULL;  // Shouldn't be necessary to set to NULL but seems to be!
             TS_ASSERT_THROWS_CONTAINS(input_arch >> p_ode, "Archive specifies a parameter 'a' which does not appear in this class.");
             // Mend the ODE system info for the following tests.
             p_mod_info->mParameterNames[0] = param_name;
+            if (p_ode) // It seems some setups will delete if the throw happens and some won't!
+            {
+                delete p_ode;
+            }
         }
         { // Load with a parameter added
             ParameterisedOde ode;
@@ -296,10 +319,14 @@ public:
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-            AbstractOdeSystem* p_ode;
+            AbstractOdeSystem* p_ode = NULL; // The = NULL obviously shouldn't be necessary, but seems to be on some compilers!
             TS_ASSERT_THROWS_CONTAINS(input_arch >> p_ode, "Number of ODE parameters in archive does not match number in class.");
             // Mend the ODE system info for the following tests.
             p_mod_info->mParameterNames.resize(1u);
+            if (p_ode) // It seems some setups will delete if the throw happens and some won't!
+            {
+                delete p_ode;
+            }
         }
         { // Load with a parameter added, and the constructor providing a default
             ParameterisedOde ode;
@@ -330,7 +357,7 @@ public:
         }
     }
 
-    void TestDerivedQuantities() throw (Exception)
+    void TestDerivedQuantities()
     {
         ParameterisedOde ode;
         boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();

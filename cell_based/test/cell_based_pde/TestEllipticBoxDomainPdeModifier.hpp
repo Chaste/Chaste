@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,31 +37,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTELLIPTICBOXDOMAINPDEMODIFIER_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <boost/archive/text_oarchive.hpp>
+
 #include <boost/archive/text_iarchive.hpp>
-#include "CheckpointArchiveTypes.hpp"
+#include <boost/archive/text_oarchive.hpp>
 
-#include <boost/math/special_functions/bessel.hpp>
-
-#include "ArchiveOpener.hpp"
-#include "SmartPointers.hpp"
-#include "ReplicatableVector.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
-#include "EllipticBoxDomainPdeModifier.hpp"
-#include "AveragedSourceEllipticPde.hpp"
-#include "UniformCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
+#include "ArchiveOpener.hpp"
+#include "AveragedSourceEllipticPde.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
-#include "MeshBasedCellPopulation.hpp"
+#include "CheckpointArchiveTypes.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "EllipticBoxDomainPdeModifier.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
-#include "CaBasedCellPopulation.hpp"
+#include "ReplicatableVector.hpp"
+#include "SmartPointers.hpp"
+#include "UniformCellCycleModel.hpp"
 #include "UniformSourceEllipticPde.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -75,10 +74,13 @@ class TestEllipticBoxDomainPdeModifier : public AbstractCellBasedWithTimingsTest
 {
 public:
 
-    void TestEllipticConstructor() throw(Exception)
+    void TestEllipticConstructor()
     {
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -117,7 +119,7 @@ public:
         TS_ASSERT_EQUALS(p_pde_modifier->GetOutputGradient(),true);
     }
 
-    void TestArchiveEllipticBoxDomainPdeModifier() throw(Exception)
+    void TestArchiveEllipticBoxDomainPdeModifier()
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
@@ -127,7 +129,10 @@ public:
         // Separate scope to write the archive
         {
             // Create PDE and boundary condition objects
-            MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+            double constant_coefficient = 0.0;
+            double linear_coefficient = -0.1;
+            double diffusion_coefficient = 1.0;
+            MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
             MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
             // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -182,10 +187,10 @@ public:
         }
     }
 
-    void TestMeshBasedSquareMonolayer() throw (Exception)
+    void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -212,7 +217,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -238,10 +246,10 @@ public:
         TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_y"), -0.0179, 1e-4);
     }
 
-    void TestNodeBasedSquareMonolayer() throw (Exception)
+    void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -270,7 +278,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -294,10 +305,10 @@ public:
         delete p_mesh;
     }
 
-    void TestVertexBasedSquareMonolayer() throw (Exception)
+    void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(10,10);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre based tests
 
@@ -326,7 +337,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -347,10 +361,10 @@ public:
         TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8605, 1e-4);
     }
 
-    void TestPottsBasedSquareMonolayer() throw (Exception)
+    void TestPottsBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(50, 10, 4, 50, 10, 4);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Translate and scale so cells are on top of those in the above centre based tests
         p_mesh->Translate(-6.5,-6.5);
@@ -381,7 +395,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
+
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -404,10 +422,10 @@ public:
         TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4); // Testing against on-lattice models
     }
 
-    void TestCaBasedSquareMonolayer() throw (Exception)
+    void TestCaBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Scale so cells are on top of those in the above centre based tests
         p_mesh->Scale(1.0,sqrt(3.0)*0.5);
@@ -444,7 +462,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -467,7 +488,7 @@ public:
         TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4); // Testing against on-lattice models
     }
 
-    void TestEllipticBoxDomainPdeModifierIn1d() throw(Exception)
+    void TestEllipticBoxDomainPdeModifierIn1d()
     {
         // Create mesh
         std::vector<Node<1>*> nodes;
@@ -493,7 +514,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<1>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<1>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -521,7 +545,7 @@ public:
         }
     }
 
-    void TestEllipticBoxDomainPdeModifierIn3d() throw(Exception)
+    void TestEllipticBoxDomainPdeModifierIn3d()
     {
         // Create a simple mesh
         TetrahedralMesh<3,3> temp_mesh;
@@ -542,7 +566,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<3>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<3>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE

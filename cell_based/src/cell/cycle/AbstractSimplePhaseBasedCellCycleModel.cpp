@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -76,7 +76,7 @@ void AbstractSimplePhaseBasedCellCycleModel::InitialiseDaughterCell()
 
 void AbstractSimplePhaseBasedCellCycleModel::SetG1Duration()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {

@@ -10,6 +10,7 @@ build/*
 
 # Backups, SCons databases, core dumps, and temporary 'stuff'
 *~
+*.DS_Store
 .sconsign*
 core.*
 *.avi
@@ -24,13 +25,12 @@ _local/
 # Temporary build folders for dynamically loaded models
 /heart/dynamic/tmp_*_*
 /heart/dynamic/luo_rudy_1991_dyn.*
+/chaste_python3_venv
+**/__pycache__/
 
 # Local hostconfig
 /python/hostconfig/local.py
 /python/hostconfig/machines/local.py
-
-# Test summary results
-/test_summary/*
 
 # Misc. in /
 /.settings
@@ -41,8 +41,10 @@ _local/
 /gmon.out
 /Chaste
 /doxygen
+/doxygen-*
 /.externalToolBuilders
 /testoutput
+/output/*
 
 # Misc in /anim/
 /anim/*.mpeg
@@ -57,5 +59,20 @@ _local/
 /apps/src/Chaste
 /apps/src/MeshConvert
 
-# Misc from VSCode
-*.json
+# IDE files
+\.vscode/
+cmake-build*
+.idea
+
+appredict_lookup_table_manifest.txt
+
+# Build directories
+Debug*
+Release*
+chaste-build*
+
+**/.uuid
+
+venv
+
+tutorials

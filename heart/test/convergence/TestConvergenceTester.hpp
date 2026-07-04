@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <cmath>
 
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "PdeConvergenceTester.hpp"
 #include "SpaceConvergenceTester.hpp"
 #include "KspConvergenceTester.hpp"
@@ -68,9 +68,9 @@ public:
 //        unsigned secs = time(NULL) - start;
 //        std::cout<<"REAL TIME Test took "<< secs/60<<" minutes, "<< secs%60<<" seconds of real time\n";
 //    }
-    void Test1DOdeTime() throw(Exception)
+    void Test1DOdeTime()
     {
-        OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
+        OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);
@@ -79,11 +79,14 @@ public:
         TS_ASSERT_EQUALS(tester.OdeTimeStep, 0.0025);
     }
 
-    void Test1DOdeTimeWarning() throw(Exception)
+    void Test1DOdeTimeWarning()
     {
-        OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
+        OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum = 1;
-        tester.AbsoluteStimulus = -5e8; // We want V to go out of range for lookup tables
+
+        // Codegen Generated Backward Euler models don't have lookup tables (only the Backward Euler opt models do)
+        // So Pick a value that will cause a convergence issue
+        tester.AbsoluteStimulus = -5e10;
         tester.Converge(__FUNCTION__);
 
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 10u);
@@ -92,9 +95,9 @@ public:
         Warnings::Instance()->QuietDestroy();
     }
 
-    void Test1DPdeTime() throw(Exception)
+    void Test1DPdeTime()
     {
-        PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
+        PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
         tester.AbsoluteStimulus = -8e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.RelativeConvergenceCriterion=3e-2;
@@ -103,9 +106,9 @@ public:
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.02); // Was 0.01 before using lookup tables
     }
 
-    void Test1DOdePdeTime() throw(Exception)
+    void Test1DOdePdeTime()
     {
-        OdePdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
+        OdePdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.RelativeConvergenceCriterion=0.026458;
@@ -114,9 +117,9 @@ public:
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.005);
     }
 
-    void Test1DPdeTimeRegion() throw(Exception)
+    void Test1DPdeTimeRegion()
     {
-        PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
+        PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Stimulus=QUARTER;
@@ -126,9 +129,9 @@ public:
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.01);
     }
 
-    void Test1DPdeTimeNeumann() throw(Exception)
+    void Test1DPdeTimeNeumann()
     {
-        PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
+        PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
         tester.Stimulus=NEUMANN;
         tester.RelativeConvergenceCriterion=0.022361;
@@ -137,9 +140,9 @@ public:
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.02);
     }
 
-    void TestSpaceConvergenceMonoIn1DWithRelativeTolerance() throw(Exception)
+    void TestSpaceConvergenceMonoIn1DWithRelativeTolerance()
     {
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<1>, 1, 1> tester;
         HeartConfig::Instance()->SetUseRelativeTolerance(1e-4);
         tester.RelativeConvergenceCriterion=0.14142;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
@@ -151,13 +154,13 @@ public:
         HeartConfig::Instance()->Reset();
     }
 
-    void TestSpaceConvergenceBidomainIn1DWithAbsoluteTolerance() throw(Exception)
+    void TestSpaceConvergenceBidomainIn1DWithAbsoluteTolerance()
     {
         // Zero pivot detected in Cholesky factorisation for mesh 1. This is not an error and it may always happen when using bjacobi with singular systems.
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
 
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-4);
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
+        HeartConfig::Instance()->SetUseAbsoluteTolerance(2e-4);
         tester.RelativeConvergenceCriterion=0.14142;
         tester.AbsoluteStimulus = -5.5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);

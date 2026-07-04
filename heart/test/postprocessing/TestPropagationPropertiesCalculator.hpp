@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPropagationPropertiesCalculator : public CxxTest::TestSuite
 {
 public:
-    void TestConductionVelocity1D(void) throw (Exception)
+    void TestConductionVelocity1D(void)
     {
         Hdf5DataReader simulation_data("heart/test/data/Monodomain1d",
                                        "MonodomainLR91_1d", false);
@@ -56,7 +56,7 @@ public:
         // Should throw because node 95 never crosses the threshold
         TS_ASSERT_THROWS_THIS(ppc.CalculateConductionVelocity(5,95,0.9),
                 "AP did not occur, never descended past threshold voltage.");
-        TS_ASSERT_THROWS_THIS(ppc.CalculateAllConductionVelocities(5,95,0.9)[0],
+        TS_ASSERT_THROWS_THIS(ppc.CalculateAllConductionVelocities(5,95,0.9),
                 "AP did not occur, never descended past threshold voltage.");
 
         // Should throw because AP is not complete here
@@ -65,7 +65,7 @@ public:
         // Should not throw because the upstroke propagated far enough in simulation time
         //for both methods of last conduction velocity and all of them
         TS_ASSERT_THROWS_NOTHING(ppc.CalculateConductionVelocity(20,40,0.1));
-        TS_ASSERT_THROWS_NOTHING(ppc.CalculateAllConductionVelocities(20,40,0.1)[0]);
+        TS_ASSERT_THROWS_NOTHING(ppc.CalculateAllConductionVelocities(20,40,0.1));
 
         //check some value
         TS_ASSERT_DELTA(ppc.CalculateConductionVelocity(20,40,0.2),0.0498,0.01);
@@ -80,7 +80,7 @@ public:
 
     }
 
-    void TestConductionVelocityWithRepeatedStimuli(void) throw (Exception)
+    void TestConductionVelocityWithRepeatedStimuli(void)
     {
         Hdf5DataReader simulation_data("heart/test/data/Monodomain1d",
                                        "RepeatedStimuli", false);
@@ -133,7 +133,7 @@ public:
 
     }
 
-    void TestConductionBidomain3D() throw (Exception)
+    void TestConductionBidomain3D()
     {
         //Note: these data files (from notforrelease/test/TestCardiacFastSlowProblem3D.hpp) are incomplete.
         unsigned middle_index = 14895U;
@@ -251,7 +251,7 @@ public:
 
     }
 
-    void TestEadCalculation() throw(Exception)
+    void TestEadCalculation()
     {
        Hdf5DataReader ead_file("heart/test/data/PostProcessingWriter", "Ead", false);
        PropagationPropertiesCalculator ead_calc(&ead_file);

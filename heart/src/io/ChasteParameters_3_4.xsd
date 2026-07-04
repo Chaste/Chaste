@@ -261,8 +261,7 @@
       <xs:documentation xml:lang="en"> An attribute for path_type elements that describes how to
         interpret the path value. It can be relative to the current working directory, relative to
         $CHASTE_TEST_OUTPUT, relative to the parameters file, relative to the Chaste source
-        code root, relative to the directory Chaste was built in (which for SCons builds is the same
-        as the source root, but may differ for CMake builds), or an absolute path. It can also be
+        code root, relative to the directory Chaste was built in, or an absolute path. It can also be
         specified as a path relative to the XML configuration file. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
@@ -1235,7 +1234,7 @@ Note that the preconditioners supplied by PETSc (ilu, jacobi and bjacobi) are su
         <xs:annotation>
           <xs:documentation>Whether to interpolate cell model state variables on to element gauss points, rather than just interpolating
 the membrane ionic current.  State variable interpolation is slower, but gives improved accuracy which may be important in certain
-situations.  See https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/StateVariableInterpolation for details.</xs:documentation>
+situations.  See https://chaste.github.io/docs/user-guides/state-variable-interpolation/ for details.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element name="AdaptivityParameters" type="adaptivity_parameters_type" minOccurs="0">

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractBoxDomainPdeModifier.hpp"
-#include "BoundaryConditionsContainer.hpp"
 #include "PetscTools.hpp"
 #include "FileFinder.hpp"
 
@@ -60,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * class.
  *
  * Examples of PDEs in the source folder that can be solved using this class are
- * AveragedSourceEllipticPde, VolumeDependentAveragedSourceEllipticPde and UniformSourceEllipticPde.
+ * AveragedSourceEllipticPde and UniformSourceEllipticPde.
  */
 template<unsigned DIM>
 class EllipticBoxDomainPdeModifier : public AbstractBoxDomainPdeModifier<DIM>
@@ -102,12 +101,12 @@ public:
                                  bool isNeumannBoundaryCondition=true,
                                  boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
                                  double stepSize=1.0,
-                                 Vec solution=NULL);
+                                 Vec solution=nullptr);
 
     /**
      * Destructor.
      */
-    virtual ~EllipticBoxDomainPdeModifier();
+    ~EllipticBoxDomainPdeModifier() override = default;
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -116,7 +115,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -126,7 +125,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory) override;
 
     /**
      * Helper method to construct the boundary conditions container for the PDE.
@@ -135,7 +134,7 @@ public:
      *
      * @return the full boundary conditions container
      */
-    virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -143,7 +142,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"
@@ -168,7 +167,7 @@ template<class Archive, unsigned DIM>
 inline void load_construct_data(
     Archive & ar, EllipticBoxDomainPdeModifier<DIM> * t, const unsigned int file_version)
 {
-    Vec solution = NULL;
+    Vec solution = nullptr;
 
     std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
     FileFinder file_finder(archive_filename, RelativeTo::Absolute);

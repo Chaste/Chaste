@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,33 +37,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 
-#include "CheckpointArchiveTypes.hpp"
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
+// This macro prevents errors with GCC 4.8 of form "unable to find numeric literal operator 'operator"" Q'"
+// when compiling with -std=gnu++11 (see #2929). \todo: remove when GCC 4.8 is no longer supported.
+#define BOOST_MATH_DISABLE_FLOAT128
 #include <boost/math/special_functions/bessel.hpp>
 
-#include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
-#include "EllipticGrowingDomainPdeModifier.hpp"
-#include "CellwiseSourceEllipticPde.hpp"
-#include "UniformSourceEllipticPde.hpp"
-#include "AveragedSourceEllipticPde.hpp"
-#include "UniformCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "AveragedSourceEllipticPde.hpp"
+#include "CaBasedCellPopulation.hpp"
+#include "CellsGenerator.hpp"
+#include "CellwiseSourceEllipticPde.hpp"
+#include "CheckpointArchiveTypes.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "CellsGenerator.hpp"
-#include "HoneycombMeshGenerator.hpp"
-#include "CellsGenerator.hpp"
+#include "EllipticGrowingDomainPdeModifier.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
+#include "HoneycombMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
-#include "CaBasedCellPopulation.hpp"
 #include "ReplicatableVector.hpp"
+#include "SmartPointers.hpp"
+#include "UniformCellCycleModel.hpp"
+#include "UniformSourceEllipticPde.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -77,10 +80,13 @@ class TestEllipticGrowingDomainPdeModifier : public AbstractCellBasedWithTimings
 {
 public:
 
-    void TestEllipticConstructor() throw(Exception)
+    void TestEllipticConstructor()
     {
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -91,10 +97,13 @@ public:
         TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
     }
 
-    void TestMeshGeneration() throw(Exception)
+    void TestMeshGeneration()
     {
         // Create PDE and boundary condition objects to be used by all cell populations
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a CellsGenerator to be used by all cell populations
@@ -106,7 +115,7 @@ public:
         {
             // Create a MeshBasedCellPopulation
             HoneycombMeshGenerator generator(10, 10, 0);
-            MutableMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> mesh_cells;
             cells_generator.GenerateBasic(mesh_cells, p_mesh->GetNumNodes());
@@ -128,7 +137,7 @@ public:
         {
             // Make a NodeBasedCellPopulation
             HoneycombMeshGenerator generator(10, 10, 0);
-            MutableMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
             NodesOnlyMesh<2> node_mesh;
             node_mesh.ConstructNodesWithoutMesh(*p_mesh, 1.5);
 
@@ -151,7 +160,7 @@ public:
         {
             // Make a VertexBasedCellPopulation
             HoneycombVertexMeshGenerator generator(10, 10);
-            MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> vertex_cells;
             cells_generator.GenerateBasic(vertex_cells, p_mesh->GetNumElements());
@@ -182,7 +191,7 @@ public:
         {
             // Make a PottsBasedCellPopulation
             PottsMeshGenerator<2> generator(50,5,5,50,5,5);
-            PottsMesh<2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> potts_cells;
             cells_generator.GenerateBasic(potts_cells, p_mesh->GetNumElements());
@@ -203,7 +212,7 @@ public:
         {
             // Make a CaBasedCellPopulation
             PottsMeshGenerator<2> generator(50,0,0,50,0,0);
-            PottsMesh<2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
             // Specify the location of each cell
             std::vector<unsigned> location_indices;
@@ -238,7 +247,7 @@ public:
         }
     }
 
-    void TestGrowingDomainPdeModifierExceptions() throw(Exception)
+    void TestGrowingDomainPdeModifierExceptions()
     {
         EXIT_IF_PARALLEL;
 
@@ -272,7 +281,11 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -1.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -283,7 +296,7 @@ public:
             "EllipticGrowingDomainPdeModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeModifier instead.");
     }
 
-    void TestArchiveEllipticGrowingDomainPdeModifier() throw(Exception)
+    void TestArchiveEllipticGrowingDomainPdeModifier()
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
@@ -293,7 +306,10 @@ public:
         // Separate scope to write the archive
         {
             // Create PDE and boundary condition objects
-            MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+            double constant_coefficient = 0.0;
+            double linear_coefficient = -0.1;
+            double diffusion_coefficient = 1.0;
+            MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
             MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
             // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -349,7 +365,7 @@ public:
      *
      * where J0 is the zeroth order Bessel function.
      */
-    void TestMeshBasedMonolayerWithEllipticPde() throw (Exception)
+    void TestMeshBasedMonolayerWithEllipticPde()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
@@ -366,7 +382,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 1.0;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -405,7 +424,7 @@ public:
      *
      *  where J0 is the zeroth order bessel fn and C and A are constants.
      */
-    void TestMeshBasedHeterogeneousMonolayerWithEllipticPde() throw (Exception)
+    void TestMeshBasedHeterogeneousMonolayerWithEllipticPde()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
@@ -436,7 +455,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 1.0;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -471,10 +493,10 @@ public:
     }
 
     // Now test on a square with half apoptotic cells to compare all the population types
-    void TestMeshBasedSquareMonolayer() throw (Exception)
+    void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(20,20,0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -501,7 +523,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -514,13 +539,13 @@ public:
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-4);
+        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4476, 1e-4);
     }
 
-    void TestNodeBasedSquareMonolayer() throw (Exception)
+    void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(20,20,0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -549,7 +574,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -562,19 +590,17 @@ public:
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-2); // Lower tolerance as slightly different meshes
-
-        // Checking it doesn't change for this cell population
+        // Same as Mesh Based as same nodes and mesh
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4476, 1e-4);
 
         // Clear memory
         delete p_mesh;
     }
 
-    void TestVertexBasedSquareMonolayer() throw (Exception)
+    void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(20,20);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre-based tests
 
@@ -603,7 +629,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -616,16 +645,16 @@ public:
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-1); // Low tolerance as mesh is slightly larger than for centre based models
+        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4476, 1e-1); // Low tolerance as mesh different than for centre based models
 
         // Checking it doesn't change for this cell population
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4654, 1e-4);
     }
 
-    void TestPottsBasedSquareMonolayer() throw (Exception)
+    void TestPottsBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(100, 20, 4, 100, 20, 4);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Translate and scale so cells are on top of those in the above centre based tests
         p_mesh->Translate(-11.5,-11.5);
@@ -656,7 +685,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -669,16 +701,16 @@ public:
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 2e-1); // Low tolerance as mesh is slightly larger than for centre based models
+        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.4476, 1e-1); // Low tolerance as mesh is different than for centre based models
 
-        // Check it doesn't change for this cell population
+        // Check it doesn't change for this cell population note matches the CA simulation
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-4);
     }
 
-    void TestCaBasedSquareMonolayer() throw (Exception)
+    void TestCaBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(20, 0, 0, 20, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Scale so cells are on top of those in the above centre based tests
         p_mesh->Scale(1.0,sqrt(3.0)*0.5);
@@ -715,7 +747,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -728,13 +763,13 @@ public:
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 2e-1); // Low tolerance as mesh is slightlty larger than for centre-based models
+        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 2e-1); // Low tolerance as mesh is different to centre-based models
 
-        // Check it doesn't change for this cell population
+        // Check it doesn't change for this cell population note matches the Potts simulation
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-3); // Note lower as slightly different answer with intel compiler
     }
 
-    void TestEllipticGrowingDomainPdeModifierIn1d() throw(Exception)
+    void TestEllipticGrowingDomainPdeModifierIn1d()
     {
         // Create mesh
         std::vector<Node<1>*> nodes;
@@ -760,8 +795,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<1>, p_pde, (cell_population, -0.1));
-        MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (1.0));;
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<1>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<1>, p_pde_modifier, (p_pde, p_bc, false));
@@ -783,7 +821,7 @@ public:
         }
     }
 
-    void TestEllipticGrowingDomainPdeModifierIn3d() throw(Exception)
+    void TestEllipticGrowingDomainPdeModifierIn3d()
     {
         // Create a simple mesh
         TetrahedralMesh<3,3> temp_mesh;
@@ -804,7 +842,10 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<3>, p_pde, (cell_population, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<3>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,11 +65,11 @@ class TestPottsUpdateRules : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestVolumeConstraintPottsUpdateRuleIn2d() throw (Exception)
+    void TestVolumeConstraintPottsUpdateRuleIn2d()
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -124,11 +124,11 @@ public:
         TS_ASSERT_DELTA(contribution, 2.0*alpha, 1e-6);
     }
 
-    void TestVolumeConstraintPottsUpdateRuleIn3d() throw (Exception)
+    void TestVolumeConstraintPottsUpdateRuleIn3d()
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<3> generator(4, 2, 2, 2, 1, 2, 4, 1, 2, true);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u);
@@ -175,7 +175,7 @@ public:
         TS_ASSERT_DELTA(contribution, 2.0*alpha, 1e-6);
     }
 
-    void TestArchiveVolumeConstraintPottsUpdateRule() throw(Exception)
+    void TestArchiveVolumeConstraintPottsUpdateRule()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "VolumeConstraintPottsUpdateRule.arch";
@@ -214,11 +214,11 @@ public:
         }
     }
 
-    void TestSurfaceAreaConstraintPottsUpdateRuleIn2d() throw (Exception)
+    void TestSurfaceAreaConstraintPottsUpdateRuleIn2d()
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -280,11 +280,11 @@ public:
         TS_ASSERT_DELTA(contribution, 2.0*2.0*gamma, 1e-6);
     }
 
-    void TestSurfaceAreaConstraintPottsUpdateRuleIn3d() throw (Exception)
+    void TestSurfaceAreaConstraintPottsUpdateRuleIn3d()
     {
         // Create a simple 3D PottsMesh with 2 elements
         PottsMeshGenerator<3> generator(4, 2, 2, 4, 1, 2, 4, 1, 2, true);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 64u);
@@ -339,7 +339,7 @@ public:
         TS_ASSERT_DELTA(contribution, 4.0*4.0*gamma, 1e-6);
     }
 
-    void TestArchiveSurfaceAreaConstraintPottsUpdateRule() throw(Exception)
+    void TestArchiveSurfaceAreaConstraintPottsUpdateRule()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SurfaceAreaConstraintPottsUpdateRule.arch";
@@ -378,11 +378,11 @@ public:
         }
     }
 
-    void TestAdhesionPottsUpdateRuleIn2d() throw (Exception)
+    void TestAdhesionPottsUpdateRuleIn2d()
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -444,11 +444,11 @@ public:
         TS_ASSERT_DELTA(contribution, gamma_cell_cell, 1e-6);
     }
 
-    void TestAdhesionPottsUpdateRuleIn3d() throw (Exception)
+    void TestAdhesionPottsUpdateRuleIn3d()
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<3> generator(4, 2, 2, 2, 1, 2, 4, 1, 2, true);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u);
@@ -503,7 +503,7 @@ public:
         TS_ASSERT_DELTA(contribution, 2.0*gamma_cell_cell, 1e-6);
     }
 
-    void TestArchiveAdhesionPottsUpdateRule() throw(Exception)
+    void TestArchiveAdhesionPottsUpdateRule()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "AdhesionPottsUpdateRule.arch";
@@ -542,11 +542,11 @@ public:
         }
     }
 
-    void TestDifferentialAdhesionPottsUpdateRuleIn2d() throw (Exception)
+    void TestDifferentialAdhesionPottsUpdateRuleIn2d()
     {
         // Create a simple 2D PottsMesh with 4 elements
         PottsMeshGenerator<2> generator(5, 2, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -632,11 +632,11 @@ public:
         TS_ASSERT_DELTA(contribution, 2.0*gamma_cell_0_cell_1 - gamma_cell_0_cell_0, 1e-6);
     }
 
-    void TestDifferentialAdhesionPottsUpdateRuleIn3d() throw (Exception)
+    void TestDifferentialAdhesionPottsUpdateRuleIn3d()
     {
         // Create a simple 2D PottsMesh with 4 elements
         PottsMeshGenerator<3> generator(4, 2, 2, 2, 2, 1, 4, 1, 2, true);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u);
@@ -701,7 +701,7 @@ public:
         TS_ASSERT_DELTA(contribution, 2.0*gamma_cell_0_cell_1 - gamma_cell_0_cell_0 + gamma_cell_1_boundary - gamma_cell_0_boundary, 1e-6);
     }
 
-    void TestArchiveDifferentialAdhesionPottsUpdateRule() throw(Exception)
+    void TestArchiveDifferentialAdhesionPottsUpdateRule()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "AdhesionPottsUpdateRule.arch";
@@ -746,11 +746,11 @@ public:
         }
     }
 
-    void TestChemotaxisPottsUpdateRuleIn2d() throw (Exception)
+    void TestChemotaxisPottsUpdateRuleIn2d()
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<2> generator(4, 1, 2, 4, 1, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -782,7 +782,7 @@ public:
         TS_ASSERT_DELTA(contribution, 0.0, 1e-6);
     }
 
-    void TestArchiveChemotaxisPottsUpdateRule() throw(Exception)
+    void TestArchiveChemotaxisPottsUpdateRule()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ChemotaxisPottsUpdateRule.arch";

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -662,7 +662,6 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
 
     for (unsigned i=0; i<this->mElements.size(); i++)
     {
-
         this->mElements[i]->ResetIndex(i);
     }
 
@@ -783,7 +782,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         this->ExportToMesher(map, mesher_input);
 
         // Library call
-        triangulate((char*)"Qze", &mesher_input, &mesher_output, NULL);
+        triangulate((char*)"Qze", &mesher_input, &mesher_output, nullptr);
 
         this->ImportFromMesher(mesher_output, mesher_output.numberoftriangles, mesher_output.trianglelist, mesher_output.numberofedges, mesher_output.edgelist, mesher_output.edgemarkerlist);
 
@@ -801,7 +800,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         // Library call
         tetgen::tetrahedralize((char*)"Qz", &mesher_input, &mesher_output);
 
-        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, NULL);
+        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, nullptr);
     }
 }
 
@@ -815,8 +814,8 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
 {
-    assert(ELEMENT_DIM == 2); 	// LCOV_EXCL_LINE
-    assert(SPACE_DIM == 3); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 2);     // LCOV_EXCL_LINE
+    assert(SPACE_DIM == 3);     // LCOV_EXCL_LINE
 
     std::vector<c_vector<unsigned, 5> > history;
 
@@ -992,7 +991,7 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration)
 {
-    assert(ELEMENT_DIM == SPACE_DIM); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
     unsigned num_nodes = pElement->GetNumNodes();
     std::set<unsigned> neighbouring_elements_indices;
     std::set< Element<ELEMENT_DIM,SPACE_DIM> *> neighbouring_elements;
@@ -1032,12 +1031,12 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
     }
 
     // Get the circumsphere information
-    c_vector<double, SPACE_DIM+1> this_circum_centre;
+    c_vector<double, SPACE_DIM+1> this_circum_centre = zero_vector<double>(SPACE_DIM+1);
 
     this_circum_centre = pElement->CalculateCircumsphere(this->mElementJacobians[pElement->GetIndex()], this->mElementInverseJacobians[pElement->GetIndex()]);
 
-    // Copy the actualy circumcentre into a smaller vector
-    c_vector<double, ELEMENT_DIM> circum_centre;
+    // Copy the actually circumcentre into a smaller vector
+    c_vector<double, ELEMENT_DIM> circum_centre = zero_vector<double>(ELEMENT_DIM);
     for (unsigned i=0; i<ELEMENT_DIM; i++)
     {
         circum_centre[i] = this_circum_centre[i];
@@ -1052,10 +1051,10 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
         // Calculate vector from circumcenter to node
         node_location -= circum_centre;
 
-        // This is to calculate the squared distance betweeen them
+        // This is to calculate the squared distance between them
         double squared_distance = inner_prod(node_location, node_location);
 
-        // If the squared idstance is less than the elements circum-radius(squared),
+        // If the squared distance is less than the elements circum-radius(squared),
         // then the Voronoi property is violated.
         if (squared_distance < this_circum_centre[ELEMENT_DIM])
         {

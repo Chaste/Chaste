@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -74,11 +74,11 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
                                               std::vector<unsigned>& rProcessorsOffset)
 {
     assert(PetscTools::IsParallel());
-    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3);  	// LCOV_EXCL_LINE // Metis works with triangles and tetras
+    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3);      // LCOV_EXCL_LINE // ParMetis works with triangles and tetras
 
     if (!PetscTools::HasParMetis()) //We must have ParMetis support compiled into Petsc
     {
-        WARN_ONCE_ONLY("PETSc support for ParMetis is not installed.");  	// LCOV_EXCL_LINE
+        WARN_ONCE_ONLY("PETSc support for ParMetis is not installed.");      // LCOV_EXCL_LINE
     }
 
     unsigned num_nodes = rMeshReader.GetNumNodes();
@@ -191,7 +191,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     xadj[0]=0;
     for (PetscInt row_global_index=connectivity_matrix_lo; row_global_index<connectivity_matrix_hi; row_global_index++)
     {
-        MatGetRow(connectivity_matrix, row_global_index, &row_num_nz, &column_indices, PETSC_NULL);
+        MatGetRow(connectivity_matrix, row_global_index, &row_num_nz, &column_indices, CHASTE_PETSC_NULLPTR);
 
         unsigned row_local_index = row_global_index - connectivity_matrix_lo;
         xadj[row_local_index+1] = xadj[row_local_index] + row_num_nz;
@@ -200,14 +200,14 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
            adjncy[xadj[row_local_index] + col_index] =  column_indices[col_index];
         }
 
-        MatRestoreRow(connectivity_matrix, row_global_index, &row_num_nz,&column_indices, PETSC_NULL);
+        MatRestoreRow(connectivity_matrix, row_global_index, &row_num_nz,&column_indices, CHASTE_PETSC_NULLPTR);
     }
 
     PetscTools::Destroy(connectivity_matrix);
 
     // Convert to an adjacency matrix
     Mat adj_matrix;
-    MatCreateMPIAdj(PETSC_COMM_WORLD, num_local_nodes, num_nodes, xadj, adjncy, PETSC_NULL, &adj_matrix);
+    MatCreateMPIAdj(PETSC_COMM_WORLD, num_local_nodes, num_nodes, xadj, adjncy, CHASTE_PETSC_NULLPTR, &adj_matrix);
 
     PetscTools::Barrier();
     if (PetscTools::AmMaster())
@@ -257,7 +257,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
     // Index sets only give local information, we want global
     AO ordering;
-    AOCreateBasicIS(new_global_node_indices, PETSC_NULL /* natural ordering */, &ordering);
+    AOCreateBasicIS(new_global_node_indices, CHASTE_PETSC_NULLPTR /* natural ordering */, &ordering);
 
     // The locally owned range under the new numbering
     PetscInt* local_range = new PetscInt[my_num_nodes];
@@ -319,8 +319,8 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
 
         // Establish whether it lies in the domain. ChasteCuboid::DoesContain is
         // insufficient for this as it treats all boundaries as open.
-        ChastePoint<SPACE_DIM> lower = pRegion->rGetLowerCorner();
-        ChastePoint<SPACE_DIM> upper = pRegion->rGetUpperCorner();
+        const ChastePoint<SPACE_DIM>& lower = pRegion->rGetLowerCorner();
+        const ChastePoint<SPACE_DIM>& upper = pRegion->rGetUpperCorner();
 
         bool does_contain = true;
 
@@ -328,8 +328,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
         {
             bool boundary_check;
             boundary_check = ((location[d] > lower[d]) || sqrt((location[d]-lower[d])*(location[d]-lower[d])) < DBL_EPSILON);
-            boundary_check *= (location[d] < upper[d]);
-            does_contain *= boundary_check;
+            does_contain = (does_contain && boundary_check && (location[d] < upper[d]));
         }
 
         if (does_contain)

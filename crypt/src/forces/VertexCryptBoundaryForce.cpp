@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -57,7 +57,7 @@ void VertexCryptBoundaryForce<DIM>::AddForceContribution(AbstractCellPopulation<
     VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
 
     // Throw an exception message if not using a VertexBasedCellPopulation
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("VertexCryptBoundaryForce is to be used with VertexBasedCellPopulations only");
     }
@@ -70,7 +70,7 @@ void VertexCryptBoundaryForce<DIM>::AddForceContribution(AbstractCellPopulation<
         double y = node_iter->rGetLocation()[1]; // y-coordinate of node
 
         // If the node lies below the line y=0, then add the boundary force contribution to the node forces
-        if (y < 0.0)
+        if (y < 0.0 && DIM > 1)
         {
             c_vector<double, DIM> boundary_force = zero_vector<double>(DIM);
             boundary_force[1] = mForceStrength*SmallPow(y, 2);

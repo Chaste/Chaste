@@ -1,40 +1,22 @@
-# A base Docker image that other Chaste images can build from.
-#
-# Handles the base Ubuntu install, installing all the Chaste dependencies,
-# and creating a default chaste user.
-#
-# Several ideas taken from the FEniCS project docker setup
-# (https://bitbucket.org/fenics-project/docker).
+# syntax=docker/dockerfile:1
 
-#FROM ubuntu:trusty
-FROM phusion/baseimage:latest
-MAINTAINER Chaste Developers <chaste-admin@maillist.ox.ac.uk>
+ARG BASE_TAG=latest
+FROM chaste/base:${BASE_TAG}
 
-# Install the Chaste repo list, and dependencies metapackage
-#USER root
-COPY chaste.list /etc/apt/sources.list.d
-RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99 \
-    && apt-get update \
-    && apt-get install -y chaste-dependencies \
-    && apt-get clean \  
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Build Chaste: GIT_TAG can be: a branch or release; '-' to skip; '.' to build local code
+ADD . ${CHASTE_SOURCE_DIR}
+# Fix git permissions issue CVE-2022-24765
+RUN git config --global --add safe.directory "${CHASTE_SOURCE_DIR}"
+ARG GIT_TAG=.
+ENV GIT_TAG=${GIT_TAG}
+RUN build_chaste.sh ${GIT_TAG}
 
-# See https://github.com/phusion/baseimage-docker/issues/186
-RUN touch /etc/service/syslog-forwarder/down
+# Automatically mount the home directory in a volume to persist changes made there.
+# NOTE: After declaring the volume, changes to the contents during build will not persist.
+VOLUME "${CHASTE_DIR}"
 
-# The entrypoint script below will ensure our new chaste user (for doing builds)
-# has the same userid as the host user owning the source code volume, to avoid
-# permission issues.
-# Based on https://denibertovic.com/posts/handling-permissions-with-docker-volumes/
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-
-# Hook to link to host chaste source folder, and set it as the working dir
-VOLUME /usr/src/chaste
-WORKDIR /usr/src/chaste
-
-# Use baseimage-docker's init system, and switch to the chaste user running
-# bash as a login shell by default (see entrypoint.sh).
-# If no specific command is given the default CMD will drop us into an
-# interactive shell.
-ENTRYPOINT ["/sbin/my_init", "--quiet", "--", "/usr/local/bin/entrypoint.sh"]
-CMD ["bash -i"]
+# Optionally run a test suite before finalising the image.
+# NOTE: These test outputs will not appear in the volume.
+ARG TEST_SUITE=-
+ENV TEST_SUITE=${TEST_SUITE}
+RUN test.sh ${TEST_SUITE}

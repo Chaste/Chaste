@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,7 +93,7 @@ void SimpleWntCellCycleModel::SetUseCellProliferativeTypeDependentG1Duration(boo
 
 void SimpleWntCellCycleModel::SetG1Duration()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
@@ -131,7 +131,7 @@ void SimpleWntCellCycleModel::SetG1Duration()
 
 double SimpleWntCellCycleModel::GetWntLevel() const
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
     double level = 0;
 
     switch (mDimension)
@@ -183,7 +183,7 @@ WntConcentrationType SimpleWntCellCycleModel::GetWntType()
             wnt_type = WntConcentration<DIM>::Instance()->GetType();
             break;
         }
-        case UNSIGNED_UNSET:
+        case UNSIGNED_UNSET: // LCOV_EXCL_LINE
         {
             // If you trip this you have tried to use a simulation without setting the dimension.
             NEVER_REACHED;

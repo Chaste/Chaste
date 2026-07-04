@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTMONODOMAINMASSLUMPING_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "PlaneStimulusCellFactory.hpp"
 #include "MonodomainProblem.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -48,7 +48,7 @@ class TestMonodomainMassLumping : public CxxTest::TestSuite
 
 public:
 
-    void TestCompareCubePlaneStimulus() throw(Exception)
+    void TestCompareCubePlaneStimulus()
     {
         HeartConfig::Instance()->SetSimulationDuration(20); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,0.1);
@@ -61,7 +61,7 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("CompareCubeStandard");
         HeartConfig::Instance()->SetOutputFilenamePrefix("CompareCubeStandard");
 
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEuler,3> cell_factory(-3e5, 1.0);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt,3> cell_factory(-3e5, 1.0);
 
         MonodomainProblem<3> monodomain_problem( &cell_factory );
 
@@ -102,7 +102,7 @@ public:
         }
     }
 
-    void TestCompareCubePlaneStimulusOnlyPrecondLumping() throw(Exception)
+    void TestCompareCubePlaneStimulusOnlyPrecondLumping()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetSimulationDuration(20); //ms
@@ -116,7 +116,7 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("CompareCubeStandard");
         HeartConfig::Instance()->SetOutputFilenamePrefix("CompareCubeStandard");
 
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEuler,3> cell_factory(-3e5, 1.0);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt,3> cell_factory(-3e5, 1.0);
 
         MonodomainProblem<3> monodomain_problem( &cell_factory );
 

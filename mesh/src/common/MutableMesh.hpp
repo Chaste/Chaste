@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -116,7 +116,7 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
             }
         }
 
-        // If ELEMENT_DIM=SPACEDIM Do a remesh after archiving has finished to get right number of boundary nodes etc.
+        // If ELEMENT_DIM==SPACE_DIM do a remesh after archiving has finished to get right number of boundary nodes etc.
         // NOTE - Subclasses must archive their member variables BEFORE calling this method.
         if (ELEMENT_DIM == SPACE_DIM)
         {
@@ -173,7 +173,10 @@ public:
     /**
      * Constructor which takes in a vector of nodes.
      *
-     * @param nodes  a vector of nodes
+     * The full tetrahedral mesh is internally constructed automatically via a call to ReMesh().
+     * The nodes you have supplied will eventually be deleted by the mesh destructor, you don't need to delete them yourself.
+     *
+     * @param nodes  a vector of pointers to nodes
      */
     MutableMesh(std::vector<Node<SPACE_DIM> *> nodes);
 

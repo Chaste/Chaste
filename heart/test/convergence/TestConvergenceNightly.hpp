@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <cmath>
 
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "LuoRudy1991.hpp"
 #include "PdeConvergenceTester.hpp"
 #include "SpaceConvergenceTester.hpp"
@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OdeConvergenceTester.hpp"
 #include "OdePdeConvergenceTester.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "NobleVargheseKohlNoble1998aBackwardEuler.hpp"
+#include "NobleVargheseKohlNoble1998aBackwardEulerOpt.hpp"
 #include "NobleVargheseKohlNoble1998a.hpp"
 #include "NobleVargheseKohlNoble1998aOpt.hpp"
 
@@ -80,24 +80,24 @@ public:
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
         HeartConfig::Instance()->SetKSPSolver("gmres");
         {
-            std::cout << "PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2>\n";
-            PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
+            std::cout << "PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2>\n";
+            PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
             RunConvergenceTester(&tester, stimulusType);
             TS_ASSERT_DELTA(tester.PdeTimeStep, 5.0e-3, 1e-10);
         }
 
         {
-            std::cout << "SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2>\n";
+            std::cout << "SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2>\n";
             //Block Jacobi with CG can detect zero pivots in a 1-D convergence test
-            SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
+            SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
             RunConvergenceTester(&tester, stimulusType);
             TS_ASSERT_EQUALS(tester.MeshNum, 5u);
         }
 
         {
-            std::cout << "KspConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2>\n";
+            std::cout << "KspConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2>\n";
             TS_ASSERT_EQUALS(HeartConfig::Instance()->GetAbsoluteTolerance(), 5.0e-4);
-            KspConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
+            KspConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
             RunConvergenceTester(&tester, stimulusType);
             //Result of KSP tester:
             TS_ASSERT_DELTA(HeartConfig::Instance()->GetAbsoluteTolerance(), 1e-3, 1e-10);
@@ -114,8 +114,8 @@ public:
         }
 
         {
-            std::cout << "OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2>\n";
-            OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
+            std::cout << "OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2>\n";
+            OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
             tester.PdeTimeStep=0.01;
             RunConvergenceTester(&tester, stimulusType);
             TS_ASSERT_DELTA(tester.OdeTimeStep, 0.0025, 1e-10);
@@ -129,43 +129,44 @@ public:
 
 public:
 
-    void TestStimulatePlanein1D() throw(Exception)
+    void TestStimulatePlanein1D()
     {
         ConvergeInVarious(PLANE);
     }
 
-    void TestStimulateRegionin1D() throw(Exception)
+    void TestStimulateRegionin1D()
     {
         ConvergeInVarious(QUARTER);
     }
 
 
-    void TestFullActionPotential() throw(Exception)
+    void TestFullActionPotential()
     {
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
         tester.SimulateFullActionPotential=true;
         //Time steps are okay for giving a sensible upstroke
-        tester.PdeTimeStep=0.1;
-        tester.OdeTimeStep=0.1;
+        tester.PdeTimeStep=0.01;
+        tester.OdeTimeStep=0.01;
 
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.IsConverged());
 
-        ///Note that long plateau phase will force convergence to happen earlier (mesh 3 instead of 4)
-        TS_ASSERT_EQUALS(tester.MeshNum, 3u);
+        ///Note that long plateau phase will force convergence to happen earlier (mesh 2 instead of 4)
+        TS_ASSERT_EQUALS(tester.MeshNum, 2u);
 
-        TS_ASSERT_DELTA(329.5, tester.Apd90FirstQn, 1.5); //330.8
+        TS_ASSERT_DELTA(331.1049, tester.Apd90FirstQn, 1.5); //330.8
         TS_ASSERT_DELTA(329.5, tester.Apd90ThirdQn, 1.5); //329.3
-        TS_ASSERT_DELTA(0.0588, tester.ConductionVelocity, 1e-3);
+        TS_ASSERT_DELTA(0.0675, tester.ConductionVelocity, 1e-3);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
     }
 
-    void TestFullActionPotentialWithRampedStimulus() throw(Exception)
+    void TestFullActionPotentialWithRampedStimulus()
     {
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
         tester.SimulateFullActionPotential=true;
         //Time steps are okay for giving a sensible upstroke
-        tester.PdeTimeStep=0.1;
-        tester.OdeTimeStep=0.1;
+        tester.PdeTimeStep=0.01;
+        tester.OdeTimeStep=0.01;
         tester.Stimulus = QUARTER;
 
         tester.Converge(__FUNCTION__);
@@ -176,16 +177,16 @@ public:
 
         TS_ASSERT_DELTA(329.5, tester.Apd90FirstQn, 1.5); //329.5
         TS_ASSERT_DELTA(329.5, tester.Apd90ThirdQn, 1.5); //328.7
-        TS_ASSERT_DELTA(0.0588, tester.ConductionVelocity, 1e-3);
+        TS_ASSERT_DELTA(0.0680, tester.ConductionVelocity, 1e-3);
     }
 
     //Current test takes about 20 mins.
     //This is much longer (1 hour?) with default ksp
-    void Test2DSpaceSymmLq() throw(Exception)
+    void Test2DSpaceSymmLq()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<2>, 2, 2> tester;
         //tester.SetKspAbsoluteTolerance(1e-3);
          HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-3);
 
@@ -198,11 +199,11 @@ public:
         HeartConfig::Instance()->Reset();
     }
 
-    void Test2DSpaceWithRegionStimulus() throw(Exception)
+    void Test2DSpaceWithRegionStimulus()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<2>, 2, 2> tester;
         tester.Stimulus = QUARTER;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-3);
 
@@ -213,11 +214,11 @@ public:
     }
 
     //Currently takes about 15 seconds to do mesh0, mesh1 and mesh2
-    void Test3DSpace() throw(Exception)
+    void Test3DSpace()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-3);
 
         tester.RelativeConvergenceCriterion=2e-1;//Just to prove the thing works
@@ -227,7 +228,7 @@ public:
         HeartConfig::Instance()->Reset();
     }
 
-    void TestSpaceConvergencein1DWithBackwardN98() throw(Exception)
+    void TestSpaceConvergencein1DWithBackwardN98()
     {
         SpaceConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLOpt,  MonodomainProblem<1>, 1, 1> tester;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
@@ -237,18 +238,18 @@ public:
         TS_ASSERT_LESS_THAN(tester.LastDifference, 0.0041039);
     }
 
-    void TestOdeConvergencein1DWithBackwardN98() throw(Exception)
+    void TestOdeConvergencein1DWithBackwardN98()
     {
-        OdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler,  MonodomainProblem<1>, 1, 1> tester;
+        OdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLBackwardEulerOpt,  MonodomainProblem<1>, 1, 1> tester;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_DELTA(tester.OdeTimeStep, 0.0025, 1e-10);
     }
 
-    void TestOdePdeConvergencein1DWithBackwardN98() throw(Exception)
+    void TestOdePdeConvergencein1DWithBackwardN98()
     {
-        OdePdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler,  MonodomainProblem<1>, 1, 1> tester;
+        OdePdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLBackwardEulerOpt,  MonodomainProblem<1>, 1, 1> tester;
         tester.NeumannStimulus = 5000;
         tester.Stimulus = NEUMANN;
         tester.Converge(__FUNCTION__);
@@ -257,7 +258,7 @@ public:
         TS_ASSERT_DELTA(tester.PdeTimeStep, 0.005, 1e-10);
     }
 
-    void TestOdePdeConvergencein1DWithForwardLookupN98() throw(Exception)
+    void TestOdePdeConvergencein1DWithForwardLookupN98()
     {
         OdePdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLOpt,  MonodomainProblem<1>, 1, 1> tester;
         tester.NeumannStimulus = 5000;
@@ -267,7 +268,7 @@ public:
         TS_ASSERT_DELTA(tester.OdeTimeStep, 0.0025, 1e-10);
         TS_ASSERT_DELTA(tester.PdeTimeStep, 0.0025, 1e-10);
     }
-    void TestOdePdeConvergencein1DWithForwardBasicN98() throw(Exception)
+    void TestOdePdeConvergencein1DWithForwardBasicN98()
     {
         OdePdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellML,  MonodomainProblem<1>, 1, 1> tester;
         tester.NeumannStimulus = 5000;

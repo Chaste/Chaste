@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 
@@ -56,7 +58,7 @@ class TestCylindrical2dMesh : public CxxTest::TestSuite
 {
 public:
 
-    void TestCreateMirrorCellsAndAlignmentTester() throw (Exception)
+    void TestCreateMirrorCellsAndAlignmentTester()
     {
         // Note that elements are not created (and boundary elements are not changed),
         // this just creates a set of new nodes
@@ -67,7 +69,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Reset the mesh
         p_mesh = generator.GetCylindricalMesh();
@@ -113,7 +115,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[1], p_mesh->GetNode(corresponding_node_index)->rGetLocation()[1], 1e-9);
     }
 
-    void TestReconstructCylindricalMesh() throw (Exception)
+    void TestReconstructCylindricalMesh()
     {
         // This test takes in a new mesh created using the mirror function above
         // and a ReMesh call, then removes nodes, elements and boundary elements
@@ -124,7 +126,7 @@ public:
 
         // Set up a mesh which can be mirrored (no ghost nodes in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create a mirrored load of nodes for the normal remesher to work with
         p_mesh->CreateMirrorNodes();
@@ -228,7 +230,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 12u);
     }
 
-    void TestCylindricalReMesh() throw (Exception)
+    void TestCylindricalReMesh()
     {
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -236,7 +238,7 @@ public:
 
         // Set up a mesh which can be mirrored (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         NodeMap map(p_mesh->GetNumNodes());
         p_mesh->ReMesh(map);
@@ -252,7 +254,7 @@ public:
     /*
      * Failing test for ReMesh (see #1275)
      */
-    void noTestCylindricalReMeshFailingTest() throw (Exception)
+    void noTestCylindricalReMeshFailingTest()
     {
         // Load a problematic mesh
         TrianglesMeshReader<2,2> mesh_reader("cell_based/test/data/TestCylindricalMeshBug/mesh");
@@ -270,7 +272,7 @@ public:
         mesh.ReMesh(map);
     }
 
-    void TestCylindricalReMeshAfterDelete() throw (Exception)
+    void TestCylindricalReMeshAfterDelete()
     {
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -278,7 +280,7 @@ public:
 
         // Set up a mesh which can be mirrored (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         unsigned num_old_nodes = p_mesh->GetNumNodes();
 
@@ -305,9 +307,9 @@ public:
                 TS_ASSERT_EQUALS(map.GetNewIndex(i), (unsigned)(i-1));
             }
         }
-   }
+    }
 
-    void TestCylindricalReMeshOnSmallMesh() throw (Exception)
+    void TestCylindricalReMeshOnSmallMesh()
     {
         unsigned cells_across = 3;
         unsigned cells_up = 3;
@@ -315,18 +317,74 @@ public:
 
         // Set up a mesh which can be mirrored (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         NodeMap map(p_mesh->GetNumNodes());
         p_mesh->ReMesh(map);
 
         // Check that there are the correct number of everything
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across*cells_up);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2*cells_across*(cells_up-1));
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across * cells_up);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2 * cells_across * (cells_up-1));
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
     }
 
-    void TestGetVectorBetweenCyclindricalPoints() throw (Exception)
+    /*
+     * This test aims to approximate not having halo nodes by making less of them and
+     * Moving them further away from the top and bottom of the mesh
+     */
+    void TestCylindricalReMeshOnSmallMeshWithoutHaloNodes()
+    {
+        unsigned cells_across = 6;
+        unsigned cells_up = 3;
+        unsigned thickness_of_ghost_layer = 0;
+
+        // Set up a mesh (no ghosts in this case)
+        CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+
+        // Change the halo parameters so still get longer edges.
+        TS_ASSERT_EQUALS(p_mesh->GetHaloScalingFactor(),2.0);
+        TS_ASSERT_EQUALS(p_mesh->GetHaloOffset(),1.0);
+
+        p_mesh->SetHaloScalingFactor(0.5);
+        p_mesh->SetHaloOffset(5.0);
+
+        TS_ASSERT_EQUALS(p_mesh->GetHaloScalingFactor(),0.5);
+        TS_ASSERT_EQUALS(p_mesh->GetHaloOffset(),5.0);
+
+        // Peturb some nodes so not in three rows
+        for (typename AbstractMesh<2, 2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+         node_iter != p_mesh->GetNodeIteratorEnd();
+         ++node_iter)
+        {
+            c_vector<double, 2> node_location = node_iter->rGetLocation();
+
+            if (fabs(node_location(0)-1.0)<1e-5)
+            {
+                node_location(1)+=0.1;
+            }
+            else if (fabs(node_location(0)-3.0)<1e-5)
+            {
+                node_location(1)+=0.3;
+            }
+            else if (fabs(node_location(0)-5.0)<1e-5)
+            {
+                node_location(1)+=0.2;
+            }
+
+            node_iter->rGetModifiableLocation() = node_location;
+        }
+
+        NodeMap map(p_mesh->GetNumNodes());
+        p_mesh->ReMesh(map);
+
+        // Check that there are the correct number of everything
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across * cells_up);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 30); // Diferent from previous test (24) as get some long edges due to distant halo nodes
+        TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
+    }
+
+    void TestGetVectorBetweenCyclindricalPoints()
     {
         unsigned cells_across = 3;
         unsigned cells_up = 3;
@@ -334,7 +392,7 @@ public:
 
         // Set up a mesh which can be mirrored (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         c_vector<double, 2> location1 = p_mesh->GetNode(1)->rGetLocation();
         c_vector<double, 2> location2 = p_mesh->GetNode(4)->rGetLocation();
@@ -342,7 +400,7 @@ public:
         // Test a normal distance calculation...
         c_vector<double, 2> vector = p_mesh->GetVectorFromAtoB(location1, location2);
         TS_ASSERT_DELTA(vector[0], 0.5, 1e-7);
-        TS_ASSERT_DELTA(vector[1], sqrt(3.0)/2.0, 1e-4);
+        TS_ASSERT_DELTA(vector[1], sqrt(3.0) / 2.0, 1e-4);
         TS_ASSERT_DELTA(norm_2(vector), 1.0, 1e-4);
         TS_ASSERT_DELTA(p_mesh->GetDistanceBetweenNodes(1, 4), 1.0, 1e-7);
 
@@ -355,7 +413,7 @@ public:
         // ...and the opposite vector
         vector = p_mesh->GetVectorFromAtoB(location2, location1);
         TS_ASSERT_DELTA(vector[0], -0.5, 1e-7);
-        TS_ASSERT_DELTA(vector[1], -sqrt(3.0)/2.0, 1e-4);
+        TS_ASSERT_DELTA(vector[1], -sqrt(3.0) / 2.0, 1e-4);
 
         // Test a periodic calculation
         location1[0] = 0.5;
@@ -395,7 +453,7 @@ public:
         TS_ASSERT_DELTA(vector[1], 1.0, 1e-7);
     }
 
-    void TestSetNodeLocationForCylindricalMesh() throw (Exception)
+    void TestSetNodeLocationForCylindricalMesh()
     {
         unsigned cells_across = 3;
         unsigned cells_up = 3;
@@ -403,7 +461,7 @@ public:
         unsigned thickness_of_ghost_layer = 2;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         /*
          * New test to check that the top and bottom rows move together
@@ -458,7 +516,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(0u)->rGetLocation()[0], 0.0001, 1e-4);
     }
 
-    void TestAddNodeAndReMesh() throw (Exception)
+    void TestAddNodeAndReMesh()
     {
         unsigned cells_across = 3;
         unsigned cells_up = 3;
@@ -466,11 +524,11 @@ public:
 
         // Set up a mesh which can be mirrored (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Check that there are the correct number of everything
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across*cells_up);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2*cells_across*(cells_up-1));
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across * cells_up);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2 * cells_across * (cells_up - 1));
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
 
         c_vector<double,2> point;
@@ -486,12 +544,12 @@ public:
         TS_ASSERT_EQUALS(map.IsIdentityMap(), true);
 
         // Check that there are the correct number of everything
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across*cells_up+1);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2*cells_across*(cells_up-1)+2);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across * cells_up + 1);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2 * cells_across * (cells_up - 1) + 2);
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
 
         // Check that we have moved the new node across
-        TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[0], 3.0+point[0], 1e-7);
+        TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[0], 3.0 + point[0], 1e-7);
         TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[1], point[1], 1e-7);
 
         // Test GetWidth
@@ -499,7 +557,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetWidth(1u), sqrt(3.0), 1e-6);
     }
 
-    void TestHaloNodeInsertionAndRemoval() throw (Exception)
+    void TestHaloNodeInsertionAndRemoval()
     {
         unsigned cells_across = 5;
         unsigned cells_up = 3;
@@ -507,7 +565,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         c_vector<double,2>& rLocation1 = p_mesh->GetNode(1)->rGetModifiableLocation();
         rLocation1[1] -= 0.5;
@@ -532,7 +590,7 @@ public:
 
         // Halo of nodes is added 0.5 above and below the original mesh.
         TS_ASSERT_DELTA(original_mesh_height, new_mesh_height, 1.0 + 1e-5);
-        TS_ASSERT_EQUALS(new_num_nodes, original_num_nodes*2+2*num_original_halo_nodes);
+        TS_ASSERT_EQUALS(new_num_nodes, original_num_nodes * 2 + 2 * num_original_halo_nodes);
 
         NodeMap map(p_mesh->GetNumNodes());
         p_mesh->MutableMesh<2,2>::ReMesh(map);   // recreates the boundary elements
@@ -547,7 +605,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), original_num_nodes);
     }
 
-    void TestHaloNodeReMesh() throw (Exception)
+    void TestHaloNodeReMesh()
     {
         // This test checks that a Halo node remesh can handle a mesh of uneven height
 
@@ -557,7 +615,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         c_vector<double,2>& rLocation1 = p_mesh->GetNode(1)->rGetModifiableLocation();
         rLocation1[1] -= 0.5;
@@ -587,7 +645,7 @@ public:
     }
 
     // NB This checks that periodicity is maintained through archiving...
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "cylindrical_mesh_base.arch";
@@ -600,7 +658,10 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        AbstractTetrahedralMesh<2,2>* const p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<AbstractTetrahedralMesh<2,2> > const p_mesh = boost::static_pointer_cast<AbstractTetrahedralMesh<2,2> >(generator.GetCylindricalMesh());
+
+        boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh)->SetHaloScalingFactor(0.5);
+        boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh)->SetHaloOffset(5.0);
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -627,7 +688,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractTetrahedralMesh<2,2>* p_mesh2;
+            boost::shared_ptr<AbstractTetrahedralMesh<2,2> > p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -663,6 +724,9 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), p_mesh2->GetNumBoundaryElements());
             TS_ASSERT_EQUALS(p_mesh->GetNumAllBoundaryElements(), p_mesh2->GetNumAllBoundaryElements());
 
+            TS_ASSERT_EQUALS(boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh2)->GetHaloScalingFactor(),0.5);
+            TS_ASSERT_EQUALS(boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh2)->GetHaloOffset(),5.0);
+
             AbstractTetrahedralMesh<2,2>::ElementIterator iter2 = p_mesh2->GetElementIteratorBegin();
 
             for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = p_mesh->GetElementIteratorBegin();
@@ -675,13 +739,10 @@ public:
                     TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(i), iter2->GetNodeGlobalIndex(i));
                 }
             }
-
-            // We now need to free the mesh, since there is no honeycomb generator to do so.
-            delete p_mesh2;
         }
     }
 
-    void TestConstructFromNodeList() throw (Exception)
+    void TestConstructFromNodeList()
     {
         std::vector<Node<2>*> nodes;
 
@@ -697,7 +758,7 @@ public:
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 6u);
 
-        // Find the element with node indices 2,3,5 (which stradles the periodic boundary)
+        // Find the element with node indices 2,3,5 (which straddles the periodic boundary)
         unsigned element_index;
         std::set<unsigned> target_element_node_indices;
         for (element_index=0; element_index<mesh.GetNumElements(); element_index++)
@@ -726,7 +787,7 @@ public:
 //        TS_ASSERT_DELTA(circumsphere[2], 0.2526, 1e-3);
 
         /* The reason that the circumsphere is calculated correctly for a periodic boundary
-         * stradling element is somewhat obscure.
+         * straddling element is somewhat obscure.
          * The Jacobian of the element is calculated when the element has a mirror node
          * The mirror node is then replaced with the node within the periodic mesh
          * The circumsphere is calculated based on the Jacobian and the replaced node within the periodic mesh
@@ -738,7 +799,7 @@ public:
          */
     }
 
-    void TestGenerateVectorsOfElementsStraddlingPeriodicBoundaries() throw (Exception)
+    void TestGenerateVectorsOfElementsStraddlingPeriodicBoundaries()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/bad_cylindrical_9_1");
         Cylindrical2dMesh mesh(9.1);
@@ -776,7 +837,7 @@ public:
         mesh.DeleteHaloNodes();
     }
 
-    void TestCorrectNonPeriodicMeshMapLeftToRight() throw (Exception)
+    void TestCorrectNonPeriodicMeshMapLeftToRight()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/bad_cylindrical_9_1");
         Cylindrical2dMesh mesh(9.1);
@@ -801,7 +862,7 @@ public:
                 continue;
             }
 
-            // Iterate over countaining elements to get the elements of the forward star
+            // Iterate over containing elements to get the elements of the forward star
             for (Node<2>::ContainingElementIterator it = p_node->ContainingElementsBegin();
                 it != p_node->ContainingElementsEnd();
                 ++it)
@@ -823,13 +884,13 @@ public:
             {
                 if (i%2 == 0)
                 {
-                   TS_ASSERT_EQUALS(indices[i], indices[i+1]);
+                   TS_ASSERT_EQUALS(indices[i], indices[i + 1]);
                 }
             }
         }
     }
 
-    void TestCorrectNonPeriodicMeshes() throw (Exception)
+    void TestCorrectNonPeriodicMeshes()
     {
         std::vector<Node<2>*> nodes;
         // Generates a mesh which could be meshed in different ways.
@@ -901,7 +962,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(mesh.ReconstructCylindricalMesh());
     }
 
-    void TestVoronoiTessellationUsesOverriddenMetric() throw (Exception)
+    void TestVoronoiTessellationUsesOverriddenMetric()
     {
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -909,7 +970,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->CheckIsVoronoi(), true);
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,50 +41,49 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
+#include "AbstractCellKiller.hpp"
+#include "CellLabel.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellsGenerator.hpp"
-#include "OffLatticeSimulation.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "LogFile.hpp"
+#include "NagaiHondaDifferentialAdhesionForce.hpp"
+#include "NagaiHondaForce.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SimpleTargetAreaModifier.hpp"
+#include "SmartPointers.hpp"
+#include "TargetedCellKiller.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "NagaiHondaForce.hpp"
-#include "NagaiHondaDifferentialAdhesionForce.hpp"
-#include "WelikyOsterForce.hpp"
-#include "AbstractCellKiller.hpp"
-#include "TargetedCellKiller.hpp"
-#include "AbstractCellBasedWithTimingsTestSuite.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
 #include "VertexMeshWriter.hpp"
-#include "WildTypeCellMutationState.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
-#include "CellLabel.hpp"
-#include "SimpleTargetAreaModifier.hpp"
 #include "Warnings.hpp"
-#include "LogFile.hpp"
-#include "SmartPointers.hpp"
-#include "CellMutationStatesCountWriter.hpp"
+#include "WelikyOsterForce.hpp"
+#include "WildTypeCellMutationState.hpp"
 #include "FakePetscSetup.hpp"
 
 class TestOffLatticeSimulationWithVertexBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
-
-    void TestSingleCellRelaxationNagaiHonda() throw (Exception)
+    void TestSingleCellRelaxationNagaiHonda()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 20;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; i++)
         {
-            double theta = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
         double cell_swap_threshold = 0.01;
         double edge_division_threshold = 2.0;
-        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+        MutableVertexMesh<2, 2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -92,7 +91,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); i++)
         {
             cells[i]->SetBirthTime(-1.0);
         }
@@ -109,7 +108,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -122,27 +121,27 @@ public:
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
         Warnings::QuietDestroy();
     }
 
-    void TestSingleCellRelaxationWelikyOster() throw (Exception)
+    void TestDoNotRestrictVertexMovement()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 20;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; i++)
         {
-            double theta = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
         double cell_swap_threshold = 0.01;
         double edge_division_threshold = 2.0;
-        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+        MutableVertexMesh<2, 2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -150,7 +149,66 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); i++)
+        {
+            cells[i]->SetBirthTime(-1.0);
+        }
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(mesh, cells);
+        TS_ASSERT(cell_population.GetRestrictVertexMovementBoolean())
+        cell_population.SetRestrictVertexMovementBoolean(false);
+        TS_ASSERT(!cell_population.GetRestrictVertexMovementBoolean())
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestVertexSimulationWithoutMovementRestriction");
+        simulator.SetEndTime(1.0);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
+        simulator.AddForce(p_nagai_honda_force);
+
+        // Pass a target area modifier to the simulation
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Test relaxes to circle (can be more stringent with more nodes and more time)
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetVolumeOfElement(0), 1.0, 0.05);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetSurfaceAreaOfElement(0), 3.549077, 0.1);
+
+        // Test that the vertex restriction warning does not occur
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+    }
+
+    void TestSingleCellRelaxationWelikyOster()
+    {
+        // Construct a 2D vertex mesh consisting of a single element
+        std::vector<Node<2>*> nodes;
+        unsigned num_nodes = 20;
+        for (unsigned i = 0; i < num_nodes; i++)
+        {
+            double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
+            nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
+        }
+
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
+
+        double cell_swap_threshold = 0.01;
+        double edge_division_threshold = 2.0;
+        MutableVertexMesh<2, 2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
+
+        for (unsigned i = 0; i < cells.size(); i++)
         {
             cells[i]->SetBirthTime(-1.0);
         }
@@ -179,11 +237,11 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestSingleCellDividing() throw (Exception)
+    void TestSingleCellDividing()
     {
         // Create a simple 2D MutableVertexMesh with only one cell
         HoneycombVertexMeshGenerator generator(1, 1);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cell.
         std::vector<CellPtr> cells;
@@ -210,7 +268,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -232,11 +290,11 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestVertexMonolayerWithCellBirth() throw (Exception)
+    void TestVertexMonolayerWithCellBirth()
     {
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(5, 5);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -245,9 +303,9 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); i++)
         {
-            if (i==12)
+            if (i == 12)
             {
                 cells[i]->SetCellProliferativeType(p_stem_type);
                 cells[i]->SetBirthTime(-23.95);
@@ -275,7 +333,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -287,9 +345,9 @@ public:
         unsigned new_num_elements = (static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements();
         unsigned new_num_cells = simulator.rGetCellPopulation().GetNumRealCells();
 
-        TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes+2); // as division of element is longer than threshold so is divided
-        TS_ASSERT_EQUALS(new_num_elements, old_num_elements+1);
-        TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
+        TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes + 2); // as division of element is longer than threshold so is divided
+        TS_ASSERT_EQUALS(new_num_elements, old_num_elements + 1);
+        TS_ASSERT_EQUALS(new_num_cells, old_num_cells + 1);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
@@ -298,11 +356,11 @@ public:
     }
 
     // This test uses a larger timestep to run faster.
-    void TestVertexMonolayerWithVoid() throw (Exception)
+    void TestVertexMonolayerWithVoid()
     {
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create a horseshoe-shaped mesh
         p_mesh->DeleteElementPriorToReMesh(0);
@@ -317,9 +375,9 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); i++)
         {
-            cells[i]->SetBirthTime(-(double)i -19.0);
+            cells[i]->SetBirthTime(-(double)i - 19.0);
         }
 
         // Create cell population
@@ -334,7 +392,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier#2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -350,7 +408,7 @@ public:
 
         // Check that void has been removed and vertices are in the correct position
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 40u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(),15u);
+        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(), 15u);
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 15u);
 
         // Test Warnings
@@ -359,7 +417,7 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestVertexMonolayerWithCellDeath() throw (Exception)
+    void TestVertexMonolayerWithCellDeath()
     {
         /*
          * We don't want apoptosing cells to be labelled as dead after a certain time in
@@ -367,8 +425,8 @@ public:
          */
 
         // Create a simple 2D MutableVertexMesh
-        HoneycombVertexMeshGenerator generator(4,4);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        HoneycombVertexMeshGenerator generator(4, 4);
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         /*
@@ -402,7 +460,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -423,9 +481,9 @@ public:
         unsigned new_num_elements = (static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements();
         unsigned new_num_cells = simulator.rGetCellPopulation().GetNumRealCells();
 
-        TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes-5);    // Due to the cells on the boundary that get killed and the apoptotic cell that does a T2 swap
-        TS_ASSERT_EQUALS(new_num_elements, old_num_elements-4);
-        TS_ASSERT_EQUALS(new_num_cells, old_num_cells-4);
+        TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes - 5); // Due to the cells on the boundary that get killed and the apoptotic cell that does a T2 swap
+        TS_ASSERT_EQUALS(new_num_elements, old_num_elements - 4);
+        TS_ASSERT_EQUALS(new_num_cells, old_num_cells - 4);
         TS_ASSERT_EQUALS(new_num_cells, new_num_elements);
 
         // Test Warnings
@@ -435,16 +493,71 @@ public:
         Warnings::QuietDestroy();
     }
 
+    void TestVertexMonolayerWithIntersectionSwap()
+    {
+        // Construct a 2D vertex mesh consisting of two rhomboid elements,
+        // where a node belonging to the right element intersects the left
+        // element
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(3, true, 0.99, 0.5));
+        nodes.push_back(new Node<2>(4, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(5, true, 0.0, 1.0));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+        unsigned node_indices_elem_0[4] = { 0, 1, 4, 5 };
+        unsigned node_indices_elem_1[4] = { 1, 2, 3, 4 };
+        for (unsigned i = 0; i < 4; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+
+        MutableVertexMesh<2, 2> mesh(nodes, vertex_elements);
+
+        /*
+         * Set check for internal intersections to allow intersection swaps to occur.
+         */
+        mesh.SetCheckForInternalIntersections(true);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestVertexMonolayerWithIntersectionSwap");
+        simulator.SetEndTime(0.5);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check that intersection swap was successful
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 5u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 3u);
+    }
+
     /*
      * This test visualizing cells of 2 mutation types, wildtype and labelled type.
      * It asserts that neighbouring cells have the correct adhesion parameter for difference
      * pairs of nodes.
      */
-    void TestVertexMonolayerWithTwoMutationTypes() throw (Exception)
+    void TestVertexMonolayerWithTwoMutationTypes()
     {
         // Create a simple 2D MutableVertexMesh with four cells
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -452,7 +565,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_transit_type);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); i++)
         {
             cells[i]->SetBirthTime(-2.0);
         }
@@ -474,7 +587,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -497,11 +610,11 @@ public:
      * may be configured and used in a vertex-based simulation. See also the
      * tutorial TestRunningDifferentialAdhesionSimulationsTutorial.hpp.
      */
-    void TestVertexMonolayerWithDifferentialAdhesion() throw (Exception)
+    void TestVertexMonolayerWithDifferentialAdhesion()
     {
         // Create a simple 2D MutableVertexMesh with four cells
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         // Create cells
@@ -510,7 +623,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); i++)
         {
             cells[i]->SetBirthTime(-2.0);
         }
@@ -539,7 +652,7 @@ public:
         p_force->SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(40.0);
         simulator.AddForce(p_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -556,21 +669,21 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestSingleCellRelaxationAndApoptosis() throw (Exception)
+    void TestSingleCellRelaxationAndApoptosis()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 20;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; i++)
         {
-            double theta = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
         mesh.SetCellRearrangementThreshold(0.1);
 
         // Create cells
@@ -579,7 +692,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); i++)
         {
             cells[i]->SetBirthTime(-1.0);
         }
@@ -596,7 +709,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -630,7 +743,7 @@ public:
      *
      * \todo In order to work the mesh archiving must support boundary nodes (see #1076)
      */
-    void noTestVertexStressTest() throw (Exception)
+    void noTestVertexStressTest()
     {
         double start_time = 0.0;
         double end_time = 100.0;
@@ -638,7 +751,7 @@ public:
 
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -658,7 +771,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -671,12 +784,12 @@ public:
         CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
 
         // Now save and reload to find where it breaks!
-        for (unsigned i=0; i<40; i++)
+        for (unsigned i = 0; i < 40; i++)
         {
             start_time = end_time;
             end_time = end_time + 10.0;
 
-            OffLatticeSimulation<2>* p_simulator = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load(output_directory,start_time);
+            OffLatticeSimulation<2>* p_simulator = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load(output_directory, start_time);
             p_simulator->SetDt(0.002);
             p_simulator->SetSamplingTimestepMultiple(50);
             p_simulator->SetEndTime(end_time);
@@ -689,92 +802,95 @@ public:
     }
 
     // Test archiving of a OffLatticeSimulation that uses a VertexBasedCellPopulation.
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         // Set end time
-        double end_time = 0.1;
+        double archive_time = 0.1;
 
-        // Create a simple 2D MutableVertexMesh
-        HoneycombVertexMeshGenerator generator(6, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        {
+            // Create a simple 2D MutableVertexMesh
+            HoneycombVertexMeshGenerator generator(6, 6);
+            boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
-        // Create cells
-        std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+            // Create cells
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        // Create cell population
-        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+            // Create cell population
+            VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestOffLatticeSimulationWithVertexBasedCellPopulationSaveAndLoad");
-        simulator.SetEndTime(end_time);
+            // Set up cell-based simulation
+            OffLatticeSimulation<2> simulator(cell_population);
+            simulator.SetOutputDirectory("TestOffLatticeSimulationWithVertexBasedCellPopulationSaveAndLoad");
+            simulator.SetEndTime(archive_time);
 
-        TS_ASSERT_DELTA(simulator.GetDt(), 0.002, 1e-12);
+            TS_ASSERT_DELTA(simulator.GetDt(), 0.002, 1e-12);
 
-        // Create a force law and pass it to the simulation
-        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
-        simulator.AddForce(p_nagai_honda_force);
+            // Create a force law and pass it to the simulation
+            MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
+            simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
-        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
-        simulator.AddSimulationModifier(p_growth_modifier);
+            // Pass a target area modifier to the simulation
+            MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+            simulator.AddSimulationModifier(p_growth_modifier);
 
-        // Run and save simulation
-        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+            // Run and save simulation
+            TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
+            CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
 
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 36u);
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 96u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(), 36u);
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 36u);
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 96u);
+            TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(), 36u);
 
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
-        CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(23);
-        TS_ASSERT_DELTA(p_cell->GetAge(), 23.1, 1e-4);
+            TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
+            CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(23);
+            TS_ASSERT_DELTA(p_cell->GetAge(), 23.1, 1e-4);
 
-        SimulationTime::Destroy();
+            SimulationTime::Destroy();
+        }
+
         SimulationTime::Instance()->SetStartTime(0.0);
 
-        // Load simulation
-        OffLatticeSimulation<2>* p_simulator
-            = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestOffLatticeSimulationWithVertexBasedCellPopulationSaveAndLoad", end_time);
+        {
+            // Load simulation
+            OffLatticeSimulation<2>* p_simulator
+                = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestOffLatticeSimulationWithVertexBasedCellPopulationSaveAndLoad", archive_time);
 
-        p_simulator->SetEndTime(0.2);
+            p_simulator->SetEndTime(0.2);
 
-        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), 36u);
-        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumNodes(), 96u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->GetNumElements(), 36u);
+            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), 36u);
+            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumNodes(), 96u);
+            TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->GetNumElements(), 36u);
 
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
-        CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(23);
-        TS_ASSERT_DELTA(p_cell2->GetAge(), 23.1, 1e-4);
+            TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), archive_time, 1e-9);
+            CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(23);
+            TS_ASSERT_DELTA(p_cell2->GetAge(), 23.1, 1e-4);
 
-        // Test we can access the force collection, and that there is one force in it
-        TS_ASSERT_EQUALS(p_simulator->rGetForceCollection().size(), 1u);
+            // Test we can access the force collection, and that there is one force in it
+            TS_ASSERT_EQUALS(p_simulator->rGetForceCollection().size(), 1u);
 
-        // Get a pointer to the Nagai Honda Force, and verify we can access its methods
-        boost::shared_ptr<NagaiHondaForce<2> > p_force =
-                boost::static_pointer_cast<NagaiHondaForce<2> >(p_simulator->rGetForceCollection()[0]);
+            // Get a pointer to the Nagai Honda Force, and verify we can access its methods
+            boost::shared_ptr<NagaiHondaForce<2> > p_force = boost::static_pointer_cast<NagaiHondaForce<2> >(p_simulator->rGetForceCollection()[0]);
 
-        double param_value = p_force->GetNagaiHondaDeformationEnergyParameter(); // Get the current value
-        p_force->SetNagaiHondaDeformationEnergyParameter(1.23);
-        TS_ASSERT_DELTA(p_force->GetNagaiHondaDeformationEnergyParameter(), 1.23, 1e-6);
-        p_force->SetNagaiHondaDeformationEnergyParameter(param_value); // Set back to the original value
+            double param_value = p_force->GetNagaiHondaDeformationEnergyParameter(); // Get the current value
+            p_force->SetNagaiHondaDeformationEnergyParameter(1.23);
+            TS_ASSERT_DELTA(p_force->GetNagaiHondaDeformationEnergyParameter(), 1.23, 1e-6);
+            p_force->SetNagaiHondaDeformationEnergyParameter(param_value); // Set back to the original value
 
+            // Run simulation
+            TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
 
-        // Run simulation
-        TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
+            // Tidy up
+            delete p_simulator;
 
-        // Tidy up
-        delete p_simulator;
-
-        // Test Warnings
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
-        Warnings::QuietDestroy();
+            // Test Warnings
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+            Warnings::QuietDestroy();
+        }
     }
 };
 

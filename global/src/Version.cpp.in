@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,10 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file
- * 
+ *
  * This is a template file for generating the Version.cpp source on the fly.
- * Content of the form %(example)s is replaced by suitable values.
- * See the function GetVersionCpp in python/SConsTools.py for more details.
+ * Content of the form ${example} is replaced by suitable values.
  */
 
 #include "Version.hpp"
@@ -48,45 +47,45 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 std::string ChasteBuildInfo::GetLicenceText()
 {
-    return "%(licence)s";
+    return "${licence}";
 }
 
 const char* ChasteBuildInfo::GetRootDir()
 {
-    return "%(chaste_root)s";
+    return "${Chaste_SOURCE_DIR}";
 }
 
 std::string ChasteBuildInfo::GetVersionString()
 {
     std::stringstream version;
     version << GetMajorReleaseNumber() << "." << GetMinorReleaseNumber()
-            << "." << GetRevisionNumber();
+            << "." << std::hex << GetRevisionNumber() << std::dec;
     return version.str();
 }
 
 unsigned ChasteBuildInfo::GetMajorReleaseNumber()
 {
-    return 3u;
+    return ${Chaste_VERSION_MAJOR}u;
 }
 
 unsigned ChasteBuildInfo::GetMinorReleaseNumber()
 {
-    return 4u;
+    return ${Chaste_VERSION_MINOR}u;
 }
 
-unsigned ChasteBuildInfo::GetRevisionNumber()
+unsigned long long ChasteBuildInfo::GetRevisionNumber()
 {
-    return %(revision)s;
+    return 0x${Chaste_revision};
 }
 
 bool ChasteBuildInfo::IsWorkingCopyModified()
 {
-    return %(wc_modified)s;
+    return ${Chaste_WC_MODIFIED};
 }
 
 const char* ChasteBuildInfo::GetBuildTime()
 {
-    return "%(build_time)s";
+    return "${build_time}";
 }
 
 const char* ChasteBuildInfo::GetCurrentTime()
@@ -96,35 +95,35 @@ const char* ChasteBuildInfo::GetCurrentTime()
     time(&rawtime);
     struct tm* p_timeinfo = gmtime(&rawtime);
     // Convert to string
-    const unsigned bufsize = %(time_size)d;
+    const unsigned bufsize = ${time_size};
     static char buffer[bufsize];
-    strftime(buffer, bufsize, "%(time_format)s", p_timeinfo);
+    strftime(buffer, bufsize, "${time_format}", p_timeinfo);
     return buffer;
 }
 
 const char* ChasteBuildInfo::GetBuilderUnameInfo()
 {
-    return "%(uname)s";
+    return "${CMAKE_SYSTEM_NAME}";
 }
 
 const char* ChasteBuildInfo::GetBuildInformation()
 {
-    return "%(build_info)s";
+    return "${CMAKE_BUILD_TYPE}";
 }
 
 const char* ChasteBuildInfo::GetCompilerType()
 {
-	return "%(compiler_type)s";
+    return "${CMAKE_CXX_COMPILER}";
 }
 
 const char* ChasteBuildInfo::GetCompilerVersion()
 {
-	return "%(compiler_version)s";
+    return "${CMAKE_CXX_COMPILER_VERSION}";
 }
 
 const char* ChasteBuildInfo::GetCompilerFlags()
 {
-	return "%(cc_flags)s";
+    return "${ALL_CXX_FLAGS}";
 }
 
 const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()
@@ -132,9 +131,19 @@ const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()
     static std::map<std::string, std::string> versions;
     if (versions.empty())
     {
-        %(project_versions)s;
+        ${project_versions}
     }
     return versions;
+}
+
+const std::map<std::string, std::string>& ChasteBuildInfo::rGetIfProjectsModified()
+{
+    static std::map<std::string, std::string> modified;
+    if (modified.empty())
+    {
+        ${projects_modified}
+    }
+    return modified;
 }
 
 std::string ChasteBuildInfo::GetProvenanceString()
@@ -168,7 +177,12 @@ std::string ChasteBuildInfo::GetProvenanceString()
     return prov.str();
 }
 
+std::string ChasteBuildInfo::GetChasteCodegenVersion()
+{
+    return "${Chaste_CODEGEN_VERSION}";
+}
+
 const char* ChasteBuildInfo::GetXsdVersion()
 {
-	return "%(xsd_version)s";
+    return "${xsd_version}";
 }

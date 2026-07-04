@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,11 +75,11 @@ class TestCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestConstructor() throw(Exception)
+    void TestConstructor()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -93,7 +93,7 @@ public:
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Test that the mesh and cells are correctly assigned
-        TS_ASSERT_EQUALS(&(cell_population.rGetMesh()), p_mesh);
+        TS_ASSERT_EQUALS(&(cell_population.rGetMesh()), p_mesh.get());
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), location_indices.size());
 
@@ -132,11 +132,11 @@ public:
             "Cannot call GetNeighbouringNodeIndices() on a subclass of AbstractOnLatticeCellPopulation, need to go through the PottsMesh instead");
     }
 
-    void TestConstructorWithMultipleCellsPerSite() throw(Exception)
+    void TestConstructorWithMultipleCellsPerSite()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(2, 0, 0, 1, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -188,7 +188,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 1u);
 
         // Test that the mesh and cells are correctly assigned
-        TS_ASSERT_EQUALS(&(cell_population.rGetMesh()), p_mesh);
+        TS_ASSERT_EQUALS(&(cell_population.rGetMesh()), p_mesh.get());
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), location_indices.size());
     }
@@ -196,7 +196,7 @@ public:
     /*
      * This test checks that cell populations with multiple cells per lattice site are dealt with correctly.
      */
-    void TestMultipleCellExceptions() throw (Exception)
+    void TestMultipleCellExceptions()
     {
         EXIT_IF_PARALLEL;   // Cell IDs are set differently in parallel
 
@@ -205,7 +205,7 @@ public:
 
         // Create a simple 2D PottsMesh with 4 nodes
         PottsMeshGenerator<2> generator(2, 0, 0, 2, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -323,7 +323,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -416,7 +416,7 @@ public:
 
         // Test that the correct cell proliferative types were recorded
         std::vector<double> proliferative_types_data;
-        vtk_reader.GetPointData("Cell types", proliferative_types_data);
+        vtk_reader.GetPointData("Legacy Cell types", proliferative_types_data);
         TS_ASSERT_EQUALS(proliferative_types_data.size(), 5u);
         TS_ASSERT_DELTA(proliferative_types_data[0], 5.0, 1e-9);
         for (unsigned i=1; i<proliferative_types_data.size(); i++)
@@ -483,11 +483,11 @@ public:
 #endif
     }
 
-    void TestRemoveDeadCellsAndUpdate() throw(Exception)
+    void TestRemoveDeadCellsAndUpdate()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -519,7 +519,7 @@ public:
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -550,11 +550,11 @@ public:
         TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(1), true);
     }
 
-    void TestAddCell() throw(Exception)
+    void TestAddCell()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -609,11 +609,11 @@ public:
     }
 
 ///\todo reinstate or remove test (#2031)
-    void DONOTTestAddCellToManyCells() throw(Exception)
+    void DONOTTestAddCellToManyCells()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -648,7 +648,7 @@ public:
     {
         // Create a simple 2D PottsMesh with one cell
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -686,7 +686,7 @@ public:
     {
         // Create a simple 2D PottsMesh entirely populated with cells
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -737,7 +737,7 @@ public:
     {
         // Create a simple 2D PottsMesh with two cells
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -770,7 +770,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "CaBasedCellPopulation-2.arch";
@@ -788,7 +788,7 @@ public:
 
             // Create a CA cell population object
             PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-            PottsMesh<2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -888,10 +888,10 @@ public:
         }
     }
 
-    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    void TestGetTetrahedralMeshForPdeModifier()
     {
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;

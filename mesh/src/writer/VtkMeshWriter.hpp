@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,6 +75,13 @@ class VtkMeshWriter : public AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DI
 
 private:
     bool mWriteParallelFiles; /**< Whether to write parallel (.pvtu + .vtu for each process) files, defaults to false */
+
+    /**
+     * Whether or not the information on mesh cells (aka mesh elements) need to be printed.
+     * Defaults to true. When calling the "write" method multiple times,
+     * you may need to set it to false after the first time.
+     */
+    bool mWriteMeshCells;
 
     std::map<unsigned, unsigned> mGlobalToNodeIndexMap; /**< Map a global node index into a local index (into mNodes and mHaloNodes as if they were concatenated) */
 
@@ -211,6 +218,19 @@ public:
      */
     void WriteFilesUsingMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                                      bool keepOriginalElementIndexing=true);
+
+    /**
+     * Specify whether the next call to MakeVtkMesh() - which is called when writing with WriteFiles()-
+     * will need to insert information on the mesh cells (aka mesh elements) or not.
+     * When requesting multiple WriteFiles() from this same object, the information on mesh
+     * cells must be included only the first time. This method can then be called after the
+     * first time by setting the flag to false.
+     *
+     * @param writeMeshCells true if the next call to MakeVtkMesh() will need to include
+     *                       information on the mesh cells (aka mesh elements)
+     */
+    void SetWriteMeshCells(bool writeMeshCells);
+
 
     /**
      * Add Chaste provenance data to a VTK file as an XML comment string

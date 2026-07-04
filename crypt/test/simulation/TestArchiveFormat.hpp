@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include <iomanip>
-#include <boost/foreach.hpp>
 #include "CryptSimulation2d.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
@@ -77,20 +76,19 @@ public:
      *
      * Note that when updating the archive, you can run TestGenerateSteadyStateCrypt.hpp with build=GccOpt to speed up the test.
      *
-     * Note: from Chaste release 3.3 onward the earliest version of Boost supported is 1.40.
+     * Note: from Chaste release 2021.1 onward the earliest version of Boost supported is 1.58.
      *
-     * NB: Produce archives with
-     *  scons build=GccOpt_hostconfig,boost=1-40,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
-     *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
-     *
-     * OR to produce archives in CMake:
-     *  cmake -DBOOST_ROOT=/path/to/boost1.40 -DChaste_USE_CVODE=OFF /path/to/Chaste
-     *  make TestGenerateSteadyStateCrypt_simulation_Runner
+     * NB: Produce archives with something similar to
+     *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/path/to/boost1.58 -DChaste_USE_CVODE=OFF /path/to/Chaste
+     *  # YOUR MILEAGE MAY VARY because CMake is very good at finding other versions of Boost:
+     *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/home/jmpf/boost_1_58 -DBoost_NO_SYSTEM_PATHS=ON -DBoost_NO_BOOST_CMAKE=ON -DChaste_USE_CVODE=FALSE ..
+     *  make TestGenerateSteadyStateCrypt
      *  ctest -R TestGenerateSteadyStateCrypt
-     *  cp /path/to/Chaste/testoutput/SteadyStateCrypt/archive/?*_150.* /path/to/Chaste/crypt/test/data/SteadyStateCrypt/archive/
+     *  cp $CHASTE_TEST_OUTPUT/SteadyStateCrypt/archive/?*_150.* ../crypt/test/data/SteadyStateCrypt/archive/
+     *
      *
      */
-    void TestLoadArchive() throw (Exception)
+    void TestLoadArchive()
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);
@@ -116,12 +114,12 @@ public:
         FileFinder test_data_directory("crypt/test/data/" + test_to_profile + "/archive", RelativeTo::ChasteSourceRoot);
         TS_ASSERT(test_data_directory.IsDir());
 
-        // to the testoutput/archive directory to continue running the simulation
+        // to the $CHASTE_TEST_OUTPUT/archive directory to continue running the simulation
         OutputFileHandler archive_handler(test_to_profile + "/archive");
 
         // Following is done in two lines to avoid a bug in Intel compiler v12.0
         std::vector<FileFinder> temp_files = test_data_directory.FindMatches("*");
-        BOOST_FOREACH(FileFinder temp_file, temp_files)
+        for (FileFinder temp_file : temp_files)
         {
             archive_handler.CopyFileTo(temp_file);
         }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,7 +56,7 @@ class TestCellsGenerator : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestGenerateBasicWithFixedG1GenerationalCellCycleModel() throw(Exception)
+    void TestGenerateBasicWithFixedG1GenerationalCellCycleModel()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
@@ -93,7 +93,7 @@ public:
         TS_ASSERT_DELTA(cells2[2]->GetBirthTime(), -9.0, 1e-4);
     }
 
-    void TestGenerateGivenLocationIndicesWithFixedG1GenerationalCellCycleModel() throw(Exception)
+    void TestGenerateGivenLocationIndicesWithFixedG1GenerationalCellCycleModel()
     {
         EXIT_IF_PARALLEL;
         // Use a mesh generator to generate some location indices corresponding to real cells
@@ -115,7 +115,7 @@ public:
         }
     }
 
-    void TestGenerateGivenLocationIndicesWithSpecifiedCellProliferativeType() throw(Exception)
+    void TestGenerateGivenLocationIndicesWithSpecifiedCellProliferativeType()
     {
         EXIT_IF_PARALLEL;
         // Use a mesh generator to generate some location indices corresponding to real cells
@@ -139,7 +139,7 @@ public:
         }
     }
 
-    void TestGenerateBasicRandomWithNoSpecifiedProliferativeCellType() throw(Exception)
+    void TestGenerateBasicRandomWithNoSpecifiedProliferativeCellType()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
@@ -165,7 +165,7 @@ public:
         }
     }
 
-    void TestGenerateBasicRandomWithFixedG1GenerationalCellCycleModel() throw(Exception)
+    void TestGenerateBasicRandomWithFixedG1GenerationalCellCycleModel()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
@@ -196,12 +196,12 @@ public:
         TS_ASSERT_DELTA(cells[2]->GetBirthTime(), -10.2953, 1e-4);
     }
 
-    void TestGenerateBasicRandomWithFixedG1GenerationalCellCycleModelandVertexCells() throw(Exception)
+    void TestGenerateBasicRandomWithFixedG1GenerationalCellCycleModelandVertexCells()
     {
         EXIT_IF_PARALLEL;
         // Create mesh
         HoneycombVertexMeshGenerator mesh_generator(2, 2);
-        VertexMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<VertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

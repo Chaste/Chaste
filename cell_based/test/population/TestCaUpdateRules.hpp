@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,18 +52,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "PottsMeshGenerator.hpp"
-#include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 class TestCaUpdateRules : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestDiffusionCaUpdateRuleIn2d() throw (Exception)
+    void TestDiffusionCaUpdateRuleIn2d()
     {
         // Set the timestep and size of domain to let us calculate the probabilities of movement
         double delta_t = 1;
@@ -86,7 +86,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -125,7 +125,7 @@ public:
         TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,23,cell_population, delta_t, delta_x, p_cell),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
     }
 
-    void TestDiffusionCaUpdateRuleIn2dWithMultipleCells() throw (Exception)
+    void TestDiffusionCaUpdateRuleIn2dWithMultipleCells()
     {
         // Set the timestep and size of domain to let us calculate the probabilities of movement
         double delta_t = 1;
@@ -148,7 +148,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -198,7 +198,7 @@ public:
         TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,23,cell_population, delta_t, delta_x, p_cell),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
     }
 
-    void TestArchiveDiffusionCaUpdateRule() throw(Exception)
+    void TestArchiveDiffusionCaUpdateRule()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionCaUpdateRule.arch";
@@ -261,7 +261,7 @@ public:
     /*
      * Now test the switching rules.
      */
-    void TestRandomCaSwitchingUpdateRuleIn2d() throw (Exception)
+    void TestRandomCaSwitchingUpdateRuleIn2d()
     {
         // Set the timestep and size of domain to let us calculate the probabilities of movement
         double delta_t = 0.1;
@@ -284,7 +284,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -310,7 +310,7 @@ public:
         TS_ASSERT_DELTA(random_switching_update_rule.EvaluateSwitchingProbability(UNSIGNED_UNSET,UNSIGNED_UNSET,cell_population, delta_t, delta_x),switching_parameter*delta_t,1e-6);
     }
 
-    void TestArchiveRandomCaSwitchingUpdateRule() throw(Exception)
+    void TestArchiveRandomCaSwitchingUpdateRule()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "RandomCaSwitchingUpdateRule.arch";

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,32 +65,9 @@ class TestCardiacSimulation : public CxxTest::TestSuite
     {
         HeartEventHandler::Reset();
     }
-//
-//    void CreateOptionsFile(const OutputFileHandler& rHandler,
-//                           const std::string& rModelName,
-//                           const std::vector<std::string>& rArgs,
-//                           const std::string& rExtraXml="")
-//    {
-//        if (PetscTools::AmMaster())
-//        {
-//            out_stream p_optfile = rHandler.OpenOutputFile(rModelName + "-conf.xml");
-//            (*p_optfile) << "<?xml version='1.0'?>" << std::endl
-//                         << "<pycml_config>" << std::endl
-//                         << "<command_line_args>" << std::endl;
-//            for (unsigned i=0; i<rArgs.size(); i++)
-//            {
-//                (*p_optfile) << "<arg>" << rArgs[i] << "</arg>" << std::endl;
-//            }
-//            (*p_optfile) << "</command_line_args>" << std::endl
-//                         << rExtraXml
-//                         << "</pycml_config>" << std::endl;
-//            p_optfile->close();
-//        }
-//        PetscTools::Barrier("CreateOptionsFile");
-//    }
 public:
 
-    void TestMono1dSmall() throw(Exception)
+    void TestMono1dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -104,14 +81,14 @@ public:
 
         /* If the above fails, and you are happy the new results are correct, uncomment the following line,
          * run the test, and then do
-         cp /tmp/$USER/testoutput/SaveMono1D/SimulationResults.h5 heart/test/data/cardiac_simulations/mono_1d_small.h5
+         cp $CHASTE_TEST_OUTPUT/SaveMono1D/SimulationResults.h5 heart/test/data/cardiac_simulations/mono_1d_small.h5
          */
         //assert(0);
 
         CardiacSimulation simulation2("heart/test/data/xml/monodomain1d_resume.xml", true);
     }
 
-    void TestMono2dSmall() throw(Exception)
+    void TestMono2dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -138,6 +115,7 @@ public:
 
             if (p_vector_factory->GetLocalOwnership() > 0)
             {
+                // One warning will come from the lookup table hitting an nan
                 TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), p_vector_factory->GetLocalOwnership());
                 std::stringstream msg;
                 msg << "Cannot apply drug to cell at node " << p_vector_factory->GetLow() << " as it has no parameter named 'not_a_current_conductance'.";
@@ -153,12 +131,54 @@ public:
                 TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), msg.str());
             }
         }
+
+        //Check that the post-processed file is there and remove it
+        FileFinder pseudoecg("SaveMono2D/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput);
+
+        if (PetscTools::AmMaster())
+        {
+            TS_ASSERT(pseudoecg.Exists()); // Only master tests. This prevents master from removing file before other processes have seen it
+            pseudoecg.Remove();
+            TS_ASSERT(pseudoecg.Exists() == false);
+        }
+
         //Check that archive which has just been produced can be read
         CardiacSimulation simulation2("heart/test/data/xml/monodomain2d_resume.xml");
+
+        //Check that the post-processed file is back after the simulation has been restarted
+        TS_ASSERT(pseudoecg.Exists());  // (Should check that it's bigger than the one we deleted)
+
         Warnings::QuietDestroy();
     }
 
-    void TestMono3dSmall() throw(Exception)
+    /* Do the same as before but ask for post-processing after the simulation has been run and checkpointed. */
+    void TestMono2dSmallAddPostprocessingOnResume()
+    {
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
+        //Clear any warnings from previous tests
+        Warnings::QuietDestroy();
+        {
+            CardiacSimulation simulation("heart/test/data/xml/monodomain2d_small2.xml", false, true);
+        }
+
+        //Check that the post-processed file is not produced in the original simulation
+        FileFinder pseudoecg("SaveMono2D2/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(pseudoecg.Exists() == false);
+
+        //Check that archive which has just been produced can be read
+        CardiacSimulation simulation2("heart/test/data/xml/monodomain2d_resume2.xml");
+
+        //Check that the post-processed file is present after the simulation has been restarted
+        TS_ASSERT(pseudoecg.Exists());  // (Should check that it's bigger than the one we deleted)
+
+        Warnings::QuietDestroy();
+    }
+
+    void TestMono3dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -170,7 +190,7 @@ public:
         CardiacSimulation simulation2("heart/test/data/xml/monodomain3d_resume.xml");
     }
 
-    void TestMono1dSodiumBlockBySettingNamedParameter() throw(Exception)
+    void TestMono1dSodiumBlockBySettingNamedParameter()
     {
         CardiacSimulation simulation("heart/test/data/xml/monodomain1d_sodium_block.xml");
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "mono_1d_sodium_block", false,
@@ -182,7 +202,7 @@ public:
                               "No parameter named 'missing-parameter'.");
     }
 
-    void TestMonoStimUsingEllipsoids() throw(Exception)
+    void TestMonoStimUsingEllipsoids()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -195,7 +215,7 @@ public:
                                                  "Mono1DStimUsingEllipsoid", "SimulationResults", true, 1e-6));
     }
 
-    void TestBi1dSmall() throw(Exception)
+    void TestBi1dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -212,7 +232,7 @@ public:
                                   "The simulation duration must be positive, not -0.1");
         }
     }
-    void TestBi2dSmall() throw(Exception)
+    void TestBi2dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -223,7 +243,7 @@ public:
         //Check that archive which has just been produced can be read
         CardiacSimulation simulation2("heart/test/data/xml/bidomain2d_resume.xml");
     }
-    void TestBi3dSmall() throw(Exception)
+    void TestBi3dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -235,7 +255,7 @@ public:
         CardiacSimulation simulation2("heart/test/data/xml/bidomain3d_resume.xml");
     }
 
-    void TestBiWithBath1dSmall() throw(Exception)
+    void TestBiWithBath1dSmall()
     {
         { CardiacSimulation simulation("heart/test/data/xml/bidomain_with_bath1d_small.xml"); }
         { CardiacSimulation simulation2("heart/test/data/xml/bidomain_with_bath1d_resume.xml"); }
@@ -248,24 +268,24 @@ public:
         }
     }
 
-    void TestBiWithBath2dSmall() throw(Exception)
+    void TestBiWithBath2dSmall()
     {
         CardiacSimulation simulation("heart/test/data/xml/bidomain_with_bath2d_small.xml");
         CardiacSimulation simulation2("heart/test/data/xml/bidomain_with_bath2d_resume.xml");
     }
 
-    void TestBiWithBath3dSmall() throw(Exception)
+    void TestBiWithBath3dSmall()
     {
         CardiacSimulation simulation("heart/test/data/xml/bidomain_with_bath3d_small.xml");
         CardiacSimulation simulation2("heart/test/data/xml/bidomain_with_bath3d_resume.xml");
     }
 
-    void TestBiWith2dHeterogeneousConductivities() throw(Exception)
+    void TestBiWith2dHeterogeneousConductivities()
     {
         CardiacSimulation simulation("heart/test/data/xml/bidomain2d_heterogeneous.xml", true);
     }
 
-    void TestCardiacSimulationBasicBidomainShort() throw(Exception)
+    void TestCardiacSimulationBasicBidomainShort()
     {
         // Fox2002BackwardEuler cell model
         // run a bidomain_with_bath simulation
@@ -276,7 +296,7 @@ public:
                                                  "BaseBidomainShort", "SimulationResults", true, 1e-6));
     }
 
-    void TestCardiacSimulationBasicMonodomainShort() throw(Exception)
+    void TestCardiacSimulationBasicMonodomainShort()
     {
         // Fox2002BackwardEuler cell model
         // run a bidomain simulation
@@ -287,7 +307,7 @@ public:
                                                  "BaseMonodomainShort", "SimulationResults", true, 1e-6));
     }
 
-    void TestCardiacSimulationPostprocessMonodomain() throw(Exception)
+    void TestCardiacSimulationPostprocessMonodomain()
     {
         // Fox2002BackwardEuler cell model
         // run a bidomain simulation
@@ -297,9 +317,18 @@ public:
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "postprocess_monodomain_short_results", false,
                                                  foldername, "SimulationResults", true, 1e-6));
+        {
+            // look for the existence of post-processing files
+            TS_ASSERT(FileFinder(foldername + "/output/Apd_90_minus_30_Map.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/ConductionVelocityFromNode10.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/ConductionVelocityFromNode20.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/MaxUpstrokeVelocityMap_minus_30.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/UpstrokeTimeMap_minus_30.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput).Exists());
+        }
     }
 
-    void TestCardiacSimulationArchiveBidomain() throw(Exception)
+    void TestCardiacSimulationArchiveBidomain()
     {
         // Fox2002BackwardEuler cell model
         // run a bidomain simulation
@@ -315,13 +344,13 @@ public:
         TS_ASSERT(file.Exists());
         /* If you want to update the .h5 results for this test for any reason, you need to stop the following test adding to them.
          * So uncomment the assert(), run the test, and then do:
-         cp /tmp/chaste/testoutput/SaveBidomainShort/SimulationResults.h5 heart/test/data/cardiac_simulations/save_bidomain_short_results.h5
+         cp $CHASTE_TEST_OUTPUT/SaveBidomainShort/SimulationResults.h5 heart/test/data/cardiac_simulations/save_bidomain_short_results.h5
          */
         //assert(0);
     }
 
     // requires TestCardiacSimulationArchiveBidomain() to have been run
-    void TestCardiacSimulationResumeBidomain() throw(Exception)
+    void TestCardiacSimulationResumeBidomain()
     {
         // run a bidomain simulation
         HeartConfig::Instance()->SetSpaceDimension(1);
@@ -337,7 +366,7 @@ public:
         //assert(0);
     }
 
-    void TestCardiacSimulationArchiveMonodomain() throw(Exception)
+    void TestCardiacSimulationArchiveMonodomain()
     {
         // Fox2002BackwardEuler cell model
         // run a bidomain simulation
@@ -353,13 +382,13 @@ public:
         TS_ASSERT(file.Exists());
         /* If you want to update the .h5 results for this test for any reason, you need to stop the following test adding to them.
          * So uncomment the assert(), run the test, and then do:
-         cp /tmp/chaste/testoutput/SaveMonodomainShort/SimulationResults.h5 heart/test/data/cardiac_simulations/save_monodomain_short_results.h5
+         cp $CHASTE_TEST_OUTPUT/SaveMonodomainShort/SimulationResults.h5 heart/test/data/cardiac_simulations/save_monodomain_short_results.h5
          */
         //assert(0);
     }
 
     // requires TestCardiacSimulationArchiveMonodomain() to have been run
-    void TestCardiacSimulationResumeMonodomain() throw(Exception)
+    void TestCardiacSimulationResumeMonodomain()
     {
         // run a monodomain simulation
         HeartConfig::Instance()->SetSpaceDimension(1);
@@ -371,7 +400,7 @@ public:
                                                  foldername, "SimulationResults", true, 1e-6));
     }
 
-    void TestCardiacSimulationArchiveDynamic() throw(Exception)
+    void TestCardiacSimulationArchiveDynamic()
     {
 #ifdef CHASTE_CAN_CHECKPOINT_DLLS
         // run a monodomain simulation
@@ -390,7 +419,7 @@ public:
 
         /* If you want to update the .h5 results for this test for any reason, you need to stop the following lines adding to them.
          * So uncomment the assert(), run the test, and then do:
-         cp /tmp/chaste/testoutput/SaveMonodomainDynamic/SimulationResults.h5 heart/test/data/cardiac_simulations/save_monodomain_dynamic.h5
+         cp $CHASTE_TEST_OUTPUT/SaveMonodomainDynamic/SimulationResults.h5 heart/test/data/cardiac_simulations/save_monodomain_dynamic.h5
          */
         //assert(0);
 
@@ -409,17 +438,8 @@ public:
     /**
      * Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
      * The earliest version of Boost supported is 1.34
-     * Run TestCardiacSimulationArchiveBidomain on 4 processors to create the archive for this test,
-     * and copy it to the repository using:
-     *
-       scons build=GccOpt_hostconfig,boost=1-34_4 test_suite=heart/test/TestCardiacSimulation.hpp
-       cp -r /tmp/$USER/testoutput/SaveBidomainShort_checkpoints/0.2ms heart/test/data/checkpoint_migration_via_xml/
-       rm -f heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort/progress_status.txt
-       rm -f heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort_0.2ms/mesh.ncl
-       rm -f heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort_0.2ms/ChasteParameters_?_?xsd
-       rm -rf heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort/output
      */
-    void TestCardiacSimulationResumeMigration() throw(Exception)
+    void TestCardiacSimulationResumeMigration()
     {
         // We can only load simulations from CHASTE_TEST_OUTPUT, so copy the archives there
         std::string source_directory = "heart/test/data/checkpoint_migration_via_xml/0.2ms/";
@@ -524,13 +544,13 @@ public:
         }
     }
 
-    void TestResumeChangingSettings() throw(Exception)
+    void TestResumeChangingSettings()
     {
         doTestResumeChangingSettings("heart/test/data/xml/save_monodomain_with_parameter.xml");
         doTestResumeChangingSettings("heart/test/data/xml/save_monodomain_with_parameter_append.xml");
     }
 
-    void TestCardiacSimulationPatchwork() throw(Exception)
+    void TestCardiacSimulationPatchwork()
     {
         OutputFileHandler handler("DynamicallyLoadedModel");
         FileFinder cellml_file("heart/dynamic/luo_rudy_1991_dyn.cellml", RelativeTo::ChasteSourceRoot);
@@ -541,10 +561,10 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT(CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "patchwork_results", false,
-                                                foldername, "SimulationResults", true, 1e-5));
+                                                foldername, "SimulationResults", true, 1.2e-5)); // the hdf5 reference was generated using chaste_codegen lookup tables
     }
 
-    void TestCardiacSimulationKirsten() throw(Exception)
+    void TestCardiacSimulationKirsten()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -559,7 +579,7 @@ public:
                                                           foldername, "SimulationResults", true, 5e-4)); // lower tolerance as comparing with non-backward-euler results.
     }
 
-    void TestTransmuralCellularheterogeneities() throw(Exception)
+    void TestTransmuralCellularheterogeneities()
     {
         CardiacSimulation simulation("heart/test/data/xml/ChasteParametersCellHeterogeneities.xml");
         std::string foldername = "ChasteResults_heterogeneities";
@@ -568,7 +588,7 @@ public:
                    foldername, "SimulationResults", true));
     }
 
-    void TestElectrodes() throw(Exception)
+    void TestElectrodes()
     {
         CardiacSimulation simulation("heart/test/data/xml/bidomain_with_bath2d_electrodes.xml");
         std::string foldername = "ChasteResults_electrodes";
@@ -577,7 +597,7 @@ public:
                    foldername, "SimulationResults", true, 1e-4));
     }
 
-    void TestExceptions() throw(Exception)
+    void TestExceptions()
     {
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation("heart/test/data/xml/monodomain8d_small.xml"),
                               "Space dimension not supported: should be 1, 2 or 3");
@@ -610,7 +630,7 @@ public:
 #endif
     }
 
-    void TestDynamicallyLoadingCvodeCell() throw (Exception)
+    void TestDynamicallyLoadingCvodeCell()
     {
         // Coverage - using native CVODE cells should no longer throw
 #ifdef CHASTE_CVODE
@@ -620,8 +640,12 @@ public:
 
         std::vector<std::string> args;
         args.push_back("--cvode");
-
-        CellMLToSharedLibraryConverter::CreateOptionsFile(handler_cvode, "luo_rudy_1991_dyn", args);
+    CellMLToSharedLibraryConverter converter(true);
+    converter.SetOptions(args);
+    // Need to perform conversion here as otherwise we can't tell it to convert a cvode
+        // It would work with a normal model too, without pre-converting this is tested in TestCardiacSimulationPatchwork
+           FileFinder copied_file("DynamicallyLoadedModelCvode/luo_rudy_1991_dyn.cellml", RelativeTo::ChasteTestOutput);
+        converter.Convert(copied_file);
         CardiacSimulation simulation("heart/test/data/xml/dynamic_cvode_model.xml");
 #else
         std::cout << "CVODE is not enabled.\n";

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -92,7 +92,7 @@ Vec MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::CreateInitialCondition()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem(AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory)
         : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>(pCellFactory),
-		  mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
+          mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
 {
 }
 
@@ -101,7 +101,7 @@ MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem(Abs
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem()
     : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>(),
-	  mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
+      mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
 {
 }
 // LCOV_EXCL_STOP
@@ -122,11 +122,11 @@ void MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::WriteInfo(double time)
 
     double v_max, v_min, v_purk_max, v_purk_min;
 
-    VecStrideMax( this->mSolution, 0, PETSC_NULL, &v_max );
-    VecStrideMin( this->mSolution, 0, PETSC_NULL, &v_min );
+    VecStrideMax( this->mSolution, 0, CHASTE_PETSC_NULLPTR, &v_max );
+    VecStrideMin( this->mSolution, 0, CHASTE_PETSC_NULLPTR, &v_min );
 
-    VecStrideMax( this->mSolution, 1, PETSC_NULL, &v_purk_max );
-    VecStrideMin( this->mSolution, 1, PETSC_NULL, &v_purk_min );
+    VecStrideMax( this->mSolution, 1, CHASTE_PETSC_NULLPTR, &v_purk_max );
+    VecStrideMin( this->mSolution, 1, CHASTE_PETSC_NULLPTR, &v_purk_min );
 
     // avoid printing 1e-320 etc
     if(fabs(v_purk_min)<1e-20)

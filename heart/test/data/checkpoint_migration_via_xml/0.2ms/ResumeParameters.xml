@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ChasteParameters xmlns='https://chaste.comlab.ox.ac.uk/nss/parameters/3_0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://chaste.comlab.ox.ac.uk/nss/parameters/3_0 ChasteParameters_3_0.xsd'>
+
+    <ResumeSimulation>
+        <ArchiveDirectory relative_to='this_file'>SaveBidomainShort_0.2ms</ArchiveDirectory>
+        <SpaceDimension>3</SpaceDimension>
+        <SimulationDuration unit='ms'>0.0</SimulationDuration> <!-- Edit with new simulation duration. Please note that the simulation does not restart at t=0 but at the time where the checkpoint was created.-->
+        <Domain>Bi</Domain>
+        <CheckpointSimulation timestep='0.2' unit='ms' max_checkpoints_on_disk='3'/> <!-- This is optional; if not given, the loaded simulation will NOT itself be checkpointed -->
+        <OutputVisualizer meshalyzer='yes' vtk='no' parallel_vtk='no' cmgui='no'/>
+    </ResumeSimulation>
+
+    <!-- These elements must exist, but their contents are ignored -->
+    <Physiological/>
+    <Numerical/>
+</ChasteParameters>

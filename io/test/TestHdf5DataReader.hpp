@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
 #include "DistributedVectorFactory.hpp"
-
 
 /*
  * Operator function to be called by H5Literate in TestListingDatasetsInAnHdf5File.
@@ -97,8 +96,10 @@ private:
          * default file creation properties, and default file
          * access properties.
          */
-        file = H5Fcreate(h5file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
+        // Set up a property list saying how we'll open the file in parallel
+        hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
+        H5Pset_fapl_mpio(plist_id, PETSC_COMM_WORLD, MPI_INFO_NULL);
+        file = H5Fcreate(h5file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
         /*
          * Describe the size of the array and create the data space for fixed
          * size dataset.
@@ -334,7 +335,7 @@ private:
 
 public:
 
-    void TestMultiStepReader() throw (Exception)
+    void TestMultiStepReader()
     {
         WriteMultiStepData();
 
@@ -476,7 +477,7 @@ public:
         H5E_END_TRY;
     }
 
-    void TestMultiStepExceptions() throw (Exception)
+    void TestMultiStepExceptions()
     {
         DistributedVectorFactory factory(NUMBER_NODES);
 
@@ -540,7 +541,7 @@ public:
         reader.Close();
     }
 
-    void TestIncompleteData() throw (Exception)
+    void TestIncompleteData()
     {
         DistributedVectorFactory factory(NUMBER_NODES);
 
@@ -591,7 +592,7 @@ public:
                                   "GetVariableOverTimeOverMultipleNodes() cannot be called using incomplete data sets");
     }
 
-    void TestReadingExtraData() throw(Exception)
+    void TestReadingExtraData()
     {
         // In this test we read data from a file in the source
         // (which is re-created and compared with in TestHdf5DataWriter.hpp)
@@ -629,7 +630,7 @@ public:
         }
     }
 
-    void TestListingDatasetsInAnHdf5File() throw (Exception)
+    void TestListingDatasetsInAnHdf5File()
     {
         /*
          * Open file.

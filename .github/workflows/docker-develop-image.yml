@@ -1,0 +1,50 @@
+name: Build chaste/develop
+
+on:
+  push:
+    branches: [ "develop" ]
+  # Schedule a weekly build on Sunday at 1am after rebuilding the base image
+  schedule:
+    - cron: '0 1 * * 0'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: docker/github-builder/.github/workflows/build.yml@v1
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      meta-images: |
+        chaste/develop
+      meta-flavor: latest=true
+      meta-tags: |
+        type=schedule,pattern={{date 'YYYYMMDD'}}
+        type=ref,event=pr
+        type=sha
+      labels: |
+        org.opencontainers.image.title=Chaste Develop Image
+        org.opencontainers.image.description=Docker Develop Image for Chaste: Cancer, Heart and Soft Tissue Environment
+        org.opencontainers.image.url=https://hub.docker.com/repository/docker/chaste/develop/general
+        org.opencontainers.image.source=https://github.com/Chaste/chaste-docker
+      context: .
+      file: docker/Dockerfile
+      build-args: |
+          'GIT_TAG=.'
+          'CMAKE_BUILD_TYPE="Debug"'
+          'Chaste_ERROR_ON_WARNING="ON"'
+          'Chaste_UPDATE_PROVENANCE="OFF"'
+      platforms: linux/amd64,linux/arm64
+      output: image
+      push: true
+      distribute: true
+      sign: auto
+    secrets:
+      registry-auths: |
+        - registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}

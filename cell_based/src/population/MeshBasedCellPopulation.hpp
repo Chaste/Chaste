@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,8 +52,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Contains a group of cells and maintains the associations between cells and
  * nodes in the mesh.
+ *
+ * @tparam ELEMENT_DIM Dimension of the elements.
+ * @tparam SPACE_DIM Dimension of the space. If not specified, it defaults to ELEMENT_DIM.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class MeshBasedCellPopulation : public AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestMeshBasedCellPopulation;
@@ -81,16 +88,19 @@ private:
          * of the VertexMesh class, so instead we delete mpVoronoiTessellation.
          */
         delete mpVoronoiTessellation;
-        mpVoronoiTessellation = NULL;
+        mpVoronoiTessellation = nullptr;
 
         archive & mSpringRestLengths;
         archive & mUseAreaBasedDampingConstant;
         archive & mAreaBasedDampingConstantParameter;
         archive & mWriteVtkAsPoints;
-        archive & mOutputMeshInVtk;
+        archive & mBoundVoronoiTessellation;
+        archive & mScaleBoundByEdgeLength;
+        archive & mBoundedVoroniTesselationLengthCutoff;
+        archive & mOffsetNewBoundaryNodes;
         archive & mHasVariableRestLength;
-
         this->Validate();
+        this->UpdateNodePairs();
     }
 
 protected:
@@ -134,14 +144,23 @@ protected:
     /** Whether to write cells as points in VTK. */
     bool mWriteVtkAsPoints;
 
-    /** Whether to output the underlying MutableMesh  in VTK. */
-    bool mOutputMeshInVtk;
+    /** Whether to bound the voronoi tesselation to avoid infinite cells on boundary. */
+    bool mBoundVoronoiTessellation;
+
+    /** Whether to scale the bound by edge lenght when using the bounded voronoi tesselation. */
+    bool mScaleBoundByEdgeLength;
+
+    /** Edges longer than this are ignored in boundary calculation for the bounded voronio tesselation. */
+    double mBoundedVoroniTesselationLengthCutoff;
+
+    /** whether to add new nodes towards the centre of the boundary edges for the bounded voronoi tesselation. */
+    bool mOffsetNewBoundaryNodes;
 
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
 
-    /** Node pairs for force calculations. */
-    std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > > mNodePairs;
+    /** Update mNodePairs using the SpringIterator. */
+    virtual void UpdateNodePairs();
 
     /**
      * Update mIsGhostNode if required by a remesh.
@@ -169,10 +188,10 @@ public:
      * @param validate whether to validate the cell population
      */
     MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                    std::vector<CellPtr>& rCells,
-                    const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
-                    bool deleteMesh=false,
-                    bool validate=true);
+                            std::vector<CellPtr>& rCells,
+                            const std::vector<unsigned> locationIndices = {},
+                            bool deleteMesh = false,
+                            bool validate = true);
 
     /**
      * Constructor for use by the de-serializer.
@@ -304,6 +323,14 @@ public:
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter);
 
     /**
+     * A virtual method to accept a cell population event writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationEventWriter the population event writer.
+     */
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter);
+
+    /**
      * A virtual method to accept a cell writer so it can
      * write data from this object to file.
      *
@@ -431,7 +458,7 @@ public:
      * Overridden WriteDataToVisualizerSetupFile() method.
      * Write any data necessary to a visualization setup file.
      * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
-     * 
+     *
      * @param pVizSetupFile a visualization setup file
      */
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
@@ -527,13 +554,6 @@ public:
     void SetAreaBasedDampingConstantParameter(double areaBasedDampingConstantParameter);
 
     /**
-     * Overridden rGetNodePairs method which uses the Delaunay triangulatiuon
-     *
-     * @return Node pairs for force calculation.
-     */
-    std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& rGetNodePairs();
-
-    /**
      * Outputs CellPopulation parameters to file
      *
      * @param rParamsFile the file stream to which the parameters are output
@@ -553,16 +573,52 @@ public:
     bool GetWriteVtkAsPoints();
 
     /**
-     * Set mOutputMeshInVtk.
+     * Set mBoundVoronoiTessellation.
      *
-     * @param outputMeshInVtk whether to write cells as points in VTK
+     * @param boundVoronoiTessellation whether to bound the Voronoi Tesselation.
      */
-    void SetOutputMeshInVtk(bool outputMeshInVtk);
+    void SetBoundVoronoiTessellation(bool boundVoronoiTessellation);
 
     /**
-     * @return mOutputMeshInVtk.
+     * @return mBoundVoronoiTessellation.
      */
-    bool GetOutputMeshInVtk();
+    bool GetBoundVoronoiTessellation();
+
+    /**
+     * Set mScaleBoundByEdgeLength.
+     *
+     * @param scaleBoundByEdgeLength whether to scale the bound with edge lenght in the Voronoi Tesselation.
+     */
+    void SetScaleBoundByEdgeLength(bool scaleBoundByEdgeLength);
+
+    /**
+     * @return mScaleBoundByEdgeLength.
+     */
+    bool GetScaleBoundByEdgeLength();
+
+    /**
+     * Set mBoundedVoroniTesselationLengthCutoff.
+     *
+     * @param boundedVoroniTesselationLengthCutoff whether to scale the bound with edge lenght in the Voronoi Tesselation.
+     */
+    void SetBoundedVoroniTesselationLengthCutoff(double boundedVoroniTesselationLengthCutoff);
+
+    /**
+     * @return mScaleBoundByEdgeLength.
+     */
+    double GetBoundedVoroniTesselationLengthCutoff();
+
+  /**
+     * Set mOffsetNewBoundaryNodes.
+     *
+     * @param offsetNewBoundaryNodes whether to add new nodes towards the centre of the boundary edges for the bounded voronoi tesselation.
+     */
+    void SetOffsetNewBoundaryNodes(bool offsetNewBoundaryNodes);
+
+    /**
+     * @return mOffsetNewBoundaryNodes.
+     */
+    bool GetOffsetNewBoundaryNodes();
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.

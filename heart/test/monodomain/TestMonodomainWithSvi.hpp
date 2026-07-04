@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -172,7 +172,7 @@ class TestMonodomainWithSvi : public CxxTest::TestSuite
     }
 
 public:
-    void TestConductionVelocityConvergesFasterWithSvi1d() throw(Exception)
+    void TestConductionVelocityConvergesFasterWithSvi1d()
     {
         double h[3] = {0.001,0.01,0.02};
         unsigned probe_node_index[3] = {300, 30, 15};
@@ -307,7 +307,7 @@ public:
         }
     }
 
-    void TestConductionVelocityInCrossFibreDirection2d() throw(Exception)
+    void TestConductionVelocityInCrossFibreDirection2d()
     {
 
         ReplicatableVector final_voltage_ici;
@@ -430,7 +430,7 @@ public:
         TS_ASSERT_DELTA(final_voltage_svit[130], svi_130, 0.2);
     }
 
-    void TestCoverage3d() throw(Exception)
+    void TestCoverage3d()
     {
         HeartConfig::Instance()->SetSimulationDuration(0.1); //ms
         HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
@@ -446,7 +446,7 @@ public:
         monodomain_problem.Solve();
     }
 
-    void TestWithHeterogeneousCellModels() throw (Exception)
+    void TestWithHeterogeneousCellModels()
     {
         HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
         HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
@@ -477,7 +477,7 @@ public:
      * This is the same as TestConductionVelocityConvergesFasterWithSvi1d with i=2, but solves in two parts.
      * If that test changes, check the hardcoded values here!
      */
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         std::string archive_dir = "monodomain_svi_archive";
         std::string archive_file = "monodomain_svi.arch";
@@ -557,16 +557,27 @@ public:
         // variables going out of range. An exception should be thrown in the
         // EvaluateYDerivatives() method of the cell model
 
-
-        TS_ASSERT_THROWS_CONTAINS(monodomain_problem.Solve(),
+        // One of three exceptions are expected to be thrown here. Which one is thrown depends on several factors,
+        // including whether the code is compiled in Debug or Release.
+        try
+        {
+            monodomain_problem.Solve();
+            TS_FAIL("Expected an exception to be thrown");
+        }
+        catch (const Exception& e)
+        {
+            std::string exception_msg = e.GetMessage();
 #ifndef NDEBUG
             // VerifyStateVariables is only called when debug is on
-            "State variable fast_sodium_current_m_gate__m has gone out of range. "
-            "Check numerical parameters, for example time and space stepsizes");
+            const bool ex_specific = exception_msg.find("State variable fast_sodium_current_m_gate__m has gone out of range.") != std::string::npos;
 #else
             // This test hits a later assert(!isnan) if we do a ndebug build.
-            "Assertion tripped: !std::isnan(i_ionic)");
+            const bool ex_specific = exception_msg.find("Assertion tripped: !std::isnan(i_ionic)") != std::string::npos;
+
 #endif // NDEBUG
+            const bool ex_petsc_tools = exception_msg.find("Chaste error: ./global/src/parallel/PetscTools.cpp") != std::string::npos;
+            TS_ASSERT(ex_specific || ex_petsc_tools);
+        }
     }
 };
 

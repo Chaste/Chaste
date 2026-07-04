@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,7 @@ void AbstractIsotropicIncompressibleMaterialLaw<DIM>::ComputeStressAndStressDeri
         bool                      computeDTdE)
 {
     assert((DIM==2) || (DIM==3)); // LCOV_EXCL_LINE
-    
+
     static c_matrix<double,DIM,DIM> identity = identity_matrix<double>(DIM);
 
     double I1 = Trace(rC);
@@ -133,16 +133,21 @@ void AbstractIsotropicIncompressibleMaterialLaw<DIM>::ComputeStressAndStressDeri
     }
 }
 
-template<>
-double AbstractIsotropicIncompressibleMaterialLaw<2>::GetZeroStrainPressure()
+template <unsigned DIM>
+double AbstractIsotropicIncompressibleMaterialLaw<DIM>::GetZeroStrainPressure()
 {
-    return 2*Get_dW_dI1(2,0);
-}
-
-template<>
-double AbstractIsotropicIncompressibleMaterialLaw<3>::GetZeroStrainPressure()
-{
-    return 2*Get_dW_dI1(3,3) + 4*Get_dW_dI2(3,3);
+    if constexpr (DIM == 2)
+    {
+        return 2 * Get_dW_dI1(2, 0);
+    }
+    else if constexpr (DIM == 3)
+    {
+        return 2 * Get_dW_dI1(3, 3) + 4 * Get_dW_dI2(3, 3);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 // Explicit instantiation

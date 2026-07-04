@@ -1,8 +1,10 @@
-		<GhostSpringStiffness>15</GhostSpringStiffness>
+		<GhostCellSpringStiffness>15</GhostCellSpringStiffness>
+		<GhostGhostSpringStiffness>15</GhostGhostSpringStiffness>
+		<GhostSpringRestLength>1</GhostSpringRestLength>
 		<UseAreaBasedDampingConstant>0</UseAreaBasedDampingConstant>
 		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
 		<WriteVtkAsPoints>0</WriteVtkAsPoints>
-		<OutputMeshInVtk>0</OutputMeshInVtk>
+		<BoundVoronoiTessellation>0</BoundVoronoiTessellation>
 		<HasVariableRestLength>0</HasVariableRestLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<CentreBasedDivisionRule>

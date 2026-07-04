@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTHONEYCOMBMESHGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 
 #include "HoneycombMeshGenerator.hpp"
 
@@ -55,8 +56,7 @@ private:
 
         for (unsigned i=0; i<num_nodes; i++)
         {
-            c_vector<double, 2> location;
-            location = pMesh->GetNode(i)->rGetLocation();
+            c_vector<double, 2> location = pMesh->GetNode(i)->rGetLocation();
             (*file) << location[0] << "\t" << location[1] << "\n" << std::flush;
         }
 
@@ -65,7 +65,7 @@ private:
 
 public:
 
-    void TestSimpleMesh() throw(Exception)
+    void TestSimpleMesh()
     {
         unsigned cells_across = 2;
         unsigned cells_up = 2;
@@ -74,7 +74,7 @@ public:
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
 
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
 
@@ -85,7 +85,7 @@ public:
         TS_ASSERT_DELTA(generator.GetDomainWidth(), 0.5000, 1e-4);
     }
 
-    void TestMonolayerHoneycombMeshGeneratorRelaxed() throw(Exception)
+    void TestMonolayerHoneycombMeshGeneratorRelaxed()
     {
         int num_cells_width = 8;
         int num_cells_depth = 22;
@@ -96,7 +96,7 @@ public:
         double length = (double)num_cells_depth*(sqrt(3.0)/2)*width/(double)num_cells_width;
 
         // Check the mesh
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS((unsigned)p_mesh->GetNumNodes(),(num_cells_width+2*ghosts)*(num_cells_depth+2*ghosts));
 
@@ -162,7 +162,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetWidth(1u), 21.6506, 1e-4); // includes ghosts
     }
 
-    void TestMonolayerHoneycombMeshGeneratorCompressed() throw(Exception)
+    void TestMonolayerHoneycombMeshGeneratorCompressed()
     {
         int num_cells_width = 8;
         int num_cells_depth = 12;
@@ -173,7 +173,7 @@ public:
         double length = (double)num_cells_depth*(sqrt(3.0)/2)*width/(double)num_cells_width;
 
         // Check the mesh
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS((unsigned)p_mesh->GetNumNodes(), (num_cells_width+2*ghosts)*(num_cells_depth+2*ghosts));
 
@@ -240,7 +240,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetWidth(1u), 12.3408, 1e-4); // includes ghosts
     }
 
-    void TestBoundaryNodes() throw(Exception)
+    void TestBoundaryNodes()
     {
         unsigned cells_across = 4;
         unsigned cells_up = 4;
@@ -248,7 +248,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
 
@@ -263,24 +263,24 @@ public:
         TS_ASSERT_EQUALS(num_non_boundary_nodes, 4u);
     }
 
-    void TestGetCircularMesh() throw(Exception)
+    void TestGetCircularMesh()
     {
         unsigned num_cells_depth = 10;
         unsigned num_cells_width = 10;
         double radius = 3.5;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetCircularMesh(radius);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(radius);
 
         double epsilon = 1e-5;
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             TS_ASSERT_LESS_THAN_EQUALS(norm_2(p_mesh->GetNode(i)->rGetLocation()), radius+epsilon);
         }
-        Output2DNodesToFile(p_mesh, "circular_mesh.dat");
+        Output2DNodesToFile(p_mesh.get(), "circular_mesh.dat");
     }
 
-    void TestGetCircularMeshWithGhostNodesThrowsException() throw(Exception)
+    void TestGetCircularMeshWithGhostNodesThrowsException()
     {
         unsigned num_cells_depth = 10;
         unsigned num_cells_width = 10;
@@ -291,23 +291,23 @@ public:
         TS_ASSERT_THROWS_THIS(generator.GetCircularMesh(radius), "Cannot call GetCircularMesh on a HoneycombMesh with ghost nodes");
     }
 
-    void TestCircularMeshIsJacobian() throw(Exception)
+    void TestCircularMeshIsJacobian()
     {
         HoneycombMeshGenerator generator(20, 20, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetCircularMesh(10);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(10);
 
         NodeMap map(p_mesh->GetNumAllNodes());
         p_mesh->ReMesh(map);
     }
 
-    void TestLargeMesh() throw(Exception)
+    void TestLargeMesh()
     {
         unsigned cells_across = 100;
         unsigned cells_up = 100;
         unsigned thickness_of_ghost_layer = 1;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 10404u);
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
-      mpLinearSystem(NULL),
-      mSolution(NULL)
+      mpLinearSystem(nullptr),
+      mSolution(nullptr)
 {
 
     // We solve for flux at every edge and for pressure at each node/bifurcation

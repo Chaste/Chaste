@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,8 +58,8 @@ gcov_flags = ' -lp '
 
 # Get output dir and build type object
 if len(sys.argv) < 2:
-    print "Syntax error."
-    print "Usage:", sys.argv[0], "<test output dir> [<build type> [<project> ...]]"
+    print("Syntax error.")
+    print("Usage: %s <test output dir> [<build type> [<project> ...]]" % sys.argv[0])
     sys.exit(1)
 output_dir = sys.argv[1]
 if len(sys.argv) > 2:
@@ -103,7 +103,7 @@ for gcda_file in gcda_files:
         try:
             toplevel, rest = gcda_file['dir'].split('build')
         except:
-            print gcda_file
+            print(gcda_file)
             raise
         # Get rid of slashes (or system equivalent)
         toplevel = os.path.dirname(toplevel)
@@ -126,12 +126,12 @@ for src_dir in src_dirs:
 
 def coverage_ignore(src_file):
     """Whether to ignore the fact that a source file is not used.
-    
-    If a file contains only typedefs, for example, this is not an error. 
+
+    If a file contains only typedefs, for example, this is not an error.
     For .hpp files we check this by looking for the presence of either
     'template' or 'class' at the start of a line.  If neither are found,
     we assume the file contains no real code.
-    
+
     This will only work if header files don't contain non-template function
     definitions, which should be the case if we're being good programmers.
     Unfortunately the boost serialization tweaking file "SerializationExportWrapper.hpp"
@@ -241,7 +241,6 @@ for src_file in src_files:
                            ):
                         warn = False
                         aggregated_count = '#####'
-                        #print 'Full details of coverage: ', src_line_stripped,'\t',src_file,'\t',aggregated_count,'\t', line_no,'\t', src_line
                     else:
                         aggregated_count = 'ignored'
                     missed_line_count += 1
@@ -253,7 +252,6 @@ for src_file in src_files:
         # No gcov files found for this source file.
         # This may not be an error, if the source file in question is an .hpp file with
         # an associated .cpp file containing all the code for the class.
-        ##print src_file
         if src_file['file'][-4:] == '.hpp' and \
             os.path.exists(os.path.join(src_file['dir'], src_file['file'][:-3]+'cpp')):
             status = '' # So output file will be deleted
@@ -274,7 +272,7 @@ for src_file in src_files:
     if coverage_ignore(src_file):
         # All special case ignorable files (not just ones with partial coverage)
         status = ''
-    
+
     # Close all files
     [fp.close() for fp in gcov_fps]
     out_file.close()
@@ -290,4 +288,4 @@ for filename in os.listdir('.'):
         os.remove(filename)
 
 # And generate a summary page
-os.system('python python/DisplayTests.py '+output_dir+' '+build_type)
+os.system(sys.executable + ' python python/DisplayTests.py '+output_dir+' '+build_type)

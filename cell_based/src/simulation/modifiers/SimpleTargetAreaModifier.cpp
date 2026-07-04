@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,27 +55,29 @@ void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     // Get target area A of a healthy cell in S, G2 or M phase
     double cell_target_area = this->mReferenceTargetArea;
 
-	double growth_duration = mGrowthDuration;
-	if (growth_duration == DOUBLE_UNSET)
-	{
-		if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == NULL)
-		{
-			EXCEPTION("If SetGrowthDuration() has not been called, a subclass of AbstractPhaseBasedCellCycleModel must be used");
-		}
-	    AbstractPhaseBasedCellCycleModel* p_model = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel());
+    double growth_duration = mGrowthDuration;
+    if (growth_duration == DOUBLE_UNSET)
+    {
 
-	    growth_duration = p_model->GetG1Duration();
+        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == nullptr)
+        {
+            EXCEPTION("If SetGrowthDuration() has not been called, a subclass of AbstractPhaseBasedCellCycleModel must be used");
+        }
+        AbstractPhaseBasedCellCycleModel* p_model = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel());
 
-	    // If the cell is differentiated then its G1 duration is infinite
-	    if (growth_duration == DBL_MAX)
-	    {
-	        // This is just for fixed cell-cycle models, need to work out how to find the g1 duration
-	    	growth_duration = p_model->GetTransitCellG1Duration();
-	    }
-	}
+        growth_duration = p_model->GetG1Duration();
+
+        // If the cell is differentiated then its G1 duration is infinite
+        if (growth_duration == DBL_MAX)
+        {
+            // This is just for fixed cell-cycle models, need to work out how to find the g1 duration
+            growth_duration = p_model->GetTransitCellG1Duration();
+        }
+    }
 
     if (pCell->HasCellProperty<ApoptoticCellProperty>())
     {
+
         // Age of cell when apoptosis begins
         if (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime() < growth_duration)
         {
@@ -90,11 +92,11 @@ void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
         {
             cell_target_area = 0;
         }
+
     }
     else
     {
         double cell_age = pCell->GetAge();
-
         // The target area of a proliferating cell increases linearly from A/2 to A over the course of the prescribed duration
         if (cell_age < growth_duration)
         {
@@ -115,7 +117,6 @@ void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
             }
         }
     }
-
     // Set cell data
     pCell->GetCellData()->SetItem("target area", cell_target_area);
 }

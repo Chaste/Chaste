@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::RadialCellDataDistributionWriter()
@@ -185,6 +186,13 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBased
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    VisitAnyPopulation(pCellPopulation);
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetVariableName(std::string variableName)
 {
     mVariableName = variableName;
@@ -199,7 +207,7 @@ std::string RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::GetVariabl
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetNumRadialBins(unsigned numRadialBins)
 {
-	mNumRadialBins = numRadialBins;
+    mNumRadialBins = numRadialBins;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

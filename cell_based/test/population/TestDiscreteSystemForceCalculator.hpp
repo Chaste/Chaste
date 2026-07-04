@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,11 +56,11 @@ class TestDiscreteSystemForceCalculator : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestPrivateMethods() throw (Exception)
+    void TestPrivateMethods()
     {
         // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
@@ -146,11 +146,11 @@ public:
         TS_ASSERT_DELTA(-M_PI + 5.0*M_PI/6.0, calculated_extremal_angles[4], 1e-4);
     }
 
-    void TestCalculateExtremalNormalForces() throw (Exception)
+    void TestCalculateExtremalNormalForces()
     {
         // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
@@ -212,14 +212,14 @@ public:
         }
     }
 
-    void TestCalculateWriteResultsToFile() throw (Exception)
+    void TestCalculateWriteResultsToFile()
     {
         std::string output_directory = "TestDiscreteSystemForceCalculator";
 
         // Set up a cell population
 
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
@@ -257,7 +257,7 @@ public:
         simulator.Solve();
     }
 
-    void TestAllCases() throw (Exception)
+    void TestAllCases()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
         MutableMesh<2,2> mesh;

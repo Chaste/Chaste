@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ import sys
 
 def CopyStrip(inFileName, outFileName, stripText):
     """Strip stripText from inFileName and write the result to outFileName.
-    
+
     This can be used to, for example, strip the XML Schema location path from
     XML configuration files.
     """
@@ -65,17 +65,17 @@ def GetArchBits():
 
 def CompileChaste(target, build='GccOpt'):
     """Compile the code and bail out if necessary.
-    
+
     target gives the target to build.
     """
-    print 'Compiling dynamically-linked executable'
+    print('Compiling dynamically-linked executable')
     if os.system('scons build=' + build + ' static=0 chaste_libs=1 exe=1 compile_only=1 ' + target):
-        print "General build failure.  You aren't ready to release!"
+        print("General build failure.  You aren't ready to release!")
         sys.exit(1)
 
 def CopySharedLibraries(executablePath, librariesPath):
     """Copy shared libraries needed by executablePath into librariesPath, which will be created."""
-    print 'Making a subdirectory of library dependencies'
+    print('Making a subdirectory of library dependencies')
     found_chaste_libraries = False
     ldd = subprocess.Popen(['ldd', executablePath], stdout=subprocess.PIPE ).communicate()[0]
     os.mkdir(librariesPath)
@@ -83,16 +83,16 @@ def CopySharedLibraries(executablePath, librariesPath):
     lib_location = re.compile(r'(\S*)\s*=>\s*(\S*)\s*')
     for lib_pair in lib_location.findall(ldd):
         if lib_pair[1][0] == '(' or lib_pair[1] == 'not':
-            print 'No library found for ', lib_pair[0]
+            print('No library found for %s' % lib_pair[0])
         elif lib_pair[0].startswith('libc.so') or lib_pair[0].startswith('libpthread.so'):
-            print 'Ignoring library ', lib_pair[0], 'for compatibility'
+            print('Ignoring library %s for compatibility' % lib_pair[0])
         else:
             if lib_pair[0] == 'libglobal.so':
                 found_chaste_libraries = True
             shutil.copy(lib_pair[1], librariesPath)
-    
+
     if not found_chaste_libraries:
-      print 'Could not find Chaste libraries (e.g. libglobal.so).  Please set LD_LIBRARY_PATH.'
+      print('Could not find Chaste libraries (e.g. libglobal.so).  Please set LD_LIBRARY_PATH.')
       sys.exit(1)
 
 def CopyXmlFiles(destPath):
@@ -144,7 +144,7 @@ export LD_LIBRARY_PATH="$script_dir/libs"
 if [ -z "$CHASTE_TEST_OUTPUT" ]; then
   echo "\$CHASTE_TEST_OUTPUT is currently unset.  Your output will appear in ./testoutput"
 else
-  echo "\$CHASTE_TEST_OUTPUT is currently set to " $CHASTE_TEST_OUTPUT. 
+  echo "\$CHASTE_TEST_OUTPUT is currently set to " $CHASTE_TEST_OUTPUT.
 fi
 
 # This line actually run Chaste with the given arguments

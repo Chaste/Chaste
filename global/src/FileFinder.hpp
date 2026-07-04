@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,8 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILEFINDER_HPP_
 
 #include <string>
-
-#include "BoostFilesystem.hpp"
+#include <vector>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 /**
  * Structure encapsulating the enumeration of path 'types', i.e. what a path
@@ -98,7 +99,7 @@ public:
     FileFinder(const std::string& rLeafName, const FileFinder& rParentOrSibling);
 
     /**
-     * Conversion constructor from a Boost Filesystem path object.
+     * Conversion constructor from a std::filesystem path object.
      * Note that since fs::path has a conversion constructor from std::string,
      * this allows us to be initialised with a string or character constant, too.
      * The path will be interpreted as relative to the current working directory,
@@ -135,7 +136,7 @@ public:
     bool IsPathSet() const;
 
     /**
-     * @return true if we exist.
+     * @return true if we exist (as either a file or a directory).
      */
     bool Exists() const;
 
@@ -252,7 +253,7 @@ public:
      * a subset of shell-style glob syntax.  A '?' anywhere in the string matches any single
      * character at that position.  A '*' may be used at the start or end of the string to
      * match any number of leading or trailing characters, respectively.
-     * Hidden files (names starting with a '.') will never be matched.
+     * Hidden files (names starting with a '.') will never be matched. Returns a sorted alphabetical list.
      *
      * @param rPattern  the pattern to match names against
      */
@@ -292,6 +293,14 @@ public:
      */
     static void StopFaking();
 
+    /**
+     * Provide a sort operator to get a logical ordering from FindMatches
+     * it orders by alphabetical (or ASCII really).
+     * @param otherFinder  Another FileFinder
+     * @return Whether this FileFinder is earlier in the alphabetical ordering than otherFinder
+     * */
+    bool operator<(const FileFinder& otherFinder) const;
+
 private:
     /** The absolute path to our file. */
     std::string mAbsPath;
@@ -307,13 +316,13 @@ private:
 
     /**
      * This is code common to Remove() and DangerousRemove(). Should remain private and not to be called from elsewhere.
-     * Remove() is only allowed to delete things with a .chaste_deletable_folder in the testoutput directory.
+     * Remove() is only allowed to delete things with a .chaste_deletable_folder in the $CHASTE_TEST_OUTPUT directory.
      *
-     * DangerousRemove() is allowed to delete anything in the source or testoutput directories.
+     * DangerousRemove() is allowed to delete anything in the source or $CHASTE_TEST_OUTPUT directories.
      *
      * @param dangerous  whether we are doing a dangerous remove.
      */
-    void PrivateRemove(bool dangerous=false) const;
+    void PrivateRemove(bool dangerous = false) const;
 };
 
 #endif /*FILEFINDER_HPP_*/

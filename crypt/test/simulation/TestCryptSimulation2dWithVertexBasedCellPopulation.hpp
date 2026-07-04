@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -111,13 +111,13 @@ private:
 
 public:
 
-    void TestBoundaryConditionsAtCryptBase() throw (Exception)
+    void TestBoundaryConditionsAtCryptBase()
     {
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Impose a larger cell rearrangement threshold so that motion is uninhibited (see #1376)
         p_mesh->SetCellRearrangementThreshold(0.1);
@@ -125,7 +125,7 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -154,8 +154,9 @@ public:
 
         for (unsigned node_index=0; node_index<simulator.rGetCellPopulation().GetNumNodes(); node_index++)
         {
-            c_vector<double, 2> node_location = simulator.rGetCellPopulation().GetNode(node_index)->rGetLocation();
-            
+            c_vector<double, 2> node_location;
+            node_location = simulator.rGetCellPopulation().GetNode(node_index)->rGetLocation();
+
             AbstractOffLatticeCellPopulation<2,2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2,2>* >(&(simulator.rGetCellPopulation()));
             double damping = p_offLattice_pop->GetDampingConstant(node_index);
             c_vector<double, 2> expected_location = p_force->GetExpectedOneStepLocationFE(node_index, damping, old_node_locations[node_index], dt);
@@ -183,12 +184,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -205,7 +206,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -235,18 +236,18 @@ public:
     /**
      * Test that a short crypt simulation without cell birth runs without throwing any errors.
      */
-    void TestCryptWithNoBirth() throw (Exception)
+    void TestCryptWithNoBirth()
     {
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, all differentiated
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -262,7 +263,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
         // No cell killer
@@ -280,18 +281,18 @@ public:
      * Test that a short crypt simulation, in which cell birth occurs,
      * runs without throwing any errors.
      */
-    void TestCryptWithBirth() throw (Exception)
+    void TestCryptWithBirth()
     {
         double crypt_length = 5.0;
 
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 6);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
         // Cell 1 should divide at time t=0.05
         cells[0]->SetBirthTime(-23.95);
@@ -314,7 +315,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -336,7 +337,7 @@ public:
      * Commented test of a long crypt simulation. Used to generate attachment
      * VertexSimulation.mpeg on #1095.
      */
-    void noTestCryptSimulationLong() throw (Exception)
+    void noTestCryptSimulationLong()
     {
         double crypt_length = 20.0;
 
@@ -344,12 +345,12 @@ public:
         unsigned crypt_width = 10;
         unsigned crypt_height = 20;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -364,7 +365,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -386,7 +387,7 @@ public:
      * cell proliferation is Wnt-based, to check that WntConcentration
      * doesn't throw a wobbly.
      */
-    void TestShortWntBasedCryptSimulation() throw (Exception)
+    void TestShortWntBasedCryptSimulation()
     {
         double crypt_length = 10.0;
 
@@ -394,12 +395,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -419,7 +420,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -441,7 +442,7 @@ public:
 
     /** Longer Wnt based simulation
      */
-    void noTestWntBasedCryptSimulationLong() throw (Exception)
+    void noTestWntBasedCryptSimulationLong()
     {
         double crypt_length = 20.0;
 
@@ -449,12 +450,12 @@ public:
         unsigned crypt_width = 10;
         unsigned crypt_height = 20;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -474,7 +475,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -495,7 +496,7 @@ public:
     }
 
     // Test a crypt simulation with a boundary force on the crypt base.
-    void TestCryptSimulationWithBoundaryForce() throw (Exception)
+    void TestCryptSimulationWithBoundaryForce()
     {
         double crypt_length = 6.0;
 
@@ -503,12 +504,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -526,7 +527,7 @@ public:
         MAKE_PTR_ARGS(VertexCryptBoundaryForce<2>, p_boundary_force_law, (150));
         simulator.AddForce(p_boundary_force_law);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -552,18 +553,18 @@ public:
     /**
      * Test that archiving a crypt simulation correctly archives its mesh.
      */
-    void TestMeshSurvivesSaveLoad() throw (Exception)
+    void TestMeshSurvivesSaveLoad()
     {
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -577,7 +578,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -597,11 +598,11 @@ public:
         p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("VertexCrypt2DArchive", 0.0);
 
         // Create an identical mesh for comparison purposes
-        Cylindrical2dVertexMesh* p_mesh2 = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh2 = generator.GetCylindricalMesh();
 
         // Compare meshes
         VertexMesh<2,2>& r_mesh = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->rGetMesh();
-        CompareMeshes(p_mesh2, &r_mesh);
+        CompareMeshes(p_mesh2.get(), &r_mesh);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
@@ -611,7 +612,7 @@ public:
         delete p_simulator;
     }
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         double crypt_length = 22.0;
 
@@ -619,12 +620,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -644,7 +645,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -678,7 +679,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestVertexCryptSimulation2DParameterOutput() throw (Exception)
+    void TestVertexCryptSimulation2DParameterOutput()
     {
         double crypt_length = 22.0;
 
@@ -686,12 +687,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -704,7 +705,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -725,7 +726,7 @@ public:
     }
 
     // Testing Save
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         double crypt_length = 22.0;
 
@@ -733,12 +734,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -759,7 +760,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -783,7 +784,7 @@ public:
     }
 
     // Testing Load (based on previous two tests)
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         // Load the simulation from the TestSave method above and
         // run it from 0.1 to 0.2
@@ -841,19 +842,19 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestWriteBetaCateninAndAncestors() throw (Exception)
+    void TestWriteBetaCateninAndAncestors()
     {
         // Create mesh
         unsigned crypt_width = 6;
         unsigned crypt_height = 4;
         double crypt_length = crypt_height*(sqrt(3.0)/2);
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create crypt
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -876,7 +877,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,7 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VoronoiVertexMeshGenerator.hpp"
-#include "RandomNumberGenerator.hpp"
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #if BOOST_VERSION >= 105200
 
@@ -46,8 +47,8 @@ VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator(unsigned numElementsX,
                                                        unsigned numElementsY,
                                                        unsigned numRelaxationSteps,
                                                        double elementTargetArea)
-        : mpMesh(NULL),
-          mpTorMesh(NULL),
+        : mpMesh(nullptr),
+          mpTorMesh(nullptr),
           mNumElementsX(numElementsX),
           mNumElementsY(numElementsY),
           mNumRelaxationSteps(numRelaxationSteps),
@@ -57,18 +58,6 @@ VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator(unsigned numElementsX,
 {
     this->ValidateInputAndSetMembers();
     this->GenerateVoronoiMesh();
-}
-
-VoronoiVertexMeshGenerator::~VoronoiVertexMeshGenerator()
-{
-    if (mpMesh)
-    {
-        delete mpMesh;
-    }
-    if (mpTorMesh)
-    {
-        delete mpTorMesh;
-    }
 }
 
 void VoronoiVertexMeshGenerator::GenerateVoronoiMesh()
@@ -107,18 +96,18 @@ void VoronoiVertexMeshGenerator::GenerateVoronoiMesh()
     }
 }
 
-MutableVertexMesh<2,2>* VoronoiVertexMeshGenerator::GetMesh()
+boost::shared_ptr<MutableVertexMesh<2,2> > VoronoiVertexMeshGenerator::GetMesh()
 {
     return mpMesh;
 }
 
-MutableVertexMesh<2,2>* VoronoiVertexMeshGenerator::GetMeshAfterReMesh()
+boost::shared_ptr<MutableVertexMesh<2,2> > VoronoiVertexMeshGenerator::GetMeshAfterReMesh()
 {
     mpMesh->ReMesh();
     return mpMesh;
 }
 
-Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
+boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalMesh()
 {
     /*
      * METHOD OUTLINE:
@@ -148,9 +137,9 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         Node<2>* p_node_to_copy = mpMesh->GetNode(node_counter);
 
         // Get all the information about the node we are copying
-        unsigned            copy_index       = p_node_to_copy->GetIndex();
-        c_vector<double, 2> copy_location    = p_node_to_copy->rGetLocation();
-        bool                copy_is_boundary = p_node_to_copy->IsBoundaryNode();
+        unsigned copy_index = p_node_to_copy->GetIndex();
+        bool copy_is_boundary = p_node_to_copy->IsBoundaryNode();
+        const c_vector<double, 2>& copy_location = p_node_to_copy->rGetLocation();
 
         // There should not be any 'gaps' in node numbering, but we will assert just to make sure
         assert(copy_index < mpMesh->GetNumNodes());
@@ -222,8 +211,8 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         Node<2>* p_node_to_copy = p_temp_mesh->GetNode(node_counter);
 
         // Get all the information about the node we are copying
-        unsigned            copy_index       = p_node_to_copy->GetIndex();
-        c_vector<double, 2> copy_location    = p_node_to_copy->rGetLocation();
+        unsigned copy_index = p_node_to_copy->GetIndex();
+        const c_vector<double, 2>& copy_location = p_node_to_copy->rGetLocation();
 
         // No nodes should be boundary nodes
         assert(!p_node_to_copy->IsBoundaryNode());
@@ -271,7 +260,8 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
      *
      * We then reposition all nodes to be within the box [0, width]x[0, height] to make mesh look nicer when visualised.
      */
-    mpTorMesh = new Toroidal2dVertexMesh(width, height, new_nodes, new_elems);
+    mpTorMesh = boost::make_shared<Toroidal2dVertexMesh>(width, height, new_nodes, new_elems);
+
     mpTorMesh->ReMesh();
 
     c_vector<double, 2> min_x_y;
@@ -682,9 +672,9 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
     // Create a new mesh with the current vector of nodes and elements
     if (mpMesh)
     {
-        delete mpMesh;
+        mpMesh.reset();
     }
-    mpMesh = new MutableVertexMesh<2,2>(nodes, elements);
+    mpMesh = boost::make_shared<MutableVertexMesh<2,2> >(nodes, elements);
 }
 
 void VoronoiVertexMeshGenerator::ValidateInputAndSetMembers()
@@ -785,7 +775,7 @@ void VoronoiVertexMeshGenerator::ValidateSeedLocations(std::vector<c_vector<doub
 
 std::vector<double> VoronoiVertexMeshGenerator::GetPolygonDistribution()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
 
     // Number of elements in the mesh
     unsigned num_elems = mpMesh->GetNumElements();
@@ -829,7 +819,7 @@ std::vector<double> VoronoiVertexMeshGenerator::GetPolygonDistribution()
 
 double VoronoiVertexMeshGenerator::GetAreaCoefficientOfVariation()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
 
     // Number of elements in the mesh, and check there are at least two
     unsigned num_elems = mpMesh->GetNumElements();

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -72,7 +72,7 @@ public:
     /*
      * Create and simulate a simple 3D cell population of about 1000 cells within a cuboid box with sloughing on the top edge
      */
-    void Test3dNodeBasedInBoxWithSloughing() throw (Exception)
+    void Test3dNodeBasedInBoxWithSloughing()
     {
         double size_of_box = 8.0;
         unsigned cells_across = 12;
@@ -146,7 +146,7 @@ public:
         simulator.Solve();
 
         // Check some results
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1128u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1124u);
 
         AbstractCellPopulation<3>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
 
@@ -155,9 +155,9 @@ public:
             ++cell_iter;
         }
         c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
-        TS_ASSERT_DELTA(node_location[0],0.9604, 1e-4);
+        TS_ASSERT_DELTA(node_location[0],0.7363, 1e-4);
         TS_ASSERT_DELTA(node_location[1],8.0, 1e-4);
-        TS_ASSERT_DELTA(node_location[2],3.6539, 1e-4);
+        TS_ASSERT_DELTA(node_location[2],4.2807, 1e-4);
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)

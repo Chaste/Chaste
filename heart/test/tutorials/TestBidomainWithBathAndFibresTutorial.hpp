@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTBIDOMAINWITHBATHANDFIBRESTUTORIAL_HPP_
 #define TESTBIDOMAINWITHBATHANDFIBRESTUTORIAL_HPP_
 /*
- * = Running a bidomain simulation with a bath and fibres =
+ * ## Running a bidomain simulation with a bath and fibres
  *
  * In this tutorial we run a bidomain simulation with both a bath and fibres
  *
@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <cxxtest/TestSuite.h>
 #include "BidomainProblem.hpp"
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "PlaneStimulusCellFactory.hpp"
 
@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestBidomainWithBathAndFibresTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestSimulation() throw(Exception)
+    void TestSimulation()
     {
         HeartConfig::Instance()->SetSimulationDuration(5.0);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainTutorialWithBathAndFibres");
@@ -75,11 +75,11 @@ public:
          */
         HeartConfig::Instance()->SetOdeTimeStep(0.01);  //ms
 
-        /* Use the {{{PlaneStimulusCellFactory}}} to define a set of Luo-Rudy cells, in this
+        /* Use the `PlaneStimulusCellFactory` to define a set of Luo-Rudy cells, in this
          * case with a Backward Euler solver. We pass the stimulus magnitude as 0.0
          * as we don't want any stimulated cells.
          */
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEuler,2> cell_factory(0.0);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt,2> cell_factory(0.0);
 
         /*
          * Note that in the previous bath example, a mesh was read in and elements where then set to be

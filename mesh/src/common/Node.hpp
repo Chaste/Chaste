@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,7 +63,7 @@ private:
     unsigned mIndex;
 
     /** The location of this node within the mesh. */
-    c_vector<double, SPACE_DIM> mLocation;
+    c_vector<double, SPACE_DIM> mLocation = {};
 
     /** A pointer to a NodeAttributes object associated with this node. */
     NodeAttributes<SPACE_DIM>* mpNodeAttributes;
@@ -309,14 +309,14 @@ public:
 
     /**
      * Remove duplicates from the vector of node neighbour indices.
-     */  
+     */
     void RemoveDuplicateNeighbours();
 
     /**
      * Check whether the node neighbours collection is empty.
      *
      * @return whether this node has any neighbours.
-     */  
+     */
     bool NeighboursIsEmpty();
 
     /**
@@ -347,7 +347,7 @@ public:
     std::set<unsigned>& rGetContainingFaceIndices();
 
     /**
-     * @return a vector containing the node attributes.
+     * @return a vector containing the node attributes. An exception is thrown if the node has no attributes.
      */
     std::vector<double>& rGetNodeAttributes();
 
@@ -393,9 +393,9 @@ public:
 
     /**
      * Add a contribution to the force applied to this node.
-     * @param forceContribution the force vector to add to mAppliedForce
+     * @param rForceContribution the force vector to add to mAppliedForce
      */
-    void AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& forceContribution);
+    void AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution);
 
     /**
      * @return whether this node is a particle or not
@@ -409,7 +409,7 @@ public:
     void SetIsParticle(bool isParticle);
 
     /**
-     * @return the radius of this node.
+     * @return the radius of this node. An exception is thrown if the node has no attributes.
      */
     double GetRadius();
 

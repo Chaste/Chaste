@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,7 @@ using std::ofstream;
 class TestHeterogeneousConductivities : public CxxTest::TestSuite
 {
 public:
-    void TestSimpleSimulation() throw(Exception)
+    void TestSimpleSimulation()
     {
         /*Simulation parameters*/
         HeartConfig::Instance()->SetSimulationDuration(0.7); //ms (falls over after this)
@@ -80,7 +80,7 @@ public:
 
         /*
         * HOW_TO_TAG Cardiac/Problem definition
-        * Set discrete '''cuboid''' areas to have heterogeneous (intra- and/or extra-cellular) conductivity tensors.
+        * Set discrete **cuboid** areas to have heterogeneous (intra- and/or extra-cellular) conductivity tensors.
         */
         std::vector<ChasteCuboid<3> > input_areas;
         std::vector< c_vector<double,3> > intra_conductivities;

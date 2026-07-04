@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,7 @@ class Test2DVertexCryptRepresentativeSimulation : public CxxTest::TestSuite
 {
 public:
 
-    void Test2DVertexCryptRepresentativeSimulationForProfiling() throw (Exception)
+    void Test2DVertexCryptRepresentativeSimulationForProfiling()
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);
@@ -74,7 +74,7 @@ public:
         unsigned crypt_width = 18;
         unsigned crypt_height = 25;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Make crypt shorter for sloughing
         double crypt_length = 20.0;
@@ -116,7 +116,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // ...and with that the target area modifier
+        // ...and with that a target area modifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 

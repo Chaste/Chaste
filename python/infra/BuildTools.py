@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,13 +35,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 Useful functions for use by the build system, and utility scripts.
 
-These have been extracted from SConsTools.py so they can be used by scripts
-run externally to an SConscript.
+These have been extracted from SConsTools.py as we moved the build system to Cmake.
 """
 
 import os
 
-# Compatability with Python 2.3
+# Compatability with Python 3.5+
 try:
     set = set
 except NameError:
@@ -54,16 +53,16 @@ try:
 except AttributeError:
     def relpath(path, start=os.path.curdir):
         """Return a relative version of a path"""
-    
+
         if not path:
             raise ValueError("no path specified")
-        
+
         start_list = os.path.abspath(start).split(os.path.sep)
         path_list = os.path.abspath(path).split(os.path.sep)
-        
+
         # Work out how much of the filepath is shared by start and path.
         i = len(os.path.commonprefix([start_list, path_list]))
-    
+
         rel_list = [os.path.pardir] * (len(start_list)-i) + path_list[i:]
         return os.path.join(*rel_list)
 
@@ -71,7 +70,7 @@ except AttributeError:
 
 def GetTestsInTestPacks(testRootDir, packNames=[], returnFoundPacks=False, subfolder=''):
     """Generate a set of all test files listed in test pack files under the given folder.
-    
+
     If packNames is non-empty, only test packs with matching names will be considered.
     If subfolder is given, only test packs under that folder will be considered.
     """
@@ -90,7 +89,7 @@ def GetTestsInTestPacks(testRootDir, packNames=[], returnFoundPacks=False, subfo
                 if not packNames or pack_name in packNames:
                     # Process this test pack file
                     try:
-                        pack_file = file(os.path.join(dirpath, filename), 'r')
+                        pack_file = open(os.path.join(dirpath, filename), 'r')
                         for rel_testfile in pack_file:
                             # Ignore empty lines and duplicates
                             rel_testfile = rel_testfile.strip()

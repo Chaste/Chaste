@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,7 @@ class TestElementAttributes : public CxxTest::TestSuite
 {
 public:
 
-    void TestAttributesContainer() throw (Exception)
+    void TestAttributesContainer()
     {
         ElementAttributes<2,2> element_attributes;
 
@@ -79,7 +79,7 @@ public:
         TS_ASSERT_DELTA(element_attributes2.rGetAttributes()[0], 42.0, 1e-10);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         EXIT_IF_PARALLEL;
 
@@ -117,7 +117,7 @@ public:
         }
     }
 
-    void TestArchivingNullPointer() throw (Exception)
+    void TestArchivingNullPointer()
     {
         EXIT_IF_PARALLEL;
 
@@ -128,11 +128,12 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            ElementAttributes<2,2>* const p_element_attributes = NULL;
+            ElementAttributes<2,2>* const p_element_attributes = nullptr;
 
             output_arch << p_element_attributes;
 
-            delete p_element_attributes;
+            // This is an unnecessary delete and GCC 11 does not like it
+            // delete p_element_attributes;
         }
 
         {
@@ -148,7 +149,7 @@ public:
         }
     }
 
-    void TestElementWithAttributes() throw (Exception)
+    void TestElementWithAttributes()
     {
         // Create an element
         MutableElement<2,2> this_element(0);

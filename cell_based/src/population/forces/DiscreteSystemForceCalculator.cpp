@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -201,7 +201,7 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned in
         if (alpha_minus_epsilon <= -M_PI)
         {
             alpha_minus_epsilon += 2*M_PI;
-        }        
+        }
         sampling_angles[i] = alpha_minus_epsilon;
 
         assert(sampling_angles[i] <= M_PI);
@@ -250,8 +250,6 @@ double DiscreteSystemForceCalculator::GetLocalExtremum(unsigned index, double an
     assert(angle1 < angle2);
 
     double tolerance = 1e-5;
-    unsigned counter = 0;
-
     double previous_angle;
     double current_error;
     double current_angle = angle1;
@@ -265,7 +263,6 @@ double DiscreteSystemForceCalculator::GetLocalExtremum(unsigned index, double an
         current_ft_and_fn = CalculateFtAndFn(index, current_angle);
         current_angle -= current_ft_and_fn[0]/current_ft_and_fn[1];
         current_error = fabs(current_angle - previous_angle);
-        counter++;
     }
 
     assert(current_angle>angle1 && current_angle<angle2);

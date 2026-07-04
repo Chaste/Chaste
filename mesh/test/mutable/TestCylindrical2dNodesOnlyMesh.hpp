@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "HoneycombMeshGenerator.hpp"
 #include "Cylindrical2dNodesOnlyMesh.hpp"
@@ -56,7 +57,7 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -90,7 +91,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -105,13 +107,14 @@ public:
         delete p_mesh;
     }
 
-    void TestGetVectorFromAtoB() throw (Exception)
+    void TestGetVectorFromAtoB()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -149,13 +152,14 @@ public:
         delete p_mesh;
     }
 
-    void TestSetNodeLocationForCylindricalMesh() throw (Exception)
+    void TestSetNodeLocationForCylindricalMesh()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -189,13 +193,14 @@ public:
         delete p_mesh;
     }
 
-    void TestAddNode() throw (Exception)
+    void TestAddNode()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -251,7 +256,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -267,7 +273,7 @@ public:
         //Check nodes moved correctly
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 2.0, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetNode(3)->rGetLocation()[0], 1.0, 1e-6);
-        
+
         p_mesh->Translate(-2.0,0.0);
 
         //Check nodes moved periodically
@@ -278,7 +284,7 @@ public:
         delete p_mesh;
     }
 
-    void TestConstuctingBoxCollection() throw (Exception)
+    void TestConstuctingBoxCollection()
     {
         EXIT_IF_PARALLEL;    // Cylindrical2dNodesOnlyMesh doesn't work in parallel.
 
@@ -330,7 +336,7 @@ public:
     }
 
     // NB This checks that periodicity is maintained through archiving...
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -342,7 +348,8 @@ public:
         unsigned num_cells_across = 4;
         unsigned num_cells_up = 7;
         HoneycombMeshGenerator generator(num_cells_across,num_cells_up);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;

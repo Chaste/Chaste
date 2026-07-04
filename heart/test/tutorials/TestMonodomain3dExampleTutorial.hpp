@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTMONODOMAIN3DEXAMPLETUTORIAL_HPP_
 
 /*
- * = 3D monodomain example =
+ * ## 3D monodomain example
  *
  * In this tutorial we show how to run a 3D simulation using the monodomain equation.
  * To go from monodomain to bidomain or vice versa is trivial, and for 2d to 3d is
@@ -97,7 +97,7 @@ public:
 class TestMonodomain3dExampleTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomain3d() throw(Exception)
+    void TestMonodomain3d()
     {
         /* HOW_TO_TAG Cardiac/Problem definition
          * Generate a slab (cuboid) mesh rather than read a mesh in, and pass it to solver
@@ -161,8 +161,7 @@ public:
 
         /* `SetWriteInfo` is a useful method that means that the min/max voltage is
          * printed as the simulation runs (useful for verifying that cells are stimulated
-         * and the wave propagating, for example) (although note scons does buffer output
-         * before printing to screen) */
+         * and the wave propagating, for example) */
         monodomain_problem.SetWriteInfo();
 
         /* Finally, call `Initialise` and `Solve` as before */

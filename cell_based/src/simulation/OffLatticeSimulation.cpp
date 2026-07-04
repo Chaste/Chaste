@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -95,6 +95,21 @@ const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& O
     return mForceCollection;
 }
 
+// KARRIGAN
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetMaxAdaptiveTimeStep(unsigned maxAdaptiveTimeStep)
+{
+    mMaxAdaptiveTimeSteps = maxAdaptiveTimeStep;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetMaxAdaptiveTimeStep() const
+{
+    return mMaxAdaptiveTimeSteps;
+}
+
+// KARRIGAN
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology()
 {
@@ -106,7 +121,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 
     while (time_advanced_so_far < target_time_step)
     {
-        // Store the initial node positions (these may be needed when applying boundary conditions)    
+        // Store the initial node positions (these may be needed when applying boundary conditions)
         std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
 
         for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
@@ -116,7 +131,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             old_node_locations[&(*node_iter)] = (node_iter)->rGetLocation();
         }
 
-        // Try to update node positions according to the numerical method 
+        // Try to update node positions according to the numerical method
         try
         {
             mpNumericalMethod->UpdateAllNodePositions(present_time_step);
@@ -136,16 +151,18 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         }
         catch (StepSizeException& e)
         {
+            unsigned adaptive_timer = 0;
             // Detects if a node has travelled too far in a single time step
-            if (mpNumericalMethod->HasAdaptiveTimestep())
+            if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < mMaxAdaptiveTimeSteps )
             {
                 // If adaptivity is switched on, revert node locations and choose a suitably smaller time step
                 RevertToOldLocations(old_node_locations);
                 present_time_step = std::min(e.GetSuggestedNewStep(), target_time_step - time_advanced_so_far);
+                adaptive_timer += 1;
             }
             else
             {
-                // If adaptivity is switched off, terminate with an error
+                // If adaptivity is switched off or we have reached the accepted number of adaptive attempts, terminate with an error
                 EXCEPTION(e.what());
             }
         }
@@ -214,12 +231,13 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
     }
 
     // Use a forward Euler method by default, unless a numerical method has been specified already
-    if (mpNumericalMethod == NULL)
+    if (mpNumericalMethod == nullptr)
     {
         mpNumericalMethod = boost::make_shared<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >();
     }
     mpNumericalMethod->SetCellPopulation(dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation)));
     mpNumericalMethod->SetForceCollection(&mForceCollection);
+    mpNumericalMethod->SetBoundaryConditions(&mBoundaryConditions);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,9 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CombinedOdeSystemInformation.hpp"
 
 CombinedOdeSystem::CombinedOdeSystem(std::vector<AbstractOdeSystem*> odeSystems)
-    : AbstractOdeSystem(0) // will be set properly below
+    : AbstractOdeSystem(1) // number of state variables will be set properly below
 {
     mOdeSystems = odeSystems;
+    mNumberOfStateVariables = 0;
     for (unsigned i=0; i<odeSystems.size(); i++)
     {
         mNumberOfStateVariables += odeSystems[i]->GetNumberOfStateVariables();

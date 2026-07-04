@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -214,7 +214,7 @@ private:
 
 public:
 
-    void TestSetAndGetMethods() throw (Exception)
+    void TestSetAndGetMethods()
     {
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
 
@@ -240,7 +240,7 @@ public:
         delete p_mesh;
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         // Set archiving location
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
@@ -342,7 +342,7 @@ public:
         }
     }
 
-    void TestHandleHighOrderJunctions() throw (Exception)
+    void TestHandleHighOrderJunctions()
     {
         /*
          * We test the method HandleHighOrderJunctions by calling IdentifySwapType on a mesh with suitable nodes,
@@ -351,7 +351,7 @@ public:
 
         // Make an empty mesh
         MutableVertexMesh<2,2> mesh;
-
+        mesh.SetMeshOperationTracking(true);//For coverage
         // Add 6 nodes, three each for two triangular elements
         mesh.AddNode(new Node<2>(0, true, 0.0, 0.0));
         mesh.AddNode(new Node<2>(1, true, 1.0, 0.0));
@@ -399,11 +399,11 @@ public:
         TS_ASSERT_THROWS_NOTHING(mesh.IdentifySwapType(p_node_0, p_node_5));
     }
 
-    void TestPerformRosetteRankIncrease() throw (Exception)
+    void TestPerformRosetteRankIncrease()
     {
         // Create the standard five-cell rosette
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
-
+        p_mesh->SetMeshOperationTracking(true);//For coverage
         /**
          * Modify the mesh to incorporate an additional element which will go on to increase the rosette rank
          */
@@ -472,11 +472,11 @@ public:
         delete p_mesh;
     }
 
-    void TestPerformProtorosetteResolution() throw (Exception)
+    void TestPerformProtorosetteResolution()
     {
         // Let us first create a protorosette
         MutableVertexMesh<2,2>* p_mesh = ConstructProtorosette();
-
+        p_mesh->SetMeshOperationTracking(true);//For coverage
         VertexElement<2,2>* p_elem_0 = p_mesh->GetElement(0);
         VertexElement<2,2>* p_elem_1 = p_mesh->GetElement(1);
         VertexElement<2,2>* p_elem_2 = p_mesh->GetElement(2);
@@ -557,11 +557,11 @@ public:
         delete p_mesh;
     }
 
-    void TestPerformRosetteRankDecrease() throw (Exception)
+    void TestPerformRosetteRankDecrease()
     {
         // Let us first create a protorosette
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
-
+        p_mesh->SetMeshOperationTracking(true);//For coverage
         Node<2>* p_node_0 = p_mesh->GetNode(0);
 
         // Perform the protorosette resolution
@@ -616,7 +616,7 @@ public:
         delete p_mesh;
     }
 
-    void TestCheckForRosettes() throw (Exception)
+    void TestCheckForRosettes()
     {
         // Let us first create reference meshes for four and five cell rosettes
         MutableVertexMesh<2,2>* p_ref_rosette = ConstructFiveCellRosette();
@@ -694,7 +694,7 @@ public:
         delete p_protorosette;
     }
 
-    void TestEnsureCoverangeWhenCheckingForRosettes() throw (Exception)
+    void TestEnsureCoverangeWhenCheckingForRosettes()
     {
         /**
          * When checking for set intersections, there is a 50/50 chance of the correct element being selected first.
@@ -719,7 +719,7 @@ public:
         }
     }
 
-    void TestPerformProtorosetteFormationInIdentifySwapType() throw (Exception)
+    void TestPerformProtorosetteFormationInIdentifySwapType()
     {
         MutableVertexMesh<2, 2>* p_mesh = this->ConstructT1Scenario();
 

@@ -3,7 +3,9 @@
 	<OffLatticeSimulation-2-2>
 		<Dt>0.00833333</Dt>
 		<EndTime>0.5</EndTime>
-		<SamplingTimestepMultiple>1</SamplingTimestepMultiple>
+		<UpdateCellPopulation>1</UpdateCellPopulation>
+		<SamplingTimestepMultiple>2</SamplingTimestepMultiple>
+		<UpdatingTimestepMultiple>2</UpdatingTimestepMultiple>
 		<OutputDivisionLocations>0</OutputDivisionLocations>
 		<OutputCellVelocities>0</OutputCellVelocities>
 	</OffLatticeSimulation-2-2>
@@ -12,7 +14,7 @@
 		<UseAreaBasedDampingConstant>0</UseAreaBasedDampingConstant>
 		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
 		<WriteVtkAsPoints>0</WriteVtkAsPoints>
-		<OutputMeshInVtk>0</OutputMeshInVtk>
+		<BoundVoronoiTessellation>0</BoundVoronoiTessellation>
 		<HasVariableRestLength>0</HasVariableRestLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<CentreBasedDivisionRule>

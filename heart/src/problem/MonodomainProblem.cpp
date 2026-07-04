@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -112,8 +112,8 @@ void MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::WriteInfo(double time)
 
     double v_max, v_min;
 
-    VecMax( this->mSolution, PETSC_NULL, &v_max );
-    VecMin( this->mSolution, PETSC_NULL, &v_min );
+    VecMax( this->mSolution, CHASTE_PETSC_NULLPTR, &v_max );
+    VecMin( this->mSolution, CHASTE_PETSC_NULLPTR, &v_min );
 
     if (PetscTools::AmMaster())
     {

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,14 +63,14 @@ class Test2DMonolayerRepresentativeSimulation : public CxxTest::TestSuite
 {
 public:
 
-    void Test2DMonolayerRepresentativeSimulationForProfiling() throw (Exception)
+    void Test2DMonolayerRepresentativeSimulationForProfiling()
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetCircularMesh(3.5);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(3.5);
 
         // Create cells
         std::vector<CellPtr> cells;

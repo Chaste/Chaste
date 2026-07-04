@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,12 +93,12 @@ public:
     EllipticGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
                                      boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                      bool isNeumannBoundaryCondition=true,
-                                     Vec solution=NULL);
+                                     Vec solution=nullptr);
 
     /**
      * Destructor.
      */
-    virtual ~EllipticGrowingDomainPdeModifier();
+    ~EllipticGrowingDomainPdeModifier() override = default;
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -107,7 +107,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -117,14 +117,14 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory) override;
 
     /**
      * Helper method to construct the boundary conditions container for the PDE.
      *
      * @return the full boundary conditions container
      */
-    virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
+    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -132,7 +132,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"
@@ -157,7 +157,7 @@ template<class Archive, unsigned DIM>
 inline void load_construct_data(
     Archive & ar, EllipticGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
 {
-    Vec solution = NULL;
+    Vec solution = nullptr;
 
     std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
     FileFinder file_finder(archive_filename, RelativeTo::Absolute);

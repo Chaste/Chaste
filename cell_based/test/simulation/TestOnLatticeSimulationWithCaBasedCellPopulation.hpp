@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -90,7 +90,7 @@ public:
 
         // Create a simple tetrahedral mesh
         HoneycombMeshGenerator generator(3, 3, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -108,7 +108,7 @@ public:
             "OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");
     }
 
-    void TestCaSingleCellRandomMovement() throw (Exception)
+    void TestCaSingleCellRandomMovement()
     {
         EXIT_IF_PARALLEL;
 
@@ -120,7 +120,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -195,13 +195,13 @@ public:
         simulator.RemoveAllUpdateRules();
     }
 
-    void TestCaMonolayerWithBirth() throw (Exception)
+    void TestCaMonolayerWithBirth()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -264,7 +264,7 @@ public:
  #endif //CHASTE_VTK
     }
 
-    void TestCaMonolayerWithDeath() throw (Exception)
+    void TestCaMonolayerWithDeath()
     {
         EXIT_IF_PARALLEL;
 
@@ -273,7 +273,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -332,7 +332,7 @@ public:
         }
     }
 
-    void  TestCaMonolayerWithApoptoticCellKiller() throw (Exception)
+    void  TestCaMonolayerWithApoptoticCellKiller()
     {
         EXIT_IF_PARALLEL;
 
@@ -341,7 +341,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -426,7 +426,7 @@ public:
         #endif //CHASTE_VTK
     }
 
-    void TestCaMonolayerWithRandomSwitching() throw (Exception)
+    void TestCaMonolayerWithRandomSwitching()
     {
         EXIT_IF_PARALLEL;
 
@@ -435,7 +435,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 0, 0, 4, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -496,7 +496,7 @@ public:
     }
 
     ///\todo #2713 check this test makes sense
-    void TestCaMonolayerWithRandomSwitchingAndUpdateNodesInNonRandomOrder() throw (Exception)
+    void TestCaMonolayerWithRandomSwitchingAndUpdateNodesInNonRandomOrder()
     {
         EXIT_IF_PARALLEL;
 
@@ -504,7 +504,7 @@ public:
         CellId::ResetMaxCellId();
 
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -579,13 +579,13 @@ public:
      * RandomMovement has been tested in TestCaSingleCellRandomMovement for one cell per lattice site.
      * This test is just to ensure that the above test works when there are multiple cells per lattice site.
      */
-    void TestCaMultipleCellsRandomMovement() throw (Exception)
+    void TestCaMultipleCellsRandomMovement()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -624,13 +624,13 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 40u);
     }
 
-    void TestCaMultipleCellsRandomMovementIn3d() throw (Exception)
+    void TestCaMultipleCellsRandomMovementIn3d()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 3D PottsMesh
         PottsMeshGenerator<3> generator(10, 0, 0, 10, 0, 0, 10, 0, 0);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -674,13 +674,13 @@ public:
      * This test adds to the above by further testing cellular birth considering multiple cells per lattice site.
      * A  two-lattice mesh was created and only one lattice had free space to add one daughter cell.
      */
-    void TestMultipleCellsPerLatticeSiteWithBirth() throw (Exception)
+    void TestMultipleCellsPerLatticeSiteWithBirth()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(2, 0, 0, 1, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -738,7 +738,7 @@ public:
      * Cellular death has been tested in TestCaMonolayerWithDeath for one cell per lattice site.
      * This test is just to ensure that the above test works when there are multiple cells per lattice site.
      */
-    void TestMultipleCellsPerLatticeSiteWithDeath() throw (Exception)
+    void TestMultipleCellsPerLatticeSiteWithDeath()
     {
         EXIT_IF_PARALLEL;
 
@@ -747,7 +747,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -807,12 +807,12 @@ public:
         }
     }
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         EXIT_IF_PARALLEL;
 
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -855,12 +855,12 @@ public:
         TS_ASSERT_DELTA(cell_location_1[1], 0.0, 1e-4);
     }
 
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         EXIT_IF_PARALLEL;
 
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -893,7 +893,7 @@ public:
         CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
     }
 
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         EXIT_IF_PARALLEL;
 

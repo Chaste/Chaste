@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,52 +48,50 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * If you want to use parameters that are supplied in the command line, then
  *  (i) add lines such as "double x = CommandLineArguments::Instance()->GetDoubleCorrespondingToOption("-myparam");" below
- *  (ii) use scons to compile but not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
- *  (iii) run the compiled executable from the command line (see ChasteGuides/RunningBinariesFromCommandLine), with your parameter.
- *        If, at this step, you "undefined symbol:" errors then set your LD_LIBRARY_PATH (see ChasteGuides/RunningBinariesFromCommandLine)
+ *  (ii) compile but do not run the test,
+ *  (iii) run the compiled executable from the command line, with your parameter.
+ *        If, at this step, you get "undefined symbol:" errors then set your LD_LIBRARY_PATH (see [Running Binaries from the Command Line](/docs/user-guides/running-binaries-from-command-line/))
  *
  *
- *  For example:
- *  scons co=1 projects/you/TestBlah.hpp
- *  ./projects/you/build/debug/TestBlahRunner -myparam 10.4
  *
- *  Alternatively, you can add the arguments to SCons so that you can compile and run in one go:
- *  scons run_time_flags="--verbose true" global/test/TestCommandLineArguments.hpp
- *  This should produce "You have successfully set --verbose to take the value 1." for this test suite.
- *
+ * For example:
+ * `cmake ..` where `..` is the Chaste source directory, followed by
+ * `make <target> -D<option=value>` where `target` is the build target you are building (e.g. Chaste, heart, or a user project such as ApPredict), and `option` and `value` pairs set build options.
  * Note: error messages such as
  *   WARNING! There are options you set that were not used!
  *   WARNING! could be spelling mistake, etc!
- * are due to PETSc thinking the parameter must have been for it.
+ * are due to PETSc thinking the parameter must have been for it rather than Chaste, and can be ignored.
  *
  */
 class TestCommandLineArguments : public CxxTest::TestSuite
 {
 public:
 
-    void TestCommandLineArgumentsSingleton() throw(Exception)
+    void TestCommandLineArgumentsSingleton()
     {
         // Test that argc and argv are populated
         int argc = *(CommandLineArguments::Instance()->p_argc);
         TS_ASSERT_LESS_THAN(0, argc); // argc should always be 1 or greater
 
-        // argv[0] will be equal to global/build/debug/TestCommandLineArgumentsRunner
-        // or global/build/optimised/TestCommandLineArgumentsRunner, etc
+        /* argv[0] will be equal to global/build/debug/TestCommandLineArguments
+         * or global/build/optimised/TestCommandLineArguments, etc
+         * Variations on Windows (CMake) include .../TestCommandLineArguments.exe
+         * Test executables built with SCons (deprecated) have the word Runner
+         * * .../TestCommandLineArgumentsRunner
+         * * .../TestCommandLineArgumentsRunner.exe
+         */
         char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
-#ifdef _MSC_VER
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner.exe", final_part_of_string);
-#else
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner", final_part_of_string);
-#endif
+        size_t pos = arg_as_string.find("TestCommandLineArguments");
+        // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
+        TS_ASSERT_DIFFERS(pos, std::string::npos);
+
         // Now test OptionExists() and GetValueCorrespondingToOption()
         //
         // The following tests would require the following arguments to be passed
         // in:
-        // ./global/build/debug/TestCommandLineArgumentsRunner -myoption -myintval 24 -mydoubleval 3.14 -3.14 -m2intval -42 -mystrings Baboons Monkeys Gibbons -mystring more_baboons
+        // ./global/build/debug/TestCommandLineArguments -myoption -myintval 24 -mydoubleval 3.14 -3.14 -m2intval -42 -mystrings Baboons Monkeys Gibbons -mystring more_baboons
         //
         // To test the methods we overwrite the arg_c and arg_v contained in the
         // singleton with the arguments that were needed.
@@ -261,7 +259,7 @@ public:
         CommandLineArguments::Instance()->p_argv = p_real_argv;
     }
 
-    void TestCommandLineArgumentsMocker() throw(Exception)
+    void TestCommandLineArgumentsMocker()
     {
         {
             /* HOW_TO_TAG General
@@ -290,17 +288,13 @@ public:
         char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
-#ifdef _MSC_VER
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner.exe", final_part_of_string);
-#else
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner", final_part_of_string);
-#endif
+        size_t pos = arg_as_string.find("TestCommandLineArguments");
+        // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
+        TS_ASSERT_DIFFERS(pos, std::string::npos);
     }
 
     /* A test which a user can run in order to check that they are passing command line arguments correctly*/
-    void TestCommandLineArgumentsParrotting() throw(Exception)
+    void TestCommandLineArgumentsParrotting()
     {
         std::string verb = "--verbose";
         if (CommandLineArguments::Instance()->OptionExists(verb))

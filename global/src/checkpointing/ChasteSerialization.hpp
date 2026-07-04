@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,8 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 // Apparently 'new' (for boost's two phase construction) isn't included sometimes...
-#include <new>
 #include <climits> // See #1024.
+#include <new>
 
 #include <boost/serialization/access.hpp>
 
@@ -70,7 +70,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CHASTE_CAN_CHECKPOINT_DLLS
 #ifndef __APPLE__
 #define CHASTE_CAN_CHECKPOINT_DLLS
-#endif //Not APPLE
+#endif // Not APPLE
 #endif
 
 /**
@@ -80,12 +80,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * See tickets #2585 (boost 1.56) and #2626 (boost 1.57).
  */
 #if BOOST_VERSION == 105600
-#include <boost/serialization/singleton.hpp>
 #include <boost/serialization/extended_type_info.hpp>
+#include <boost/serialization/singleton.hpp>
 #endif
 
 #if BOOST_VERSION == 105700
 #include <boost/serialization/type_info_implementation.hpp>
+#endif
+
+/**
+ * Add a missing #include for boost 1.74, which is needed
+ * to work around a bug in that boost version.
+ *
+ * See #3038
+ */
+#if BOOST_VERSION == 107400
+#include <boost/serialization/library_version_type.hpp>
 #endif
 
 #endif // CHASTESERIALIZATION_HPP_

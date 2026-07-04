@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BackwardEulerIvpOdeSolver.hpp"
 
 #include <boost/math/tools/roots.hpp>
-#include <boost/bind.hpp>
 #include <iomanip>
 
 //#include "PetscSetupAndFinalize.hpp"
@@ -138,7 +137,7 @@ class TestAcinarUnitModels: public CxxTest::TestSuite
 {
 public:
 
-    void TestSimpleBalloonAcinarUnitInspiration() throw (Exception)
+    void TestSimpleBalloonAcinarUnitInspiration()
     {
         double viscosity = 1.92e-5;               //Pa s
         double terminal_airway_radius = 0.05;   //m
@@ -209,7 +208,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
     }
 
-    void TestSimpleBalloonExplicitAcinarUnitInspiration() throw (Exception)
+    void TestSimpleBalloonExplicitAcinarUnitInspiration()
     {
        double viscosity = 1.92e-5;               //Pa s
        double terminal_airway_radius = 0.05;   //m
@@ -244,7 +243,7 @@ public:
        double pleural_pressure = 0.0;
 
        double ode_volume = 0.0;
-       double flow_integral = 0.0;
+       [[maybe_unused]] double flow_integral = 0.0;
 
        while (!time_stepper.IsTimeAtEnd())
        {
@@ -277,7 +276,7 @@ public:
        TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
    }
 
-    void TestSigmoidalAcinarUnitInspiration() throw (Exception)
+    void TestSigmoidalAcinarUnitInspiration()
     {
         double viscosity = 1.92e-5;               //Pa s
         double terminal_airway_radius = 0.05;   //m
@@ -344,7 +343,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
     }
 
-    void TestSwan2012AcinarUnit() throw(Exception)
+    void TestSwan2012AcinarUnit()
     {
         Swan2012AcinarUnit acinus;
 

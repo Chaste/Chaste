@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <map>
+#include "FileFinder.hpp"
+#include <boost/algorithm/string/trim.hpp>
 
 /**
  * A class with static methods providing various information about this build of Chaste.
@@ -65,7 +67,7 @@ public:
      * @return The major number of the "current" Chaste release.
      * If this is a development build, this will be the number of the last release.
      *
-     * @note This must be set manually by modifying Version.cpp.in.
+     * @note This must be set manually by modifying CMakeLists.txt.
      */
     static unsigned GetMajorReleaseNumber();
 
@@ -73,22 +75,21 @@ public:
      * @return The minor number of the "current" Chaste release.
      * If this is a development build, this will be the number of the last release.
      *
-     * @note This must be set manually by modifying Version.cpp.in.
+     * @note This must be set manually by modifying CMakeLists.txt.
      */
     static unsigned GetMinorReleaseNumber();
 
     /**
-     * @return  Get the subversion revision number of the Chaste source tree.
+     * @return  Get the Git revision number of the Chaste source tree.
      *
      * If the file ReleaseVersion.txt exists in the directory given by GetRootDir, then
      * we assume this is not a working copy, and read the version information from there.
      *
-     * Otherwise, we assume this is a checked-out tree, and call svnversion
-     * during the build.  If it returns a range of versions, the upper end of this range
-     * is used.  Whether the working copy is modified is ignored by this method; use
+     * Otherwise, we assume this is a checked-out tree, and get Git revision info via CMake
+     * during the build.  Whether the working copy is modified is ignored by this method; use
      * IsWorkingCopyModified to test that.
      */
-    static unsigned GetRevisionNumber();
+    static unsigned long long GetRevisionNumber();
 
     /**
      * @return  If this Chaste was built from a subversion working copy, then return whether there
@@ -145,11 +146,22 @@ public:
     static const std::map<std::string, std::string>& rGetProjectVersions();
 
     /**
+     * @return  Whether any checked-out projects have uncommitted revisions.
+     */
+    static const std::map<std::string, std::string>& rGetIfProjectsModified();
+
+    /**
      * @return  A single-line string representation of the provenance information to be attached
      * to any files we generate.  This includes the version of the Chaste code used, how and
      * when it was built, and the current date and time.
      */
     static std::string GetProvenanceString();
+
+    /**
+     * @return  A single-line string representation the version of chaste_codegen being used.
+     */
+    static std::string GetChasteCodegenVersion();
+
 };
 
 #endif // VERSION_HPP_

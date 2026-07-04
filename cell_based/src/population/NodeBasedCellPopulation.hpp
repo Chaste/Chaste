@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,11 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include <boost/version.hpp>
-#if BOOST_VERSION >= 103700
-#include "ObjectCommunicator.hpp"
-#endif
 
+#include "ObjectCommunicator.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
 
@@ -56,6 +53,7 @@ class NodeBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
 {
     friend class TestNodeBasedCellPopulation;
     friend class TestNodeBasedCellPopulationParallelMethods;
+    friend class TestPeriodicNodeBasedCellPopulationParallelMethods;
 
 protected:
 
@@ -69,9 +67,6 @@ private:
 
     /** Vector of maximal spatial positions in each dimension. */
     c_vector<double, DIM> mMaxSpatialPositions;
-
-    /** Node pairs for force calculations. */
-    std::vector< std::pair<Node<DIM>*, Node<DIM>* > > mNodePairs;
 
     /** Whether to delete the nodes-only mesh (taken in one of the constructors, defaults to false). */
     bool mDeleteMesh;
@@ -233,6 +228,17 @@ private:
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory);
 
+    /**
+     * Helper method to calculate the message tags between processors
+     * for NonBlockingSendCellsToNeighbourProcesses method
+     * Uses a Cantor pairing function
+     *
+     * @param senderI sender processor rank
+     * @param receiverJ receiver processor rank
+     * @return a unique tag number
+     */
+    unsigned CalculateMessageTag(unsigned senderI, unsigned receiverJ);
+
 public:
 
     /**
@@ -340,13 +346,6 @@ public:
     void Update(bool hasHadBirthsOrDeaths=true);
 
     /**
-     * Overridden rGetNodePairs method
-     *
-     * @return Node pairs for force calculation.
-     */
-    std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& rGetNodePairs();
-
-    /**
      * Outputs CellPopulation parameters to file
      *
      * As this method is pure virtual, it must be overridden
@@ -371,6 +370,14 @@ public:
      * @param pPopulationCountWriter the population count writer.
      */
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+
+    /**
+     * A virtual method to accept a cell population event writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationEventWriter the population event writer.
+     */
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
 
     /**
      * A virtual method to accept a cell writer so it can

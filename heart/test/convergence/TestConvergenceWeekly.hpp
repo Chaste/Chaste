@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <cmath>
 
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "LuoRudy1991.hpp"
 #include "PdeConvergenceTester.hpp"
 #include "SpaceConvergenceTester.hpp"
@@ -58,10 +58,10 @@ class TestConvergenceWeekly : public CxxTest::TestSuite
 {
 public:
 
-    void xxTest3DSpace() throw(Exception)
+    void xxTest3DSpace()
     {
 
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
         HeartConfig::Instance()->SetUseRelativeTolerance(1e-8);
         //tester.SetKspRelativeTolerance(1e-8);
         tester.SetMeshWidth(0.15);//cm
@@ -73,11 +73,11 @@ public:
 
     //Experiments with ksp_atol follow.
     //This first one has to be done with GMRES as 1D are known to be a bit flakey
-    void TestSpaceConvergencein1DWithAtol() throw(Exception)
+    void TestSpaceConvergencein1DWithAtol()
     {
         HeartConfig::Instance()->SetKSPSolver("gmres");
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
        //tester.SetKspAbsoluteTolerance(1e-5);
         tester.Converge(__FUNCTION__);
@@ -90,12 +90,12 @@ public:
     }
 
 
-    void Test3DSpace10() throw(Exception)
+    void Test3DSpace10()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         PetscTools::SetOption("-log_summary", "");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-7);
         //tester.SetKspAbsoluteTolerance(1e-7);
         tester.OdeTimeStep /= 2.0;
@@ -108,12 +108,12 @@ public:
         HeartConfig::Instance()->Reset();
     }
 
-    void Test3DSpace10RampedQuarterStimulus() throw(Exception)
+    void Test3DSpace10RampedQuarterStimulus()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         PetscTools::SetOption("-log_summary", "");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-7);
         //tester.SetKspAbsoluteTolerance(1e-7);
         tester.OdeTimeStep /= 2.0;
@@ -128,11 +128,11 @@ public:
     }
 
     //More experiments with ksp_atol follow.
-    void TestSpaceConvergencein2DWithAtol() throw(Exception)
+    void TestSpaceConvergencein2DWithAtol()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<2>, 2, 2> tester;
         //tester.SetKspAbsoluteTolerance(1e-5);
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
         tester.Converge(__FUNCTION__);
@@ -146,11 +146,11 @@ public:
     }
 
     //Copied from projects/jmpf since this converges on mesh4
-    void Test3DSpaceRelaxWidthWithAtol() throw(Exception)
+    void Test3DSpaceRelaxWidthWithAtol()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
         //tester.SetKspAbsoluteTolerance(1e-3);
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-3);
         tester.SetMeshWidth(0.15);//cm

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -100,13 +100,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 {
   public:
 
-    void TestPottsBasedWithCoarseMesh() throw(Exception)
+    void TestPottsBasedWithCoarseMesh()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -123,7 +123,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(0.1);
 
         // Create PDE and boundary condition objects (zero uptake to check analytic solution)
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -180,13 +184,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
     }
 
-    void TestCaBasedWithoutCoarseMesh() throw(Exception)
+    void TestCaBasedWithoutCoarseMesh()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -209,7 +213,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Create PDE and boundary condition objects (zero uptake to check analytic solution)
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -256,13 +264,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
     }
 
     // In this test there are only 9 cells but 100 lattice sites
-    void TestCaBasedWithCellwiseSourceEllipticPde() throw(Exception)
+    void TestCaBasedWithCellwiseSourceEllipticPde()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<unsigned> location_indices;
         for (unsigned i=3; i<6; i++)
@@ -287,7 +295,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 0.0;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
+
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -309,13 +321,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
     }
 
     // In this test there are only 50 cells but 100 lattice sites
-    void TestCaBasedWithCellwiseSourceEllipticPdeWithTightBoundaries() throw(Exception)
+    void TestCaBasedWithCellwiseSourceEllipticPdeWithTightBoundaries()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<unsigned> location_indices;
         for (unsigned i=2; i<8; i++)
@@ -343,7 +355,10 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 0.0;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -365,13 +380,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
     }
 
-    void TestCaBasedWithoutCoarseMeshUsingPdeHandlerOnCuboid() throw(Exception)
+    void TestCaBasedWithoutCoarseMeshUsingPdeHandlerOnCuboid()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -394,7 +409,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Create PDE and boundary condition objects (use zero uptake to check analytic solution)
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -423,13 +442,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
     /*
      * This tests that a sensible error is thrown if the coarse mesh is too small.
      */
-    void TestCaBasedCellsOutsideMesh() throw(Exception)
+    void TestCaBasedCellsOutsideMesh()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -452,7 +471,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -470,13 +493,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "Point [6,0] is not in mesh - all elements tested");
     }
 
-    void TestCaBasedWithCoarseMesh() throw(Exception)
+    void TestCaBasedWithCoarseMesh()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -495,7 +518,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(0.1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -561,13 +588,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
     }
 
-    void TestPottsBasedWithCoarseMeshTwoEquations() throw(Exception)
+    void TestPottsBasedWithCoarseMeshTwoEquations()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -584,10 +611,14 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(0.1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde_1, (cell_population, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde_1, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc_1, (1.0));
 
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde_2, (cell_population, 0.0));
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde_2, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc_2, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -642,13 +673,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
     }
 
     // Under construction: Test growth of a population of cells that consumes nutrient
-    void TestOnLatticeSpheroidWithNutrient() throw(Exception)
+    void TestOnLatticeSpheroidWithNutrient()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -672,8 +703,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(10);
 
         // Create PDE and boundary condition objects
-        double nutrient_uptake_rate = -0.1;
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, nutrient_uptake_rate));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -710,7 +744,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
     }
 
-    void TestPdeOutput() throw(Exception)
+    void TestPdeOutput()
     {
         EXIT_IF_PARALLEL;
 

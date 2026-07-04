@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,7 +68,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -101,8 +101,8 @@ public:
             std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
             c_vector<double, 2> random_axis = positions.second - positions.first;
 
-            // Each random vector should have norm equal to 0.5*0.3 = 0.15
-            TS_ASSERT_DELTA(norm_2(random_axis), 0.15,1e-6);
+            // Each random vector should have norm equal to 0.3
+            TS_ASSERT_DELTA(norm_2(random_axis), 0.3,1e-6);
 
             average_axis(0) += random_axis(0);
             axis_variance(0) += random_axis(0)*random_axis(0);
@@ -121,9 +121,9 @@ public:
         TS_ASSERT_DELTA(average_axis(0), 0.0, 1e-2);
         TS_ASSERT_DELTA(average_axis(1), 0.0, 1e-2);
 
-        // Each component of the axis variance should equal 0.5*(0.15^2) = 0.01125
-        TS_ASSERT_DELTA(axis_variance(0), 0.01125, 1e-2);
-        TS_ASSERT_DELTA(axis_variance(1), 0.01125, 1e-2);
+        // Each component of the axis variance should equal 0.5*(0.3^2) = 0.045
+        TS_ASSERT_DELTA(axis_variance(0), 0.045, 1e-2);
+        TS_ASSERT_DELTA(axis_variance(1), 0.045, 1e-2);
         TS_ASSERT_DELTA(average_angle, 0.0, 1e-2);
         TS_ASSERT_DELTA(angle_variance, M_PI*M_PI/12.0, 1e-2);
     }
@@ -132,7 +132,7 @@ public:
     {
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -180,7 +180,7 @@ public:
         TS_ASSERT_DELTA(daughter_location[1], expected_daughter_location[1], 1e-6);
     }
 
-    void TestArchiveRandomDirectionCentreBasedDivisionRule() throw(Exception)
+    void TestArchiveRandomDirectionCentreBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "RandomDirectionCentreBasedDivisionRule.arch";
@@ -207,7 +207,7 @@ public:
         }
     }
 
-    void TestArchiveFixedCentreBasedDivisionRule() throw(Exception)
+    void TestArchiveFixedCentreBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "FixedCentreBasedDivisionRule.arch";

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,16 +46,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWCELLKILLERTUTORIAL_HPP_
 
 /*
- * = An example showing how to create a new cell killer and use it in a cell-based simulation =
+ * ## An example showing how to create a new cell killer and use it in a cell-based simulation
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In the crypt tutorial, we used an existing cell killer class to define
  * how cells were sloughed off the top of a crypt. In this tutorial we show
  * how to create a new cell killer class, and how this can be used in a cell-based
  * simulation.
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary
  * header file and archiving headers.
@@ -70,12 +70,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* The next header defines a base class for cell killers, from which the new
  * cell killer class will inherit. */
 #include "AbstractCellKiller.hpp"
+
+/* The next header defines a writer which outputs information on cells killed to the file
+ * `removals.dat` . */
+#include "CellRemovalLocationsWriter.hpp"
+
 /* The remaining header files define classes that will be used in the cell-based
  * simulation test. We have encountered each of these header files in previous cell-based
  * Chaste tutorials. */
 #include "HoneycombMeshGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
 #include "SmartPointers.hpp"
@@ -83,14 +89,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * == Defining the cell killer class ==
+ * ### Defining the cell killer class
  *
  * As an example, let us consider a cell killer that labels any cells in a
  * two-dimensional cell population which lie outside the elliptical domain given in
- * Cartesian coordinates by the equation (''x''/20)^2^ + (''y''/10)^2^ < 1. To
- * implement this we define a new cell killer class, {{{MyCellKiller}}},
- * which inherits from {{{AbstractCellKiller}}} and overrides the
- * {{{CheckAndLabelCellsForApoptosisOrDeath()}}} method.
+ * Cartesian coordinates by the equation $\left(\frac{x}{20}\right)^2 + \left(\frac{y}{10}\right)^2 < 1$.
+ * To implement this we define a new cell killer class, `MyCellKiller`,
+ * which inherits from `AbstractCellKiller` and overrides the
+ * `CheckAndLabelCellsForApoptosisOrDeath()` method.
  *
  * Note that usually this code would be separated out into a separate declaration in
  * a .hpp file and definition in a .cpp file.
@@ -114,9 +120,9 @@ public:
         : AbstractCellKiller<2>(pCellPopulation)
     {}
 
-    /* The second public method overrides {{{CheckAndLabelCellsForApoptosisOrDeath()}}}.
-     * This method iterates over all cells in the population, and calls {{{Kill()}}} on
-     * any cell whose centre is located outside the ellipse (''x''/20)^2^ + (''y''/10)^2^ < 1. */
+    /* The second public method overrides `CheckAndLabelCellsForApoptosisOrDeath()`.
+     * This method iterates over all cells in the population, and calls `KillCell()` on
+     * any cell whose centre is located outside the ellipse $(\frac{x}{20})^2 + (\frac{y}{10})^2 < 1$. */
     void CheckAndLabelCellsForApoptosisOrDeath()
     {
         for (AbstractCellPopulation<2>::Iterator cell_iter = this->mpCellPopulation->Begin();
@@ -128,13 +134,15 @@ public:
 
             if (pow(location[0]/20, 2) + pow(location[1]/10, 2) > 1.0)
             {
-                cell_iter->Kill();
+                /* This line marks the cell as killed and stores removal information for use by
+                 * by the cell writers if the writer `CellRemovalLocationsWriter` is included.*/
+                this->mpCellPopulation->KillCell(*cell_iter, "MyCellKiller");
             }
         }
     }
 
-    /* The final public method overrides {{{OutputCellKillerParameters()}}}.
-     * This method outputs any member variables to a specified results file {{{rParamsFile}}}.
+    /* The final public method overrides `OutputCellKillerParameters()`.
+     * This method outputs any member variables to a specified results file `rParamsFile`.
      * In our case, there are no parameters, so we simply call the method on the base class.
      * Nonetheless, we still need to override the method, since it is pure virtual in the base
      * class.
@@ -145,7 +153,7 @@ public:
     }
 };
 
-/* As mentioned in [wiki:UserTutorials/CreatingAndUsingANewCellCycleModel], we need to include the next block
+/* As mentioned in [Creating And Using A New Cell Cycle Model](../creatingandusinganewcellcyclemodel/), we need to include the next block
  * of code to be able to archive the cell killer object in a cell-based
  * simulation, and to obtain a unique identifier for our new cell killer for writing
  * results to file.
@@ -185,32 +193,32 @@ namespace boost
 }
 
 /*
- * This completes the code for {{{MyCellKiller}}}. Note that usually this code
+ * This completes the code for `MyCellKiller`. Note that usually this code
  * would be separated out into a separate declaration in a .hpp file and definition
  * in a .cpp file.
  *
- * === The Tests ===
+ * #### The Tests
  *
- * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
+ * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.
  */
 class TestCreatingAndUsingANewCellKillerTutorial : public AbstractCellBasedTestSuite
 {
 public:
 
     /*
-     * == Testing the cell killer ==
+     * ### Testing the cell killer
      *
      * We begin by testing that our new cell-cycle model is implemented correctly.
      */
-    void TestMyCellKiller() throw(Exception)
+    void TestMyCellKiller()
     {
         /* We use the honeycomb mesh generator to create a honeycomb mesh. */
         HoneycombMeshGenerator generator(20, 20, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We then construct and initialise some cells, each with a
-         * {{{FixedG1GenerationalCellCycleModel}}}, using the helper class
-         * {{{CellsGenerator}}}. */
+         * `FixedG1GenerationalCellCycleModel`, using the helper class
+         * `CellsGenerator`. */
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -222,12 +230,16 @@ public:
         /* We now use the cell population to construct a cell killer object. */
         MyCellKiller my_cell_killer(&cell_population);
 
+        /* To store information about the lovations and times of the killed cells use the
+         * `CellRemovalLocationsWriter` */
+        cell_population.AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
+
         /* To test that we have implemented the cell killer correctly, we call the
-         * overridden method {{{CheckAndLabelCellsForApoptosisOrDeath}}}... */
+         * overridden method `CheckAndLabelCellsForApoptosisOrDeath`... */
         my_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         /* ... and check that any cell whose centre is located outside the ellipse
-         * (''x''/20)^2^ + (''y''/10)^2^ < 1 has indeed been labelled as dead. */
+         * $(\frac{x}{20})^2 + (\frac{y}{10})^2 < 1$ has indeed been labelled as dead. */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
@@ -289,16 +301,16 @@ public:
     }
 
     /*
-     * == Using the cell killer in a cell-based simulation ==
+     * ### Using the cell killer in a cell-based simulation
      *
-     * We now provide a test demonstrating how {{{MyCellKiller}}} can be used
+     * We now provide a test demonstrating how `MyCellKiller` can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMyCellKiller() throw(Exception)
+    void TestOffLatticeSimulationWithMyCellKiller()
     {
         /* We proceed as before, creating a mesh-based cell population. */
         HoneycombMeshGenerator generator(20, 20, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -308,16 +320,16 @@ public:
 
         /* We now use the cell population to construct a cell killer object. This object
          * must be added to the cell-based simulation as a boost::shared_ptr, so we make
-         * use of the macro MAKR_PTR_ARGS (defined in the header {{{SmartPointers.hpp}}}).*/
+         * use of the macro `MAKE_PTR_ARG` (defined in the header `SmartPointers.hpp`).*/
         MAKE_PTR_ARGS(MyCellKiller, p_killer, (&cell_population));
 
-        /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
+        /* We then pass in the cell population into an `OffLatticeSimulation`,
          * and set the output directory and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithMyCellKiller");
         simulator.SetEndTime(1.0);
 
-        /* We create a force law and pass it to the {{{OffLatticeSimulation}}}. */
+        /* We create a force law and pass it to the `OffLatticeSimulation`. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(3);
         simulator.AddForce(p_linear_force);
@@ -325,17 +337,17 @@ public:
         /* We now pass the cell killer into the cell-based simulation. */
         simulator.AddCellKiller(p_killer);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
-    /*
-     * When you visualize the results with
-     *
-     * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyCellKiller/results_from_time_0}}}
-     *
-     * you should see that once cells move out of the ellipse they are removed from the simulation.
-     *
-     */
 };
+/*
+ * When you visualize the results with
+ *
+ * `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/TestOffLatticeSimulationWithMyCellKiller/results_from_time_0`
+ *
+ * you should see that once cells move out of the ellipse they are removed from the simulation.
+ *
+ */
 
 #endif /*TESTCREATINGANDUSINGANEWCELLKILLERTUTORIAL_HPP_*/

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "MutableVertexMesh.hpp"
+#include "Toroidal2dMesh.hpp"
 
 /**
  * A subclass of MutableVertexMesh<2,2> for a rectangular mesh with
@@ -62,6 +63,12 @@ private:
     /** The height of the mesh, taking account of top-bottom periodicity. */
     double mHeight;
 
+    /**
+     * Auxiliary mesh pointer, created/updated when GetMeshForVtk() is called
+     * and stored so that it may be deleted by the destructor.
+     */
+    VertexMesh<2,2>* mpMeshForVtk;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -80,6 +87,7 @@ private:
         archive & boost::serialization::base_object<MutableVertexMesh<2,2> >(*this);
         archive & mWidth;
         archive & mHeight;
+        mpMeshForVtk = nullptr;
     }
 
 public:
@@ -105,6 +113,15 @@ public:
      * Constructor.
      */
     Toroidal2dVertexMesh();
+
+    /**
+     * Alternative constructor. Creates a Voronoi tessellation of a given Toroidal2dMesh,
+     * which must be Delaunay (see TetrahedralMesh::CheckIsVoronoi).
+     *
+     * @param rMesh a Toroidal2dMesh
+     * @param isBounded a boolean to indicate whether to bound the voronoi tesselation. Defaults to false.
+     */
+    Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded = false);
 
     /**
      * Destructor.
@@ -147,6 +164,20 @@ public:
     double GetWidth(const unsigned& rDimension) const;
 
     /**
+     * Set mHeight.
+     *
+     * @param height the new value of mHeight
+     */
+    void SetHeight(double height);
+
+    /**
+     * Set mWidth.
+     *
+     * @param width the new value of mWidth
+     */
+    void SetWidth(double width);
+
+    /**
      * Overridden AddNode() method.
      *
      * @param pNewNode the node to be added to the mesh
@@ -156,13 +187,23 @@ public:
     unsigned AddNode(Node<2>* pNewNode);
 
     /**
+     * Helper method to check if a node is within [0,mWidth]x[0,mHeight]
+     * and move back into the domain if needed.
+     *
+     * @param pNode the node to be checked
+     */
+    void CheckNodeLocation(Node<2>* pNode);
+
+    /**
+     * Overridden GetMeshForVtk() method.
+     *
      * Return a pointer to an extended mesh that is a 'non-periodic'
      * version of our mesh. This can then be used when writing to
      * VTK.
      *
      * @return a non-periodic vertex mesh
      */
-     MutableVertexMesh<2, 2>* GetMeshForVtk() const;
+     VertexMesh<2,2>* GetMeshForVtk();
 
      /**
       * Construct the mesh using a MeshReader.

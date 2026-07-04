@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneStimulusCellFactory.hpp"
 #include "ZeroStimulusCellFactory.hpp"
 #include "LuoRudy1991.hpp"
-#include "FoxModel2002BackwardEuler.hpp"
+#include "FoxModel2002BackwardEulerOpt.hpp"
 #include "FaberRudy2000.hpp"
 
 #include "BidomainProblem.hpp"
@@ -94,7 +94,7 @@ public:
     /*
      *  Simple bidomain simulation to test against in TestArchivingWithHelperClass below
      */
-    void TestSimpleBidomain1D() throw(Exception)
+    void TestSimpleBidomain1D()
     {
         OutputFileHandler handler("BidomainSimple1d",true); // This test was accruing output - true to wipe directory.
 
@@ -277,9 +277,6 @@ public:
      * Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
      * The earliest version of Boost supported in 1.34
      *
-scons build=GccOpt_hostconfig,boost=1-34  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
-cp -r /tmp/$USER/testoutput/save_bidomain/ ~/eclipse/workspace/Chaste/apps/texttest/chaste/resume_bidomain/
-cp -r /tmp/$USER/testoutput/SaveBidomain/ ~/eclipse/workspace/Chaste/apps/texttest/chaste/resume_bidomain/
      */
     void TestGenerateResultsForResumeBidomain()
     {
@@ -299,7 +296,7 @@ cp -r /tmp/$USER/testoutput/SaveBidomain/ ~/eclipse/workspace/Chaste/apps/textte
         HeartConfig::Instance()->SetOutputFilenamePrefix("Bidomain_3d");
 
         // This cell factory should apply the same stimulus described in the xml config file.
-        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEuler, 3> cell_factory(-80000.0, 1.0);
+        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEulerOpt, 3> cell_factory(-80000.0, 1.0);
         BidomainProblem<3> bidomain_problem( &cell_factory );
 
         bidomain_problem.Initialise();
@@ -343,10 +340,7 @@ cp -r /tmp/$USER/testoutput/SaveBidomain/ ~/eclipse/workspace/Chaste/apps/textte
      * Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
      * The earliest version of Boost supported in 1.34
      *
-scons build=GccOpt_hostconfig,boost=1-34  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
-cp -r /tmp/$USER/testoutput/save_monodomain/ ~/eclipse/workspace/Chaste/apps/texttest/chaste/resume_monodomain/
-cp -r /tmp/$USER/testoutput/SaveMonodomain/ ~/eclipse/workspace/Chaste/apps/texttest/chaste/resume_monodomain/
- */
+     */
     void TestGenerateResultsForResumeMonodomain()
     {
         HeartConfig::Instance()->SetUseFixedSchemaLocation(true);
@@ -361,7 +355,7 @@ cp -r /tmp/$USER/testoutput/SaveMonodomain/ ~/eclipse/workspace/Chaste/apps/text
         HeartConfig::Instance()->SetOutputFilenamePrefix("Monodomain_2d");
 
         // This cell factory should apply the same stimulus described in the xml config file.
-        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEuler, 2> cell_factory(-600000.0, 1.0);
+        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEulerOpt, 2> cell_factory(-600000.0, 1.0);
         MonodomainProblem<2> monodomain_problem( &cell_factory );
 
         monodomain_problem.Initialise();
@@ -479,15 +473,6 @@ private:
              * If this fails you probably just need to copy a new reference_0_archive file from "my_archive.0",
              * (running with Boost 1.34 - this code isn't executed otherwise!)
              * but do check that's the case!
-             *
-             * (Assuming 1.34)
-scons test_suite=heart/test/TestCardiacSimulationArchiver.hpp
-cp /tmp/$USER/testoutput/TestLoadAsSequential/archive.arch.0 ./heart/test/data/checkpoint_migration/reference_0_archive
-cp /tmp/$USER/testoutput/TestLoadAsSequentialWithBath/archive.arch.0 ./heart/test/data/checkpoint_migration_with_bath/reference_0_archive
-cp /tmp/$USER/testoutput/TestBcsOnNonMasterOnly/archive.arch.0 ./heart/test/data/checkpoint_migration_bcs_on_non_master_only/reference_0_archive
-cp /tmp/$USER/testoutput/TestMigrateAfterSolve/archive.arch.0 ./heart/test/data/checkpoint_migration_after_solve/reference_0_archive
-scons test_suite=heart/test/TestCardiacSimulationArchiver.hpp
-cp /tmp/$USER/testoutput/TestLoadAsSequentialWithBathAndDistributedMesh/archive.arch.0 ./heart/test/data/checkpoint_migration_with_bath_and_distributed_mesh/reference_0_archive
              */
             //Not a collective call in general, but we only do this one in serial
             FileComparison comp(rArchiveDirectory.GetAbsolutePath() + "reference_0_archive", my_archive + ".0");
@@ -585,7 +570,7 @@ cp /tmp/$USER/testoutput/TestLoadAsSequentialWithBathAndDistributedMesh/archive.
     }
 
 public:
-    void TestMigrationExceptions() throw (Exception)
+    void TestMigrationExceptions()
     {
         FileFinder archive_dir("heart/test/data/checkpoint_migration_exception/", RelativeTo::ChasteSourceRoot);
         TS_ASSERT_THROWS_CONTAINS(CardiacSimulationArchiver<BidomainProblem<3> >::Load(archive_dir),
@@ -597,8 +582,6 @@ public:
     /**
      * Run this in parallel (build=_3) to create the archive for TestLoadAsSequential.
      *
-scons build=GccOpt_hostconfig,boost=1-34_3 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
-cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/data/checkpoint_migration/
      *
      * Sets up a simulation and archives it without solving at all.
      *
@@ -608,7 +591,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/da
      * Generates a 3d cube mesh with 125 nodes, corners at (0,0,0) and (1,1,1)
      * with nodal spacing of 0.2cm.
      */
-    void TestCreateArchiveForLoadAsSequential() throw (Exception)
+    void TestCreateArchiveForLoadAsSequential()
     {
         std::string directory = "TestCreateArchiveForLoadAsSequential";
         HeartConfig::Instance()->Reset();
@@ -618,7 +601,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/da
         HeartConfig::Instance()->SetOutputFilenamePrefix("simulation");
         HeartConfig::Instance()->SetUseAbsoluteTolerance(ABS_TOL);
 
-        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEuler, 3> cell_factory(-80000.0, 1.0);
+        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEulerOpt, 3> cell_factory(-80000.0, 1.0);
         BidomainProblem<3> bidomain_problem( &cell_factory );
 
         bidomain_problem.Initialise();
@@ -649,7 +632,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/da
      * we can do everything with a single Load method.  But the tests are still named after
      * the original methods.
      */
-    void TestLoadAsSequential() throw (Exception)
+    void TestLoadAsSequential()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration/", RelativeTo::ChasteSourceRoot);
         std::string new_directory = "TestLoadAsSequential";
@@ -695,11 +678,8 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/da
     /**
      * Run this in parallel (build=_3) to create the archive for TestLoadAsSequentialWithBath.
      *
-scons build=GccOpt_hostconfig,boost=1-34_3 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
-cp  /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequentialWithBath/?* ./heart/test/data/checkpoint_migration_with_bath/
-cp  /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequentialWithBathAndDistributedMesh/?* ./heart/test/data/checkpoint_migration_with_bath_and_distributed_mesh/
      */
-    void TestCreateArchiveForLoadAsSequentialWithBath() throw (Exception)
+    void TestCreateArchiveForLoadAsSequentialWithBath()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetSimulationDuration(0.2);
@@ -752,7 +732,7 @@ cp  /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequentialWithBathAndDistrib
         }
     }
 
-    void TestLoadAsSequentialWithBath() throw (Exception)
+    void TestLoadAsSequentialWithBath()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration_with_bath/", RelativeTo::ChasteSourceRoot);
         std::string new_archive_dir = "TestLoadAsSequentialWithBath";
@@ -945,15 +925,13 @@ private:
 public:
     /**
      * Run this in sequential to create the archive for TestLoadFromSequential.
-scons build=GccOpt_hostconfig,boost=1-34 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
-cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequential/?* ./heart/test/data/checkpoint_migration_from_seq/
      *
      * Sets up a simulation and archives it without solving at all.
      *
      * Generates a 3d cube mesh with 125 nodes, corners at (0,0,0) and (1,1,1)
      * with nodal spacing of 0.2cm.
      */
-    void TestCreateArchiveForLoadFromSequential() throw (Exception)
+    void TestCreateArchiveForLoadFromSequential()
     {
         std::string directory = "TestCreateArchiveForLoadFromSequential";
         HeartConfig::Instance()->Reset();
@@ -974,7 +952,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequential/?* ./heart/test/
     /**
      * #1159 - the second part of migrating a checkpoint to a different number of processes.
      */
-    void TestLoadFromSequential() throw (Exception)
+    void TestLoadFromSequential()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration_from_seq/", RelativeTo::ChasteSourceRoot);
         std::string new_archive_dir = "TestLoadFromSequential";
@@ -1019,12 +997,10 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequential/?* ./heart/test/
 
     /**
      * Run this in sequential to create the archive for TestLoadFromSequentialWithBath.
-scons build=GccOpt_hostconfig,boost=1-34  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
-cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./heart/test/data/checkpoint_migration_from_seq_with_bath/
      *
      * Sets up a simulation and archives it, solving for one PDE step first to set up default BCs.
      */
-    void TestCreateArchiveForLoadFromSequentialWithBath() throw (Exception)
+    void TestCreateArchiveForLoadFromSequentialWithBath()
     {
         std::string directory = "TestCreateArchiveForLoadFromSequentialWithBath";
         HeartConfig::Instance()->Reset();
@@ -1060,7 +1036,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
         delete p_mesh;
     }
 
-    void TestLoadFromSequentialWithBath() throw (Exception)
+    void TestLoadFromSequentialWithBath()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration_from_seq_with_bath/", RelativeTo::ChasteSourceRoot);
         std::string new_archive_dir = "TestLoadFromSequentialWithBath";
@@ -1151,7 +1127,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
     /*
      * The following tests that there are no problems when running and resuming a simulation with postprocessing.
      */
-    void TestSolveAndResumeWithPostprocessing() throw (Exception)
+    void TestSolveAndResumeWithPostprocessing()
     {
         setUp();
         HeartConfig::Instance()->SetOutputDirectory("SolveAndResumeWithPostprocessing");
@@ -1207,10 +1183,8 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
      * has no boundary conditions, but at least one other process does.
      * We set a zero dirichlet boundary condition on the right end of a parallel 1d mesh.
      *
-scons build=GccOpt_hostconfig,boost=1-34_2  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
-cp /tmp/$USER/testoutput/TestCreateArchiveForBcsOnNonMasterOnly/?* ./heart/test/data/checkpoint_migration_bcs_on_non_master_only/
      */
-    void TestCreateArchiveForBcsOnNonMasterOnly() throw (Exception)
+    void TestCreateArchiveForBcsOnNonMasterOnly()
     {
         std::string directory = "TestCreateArchiveForBcsOnNonMasterOnly";
         HeartConfig::Instance()->Reset();
@@ -1258,7 +1232,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForBcsOnNonMasterOnly/?* ./heart/test/
         CardiacSimulationArchiver<BidomainProblem<1> >::Save(bidomain_problem, directory);
     }
 
-    void TestBcsOnNonMasterOnly() throw (Exception)
+    void TestBcsOnNonMasterOnly()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration_bcs_on_non_master_only/", RelativeTo::ChasteSourceRoot);
         std::string new_archive_dir = "TestBcsOnNonMasterOnly";
@@ -1303,10 +1277,8 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForBcsOnNonMasterOnly/?* ./heart/test/
      * direct call of mpBoundaryConditionsContainer->MergeFromArchive in LoadExtraArchive.
      *
      * Run this in parallel (build=_2) to create the archive for TestMigrateAfterSolve.
-scons build=GccOpt_hostconfig,boost=1-34_2 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
-cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./heart/test/data/checkpoint_migration_after_solve/
      */
-    void TestCreateArchiveForMigrateAfterSolve() throw (Exception)
+    void TestCreateArchiveForMigrateAfterSolve()
     {
         std::string directory = "TestCreateArchiveForMigrateAfterSolve";
         HeartConfig::Instance()->Reset();
@@ -1342,7 +1314,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
         );
     }
 
-    void TestMigrateAfterSolve() throw (Exception)
+    void TestMigrateAfterSolve()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration_after_solve/", RelativeTo::ChasteSourceRoot);
         std::string new_archive_dir = "TestMigrateAfterSolve";
@@ -1389,7 +1361,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
     /*
      *  Check that we can read for a permuted mesh (or permuted archive) and then correctly record that it was permuted
      */
-    void TestPermutedBidomain1D() throw(Exception)
+    void TestPermutedBidomain1D()
     {
         std::string archive_dir("ArchiveBidomainPermuted");
 

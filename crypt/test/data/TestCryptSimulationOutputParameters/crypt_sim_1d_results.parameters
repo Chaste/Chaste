@@ -1,5 +1,7 @@
 		<Dt>0.00833333</Dt>
 		<EndTime>10</EndTime>
+		<UpdateCellPopulation>1</UpdateCellPopulation>
 		<SamplingTimestepMultiple>1</SamplingTimestepMultiple>
+		<UpdatingTimestepMultiple>1</UpdatingTimestepMultiple>
 		<OutputDivisionLocations>0</OutputDivisionLocations>
 		<OutputCellVelocities>0</OutputCellVelocities>

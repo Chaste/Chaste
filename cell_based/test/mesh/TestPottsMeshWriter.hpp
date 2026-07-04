@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTPOTTSMESHWRITER_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 
 #include <string>
 #include <fstream>
@@ -56,11 +57,11 @@ class TestPottsMeshWriter : public CxxTest::TestSuite
 {
 public:
 
-    void TestPottsMeshWriter2d() throw (Exception)
+    void TestPottsMeshWriter2d()
     {
         // Create 2D mesh with 2 square elements
         PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create a Potts mesh writer
         PottsMeshWriter<2> potts_mesh_writer("TestPottsMeshWriter2d", "potts_mesh_2d");
@@ -84,11 +85,11 @@ public:
         }
     }
 
-    void TestPottsMeshWriter3d() throw(Exception)
+    void TestPottsMeshWriter3d()
     {
         // Create 3D mesh with 2 square elements
         PottsMeshGenerator<3> generator(2, 2, 1, 2, 1, 2, 2, 1, 2);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         // Create a Potts mesh writer
         PottsMeshWriter<3> potts_mesh_writer("TestPottsMeshWriter3d", "potts_mesh_3d");
@@ -112,7 +113,7 @@ public:
         }
     }
 
-    void TestReadingAndWritingElementAttributes() throw(Exception)
+    void TestReadingAndWritingElementAttributes()
     {
         // Read in a mesh with element attributes
         PottsMeshReader<2> mesh_reader("cell_based/test/data/TestPottsMeshReader2d/potts_mesh_with_element_attributes");
@@ -142,7 +143,7 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 152u);
     }
 
-    void TestWriteFilesUsingMeshReader() throw (Exception)
+    void TestWriteFilesUsingMeshReader()
     {
         // Create a PottsMeshReader and use it to write mesh files
         PottsMeshReader<2> mesh_reader("cell_based/test/data/TestPottsMeshReader2d/potts_mesh_with_element_attributes");

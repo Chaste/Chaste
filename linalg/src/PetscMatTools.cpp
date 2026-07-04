@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -180,7 +180,7 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
     }
     */
 #elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    MatZeroRows(matrix, rRows.size(), rows, diagonalValue , NULL, NULL);
+    MatZeroRows(matrix, rRows.size(), rows, diagonalValue , nullptr, nullptr);
 #else
     MatZeroRows(matrix, rRows.size(), rows, diagonalValue);
 #endif
@@ -208,7 +208,7 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
         // get all the non-zero cols for this row
         PetscInt num_cols;
         const PetscInt* cols;
-        MatGetRow(matrix, row, &num_cols, &cols, PETSC_NULL);
+        MatGetRow(matrix, row, &num_cols, &cols, CHASTE_PETSC_NULLPTR);
 
         // see which of these cols are in the list of cols to be zeroed
         for (PetscInt i=0; i<num_cols; i++)
@@ -220,7 +220,7 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
         }
 
         // this must be called for each MatGetRow
-        MatRestoreRow(matrix, row, &num_cols, &cols, PETSC_NULL);
+        MatRestoreRow(matrix, row, &num_cols, &cols, CHASTE_PETSC_NULLPTR);
     }
 
     // Now zero columns of each row

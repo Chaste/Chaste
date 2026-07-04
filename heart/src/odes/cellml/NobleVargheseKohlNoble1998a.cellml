@@ -8,21 +8,21 @@ LAST MODIFIED : 22nd July 2002
 AUTHOR :  Catherine Lloyd
           Department of Engineering Science
           The University of Auckland
-          
+
 MODEL STATUS :  This model conforms to the CellML 1.0 Specification released on
 10th August 2001, and the 16/1/02 CellML Metadata 1.0 Specification.
 
 DESCRIPTION :  This file contains a CellML description of Noble's 1998 improved
 guinea-pig ventricular cell model.
 
-CHANGES:  
+CHANGES:
   04/01/2002 - CML - Altered some of the connections.
   21/01/2002 - AAC - Updated metadata to conform to the 16/1/02 CellML Metadata
                      1.0 Specification.
   25/02/2002 - CML - Corrected i_K1 and i_K_ACh calculations.
   26/02/2002 - CML - Corrected several more equations.
   01/03/2002 - CML - Corrected units.
-  06/05/2002 - CML - Added some initial values.  Removed the blocked h_gate 
+  06/05/2002 - CML - Added some initial values.  Removed the blocked h_gate
                      component from the fast sodium current as it belongs to a
                      separate model which considers the effect of drugs.
   22/07/2002 - CML - Added more metadata.
@@ -152,7 +152,13 @@ Improved guinea-pig ventricular cell model incorporating a diadic space, IKr and
       </variable>
    </component>
    <component name="membrane">
-      <variable cmeta:id="membrane_voltage" initial_value="-92.849333" name="V" public_interface="out" units="millivolt"/>
+      <variable cmeta:id="membrane_voltage" initial_value="-92.849333" name="V" public_interface="out" units="millivolt">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_voltage">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_voltage"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable initial_value="8314.472" name="R" public_interface="out" units="joule_per_kilomole_kelvin"/>
       <variable initial_value="310" name="T" public_interface="out" units="kelvin"/>
       <variable initial_value="96485.3415" name="F" public_interface="out" units="coulomb_per_mole"/>
@@ -4066,7 +4072,7 @@ Improved guinea-pig ventricular cell model incorporating a diadic space, IKr and
   </rdf:Description>
   <rdf:Description rdf:about="rdf:#ac7c954d-33c2-42b6-9319-38b1df9471a9">
     <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:resource="rdf:#8a68918c-0021-4c09-9fa8-94d28af6a487"/>
-    <rdf:value>This file is a CellML description of Noble, Carghese, Kohl and Noble's 1998 extension of their 1991 guinea pig ventricular cell model. This model incorporates a diadic space, IKr and IKs currents, and length and tension dependent processes. Variant 1 is parameterised for the 'basic' model. 
+    <rdf:value>This file is a CellML description of Noble, Carghese, Kohl and Noble's 1998 extension of their 1991 guinea pig ventricular cell model. This model incorporates a diadic space, IKr and IKs currents, and length and tension dependent processes. Variant 1 is parameterised for the 'basic' model.
 To simulate multiple action potentials with this model the following integrator parameters must be used: max step size must be 0.001 or less, max point density must be 10,000 or more.</rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="rdf:#3418fe8f-f36b-48f4-b085-b60d8cff83f3">

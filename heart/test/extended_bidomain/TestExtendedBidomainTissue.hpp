@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -248,7 +248,7 @@ public:
     }
 
     /**This test checks heterogeneous conductivities*/
-    void TestExtendedTissueHeterogeneous3D() throw (Exception)
+    void TestExtendedTissueHeterogeneous3D()
     {
         HeartConfig::Instance()->Reset();
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
@@ -323,7 +323,7 @@ public:
 
     }
 
-    void TestExtendedTissueHeterogeneousConductivities2D() throw (Exception)
+    void TestExtendedTissueHeterogeneousConductivities2D()
     {
         HeartConfig::Instance()->Reset();
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -402,7 +402,7 @@ public:
         TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetExtracellularConductivityTensor(3u)(0,0),65.0);//within no cuboid
     }
 
-    void TestExtendedTissueHeterogeneousGgap3D() throw (Exception)
+    void TestExtendedTissueHeterogeneousGgap3D()
     {
         HeartConfig::Instance()->Reset();
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
@@ -478,7 +478,7 @@ public:
         PetscTools::Destroy(vector);
     }
 
-    void TestExtendedBidomainTissueParameters() throw (Exception)
+    void TestExtendedBidomainTissueParameters()
     {
         HeartConfig::Instance()->Reset();
 
@@ -522,7 +522,7 @@ public:
      * It creates one, changes the default values of some member variables and saves.
      * Then it tries to load from the archive and checks that the member variables are with the right values.
      */
-    void TestSaveAndLoadExtendedBidomainTissue() throw (Exception)
+    void TestSaveAndLoadExtendedBidomainTissue()
     {
         HeartConfig::Instance()->Reset();
         // Archive settings
@@ -544,7 +544,14 @@ public:
             HeartConfig::Instance()->SetMeshFileName("mesh/test/data/cube_136_elements");
 
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
+#ifndef CHASTE_SCOTCH_PARMETIS
             DistributedTetrahedralMesh<3,3> mesh;
+#else
+            // For libscotchparmetis turn off smart partitioning
+            // PT-Scotch will produce good partitions but it cannot be forced to always
+            // give the same partition of the same mesh twice running.
+            DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+#endif
             mesh.ConstructFromMeshReader(mesh_reader);
 
             UnStimulatedCellFactory first_cell;
@@ -648,7 +655,14 @@ public:
             // Also, when testing in parallel, we use it to get the vector factory to loop over the nodes we own.
             // this is because  p_extended_tissue->pGetMesh()->GetDistributedVectorFactory() doesn't compile (discards qualifier stuff caused by use of const).
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
+#ifndef CHASTE_SCOTCH_PARMETIS
             DistributedTetrahedralMesh<3,3> mesh;
+#else
+            // For libscotchparmetis turn off smart partitioning
+            // PT-Scotch will produce good partitions but it cannot be forced to always
+            // give the same partition of the same mesh twice running.
+            DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+#endif
             mesh.ConstructFromMeshReader(mesh_reader);
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), p_extended_tissue->pGetMesh()->GetNumNodes());//note: this is allowed because GetNumNodes has const in the signature

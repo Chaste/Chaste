@@ -3,7 +3,7 @@
 # Chaste template script
 # Use this template to create a script for running tests on supercomputers
 #  * First edit this file to suit your system and job scheduler
-#  * Then compile on the head node with this command: "scons offline_mode=1 <list of tests>"
+#  * Then compile on the head node
 
 # EDIT HERE - commands for the scheduler
 # Here is an example to run in the current directory (works on GridEngine)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,7 +73,7 @@ public:
     {
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 9 cells in the central nodes
         std::vector<unsigned> location_indices;
@@ -153,7 +153,7 @@ public:
     {
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 25 cells, one for each node
         std::vector<unsigned> location_indices;
@@ -193,7 +193,7 @@ public:
             "Cells reaching the boundary of the domain. Make the Potts mesh larger.");
     }
 
-    void TestArchivingShovingCaBasedDivisionRule() throw (Exception)
+    void TestArchivingShovingCaBasedDivisionRule()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -208,6 +208,7 @@ public:
             // Serialize via pointer to most abstract class possible
             AbstractCaBasedDivisionRule<2>* const p_division_rule = &division_rule;
             output_arch << p_division_rule;
+            ofs.close();
         }
 
         {
@@ -219,6 +220,7 @@ public:
 
             // Restore from the archive
             input_arch >> p_division_rule;
+            ifs.close();
 
             TS_ASSERT(p_division_rule != NULL);
 
@@ -236,7 +238,7 @@ public:
     {
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 4, 0, 0,1,0,0,false, true); // Periodic in x
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 6 cells in the bottom 2 rows
         std::vector<unsigned> location_indices;
@@ -343,7 +345,7 @@ public:
     {
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0, 1, 0, 0, false, true); // x periodic
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 9 cells, one for each node
         std::vector<unsigned> location_indices;
@@ -383,7 +385,7 @@ public:
             "Cells reaching the top of the crypt need to increase length to at least double the sloughing height.");
     }
 
-    void TestArchivingCryptShovingCaBasedDivisionRule() throw (Exception)
+    void TestArchivingCryptShovingCaBasedDivisionRule()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -398,6 +400,7 @@ public:
             // Serialize via pointer to most abstract class possible
             AbstractCaBasedDivisionRule<2>* const p_division_rule = &division_rule;
             output_arch << p_division_rule;
+            ofs.close();
         }
 
         {
@@ -409,6 +412,7 @@ public:
 
             // Restore from the archive
             input_arch >> p_division_rule;
+            ifs.close();
 
             TS_ASSERT(p_division_rule != NULL);
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** Definition of partition types.
  * "DUMB" is using natural mesh ordering with PETSC_DECIDE.
  * "PARMETIS_LIBRARY" is a call to the parallel parMETIS library
- * "METIS_LIBRARY" used to be a call to the sequential METIS library.  (Now deprecated in favour of a drop through call to parMETIS.)
+ * "METIS_LIBRARY" used to be a call to the sequential METIS library.  NOW DEPRECATED,
  * "PETSC_MAT_PARTITION" is a call to parMETIS (or whatever) via PETSc functionality.  This is not always available on a given installation.
  * "GEOMETRIC" requires user to define which region of space is owned by each process.
  */
@@ -49,8 +49,8 @@ struct DistributedTetrahedralMeshPartitionType
     typedef enum
     {
         DUMB=0,
-        PARMETIS_LIBRARY=1,  // Deprecated
-        METIS_LIBRARY=2,
+        PARMETIS_LIBRARY=1,
+        METIS_LIBRARY=2,  // Deprecated
         PETSC_MAT_PARTITION=3,
         GEOMETRIC=4
     } type;

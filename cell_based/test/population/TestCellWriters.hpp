@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,45 +43,59 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
-#include "FileComparison.hpp"
-#include "Cell.hpp"
-#include "WildTypeCellMutationState.hpp"
-#include "BetaCateninOneHitCellMutationState.hpp"
-#include "UniformG1GenerationalCellCycleModel.hpp"
-#include "StemCellProliferativeType.hpp"
-#include "FixedG1GenerationalCellCycleModel.hpp"
-#include "TysonNovakCellCycleModel.hpp"
-#include "DeltaNotchSrnModel.hpp"
-#include "BackwardEulerIvpOdeSolver.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "CaBasedCellPopulation.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "MutableVertexMesh.hpp"
-#include "CellsGenerator.hpp"
-#include "PottsMeshGenerator.hpp"
-#include "CellAncestor.hpp"
-#include "SimulationTime.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "BackwardEulerIvpOdeSolver.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
+#include "CaBasedCellPopulation.hpp"
+#include "Cell.hpp"
+#include "CellAncestor.hpp"
 #include "CellLabel.hpp"
+#include "CellsGenerator.hpp"
+#include "CellsGenerator.hpp"
+#include "DeltaNotchSrnModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "FileComparison.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryMesh.hpp"
+#include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
+#include "MutableVertexMesh.hpp"
+#include "NoCellCycleModel.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "PottsMeshGenerator.hpp"
+#include "SimulationTime.hpp"
 #include "SmartPointers.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TysonNovakCellCycleModel.hpp"
+#include "UblasCustomFunctions.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
+#include "VertexBasedCellPopulation.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
-#include "CellDeltaNotchWriter.hpp"
+#include "CellAppliedForceWriter.hpp"
+#include "CellCycleModelProteinConcentrationsWriter.hpp"
 #include "CellDataItemWriter.hpp"
+#include "CellDeltaNotchWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "CellLabelWriter.hpp"
 #include "CellLocationIndexWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
-#include "CellCycleModelProteinConcentrationsWriter.hpp"
-#include "CellVolumesWriter.hpp"
-#include "CellRosetteRankWriter.hpp"
+#include "LegacyCellProliferativeTypesWriter.hpp"
 #include "CellRadiusWriter.hpp"
+#include "CellRosetteRankWriter.hpp"
+#include "CellVolumesWriter.hpp"
+#include "ImmersedBoundaryNeighbourNumberWriter.hpp"
+#include "ImmersedBoundaryBoundaryCellWriter.hpp"
+
+// Boost
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -92,7 +106,7 @@ class TestCellWriters : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellAgesWriter() throw (Exception)
+    void TestCellAgesWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -169,7 +183,7 @@ public:
         }
     }
 
-    void TestCellAgesWriterArchiving() throw (Exception)
+    void TestCellAgesWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -198,7 +212,7 @@ public:
         }
     }
 
-    void TestCellAncestorWriter() throw (Exception)
+    void TestCellAncestorWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -265,7 +279,7 @@ public:
         }
     }
 
-    void TestCellAncestorWriterArchiving() throw (Exception)
+    void TestCellAncestorWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -294,7 +308,7 @@ public:
         }
     }
 
-    void TestCellDeltaNotchWriter() throw (Exception)
+    void TestCellDeltaNotchWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -303,7 +317,7 @@ public:
 
         // Create a regular vertex mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create some cells, each with a cell-cycle model that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
@@ -360,7 +374,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell delta");
     }
 
-    void TestCellDeltaNotchWriterArchiving() throw (Exception)
+    void TestCellDeltaNotchWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -389,7 +403,7 @@ public:
         }
     }
 
-    void TestCellDataItemWriter() throw (Exception)
+    void TestCellDataItemWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -398,7 +412,7 @@ public:
 
         // Create a regular vertex mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create some cells
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
@@ -446,7 +460,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "CellData test_variable");
     }
 
-    void TestCellDataItemWriterArchiving() throw (Exception)
+    void TestCellDataItemWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -482,7 +496,7 @@ public:
         }
     }
 
-    void TestCellIdWriter() throw (Exception)
+    void TestCellIdWriter()
     {
 
         EXIT_IF_PARALLEL;
@@ -554,7 +568,7 @@ public:
         }
     }
 
-    void TestCellIdWriterArchiving() throw (Exception)
+    void TestCellIdWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -583,7 +597,7 @@ public:
         }
     }
 
-    void TestCellLabelWriter() throw (Exception)
+    void TestCellLabelWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -648,7 +662,7 @@ public:
         }
     }
 
-    void TestCellLabelWriterArchiving() throw (Exception)
+    void TestCellLabelWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -677,13 +691,13 @@ public:
         }
     }
 
-    void TestCellLocationIndexWriter() throw (Exception)
+    void TestCellLocationIndexWriter()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple CA-based cell population
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -727,7 +741,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Location indices");
     }
 
-    void TestCellLocationIndexWriterArchiving() throw (Exception)
+    void TestCellLocationIndexWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -756,7 +770,7 @@ public:
         }
     }
 
-    void TestCellMutationStatesWriter() throw (Exception)
+    void TestCellMutationStatesWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -826,7 +840,7 @@ public:
         }
     }
 
-    void TestCellMutationStatesWriterArchiving() throw (Exception)
+    void TestCellMutationStatesWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -855,7 +869,7 @@ public:
         }
     }
 
-    void TestCellProliferativePhasesWriter() throw (Exception)
+    void TestCellProliferativePhasesWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -919,7 +933,7 @@ public:
         }
     }
 
-    void TestCellProliferativePhasesWriterArchiving() throw (Exception)
+    void TestCellProliferativePhasesWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -948,7 +962,7 @@ public:
         }
     }
 
-    void TestCellProliferativeTypesWriter() throw (Exception)
+    void TestCellProliferativeTypesWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1011,14 +1025,14 @@ public:
         cell_writer.CloseFile();
 
         // Test that the data are output correctly
-        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestCellWriters/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "results.vizprolifcelltypes", "cell_based/test/data/TestCellWriters/results.vizprolifcelltypes").CompareFiles();
 
         // Test the correct data are returned for VTK output for the first cell
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
-        TS_ASSERT_DELTA(vtk_data, 5.0, 1e-6);
+        TS_ASSERT_DELTA(vtk_data, 0.0, 1e-6);
 
         // Test GetVtkCellDataName() method
-        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell types");
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Prolif Cell types");
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
@@ -1027,7 +1041,8 @@ public:
         }
     }
 
-    void TestCellProliferativeTypesWriterArchiving() throw (Exception)
+
+    void TestCellProliferativeTypesWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1056,7 +1071,118 @@ public:
         }
     }
 
-    void TestCellCycleModelProteinConcentrationsWriter() throw (Exception)
+
+    void TestLegacyCellProliferativeTypesWriter()
+    {
+        EXIT_IF_PARALLEL;
+
+        // Set up SimulationTime (this is usually done by a simulation object)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(25, 2);
+
+        // Create a simple node-based cell population
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false,  1.4));
+        nodes.push_back(new Node<2>(1, false,  2.3));
+        nodes.push_back(new Node<2>(2, false, -6.1));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_mutant_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+
+        std::vector<CellPtr> cells;
+        for (unsigned i=0; i<2; i++)
+        {
+            FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
+            CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
+            p_cell->SetCellProliferativeType(p_type);
+            p_cell->SetBirthTime(-0.7 - i*0.5);
+            cells.push_back(p_cell);
+        }
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
+        CellPtr p_cell(new Cell(p_mutant_state, p_cell_model));
+        p_cell->SetCellProliferativeType(p_type);
+        p_cell->SetBirthTime(-0.1);
+        cells.push_back(p_cell);
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // For coverage of GetCellDataForVtkOutput() label a cell and set a cell to be apoptotic
+        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        cell_iter->AddCellProperty(p_label);
+        ++cell_iter;
+        cell_iter->AddCellProperty(p_apoptotic_state);
+
+        // Create output directory
+        std::string output_directory = "TestLegacyCellProliferativeTypesWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create cell writer and output data for each cell to file
+        LegacyCellProliferativeTypesWriter<2,2> cell_writer;
+        cell_writer.OpenOutputFile(output_file_handler);
+        cell_writer.WriteTimeStamp();
+        for (AbstractCellPopulation<2>::Iterator other_cell_iter = cell_population.Begin();
+             other_cell_iter != cell_population.End();
+             ++other_cell_iter)
+        {
+            cell_writer.VisitCell(*other_cell_iter, &cell_population);
+        }
+        cell_writer.CloseFile();
+
+        // Test that the data are output correctly
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestCellWriters/results.vizcelltypes").CompareFiles();
+
+        // Test the correct data are returned for VTK output for the first cell Note as this is labeled the legacy writer will overwrite the cell ptoliferative type.
+        double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        TS_ASSERT_DELTA(vtk_data, 5.0, 1e-6);
+
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Legacy Cell types");
+
+        // Avoid memory leak
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+
+    void TestLegacyCellProliferativeTypesWriterArchiving()
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "LegacyCellProliferativeTypesWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new LegacyCellProliferativeTypesWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+        }
+    }
+
+
+    void TestCellCycleModelProteinConcentrationsWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1125,7 +1251,7 @@ public:
         }
     }
 
-    void TestCellCycleModelProteinConcentrationsWriterException() throw (Exception)
+    void TestCellCycleModelProteinConcentrationsWriterException()
     {
         EXIT_IF_PARALLEL;
 
@@ -1175,7 +1301,7 @@ public:
         }
     }
 
-    void TestCellCycleModelProteinConcentrationsWriterArchiving() throw (Exception)
+    void TestCellCycleModelProteinConcentrationsWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1204,7 +1330,7 @@ public:
        }
     }
 
-    void TestCellVolumesWriter() throw (Exception)
+    void TestCellVolumesWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1213,7 +1339,7 @@ public:
 
         // Create a simple vertex-based cell population
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
@@ -1250,7 +1376,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell volumes");
     }
 
-    void TestCellVolumesWriterArchiving() throw (Exception)
+    void TestCellVolumesWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1279,7 +1405,7 @@ public:
         }
     }
 
-    void TestCellRosetteRankWriter() throw (Exception)
+    void TestCellRosetteRankWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1292,7 +1418,7 @@ public:
 
             // Create a simple vertex-based cell population
             HoneycombVertexMeshGenerator generator(4, 6);
-            MutableVertexMesh<2, 2> *p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             boost::shared_ptr<AbstractCellProperty> p_diff_type(
@@ -1337,7 +1463,7 @@ public:
         {
             // Create a simple CA-based cell population
             PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-            PottsMesh<2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1372,7 +1498,7 @@ public:
         }
     }
 
-    void TestCellRosetteRankWriterArchiving() throw (Exception)
+    void TestCellRosetteRankWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1401,7 +1527,7 @@ public:
         }
     }
 
-    void TestCellRadiusWriter() throw (Exception)
+    void TestCellRadiusWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1465,7 +1591,7 @@ public:
         }
     }
 
-    void TestCellRadiusWriterArchiving() throw (Exception)
+    void TestCellRadiusWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1492,6 +1618,294 @@ public:
 
             delete p_cell_writer_2;
        }
+    }
+
+    void TestCellAppliedForceWriter()
+    {
+        EXIT_IF_PARALLEL;
+
+        // Set up SimulationTime (this is usually done by a simulation object)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(25, 2);
+
+        // Create a simple node-based cell population
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0u));
+        nodes.push_back(new Node<2>(1u));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Add an applied force to the nodes
+        c_vector<double, 2> force_0 = Create_c_vector(1.23, 2.34);
+        c_vector<double, 2> force_1 = Create_c_vector(3.45, 4.56);
+        mesh.GetNode(0u)->AddAppliedForceContribution(force_0);
+        mesh.GetNode(1u)->AddAppliedForceContribution(force_1);
+
+        // Create output directory
+        std::string output_directory = "TestCellAppliedForceWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create cell writer and output data for each cell to file
+        CellAppliedForceWriter<2,2> cell_writer;
+        cell_writer.OpenOutputFile(output_file_handler);
+        cell_writer.WriteTimeStamp();
+        for (auto cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
+        {
+            cell_writer.VisitCell(*cell_iter, &cell_population);
+        }
+        cell_writer.CloseFile();
+
+        // Test that the data are output correctly
+        FileComparison(results_dir + "cellappliedforce.dat", "cell_based/test/data/TestCellWriters/cellappliedforce.dat").CompareFiles();
+
+        // Test the correct data are returned for VTK vector output for the first cell
+        c_vector<double, 2> vtk_data_0 = cell_writer.GetVectorCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        c_vector<double, 2> vtk_data_1 = cell_writer.GetVectorCellDataForVtkOutput(*(++cell_population.Begin()), &cell_population);
+
+        TS_ASSERT_DELTA(vtk_data_0[0], 1.23, 1e-6);
+        TS_ASSERT_DELTA(vtk_data_0[1], 2.34, 1e-6);
+        TS_ASSERT_DELTA(vtk_data_1[0], 3.45, 1e-6);
+        TS_ASSERT_DELTA(vtk_data_1[1], 4.56, 1e-6);
+
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkVectorCellDataName(), "Cell applied force");
+
+        cell_writer.SetVtkVectorCellDataName("New name");
+        TS_ASSERT_EQUALS(cell_writer.GetVtkVectorCellDataName(), "New name");
+
+        // Avoid memory leak
+        for (auto& p_node : nodes)
+        {
+            delete p_node;
+        }
+    }
+
+    void TestCellAppliedForceWriterArchiving()
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellRadiusWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellAppliedForceWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+        PetscTools::Barrier(); // Processes read after last process has (over-)written archive
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+        }
+    }
+
+    void TestDefaultVecBehaviourWhenWritingScalars()
+    {
+        // We test here that a writer designed to only output scalar data has the correct default behaviour for
+        // outputting vectors
+        EXIT_IF_PARALLEL;
+
+        CellRadiusWriter<2,2> cell_writer;
+
+        TS_ASSERT_EQUALS(cell_writer.GetVtkVectorCellDataName(), "DefaultVtkVectorCellDataName");
+        TS_ASSERT(cell_writer.GetOutputScalarData());
+        TS_ASSERT(!cell_writer.GetOutputVectorData());
+
+        // Create a simple node-based cell population
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0u));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        c_vector<double, 2> vec_data = cell_writer.GetVectorCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        for (auto& component : vec_data)
+        {
+            TS_ASSERT_EQUALS(component, DOUBLE_UNSET);
+        }
+
+        // Avoid memory leak
+        for (auto& p_node : nodes)
+        {
+            delete p_node;
+        }
+    }
+
+    void TestDefaultScalarBehaviourWhenWritingVectors()
+    {
+        // We test here that a writer designed to only output vector data has the correct default behaviour for
+        // outputting scalars
+        EXIT_IF_PARALLEL;
+
+        CellAppliedForceWriter<2,2> cell_writer;
+
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "DefaultVtkCellDataName");
+        TS_ASSERT(!cell_writer.GetOutputScalarData());
+        TS_ASSERT(cell_writer.GetOutputVectorData());
+
+        // Create a simple node-based cell population
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0u));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        double scalar_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        TS_ASSERT_EQUALS(scalar_data, DOUBLE_UNSET);
+
+        // Avoid memory leak
+        for (auto& p_node : nodes)
+        {
+            delete p_node;
+        }
+    }
+
+    void TestImmersedBoundaryCellWriter()
+    {
+        EXIT_IF_PARALLEL;
+        ImmersedBoundaryBoundaryCellWriter<2, 2> writer;
+
+        // Create an immersed boundary cell population object
+        ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 5, 0.05, 0.15);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestCellWriters";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        writer.OpenOutputFile(output_file_handler);
+        writer.WriteTimeStamp();
+        writer.VisitCell(ib_cell_population.rGetCells().front(), &ib_cell_population);
+        writer.WriteNewline();
+        writer.CloseFile();
+
+        FileComparison(results_dir + "ib_boundarycell.dat", "cell_based/test/data/TestCellWriters/ib_boundarycell.dat").CompareFiles();
+    }
+
+    void TestImmersedBoundaryCellWriterArchiving()
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryCellWriterArchive.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new ImmersedBoundaryBoundaryCellWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+        }
+    }
+
+    void TestImmersedBoundaryNeighbourNumberWriter()
+    {
+        EXIT_IF_PARALLEL;
+        ImmersedBoundaryNeighbourNumberWriter<2, 2> writer;
+
+        // Create an immersed boundary cell population object
+        ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 5, 0.05, 0.15);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestCellWriters";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        writer.OpenOutputFile(output_file_handler);
+        writer.WriteTimeStamp();
+        writer.VisitCell(ib_cell_population.rGetCells().front(), &ib_cell_population);
+        writer.WriteNewline();
+        writer.CloseFile();
+
+        FileComparison(results_dir + "ib_neighbournumber.dat", "cell_based/test/data/TestCellWriters/ib_neighbournumber.dat").CompareFiles();
+    }
+
+    void TestImmersedBoundaryNeighbourNumberWriterArchiving()
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryNeighbourNumberWriterArchive.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new ImmersedBoundaryNeighbourNumberWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+        }
     }
 };
 

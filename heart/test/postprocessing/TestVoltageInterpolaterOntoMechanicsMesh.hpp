@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ private :
     }
 public:
 
-    void TestWith1dData(void) throw (Exception)
+    void TestWith1dData(void)
     {
         // firstly, copy ./heart/test/data/MonoDg01d/*.h5 to CHASTE_TEST_OUTPUT/TestVoltageInterpolater1d,
         // as that is where the interpolater reads and writes to
@@ -80,11 +80,8 @@ public:
         std::vector<std::string> variable_names;
         variable_names.push_back("V");
 
-        VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh,
-                                                             mech_mesh,
-                                                             variable_names,
-                                                             "TestVoltageInterpolater1d",
-                                                             "MonodomainLR91_1d");
+        VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh, mech_mesh);
+        interpolater.OutputToCmgui(variable_names,"TestVoltageInterpolater1d","MonodomainLR91_1d");
 
         Hdf5DataReader fine_reader("TestVoltageInterpolater1d","MonodomainLR91_1d");
         DistributedVectorFactory factory1(mesh.GetNumNodes());
@@ -132,7 +129,7 @@ public:
     }
 
     // the data in this test came from TestCardiacElectroMechanicsProblem::TestImplicitNhs2dOneMechanicsElement()
-    void TestWith2dData(void) throw (Exception)
+    void TestWith2dData(void)
     {
         // firstly, copy .h5 file to CHASTE_TEST_OUTPUT/TestVoltageInterpolater2d,
         // as that is where the interpolater reads and writes to
@@ -147,12 +144,8 @@ public:
 
         std::vector<std::string> variable_names;
         variable_names.push_back("V");
-        VoltageInterpolaterOntoMechanicsMesh<2> interpolater(mesh,
-                                                             mech_mesh,
-                                                             variable_names,
-                                                             "TestVoltageInterpolater2d",
-                                                             "Monodomain2d");
-
+        VoltageInterpolaterOntoMechanicsMesh<2> interpolater(mesh,mech_mesh);
+        interpolater.OutputToCmgui(variable_names,"TestVoltageInterpolater2d","Monodomain2d");
 
         Hdf5DataReader fine_reader("TestVoltageInterpolater2d","Monodomain2d");
         DistributedVectorFactory factory1(mesh.GetNumNodes());
@@ -177,7 +170,7 @@ public:
         PetscTools::Destroy(voltage_fine);
     }
 
-    void TestWithMultipleVariables1D() throw (Exception)
+    void TestWithMultipleVariables1D()
     {
         // firstly, copy .h5 file to CHASTE_TEST_OUTPUT/TestWithMultipleVariables1D,
         // as that is where the interpolater reads and writes to
@@ -196,11 +189,8 @@ public:
         std::vector<std::string> variable_names;
         variable_names.push_back("V");
         variable_names.push_back("Phi_e");
-        VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh,
-                                                             mech_mesh,
-                                                             variable_names,
-                                                             "TestWithMultipleVariables1D",
-                                                             "1D_0_to_1_100_elements");
+        VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh,mech_mesh);
+        interpolater.OutputToCmgui(variable_names,"TestWithMultipleVariables1D","1D_0_to_1_100_elements");
 
 
         Hdf5DataReader fine_reader("TestWithMultipleVariables1D","1D_0_to_1_100_elements");

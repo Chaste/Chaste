@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,36 +39,70 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <string>
 #include "UblasIncludes.hpp"
+#include "ReplicatableVector.hpp"
 #include "TetrahedralMesh.hpp"
 #include "QuadraticMesh.hpp"
+#include "FineCoarseMeshPair.hpp"
 
 /**
- *  Very simple one-method class which can be used to convert the voltage from an electrics
+ *  A class which can be used to convert the voltage from an electrics
  *  (or electromechanics) simulation onto a coarser mechanics mesh, by interpolation. The
- *  class outputs a HDF5 file corresponding to nodes on the mechanics mesh, and converts it to
- *  CMGUI output.
+ *  class provides a method to interpolate values from the fine mesh
+ *  onto the coarse mesh and the main method to output a HDF5 file corresponding to nodes
+ *  on the mechanics mesh, and convert it to CMGUI output.
  */
 template<unsigned DIM>
 class VoltageInterpolaterOntoMechanicsMesh
 {
 
+private:
+
+    /** The fine mesh (values will be interpolated from this one)*/
+    TetrahedralMesh<DIM,DIM>& mrElectricsMesh;
+    /** The coarse mesh (values will be interpolated onto this one)*/
+    QuadraticMesh<DIM>& mrMechanicsMesh;
+    /** Mesh pair object. Initialized by the constructor using the two meshes passed in*/
+    FineCoarseMeshPair<DIM>* mpMeshPair;
+
 public:
     /**
-     *  Constructor, also the main method of the class
+     *  Constructor. Sets up the Mesh Pair object used for the interpolation later.
      *
      *  @param rElectricsMesh The electrics mesh
      *  @param rMechanicsMesh The mechanics mesh
+     */
+    VoltageInterpolaterOntoMechanicsMesh(TetrahedralMesh<DIM,DIM>& rElectricsMesh,
+                                         QuadraticMesh<DIM>& rMechanicsMesh);
+
+    /**
+     * Destructor.
+     */
+    ~VoltageInterpolaterOntoMechanicsMesh();
+
+    /**
+     * Does the actual interpolation.
+     *
+     * @param rValuesOnCoarseMesh It will be filled with the interpolated values. Memory must
+     *                            have been allocated before (this method checks): the vector must be of
+     *                            the same size as the number of nodes of the coarser mesh
+     * @param rValuesOnFineMesh The values on the fine mesh to be interpolated onto the coarser mesh
+     */
+    void InterpolateOnCoarseMesh(std::vector<double>& rValuesOnCoarseMesh, ReplicatableVector& rValuesOnFineMesh);
+
+
+    /**
+     * The main method of the class. It reads the h5 files in directory (filename prefix inputFileNamePrefix)
+     * It then considers all the variables whose name is specified in rVariableNames, does
+     * the interplation using  InterpolateOnCoarseMesh, and creates output for all the variables over
+     * all the time steps included in the h5 file. It does so by first writing out to h5
+     * and then converting to CMGUI.
+     *
      *  @param rVariableNames vector of names of variables contained in the input h5 file and
      *                        that you want to be interpolated.
      *  @param directory Directory the voltage file is in
      *  @param inputFileNamePrefix Filename (without ".h5") of the electrics solution HDF5 file
-     *
      */
-    VoltageInterpolaterOntoMechanicsMesh(TetrahedralMesh<DIM,DIM>& rElectricsMesh,
-                                         QuadraticMesh<DIM>& rMechanicsMesh,
-                                         std::vector<std::string>& rVariableNames,
-                                         std::string directory,
-                                         std::string inputFileNamePrefix);
+    void OutputToCmgui(std::vector<std::string>& rVariableNames, std::string directory, std::string inputFileNamePrefix);
 };
 
 #endif /*VOLTAGEINTERPOLATERONTOMECHANICSMESH_HPP_*/

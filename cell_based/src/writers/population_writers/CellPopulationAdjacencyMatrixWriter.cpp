@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 
 #include "CellLabel.hpp"
 
@@ -70,7 +71,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
         local_cell_id_location_index_map[pCellPopulation->GetLocationIndexUsingCell(*cell_iter)] = local_cell_id;
         local_cell_id++;
     }
-    assert(local_cell_id = num_cells+1);
+    assert(local_cell_id == num_cells);
 
     // Iterate over cells and calculate the adjacency matrix (stored as a long vector)
     std::vector<double> adjacency_matrix(num_cells*num_cells);
@@ -154,7 +155,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBase
         local_cell_id_location_index_map[pCellPopulation->GetLocationIndexUsingCell(*cell_iter)] = local_cell_id;
         local_cell_id++;
     }
-    assert(local_cell_id = num_cells+1);
+    assert(local_cell_id == num_cells);
 
     // Iterate over cells and calculate the adjacency matrix (stored as a long vector)
     std::vector<double> adjacency_matrix(num_cells*num_cells);
@@ -237,6 +238,12 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBas
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    VisitAnyPopulation(pCellPopulation);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }

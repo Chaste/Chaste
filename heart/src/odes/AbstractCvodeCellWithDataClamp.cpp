@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -84,7 +84,7 @@ double AbstractCvodeCellWithDataClamp::GetExperimentalVoltageAtTimeT(const doubl
     }
 
     std::vector<double>::iterator upper_vec =
-    		std::upper_bound(mExperimentalTimes.begin(), mExperimentalTimes.end(), rTime);
+            std::upper_bound(mExperimentalTimes.begin(), mExperimentalTimes.end(), rTime);
     // upper_vec points to first element that is (strictly) > rTime (so it can't be first one if rTime is in range)
 
     // Special case - here the lower bound is equal to upper bound and both are pointing to end!
@@ -99,9 +99,9 @@ double AbstractCvodeCellWithDataClamp::GetExperimentalVoltageAtTimeT(const doubl
     // if this assert ever fails we may need the code below, but I can't see how it could!
 //    if (upper_index == 0u)
 //    {
-//    	// Special case - here the lower bound is equal to upper bound and no interpolation needed
-//    	return mExperimentalVoltages[0];
-//	}
+//        // Special case - here the lower bound is equal to upper bound and no interpolation needed
+//        return mExperimentalVoltages[0];
+//    }
 
     double lower_time = mExperimentalTimes[upper_index-1];
     double increment = rTime - lower_time;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,12 +34,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PetscTools.hpp"
-#include "Exception.hpp"
-#include "Warnings.hpp"
-#include <iostream>
-#include <sstream>
 #include <cassert>
 #include <cstring> // For strcmp etc. Needed in gcc-4.3
+#include <iostream>
+#include <sstream>
+#include "Exception.hpp"
+#include "Warnings.hpp"
 
 bool PetscTools::mPetscIsInitialised = false;
 unsigned PetscTools::mNumProcessors = 0;
@@ -65,11 +65,11 @@ void PetscTools::ResetCache()
 
         PetscInt num_procs;
         MPI_Comm_size(PETSC_COMM_WORLD, &num_procs);
-        mNumProcessors = (unsigned) num_procs;
+        mNumProcessors = (unsigned)num_procs;
 
         PetscInt my_rank;
         MPI_Comm_rank(PETSC_COMM_WORLD, &my_rank);
-        mRank = (unsigned) my_rank;
+        mRank = (unsigned)my_rank;
     }
     else
     {
@@ -138,11 +138,15 @@ void PetscTools::Barrier(const std::string callerId)
     {
 #ifdef DEBUG_BARRIERS
         // "Before" is alphabetically before "Post" so that one can sort the output on process/event/barrier
-        std::cout << "DEBUG: proc " << PetscTools::GetMyRank() << ": Before " << "Barrier " << mNumBarriers << " \""<< callerId <<  "\"." << std::endl << std::flush;
+        std::cout << "DEBUG: proc " << PetscTools::GetMyRank() << ": Before "
+                  << "Barrier " << mNumBarriers << " \"" << callerId << "\"." << std::endl
+                  << std::flush;
 #endif
-        PetscBarrier(PETSC_NULL);
+        PetscBarrier(CHASTE_PETSC_NULLPTR);
 #ifdef DEBUG_BARRIERS
-        std::cout << "DEBUG: proc " << PetscTools::GetMyRank() << ": Post " << "Barrier " << mNumBarriers++ << " \""<< callerId <<  "\"." << std::endl << std::flush;
+        std::cout << "DEBUG: proc " << PetscTools::GetMyRank() << ": Post "
+                  << "Barrier " << mNumBarriers++ << " \"" << callerId << "\"." << std::endl
+                  << std::flush;
 #endif
     }
 }
@@ -151,7 +155,7 @@ void PetscTools::BeginRoundRobin()
 {
     Barrier("PetscTools::RoundRobin"); // We want barriers both before all and after all, just in case
     const unsigned my_rank = GetMyRank();
-    for (unsigned turn=0; turn<my_rank; turn++)
+    for (unsigned turn = 0; turn < my_rank; turn++)
     {
         Barrier("PetscTools::RoundRobin");
     }
@@ -160,7 +164,7 @@ void PetscTools::BeginRoundRobin()
 void PetscTools::EndRoundRobin()
 {
     const unsigned num_procs = GetNumProcs();
-    for (unsigned turn=GetMyRank(); turn<num_procs; turn++)
+    for (unsigned turn = GetMyRank(); turn < num_procs; turn++)
     {
         Barrier("PetscTools::RoundRobin");
     }
@@ -186,7 +190,7 @@ MPI_Comm PetscTools::GetWorld()
 bool PetscTools::ReplicateBool(bool flag)
 {
     CheckCache();
-    unsigned my_flag = (unsigned) flag;
+    unsigned my_flag = (unsigned)flag;
     unsigned anyones_flag_is_true = my_flag;
     if (mPetscIsInitialised && !mIsolateProcesses)
     {
@@ -197,7 +201,7 @@ bool PetscTools::ReplicateBool(bool flag)
 
 void PetscTools::ReplicateException(bool flag)
 {
-    bool anyones_error=ReplicateBool(flag);
+    bool anyones_error = ReplicateBool(flag);
     if (flag)
     {
         // Return control to exception thrower
@@ -241,7 +245,7 @@ Vec PetscTools::CreateVec(std::vector<double> data)
     int lo, hi;
     VecGetOwnershipRange(ret, &lo, &hi);
 
-    for (int global_index=lo; global_index<hi; global_index++)
+    for (int global_index = lo; global_index < hi; global_index++)
     {
         int local_index = global_index - lo;
         p_ret[local_index] = data[global_index];
@@ -274,17 +278,17 @@ void PetscTools::SetupMat(Mat& rMat, int numRows, int numColumns,
 {
     assert(numRows > 0);
     assert(numColumns > 0);
-    if ((int) rowPreallocation>numColumns)
+    if ((int)rowPreallocation > numColumns)
     {
-        WARNING("Preallocation failure: requested number of nonzeros per row greater than number of columns");//+rowPreallocation+">"+numColumns);
+        WARNING("Preallocation failure: requested number of nonzeros per row greater than number of columns"); //+rowPreallocation+">"+numColumns);
         rowPreallocation = numColumns;
     }
 
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
-    MatCreate(PETSC_COMM_WORLD,numLocalRows,numLocalColumns,numRows,numColumns,&rMat);
+    MatCreate(PETSC_COMM_WORLD, numLocalRows, numLocalColumns, numRows, numColumns, &rMat);
 #else //New API
-    MatCreate(PETSC_COMM_WORLD,&rMat);
-    MatSetSizes(rMat,numLocalRows,numLocalColumns,numRows,numColumns);
+    MatCreate(PETSC_COMM_WORLD, &rMat);
+    MatSetSizes(rMat, numLocalRows, numLocalColumns, numRows, numColumns);
 #endif
 
     if (PetscTools::IsSequential())
@@ -292,7 +296,7 @@ void PetscTools::SetupMat(Mat& rMat, int numRows, int numColumns,
         MatSetType(rMat, MATSEQAIJ);
         if (rowPreallocation > 0)
         {
-            MatSeqAIJSetPreallocation(rMat, rowPreallocation, PETSC_NULL);
+            MatSeqAIJSetPreallocation(rMat, rowPreallocation, CHASTE_PETSC_NULLPTR);
         }
     }
     else
@@ -300,13 +304,13 @@ void PetscTools::SetupMat(Mat& rMat, int numRows, int numColumns,
         MatSetType(rMat, MATMPIAIJ);
         if (rowPreallocation > 0)
         {
-            MatMPIAIJSetPreallocation(rMat, rowPreallocation, PETSC_NULL, rowPreallocation, PETSC_NULL);
+            MatMPIAIJSetPreallocation(rMat, rowPreallocation, CHASTE_PETSC_NULLPTR, rowPreallocation, CHASTE_PETSC_NULLPTR);
         }
     }
 
     MatSetFromOptions(rMat);
 
-    if (ignoreOffProcEntries)//&& IsParallel())
+    if (ignoreOffProcEntries) //&& IsParallel())
     {
         if (rowPreallocation == 0)
         {
@@ -360,6 +364,36 @@ void PetscTools::DumpPetscObject(const Vec& rVec, const std::string& rOutputFile
 
 void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPath, Vec rParallelLayout)
 {
+
+#if PETSC_VERSION_GE(3, 11, 2) // PETSc 3.11.2 or newer
+    // All modern versions of PETSc allow us to directly read into a non-standard parallel layout
+    PetscViewer view;
+    PetscFileMode type = FILE_MODE_READ;
+    PetscViewerBinaryOpen(PETSC_COMM_WORLD, rOutputFileFullPath.c_str(),
+                          type, &view);
+
+    if (rParallelLayout != nullptr)
+    {
+        // Create an empty matrix with non-default parallel layout
+        PetscInt num_rows, num_local_rows;
+        VecGetSize(rParallelLayout, &num_rows);
+        VecGetLocalSize(rParallelLayout, &num_local_rows);
+        /// \todo: #1082 work out appropriate nz allocation.
+        PetscTools::SetupMat(rMat, num_rows, num_rows, 100, num_local_rows, num_local_rows, false);
+
+    }
+    else
+    {
+        // Create an empty matrix with default parallel layout
+        MatCreate(PETSC_COMM_WORLD, &rMat);
+        MatSetType(rMat, MATMPIAIJ);
+    }
+
+    // Read into parallel matrix
+    MatLoad(rMat, view);
+    PetscViewerDestroy(PETSC_DESTROY_PARAM(view));
+#else
+    // Code below is for unsupported versions of PETSc
     /*
      * PETSc (as of 3.1) doesn't provide any method for loading a Mat object with a user-defined parallel
      * layout, i.e. there's no equivalent to VecLoadIntoVector for Mat's.
@@ -378,16 +412,16 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
                           type, &view);
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    MatCreate(PETSC_COMM_WORLD,&rMat);
-    MatSetType(rMat,MATMPIAIJ);
-    MatLoad(rMat,view);
+    MatCreate(PETSC_COMM_WORLD, &rMat);
+    MatSetType(rMat, MATMPIAIJ);
+    MatLoad(rMat, view);
 #else
     MatLoad(view, MATMPIAIJ, &rMat);
 #endif
 
     PetscViewerDestroy(PETSC_DESTROY_PARAM(view));
 
-    if (rParallelLayout != NULL)
+    if (rParallelLayout != nullptr)
     {
         /*
          * The idea is to copy rMat into a matrix that has the appropriate
@@ -407,6 +441,7 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
         PetscTools::Destroy(rMat);
         rMat = temp_mat;
     }
+#endif
 }
 
 void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPath, Vec rParallelLayout)
@@ -420,12 +455,12 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
 
     PetscViewerBinaryOpen(PETSC_COMM_WORLD, rOutputFileFullPath.c_str(),
                           type, &view);
-    if (rParallelLayout == NULL)
+    if (rParallelLayout == nullptr)
     {
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-        VecCreate(PETSC_COMM_WORLD,&rVec);
-        VecSetType(rVec,VECMPI);
-        VecLoad(rVec,view);
+        VecCreate(PETSC_COMM_WORLD, &rVec);
+        VecSetType(rVec, VECMPI);
+        VecLoad(rVec, view);
 #else
         VecLoad(view, VECMPI, &rVec);
 #endif
@@ -434,7 +469,7 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
     {
         VecDuplicate(rParallelLayout, &rVec);
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-        VecLoad(rVec,view);
+        VecLoad(rVec, view);
 #else
         VecLoadIntoVector(view, rVec);
 #endif
@@ -455,15 +490,14 @@ bool PetscTools::HasParMetis()
     MatPartitioning part;
     MatPartitioningCreate(PETSC_COMM_WORLD, &part);
 
-
     // We are expecting an error from PETSC on systems that don't have the interface, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscPushErrorHandler(PetscReturnErrorHandler, nullptr);
 
 #if (PETSC_VERSION_MAJOR == 2 || (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2))
-    PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part,MAT_PARTITIONING_PARMETIS);
+    PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part, MAT_PARTITIONING_PARMETIS);
 #else
-    PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part,MATPARTITIONINGPARMETIS);
+    PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part, MATPARTITIONINGPARMETIS);
 #endif
 
     // Stop supressing error
@@ -475,7 +509,7 @@ bool PetscTools::HasParMetis()
 
     // Get out of jail free card for Windows where the latest configuration of the integration machine shows that our implementation doesn't work as expected.
 #ifdef _MSC_VER
-//\todo #2016 (or similar ticket).  The method NodePartitioner::PetscMatrixPartitioning is not working in parallel
+    //\todo #2016 (or similar ticket).  The method NodePartitioner::PetscMatrixPartitioning is not working in parallel
     if (parmetis_installed_error == 0)
     {
         WARN_ONCE_ONLY("The PETSc/parMETIS interface is correctly installed but does not yet work in Windows so matrix-based partitioning will be turned off.");

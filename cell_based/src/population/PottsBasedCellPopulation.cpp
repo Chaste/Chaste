@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -78,8 +78,8 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                                         bool validate,
                                                         const std::vector<unsigned> locationIndices)
     : AbstractOnLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh),
-      mpElementTessellation(NULL),
-      mpMutableMesh(NULL),
+      mpElementTessellation(nullptr),
+      mpMutableMesh(nullptr),
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
@@ -94,8 +94,8 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
 template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
     : AbstractOnLatticeCellPopulation<DIM>(rMesh),
-      mpElementTessellation(NULL),
-      mpMutableMesh(NULL),
+      mpElementTessellation(nullptr),
+      mpMutableMesh(nullptr),
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
@@ -105,7 +105,9 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
 template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::~PottsBasedCellPopulation()
 {
-    delete mpElementTessellation;
+    // This pointer is always null because PottsBasedCellPopulation::CreateElementTessellation
+    // is not implemented. See #1666 in the trac ticket archive for more information.
+    assert(mpElementTessellation == nullptr);
 
     delete mpMutableMesh;
 
@@ -391,6 +393,12 @@ template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
+}
+
+template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
+{
+    pPopulationEventWriter->Visit(this);
 }
 
 template<unsigned DIM>

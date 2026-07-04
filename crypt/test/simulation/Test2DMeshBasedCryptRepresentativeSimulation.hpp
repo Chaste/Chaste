@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/foreach.hpp>
 
 // Must be included before any other cell_based or crypt headers
 #include "CellBasedSimulationArchiver.hpp"
@@ -72,7 +71,7 @@ class Test2DCryptRepresentativeSimulation : public CxxTest::TestSuite
 {
 public:
 
-    void TestRepresentativeSimulationForProfiling() throw (Exception)
+    void TestRepresentativeSimulationForProfiling()
     {
         EXIT_IF_PARALLEL;
 
@@ -95,12 +94,12 @@ public:
         FileFinder test_data_directory("crypt/test/data/" + test_to_load +"/archive",RelativeTo::ChasteSourceRoot);
         TS_ASSERT(test_data_directory.IsDir());
 
-        // to the testoutput/archive directory to continue running the simulation
+        // to the $CHASTE_TEST_OUTPUT/archive directory to continue running the simulation
         OutputFileHandler archive_handler(test_to_profile + "/archive");
 
         // Following is done in two lines to avoid a bug in Intel compiler v12.0
         std::vector<FileFinder> temp_files = test_data_directory.FindMatches("*");
-        BOOST_FOREACH(FileFinder temp_file, temp_files)
+        for (FileFinder temp_file : temp_files)
         {
             archive_handler.CopyFileTo(temp_file);
         }

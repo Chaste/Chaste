@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,35 +34,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractCentreBasedCellPopulation.hpp"
+
 #include "RandomDirectionCentreBasedDivisionRule.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "StepSizeException.hpp"
 #include "WildTypeCellMutationState.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                                                                    std::vector<CellPtr>& rCells,
-                                                                  const std::vector<unsigned> locationIndices)
-    : AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh, rCells, locationIndices),
-      mMeinekeDivisionSeparation(0.3) // educated guess
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+                                                                                             std::vector<CellPtr>& rCells,
+                                                                                             const std::vector<unsigned> locationIndices)
+        : AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh, rCells, locationIndices),
+          mMeinekeDivisionSeparation(0.3) // educated guess
 {
     // If no location indices are specified, associate with nodes from the mesh.
     std::list<CellPtr>::iterator it = this->mCells.begin();
     typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = rMesh.GetNodeIteratorBegin();
 
-    for (unsigned i=0; it != this->mCells.end(); ++it, ++i, ++node_iter)
+    for (unsigned i = 0; it != this->mCells.end(); ++it, ++i, ++node_iter)
     {
         unsigned index = locationIndices.empty() ? node_iter->GetIndex() : locationIndices[i]; // assume that the ordering matches
-        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCellUsingLocationIndex(index,*it);
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCellUsingLocationIndex(index, *it);
     }
 
     mpCentreBasedDivisionRule.reset(new RandomDirectionCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>());
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
-    : AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh),
-      mMeinekeDivisionSeparation(0.3) // educated guess
+        : AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh),
+          mMeinekeDivisionSeparation(0.3) // educated guess
 {
 }
 
@@ -108,7 +109,16 @@ CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellP
 
     // Create a new node
     Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), daughter_position, false); // never on boundary
-    p_new_node->ClearAppliedForce(); // Incase velocity is ouptut on the same timestep as the cell has divided
+
+    // Clear the applied force on the new node, in case velocity is ouptut on the same timestep as this cell's division
+    p_new_node->ClearAppliedForce();
+
+    // Copy any node attributes from the parent node
+    if (this->GetNode(node_index)->HasNodeAttributes())
+    {
+        p_new_node->rGetNodeAttributes() = this->GetNode(node_index)->rGetNodeAttributes();
+    }
+
     unsigned new_node_index = this->AddNode(p_new_node); // use copy constructor so it doesn't matter that new_node goes out of scope
 
     // Update cells vector
@@ -186,7 +196,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt)
 {
     double length = norm_2(rDisplacement);
- 
+
     if ((length > this->mAbsoluteMovementThreshold) && (!this->IsGhostNode(nodeIndex)) && (!this->IsParticle(nodeIndex)))
     {
         std::ostringstream message;

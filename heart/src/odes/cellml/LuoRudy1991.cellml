@@ -53,7 +53,7 @@ The complete original paper reference is cited below:
 <para>
 <ulink url="http://circres.ahajournals.org/cgi/content/abstract/68/6/1501">A Model of the Ventricular Cardiac Action Potential - Depolarisation, Repolarisation and Their Interaction</ulink>, Ching-hsing Luo and Yoram Rudy, 1991 <ulink url="http://circres.ahajournals.org/">
             <emphasis>Circulation Research</emphasis>
-          </ulink>, 68, 1501-1526.  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=1709839&amp;dopt=Abstract">PubMed ID: 1709839</ulink> 
+          </ulink>, 68, 1501-1526.  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=1709839&amp;dopt=Abstract">PubMed ID: 1709839</ulink>
 </para>
 
 <informalfigure float="0" id="fig_cell_diagram">
@@ -136,17 +136,37 @@ The breakdown of the model into components and the definition of encapsulation a
       <unit units="mole" exponent="-1"/>
    </units>
    <component name="environment">
-      <variable units="millisecond" public_interface="out" cmeta:id="environment_time" name="time"/>
+      <variable units="millisecond" public_interface="out" cmeta:id="time" name="time">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#time">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#time"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
    </component>
    <component name="membrane">
-      <variable units="millivolt" public_interface="out" cmeta:id="membrane_voltage" name="V" initial_value="-83.853"/>
+      <variable units="millivolt" public_interface="out" cmeta:id="membrane_voltage" name="V" initial_value="-83.853">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_voltage">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_voltage"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
+
       <variable units="joule_per_kilomole_kelvin" public_interface="out" name="R" initial_value="8314"/>
       <variable units="kelvin" public_interface="out" name="T" initial_value="310"/>
       <variable units="coulomb_per_mole" public_interface="out" name="F" initial_value="96484.6"/>
       <variable units="per_millivolt" name="FonRT" cmeta:id="FonRT"/>
       <variable units="microA_per_cm2" name="potassium_currents" cmeta:id="potassium_currents"/>
       <variable units="microF_per_cm2" name="C" initial_value="1"/>
-      <variable units="microA_per_cm2" name="I_stim"/>
+      <variable units="microA_per_cm2" name="I_stim" cmeta:id="membrane_stimulus_current">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_stimulus_current">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
+
       <variable units="millisecond" public_interface="in" name="time"/>
       <variable units="microA_per_cm2" public_interface="in" name="i_Na"/>
       <variable units="microA_per_cm2" public_interface="in" name="i_si"/>
@@ -182,7 +202,7 @@ The breakdown of the model into components and the definition of encapsulation a
                <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_amplitude"/>
             </rdf:Description>
          </rdf:RDF>
-      </variable>    
+      </variable>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
          <apply><eq/>
             <ci>FonRT</ci>
@@ -793,14 +813,8 @@ The breakdown of the model into components and the definition of encapsulation a
       </math>
    </component>
    <component name="slow_inward_current">
-	  <variable name="i_si" units="microA_per_cm2" public_interface="out" cmeta:id="membrane_L_type_calcium_current">
-         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-            <rdf:Description rdf:about="#membrane_L_type_calcium_current">
-               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_L_type_calcium_current"/>
-            </rdf:Description>
-         </rdf:RDF>
-      </variable>
- 	  <variable name="P_si" units="milliS_per_cm2" initial_value="0.09" cmeta:id="membrane_L_type_calcium_current_conductance">
+      <variable name="i_si" units="microA_per_cm2" public_interface="out"/>
+       <variable name="P_si" units="milliS_per_cm2" initial_value="0.09" cmeta:id="membrane_L_type_calcium_current_conductance">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#membrane_L_type_calcium_current_conductance">
                <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
@@ -2067,7 +2081,7 @@ The breakdown of the model into components and the definition of encapsulation a
   </rdf:Description>
   <rdf:Description rdf:about="#Cai">
     <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
-  </rdf:Description>  
+  </rdf:Description>
   <rdf:Description rdf:about="#membrane_rapid_delayed_rectifier_potassium_current_conductance">
     <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
     <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_rapid_delayed_rectifier_potassium_current_conductance"/>

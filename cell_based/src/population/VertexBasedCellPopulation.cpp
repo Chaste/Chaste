@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,10 +42,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "T2SwapCellKiller.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "CellSrnModel.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT2SwapLocationsWriter.hpp"
 #include "VertexT3SwapLocationsWriter.hpp"
+#include "VertexIntersectionSwapLocationsWriter.hpp"
 #include "AbstractCellBasedSimulation.hpp"
 
 template<unsigned DIM>
@@ -56,7 +58,8 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
                                           const std::vector<unsigned> locationIndices)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
-      mOutputCellRearrangementLocations(true)
+      mOutputCellRearrangementLocations(true),
+      mRestrictVertexMovement(true)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
     mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
@@ -74,15 +77,27 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
     {
         Validate();
     }
+
+    // If cells contain an SRN model, then we need to track mesh operations
+    // and update SRNs accordingly. Here we assume the first cell is a representative of other cells
+    if ((*this->mCells.begin())->HasSrnModel())
+    {
+        mPopulationSrn.SetVertexCellPopulation(this);
+        mpMutableVertexMesh->SetMeshOperationTracking(true);
+    }
 }
 
 template<unsigned DIM>
-VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh)
+VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
+                                                          VertexBasedPopulationSrn<DIM>& rPopSrn)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
-      mOutputCellRearrangementLocations(true)
+      mOutputCellRearrangementLocations(true),
+      mRestrictVertexMovement(true),
+      mPopulationSrn(rPopSrn)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
+    mPopulationSrn.SetVertexCellPopulation(this);
 }
 
 template<unsigned DIM>
@@ -173,6 +188,35 @@ std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringLocationIndice
 }
 
 template<unsigned DIM>
+std::set<std::pair<unsigned, unsigned>>
+VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned edgeLocalIndex)
+{
+    std::set<std::pair<unsigned, unsigned>> neighbours;
+    auto cellLocationIndex = this->GetLocationIndexUsingCell(pCell);
+    auto p_element = this->GetElement(cellLocationIndex);
+    auto global_edge_index = p_element->GetEdgeGlobalIndex(edgeLocalIndex);
+    auto neighbour_element_indices = p_element->GetNeighbouringElementAtEdgeIndex(edgeLocalIndex);
+
+    // Normally there is only one neighbouring element
+    for (auto neighbour_element_index : neighbour_element_indices)
+    {
+        auto p_neighbour_element = this->GetElement(neighbour_element_index);
+
+        // Iterate over neighbouring element indices
+        for (unsigned elem_index = 0; elem_index < p_neighbour_element->GetNumEdges(); elem_index++)
+        {
+            // If the neighbours edge matches EdgeLocalIndex
+            if (p_neighbour_element->GetEdge(elem_index)->GetIndex() == global_edge_index)
+            {
+                neighbours.insert(std::pair<unsigned, unsigned>(neighbour_element_index, elem_index));
+            }
+        }
+    }
+
+    return neighbours;
+}
+
+template<unsigned DIM>
 unsigned VertexBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
     return mpMutableVertexMesh->AddNode(pNewNode);
@@ -259,17 +303,25 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
 {
     double length = norm_2(rDisplacement);
 
-    if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
-    {   
-        rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
-        
-        std::ostringstream message;
-        message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
-        message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
+    if(mRestrictVertexMovement)
+    {
+        if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
+        {
+            rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
 
-        double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
+            std::ostringstream message;
+            message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
+            message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
 
-        throw StepSizeException(suggested_step, message.str(), false);
+            double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
+
+            // The first time we see this behaviour, throw a StepSizeException, but not more than once
+            if(mThrowStepSizeException)
+            {
+                mThrowStepSizeException = false;
+                throw StepSizeException(suggested_step, message.str(), false);
+            }
+        }
     }
 }
 
@@ -308,6 +360,18 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
         // Check that each VertexElement has only one CellPtr associated with it in the updated cell population
         Validate();
+    }
+
+    if (this->GetNumAllCells()>0)
+    {
+        //First cell is representative of other cells
+        bool EdgeModelOrNot = (*this->mCells.begin())->GetSrnModel()->HasEdgeModel();
+
+        if (EdgeModelOrNot)
+        {
+            // Note that SRN initialisation in daughter cell is handled through Cell::Divide() method
+            mPopulationSrn.UpdateSrnAfterBirthOrDeath(element_map);
+        }
     }
 
     element_map.ResetToIdentity();
@@ -354,6 +418,12 @@ void VertexBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_p
 }
 
 template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
+{
+    pPopulationEventWriter->Visit(this);
+}
+
+template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
@@ -386,22 +456,234 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
+    unsigned num_cells = this->GetNumAllCells();
+    if (num_cells>0)
+    {
+        auto cells = this->rGetCells();
+        boost::shared_ptr<CellEdgeData> p_cell_edge_data = (*cells.begin())->GetCellEdgeData();
+        //If edge SRNs are specified, then write vtk results into a mesh where quantities
+        //associated with each edge are taken into account. We assume that the first cell is
+        //representative of all cells.
+        //Edge VTKs are also written if cells contain CellEdgeData
+
+        //If cells contain edge data
+        if (p_cell_edge_data->GetNumItems() != 0&&mWriteEdgeVtkResults)
+        {
+            this->WriteCellEdgeVtkResultsToFile(rDirectory);
+            return;
+        }
+
+        //If cells don't contain edge data, output CellData only
+        if (p_cell_edge_data->GetNumItems() == 0&&mWriteCellVtkResults)
+        {
+            this->WriteCellVtkResultsToFile(rDirectory);
+        }
+    }
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string& rDirectory)
+{
 #ifdef CHASTE_VTK
 
     // Create mesh writer for VTK output
     VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
-    // Iterate over any cell writers that are present
+    // We avoid writing out CellData if the population is empty (i.e. no cells).
     unsigned num_cells = this->GetNumAllCells();
-    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
-         cell_writer_iter != this->mCellWriters.end();
-         ++cell_writer_iter)
+
+    if (num_cells > 0)
+    {
+        // Iterate over any cell writers that are present
+        for (auto cell_writer_iter = this->mCellWriters.begin();
+             cell_writer_iter != this->mCellWriters.end();
+             ++cell_writer_iter)
+        {
+            // Create vector to store VTK cell data
+            std::vector<double> vtk_cell_data(num_cells);
+
+            // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
+            for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+                 elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+                 ++elem_iter)
+            {
+                // Get index of this element in the vertex mesh
+                unsigned elem_index = elem_iter->GetIndex();
+
+                // Get the cell corresponding to this element
+                CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+                assert(p_cell);
+
+                // Populate the vector of VTK cell data
+                vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+            }
+
+            mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+        }
+
+        // When outputting any CellData, we assume that the first cell is representative of all cells
+        unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+
+        std::vector<std::vector<double> > cell_data;
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            std::vector<double> cell_data_var(num_cells);
+            cell_data.push_back(cell_data_var);
+        }
+
+        // Loop over vertex elements ///\todo #2512 - replace with loop over cells
+        for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+                elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+                ++elem_iter)
+        {
+            // Get index of this element in the vertex mesh
+            unsigned elem_index = elem_iter->GetIndex();
+
+            // Get the cell corresponding to this element
+            CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+            assert(p_cell);
+
+            for (unsigned var=0; var<num_cell_data_items; var++)
+            {
+                cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+            }
+        }
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
+        }
+    }
+
+    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
+    std::stringstream time;
+    time << num_timesteps;
+
+    mesh_writer.WriteVtkUsingMesh(*mpMutableVertexMesh, time.str());
+
+    *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
+    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+
+#endif //CHASTE_VTK
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::string& rDirectory)
+{
+#ifdef CHASTE_VTK
+    //Writes cell only data
+    {
+        // Create mesh writer for VTK output
+        VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "cell_results", false);
+
+        // Iterate over any cell writers that are present
+        unsigned num_cells = this->GetNumAllCells();
+        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+                cell_writer_iter != this->mCellWriters.end();
+                ++cell_writer_iter)
+        {
+            // Create vector to store VTK cell data
+            std::vector<double> vtk_cell_data(num_cells);
+
+            // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
+            for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+                    elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+                    ++elem_iter)
+            {
+                // Get index of this element in the vertex mesh
+                unsigned elem_index = elem_iter->GetIndex();
+
+                // Get the cell corresponding to this element
+                CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+                assert(p_cell);
+
+                // Populate the vector of VTK cell data
+                vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+            }
+
+            mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+        }
+
+        // When outputting any CellData, we assume that the first cell is representative of all cells
+        unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+
+        std::vector<std::vector<double> > cell_data;
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            std::vector<double> cell_data_var(num_cells);
+            cell_data.push_back(cell_data_var);
+        }
+
+        // Loop over vertex elements ///\todo #2512 - replace with loop over cells
+        for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+                elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+                ++elem_iter)
+        {
+            // Get index of this element in the vertex mesh
+            unsigned elem_index = elem_iter->GetIndex();
+
+            // Get the cell corresponding to this element
+            CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+            assert(p_cell);
+
+            for (unsigned var=0; var<num_cell_data_items; var++)
+            {
+                cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+            }
+        }
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
+        }
+
+        unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
+        std::stringstream time;
+        time << num_timesteps;
+
+        mesh_writer.WriteVtkUsingMesh(*mpMutableVertexMesh, time.str());
+
+        *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
+        *(this->mpVtkMetaFile) << num_timesteps;
+        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"cell_results_";
+        *(this->mpVtkMetaFile) << num_timesteps;
+        *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+    }
+    // Create mesh writer for VTK output
+    TrapezoidEdgeVertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
+    unsigned num_edges = 0;
+
+    // Here elements are synonymous with cells
+    const unsigned num_cells = this->GetNumElements();
+    //Similarly as in TrapEdgeVerteMeshWriter, but instead of nodes
+    //we fill edge arrays
+    //The first value MUST be zero
+    std::vector<unsigned> cell_offset_dist(num_cells);
+    //The order of stored data is illustrated below:
+    // [_____|_][____|_]
+    //  ^^^^  ^
+    // edge   cell interior
+    for (unsigned i=1; i<num_cells; ++i)
+    {
+        cell_offset_dist[i] = cell_offset_dist[i-1]+this->GetElement(i-1)->GetNumEdges()+1;
+        num_edges += this->GetElement(i)->GetNumEdges();
+    }
+    // Total number of edges
+    num_edges += this->GetElement(0)->GetNumEdges();
+
+    // Iterate over any cell writers that are present
+    // The data that is written below is associated with the entire cell
+    // E.g. the cell age. Thus, edges also share the same characteristic
+    for (auto cell_writer : this->mCellWriters)
     {
         // Create vector to store VTK cell data
-        std::vector<double> vtk_cell_data(num_cells);
+        std::vector<double> vtk_cell_data(num_edges+num_cells);
 
         // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
-        for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+        for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
              elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
              ++elem_iter)
         {
@@ -412,44 +694,97 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
             CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
             assert(p_cell);
 
-            // Populate the vector of VTK cell data
-            vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+            // Write the same property in all the edges
+            unsigned elem_num_edges = elem_iter->GetNumEdges();
+
+            // Edge data
+            for (unsigned e = 0; e < elem_num_edges; ++e)
+            {
+                // Populate the vector of VTK cell data
+                vtk_cell_data[cell_offset_dist[elem_index]+e] = cell_writer->GetCellDataForVtkOutput(p_cell, this);
+            }
+            // Internal cell data
+            vtk_cell_data[cell_offset_dist[elem_index]+elem_num_edges] = cell_writer->GetCellDataForVtkOutput(p_cell, this);
         }
-
-        mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+        mesh_writer.AddCellData(cell_writer->GetVtkCellDataName(), vtk_cell_data);
     }
+    // When outputting CellData and CellEdgeData, we assume that the first cell
+    // and its edges are representative of the population
 
-    // When outputting any CellData, we assume that the first cell is representative of all cells
-    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    // Get cell/edge data names
+    const unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
-    std::vector<std::vector<double> > cell_data;
-    for (unsigned var=0; var<num_cell_data_items; var++)
+    const unsigned num_edge_data_items = this->Begin()->GetCellEdgeData()->GetNumItems();
+    std::vector<std::string> edge_data_names = this->Begin()->GetCellEdgeData()->GetKeys();
+
+    // Total number of data items. Each data item (edge+interior) has its own value
+    const unsigned num_data_items = num_edge_data_items + num_cell_data_items;
+    std::vector<std::string> data_names(num_data_items);
+    for (unsigned var=0; var<num_edge_data_items; ++var)
     {
-        std::vector<double> cell_data_var(num_cells);
-        cell_data.push_back(cell_data_var);
+        data_names[var] = edge_data_names[var];
+    }
+    for (unsigned var=num_edge_data_items; var<num_data_items; ++var)
+    {
+        data_names[var] = cell_data_names[var-num_edge_data_items];
+    }
+    std::vector<std::vector<double> > data_values(num_data_items,
+                                                  std::vector<double>(num_edges + num_cells));
+
+    // Writing CellEdgeData values to the edges of the cells
+    // Loop over vertex elements ///\todo #2512 - replace with loop over cells
+    for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+         elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+         ++elem_iter)
+    {
+        const unsigned elem_index = elem_iter->GetIndex();
+        CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+        assert(p_cell);
+
+        // Edge data for interior data is set to zero.
+        unsigned elem_num_edges = elem_iter->GetNumEdges();
+        for (unsigned var = 0; var < num_edge_data_items; ++var)
+        {
+            // Write the same property in all the edges
+            for (unsigned e = 0; e < elem_num_edges; ++e)
+            {
+                data_values[var][cell_offset_dist[elem_index]+e] = p_cell->GetCellEdgeData()->GetItem(data_names[var])[e];
+            }
+            // Cell interior is set to zero
+            data_values[var][cell_offset_dist[elem_index]+elem_num_edges] = 0.0;
+        }
     }
 
+    // Writing CellData values to the interior of the cells
     // Loop over vertex elements ///\todo #2512 - replace with loop over cells
-    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+    for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
          elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
          ++elem_iter)
     {
         // Get index of this element in the vertex mesh
         unsigned elem_index = elem_iter->GetIndex();
+        unsigned elem_num_edges = elem_iter->GetNumEdges();
 
         // Get the cell corresponding to this element
         CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
         assert(p_cell);
 
-        for (unsigned var=0; var<num_cell_data_items; var++)
+        for (unsigned var = num_edge_data_items; var<num_data_items; ++var)
         {
-            cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+            // Data in the edges are set to 0
+            for (unsigned e = 0; e < elem_num_edges; ++e)
+            {
+                data_values[var][cell_offset_dist[elem_index]+e] = 0.0;
+            }
+            // Filling cell interior data
+            data_values[var][cell_offset_dist[elem_index]+elem_num_edges] = p_cell->GetCellData()->GetItem(data_names[var]);
         }
     }
-    for (unsigned var=0; var<num_cell_data_items; var++)
+
+    for (unsigned var=0; var<num_data_items; var++)
     {
-        mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
+        mesh_writer.AddCellData(data_names[var], data_values[var]);
     }
 
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -490,6 +825,10 @@ void VertexBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutput
         if (!this-> template HasWriter<VertexT3SwapLocationsWriter>())
         {
             this-> template AddPopulationWriter<VertexT3SwapLocationsWriter>();
+        }
+        if (!this-> template HasWriter<VertexIntersectionSwapLocationsWriter>())
+        {
+            this-> template AddPopulationWriter<VertexIntersectionSwapLocationsWriter>();
         }
     }
 
@@ -553,41 +892,13 @@ void VertexBasedCellPopulation<DIM>::SetVertexBasedDivisionRule(boost::shared_pt
 }
 
 template<unsigned DIM>
-std::vector< c_vector< double, DIM > > VertexBasedCellPopulation<DIM>::GetLocationsOfT2Swaps()
-{
-    return mLocationsOfT2Swaps;
-}
-
-template<unsigned DIM>
-std::vector< unsigned > VertexBasedCellPopulation<DIM>::GetCellIdsOfT2Swaps()
-{
-    return mCellIdsOfT2Swaps;
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::AddLocationOfT2Swap(c_vector< double, DIM> locationOfT2Swap)
-{
-    mLocationsOfT2Swaps.push_back(locationOfT2Swap);
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::AddCellIdOfT2Swap(unsigned idOfT2Swap)
-{
-    mCellIdsOfT2Swaps.push_back(idOfT2Swap);
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::ClearLocationsAndCellIdsOfT2Swaps()
-{
-    mCellIdsOfT2Swaps.clear();
-    mLocationsOfT2Swaps.clear();
-}
-
-template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     // This method only works in 2D sequential
-    assert(DIM == 2);						// LCOV_EXCL_LINE - disappears at compile time.
+    if (DIM != 2)
+    {
+        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
+    }
     assert(PetscTools::IsSequential());
 
     unsigned num_vertex_nodes = mpMutableVertexMesh->GetNumNodes();
@@ -719,6 +1030,37 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshFor
 }
 
 template<unsigned DIM>
+std::vector< c_vector< double, DIM > > VertexBasedCellPopulation<DIM>::GetLocationsOfT2Swaps()
+{
+    return mLocationsOfT2Swaps;
+}
+
+template<unsigned DIM>
+std::vector< unsigned > VertexBasedCellPopulation<DIM>::GetCellIdsOfT2Swaps()
+{
+    return mCellIdsOfT2Swaps;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::AddLocationOfT2Swap(c_vector< double, DIM> locationOfT2Swap)
+{
+    mLocationsOfT2Swaps.push_back(locationOfT2Swap);
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::AddCellIdOfT2Swap(unsigned idOfT2Swap)
+{
+    mCellIdsOfT2Swaps.push_back(idOfT2Swap);
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::ClearLocationsAndCellIdsOfT2Swaps()
+{
+    mCellIdsOfT2Swaps.clear();
+    mLocationsOfT2Swaps.clear();
+}
+
+template<unsigned DIM>
 bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
 {
     bool non_apoptotic_cell_present = true;
@@ -820,6 +1162,43 @@ void VertexBasedCellPopulation<DIM>::SimulationSetupHook(AbstractCellBasedSimula
 {
     MAKE_PTR_ARGS(T2SwapCellKiller<DIM>, p_t2_swap_cell_killer, (this));
     pSimulation->AddCellKiller(p_t2_swap_cell_killer);
+}
+
+
+template<unsigned DIM>
+bool VertexBasedCellPopulation<DIM>::GetRestrictVertexMovementBoolean()
+{
+    return mRestrictVertexMovement;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SetRestrictVertexMovementBoolean(bool restrictMovement)
+{
+    mRestrictVertexMovement = restrictMovement;
+}
+
+template<unsigned DIM>
+VertexBasedPopulationSrn<DIM>& VertexBasedCellPopulation<DIM>::rGetVertexBasedPopulationSrn()
+{
+    return mPopulationSrn;
+}
+
+template<unsigned DIM>
+const VertexBasedPopulationSrn<DIM>& VertexBasedCellPopulation<DIM>::rGetVertexBasedPopulationSrn() const
+{
+    return mPopulationSrn;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SetWriteCellVtkResults(const bool new_val)
+{
+    mWriteCellVtkResults = new_val;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SetWriteEdgeVtkResults(const bool new_val)
+{
+    mWriteEdgeVtkResults = new_val;
 }
 
 // Explicit instantiation

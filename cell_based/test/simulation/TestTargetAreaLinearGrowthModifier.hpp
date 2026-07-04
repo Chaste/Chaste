@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,7 @@ class TestTargetAreaLinearGrowthModifier : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestNonPhaseBasedCellCycleModelMethodsAndExceptions() throw (Exception)
+    void TestNonPhaseBasedCellCycleModelMethodsAndExceptions()
     {
         // First set up SimulationTime (this is usually handled by a simulation object)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -116,7 +116,7 @@ public:
         CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above
     }
 
-    void TestTargetAreaLinearGrowthModifierMethods() throw (Exception)
+    void TestTargetAreaLinearGrowthModifierMethods()
     {
         // Create a modifier
         MAKE_PTR(TargetAreaLinearGrowthModifier<2>,p_growth_modifier);
@@ -126,7 +126,7 @@ public:
 
         // Create mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -244,7 +244,7 @@ public:
         TS_ASSERT_DELTA(actual_area_3_after_3dt, 0.0, 1e-12);
     }
 
-    void TestTargetAreaOfDaughterCells()
+    void TestTargetAreaOfDaughterCellsLinear()
     {
         // Plan: initialise a cell and have it divide at a fixed time. If cell divides at t, check that:
         // target area of mother cell at t - dt = mature target area
@@ -253,7 +253,7 @@ public:
 
         // Create a simple 2D MutableVertexMesh with only one cell
         HoneycombVertexMeshGenerator generator(1, 1);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cell
         std::vector<CellPtr> cells;
@@ -273,7 +273,7 @@ public:
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestTargetAreaOfDaughterCells");
+        simulator.SetOutputDirectory("TestTargetAreaOfDaughterCellsLinear");
         simulator.SetEndTime(0.997);
         //dt=0.002
 

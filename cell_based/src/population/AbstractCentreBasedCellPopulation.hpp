@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,8 +44,15 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivi
 /**
  * An abstract facade class encapsulating a centre-based cell population, in which
  * each cell corresponds to a Node.
+ *
+ * @tparam ELEMENT_DIM Dimension of the elements.
+ * @tparam SPACE_DIM Dimension of the space. If not specified, it defaults to ELEMENT_DIM.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class AbstractCentreBasedCellPopulation : public AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
 private:
@@ -85,7 +92,7 @@ protected:
      */
     std::set<std::pair<CellPtr,CellPtr> > mMarkedSprings;
 
-    /** A pointer to a division rule that is used to generate the locations of daughter cells when a cell divides. 
+    /** A pointer to a division rule that is used to generate the locations of daughter cells when a cell divides.
      * This is a specialisation for centre-based models.
      */
     boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > mpCentreBasedDivisionRule;
@@ -277,16 +284,6 @@ public:
     virtual bool IsParticle(unsigned index);
 
     /**
-     * Method to return the connected nodes in  a centre based simulation.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @return Node pairs for force calculation.
-     */
-    virtual std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& rGetNodePairs()=0;
-
-    /**
      * @return mMeinekeDivisionSeparation
      */
     double GetMeinekeDivisionSeparation();
@@ -323,8 +320,8 @@ public:
      * @return a default value for the time step to use
      * when simulating the cell population.
      *
-     * A hard-coded value of 1/120 is returned. However, note that the time 
-     * step can be reset by calling SetDt() on the simulation object used to 
+     * A hard-coded value of 1/120 is returned. However, note that the time
+     * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
     virtual double GetDefaultTimeStep();

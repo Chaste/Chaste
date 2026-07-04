@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_4"
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/3_4 heart/src/io/ChasteParameters_3_4.xsd">
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1 heart/src/io/ChasteParameters_2017_1.xsd">
 
     <!--
         Note: all unit attributes must be included, but their content cannot be changed.
         They exist for documentary purposes only.
-        See https://chaste.cs.ox.ac.uk/trac/wiki/ChasteUnits for details
+        See https://chaste.github.io/docs/user-guides/chaste-units/ for details
         on the units used by Chaste.
     -->
 
     <Simulation>
-        <!-- 
-            Problem definition 
+        <!--
+            Problem definition
         -->
         <SpaceDimension>3</SpaceDimension>
         <SimulationDuration unit="ms">50.0</SimulationDuration>
@@ -23,15 +23,15 @@
             </Default>
         </IonicModels>
 
-        <!-- 
-            Mesh definition 
+        <!--
+            Mesh definition
         -->
         <Mesh unit="cm">
             <Slab x="4.0" y="0.1" z="2.0" inter_node_space="0.1"/>
         </Mesh>
 
-        <!-- 
-            Stimuli (as many <Stimulus> definitions as needed) 
+        <!--
+            Stimuli (as many <Stimulus> definitions as needed)
            -->
         <Stimuli>
             <Stimulus>
@@ -48,8 +48,8 @@
             </Stimulus>
         </Stimuli>
 
-        <!-- 
-            Ionic cell model heterogeneities (as many <CellHeterogeneity> definitions as needed) 
+        <!--
+            Ionic cell model heterogeneities (as many <CellHeterogeneity> definitions as needed)
            -->
         <CellHeterogeneities>
             <CellHeterogeneity>
@@ -92,8 +92,8 @@
             </CellHeterogeneity>
         </CellHeterogeneities>
 
-        <!-- 
-            Output 
+        <!--
+            Output
         -->
         <OutputDirectory>ChasteResults</OutputDirectory>
         <OutputFilenamePrefix>SimulationResults</OutputFilenamePrefix>

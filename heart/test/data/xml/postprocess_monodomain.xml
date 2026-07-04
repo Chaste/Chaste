@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0">
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_3">
 
 	<Simulation>
 		<!-- 
@@ -67,6 +67,7 @@
 	        <MaxUpstrokeVelocityMap threshold="-30.0" threshold_unit="mV"/>
 	        <ConductionVelocityMap origin_node="10"/>
 	        <ConductionVelocityMap origin_node="20"/>
+	        <PseudoEcgElectrodePosition x="0.05" y="0.05" z="0" />
 	</PostProcessing>
 		    
 </ChasteParameters>

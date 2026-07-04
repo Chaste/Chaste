@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -143,12 +143,12 @@ void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low, 2, &A11_local_rows);
         ISCreateStride(PETSC_COMM_WORLD, global_size, 0, 2, &A11_columns);
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
-        MatGetSubMatrix(system_matrix, A11_local_rows, A11_local_rows,
-            MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 8) //PETSc 3.8 or later
+        MatCreateSubMatrix(system_matrix, A11_local_rows, A11_local_rows,
+                           MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #else
-        MatGetSubMatrix(system_matrix, A11_local_rows, A11_columns, PETSC_DECIDE,
-            MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
+        MatGetSubMatrix(system_matrix, A11_local_rows, A11_local_rows,
+                        MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #endif
 
 
@@ -169,12 +169,12 @@ void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low+1, 2, &A22_local_rows);
         ISCreateStride(PETSC_COMM_WORLD, global_size, 1, 2, &A22_columns);
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
-        MatGetSubMatrix(system_matrix, A22_local_rows, A22_local_rows,
-            MAT_INITIAL_MATRIX, &mPCContext.A22_matrix_subblock);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 8) //PETSc 3.8 or later
+        MatCreateSubMatrix(system_matrix, A22_local_rows, A22_local_rows,
+                           MAT_INITIAL_MATRIX, &mPCContext.A22_matrix_subblock);
 #else
-        MatGetSubMatrix(system_matrix, A22_local_rows, A22_columns, PETSC_DECIDE,
-            MAT_INITIAL_MATRIX, &mPCContext.A22_matrix_subblock);
+        MatGetSubMatrix(system_matrix, A22_local_rows, A22_local_rows,
+                        MAT_INITIAL_MATRIX, &mPCContext.A22_matrix_subblock);
 #endif
 
         ISDestroy(PETSC_DESTROY_PARAM(A22_local_rows));
@@ -209,11 +209,11 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
 
     // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscPushErrorHandler(PetscReturnErrorHandler, nullptr);
     PetscErrorCode pc_set_error = PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
     if (pc_set_error != 0)
     {
-        WARNING("PETSc hypre preconditioning library is not installed");
+        WARNING("PETSc hypre preconditioning library is not installed"); // LCOV_EXCL_LINE
     }
     // Stop supressing error
     PetscPopErrorHandler();
@@ -243,7 +243,7 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22));
 
     /* Full AMG in the block */
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscPushErrorHandler(PetscReturnErrorHandler, nullptr);
     PCSetType(mPCContext.PC_amg_A22, PCHYPRE);
     // Stop supressing error
     PetscPopErrorHandler();
@@ -313,7 +313,7 @@ PetscErrorCode PCBlockDiagonalApply(void* pc_context, Vec x, Vec y)
 
     // Cast the context pointer to PCBlockDiagonalContext
     PCBlockDiagonal::PCBlockDiagonalContext* block_diag_context = (PCBlockDiagonal::PCBlockDiagonalContext*) pc_context;
-    assert(block_diag_context!=NULL);
+    assert(block_diag_context!=nullptr);
 
     /*
      * Scatter x = [x1 x2]'

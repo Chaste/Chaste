@@ -4,6 +4,7 @@ TestCitations.hpp
 TestCommandLineArguments.hpp
 TestCellBasedEventHandler.hpp
 TestChasteBuildInfo.hpp
+TestModernCppFeatures.hpp
 TestCwd.hpp
 TestDebug.hpp
 TestDistributedVector.hpp
@@ -11,6 +12,8 @@ TestException.hpp
 TestExecutableSupport.hpp
 TestFileFinder.hpp
 TestFileComparison.hpp
+TestFloatingPointDivisionByZero.hpp
+TestFloatingPointDivisionByZeroPetsc.hpp
 TestGenericEventHandler.hpp
 TestHeartEventHandler.hpp
 TestHelloWorld.hpp
@@ -31,3 +34,4 @@ TestTimer.hpp
 TestTimeStepper.hpp
 TestWarnings.hpp
 TestWritingTestsTutorial.hpp
+TestCommandLineArgumentsTutorial.hpp

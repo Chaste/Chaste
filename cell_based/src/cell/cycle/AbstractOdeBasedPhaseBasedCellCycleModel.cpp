@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -76,7 +76,7 @@ void AbstractOdeBasedPhaseBasedCellCycleModel::SetBirthTime(double birthTime)
 
 void AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
 
     double current_time = SimulationTime::Instance()->GetTime();
 

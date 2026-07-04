@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,16 +45,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCARDIACELECTROMECHANICSTUTORIAL_HPP_
 
 /*
- * = Cardiac Electro-mechanical Problems =
+ * ## Cardiac Electro-mechanical Problems
  *
- * == Introduction ==
+ * ### Introduction
  *
  * The tutorial explains how electro-mechanics problems can be solved in Chaste. The reader should certainly read
  * the electro-physiological tutorials before this tutorial, and really they should have also had a look at
  * the tutorial(s) on solving general solid mechanics problems.
  *
  * The equations of cardiac electro-mechanics are written down in Section 4.2 of the PDF on equations and
- * finite element implementations in ChasteGuides -> Miscellaneous information. '''Note:''' By default we do
+ * finite element implementations in ChasteGuides -> Miscellaneous information. **Note:** By default we do
  * not solve these full equations: the mechanics information is not coupled back to electrics, ie by default
  * the conductivities do not depend on deformation, and cell models do not get affected by stretch.
  * This has to be switched on if required, as will be described further below.
@@ -94,7 +94,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  * ''Timesteps:'' Should-divide rules are: (a) ode_timestep should-divide pde_timestep should-divide
  *  mechanics_update_timestep and (b) contraction_model_ode_timestep should-divide mechanics_update_timestep.
  *
- * '''Another important note:''' mechanics problems are not currently implemented to scale in parallel yet. This
+ * **Another important note:** mechanics problems are not currently implemented to scale in parallel yet. This
  * is work in progress.
  *
  * The basic includes are */
@@ -115,23 +115,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  * HOW_TO_TAG Cardiac/Electro-mechanics
- * Run basic electro-mechanics simulations; specify different models, boundary conditions, fibres
+ * Run basic electro-mechanics simulations; specify different models, boundary conditions, fibres,
+ * visualize electro-mechanics output with VTK (Paraview)
  */
 
 /*
- * == IMPORTANT: using HYPRE ==
+ * ### IMPORTANT: using HYPRE
  *
- * Mechanics solves being nonlinear are expensive, so it is recommended you also use `build=GccOpt_ndebug` (when running scons)
- * on larger problems. Also:
+ * Mechanics solves being nonlinear are expensive, so it is recommended you also use a `Release` build type for `cmake`
+  * on larger problems. Also:
  *
  * Mechanics solves involve solving a nonlinear system, which is broken down into a sequence of linear solves.
- * When running '''incompressible''' problems '''in 3D, or with more elements than in the first test below''',
+ * When running **incompressible** problems **in 3D, or with more elements than in the first test below**,
  * it is vital to change the linear solver to use HYPRE, an algebraic multigrid solver.
  * Without HYRPE, the linear solve (i) may become very very slow; or
  * (ii) may not converge, in which case the nonlinear solve will (probably) not converge. See the comments on using
  * HYPRE in the first solid mechanics tutorial.
  *
- * == Simple 2d test ==
+ * ### Simple 2d test
  *
  * This test shows how to use the `CardiacElectroMechProbRegularGeom` class, which
  * inherits from a more general class, `CardiacElectroMechanicsProblem`, and
@@ -144,7 +145,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCardiacElectroMechanicsTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestCardiacElectroMechanicsExample() throw(Exception)
+    void TestCardiacElectroMechanicsExample()
     {
         /* All electro-mechanics problems require a cell factory as normal. This particular
          * factory stimulates the LHS side (X=0) surface. */
@@ -222,10 +223,10 @@ public:
          */
     }
 
-    /* == Same simulation, this time using `CardiacElectroMechanicsProblem` ==
+    /* ### Same simulation, this time using `CardiacElectroMechanicsProblem`
      *
      * Let us repeat the above test using `CardiacElectroMechanicsProblem`. */
-    void TestCardiacElectroMechanicsExampleAgain() throw(Exception)
+    void TestCardiacElectroMechanicsExampleAgain()
     {
         /* This lines is as above */
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-5000*1000);
@@ -283,7 +284,27 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacElectroMechanicsExample2");
-
+        /* In this second example, we ask for VTK output as well, to be visualized using, for example,
+         * Paraview. Having specified TestCardiacElectroMechanicsExample2 as output
+         * directory in the problem class (relative to CHASTE_TEST_OUTPUT), you will find the VTK files in
+         * the directory TestCardiacElectroMechanicsExample2/deformation/vtk/
+         * The files will be called deformed_mechanics_mesh_X.vtu, where X=0 will contain
+         * the initial conditions and X=n cprresponds to the n-th step.
+         * Each of those VTU files contains information on the node locations of the mechanics mesh,
+         * voltage solution interpolated onto the nodes of the mechanics mesh, displacement vectors
+         * at each node of the mechanics mesh, and deformation gradient tensor (F) at each element
+         * of the mechanics mesh.
+         *
+         * To visualize with Paraview, click on "Open", navigate to the directory mentioned above,
+         * and select the .vtu files, which will appear as a group (because of how they are named).
+         * You can then click on the "eye" icon in the pipeline browser on the left next to the files
+         * just loaded. The drop-down menus on top allows you to choose what to see
+         * (voltage, displacements, etc) and on what visual entity (surface, nodes, etc).
+         * The properties of the spectrum can also be adjusted. By pressing the "Play"
+         * button you will see the mesh deforming over time with the chosen variable
+         * plotted with the color according to the spectrum.
+         */
+        HeartConfig::Instance()->SetVisualizeWithVtk(true);
         problem.Solve();
         /* Visualise as above.
          *
@@ -300,7 +321,7 @@ public:
          */
         CompressibleMooneyRivlinMaterialLaw<2> law(2.0,1.0); // random (non-cardiac) material law
         problem_defn.SetMaterialLaw(COMPRESSIBLE,&law);
-        /* As mentioned above, by default the deformation does '''not''' couple back to the electrics.
+        /* As mentioned above, by default the deformation does **not** couple back to the electrics.
          * The stretch is not passed to the cell model to allow for stretch-activated channels (M.E.F.),
          * and the deformation is not used in altering the conductivity tensor (the latter simplifications has
          * little effect in
@@ -326,7 +347,7 @@ public:
         TS_ASSERT(comparer.CompareFiles());
     }
 
-    /* == Twisting cube: 3d example with varying fibre directions ==
+    /* ### Twisting cube: 3d example with varying fibre directions
      *
      * The third test is a longer running 3d test - the 'dont' in the name of the test
      * means it isn't run automatically. To run, remove the 'dont'. It is worth running
@@ -336,7 +357,7 @@ public:
      * This test shows how to do 3d simulations (trivial changes), and how to pass in
      * fibre directions for the mechanics mesh. It also uses a compressible law.
      */
-    void dontTestTwistingCube() throw(Exception)
+    void dontTestTwistingCube()
     {
         /* Cell factory as normal */
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);

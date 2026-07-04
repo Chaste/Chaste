@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,12 +40,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-// This doesn't test anything, it is just a first test for new users to run immediately after installation
-
+/* This doesn't test anything, it is just a first test for new users to run immediately after installation */
 class TestHelloWorld : public CxxTest::TestSuite
 {
 public:
-    void TestPrintHelloWorld() throw(Exception)
+    // Note that tests have to be void() and start with the word `Test` (with a capital T).
+    void TestPrintHelloWorld()
     {
         std::cout << "\nHello, world!\nChaste and dependencies are (at least partially) installed and running!\n\n";
     }

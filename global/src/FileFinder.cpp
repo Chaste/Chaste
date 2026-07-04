@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,17 +33,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "FileFinder.hpp"
-
+#include <algorithm>
 #include <cassert>
 
-#include "BoostFilesystem.hpp"
+#include "FileFinder.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "Exception.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "OutputFileHandler.hpp"
-#include "Warnings.hpp"
 #include "PosixPathFixer.hpp"
+#include "Warnings.hpp"
 
 bool FileFinder::msFaking = false;
 
@@ -54,26 +53,29 @@ std::string FileFinder::msFakePath = "";
 #define UNSET_PATH "UNSET!"
 
 /**
- * This macro converts boost filesystem exceptions into Chaste Exceptions.
+ * This macro converts std::filesystem exceptions into Chaste Exceptions.
  *
  * It should be put round any calls in this class' public methods to
  * either:
- *  * boost filesystem
+ *  * std::filesystem
  *  * or private methods of this class
  *
  * that are likely to throw.
  *
- * @param code some code that could throw a boost file system error
+ * @param code some code that could throw a std::file system error
  */
-#define CONVERT_ERROR(code)                   \
-    try {                                     \
-        code;                                 \
-    } catch (const fs::filesystem_error& e) { \
-        EXCEPTION(e.what());                  \
+#define CONVERT_ERROR(code)               \
+    try                                   \
+    {                                     \
+        code;                             \
+    }                                     \
+    catch (const fs::filesystem_error& e) \
+    {                                     \
+        EXCEPTION(e.what());              \
     }
 
 FileFinder::FileFinder()
-    : mAbsPath(UNSET_PATH)
+        : mAbsPath(UNSET_PATH)
 {
 }
 
@@ -89,7 +91,7 @@ FileFinder::FileFinder(const std::string& rLeafName, const FileFinder& rParentOr
 
 FileFinder::FileFinder(const fs::path& rPath)
 {
-    SetPath(fs::complete(rPath).string(), RelativeTo::Absolute);
+    SetPath(fs::absolute(rPath).string(), RelativeTo::Absolute);
 }
 
 FileFinder::~FileFinder()
@@ -184,7 +186,7 @@ bool FileFinder::Exists() const
 
 bool FileFinder::IsFile() const
 {
-    return fs::is_regular(mAbsPath);
+    return fs::is_regular_file(mAbsPath);
 }
 
 bool FileFinder::IsDir() const
@@ -204,7 +206,7 @@ bool FileFinder::IsEmpty() const
         fs::directory_iterator end_iter;
         for (fs::directory_iterator dir_iter(mAbsPath); dir_iter != end_iter; ++dir_iter)
         {
-            if (PATH_LEAF_NAME(dir_iter->path()).substr(0, 1) != ".")
+            if ((dir_iter->path().filename().string()).substr(0, 1) != ".")
             {
                 empty = false;
                 break;
@@ -236,27 +238,28 @@ bool FileFinder::IsNewerThan(const FileFinder& rOtherEntity) const
 
 std::string FileFinder::GetLeafName() const
 {
-    return PATH_LEAF_NAME(fs::path(mAbsPath));
+    return fs::path(mAbsPath).filename().string();
 }
 
 std::string FileFinder::GetLeafNameNoExtension() const
 {
-    return fs::basename(mAbsPath);
+    return fs::path(mAbsPath).stem().string();
 }
 
 std::string FileFinder::GetExtension() const
 {
-    return fs::extension(mAbsPath);
+    return fs::path(mAbsPath).extension().string();
 }
 
 FileFinder FileFinder::GetParent() const
 {
     fs::path our_path(mAbsPath);
-    EXCEPT_IF_NOT(our_path.has_branch_path());
-    return FileFinder(our_path.branch_path().string(),
+    // Assertion will only happen if constructed with an empty string and absolute path.
+    // (Arguably a user could do this, but not accidentally.)
+    assert(!our_path.parent_path().empty());
+    return FileFinder(our_path.parent_path().string(),
                       RelativeTo::Absolute);
 }
-
 
 std::string FileFinder::GetRelativePath(const FileFinder& rBasePath) const
 {
@@ -268,7 +271,6 @@ std::string FileFinder::GetRelativePath(const FileFinder& rBasePath) const
     }
     return our_path.substr(base_path.length());
 }
-
 
 /**
  * Helper function for FileFinder::CopyTo - recursively copy the given path.
@@ -283,13 +285,13 @@ void RecursiveCopy(const fs::path& rFromPath, const fs::path& rToPath)
     // If rToPath is a folder, then we're copying to the source name *inside* this folder
     if (fs::is_directory(dest))
     {
-        dest /= rFromPath.leaf();
+        dest /= rFromPath.filename();
     }
     // If the source is a folder, it's complicated
     if (fs::is_directory(rFromPath))
     {
         // Create the destination folder
-        EXCEPT_IF_NOT(!fs::exists(dest));
+        EXCEPT_IF(fs::exists(dest));
         fs::create_directory(dest);
         // Recursively copy our contents
         fs::directory_iterator end_iter;
@@ -304,7 +306,6 @@ void RecursiveCopy(const fs::path& rFromPath, const fs::path& rToPath)
     }
 }
 
-
 FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
 {
     if (!Exists())
@@ -315,7 +316,7 @@ FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
     fs::path to_path(rDest.mAbsPath);
     if (rDest.IsDir())
     {
-        to_path /= from_path.leaf();
+        to_path /= from_path.filename();
     }
     if (fs::exists(to_path))
     {
@@ -331,7 +332,6 @@ FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
     CONVERT_ERROR(RecursiveCopy(from_path, to_path));
     return FileFinder(to_path);
 }
-
 
 /**
  * Helper function for FileFinder::Remove - recursively remove the given path.
@@ -366,35 +366,35 @@ void FileFinder::PrivateRemove(bool dangerous) const
     {
         if (dangerous)
         {
-            const std::string source_folder(FileFinder("",RelativeTo::ChasteSourceRoot).GetAbsolutePath());
+            const std::string source_folder(FileFinder("", RelativeTo::ChasteSourceRoot).GetAbsolutePath());
             const std::string source_folder_path = ChastePosixPathFixer::ToPosix(fs::path(source_folder));
             bool in_source = (absolute_path.substr(0, source_folder_path.length()) == source_folder_path);
 
-            const std::string build_folder(FileFinder("",RelativeTo::ChasteBuildRoot).GetAbsolutePath());
+            const std::string build_folder(FileFinder("", RelativeTo::ChasteBuildRoot).GetAbsolutePath());
             const std::string build_folder_path = ChastePosixPathFixer::ToPosix(fs::path(build_folder));
             bool in_build = (absolute_path.substr(0, build_folder_path.length()) == build_folder_path);
 
             if (!(in_source || in_build))
             {
                 EXCEPTION("Cannot remove location '" << mAbsPath
-                          << "' as it is not located within the Chaste test output folder ("
-                          << test_output_path << "), the Chaste source folder ("
-                          << source_folder_path <<") or the Chaste build folder ("
-                          << build_folder_path <<").");
+                                                     << "' as it is not located within the Chaste test output folder ("
+                                                     << test_output_path << "), the Chaste source folder ("
+                                                     << source_folder_path << ") or the Chaste build folder ("
+                                                     << build_folder_path << ").");
             }
         }
         else
         {
             EXCEPTION("Cannot remove location '" << mAbsPath
-                      << "' as it is not located within the Chaste test output folder ("
-                      << test_output_path << ").");
+                                                 << "' as it is not located within the Chaste test output folder ("
+                                                 << test_output_path << ").");
         }
     }
 
     if (mAbsPath.find("..") != std::string::npos)
     {
         EXCEPTION("Cannot remove location '" << mAbsPath
-                  << "' as it contains a dangerous path component.");
+                                             << "' as it contains a dangerous path component.");
     }
     if (Exists())
     {
@@ -404,13 +404,13 @@ void FileFinder::PrivateRemove(bool dangerous) const
             if (IsFile())
             {
                 // We need to look for the signature file in the parent folder
-                sig_file.remove_leaf();
+                sig_file.remove_filename();
             }
             sig_file /= OutputFileHandler::SIG_FILE_NAME;
             if (!fs::exists(sig_file))
             {
                 EXCEPTION("Cannot remove location '" << mAbsPath << "' because the signature file '"
-                          << OutputFileHandler::SIG_FILE_NAME << "' is not present.");
+                                                     << OutputFileHandler::SIG_FILE_NAME << "' is not present.");
             }
         }
         // Do the removal
@@ -427,7 +427,6 @@ void FileFinder::DangerousRemove() const
 {
     PrivateRemove(true);
 }
-
 
 std::vector<FileFinder> FileFinder::FindMatches(const std::string& rPattern) const
 {
@@ -449,7 +448,7 @@ std::vector<FileFinder> FileFinder::FindMatches(const std::string& rPattern) con
     if (!pattern.empty() && *(pattern.rbegin()) == '*')
     {
         star_fini = true;
-        pattern = pattern.substr(0, len-1);
+        pattern = pattern.substr(0, len - 1);
         len--;
     }
     bool star_init = false;
@@ -474,9 +473,9 @@ std::vector<FileFinder> FileFinder::FindMatches(const std::string& rPattern) con
         fs::path our_path(mAbsPath);
         for (fs::directory_iterator dir_iter(our_path); dir_iter != end_iter; ++dir_iter)
         {
-            std::string leafname = PATH_LEAF_NAME(dir_iter->path());
+            std::string leafname = dir_iter->path().filename().string();
             size_t leaf_len = leafname.length();
-            if (leafname[0] != '.'  // Don't include hidden files
+            if (leafname[0] != '.' // Don't include hidden files
                 && leaf_len >= len) // Ignore stuff that can't match
             {
                 if (!has_query) // Easier case
@@ -501,7 +500,7 @@ std::vector<FileFinder> FileFinder::FindMatches(const std::string& rPattern) con
                         match = leafname.substr(0, len);
                     }
                     bool ok = true;
-                    for (std::string::const_iterator it_p=pattern.begin(), it_m=match.begin();
+                    for (std::string::const_iterator it_p = pattern.begin(), it_m = match.begin();
                          it_p != pattern.end();
                          ++it_p, ++it_m)
                     {
@@ -519,13 +518,14 @@ std::vector<FileFinder> FileFinder::FindMatches(const std::string& rPattern) con
             }
         }
     }
+
+    std::sort(results.begin(), results.end());
     return results;
 }
 
-
 bool FileFinder::IsAbsolutePath(const std::string& rPath)
 {
-    return fs::path(rPath).is_complete();
+    return fs::path(rPath).is_absolute();
 }
 
 void FileFinder::ReplaceSpacesWithUnderscores(std::string& rPath)
@@ -548,6 +548,11 @@ void FileFinder::ReplaceUnderscoresWithSpaces(std::string& rPath)
             *it = ' ';
         }
     }
+}
+
+bool FileFinder::operator<(const FileFinder& otherFinder) const
+{
+    return (mAbsPath < otherFinder.GetAbsolutePath());
 }
 
 void FileFinder::FakePath(RelativeTo::Value fakeWhat, const std::string& rFakePath)

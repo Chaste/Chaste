@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,12 +40,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "ToroidalHoneycombVertexMeshGenerator.hpp"
 #include "Toroidal2dVertexMesh.hpp"
+#include "ToroidalHoneycombMeshGenerator.hpp"
+#include "Toroidal2dMesh.hpp"
 #include "VertexMeshWriter.hpp"
 #include "VertexMeshReader.hpp"
 #include "ArchiveOpener.hpp"
+#include "TrianglesMeshWriter.hpp"
+#include "VtkMeshWriter.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -58,7 +64,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(18, 24);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 864u); // 2*18*24
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 432u); // 18*24
@@ -72,11 +78,11 @@ public:
         }
     }
 
-    void TestMeshGetWidth()
+    void TestMeshGetAndSetWidthAndHeight()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         // Test CalculateBoundingBox() method
         ChasteCuboid<2> bounds = p_mesh->CalculateBoundingBox();
@@ -89,16 +95,25 @@ public:
         // Test GetWidth() method
         double width = p_mesh->GetWidth(0);
         double height = p_mesh->GetWidth(1);
-
         TS_ASSERT_DELTA(width, 4.0, 1e-4);
         TS_ASSERT_DELTA(height, 6.0/sqrt(3.0), 1e-4);
+
+        // Test SetWidth() method
+        p_mesh->SetWidth(61.47);
+        width = p_mesh->GetWidth(0);
+        TS_ASSERT_DELTA(width, 61.47, 1e-4);
+
+        // Test SetHeight() method
+        p_mesh->SetHeight(123.89);
+        height = p_mesh->GetWidth(1);
+        TS_ASSERT_DELTA(height, 123.89, 1e-4);
     }
 
-    void TestGetVectorFromAtoB() throw (Exception)
+    void TestGetVectorFromAtoB()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         // Store the locations of some nodes
         c_vector<double, 2> node0_location = p_mesh->GetNode(0)->rGetLocation();
@@ -152,11 +167,11 @@ public:
         TS_ASSERT_DELTA(vector[1], 1/sqrt(3.0), 1e-4);
     }
 
-    void TestSetNodeLocationForToroidalMesh() throw (Exception)
+    void TestSetNodeLocationForToroidalMesh()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         // Move one of the nodes to near the periodic boundary
         c_vector<double, 2> new_point_location;
@@ -195,11 +210,11 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(2)->rGetLocation()[1], 6.0/sqrt(3.0) - 0.1, 1e-4);
     }
 
-    void TestAddNodeAndReMesh() throw (Exception)
+    void TestAddNodeAndReMesh()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(6, 6);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 72u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 36u);
@@ -282,7 +297,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u); // 2*4*4
 
@@ -353,7 +368,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u);
@@ -443,7 +458,220 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNodeGlobalIndex(4), 37u);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestTessellationConstructor()
+    {
+        // Create a simple Toroidal2dMesh, the Delaunay triangulation
+        unsigned cells_across = 3;
+        unsigned cells_up = 4;
+        ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
+        boost::shared_ptr<Toroidal2dMesh> p_delaunay_mesh = generator.GetToroidalMesh();
+
+        TrianglesMeshWriter<2,2> mesh_writer("TestToroidalVertexMesh", "DelaunayMesh", false);
+        TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
+
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 3);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(1), 4.0*sqrt(3)/2.0);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->CheckIsVoronoi(), true);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetNumElements(), 24u);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetNumNodes(), 12u);
+
+        // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh
+        Toroidal2dVertexMesh voronoi_mesh(*p_delaunay_mesh);
+
+        VertexMeshWriter<2,2> vertexmesh_writer("TestToroidalVertexMesh", "ToroidalVertexMesh", false);
+        TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteFilesUsingMesh(voronoi_mesh));
+
+        // TODO Check this file !
+        TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteVtkUsingMesh(voronoi_mesh,"0"));
+
+        // Test the Voronoi tessellation has the correct number of nodes and elements
+        TS_ASSERT_EQUALS(voronoi_mesh.GetWidth(0), 3u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetWidth(1), 4.0*sqrt(3)/2.0);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 12u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 24u);
+
+        // Test the location of the Voronoi nodes
+        /* These are ordered from right to left from bottom to top as
+         *
+         * 21 2 14, 4 22 19, 1 8 11, 7 9 10,
+         *
+         * Due to the numbering of the elements in the generator.
+         */
+
+        //Bottom row at y = -sqrt(3)/3 = 2sqrt(3)/3
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(21)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(21)->rGetLocation()[1], 5.0*sqrt(3.0)/3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(2)->rGetLocation()[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(2)->rGetLocation()[1], 5.0*sqrt(3.0)/3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(14)->rGetLocation()[0], 2.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(14)->rGetLocation()[1], 5.0*sqrt(3.0)/3.0, 1e-6);
+
+        //Bottom row at y = -sqrt(3)/6 = 5sqrt(3)/6
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[1], 11.0*sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(22)->rGetLocation()[0], 1.5, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(22)->rGetLocation()[1], 11.0*sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(19)->rGetLocation()[0], 2.5, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(19)->rGetLocation()[1], 11.0*sqrt(3.0)/6.0, 1e-6);
+
+        //Bottom row at y = sqrt(3)/6
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(1)->rGetLocation()[0], 0.5, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(1)->rGetLocation()[1], sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(8)->rGetLocation()[0], 1.5, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(8)->rGetLocation()[1], sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(11)->rGetLocation()[0], 2.5, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(11)->rGetLocation()[1], sqrt(3.0)/6.0, 1e-6);
+
+        //Bottom row at y = 4sqrt(3)/3
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(10)->rGetLocation()[0], 3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(10)->rGetLocation()[1], 2.0*sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(7)->rGetLocation()[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(7)->rGetLocation()[1], 2.0*sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[0], 2.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[1], 2.0*sqrt(3.0)/6.0, 1e-6);
+
+        // Test element areas and number of nodes
+        for (unsigned i=0; i<12; i++)
+        {
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(i), sqrt(3.0)/2.0, 1e-6);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(i)->GetNumNodes(), 6u);
+        }
+
+        // Test some Element Nodes
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(0), 19u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(1), 21u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(2), 4u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(3), 1u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(4), 10u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(5), 11u);
+
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNodeGlobalIndex(0), 7u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNodeGlobalIndex(1), 8u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNodeGlobalIndex(2), 9u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNodeGlobalIndex(3), 12u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNodeGlobalIndex(4), 23u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNodeGlobalIndex(5), 0u);
+
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(0), 20u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(1), 13u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(2), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(3), 3u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(4), 17u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(5), 18u);
+
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(11)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(11)->GetNodeGlobalIndex(0), 16u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(11)->GetNodeGlobalIndex(1), 18u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(11)->GetNodeGlobalIndex(2), 17u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(11)->GetNodeGlobalIndex(3), 21u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(11)->GetNodeGlobalIndex(4), 19u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(11)->GetNodeGlobalIndex(5), 14u);
+    }
+
+    void TestBoundedTessellationConstructor()
+    {
+        // Create a simple Toroidal2dMesh, the Delaunay triangulation
+        unsigned cells_across = 5;
+        unsigned cells_up = 6;
+        ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
+        boost::shared_ptr<Toroidal2dMesh> p_delaunay_mesh = generator.GetToroidalMesh();
+
+        // Remove central node
+        p_delaunay_mesh->DeleteNode(12);
+        NodeMap map(p_delaunay_mesh->GetNumAllNodes());
+        p_delaunay_mesh->ReMesh(map);
+
+        TrianglesMeshWriter<2,2> mesh_writer("TestBoundedToroidalVertexMesh", "ToroidalDelaunayMesh", false);
+        TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
+
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 5);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(1), 6.0*sqrt(3)/2.0);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->CheckIsVoronoi(), false); //Fails due to hole.
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetNumElements(), 58u);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetNumNodes(), 29u);
+
+        // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh, and bound this mesh.
+        bool is_bounded = true;
+        Toroidal2dVertexMesh voronoi_mesh(*p_delaunay_mesh,is_bounded);
+
+        VertexMeshWriter<2,2> vertexmesh_writer("TestBoundedToroidalVertexMesh", "ToroidalVertexMesh", false);
+        TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteFilesUsingMesh(voronoi_mesh));
+
+        // TODO Check this file !
+        TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteVtkUsingMesh(voronoi_mesh,"0"));
+
+        // Test the Voronoi tessellation has the correct number of nodes and elements
+        TS_ASSERT_EQUALS(voronoi_mesh.GetWidth(0), 5u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetWidth(1), 6.0*sqrt(3)/2.0);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 29u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 78u); // More than elements due to void
+
+        // Test the location of some of the Voronoi nodes
+
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(1)->rGetLocation()[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(1)->rGetLocation()[1], 2.0*sqrt(3.0)/3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[0], 2.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[1], 5.0*sqrt(3.0)/3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(34)->rGetLocation()[0], 2.5, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(34)->rGetLocation()[1], 0.5*sqrt(3.0)/3.0, 1e-6);
+
+        // Test element areas and number of nodes
+        for (unsigned i=0; i<24; i++)
+        {
+            if (i!=6 && i!=7 && i!=11 && i!=12 && i!=15 && i!=16)
+            {
+                TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(i), sqrt(3.0)/2.0, 1e-6);
+                TS_ASSERT_EQUALS(voronoi_mesh.GetElement(i)->GetNumNodes(), 6u);
+            }
+        }
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(6), 0.6811, 1e-4);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNumNodes(), 7u);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(7), 0.6688, 1e-4);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(7)->GetNumNodes(), 8u);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(11), 0.7358, 1e-4);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(11)->GetNumNodes(), 7u);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(12), 0.7113, 1e-4);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(12)->GetNumNodes(), 9u);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(15), 0.6811, 1e-4);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(15)->GetNumNodes(), 7u);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(16), 0.6688, 1e-4);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(16)->GetNumNodes(), 7u);
+
+        // Test some Element Nodes
+
+        //On bottom
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(0), 73u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(1), 72u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(2), 24u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(3), 0u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(4), 52u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNodeGlobalIndex(5), 47u);
+
+        // Adjacent to void
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(0), 2u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(1), 9u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(2), 7u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(3), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(4), 3u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(5), 11u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNodeGlobalIndex(6), 1u);
+
+        // On top
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(20)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(20)->GetNodeGlobalIndex(0), 12u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(20)->GetNodeGlobalIndex(1), 13u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(20)->GetNodeGlobalIndex(2), 29u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(20)->GetNodeGlobalIndex(3), 26u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(20)->GetNodeGlobalIndex(4), 23u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(20)->GetNodeGlobalIndex(5), 22u);
+    }
+
+    void TestArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "toroidal_vertex_mesh_base.arch";
@@ -453,7 +681,7 @@ public:
         unsigned num_cells_across = 4;
         unsigned num_cells_up = 6;
         ToroidalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        AbstractMesh<2,2>* const p_saved_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<AbstractMesh<2,2> > const p_saved_mesh = boost::static_pointer_cast<AbstractMesh<2, 2> >(generator.GetToroidalMesh());
 
         double mesh_width = num_cells_across;
         double mesh_height = num_cells_up*1.5/sqrt(3.0);
@@ -469,7 +697,7 @@ public:
          */
         {
             // Serialize the mesh
-            TS_ASSERT_DELTA((static_cast<Toroidal2dVertexMesh*>(p_saved_mesh))->GetWidth(0), mesh_width, 1e-7);
+            TS_ASSERT_DELTA((boost::static_pointer_cast<Toroidal2dVertexMesh>(p_saved_mesh))->GetWidth(0), mesh_width, 1e-7);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -481,7 +709,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractMesh<2,2>* p_loaded_mesh;
+            boost::shared_ptr<AbstractMesh<2,2> > p_loaded_mesh;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -491,8 +719,8 @@ public:
             (*p_arch) >> p_loaded_mesh;
 
             // Compare the loaded mesh against the original
-            Toroidal2dVertexMesh* p_mesh2 = static_cast<Toroidal2dVertexMesh*>(p_loaded_mesh);
-            Toroidal2dVertexMesh* p_mesh = static_cast<Toroidal2dVertexMesh*>(p_saved_mesh);
+            boost::shared_ptr<Toroidal2dVertexMesh> p_mesh2 = boost::static_pointer_cast<Toroidal2dVertexMesh>(p_loaded_mesh);
+            boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = boost::static_pointer_cast<Toroidal2dVertexMesh>(p_saved_mesh);
 
             // Compare width
             TS_ASSERT_DELTA(p_mesh2->GetWidth(0), mesh_width, 1e-7);
@@ -531,19 +759,16 @@ public:
                     TS_ASSERT_EQUALS(p_elt->GetNodeGlobalIndex(j), p_elt2->GetNodeGlobalIndex(j));
                 }
             }
-
-            // Tidy up
-            delete p_mesh2;
         }
     }
 
-    void TestToroidalReMesh() throw (Exception)
+    void TestToroidalReMesh()
     {
         // Create mesh
         unsigned num_cells_across = 6;
         unsigned num_cells_up = 12;
         ToroidalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         // Call Remesh()
         VertexElementMap map(p_mesh->GetNumElements());
@@ -556,13 +781,13 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_cells_across*num_cells_up);
     }
 
-    void TestToroidalReMeshAfterDelete() throw (Exception)
+    void TestToroidalReMeshAfterDelete()
     {
         // Create mesh
         unsigned num_cells_across = 6;
         unsigned num_cells_up = 12;
         ToroidalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         unsigned num_old_nodes = p_mesh->GetNumNodes();
         unsigned num_old_elements = num_cells_across*num_cells_up;
@@ -621,7 +846,7 @@ public:
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point2, 0), false);
 
         // Another point outside the element due to periodicity
-        // (note that this point would be inside the element if we had a Cylindrical2dVertexMesh)
+        // (note that this point would be inside the element if we had a Toroidal2dVertexMesh)
         c_vector<double, 2> test_point3;
         test_point3[0] = 9.5;
         test_point3[1] = 1.0;
@@ -646,13 +871,13 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u); // 2*4*4
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u); // 4*4
 
         // Test GetMeshForVtk() method
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+        VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
 
         // The mesh for VTK should have the same number of elements, but 16 extra nodes
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
@@ -703,9 +928,84 @@ public:
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(3), 47u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(4), 42u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(5), 31u);
+    }
 
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
+    void TestGetMeshForVtkForVoronoiTesselation()
+    {
+        // Create a simple Toroidal2dMesh, the Delaunay triangulation
+        unsigned cells_across = 4;
+        unsigned cells_up = 4;
+        ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
+        boost::shared_ptr<Toroidal2dMesh> p_delaunay_mesh = generator.GetToroidalMesh();
+
+        // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh
+        Toroidal2dVertexMesh voronoi_mesh(*p_delaunay_mesh);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 32u); // 2*4*4
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 16u); // 4*4
+
+        // Test GetMeshForVtk() method
+        VertexMesh<2, 2>* p_mesh_for_vtk = voronoi_mesh.GetMeshForVtk();
+
+        // The mesh for VTK should have the same number of elements, but 16 extra nodes
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
+
+        // Every element in the mesh for VTK should have 6 nodes
+        for (unsigned elem_index=0; elem_index<p_mesh_for_vtk->GetNumElements(); elem_index++)
+        {
+            TS_ASSERT_EQUALS(p_mesh_for_vtk->GetElement(elem_index)->GetNumNodes(), 6u);        }
+
+
+        // Translate mesh for coverage
+        p_delaunay_mesh->Translate(0.1,0.05*sqrt(3.0));
+
+        Toroidal2dVertexMesh voronoi_mesh_1(*p_delaunay_mesh);
+        TS_ASSERT_EQUALS(voronoi_mesh_1.GetNumNodes(), 32u); // 2*4*4
+        TS_ASSERT_EQUALS(voronoi_mesh_1.GetNumElements(), 16u); // 4*4
+
+        p_mesh_for_vtk = voronoi_mesh_1.GetMeshForVtk();
+
+        // The mesh for VTK should have the same number of elements, but 16 extra nodes
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
+
+        // Translate mesh for coverage
+        p_delaunay_mesh->Translate(0.8,0.4*sqrt(3.0));
+
+        Toroidal2dVertexMesh voronoi_mesh_2(*p_delaunay_mesh);
+        TS_ASSERT_EQUALS(voronoi_mesh_2.GetNumNodes(), 32u); // 2*4*4
+        TS_ASSERT_EQUALS(voronoi_mesh_2.GetNumElements(), 16u); // 4*4
+
+        p_mesh_for_vtk = voronoi_mesh_2.GetMeshForVtk();
+
+        // The mesh for VTK should have the same number of elements, but 16 extra nodes
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
+
+        // Translate mesh for coverage
+        p_delaunay_mesh->Translate(0.0,-0.4*sqrt(3.0));
+
+        Toroidal2dVertexMesh voronoi_mesh_3(*p_delaunay_mesh);
+        TS_ASSERT_EQUALS(voronoi_mesh_3.GetNumNodes(), 32u); // 2*4*4
+        TS_ASSERT_EQUALS(voronoi_mesh_3.GetNumElements(), 16u); // 4*4
+
+        p_mesh_for_vtk = voronoi_mesh_3.GetMeshForVtk();
+
+        // The mesh for VTK should have the same number of elements, but 16 extra nodes
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
+        // Translate mesh for coverage
+        p_delaunay_mesh->Translate(0.0,-0.1*sqrt(3.0));
+
+        Toroidal2dVertexMesh voronoi_mesh_4(*p_delaunay_mesh);
+        TS_ASSERT_EQUALS(voronoi_mesh_4.GetNumNodes(), 32u); // 2*4*4
+        TS_ASSERT_EQUALS(voronoi_mesh_4.GetNumElements(), 16u); // 4*4
+
+        p_mesh_for_vtk = voronoi_mesh_4.GetMeshForVtk();
+
+        // The mesh for VTK should have the same number of elements, but 16 extra nodes
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
     }
 
     void TestConstructFromMeshReader()

@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,23 +41,23 @@ if __name__ == "__main__":
     table_cell_counter=0
     match_counter=0;
     for line in genhtml_output:
-        #print line
+        #print(line)
         if table_cell_counter > 0:
             table_cell_counter = table_cell_counter + 1
         if re.match('(.*)headerItem(.*)Lines(.*)',line):
             # This line gives the header of the table in the top right of the genhtml index page.
-            # It should only match one line in the entire file.            
+            # It should only match one line in the entire file.
             table_cell_counter = 1
             match_counter = match_counter + 1
         if table_cell_counter == 4:
-            # If we go down 4 lines we get to the 
+            # If we go down 4 lines we get to the
             if re.match('(.*)headerCovTableEntryHi(.*)',line):
                 ok = True
 
     if match_counter is not 1:
         print('Did not find a match for coverage summary line, or found more than one match. process_coverage_output.py needs tweaking!')
         sys.exit(2)
-        
+
     if not ok:
         print('Coverage is not 100% - failing coverage test.')
         sys.exit(1)

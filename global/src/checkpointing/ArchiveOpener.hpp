@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,11 +35,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ARCHIVEOPENER_HPP_
 #define ARCHIVEOPENER_HPP_
 
-#include <string>
 #include <cassert>
+#include <string>
 
-#include "PetscTools.hpp"
 #include "FileFinder.hpp"
+#include "PetscTools.hpp"
 
 /**
  * A convenience class to assist with managing archives for parallel checkpointing.
@@ -55,15 +55,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Note also that implementations of this templated class only exist for text archives, i.e.
  * Archive = boost::archive::text_iarchive (with Stream = std::ifstream), or
- * Archive = boost::archive::text_oarchive (with Stream = std::ofstream).
+ * Archive = boost::archive::text_oarchive (with Stream = std::ofstream) and for binary archives, i.e.
+ * Archive = boost::archive::binary_iarchive (with Stream = std::ifstream), or
+ * Archive = boost::archive::binary_oarchive (with Stream = std::ofstream).
  */
 template <class Archive, class Stream>
 class ArchiveOpener
 {
 private:
     friend class TestArchivingHelperClasses;
-public:
 
+public:
     /**
      * Open the archives for this process, either for reading or writing depending on the
      * template parameter Archive.
@@ -85,29 +87,24 @@ public:
      */
     ArchiveOpener(const FileFinder& rDirectory,
                   const std::string& rFileNameBase,
-                  unsigned procId=PetscTools::GetMyRank());
+                  unsigned procId = PetscTools::GetMyRank());
+
+    /**
+     * @return the main archive for replicated data.
+     */
+    Archive* GetCommonArchive();
 
     /**
      * Close the opened archives.
      */
     ~ArchiveOpener();
 
-    /**
-     * @return the main archive for replicated data.
-     */
-    Archive* GetCommonArchive()
-    {
-        assert(mpCommonArchive != NULL);
-        return mpCommonArchive;
-    }
-
 private:
-
     /** The file stream for the main archive. */
-    Stream* mpCommonStream;
+    std::ofstream* mpCommonStream;
 
     /** The file stream for the secondary archive. */
-    Stream* mpPrivateStream;
+    std::ofstream* mpPrivateStream;
 
     /** The main archive. */
     Archive* mpCommonArchive;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "RungeKuttaFehlbergIvpOdeSolver.hpp"
+#include <algorithm>
 #include <cmath>
 #include <cfloat>
 #include <iostream>
@@ -97,14 +98,7 @@ void RungeKuttaFehlbergIvpOdeSolver::InternalSolve(OdeSolution& rSolution,
                                 rWorkingMemory);
 
             // Find the maximum error in this vector
-            double max_error = -DBL_MAX;
-            for (unsigned i=0; i<number_of_variables; i++)
-            {
-                if (mError[i] > max_error)
-                {
-                    max_error = mError[i];
-                }
-            }
+            double max_error = *std::max_element(mError.begin(), mError.end());
 
             if (max_error > tolerance)
             {// Reject the step-size and do it again.

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -133,7 +133,7 @@ boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > CellCy
 template<class CELL_CYCLE_MODEL, class ODE_SOLVER>
 bool CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::IsSetUp()
 {
-    return mpOdeSolver;
+    return static_cast<bool>(mpOdeSolver.get());
 }
 
 template<class CELL_CYCLE_MODEL, class ODE_SOLVER>

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTVERTEXMESHWRITER_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 
 #include <string>
 #include <fstream>
@@ -48,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "ToroidalHoneycombVertexMeshGenerator.hpp"
 #include "FileComparison.hpp"
-
+#include "TrapezoidEdgeVertexMeshWriter.hpp"
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -61,7 +62,7 @@ class TestVertexMeshWriter : public CxxTest::TestSuite
 {
 public:
 
-    void TestVertexMeshWriterIn2d() throw(Exception)
+    void TestVertexMeshWriterIn2d()
     {
         std::vector<Node<2>*> basic_nodes;
         basic_nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -136,11 +137,11 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVertexMeshWriterWithCylindricalMesh() throw(Exception)
+    void TestVertexMeshWriterWithCylindricalMesh()
     {
         // Create cylindrical mesh (i.e. one that is left/right periodic)
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
@@ -162,7 +163,7 @@ public:
         TS_ASSERT(comparer2.CompareFiles());
 
 #ifdef CHASTE_VTK
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+        VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
         std::vector<double> cell_ids;
         for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
         {
@@ -188,20 +189,17 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
 #else
         std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
-    void TestVertexMeshWriterWithToroidalMesh() throw(Exception)
+    void TestVertexMeshWriterWithToroidalMesh()
     {
         // Create toroidal mesh (i.e. one that is periodic in both directions)
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u); // 2*4*4
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u); // 4*4
@@ -223,7 +221,7 @@ public:
         TS_ASSERT(comparer2.CompareFiles());
 
 #ifdef CHASTE_VTK
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+        VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
         std::vector<double> cell_ids;
         for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
         {
@@ -250,15 +248,13 @@ public:
             TS_ASSERT(vtk_file.Exists());
         }
 
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
 #else
         std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
-    void TestVertexMeshWriterIn3dWithoutFaces() throw(Exception)
+    void TestVertexMeshWriterIn3dWithoutFaces()
     {
         // Create 3D mesh
         std::vector<Node<3>*> nodes;
@@ -323,7 +319,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVertexMeshWriterIn3dWithFaces() throw(Exception)
+    void TestVertexMeshWriterIn3dWithFaces()
     {
         // Create a simple 3D mesh using the Voronoi constructor
         std::vector<Node<3>*> nodes;
@@ -382,7 +378,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestMeshWriterWithDeletedNode() throw (Exception)
+    void TestMeshWriterWithDeletedNode()
     {
         // Create mesh
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
@@ -412,7 +408,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 8u);
     }
 
-    void TestReadingAndWritingElementAttributes() throw(Exception)
+    void TestReadingAndWritingElementAttributes()
     {
         // Read in a mesh with element attributes
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
@@ -470,7 +466,7 @@ public:
         TS_ASSERT_EQUALS(mesh3d2.GetElement(0)->GetUnsignedAttribute(), 49u);
     }
 
-    void TestWriteFilesUsingMeshReader() throw (Exception)
+    void TestWriteFilesUsingMeshReader()
     {
         // Create a VertexMeshReader and use it to write mesh files
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
@@ -487,6 +483,17 @@ public:
         TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElementAttributes(), 1u);
+    }
+
+    void TestTrapezoidEdgeVertexMeshWriter()
+    {
+        // The class is utilised when there are CellEdgeData associated with the mesh
+        // TrapezoidEdgeVertexMeshWriter() only outputs .vtk files for visualisation,
+        // where trapezoids represent edges.
+        // Here we only test for coverage of an implementation of WriteFiles() method
+        TrapezoidEdgeVertexMeshWriter<2,2> mesh_writer("TestTrapezoidEdgeVertexMeshWriter", "vertex_mesh");
+        //For coverage
+        mesh_writer.WriteFiles();
     }
 };
 

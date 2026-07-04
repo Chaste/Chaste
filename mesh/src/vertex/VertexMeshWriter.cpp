@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -62,13 +62,13 @@ VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::VertexMeshWriter(const std::string& rD
                                                            const std::string& rBaseName,
                                                            const bool clearOutputDir)
     : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
-      mpMesh(NULL),
+      mpMesh(nullptr),
       mpIters(new MeshWriterIterators<ELEMENT_DIM, SPACE_DIM>),
-      mpNodeMap(NULL),
+      mpNodeMap(nullptr),
       mNodeMapCurrentIndex(0)
 {
-    mpIters->pNodeIter = NULL;
-    mpIters->pElemIter = NULL;
+    mpIters->pNodeIter = nullptr;
+    mpIters->pElemIter = nullptr;
 
 #ifdef CHASTE_VTK
      // Dubious, since we shouldn't yet know what any details of the mesh are.
@@ -131,7 +131,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElementWithFaces()
 {
     // This method should only be called in 3D
-    assert(SPACE_DIM == 3);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE
     assert(mpMesh);
     assert(this->mNumElements == mpMesh->GetNumElements());
 
@@ -213,7 +213,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
 {
 #ifdef CHASTE_VTK
-    assert(SPACE_DIM==3 || SPACE_DIM == 2);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM==3 || SPACE_DIM == 2);    // LCOV_EXCL_LINE
 
     // Create VTK mesh
     MakeVtkMesh(rMesh);
@@ -228,7 +228,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(const VertexMes
 #endif
     // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
     // **** REMOVE WITH CAUTION *****
-    p_writer->SetCompressor(NULL);
+    p_writer->SetCompressor(nullptr);
     // **** REMOVE WITH CAUTION *****
 
     std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
@@ -274,26 +274,8 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(const VertexMesh<2, 2>& rMesh, st
 {
 #ifdef CHASTE_VTK
     // Create VTK mesh
-    if (dynamic_cast<const Toroidal2dVertexMesh*>(&rMesh))
-    {
-        const MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<const Toroidal2dVertexMesh*>(&rMesh)->GetMeshForVtk();
-        MakeVtkMesh(*p_mesh_for_vtk);
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
-    }
-    else if (dynamic_cast<const Cylindrical2dVertexMesh*>(&rMesh))
-    {
-        const MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<const Cylindrical2dVertexMesh*>(&rMesh)->GetMeshForVtk();
-        MakeVtkMesh(*p_mesh_for_vtk);
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
-    }
-    else
-    {
-        MakeVtkMesh(rMesh);
-    }
+    VertexMesh<2, 2>* p_mesh_for_vtk = rMesh.GetMeshForVtk();
+    MakeVtkMesh(*p_mesh_for_vtk);
 
     // Now write VTK mesh to file
     assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
@@ -305,7 +287,7 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(const VertexMesh<2, 2>& rMesh, st
 #endif
     // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
     // **** REMOVE WITH CAUTION *****
-    p_writer->SetCompressor(NULL);
+    p_writer->SetCompressor(nullptr);
     // **** REMOVE WITH CAUTION *****
 
     std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
@@ -372,19 +354,21 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
     // Make the Vtk mesh
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
-    for (unsigned node_num=0; node_num<rMesh.GetNumAllNodes(); node_num++)
+    for (unsigned node_num = 0; node_num < rMesh.GetNumNodes(); node_num++)
     {
-        if (rMesh.GetNode(node_num)->IsDeleted())
-            continue;
-
-        const c_vector<double, SPACE_DIM> position = rMesh.GetNode(node_num)->rGetLocation();
-        if (SPACE_DIM==2)
+        c_vector<double, SPACE_DIM> position;
+        position = rMesh.GetNode(node_num)->rGetLocation();
+        if constexpr (SPACE_DIM == 2)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
         }
-        else
+        else if constexpr (SPACE_DIM == 3)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], position[2]);
+        }
+        else
+        {
+            NEVER_REACHED;
         }
     }
 
@@ -507,7 +491,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)
 {
-    this->mpMeshReader = NULL;
+    this->mpMeshReader = nullptr;
     mpMesh = &rMesh;
 
     this->mNumNodes = mpMesh->GetNumNodes();
@@ -602,7 +586,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         }
         else // 3D
         {
-            assert(SPACE_DIM == 3);	// LCOV_EXCL_LINE
+            assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE
 
             // Get data for this element
             VertexElementData elem_data_with_faces = this->GetNextElementWithFaces();

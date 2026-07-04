@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,22 +45,14 @@ template<unsigned DIM>
 void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a NodeBasedCellPopulation
-    if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("RepulsionForce is to be used with a NodeBasedCellPopulation only");
     }
 
-    std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& r_node_pairs = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetNodePairs();
-
-    for (typename std::vector< std::pair<Node<DIM>*, Node<DIM>* > >::iterator iter = r_node_pairs.begin();
-        iter != r_node_pairs.end();
-        iter++)
+    const std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& r_node_pairs = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetNodePairs();
+    for (const auto& [p_node_a, p_node_b] : r_node_pairs)
     {
-        std::pair<Node<DIM>*, Node<DIM>* > pair = *iter;
-
-        Node<DIM>* p_node_a = pair.first;
-        Node<DIM>* p_node_b = pair.second;
-
         // Get the node locations
         const c_vector<double, DIM>& r_node_a_location = p_node_a->rGetLocation();
         const c_vector<double, DIM>& r_node_b_location = p_node_b->rGetLocation();

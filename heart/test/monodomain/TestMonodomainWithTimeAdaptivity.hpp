@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -84,7 +84,7 @@ public:
 class TestMonodomainWithTimeAdaptivity : public CxxTest::TestSuite
 {
 public:
-    void TestWithCube() throw(Exception)
+    void TestWithCube()
     {
         HeartConfig::Instance()->SetPrintingTimeStep(1.0);
         HeartConfig::Instance()->SetSimulationDuration(3); //ms
@@ -141,7 +141,7 @@ public:
         TS_ASSERT_DELTA(max_adaptive, 25.6083, 1e-3);
     }
 
-    void TestWithChebyshevAndFixedIterations() throw(Exception)
+    void TestWithChebyshevAndFixedIterations()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetPrintingTimeStep(1.0);
@@ -180,7 +180,8 @@ public:
 
                 //This test assumes no exception.  Requires PETSc > 2.3.2
                 TS_ASSERT_DELTA(min_non_adaptive, 21.9062, 1e-3);
-                TS_ASSERT_DELTA(max_non_adaptive, 28.8346, 1e-3);
+                TS_ASSERT_DELTA(max_non_adaptive, 28.8346, 2e-3);
+                // Threshold relaxed: see https://github.com/Chaste/Chaste/pull/342
             }
 
 
@@ -207,7 +208,8 @@ public:
                 // compare
                 //This test assumes no exception.  Requires PETSc > 2.3.2
                 TS_ASSERT_DELTA(min_adaptive, 19.9009, 1e-3);
-                TS_ASSERT_DELTA(max_adaptive, 25.6082, 1e-3);
+                TS_ASSERT_DELTA(max_adaptive, 25.6082, 3e-3);
+                // Note that the threshold was relaxed twice. See #2997 and https://github.com/Chaste/Chaste/pull/342.
             }
         }
         catch (Exception& e)

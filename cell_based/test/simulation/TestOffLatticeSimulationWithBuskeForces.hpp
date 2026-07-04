@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,13 +64,13 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a BuskeInteractionForce system.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void TestSimpleMonolayerWithBuskeAdhesiveForce() throw (Exception)
+    void TestSimpleMonolayerWithBuskeAdhesiveForce()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -118,13 +118,13 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a BuskeElasticForce system.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void TestSimpleMonolayerWithBuskeElasticForce() throw (Exception)
+    void TestSimpleMonolayerWithBuskeElasticForce()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -171,7 +171,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a BuskeCompressionForce system.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void TestSimpleMonolayerWithBuskeCompressionForce() throw (Exception)
+    void TestSimpleMonolayerWithBuskeCompressionForce()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -179,7 +179,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -228,13 +228,13 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with all Buske forces.
      * Test that no exceptions are thrown.
      */
-    void TestAllBuskeForces() throw (Exception)
+    void TestAllBuskeForces()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -269,13 +269,13 @@ public:
     /**
      * Test that two nodes relax to the equilibrium distance.
      */
-    void TestBuskeRelaxationForces() throw (Exception)
+    void TestBuskeRelaxationForces()
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple mesh with two nodes
         HoneycombMeshGenerator generator(2, 1, 0, 0.9);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;

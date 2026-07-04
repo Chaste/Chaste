@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -344,7 +344,6 @@ void QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(const 
                                                                           c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue)
 {
     assert(ELEMENT_DIM < 4 && ELEMENT_DIM > 0);
-
     for (unsigned j=0; j<(ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2; j++)
     {
         matrix_column<c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2> > column(rReturnValue, j);

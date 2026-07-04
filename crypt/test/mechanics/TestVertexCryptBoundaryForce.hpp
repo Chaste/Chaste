@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -73,11 +74,11 @@ public:
         FileComparison( boundary_force_results_dir + "boundary_results.parameters", "crypt/test/data/TestForcesForCrypt/boundary_results.parameters").CompareFiles();
     }
 
-    void TestVertexCryptBoundaryForceMethods() throw (Exception)
+    void TestVertexCryptBoundaryForceMethods()
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 5, false, 0.1, 0.5);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Translate mesh so that some points are below y=0
         p_mesh->Translate(0.0, -3.0);
@@ -130,7 +131,7 @@ public:
         }
     }
 
-    void TestVertexCryptBoundaryForceForceWithNonVertexCellPopulation() throw (Exception)
+    void TestVertexCryptBoundaryForceForceWithNonVertexCellPopulation()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;

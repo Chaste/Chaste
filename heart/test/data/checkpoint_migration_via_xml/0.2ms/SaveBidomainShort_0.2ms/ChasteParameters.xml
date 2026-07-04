@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<cp:ChasteParameters xmlns:cp="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1" xmlns:cp20="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0" xmlns:cp21="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1" xmlns:cp22="https://chaste.comlab.ox.ac.uk/nss/parameters/2_2" xmlns:cp23="https://chaste.comlab.ox.ac.uk/nss/parameters/2_3" xmlns:cp30="https://chaste.comlab.ox.ac.uk/nss/parameters/3_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ChasteParameters_1_1.xsd" xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1 ChasteParameters_3_1.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ChasteParameters_2_0.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_1 ChasteParameters_2_1.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_2 ChasteParameters_2_2.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_3 ChasteParameters_2_3.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/3_0 ChasteParameters_3_0.xsd">
-
+<cp:ChasteParameters xmlns:cp="https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1" xmlns:cp20="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0" xmlns:cp21="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1" xmlns:cp22="https://chaste.comlab.ox.ac.uk/nss/parameters/2_2" xmlns:cp23="https://chaste.comlab.ox.ac.uk/nss/parameters/2_3" xmlns:cp30="https://chaste.comlab.ox.ac.uk/nss/parameters/3_0" xmlns:cp31="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1" xmlns:cp33="https://chaste.comlab.ox.ac.uk/nss/parameters/3_3" xmlns:cp34="https://chaste.comlab.ox.ac.uk/nss/parameters/3_4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ChasteParameters_1_1.xsd" xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1 ChasteParameters_2017_1.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ChasteParameters_2_0.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_1 ChasteParameters_2_1.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_2 ChasteParameters_2_2.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_3 ChasteParameters_2_3.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/3_0 ChasteParameters_3_0.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/3_1 ChasteParameters_3_1.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/3_3 ChasteParameters_3_3.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/3_4 ChasteParameters_3_4.xsd">
   <cp:Simulation>
     <cp:SpaceDimension>3</cp:SpaceDimension>
     <cp:SimulationDuration unit="ms">0.2</cp:SimulationDuration>
@@ -28,9 +27,9 @@
     </cp:Stimuli>
     <cp:OutputDirectory>SaveBidomainShort</cp:OutputDirectory>
     <cp:OutputFilenamePrefix>SimulationResults</cp:OutputFilenamePrefix>
+    <cp:OutputVisualizer cmgui="no" meshalyzer="yes" parallel_vtk="no" precision="0" vtk="no"/>
     <cp:CheckpointSimulation max_checkpoints_on_disk="3" timestep="0.2" unit="ms"/>
   </cp:Simulation>
-
   <cp:Physiological>
     <cp:IntracellularConductivities longi="1.75" normal="1.75" trans="1.75" unit="mS/cm"/>
     <cp:ExtracellularConductivities longi="7" normal="7" trans="7" unit="mS/cm"/>
@@ -43,7 +42,6 @@
       <cp:Conductivity unit="mS/cm">1.75</cp:Conductivity>
     </cp:Purkinje>
   </cp:Physiological>
-
   <cp:Numerical>
     <cp:TimeSteps ode="0.01" pde="0.1" printing="0.1" unit="ms"/>
     <cp:KSPTolerances>
@@ -51,8 +49,7 @@
     </cp:KSPTolerances>
     <cp:KSPSolver>gmres</cp:KSPSolver>
     <cp:KSPPreconditioner>jacobi</cp:KSPPreconditioner>
-    <cp:MeshPartitioning>metis</cp:MeshPartitioning>
+    <cp:MeshPartitioning>parmetis</cp:MeshPartitioning>
     <cp:UseStateVariableInterpolation>no</cp:UseStateVariableInterpolation>
   </cp:Numerical>
-
 </cp:ChasteParameters>

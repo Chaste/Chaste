@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,17 +54,12 @@ AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(boost::s
 }
 
 template<unsigned DIM>
-AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
-{
-}
-
-template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     if (this->mDeleteFeMesh)
     {
         // If a mesh has been created on a previous time step then we need to tidy it up
-        assert(this->mpFeMesh != NULL);
+        assert(this->mpFeMesh != nullptr);
         delete this->mpFeMesh;
     }
     else
@@ -72,12 +67,15 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
         ///\todo We should only set mDeleteFeMesh once, not every time step (#2687, #2863)
         // This placement assumes that if this->mDeleteFeMesh is false it is uninitialised and needs to
         // be checked. If true, it has been checked elsewhere.
-        this->mDeleteFeMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
+        this->mDeleteFeMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr);
     }
 
     // Get the finite element mesh via the cell population. Set to NULL first in case mesh generation fails.
-    this->mpFeMesh = NULL;
+    this->mpFeMesh = nullptr;
     this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
+
+    // initialise Dirichlet boundary node tracking
+    this->mIsDirichletBoundaryNode = std::vector<double>(this->mpFeMesh->GetNumNodes(), 0.0);
 }
 
 template<unsigned DIM>
@@ -97,18 +95,18 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
         unsigned tet_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
         ///\todo Consider how to remove dynamic_casts here
-        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
+        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != nullptr)
         {
             // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
             tet_node_index += rCellPopulation.GetNumNodes();
         }
-        else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
+        else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != nullptr)
         {
             // Here local cell index corresponds to tet node
             tet_node_index = cell_index;
             cell_index++;
         }
-        else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
+        else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != nullptr)
         {
             tet_node_index = index_in_solution_repl;
             index_in_solution_repl++;
@@ -130,7 +128,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
                  element_iter != p_tet_node->ContainingElementsEnd();
                  ++element_iter)
             {
-                // Calculate the basis functions at any point (eg zero) in the element
+                // Calculate the basis functions at any point (e.g. zero) in the element
                 c_matrix<double, DIM, DIM> jacobian, inverse_jacobian;
                 double jacobian_det;
                 this->mpFeMesh->GetInverseJacobianForElement(*element_iter, jacobian, jacobian_det, inverse_jacobian);

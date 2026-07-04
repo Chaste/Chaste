@@ -1,6 +1,6 @@
 Warning: These have been filtered by  /home/jmpf/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
 This means that all floating point numbers have been rounded to 8 decimal places.
-HDF5 "/home/jmpf/.texttest/tmp/chaste.12Mar150606.40022/chaste/imported_mesh_bidomain/ChasteResults/SimulationResults.h5" {
+HDF5 "/home/jmpf/.texttest/tmp/chaste.19Mar155829.43577/chaste/imported_mesh_bidomain/ChasteResults/SimulationResults.h5" {
 GROUP "/" {
    DATASET "Data" {
       DATATYPE  H5T_IEEE_F64LE
@@ -38490,14 +38490,14 @@ GROUP "/" {
       }
       ATTRIBUTE "Chaste Provenance" {
          DATATYPE  H5T_STRING {
-            STRSIZE 1023;
-            STRPAD H5T_STR_NULLTERM;
-            CSET H5T_CSET_ASCII;
-            CTYPE H5T_C_S1;
-         }
+               STRSIZE 1023;
+               STRPAD H5T_STR_NULLTERM;
+               CSET H5T_CSET_ASCII;
+               CTYPE H5T_C_S1;
+            }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
-         (0): "Created by Chaste version 3.3.23823 (with uncommitted modifications) on Thu, 12 Mar 2015 15:09:39 +0000.  Chaste was built on Thu, 12 Mar 2015 10:07:30 +0000 by machine (uname) 'Linux scoop 3.2.0-77-generic #112-Ubuntu SMP Tue Feb 10 15:22:22 UTC 2015 x86_64' using settings: default, shared libraries.  Checked-out project versions: Eikonal=66M; Harvey2015=23520:23521; papers=18344M; simone=22322; template=21133:21135.
+         (0): "Created by Chaste version 2017.1.6ba68bb on Mon, 19 Mar 2018 16:00:32 +0000.  Chaste was built on Mon, 19 Mar 2018 13:44:16 +0000 by machine (uname) 'Linux scoop 4.4.0-101-generic #124-Ubuntu SMP Fri Nov 10 18:29:59 UTC 2017 x86_64' using settings: GccOpt, shared libraries.
            "
          }
       }
@@ -38510,11 +38510,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Variable Details" {
          DATATYPE  H5T_STRING {
-            STRSIZE 100;
-            STRPAD H5T_STR_NULLTERM;
-            CSET H5T_CSET_ASCII;
-            CTYPE H5T_C_S1;
-         }
+               STRSIZE 100;
+               STRPAD H5T_STR_NULLTERM;
+               CSET H5T_CSET_ASCII;
+               CTYPE H5T_C_S1;
+            }
          DATASPACE  SIMPLE { ( 2 ) / ( 2 ) }
          DATA {
          (0): "V(mV)", "Phi_e(mV)"
@@ -38536,11 +38536,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Name" {
          DATATYPE  H5T_STRING {
-            STRSIZE 100;
-            STRPAD H5T_STR_NULLTERM;
-            CSET H5T_CSET_ASCII;
-            CTYPE H5T_C_S1;
-         }
+               STRSIZE 100;
+               STRPAD H5T_STR_NULLTERM;
+               CSET H5T_CSET_ASCII;
+               CTYPE H5T_C_S1;
+            }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "Time"
@@ -38548,11 +38548,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Unit" {
          DATATYPE  H5T_STRING {
-            STRSIZE 100;
-            STRPAD H5T_STR_NULLTERM;
-            CSET H5T_CSET_ASCII;
-            CTYPE H5T_C_S1;
-         }
+               STRSIZE 100;
+               STRPAD H5T_STR_NULLTERM;
+               CSET H5T_CSET_ASCII;
+               CTYPE H5T_C_S1;
+            }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "msecs"

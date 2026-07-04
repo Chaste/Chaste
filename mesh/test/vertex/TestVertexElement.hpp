@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -161,6 +161,9 @@ public:
 
         TS_ASSERT_DELTA(element.GetNode(0)->rGetLocation()[0], 1.2, 1e-12);
         TS_ASSERT_DELTA(element.GetNode(0)->rGetLocation()[1], 1.3, 1e-12);
+
+        // Test Edegs
+        TS_ASSERT_EQUALS(element.GetNumEdges(), 0u);
 
         // Test ResetIndex()
         TS_ASSERT_EQUALS(element.GetIndex(), 0u);

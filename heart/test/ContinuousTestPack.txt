@@ -24,10 +24,12 @@ ionicmodels/TestGeneralizedRushLarsen.hpp
 ionicmodels/TestHodgkinHuxleySquidAxon1952OriginalOdeSystem.hpp
 ionicmodels/TestIonicModels.hpp
 ionicmodels/TestIonicModelsWithSacs.hpp
+ionicmodels/TestCodegenPresent.hpp
 ionicmodels/TestModifiers.hpp
-ionicmodels/TestPyCml.hpp
+ionicmodels/TestCodegen.hpp
 ionicmodels/TestRushLarsen.hpp
 ionicmodels/TestSteadyStateRunner.hpp
+mechanics/TestCardiacElectroMechanicsVtkHandler.hpp
 mechanics/TestCardiacElectroMechanicsProblem.hpp
 mechanics/TestCardiacElectroMechanicsFurtherFunctionality.hpp
 mechanics/TestContractionModels.hpp
@@ -64,6 +66,7 @@ TestAbstractContractionCellFactory.hpp
 TestAbstractPurkinjeCellFactory.hpp
 TestCardiacSimulation.hpp
 TestCardiacSimulationArchiver.hpp
+TestChasteXsdVersion.hpp
 TestCheckpointing.hpp
 TestConductivityTensors.hpp
 TestElectrodes.hpp
@@ -72,4 +75,3 @@ TestHeartFileFinder.hpp
 TestHeartGeometryInformation.hpp
 TestHeartRegionCodes.hpp
 TestHeterogeneousConductivities.hpp
-

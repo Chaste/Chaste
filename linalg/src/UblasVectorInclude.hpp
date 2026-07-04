@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,7 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Convenience header for including ublas vector in default namespace
  */
 
+#include "ChastePragmas.hpp"
+
+CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN
 #include <boost/numeric/ublas/vector.hpp>
+CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END
 
 using boost::numeric::ublas::c_vector;
 using boost::numeric::ublas::zero_vector;

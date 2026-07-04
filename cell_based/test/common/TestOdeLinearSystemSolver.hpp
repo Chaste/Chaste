@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,6 +81,7 @@ public:
         Vec& r_force_vector = solver.rGetForceVector();
         PetscVecTools::SetElement(r_force_vector, 0, 1.0);
         PetscVecTools::SetElement(r_force_vector, 1, 3.0);
+        PetscVecTools::Finalise(r_force_vector);
 
         // Solve to get solution at next timestep
         Vec soln_next_timestep = solver.SolveOneTimeStep();
@@ -131,6 +132,7 @@ public:
         Vec& r_vector = solver.rGetForceVector();
         PetscVecTools::SetElement(r_vector, 0, 1.0);
         PetscVecTools::SetElement(r_vector, 1, 2.0);
+        PetscVecTools::Finalise(r_vector);
 
         // Solve to get solution at next timestep
         Vec soln_next_timestep = solver.SolveOneTimeStep();
@@ -197,6 +199,7 @@ public:
         PetscVecTools::SetElement(r_vector, 1, 2.0);
         PetscVecTools::SetElement(r_vector, 2, 3.0);
         PetscVecTools::SetElement(r_vector, 3, 4.0);
+        PetscVecTools::Finalise(r_vector);
 
         // Solve to get solution at next timestep
         Vec soln_next_timestep = solver.SolveOneTimeStep();

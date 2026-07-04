@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,12 +45,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 unsigned AbstractAcinarUnitFactory::GetNumberOfAcini()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
     return mpMesh->GetNumBoundaryNodes();
 }
 
 AbstractAcinarUnitFactory::AbstractAcinarUnitFactory()
-    : mpMesh(NULL)
+    : mpMesh(nullptr)
 {
 }
 
@@ -65,7 +65,7 @@ void AbstractAcinarUnitFactory::SetMesh(AbstractTetrahedralMesh<1,3>* pMesh)
 
 AbstractTetrahedralMesh<1,3>* AbstractAcinarUnitFactory::GetMesh()
 {
-    if (mpMesh == NULL)
+    if (mpMesh == nullptr)
     {
         EXCEPTION("The mesh object has not been set in the acinar unit factory");
     }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -326,7 +326,7 @@ public:
     /**
      * Use CellML metadata to set up the default stimulus for this cell.
      * By default this method will always throw an exception.  For suitably annotated
-     * models, PyCml will override this to provide a RegularStimulus as defined in
+     * models, chaste_codegen will override this to provide a RegularStimulus as defined in
      * the CellML.
      * @return a regular stimulus as defined in the CellML
      */
@@ -410,6 +410,9 @@ public:
      *  types of cells). This method by default throws an exception, so should be
      *  implemented in the concrete class if intracellular (cytosolic) calcium concentration is
      *  one of the state variables.
+     *
+     *  Returns the intracellular calcium concentraion *in milliMolar*.
+     *
      *  @return intracellular calcium concentration
      */
     virtual double GetIntracellularCalciumConcentration();

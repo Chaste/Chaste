@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -102,7 +102,11 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool stagger)
 {
-    assert(DIM==2); // LCOV_EXCL_LINE
+    if (DIM != 2)
+    {
+        EXCEPTION("This cuboid construction is only valid in 3D"); // LCOV_EXCL_LINE
+    }
+
     assert(numElemX > 0);
     assert(numElemY > 0);
 
@@ -126,7 +130,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
         for (unsigned i=0; i<numElemX; i++)
         {
             unsigned left_index = j*(numElemX+1) + i;
-            std::pair<unsigned,unsigned> edge(left_index, left_index+1 ) ;
+            std::pair<unsigned,unsigned> edge(left_index, left_index+1 );
             edge_to_internal_map[edge] = node_index;
             node_pos[0]=i+0.5;
             MakeNewInternalNode(node_index, node_pos, top);
@@ -138,20 +142,20 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
         {
             node_pos[0] = i;
             unsigned left_index = j*(numElemX+1) + i;
-            std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1) ) ;
+            std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1) );
             edge_to_internal_map[edge] = node_index;
             MakeNewInternalNode(node_index, node_pos, top);
             unsigned parity=(i+(numElemY-j))%2;
             if (stagger==false || parity==1) //Default when no stagger
             {
                 //backslash
-                std::pair<unsigned,unsigned> back_edge(left_index+1, left_index+(numElemX+1) ) ;
+                std::pair<unsigned,unsigned> back_edge(left_index+1, left_index+(numElemX+1) );
                 edge_to_internal_map[back_edge] = node_index;
             }
             else
             {
                 //foward slash
-                std::pair<unsigned,unsigned> forward_edge(left_index, left_index+(numElemX+1)+1 ) ;
+                std::pair<unsigned,unsigned> forward_edge(left_index, left_index+(numElemX+1)+1 );
                 edge_to_internal_map[forward_edge] = node_index;
             }
             node_pos[0] = i+0.5;
@@ -201,7 +205,7 @@ Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<do
         if (rLocation[dim] > rTop[dim])
         {
             //Outside the box so don't do anything
-            return NULL;
+            return nullptr;
         }
         if ((rLocation[dim] == 0.0) || (rLocation[dim] == rTop[dim]))
         {
@@ -242,7 +246,10 @@ unsigned QuadraticMesh<DIM>::LookupInternalNode(unsigned globalIndex1, unsigned 
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, unsigned numElemZ)
 {
-    assert(DIM==3); // LCOV_EXCL_LINE
+    if (DIM != 3)
+    {
+        EXCEPTION("This cuboid construction is only valid in 3D"); // LCOV_EXCL_LINE
+    }
 
     assert(numElemX > 0);
     assert(numElemY > 0);
@@ -427,11 +434,11 @@ void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, D
         this->ExportToMesher(unused_map, mesher_input, mesher_input.trianglelist);
 
         // Library call
-        triangulate((char*)"Qzero2", &mesher_input, &mesher_output, NULL);
+        triangulate((char*)"Qzero2", &mesher_input, &mesher_output, nullptr);
 
         this->ImportFromMesher(mesher_output, mesher_output.numberoftriangles, mesher_output.trianglelist, mesher_output.numberofedges, mesher_output.edgelist, mesher_output.edgemarkerlist);
         CountVertices();
-        QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, NULL);
+        QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, nullptr);
 
         //Tidy up triangle
         this->FreeTriangulateIo(mesher_input);
@@ -449,9 +456,9 @@ void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, D
         // Library call
         tetgen::tetrahedralize((char*)"Qzro2", &mesher_input, &mesher_output);
 
-        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, NULL);
+        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, nullptr);
         CountVertices();
-        QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, NULL);
+        QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, nullptr);
     }
 }
 

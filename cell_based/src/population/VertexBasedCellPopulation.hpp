@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
+#include "TrapezoidEdgeVertexMeshWriter.hpp"
+#include "VertexBasedPopulationSrn.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -46,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 class AbstractVertexBasedDivisionRule; // Forward declaration to prevent circular include chain
+template<unsigned DIM>
+class VertexBasedPopulationSrn;
 
 /**
  * A facade class encapsulating a vertex-based cell population.
@@ -63,6 +67,8 @@ private:
      * This test uses the private constructor to simplify testing.
      */
     friend class TestVertexBasedDivisionRules;
+    friend class TestVertexBasedCellPopulation;
+    friend class TestMutableVertexMeshOperationsWithPopulationSrn;
 
     /**
      * Whether to delete the mesh when we are destroyed.
@@ -96,11 +102,55 @@ private:
     std::vector< unsigned > mCellIdsOfT2Swaps;
 
     /**
-     * Overridden WriteVtkResultsToFile() method.
-     *
+     * Whether to restrict the vertex movement if vertex displacement is larger than
+     * the cell rearrangement threshold.
+     */
+    bool mRestrictVertexMovement;
+
+    /**
+     * Whether to throw StepSizeExceptions, which defaults to true but is made false after the first StepSizeException
+     * is thrown. In vertex based cell populations a StepSizeException is not considered terminal, so there is no need
+     * to throw more than one (as the numerical method uses WARN_ONCE_ONLY).
+     */
+     bool mThrowStepSizeException = true;
+
+     /**
+      * SRN remapping helper class
+      */
+     VertexBasedPopulationSrn<DIM> mPopulationSrn;
+
+     /**
+      * Whether to write cell vtk results. True by default
+      */
+     bool mWriteCellVtkResults = true;
+
+     /**
+      * Whether to write edge vtk results. True by default
+      */
+     bool mWriteEdgeVtkResults = true;
+
+    /**
+     * Overridden WriteVtkResultsToFile() method. If the first cell uses the SrnCellModel,
+     * the WriteCellEdgeVtkResultsToFile() is used which outputs an edge-based representation of the cell,
+     * otherwise WriteCellVtkResultsToFile() is used to represent entire cells.
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+
+    /**
+     * Writes a representation of cells to file.
+     * @param rDirectory
+     */
+    virtual void WriteCellVtkResultsToFile(const std::string& rDirectory);
+
+    /**
+     * Writes an edge-based representation of the cells to file.
+     * Each cell is divided into a number of triangles equaling the number of edges.
+     *
+     * Cell ID property is added by default so individual cells can still be differentiated.
+     * @param rDirectory
+     */
+    virtual void WriteCellEdgeVtkResultsToFile(const std::string& rDirectory);
 
     friend class boost::serialization::access;
     /**
@@ -120,6 +170,7 @@ private:
         archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<DIM> >(*this);
         archive & mOutputCellRearrangementLocations;
         archive & mpVertexBasedDivisionRule;
+        archive & mRestrictVertexMovement;
     }
 
     /**
@@ -152,8 +203,10 @@ public:
      * Constructor for use by boost serialization ONLY!
      *
      * @param rMesh a vertex mesh.
+     * @param rPopSrn a population SRN remapping helper class
      */
-    VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh);
+    VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
+                              VertexBasedPopulationSrn<DIM>& rPopSrn);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.
@@ -223,13 +276,26 @@ public:
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
-     *
-     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     * Given a cell, returns the set of location indices corresponding to
+     * neighbouring cells.
      *
      * @param pCell a cell
+     *
      * @return the set of neighbouring location indices.
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+
+    /**
+     * Overridden GetNeighbouringEdgeIndices() method.
+     * Gets the local edge index of the neighbouring element and the element
+     * index.
+     *
+     * @param pCell  Cell pointer
+     * @param edgeLocalIndex Local edge index
+     *
+     * @return set of pairs consisting of element index neighbouring pCell and local edge index
+     */
+    std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned edgeLocalIndex);
 
     /**
      * Overridden AddNode() method.
@@ -335,6 +401,14 @@ public:
      * @param pPopulationCountWriter the population count writer.
      */
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+
+    /**
+     * A virtual method to accept a cell population event writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationEventWriter the population event writer.
+     */
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -494,8 +568,8 @@ public:
      * @return a default value for the time step to use
      * when simulating the cell population.
      *
-     * A hard-coded value of 0.002 is returned. However, note that the time 
-     * step can be reset by calling SetDt() on the simulation object used to 
+     * A hard-coded value of 0.002 is returned. However, note that the time
+     * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
     virtual double GetDefaultTimeStep();
@@ -504,25 +578,62 @@ public:
      * Overridden WriteDataToVisualizerSetupFile() method.
      * Write any data necessary to a visualization setup file.
      * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
-     * 
+     *
      * @param pVizSetupFile a visualization setup file
      */
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 
     /**
      * Overridden SimulationSetupHook() method.
-     * 
-     * Hook method to add a T2SwapCellKiller to a simulation object, which is always 
-     * required in the case of a VertexBasedCellPopulation. This functionality avoids 
-     * the need for static or dynamic casts to specific cell population types within 
+     *
+     * Hook method to add a T2SwapCellKiller to a simulation object, which is always
+     * required in the case of a VertexBasedCellPopulation. This functionality avoids
+     * the need for static or dynamic casts to specific cell population types within
      * simulation methods.
-     * 
-     * Note: In order to inhibit T2 swaps, the user needs to set the threshold for T2 
+     *
+     * Note: In order to inhibit T2 swaps, the user needs to set the threshold for T2
      * swaps in the MutableVertexMesh object mrMesh to 0, using the SetT2Threshold() method.
      *
      * @param pSimulation pointer to a cell-based simulation object
      */
     virtual void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation);
+
+    /**
+     * Get the value of the mRestrictVertexMovement boolean.
+     *
+     * @return True if vertex movement is restricted at each timestep.
+     */
+    bool GetRestrictVertexMovementBoolean();
+
+    /**
+     * Set the value of the mRestrictVertexMovement boolean.
+     *
+     * @param restrictVertexMovement whether to restrict vertex movement in this simulation.
+     */
+    void SetRestrictVertexMovementBoolean(bool restrictVertexMovement);
+
+    /**
+     * Get VertexBasedPopulationSrn object. Used e.g. in TestMutableVertexMeshRemeshWithPopulationSrn.
+     * @return reference to mPopulationSrn
+     */
+    VertexBasedPopulationSrn<DIM>& rGetVertexBasedPopulationSrn();
+
+    /**
+     * @return const reference to mPopulationSrn (used in archiving).
+     */
+    const VertexBasedPopulationSrn<DIM>& rGetVertexBasedPopulationSrn() const;
+
+    /**
+     * Set whether to write cell vtk results
+     * @param new_val whether to write cell vtk
+     */
+    void SetWriteCellVtkResults(const bool new_val);
+
+    /**
+     * Set whether to write cell vtk results
+     * @param new_val whether to write cell vtk
+     */
+    void SetWriteEdgeVtkResults(const bool new_val);
 };
 
 #include "SerializationExportWrapper.hpp"
@@ -542,6 +653,9 @@ inline void save_construct_data(
     // Save data required to construct instance
     const MutableVertexMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
     ar & p_mesh;
+
+    const VertexBasedPopulationSrn<DIM>& pop_srn = t->rGetVertexBasedPopulationSrn();
+    ar & pop_srn;
 }
 
 /**
@@ -556,8 +670,10 @@ inline void load_construct_data(
     MutableVertexMesh<DIM,DIM>* p_mesh;
     ar >> p_mesh;
 
+    VertexBasedPopulationSrn<DIM> pop_srn;
+    ar & pop_srn;
     // Invoke inplace constructor to initialise instance
-    ::new(t)VertexBasedCellPopulation<DIM>(*p_mesh);
+    ::new(t)VertexBasedCellPopulation<DIM>(*p_mesh, pop_srn);
 }
 }
 } // namespace ...
