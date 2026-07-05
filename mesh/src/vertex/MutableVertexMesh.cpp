@@ -1095,9 +1095,10 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
                 // If the nodes are too close together...
                 if (distance_between_nodes < mCellRearrangementThreshold)
                 {
-                    // ...then check if any triangular elements are shared by these nodes...
-                    std::set<unsigned> elements_of_node_a = p_current_node->rGetContainingElementIndices();
-                    std::set<unsigned> elements_of_node_b = p_anticlockwise_node->rGetContainingElementIndices();
+                    // ...then check if any triangular elements are shared by these nodes (the element
+                    // sets are taken by reference to avoid copying them)...
+                    const std::set<unsigned>& elements_of_node_a = p_current_node->rGetContainingElementIndices();
+                    const std::set<unsigned>& elements_of_node_b = p_anticlockwise_node->rGetContainingElementIndices();
 
                     std::set<unsigned> shared_elements;
                     std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
