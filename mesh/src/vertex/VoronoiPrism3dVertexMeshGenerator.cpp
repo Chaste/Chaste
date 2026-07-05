@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ VoronoiPrism3dVertexMeshGenerator::VoronoiPrism3dVertexMeshGenerator(unsigned nu
                                                                      double elementHeightZ,
                                                                      unsigned numRelaxationSteps,
                                                                      double elementTargetApicalArea)
-        : mpMesh(NULL),
+        : mpMesh(nullptr),
           mNumElementsX(numElementsX),
           mNumElementsY(numElementsY),
           mElementHeightZ(elementHeightZ),
@@ -99,7 +99,7 @@ MutableVertexMesh<3, 3>* VoronoiPrism3dVertexMeshGenerator::GetMeshAfterReMesh()
 
 std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
 
     // Number of elements in the mesh
     unsigned num_elems = mpMesh->GetNumElements();
@@ -145,7 +145,7 @@ std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution()
 
 double VoronoiPrism3dVertexMeshGenerator::GetApicalAreaCoefficientOfVariation()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
 
     // Number of elements in the mesh, and check there are at least two
     unsigned num_elems = mpMesh->GetNumElements();

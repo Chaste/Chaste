@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,22 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "CellLabel.hpp"
 
-PatternedApicalConstrictionForce::PatternedApicalConstrictionForce()
-        : GeneralMonolayerVertexMeshForce(),
-          mPatternedTargetApicalArea(0.0),
-          mPatternedApicalAreaParameter(0.0),
-          mPatternedApicalEdgeParameter(0.0)
-{
-}
-
-PatternedApicalConstrictionForce::~PatternedApicalConstrictionForce()
-{
-}
-
 void PatternedApicalConstrictionForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation)
 {
     c_vector<double, 3> force = zero_vector<double>(3);
-    if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("PatternedApicalConstrictionForce is to be used with a VertexBasedCellPopulation only");
     }
@@ -97,12 +85,10 @@ void PatternedApicalConstrictionForce::AddForceContribution(AbstractCellPopulati
         const std::set<unsigned> containing_elem_indices = p_this_node->rGetContainingElementIndices();
 
         // Iterate over these elements
-        for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
-             iter != containing_elem_indices.end();
-             ++iter)
+        for (unsigned containing_elem_index : containing_elem_indices)
         {
             // Get this element, its index and its number of nodes
-            VertexElement<3, 3>* p_element = p_cell_population->GetElement(*iter);
+            VertexElement<3, 3>* p_element = p_cell_population->GetElement(containing_elem_index);
             std::vector<VertexElement<2, 3>*> lateral_faces;
 
             // Populate the pointers/vector to different types of face
@@ -154,11 +140,9 @@ void PatternedApicalConstrictionForce::AddForceContribution(AbstractCellPopulati
             neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face - 1 + num_nodes_in_ab_face) % num_nodes_in_ab_face));
         }
 
-        for (std::set<unsigned>::iterator it = neighbour_node_indices.begin();
-             it != neighbour_node_indices.end();
-             ++it)
+        for (unsigned neighbour_node_index : neighbour_node_indices)
         {
-            Node<3>* p_neighbour_node = p_cell_population->GetNode(*it);
+            Node<3>* p_neighbour_node = p_cell_population->GetNode(neighbour_node_index);
             const c_vector<double, 3> edge_gradient = (p_this_node->rGetLocation() - p_neighbour_node->rGetLocation()) / norm_2(p_this_node->rGetLocation() - p_neighbour_node->rGetLocation());
             ab_edge_contribution -= edge_gradient * (node_type == 1u ? this->mBasalEdgeParameter : this->mApicalEdgeParameter);
         }

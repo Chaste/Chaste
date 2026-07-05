@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,9 +66,7 @@ public:
     /**
      * Null constructor for derived classes to call.
      */
-    HexagonalPrism3dVertexMeshGenerator()
-    {
-    }
+    HexagonalPrism3dVertexMeshGenerator() = default;
 
     /**
      * Destructor - deletes the mesh object and pointer.

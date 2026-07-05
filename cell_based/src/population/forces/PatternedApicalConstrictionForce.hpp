@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "GeneralMonolayerVertexMeshForce.hpp"
 
-///\todo document class (#2850)
+/**
+ * A GeneralMonolayerVertexMeshForce that additionally imposes patterned apical constriction
+ * on a 3D monolayer.
+ *
+ * In addition to the volume, area and edge contributions of GeneralMonolayerVertexMeshForce,
+ * this force applies a distinct set of apical parameters - a patterned apical target area,
+ * apical area modulus and apical edge modulus (set via the SetPatternedApical...() methods) -
+ * to a designated subset of "patterned" cells. Giving these cells a smaller apical target
+ * area and/or stronger apical contractility drives apical constriction in the patterned
+ * region, which is the mechanical basis of epithelial folding and invagination.
+ */
 class PatternedApicalConstrictionForce : public GeneralMonolayerVertexMeshForce
 {
 private:
@@ -60,37 +70,37 @@ private:
      * Target area for each patterned cell's apical surface.
      * Initialised to 0 in the constructor.
      */
-    double mPatternedTargetApicalArea;
+    double mPatternedTargetApicalArea = 0.0;
 
     /**
      * Strength of each patterned cell's apical surface area term in the energy expression.
      * Initialised to 0 in the constructor.
      */
-    double mPatternedApicalAreaParameter;
+    double mPatternedApicalAreaParameter = 0.0;
 
     /**
      * Strength of each patterned apical cell-cell interface length term in the energy expression.
      * Initialised to 0 in the constructor.
      */
-    double mPatternedApicalEdgeParameter;
+    double mPatternedApicalEdgeParameter = 0.0;
 
 public:
     /**
-     * Constuctor.
+     * Constructor.
      */
-    PatternedApicalConstrictionForce();
+    PatternedApicalConstrictionForce() = default;
 
     /**
      * Destructor.
      */
-    virtual ~PatternedApicalConstrictionForce();
+    ~PatternedApicalConstrictionForce() override = default;
 
     /**
      * Set mPatternedTargetApicalArea, mPatternedApicalAreaParameter and mPatternedApicalEdgeParameter.
      *
-     * @param patternedApicalEdgeParameter the new value of mPatternedTargetApicalArea
+     * @param patternedApicalEdgeParameter the new value of mPatternedApicalEdgeParameter
      * @param patternedApicalAreaParameter the new value of mPatternedApicalAreaParameter
-     * @param patternedTargetApicalArea the new value of mPatternedApicalEdgeParameter
+     * @param patternedTargetApicalArea the new value of mPatternedTargetApicalArea
      */
     void SetPatternedApicalParameter(const double patternedApicalEdgeParameter,
                                      const double patternedApicalAreaParameter,
@@ -103,14 +113,14 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation) override;
 
     /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

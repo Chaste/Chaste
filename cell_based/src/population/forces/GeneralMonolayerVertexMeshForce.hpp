@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,10 +39,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractForce.hpp"
 
 /**
- * A force used by monolayer vertex based cell population which has volume, area and
- * edge contributions (apical, basal and lateral faces & edges can have different parameters).
+ * A force for 3D "monolayer" vertex-based cell populations, in which each cell is a
+ * prism-like VertexElement<3,3> with a distinguished apical face, basal face and a set
+ * of lateral faces (see MonolayerVertexMeshGenerator).
  *
- * ///\todo Define this class and write down energy expression (#2850)
+ * The force on each vertex is minus the gradient, with respect to that vertex's position,
+ * of a free energy that is a sum over all cells of three kinds of contribution:
+ *
+ *  - a volume-elasticity term penalising the deviation of each cell's volume V from a
+ *    target volume V_0, with modulus set by SetVolumeParameters();
+ *  - an area (surface-tension) term for the apical, basal and lateral faces, proportional
+ *    to face area, with independent moduli for apical, basal and lateral faces;
+ *  - an edge (line-tension) term for the apical, basal and lateral edges, proportional to
+ *    edge length, with independent moduli for apical, basal and lateral edges.
+ *
+ * The apical, basal, lateral and volume parameters are set independently via
+ * SetApicalParameters(), SetBasalParameters(), SetLateralParameter() and
+ * SetVolumeParameters(). The contributions are assembled by the helper methods
+ * AddVolumeContribution(), AddAreaContribution() and AddEdgeContribution().
  */
 class GeneralMonolayerVertexMeshForce : public AbstractForce<3>
 {
@@ -80,61 +94,61 @@ protected:
      * Target area for each cell's apical surface.
      * Initialised to 0 in the constructor.
      */
-    double mTargetApicalArea;
+    double mTargetApicalArea = 0.0;
 
     /**
      * Strength of each cell's apical surface area term in the energy expression.
      * Initialised to 0 in the constructor.
      */
-    double mApicalAreaParameter;
+    double mApicalAreaParameter = 0.0;
 
     /**
      * Strength of each apical cell-cell interface length term in the energy expression.
      * Initialised to 0 in the constructor.
      */
-    double mApicalEdgeParameter;
+    double mApicalEdgeParameter = 0.0;
 
     /**
      * Target area for each cell's basal surface.
      * Initialised to 0 in the constructor.
      */
-    double mTargetBasalArea;
+    double mTargetBasalArea = 0.0;
 
     /**
      * Strength of each cell's basal surface area term in the energy expression.
      * Initialised to 0 in the constructor.
      */
-    double mBasalAreaParameter;
+    double mBasalAreaParameter = 0.0;
 
     /**
      * Strength of each basal cell-cell interface length term in the energy expression.
      * Initialised to 0 in the constructor.
      */
-    double mBasalEdgeParameter;
+    double mBasalEdgeParameter = 0.0;
 
     /**
      * Strength of each cell's lateral surface area term in the energy expression.
      * Initialised to 0 in the constructor.
      */
-    double mLateralAreaParameter;
+    double mLateralAreaParameter = 0.0;
 
     /**
      * Strength of each lateral (apico-basal) cell-cell interface length term in the energy expression.
      * Initialised to 0 in the constructor.
      */
-    double mLateralEdgeParameter;
+    double mLateralEdgeParameter = 0.0;
 
     /**
      * Target volume for each cell.
      * Initialised to 0 in the constructor.
      */
-    double mTargetVolume;
+    double mTargetVolume = 0.0;
 
     /**
      * Strength of each cell's volume term in the energy expression.
      * Initialised to 0 in the constructor.
      */
-    double mVolumeParameter;
+    double mVolumeParameter = 0.0;
 
     /**
      * Helper function which is called by AddForceContribution.
@@ -156,14 +170,14 @@ protected:
 
 public:
     /**
-     * Constuctor.
+     * Constructor.
      */
-    GeneralMonolayerVertexMeshForce();
+    GeneralMonolayerVertexMeshForce() = default;
 
     /**
      * Destructor.
      */
-    virtual ~GeneralMonolayerVertexMeshForce();
+    ~GeneralMonolayerVertexMeshForce() override = default;
 
     /**
      * Overridden AddForceContribution() method.
@@ -172,7 +186,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation) override;
 
     /**
      * Set mApicalEdgeParameter, mApicalAreaParameter and mTargetApicalArea.
@@ -213,7 +227,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

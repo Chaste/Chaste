@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,11 +61,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
 {
 private:
-    static const double z_height = 2;
-    static const double target_area = 1;
+    static constexpr double z_height = 2;
+    static constexpr double target_area = 1;
     const unsigned num_cells_x = 20;
     const unsigned num_cells_y = 10;
-    static const double end_time = 15;
+    static constexpr double end_time = 15;
 
 public:
     void TestOnHexagonalMesh()

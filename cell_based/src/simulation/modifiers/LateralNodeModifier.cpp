@@ -1,9 +1,37 @@
 /*
- * LateralNodeModifier.cpp
- *
- *  Created on: 11 Mar 2017
- *      Author: Weijie
- */
+
+Copyright (c) 2005-2026, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
 
 #include "LateralNodeModifier.hpp"
 #include <set>
@@ -33,7 +61,7 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
 {
     AbstractMesh<3, 3>* p_tmp_mesh = &(rCellPopulation.rGetMesh());
 
-    if (dynamic_cast<MutableVertexMesh<3, 3>*>(p_tmp_mesh) == NULL)
+    if (dynamic_cast<MutableVertexMesh<3, 3>*>(p_tmp_mesh) == nullptr)
     {
         EXCEPTION("only for vertex mesh"); //LCOV_EXCL_LINE
     }
@@ -51,10 +79,8 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
         std::vector<Node<3>*> basal_nodes;
         std::vector<Node<3>*> apical_nodes;
 
-        for (std::set<VertexElement<2, 3>*>::const_iterator it = lateral_faces.begin();
-             it != lateral_faces.end(); ++it)
+        for (VertexElement<2, 3>* p_face_tmp : lateral_faces)
         {
-            VertexElement<2, 3>* p_face_tmp = *it;
             if (p_face_tmp->GetNumNodes() != 3u)
             {
                 continue;
@@ -96,13 +122,13 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
             const double distance_xy = reverse_t1_on_basal ? apical_length : basal_length;
 
             VertexElement<2, 3>* p_small_triangular_face = GetSharedLateralFace(p_node_a, p_node_b, p_mesh);
-            if (p_small_triangular_face == NULL || p_small_triangular_face->GetNumNodes() != 3u || p_small_triangular_face->GetNodeLocalIndex(p_lateral_node->GetIndex()) == UINT_MAX)
+            if (p_small_triangular_face == nullptr || p_small_triangular_face->GetNumNodes() != 3u || p_small_triangular_face->GetNodeLocalIndex(p_lateral_node->GetIndex()) == UINT_MAX)
             {
                 NEVER_REACHED;
             }
 
             VertexElement<2, 3>* p_big_triangular_face = GetSharedLateralFace(p_node_x, p_node_y, p_mesh);
-            if (p_big_triangular_face == NULL || p_big_triangular_face->GetNumNodes() != 3u || p_big_triangular_face->GetNodeLocalIndex(p_lateral_node->GetIndex()) == UINT_MAX)
+            if (p_big_triangular_face == nullptr || p_big_triangular_face->GetNumNodes() != 3u || p_big_triangular_face->GetNodeLocalIndex(p_lateral_node->GetIndex()) == UINT_MAX)
             {
                 NEVER_REACHED;
             }
@@ -127,7 +153,7 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
             // Compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
             // mLocationsOfT1Swaps.push_back(mid_ab);
 
-            std::vector<VertexElement<3, 3>*> elems(5, NULL);
+            std::vector<VertexElement<3, 3>*> elems(5, nullptr);
             {
                 const std::set<unsigned>& elem_24 = p_small_triangular_face->rFaceGetContainingElementIndices();
                 const std::set<unsigned>& elem_a_124 = p_node_a->rGetContainingElementIndices();
@@ -166,7 +192,7 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
                 c_vector<double, 3> vector_cd = p_mesh->GetCellRearrangementRatio() * p_mesh->GetCellRearrangementThreshold() * vector_xy / norm_2(vector_xy);
 
                 const c_vector<double, 3> centroid_2 = GetFacesWithType(elems[2], T1_type)[0]->GetCentroid();
-                const c_vector<double, 3> centroid_4 = (elems[4] != NULL) ? GetFacesWithType(elems[4], T1_type)[0]->GetCentroid()
+                const c_vector<double, 3> centroid_4 = (elems[4] != nullptr) ? GetFacesWithType(elems[4], T1_type)[0]->GetCentroid()
                                                                           : p_small_triangular_face->GetCentroid();
                 const c_vector<double, 3> vector_from2 = p_mesh->GetVectorFromAtoB(centroid_2, centroid_4);
 
@@ -186,15 +212,15 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
             // Remove the lateral node
             {
                 const std::set<unsigned> faces_tmp = p_lateral_node->rGetContainingFaceIndices();
-                for (std::set<unsigned>::const_iterator face_it = faces_tmp.begin(); face_it != faces_tmp.end(); ++face_it)
+                for (unsigned face_index : faces_tmp)
                 {
-                    p_mesh->GetFace(*face_it)->FaceDeleteNode(p_lateral_node);
+                    p_mesh->GetFace(face_index)->FaceDeleteNode(p_lateral_node);
                 }
 
                 const std::set<unsigned> elems_tmp = p_lateral_node->rGetContainingElementIndices();
-                for (std::set<unsigned>::const_iterator elem_it = elems_tmp.begin(); elem_it != elems_tmp.end(); ++elem_it)
+                for (unsigned elem_index : elems_tmp)
                 {
-                    p_mesh->GetElement(*elem_it)->DeleteNode(p_lateral_node);
+                    p_mesh->GetElement(elem_index)->DeleteNode(p_lateral_node);
                 }
                 p_mesh->DeleteNodePriorToReMesh(p_lateral_node->GetIndex());
             }
@@ -227,9 +253,9 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
 
             // Modify lateral face "share" by element 1 and element 4
             {
-                VertexElement<2, 3>* p_lateral_face_14 = NULL;
+                VertexElement<2, 3>* p_lateral_face_14 = nullptr;
                 const std::set<unsigned>& tmp_face_ids = p_node_a->rGetContainingFaceIndices();
-                if (elems[4] != NULL)
+                if (elems[4] != nullptr)
                 {
                     std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, elems[4], Monolayer::LateralValue);
                     // p_node_a is already removed from p_small_triangular_face
@@ -253,7 +279,7 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
 
             for (unsigned i = 1; i <= 4; ++i)
             {
-                if (elems[i] == NULL)
+                if (elems[i] == nullptr)
                 {
                     continue;
                 }

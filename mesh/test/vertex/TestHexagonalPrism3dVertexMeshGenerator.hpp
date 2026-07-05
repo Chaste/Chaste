@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -90,7 +90,7 @@ public:
         }
 
         const unsigned a_tmp[6] = { 0, 1, 8, 9, 15, 16 };
-        const std::set<unsigned> s(a_tmp, a_tmp + 18);
+        const std::set<unsigned> s(a_tmp, a_tmp + 6);
         // Test that each face has the correct number of nodes
         for (unsigned index = 0; index < p_mesh->GetNumFaces(); index++)
         {

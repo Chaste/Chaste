@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -231,7 +231,7 @@ public:
         TS_ASSERT_EQUALS(iii, 12);
         for (unsigned i = 30; i < builder.mEdges.size(); ++i)
         {
-            if (builder.mEdges[i] == NULL)
+            if (builder.mEdges[i] == nullptr)
                 continue;
             TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
             TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
@@ -278,7 +278,7 @@ public:
         TS_ASSERT_EQUALS(iii, 12);
         for (unsigned i = 30; i < builder.mEdges.size(); ++i)
         {
-            if (builder.mEdges[i] == NULL)
+            if (builder.mEdges[i] == nullptr)
                 continue;
             TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
             TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
@@ -327,7 +327,7 @@ public:
         TS_ASSERT_EQUALS(iii, 12);
         for (unsigned i = 30; i < builder.mEdges.size(); ++i)
         {
-            if (builder.mEdges[i] == NULL)
+            if (builder.mEdges[i] == nullptr)
                 continue;
             TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
             TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);

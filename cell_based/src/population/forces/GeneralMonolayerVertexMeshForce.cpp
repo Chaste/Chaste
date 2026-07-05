@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,25 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
-GeneralMonolayerVertexMeshForce::GeneralMonolayerVertexMeshForce()
-        : AbstractForce<3>(),
-          mTargetApicalArea(0),
-          mApicalAreaParameter(0),
-          mApicalEdgeParameter(0),
-          mTargetBasalArea(0),
-          mBasalAreaParameter(0),
-          mBasalEdgeParameter(0),
-          mLateralAreaParameter(0),
-          mLateralEdgeParameter(0),
-          mTargetVolume(0),
-          mVolumeParameter(0)
-{
-}
-
-GeneralMonolayerVertexMeshForce::~GeneralMonolayerVertexMeshForce()
-{
-}
-
 c_vector<double, 3> CalculateEdgeGradient(const Node<3>* pNode1, const Node<3>* pNode2)
 {
     const c_vector<double, 3>& loc1 = pNode1->rGetLocation();
@@ -65,7 +46,7 @@ c_vector<double, 3> CalculateEdgeGradient(const Node<3>* pNode1, const Node<3>* 
 
 void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation)
 {
-    if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("GeneralMonolayerVertexMeshForce is to be used with a VertexBasedCellPopulation only"); //LCOV_EXCL_LINE
     }
@@ -127,12 +108,10 @@ void GeneralMonolayerVertexMeshForce::AddAreaContribution(VertexBasedCellPopulat
                 // Calculate apical area contribution
                 if (fabs(mApicalAreaParameter) > 1e-5)
                 {
-                    const double apical_area = rMesh.CalculateAreaOfFace(p_face);
-
                     for (unsigned node_id = 0; node_id < p_face->GetNumNodes(); ++node_id)
                     {
                         c_vector<double, 3> result = rMesh.GetAreaGradientOfFaceAtNode(p_face, node_id);
-                        result *= -1 * mApicalAreaParameter; // *(apical_area - mTargetApicalArea);
+                        result *= -1 * mApicalAreaParameter; // *(rMesh.CalculateAreaOfFace(p_face) - mTargetApicalArea);
                         p_face->GetNode(node_id)->AddAppliedForceContribution(result);
                     }
                 }
@@ -143,12 +122,10 @@ void GeneralMonolayerVertexMeshForce::AddAreaContribution(VertexBasedCellPopulat
                 // Calculate basal area contribution
                 if (fabs(mBasalAreaParameter) > 1e-5)
                 {
-                    const double basal_area = rMesh.CalculateAreaOfFace(p_face);
-
                     for (unsigned node_id = 0; node_id < p_face->GetNumNodes(); ++node_id)
                     {
                         c_vector<double, 3> result = rMesh.GetAreaGradientOfFaceAtNode(p_face, node_id);
-                        result *= -1 * mBasalAreaParameter; // *(basal_area - mTargetBasalArea);
+                        result *= -1 * mBasalAreaParameter; // *(rMesh.CalculateAreaOfFace(p_face) - mTargetBasalArea);
                         p_face->GetNode(node_id)->AddAppliedForceContribution(result);
                     }
                 }

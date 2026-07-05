@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,15 +45,13 @@ MisraForce::MisraForce()
 {
 }
 
-MisraForce::~MisraForce()
-{
-}
+MisraForce::~MisraForce() = default;
 
 void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation)
 {
     // Throw an exception message if not using a VertexBasedCellPopulation
     ///\todo check whether this line influences profiling tests - if so, we should remove it.
-    if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("MisraForce is to be used with a VertexBasedCellPopulation only"); //LCOV_EXCL_LINE
     }
@@ -104,15 +102,13 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
         const std::set<unsigned> containing_elem_indices = p_this_node->rGetContainingElementIndices();
 
         // Iterate over these elements
-        for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
-             iter != containing_elem_indices.end();
-             ++iter)
+        for (unsigned containing_element_index : containing_elem_indices)
         {
             // Get this element, its index and its number of nodes
-            VertexElement<3, 3>* p_element = p_cell_population->GetElement(*iter);
+            VertexElement<3, 3>* p_element = p_cell_population->GetElement(containing_element_index);
             std::vector<VertexElement<2, 3>*> lateral_faces;
-            VertexElement<2, 3>* p_basal_face = NULL;
-            VertexElement<2, 3>* p_apical_face = NULL;
+            VertexElement<2, 3>* p_basal_face = nullptr;
+            VertexElement<2, 3>* p_apical_face = nullptr;
             bool apical_face_orientation = false;
 
             // Populate the pointers/vector to different types of face

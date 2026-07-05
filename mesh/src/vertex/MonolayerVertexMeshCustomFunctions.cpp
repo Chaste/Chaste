@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,8 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 #include <iomanip> // PrintElement
-#include <iostream> // PrintMesh
-#include <iostream> // PrintElement
+#include <iostream> // PrintMesh and PrintElement
 
 #include "Debug.hpp"
 
@@ -106,7 +105,7 @@ std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pN
 VertexElement<2, 3>* GetSharedLateralFace(const VertexElement<3, 3>* pElemA,
                                           const VertexElement<3, 3>* pElemB)
 {
-    if (pElemA == NULL || pElemB == NULL)
+    if (pElemA == nullptr || pElemB == nullptr)
     {
         EXCEPTION("Two elements do not share lateral face."); //LCOV_EXCL_LINE
     }
@@ -177,11 +176,11 @@ std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& fac
     if (faceType != Monolayer::AllTypes)
     {
         std::set<VertexElement<2, 3>*> s_matched;
-        for (std::set<VertexElement<2, 3>*>::iterator it = s_result.begin(); it != s_result.end(); ++it)
+        for (VertexElement<2, 3>* p_result_face : s_result)
         {
-            if (GetFaceType(*it) == faceType)
+            if (GetFaceType(p_result_face) == faceType)
             {
-                s_matched.insert(*it);
+                s_matched.insert(p_result_face);
             }
         }
 
@@ -195,19 +194,19 @@ std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& fac
                                                    const Monolayer::v_type faceType)
 {
     std::set<VertexElement<2, 3>*> s_result;
-    for (std::set<unsigned>::const_iterator it = face_indices.begin(); it != face_indices.end(); ++it)
+    for (unsigned face_index : face_indices)
     {
-        s_result.insert(pMesh->GetFace(*it));
+        s_result.insert(pMesh->GetFace(face_index));
     }
 
     if (faceType != Monolayer::AllTypes)
     {
         std::set<VertexElement<2, 3>*> s_matched;
-        for (std::set<VertexElement<2, 3>*>::iterator it = s_result.begin(); it != s_result.end(); ++it)
+        for (VertexElement<2, 3>* p_result_face : s_result)
         {
-            if (GetFaceType(*it) == faceType)
+            if (GetFaceType(p_result_face) == faceType)
             {
-                s_matched.insert(*it);
+                s_matched.insert(p_result_face);
             }
         }
 
@@ -273,9 +272,9 @@ void PrintElement(const VertexElement<3, 3>* pElement)
 
         std::set<unsigned> set_tmp = p_face->rFaceGetContainingElementIndices();
         std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
-        for (std::set<unsigned>::iterator it = set_tmp.begin(); it != set_tmp.end(); ++it)
+        for (unsigned elem_index : set_tmp)
         {
-            std::cout << *it << "  ";
+            std::cout << elem_index << "  ";
         }
         std::cout << "}" << std::endl;
 
@@ -298,17 +297,17 @@ void PrintElement(const VertexElement<3, 3>* pElement)
 
         std::set<unsigned> set_tmp = p_node->rGetContainingElementIndices();
         std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
-        for (std::set<unsigned>::iterator it = set_tmp.begin(); it != set_tmp.end(); ++it)
+        for (unsigned elem_index : set_tmp)
         {
-            std::cout << *it << "  ";
+            std::cout << elem_index << "  ";
         }
         std::cout << "}" << std::endl;
 
         std::set<unsigned> face_tmp = p_node->rGetContainingFaceIndices();
         std::cout << TAB << "number of Faces : " << face_tmp.size() << " {  ";
-        for (std::set<unsigned>::iterator it = face_tmp.begin(); it != face_tmp.end(); ++it)
+        for (unsigned face_index : face_tmp)
         {
-            std::cout << *it << "  ";
+            std::cout << face_index << "  ";
         }
         std::cout << "}" << std::endl
                   << "---------------------------------------------------------" << std::endl;
@@ -329,10 +328,9 @@ void PrintElement(const VertexElement<2, 3>* pFace)
 
     const std::set<unsigned>& s_elems = (const_cast<VertexElement<2, 3>*>(pFace))->rFaceGetContainingElementIndices();
     std::cout << TAB << "number of Elements : " << pFace->FaceGetNumContainingElements() << " {";
-    for (std::set<unsigned>::const_iterator it = s_elems.begin();
-         it != s_elems.end(); ++it)
+    for (unsigned elem_index : s_elems)
     {
-        std::cout << std::setw(3) << *it << "  ";
+        std::cout << std::setw(3) << elem_index << "  ";
     }
     std::cout << "}" << std::endl;
 
@@ -389,13 +387,13 @@ void PrintMesh(const VertexMesh<3, 3>* pMesh, const bool printDeletedObjects)
     {
         VertexElement<2, 3>& face = *(pMesh->GetFace(i));
         std::cout << "FACE (" << i << ") : " << face.GetIndex() << (face.IsDeleted() ? " (DELETED)" : "") << std::endl;
-        std::cout << TAB << "Face Attrbute : " << Monolayer::ValueToString[GetFaceType(&face)] << (IsFaceOnBoundary(&face) ? " (BOUNDARY)" : "") << std::endl;
+        std::cout << TAB << "Face Attribute : " << Monolayer::ValueToString[GetFaceType(&face)] << (IsFaceOnBoundary(&face) ? " (BOUNDARY)" : "") << std::endl;
 
         std::set<unsigned> set_tmp = face.rFaceGetContainingElementIndices();
         std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
-        for (std::set<unsigned>::iterator it = set_tmp.begin(); it != set_tmp.end(); ++it)
+        for (unsigned elem_index : set_tmp)
         {
-            std::cout << *it << "  ";
+            std::cout << elem_index << "  ";
         }
         std::cout << "}" << std::endl;
 
@@ -419,17 +417,17 @@ void PrintMesh(const VertexMesh<3, 3>* pMesh, const bool printDeletedObjects)
 
         std::set<unsigned> set_tmp = p_node->rGetContainingElementIndices();
         std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
-        for (std::set<unsigned>::iterator it = set_tmp.begin(); it != set_tmp.end(); ++it)
+        for (unsigned elem_index : set_tmp)
         {
-            std::cout << *it << "  ";
+            std::cout << elem_index << "  ";
         }
         std::cout << "}" << std::endl;
 
         std::set<unsigned> face_tmp = p_node->rGetContainingFaceIndices();
         std::cout << TAB << "number of Faces : " << face_tmp.size() << " {  ";
-        for (std::set<unsigned>::iterator it = face_tmp.begin(); it != face_tmp.end(); ++it)
+        for (unsigned face_index : face_tmp)
         {
-            std::cout << *it << "  ";
+            std::cout << face_index << "  ";
         }
         std::cout << "}" << std::endl
                   << "---------------------------------------------------------" << std::endl;
@@ -451,9 +449,9 @@ void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFac
 
     if (has_changes)
     {
-        for (std::set<unsigned>::const_iterator it = set_tmp.begin(); it != set_tmp.end(); ++it)
+        for (unsigned elem_index : set_tmp)
         {
-            VertexElement<3, 3>* p_elem = pMesh->GetElement(*it);
+            VertexElement<3, 3>* p_elem = pMesh->GetElement(elem_index);
             p_elem->CheckFaceOrientationOfElement(p_elem->GetFaceLocalIndex(pFace->GetIndex()));
         }
 
@@ -675,13 +673,13 @@ VertexElement<2, 3>* GetApicalFace(const VertexElement<3, 3>* pElement)
         }
     }
 
-    assert(p_face != NULL && IsApicalFace(p_face)); // LCOV_EXCL_LINE
+    assert(p_face != nullptr && IsApicalFace(p_face)); // LCOV_EXCL_LINE
     return p_face;
 }
 
 VertexElement<2, 3>* GetBasalFace(const VertexElement<3, 3>* pElement)
 {
-    VertexElement<2, 3>* p_face(NULL);
+    VertexElement<2, 3>* p_face(nullptr);
     for (unsigned i = 0; i < pElement->GetNumFaces(); ++i)
     {
         if (IsBasalFace(pElement->GetFace(i)))
@@ -691,7 +689,7 @@ VertexElement<2, 3>* GetBasalFace(const VertexElement<3, 3>* pElement)
         }
     }
 
-    assert(p_face != NULL && IsBasalFace(p_face)); // LCOV_EXCL_LINE
+    assert(p_face != nullptr && IsBasalFace(p_face)); // LCOV_EXCL_LINE
     return p_face;
 }
 
@@ -739,7 +737,7 @@ Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<2, 3>* pFace)
     const Monolayer::v_type opposite_type = IsApicalNode(pNode) ? Monolayer::BasalValue : Monolayer::ApicalValue;
     const unsigned num_lateral_faces = pNode->GetNumContainingFaces() - pNode->GetNumContainingElements();
 
-    Node<3>* p_return_node = NULL;
+    Node<3>* p_return_node = nullptr;
     for (unsigned i = 0; i < pFace->GetNumNodes(); ++i)
     {
         const Node<3>* p_tmp_node = pFace->GetNode(i);
@@ -759,7 +757,7 @@ Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<2, 3>* pFace)
 
 Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<3, 3>* pElement)
 {
-    VertexElement<2, 3>* p_other_face = NULL;
+    VertexElement<2, 3>* p_other_face = nullptr;
     switch (GetNodeType(pNode))
     {
         case Monolayer::LateralValue:
@@ -787,27 +785,27 @@ void MeshUpdateNode(Node<3>* pOldNode, Node<3>* pNewNode, MutableVertexMesh<3, 3
 {
     const std::set<unsigned> containing_faces = pOldNode->rGetContainingFaceIndices();
     const std::set<unsigned> containing_elems = pOldNode->rGetContainingElementIndices();
-    for (std::set<unsigned>::const_iterator it = containing_faces.begin(); it != containing_faces.end(); ++it)
+    for (unsigned face_index : containing_faces)
     {
-        if (pMesh->GetFace(*it)->GetNodeLocalIndex(pNewNode->GetIndex()) != UINT_MAX)
+        if (pMesh->GetFace(face_index)->GetNodeLocalIndex(pNewNode->GetIndex()) != UINT_MAX)
         {
-            pMesh->GetFace(*it)->FaceDeleteNode(pOldNode);
+            pMesh->GetFace(face_index)->FaceDeleteNode(pOldNode);
         }
         else
         {
-            pMesh->GetFace(*it)->FaceUpdateNode(pOldNode, pNewNode);
+            pMesh->GetFace(face_index)->FaceUpdateNode(pOldNode, pNewNode);
         }
     }
 
-    for (std::set<unsigned>::const_iterator it = containing_elems.begin(); it != containing_elems.end(); ++it)
+    for (unsigned elem_index : containing_elems)
     {
-        if (pMesh->GetElement(*it)->GetNodeLocalIndex(pNewNode->GetIndex()) != UINT_MAX)
+        if (pMesh->GetElement(elem_index)->GetNodeLocalIndex(pNewNode->GetIndex()) != UINT_MAX)
         {
-            pMesh->GetElement(*it)->DeleteNode(pOldNode);
+            pMesh->GetElement(elem_index)->DeleteNode(pOldNode);
         }
         else
         {
-            pMesh->GetElement(*it)->UpdateNode(pOldNode, pNewNode);
+            pMesh->GetElement(elem_index)->UpdateNode(pOldNode, pNewNode);
         }
     }
 

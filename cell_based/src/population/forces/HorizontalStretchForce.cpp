@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,9 +47,7 @@ HorizontalStretchForce<DIM>::HorizontalStretchForce(const double ForceMagnitude,
 }
 
 template <unsigned DIM>
-HorizontalStretchForce<DIM>::~HorizontalStretchForce()
-{
-}
+HorizontalStretchForce<DIM>::~HorizontalStretchForce() = default;
 
 template <unsigned DIM>
 void HorizontalStretchForce<DIM>::SetUpForceVectorUsingMagnitude()
@@ -75,34 +73,32 @@ template <unsigned DIM>
 void HorizontalStretchForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     std::set<Node<DIM>*> moving_nodes;
-    for (typename std::set<VertexElement<DIM, DIM>*>::iterator it = mMovingPinnedElements.begin(); it != mMovingPinnedElements.end(); ++it)
+    for (VertexElement<DIM, DIM>* p_elem : mMovingPinnedElements)
     {
-        VertexElement<DIM, DIM>* p_elem = *it;
         for (unsigned i = 0; i < p_elem->GetNumNodes(); ++i)
         {
             moving_nodes.insert(p_elem->GetNode(i));
         }
     }
 
-    for (typename std::set<Node<DIM>*>::iterator p_p_node = moving_nodes.begin(); p_p_node != moving_nodes.end(); ++p_p_node)
+    for (Node<DIM>* p_node : moving_nodes)
     {
-        (*p_p_node)->ClearAppliedForce();
-        (*p_p_node)->AddAppliedForceContribution(mForceVector);
+        p_node->ClearAppliedForce();
+        p_node->AddAppliedForceContribution(mForceVector);
     }
 
     std::set<Node<DIM>*> non_moving_nodes;
-    for (typename std::set<VertexElement<DIM, DIM>*>::iterator it = mNonMovingPinnedElements.begin(); it != mNonMovingPinnedElements.end(); ++it)
+    for (VertexElement<DIM, DIM>* p_elem : mNonMovingPinnedElements)
     {
-        VertexElement<DIM, DIM>* p_elem = *it;
         for (unsigned i = 0; i < p_elem->GetNumNodes(); ++i)
         {
             non_moving_nodes.insert(p_elem->GetNode(i));
         }
     }
 
-    for (typename std::set<Node<DIM>*>::iterator p_p_node = non_moving_nodes.begin(); p_p_node != non_moving_nodes.end(); ++p_p_node)
+    for (Node<DIM>* p_node : non_moving_nodes)
     {
-        (*p_p_node)->ClearAppliedForce();
+        p_node->ClearAppliedForce();
     }
 }
 
@@ -119,7 +115,7 @@ void HorizontalStretchForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 template <unsigned DIM>
 void HorizontalStretchForce<DIM>::SetUpPinnedElements(AbstractCellPopulation<DIM>& rCellPopulation)
 {
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("HorizontalStretchForce is to be used with a VertexBasedCellPopulation only");
     }

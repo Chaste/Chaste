@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::string& name, const bool callDestructor)
         : mName(name),
-          mpMesh(NULL),
+          mpMesh(nullptr),
           mCallDestructor(callDestructor)
 {
 }
@@ -51,7 +51,7 @@ MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::vector<Nod
         : mName(name),
           mBasalNodes(rLowerNodes),
           mApicalNodes(mBasalNodes.size()),
-          mpMesh(NULL),
+          mpMesh(nullptr),
           mCallDestructor(true)
 {
     const unsigned num_lower_nodes = mBasalNodes.size();
@@ -169,19 +169,18 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
         const std::set<unsigned> shared_face_indices = GetSharedFaceIndices(mBasalNodes[node1Index], mBasalNodes[node2Index]);
 
         assert(shared_face_indices.size() <= 2);
-        VertexElement<2, 3>* p_shared_lateral_face = NULL;
-        for (std::set<unsigned>::const_iterator set_it = shared_face_indices.begin();
-             set_it != shared_face_indices.end(); ++set_it)
+        VertexElement<2, 3>* p_shared_lateral_face = nullptr;
+        for (unsigned shared_face_index : shared_face_indices)
         {
-            VertexElement<2, 3>* p_tmp_face = mFaces[*set_it];
+            VertexElement<2, 3>* p_tmp_face = mFaces[shared_face_index];
             if (IsLateralFace(p_tmp_face))
             {
-                assert(p_shared_lateral_face == NULL);
+                assert(p_shared_lateral_face == nullptr);
                 p_shared_lateral_face = p_tmp_face;
             }
         }
 
-        if (p_shared_lateral_face != NULL) // meaning it's found
+        if (p_shared_lateral_face != nullptr) // meaning it's found
         {
             faces_this_elem.push_back(p_shared_lateral_face);
             // Face orientation is false as it was created by another element. CCW for another will be CW when
@@ -189,7 +188,7 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
             faces_orientation.push_back(true);
         }
 
-        if (p_shared_lateral_face == NULL)
+        if (p_shared_lateral_face == nullptr)
         {
             // Create new lateral rectangular face
             std::vector<Node<3>*> nodes_of_lateral_face;
@@ -230,7 +229,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
 {
     const double mTol = 1e-6;
     // normal mesh should already exist before call of this function.
-    if (mpMesh == NULL)
+    if (mpMesh == nullptr)
     {
         EXCEPTION("No mesh available. Please generate flat mesh before using this function.");
     }
@@ -269,7 +268,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
     {
         Node<3>* node_a = boundary_nodes[index_a];
         // Skip over identified nodes
-        if (node_a == NULL)
+        if (node_a == nullptr)
         {
             continue;
         }
@@ -278,7 +277,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
         for (unsigned index_b = index_a + 1; index_b < boundary_nodes.size(); ++index_b)
         {
             Node<3>* node_b = boundary_nodes[index_b];
-            if (node_b == NULL)
+            if (node_b == nullptr)
             {
                 continue;
             }
@@ -291,15 +290,15 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
             if (abs(abs(a_to_b[0]) - widthX) < mTol && abs(a_to_b[1]) < mTol && abs(a_to_b[2]) < mTol)
             {
                 // for simplicity just delete the node b
-                boundary_nodes[index_a] = NULL;
-                boundary_nodes[index_b] = NULL;
+                boundary_nodes[index_a] = nullptr;
+                boundary_nodes[index_b] = nullptr;
                 glued_nodes.push_back(node_a);
                 deleted_nodes.push_back(node_b);
 
                 const std::set<unsigned> elements_of_b = node_b->rGetContainingElementIndices();
-                for (std::set<unsigned>::iterator it = elements_of_b.begin(); it != elements_of_b.end(); ++it)
+                for (unsigned elem_b_index : elements_of_b)
                 {
-                    VertexElement<3, 3>* elem_tmp = mpMesh->GetElement(*it);
+                    VertexElement<3, 3>* elem_tmp = mpMesh->GetElement(elem_b_index);
                     elem_tmp->ReplaceNode(node_b, node_a);
                 }
 
@@ -336,7 +335,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
     for (unsigned index_a = 0; index_a < boundary_faces.size(); ++index_a)
     {
         VertexElement<2, 3>* p_face_a = boundary_faces[index_a];
-        if (p_face_a == NULL)
+        if (p_face_a == nullptr)
         {
             continue;
         }
@@ -344,15 +343,15 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
         for (unsigned index_b = index_a + 1; index_b < boundary_faces.size(); ++index_b)
         {
             VertexElement<2, 3>* p_face_b = boundary_faces[index_b];
-            if (p_face_b == NULL)
+            if (p_face_b == nullptr)
             {
                 continue;
             }
 
             if (nodes_for_boundary_face[index_a] == nodes_for_boundary_face[index_b])
             {
-                boundary_faces[index_a] = NULL;
-                boundary_faces[index_b] = NULL;
+                boundary_faces[index_a] = nullptr;
+                boundary_faces[index_b] = nullptr;
                 deleted_faces.push_back(p_face_b);
 
                 if (p_face_a->FaceGetNumContainingElements() != 1)
@@ -380,23 +379,23 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
         }
     }
 
-    for (unsigned ind = 0; ind < glued_nodes.size(); ++ind)
+    for (Node<3>* p_glued_node : glued_nodes)
     {
         // Since it is still during its creation, there should be no higher order junctions
-        if (glued_nodes[ind]->GetNumContainingElements() > 2)
+        if (p_glued_node->GetNumContainingElements() > 2)
         {
-            glued_nodes[ind]->SetAsBoundaryNode(false);
+            p_glued_node->SetAsBoundaryNode(false);
         }
     }
 
     // Remove deleted nodes and faces.
-    for (unsigned ind = 0; ind < deleted_nodes.size(); ++ind)
+    for (Node<3>* p_deleted_node : deleted_nodes)
     {
-        mpMesh->DeleteNodePriorToReMesh(deleted_nodes[ind]->GetIndex());
+        mpMesh->DeleteNodePriorToReMesh(p_deleted_node->GetIndex());
     }
-    for (unsigned ind = 0; ind < deleted_faces.size(); ++ind)
+    for (VertexElement<2, 3>* p_deleted_face : deleted_faces)
     {
-        mpMesh->DeleteFacePriorToReMesh(deleted_faces[ind]->GetIndex());
+        mpMesh->DeleteFacePriorToReMesh(p_deleted_face->GetIndex());
     }
     mpMesh->ReMesh();
 

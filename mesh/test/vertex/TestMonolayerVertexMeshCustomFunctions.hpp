@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -301,12 +301,10 @@ public:
             const std::set<unsigned> containing_elem_indices = p_this_node->rGetContainingElementIndices();
 
             // Iterate over these elements
-            for (std::set<unsigned>::const_iterator iter = containing_elem_indices.begin();
-                 iter != containing_elem_indices.end();
-                 ++iter)
+            for (unsigned containing_elem_index : containing_elem_indices)
             {
                 // Get this element, its index and its number of nodes
-                VertexElement<3, 3>* p_element = vertex_mesh.GetElement(*iter);
+                VertexElement<3, 3>* p_element = vertex_mesh.GetElement(containing_elem_index);
 
                 const unsigned elem_index = p_element->GetIndex();
 

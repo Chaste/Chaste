@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,7 +41,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexElement;
 
-///\todo document class (#2850)
+/**
+ * A force that applies a uniaxial stretch to a vertex-based tissue in the x-direction.
+ *
+ * When SetUpPinnedElements() is called, the elements whose centroid lies within a
+ * fraction mRelativeWidth of the domain width from the left-hand (minimum-x) boundary are
+ * recorded as "non-moving pinned" elements, and those the same distance from the
+ * right-hand (maximum-x) boundary as "moving pinned" elements. On each call to
+ * AddForceContribution(), the nodes of the moving-pinned elements have their applied force
+ * overwritten with a constant force of magnitude mForceMagnitude in the +x direction,
+ * while the nodes of the non-moving-pinned elements have their applied force cleared (so
+ * they are held fixed). All other nodes are left to evolve under the other forces in the
+ * simulation. The net effect is to clamp one edge of the tissue and pull the opposite edge,
+ * producing a horizontal stretch.
+ */
 template <unsigned DIM>
 class HorizontalStretchForce : public AbstractForce<DIM>
 {
@@ -109,7 +122,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~HorizontalStretchForce();
+    ~HorizontalStretchForce() override;
 
     /**
      * Set up mMovingPinnedElements and mNonMovingPinnedElements according to mRelativeWidth.
@@ -162,15 +175,15 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(
-        AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(
+        AbstractCellPopulation<DIM>& rCellPopulation) override;
 
     /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

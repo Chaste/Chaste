@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -116,7 +116,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~MisraForce();
+    ~MisraForce() override;
 
     /**
      * Overridden AddForceContribution() method.
@@ -125,7 +125,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation) override;
 
     /**
      * Get the line tension parameter for the edge between two given nodes.
@@ -203,7 +203,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer
