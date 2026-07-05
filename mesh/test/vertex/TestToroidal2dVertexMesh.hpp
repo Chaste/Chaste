@@ -115,6 +115,9 @@ public:
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
         boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
+        // This mesh is periodic in both directions, so GetVectorFromAtoB() wraps around the domain
+        TS_ASSERT_EQUALS(p_mesh->IsMeshPeriodic(), true);
+
         // Store the locations of some nodes
         c_vector<double, 2> node0_location = p_mesh->GetNode(0)->rGetLocation();
         c_vector<double, 2> node12_location = p_mesh->GetNode(12)->rGetLocation();

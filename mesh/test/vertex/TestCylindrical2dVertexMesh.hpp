@@ -108,6 +108,9 @@ public:
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
         boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
+        // This mesh is periodic in the x-direction, so GetVectorFromAtoB() wraps around the domain
+        TS_ASSERT_EQUALS(p_mesh->IsMeshPeriodic(), true);
+
         c_vector<double, 2> node18_location = p_mesh->GetNode(18)->rGetLocation();
         c_vector<double, 2> node19_location = p_mesh->GetNode(19)->rGetLocation();
 

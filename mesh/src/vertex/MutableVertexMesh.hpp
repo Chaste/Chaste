@@ -179,6 +179,19 @@ protected:
     bool CheckForIntersections(std::map<unsigned, c_vector<double, SPACE_DIM> >* pBoundaryElementCentroids = nullptr);
 
     /**
+     * Whether this mesh is periodic in one or more directions, so that GetVectorFromAtoB() wraps
+     * around the domain. This base implementation returns false; periodic subclasses (for example
+     * Cylindrical2dVertexMesh and Toroidal2dVertexMesh) override it to return true.
+     *
+     * Used by CheckForIntersections() to decide whether the uniform spatial grid that accelerates
+     * T3-swap checking may be used: that grid buckets elements by raw coordinate and so is invalid
+     * when distances wrap around the domain.
+     *
+     * @return whether the mesh is periodic
+     */
+    virtual bool IsMeshPeriodic() const;
+
+    /**
      * Helper method for ReMesh(), called by CheckForSwapsFromShortEdges() when
      * neighbouring nodes in an element have been found to be closer than the mCellRearrangementThreshold
      * and do not share any triangular elements.

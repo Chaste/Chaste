@@ -35,6 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MutableVertexMesh.hpp"
 
+#include <algorithm>
+#include <cmath>
+
 #include "LogFile.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
@@ -1157,6 +1160,12 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IsMeshPeriodic() const
+{
+    return false;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections(
     [[maybe_unused]] std::map<unsigned, c_vector<double, SPACE_DIM> >* pBoundaryElementCentroids)
 {
@@ -1272,8 +1281,58 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections(
                 }
             }
 
-            // Second: Check intersections only for those nodes and elements within
-            // mDistanceForT3SwapChecking within each other (node<-->element centroid)
+            /*
+             * Second: build a uniform spatial grid over the boundary-element centroids so that each
+             * boundary node need only be tested against elements whose centroid lies in the same grid
+             * cell or one of the eight neighbouring cells, rather than against every boundary element
+             * (see #2401). The cell size is mDistanceForT3SwapChecking; since a T3 swap is only
+             * considered when a node lies within this distance of an element centroid, every such
+             * centroid is guaranteed to fall within this 3x3 block of cells. The grid therefore yields
+             * exactly the same candidate (node, element) pairs as an all-pairs search, and testing the
+             * candidates in increasing element order preserves which intersecting element is found first.
+             *
+             * The grid buckets elements by raw coordinate, so it cannot be used when the metric wraps
+             * around the domain; for periodic meshes we fall back to an all-pairs search.
+             */
+            const bool use_grid = !this->IsMeshPeriodic();
+
+            std::map<std::pair<int, int>, std::vector<unsigned> > boundary_element_grid;
+            c_vector<double, SPACE_DIM> grid_origin = zero_vector<double>(SPACE_DIM);
+            std::vector<unsigned> all_boundary_positions;
+            if (use_grid)
+            {
+                // Use the componentwise minimum centroid as the grid origin
+                if (!boundary_element_centroids.empty())
+                {
+                    grid_origin = boundary_element_centroids[0];
+                    for (unsigned i = 1; i < boundary_element_centroids.size(); ++i)
+                    {
+                        grid_origin[0] = std::min(grid_origin[0], boundary_element_centroids[i][0]);
+                        grid_origin[1] = std::min(grid_origin[1], boundary_element_centroids[i][1]);
+                    }
+                }
+
+                // Bucket each boundary element into its grid cell (positions are pushed in element order)
+                for (unsigned i = 0; i < boundary_element_centroids.size(); ++i)
+                {
+                    int cell_i = (int) std::floor((boundary_element_centroids[i][0] - grid_origin[0]) / mDistanceForT3SwapChecking);
+                    int cell_j = (int) std::floor((boundary_element_centroids[i][1] - grid_origin[1]) / mDistanceForT3SwapChecking);
+                    boundary_element_grid[std::make_pair(cell_i, cell_j)].push_back(i);
+                }
+            }
+            else
+            {
+                // All-pairs fallback: every boundary element is a candidate, in element order
+                all_boundary_positions.reserve(boundary_element_indices.size());
+                for (unsigned i = 0; i < boundary_element_indices.size(); ++i)
+                {
+                    all_boundary_positions.push_back(i);
+                }
+            }
+
+            // Check intersections only for those nodes and elements within mDistanceForT3SwapChecking
+            // of each other (node <--> element centroid)
+            std::vector<unsigned> grid_candidate_positions;
             for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
                  node_iter != this->GetNodeIteratorEnd();
                  ++node_iter)
@@ -1282,22 +1341,57 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections(
                 {
                     assert(!(node_iter->IsDeleted()));
 
-                    // index in boundary_element_centroids and boundary_element_indices
-                    unsigned boundary_element_index = 0;
-                    for (std::vector<unsigned>::iterator elem_iter = boundary_element_indices.begin();
-                         elem_iter != boundary_element_indices.end();
-                         ++elem_iter)
+                    c_vector<double, SPACE_DIM> node_location = node_iter->rGetLocation();
+
+                    /*
+                     * Gather the boundary elements to test against this node, in increasing element
+                     * order, either from the 3x3 block of grid cells around the node or (for periodic
+                     * meshes) from the full list of boundary elements.
+                     */
+                    const std::vector<unsigned>* p_candidate_positions;
+                    if (use_grid)
                     {
-                        // Check that the node is not part of this element
-                        if (node_iter->rGetContainingElementIndices().count(*elem_iter) == 0)
+                        grid_candidate_positions.clear();
+                        int node_cell_i = (int) std::floor((node_location[0] - grid_origin[0]) / mDistanceForT3SwapChecking);
+                        int node_cell_j = (int) std::floor((node_location[1] - grid_origin[1]) / mDistanceForT3SwapChecking);
+                        for (int di = -1; di <= 1; ++di)
                         {
-                            c_vector<double, SPACE_DIM> node_location = node_iter->rGetLocation();
+                            for (int dj = -1; dj <= 1; ++dj)
+                            {
+                                typename std::map<std::pair<int, int>, std::vector<unsigned> >::const_iterator cell_iter
+                                    = boundary_element_grid.find(std::make_pair(node_cell_i + di, node_cell_j + dj));
+                                if (cell_iter != boundary_element_grid.end())
+                                {
+                                    grid_candidate_positions.insert(grid_candidate_positions.end(),
+                                                                    cell_iter->second.begin(), cell_iter->second.end());
+                                }
+                            }
+                        }
+                        // Restore increasing element order across the gathered cells
+                        std::sort(grid_candidate_positions.begin(), grid_candidate_positions.end());
+                        p_candidate_positions = &grid_candidate_positions;
+                    }
+                    else
+                    {
+                        p_candidate_positions = &all_boundary_positions;
+                    }
+
+                    for (std::vector<unsigned>::const_iterator pos_iter = p_candidate_positions->begin();
+                         pos_iter != p_candidate_positions->end();
+                         ++pos_iter)
+                    {
+                        unsigned boundary_element_index = *pos_iter;
+                        unsigned element_index = boundary_element_indices[boundary_element_index];
+
+                        // Check that the node is not part of this element
+                        if (node_iter->rGetContainingElementIndices().count(element_index) == 0)
+                        {
                             c_vector<double, SPACE_DIM> element_centroid = boundary_element_centroids[boundary_element_index];
                             double node_element_distance = norm_2(this->GetVectorFromAtoB(node_location, element_centroid));
 
                             if (node_element_distance < mDistanceForT3SwapChecking)
                             {
-                                if (this->ElementIncludesPoint(node_iter->rGetLocation(), *elem_iter))
+                                if (this->ElementIncludesPoint(node_iter->rGetLocation(), element_index))
                                 {
                                     // The swap moves this boundary node and adds it to the intersected
                                     // element, changing the geometry of the intersected element and of
@@ -1306,7 +1400,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections(
                                     // next pass; all other centroids are unaffected as no other node moves.
                                     if (pBoundaryElementCentroids != nullptr)
                                     {
-                                        pBoundaryElementCentroids->erase(*elem_iter);
+                                        pBoundaryElementCentroids->erase(element_index);
                                         const std::set<unsigned>& r_containing_elements = node_iter->rGetContainingElementIndices();
                                         for (std::set<unsigned>::const_iterator containing_iter = r_containing_elements.begin();
                                              containing_iter != r_containing_elements.end();
@@ -1316,13 +1410,11 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections(
                                         }
                                     }
 
-                                    this->PerformT3Swap(&(*node_iter), *elem_iter);
+                                    this->PerformT3Swap(&(*node_iter), element_index);
                                     return true;
                                 }
                             }
                         }
-                        // increment the boundary element index
-                        boundary_element_index += 1u;
                     }
                 }
             }
