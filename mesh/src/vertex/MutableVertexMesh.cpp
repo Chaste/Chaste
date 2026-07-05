@@ -1022,10 +1022,19 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh([[maybe_unused]] VertexEl
 
         // Check for element intersections
         recheck_mesh = true;
+
+        /*
+         * Cache of boundary-element centroids, keyed by element index, reused across the repeated
+         * CheckForIntersections() calls below. Since node positions do not change during ReMesh()
+         * except at elements directly involved in a swap (whose entries CheckForIntersections()
+         * invalidates), this avoids recomputing every boundary-element centroid from scratch after
+         * each T3 swap (see #2401).
+         */
+        std::map<unsigned, c_vector<double, SPACE_DIM> > boundary_element_centroid_cache;
         while (recheck_mesh == true)
         {
             // Check mesh for intersections, and perform T3 swaps where required
-            recheck_mesh = CheckForIntersections();
+            recheck_mesh = CheckForIntersections(&boundary_element_centroid_cache);
         }
 
         RemoveDeletedNodes();
@@ -1148,7 +1157,8 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
+bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections(
+    [[maybe_unused]] std::map<unsigned, c_vector<double, SPACE_DIM> >* pBoundaryElementCentroids)
 {
     if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
     {
@@ -1237,8 +1247,28 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
                 {
                     unsigned element_index = elem_iter->GetIndex();
                     boundary_element_indices.push_back(element_index);
-                    // should be a map but I am too lazy to look up the syntax
-                    boundary_element_centroids.push_back(this->GetCentroidOfElement(element_index));
+
+                    // Look the centroid up in the caller-supplied cache if there is one, otherwise
+                    // compute it directly; either way store it for the distance checks below.
+                    if (pBoundaryElementCentroids != nullptr)
+                    {
+                        typename std::map<unsigned, c_vector<double, SPACE_DIM> >::const_iterator cache_iter
+                            = pBoundaryElementCentroids->find(element_index);
+                        if (cache_iter == pBoundaryElementCentroids->end())
+                        {
+                            c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(element_index);
+                            (*pBoundaryElementCentroids)[element_index] = centroid;
+                            boundary_element_centroids.push_back(centroid);
+                        }
+                        else
+                        {
+                            boundary_element_centroids.push_back(cache_iter->second);
+                        }
+                    }
+                    else
+                    {
+                        boundary_element_centroids.push_back(this->GetCentroidOfElement(element_index));
+                    }
                 }
             }
 
@@ -1269,6 +1299,23 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
                             {
                                 if (this->ElementIncludesPoint(node_iter->rGetLocation(), *elem_iter))
                                 {
+                                    // The swap moves this boundary node and adds it to the intersected
+                                    // element, changing the geometry of the intersected element and of
+                                    // every element that currently contains the node. Drop their cached
+                                    // centroids (computed before the swap) so they are recomputed on the
+                                    // next pass; all other centroids are unaffected as no other node moves.
+                                    if (pBoundaryElementCentroids != nullptr)
+                                    {
+                                        pBoundaryElementCentroids->erase(*elem_iter);
+                                        const std::set<unsigned>& r_containing_elements = node_iter->rGetContainingElementIndices();
+                                        for (std::set<unsigned>::const_iterator containing_iter = r_containing_elements.begin();
+                                             containing_iter != r_containing_elements.end();
+                                             ++containing_iter)
+                                        {
+                                            pBoundaryElementCentroids->erase(*containing_iter);
+                                        }
+                                    }
+
                                     this->PerformT3Swap(&(*node_iter), *elem_iter);
                                     return true;
                                 }

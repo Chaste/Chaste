@@ -70,6 +70,16 @@ public:
         boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh;
         VoronoiVertexMeshGenerator mesh_generator = VoronoiVertexMeshGenerator(35,35,1,1.0);
         p_mesh = mesh_generator.GetMesh();
+
+        /*
+         * Reduce the radius within which boundary nodes are tested against boundary elements for T3
+         * swaps. The default (5.0) is very conservative relative to the cell diameter (~1.0 here): a
+         * node can only intersect an element it is already almost touching, and its per-timestep
+         * displacement is capped at 0.5*cell_rearrangement_threshold. A radius of 1.5 comfortably
+         * covers any overlapping configuration while greatly reducing the number of (expensive)
+         * ElementIncludesPoint() tests performed each timestep.
+         */
+        p_mesh->SetDistanceForT3SwapChecking(1.5);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
         CellsGenerator<NoCellCycleModel, 2> cells_generator;
 
