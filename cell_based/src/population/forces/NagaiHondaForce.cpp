@@ -68,6 +68,11 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     unsigned num_nodes = p_cell_population->GetNumNodes();
     unsigned num_elements = p_cell_population->GetNumElements();
 
+    // Cache the mesh reference and force parameters, which are used repeatedly in the loops below
+    VertexMesh<DIM, DIM>& r_mesh = p_cell_population->rGetMesh();
+    const double deformation_energy_parameter = GetNagaiHondaDeformationEnergyParameter();
+    const double membrane_surface_energy_parameter = GetNagaiHondaMembraneSurfaceEnergyParameter();
+
     /*
      * Check if a subclass of AbstractTargetAreaModifier is being used by
      * interrogating the first cell (assuming either all cells, or no cells, in
@@ -79,13 +84,13 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     std::vector<double> element_areas(num_elements);
     std::vector<double> element_perimeters(num_elements);
     std::vector<double> target_areas(num_elements);
-    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
-         elem_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
+    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = r_mesh.GetElementIteratorBegin();
+         elem_iter != r_mesh.GetElementIteratorEnd();
          ++elem_iter)
     {
         unsigned elem_index = elem_iter->GetIndex();
-        element_areas[elem_index] = p_cell_population->rGetMesh().GetVolumeOfElement(elem_index);
-        element_perimeters[elem_index] = p_cell_population->rGetMesh().GetSurfaceAreaOfElement(elem_index);
+        element_areas[elem_index] = r_mesh.GetVolumeOfElement(elem_index);
+        element_perimeters[elem_index] = r_mesh.GetSurfaceAreaOfElement(elem_index);
 
         if (using_target_area_modifier)
         {
@@ -118,8 +123,8 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
         c_vector<double, DIM> membrane_surface_tension_contribution = zero_vector<double>(DIM);
         c_vector<double, DIM> adhesion_contribution = zero_vector<double>(DIM);
 
-        // Find the indices of the elements owned by this node
-        std::set<unsigned> containing_elem_indices = p_cell_population->GetNode(node_index)->rGetContainingElementIndices();
+        // Find the indices of the elements owned by this node (by reference, to avoid copying the set)
+        const std::set<unsigned>& containing_elem_indices = p_this_node->rGetContainingElementIndices();
 
         // Iterate over these elements
         for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
@@ -135,8 +140,8 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             unsigned local_index = p_element->GetNodeLocalIndex(node_index);
 
             // Add the force contribution from this cell's deformation energy (note the minus sign)
-            c_vector<double, DIM> element_area_gradient = p_cell_population->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
-            deformation_contribution -= 2*GetNagaiHondaDeformationEnergyParameter()*(element_areas[elem_index] - target_areas[elem_index])*element_area_gradient;
+            c_vector<double, DIM> element_area_gradient = r_mesh.GetAreaGradientOfElementAtNode(p_element, local_index);
+            deformation_contribution -= 2*deformation_energy_parameter*(element_areas[elem_index] - target_areas[elem_index])*element_area_gradient;
 
             // Get the previous and next nodes in this element
             unsigned previous_node_local_index = (num_nodes_elem+local_index-1)%num_nodes_elem;
@@ -150,8 +155,8 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             double next_edge_adhesion_parameter = GetAdhesionParameter(p_this_node, p_next_node, *p_cell_population);
 
             // Compute the gradient of each these edges, computed at the present node
-            c_vector<double, DIM> previous_edge_gradient = -p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, previous_node_local_index);
-            c_vector<double, DIM> next_edge_gradient = p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, local_index);
+            c_vector<double, DIM> previous_edge_gradient = -r_mesh.GetNextEdgeGradientOfElementAtNode(p_element, previous_node_local_index);
+            c_vector<double, DIM> next_edge_gradient = r_mesh.GetNextEdgeGradientOfElementAtNode(p_element, local_index);
 
             // Add the force contribution from cell-cell and cell-boundary adhesion (note the minus sign)
             adhesion_contribution -= previous_edge_adhesion_parameter*previous_edge_gradient + next_edge_adhesion_parameter*next_edge_gradient;
@@ -160,41 +165,53 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             c_vector<double, DIM> element_perimeter_gradient;
             element_perimeter_gradient = previous_edge_gradient + next_edge_gradient;
             double cell_target_perimeter = 2*sqrt(M_PI*target_areas[elem_index]);
-            membrane_surface_tension_contribution -= 2*GetNagaiHondaMembraneSurfaceEnergyParameter()*(element_perimeters[elem_index] - cell_target_perimeter)*element_perimeter_gradient;
+            membrane_surface_tension_contribution -= 2*membrane_surface_energy_parameter*(element_perimeters[elem_index] - cell_target_perimeter)*element_perimeter_gradient;
         }
 
         c_vector<double, DIM> force_on_node = deformation_contribution + membrane_surface_tension_contribution + adhesion_contribution;
-        p_cell_population->GetNode(node_index)->AddAppliedForceContribution(force_on_node);
+        p_this_node->AddAppliedForceContribution(force_on_node);
     }
 }
 
 template<unsigned DIM>
 double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
 {
-    // Find the indices of the elements owned by each node
-    std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
-    std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
+    // Find the indices of the elements owned by each node (taken by reference to avoid copying the sets)
+    const std::set<unsigned>& elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
+    const std::set<unsigned>& elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
 
-    // Find common elements
-    std::set<unsigned> shared_elements;
-    std::set_intersection(elements_containing_nodeA.begin(),
-                          elements_containing_nodeA.end(),
-                          elements_containing_nodeB.begin(),
-                          elements_containing_nodeB.end(),
-                          std::inserter(shared_elements, shared_elements.begin()));
+    /*
+     * Count how many elements the two nodes share, which determines whether the edge is on the
+     * boundary (1 shared element) or internal (2). We only need to distinguish these cases, so we
+     * iterate over the smaller set counting membership in the larger and stop as soon as we reach
+     * two, avoiding the allocation of an intersection set.
+     */
+    const std::set<unsigned>& smaller_set = (elements_containing_nodeA.size() <= elements_containing_nodeB.size())
+                                                ? elements_containing_nodeA : elements_containing_nodeB;
+    const std::set<unsigned>& larger_set = (elements_containing_nodeA.size() <= elements_containing_nodeB.size())
+                                               ? elements_containing_nodeB : elements_containing_nodeA;
 
-    // Check that the nodes have a common edge
-    assert(!shared_elements.empty());
-
-    double adhesion_parameter = GetNagaiHondaCellCellAdhesionEnergyParameter();
-
-    // If the edge corresponds to a single element, then the cell is on the boundary
-    if (shared_elements.size() == 1)
+    unsigned num_shared_elements = 0;
+    for (std::set<unsigned>::const_iterator iter = smaller_set.begin(); iter != smaller_set.end(); ++iter)
     {
-        adhesion_parameter = GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
+        if (larger_set.count(*iter) != 0)
+        {
+            if (++num_shared_elements == 2u)
+            {
+                break;
+            }
+        }
     }
 
-    return adhesion_parameter;
+    // Check that the nodes have a common edge
+    assert(num_shared_elements > 0);
+
+    // If the edge corresponds to a single element, then the cell is on the boundary
+    if (num_shared_elements == 1)
+    {
+        return GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
+    }
+    return GetNagaiHondaCellCellAdhesionEnergyParameter();
 }
 
 template<unsigned DIM>

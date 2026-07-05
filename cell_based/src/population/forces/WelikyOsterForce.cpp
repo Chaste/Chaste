@@ -63,14 +63,17 @@ void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPo
         // Helper variable that is a static cast of the cell population
         VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
 
+        // Cache the mesh reference, which is used repeatedly in the loops below
+        VertexMesh<DIM, DIM>& r_mesh = p_cell_population->rGetMesh();
+
         /*
             * The force on each node is given by the interaction between the area and
             * the perimeter of the element containing the node.
             */
 
         // Iterate over elements in the cell population
-        for (typename VertexMesh<DIM,DIM>::VertexElementIterator element_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
-                    element_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
+        for (typename VertexMesh<DIM,DIM>::VertexElementIterator element_iter = r_mesh.GetElementIteratorBegin();
+                    element_iter != r_mesh.GetElementIteratorEnd();
                     ++element_iter)
         {
             unsigned element_index = element_iter->GetIndex();
@@ -78,7 +81,7 @@ void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPo
             /******** Start of deformation force calculation ********/
 
             // Compute the area of this element
-            double element_area = p_cell_population->rGetMesh().GetVolumeOfElement(element_index);
+            double element_area = r_mesh.GetVolumeOfElement(element_index);
 
             double deformation_coefficient = GetWelikyOsterAreaParameter()/element_area;
 
@@ -87,7 +90,7 @@ void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPo
             /******** Start of membrane force calculation ***********/
 
             // Compute the perimeter of the element
-            double element_perimeter = p_cell_population->rGetMesh().GetSurfaceAreaOfElement(element_index);
+            double element_perimeter = r_mesh.GetSurfaceAreaOfElement(element_index);
 
             double membrane_surface_tension_coefficient = GetWelikyOsterPerimeterParameter()*element_perimeter;
 
@@ -99,13 +102,13 @@ void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPo
                 unsigned node_global_index = element_iter->GetNodeGlobalIndex(node_local_index);
 
                 c_vector<double, DIM> current_node = element_iter->GetNodeLocation(node_local_index);
-                c_vector<double, DIM> next_node = element_iter->GetNodeLocation((node_local_index + 1)%(element_iter->GetNumNodes()));
-                c_vector<double, DIM> previous_node = element_iter->GetNodeLocation((node_local_index + element_iter->GetNumNodes() - 1)%(element_iter->GetNumNodes()));
+                c_vector<double, DIM> next_node = element_iter->GetNodeLocation((node_local_index + 1)%num_nodes);
+                c_vector<double, DIM> previous_node = element_iter->GetNodeLocation((node_local_index + num_nodes - 1)%num_nodes);
 
-                c_vector<double, DIM> clockwise_unit_vector = p_cell_population->rGetMesh().GetVectorFromAtoB(current_node, previous_node);
+                c_vector<double, DIM> clockwise_unit_vector = r_mesh.GetVectorFromAtoB(current_node, previous_node);
                 clockwise_unit_vector /= norm_2(clockwise_unit_vector);
 
-                c_vector<double, DIM> anti_clockwise_unit_vector = p_cell_population->rGetMesh().GetVectorFromAtoB(current_node, next_node);
+                c_vector<double, DIM> anti_clockwise_unit_vector = r_mesh.GetVectorFromAtoB(current_node, next_node);
                 anti_clockwise_unit_vector /= norm_2(anti_clockwise_unit_vector);
 
                 // Calculate the outward normal at the node
