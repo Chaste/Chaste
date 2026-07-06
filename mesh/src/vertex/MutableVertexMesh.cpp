@@ -837,7 +837,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh([[maybe_unused]] unsigned index)
 {
-    if constexpr (SPACE_DIM == 2)
+    if constexpr (SPACE_DIM == 2 || SPACE_DIM == 3)
     {
         // Mark any nodes that are contained only in this element as deleted
         for (unsigned i = 0; i < this->mElements[index]->GetNumNodes(); i++)
@@ -4262,6 +4262,13 @@ VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>* MutableVertexMesh<ELEMENT_D
 //   Template Specialization for MutableVertexMesh<3, 3>   //
 /////////////////////////////////////////////////////////////
 
+// Forward declaration of the IdentifySwapType() specialization. This is required because
+// CheckForSwapsFromShortEdges() (specialized below) calls IdentifySwapType() before its definition
+// appears; declaring the specialization here ensures that call binds to it rather than implicitly
+// instantiating the (2D-only) base template. The definition appears after PerformT1Swap() below.
+template <>
+void MutableVertexMesh<3, 3>::IdentifySwapType(Node<3>* pNodeA, Node<3>* pNodeB);
+
 // Specialized as otherwise compiler will complain about undefined reference to functions of
 // VertexElement<0, x>.
 template <>
@@ -5123,6 +5130,131 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
             p_node_b->SetAsBoundaryNode(true);
             p_node_y->SetAsBoundaryNode(true);
         }
+    }
+}
+
+template <>
+void MutableVertexMesh<3, 3>::IdentifySwapType(Node<3>* pNodeA, Node<3>* pNodeB)
+{
+    /*
+     * Specialization of IdentifySwapType() for a 3D monolayer mesh.
+     *
+     * pNodeA and pNodeB are the two basal nodes of a lateral face whose basal and/or apical edge has
+     * become shorter than mCellRearrangementThreshold, as identified by CheckForSwapsFromShortEdges().
+     * This method classifies the local configuration by the number of cells (elements) around the
+     * edge and dispatches to the appropriate monolayer remeshing operation, mirroring the
+     * two-dimensional IdentifySwapType(). The apical counterparts of pNodeA and pNodeB are handled by
+     * the dispatched operations, and PerformT1Swap() itself routes to an asynchronous T1 swap when
+     * only one of the basal/apical edges is short.
+     */
+    const std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
+    const std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
+
+    std::set<unsigned> all_indices;
+    std::set_union(nodeA_elem_indices.begin(), nodeA_elem_indices.end(),
+                   nodeB_elem_indices.begin(), nodeB_elem_indices.end(),
+                   std::inserter(all_indices, all_indices.begin()));
+
+    // High-order junctions (rosettes) are not yet implemented for 3D monolayer meshes (#2850).
+    if (nodeA_elem_indices.size() > 3 || nodeB_elem_indices.size() > 3)
+    {
+        EXCEPTION("High-order junctions (rosettes) are not implemented for 3D monolayer meshes (#2850)");
+    }
+
+    switch (all_indices.size())
+    {
+        case 1:
+        {
+            /*
+             * Both nodes are contained in a single cell, so the short edge is on the mesh boundary.
+             * Merge the two nodes (and their apical counterparts) and tidy up the deleted nodes/faces.
+             */
+            PerformNodeMerge(pNodeA, pNodeB);
+            RemoveDeletedNodes();
+            RemoveDeletedFaces();
+            break;
+        }
+        case 2:
+        {
+            if (nodeA_elem_indices.size() == 2 && nodeB_elem_indices.size() == 2)
+            {
+                // The two cells meet along this edge on both sides: perform a T1 swap.
+                PerformT1Swap(pNodeA, pNodeB, all_indices);
+            }
+            else
+            {
+                /*
+                 * One node is contained in a single cell and the other in two, so the edge is on the
+                 * boundary. Merge the nodes and tidy up the deleted nodes/faces.
+                 */
+                PerformNodeMerge(pNodeA, pNodeB);
+                RemoveDeletedNodes();
+                RemoveDeletedFaces();
+            }
+            break;
+        }
+        case 3:
+        {
+            /*
+             * The edge is shared by three cells. This is either a normal T1 swap or, if the two cells
+             * that do not share the edge meet at a third node, a triangular void. Detect the void case
+             * by checking whether the node following pNodeA in the element containing A (but not B)
+             * coincides with the node preceding pNodeB in the element containing B (but not A), or vice
+             * versa - working on the basal face, whose node count is half the prism's total node count.
+             */
+            std::set<unsigned> element_A_not_B;
+            std::set_difference(all_indices.begin(), all_indices.end(),
+                                nodeB_elem_indices.begin(), nodeB_elem_indices.end(),
+                                std::inserter(element_A_not_B, element_A_not_B.begin()));
+            std::set<unsigned> element_B_not_A;
+            std::set_difference(all_indices.begin(), all_indices.end(),
+                                nodeA_elem_indices.begin(), nodeA_elem_indices.end(),
+                                std::inserter(element_B_not_A, element_B_not_A.begin()));
+
+            if (element_A_not_B.size() == 1 && element_B_not_A.size() == 1)
+            {
+                VertexElement<3, 3>* p_element_A_not_B = this->mElements[*element_A_not_B.begin()];
+                VertexElement<3, 3>* p_element_B_not_A = this->mElements[*element_B_not_A.begin()];
+
+                // Number of basal nodes = half the total (basal + apical) nodes of the prism
+                const unsigned num_basal_a = p_element_A_not_B->GetNumNodes() / 2;
+                const unsigned num_basal_b = p_element_B_not_A->GetNumNodes() / 2;
+
+                const unsigned local_index_1 = p_element_A_not_B->GetNodeLocalIndex(pNodeA->GetIndex());
+                const unsigned next_node_1 = p_element_A_not_B->GetNodeGlobalIndex((local_index_1 + 1) % num_basal_a);
+                const unsigned previous_node_1 = p_element_A_not_B->GetNodeGlobalIndex((local_index_1 + num_basal_a - 1) % num_basal_a);
+                const unsigned local_index_2 = p_element_B_not_A->GetNodeLocalIndex(pNodeB->GetIndex());
+                const unsigned next_node_2 = p_element_B_not_A->GetNodeGlobalIndex((local_index_2 + 1) % num_basal_b);
+                const unsigned previous_node_2 = p_element_B_not_A->GetNodeGlobalIndex((local_index_2 + num_basal_b - 1) % num_basal_b);
+
+                if (next_node_1 == previous_node_2 || next_node_2 == previous_node_1)
+                {
+                    // Triangular void. If either adjacent cell is itself triangular it would lose an
+                    // edge in the rearrangement, which is not supported (mirrors the 2D behaviour).
+                    if (p_element_A_not_B->GetNumNodes() == 6u || p_element_B_not_A->GetNumNodes() == 6u)
+                    {
+                        EXCEPTION("Triangular element next to triangular void, not implemented yet.");
+                    }
+
+                    // Removal of a (non-triangular-adjacent) void is not yet implemented in 3D.
+                    EXCEPTION("Void removal is not implemented for 3D monolayer meshes (#2850)");
+                }
+            }
+
+            PerformT1Swap(pNodeA, pNodeB, all_indices);
+            break;
+        }
+        case 4:
+        {
+            /*
+             * The edge is internal, shared by four cells: perform a T1 swap. PerformT1Swap() handles
+             * the asynchronous case, and throws if the nodes are degenerately close together.
+             */
+            PerformT1Swap(pNodeA, pNodeB, all_indices);
+            break;
+        }
+        default:
+            NEVER_REACHED;
     }
 }
 
