@@ -591,6 +591,18 @@ bool VertexElement<2, 3>::FaceRearrangeNodes(const c_vector<double, 3>& rPointOf
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceSetNodeOrder(const std::vector<Node<SPACE_DIM>*>& rOrderedNodes)
+{
+    assert(rOrderedNodes.size() == this->mNodes.size()); // LCOV_EXCL_LINE
+    const bool return_val = (rOrderedNodes != this->mNodes);
+    if (return_val)
+    {
+        this->mNodes = rOrderedNodes;
+    }
+    return return_val;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceRearrangeNodes()
 {
     NEVER_REACHED;

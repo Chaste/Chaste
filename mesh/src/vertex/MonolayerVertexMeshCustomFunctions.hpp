@@ -147,6 +147,18 @@ bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace);
 
 void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace);
 
+/**
+ * \todo #2850 Repair the node ordering of a monolayer apical or basal face if the geometric sort has
+ * left it inconsistent with the element's lateral faces (which happens on curved or non-convex faces).
+ * The order is re-derived topologically from the lateral faces so that every apical/basal edge again
+ * has a matching lateral face. Consistent faces, and non apical/basal faces, are left unchanged. Used
+ * as a self-healing pass in MutableVertexMesh<3,3>::ReMesh().
+ *
+ * @param pMesh  the mesh owning the face
+ * @param pFace  the face to check and, if necessary, repair
+ */
+void RepairApicalBasalFaceOrdering(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace);
+
 ///////////////////////////////////////////////////////////////////////////////////
 ///                       Functions for monolayer classes                       ///
 ///////////////////////////////////////////////////////////////////////////////////

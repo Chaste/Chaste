@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexElement.hpp"
 
 #include <algorithm>
+#include <map>
 #include <string>
 
 #include <iomanip> // PrintElement
@@ -440,6 +441,135 @@ bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace)
     return pFace->FaceGetNumContainingElements() == 1;
 }
 
+/**
+ * \todo #2850 Compute the cyclic node order of a monolayer element's apical or basal face from
+ * the element's lateral faces, instead of sorting the nodes geometrically by angle.
+ *
+ * Each lateral face of a prism is a quad sharing exactly two nodes with the apical/basal face (its
+ * two nodes of the same type); those two nodes are adjacent on the face. Collecting these
+ * adjacencies over all lateral faces yields the face's node ring, independent of geometry. This is
+ * robust on curved (e.g. cylindrical) meshes and after division makes a face non-convex, where the
+ * geometric angular sort in VertexElement<2,3>::FaceRearrangeNodes() can transpose two nodes and so
+ * break the prism invariant that every apical/basal edge has a matching lateral face.
+ *
+ * Returns false (so the caller can fall back to the geometric sort) if the lateral faces do not
+ * form a single clean ring over this face's nodes - e.g. when an asynchronous T1 swap has left a
+ * scutoid interface node, so a lateral face is a triangle sharing only one node with the face.
+ *
+ * @param pElement  the (single) element owning this apical/basal face
+ * @param pFace  the apical or basal face to be ordered
+ * @param rOrderedNodes  filled with the topological node order on success
+ * @return whether a clean ring was found
+ */
+static bool ComputeApicalBasalNodeOrderFromLateralFaces(const VertexElement<3, 3>* pElement,
+                                                        const VertexElement<2, 3>* pFace,
+                                                        std::vector<Node<3>*>& rOrderedNodes)
+{
+    const unsigned num_nodes = pFace->GetNumNodes();
+    if (num_nodes < 3)
+    {
+        return false;
+    }
+
+    std::vector<Node<3>*> face_node_vec(num_nodes);
+    for (unsigned i = 0; i < num_nodes; ++i)
+    {
+        face_node_vec[i] = pFace->GetNode(i);
+    }
+    const std::set<Node<3>*> face_node_set(face_node_vec.begin(), face_node_vec.end());
+
+    // Build the adjacency among this face's nodes from the element's lateral faces.
+    std::map<Node<3>*, std::set<Node<3>*> > adjacency;
+    for (unsigned f = 0; f < pElement->GetNumFaces(); ++f)
+    {
+        const VertexElement<2, 3>* p_lateral = pElement->GetFace(f);
+        if (!IsLateralFace(p_lateral))
+        {
+            continue;
+        }
+        std::vector<Node<3>*> shared;
+        for (unsigned j = 0; j < p_lateral->GetNumNodes(); ++j)
+        {
+            Node<3>* p_node = p_lateral->GetNode(j);
+            if (face_node_set.count(p_node) == 1u)
+            {
+                shared.push_back(p_node);
+            }
+        }
+        if (shared.size() != 2u)
+        {
+            // Not a clean prism (e.g. a scutoid interface node); let the caller fall back.
+            return false;
+        }
+        adjacency[shared[0]].insert(shared[1]);
+        adjacency[shared[1]].insert(shared[0]);
+    }
+
+    // For a single closed ring every node must have exactly two neighbours.
+    for (unsigned i = 0; i < num_nodes; ++i)
+    {
+        if (adjacency[face_node_vec[i]].size() != 2u)
+        {
+            return false;
+        }
+    }
+
+    // Walk the ring, starting from node 0 and never stepping back to the previous node.
+    rOrderedNodes.clear();
+    rOrderedNodes.reserve(num_nodes);
+    Node<3>* p_start = face_node_vec[0];
+    Node<3>* p_prev = nullptr;
+    Node<3>* p_curr = p_start;
+    do
+    {
+        rOrderedNodes.push_back(p_curr);
+        Node<3>* p_next = nullptr;
+        for (Node<3>* p_candidate : adjacency[p_curr])
+        {
+            if (p_candidate != p_prev)
+            {
+                p_next = p_candidate;
+                break;
+            }
+        }
+        p_prev = p_curr;
+        p_curr = p_next;
+    } while (p_curr != p_start && p_curr != nullptr && rOrderedNodes.size() <= num_nodes);
+
+    // Every node must have been visited exactly once and the loop must have closed.
+    if (rOrderedNodes.size() != num_nodes || p_curr != p_start)
+    {
+        return false;
+    }
+
+    /*
+     * The walk direction is arbitrary, so fix the winding to match the historical convention used by
+     * the geometric sort (VertexElement<2,3>::FaceRearrangeNodes): nodes ordered counterclockwise as
+     * viewed from outside the element, i.e. the polygon's Newell normal points away from the element
+     * centroid. This keeps the node order (and thus serialised meshes and any code that relies on the
+     * winding) unchanged apart from repairing transposed nodes.
+     */
+    const c_vector<double, 3> face_centroid = pFace->GetCentroid();
+    const c_vector<double, 3> outward_direction = face_centroid - pElement->GetCentroid();
+    c_vector<double, 3> newell_normal = zero_vector<double>(3);
+    for (unsigned i = 0; i < num_nodes; ++i)
+    {
+        const c_vector<double, 3> a = rOrderedNodes[i]->rGetLocation() - face_centroid;
+        const c_vector<double, 3> b = rOrderedNodes[(i + 1) % num_nodes]->rGetLocation() - face_centroid;
+        // Accumulate the cross product a x b (Newell's method) without depending on VectorProduct,
+        // which is only included later in this translation unit.
+        newell_normal[0] += a[1] * b[2] - a[2] * b[1];
+        newell_normal[1] += a[2] * b[0] - a[0] * b[2];
+        newell_normal[2] += a[0] * b[1] - a[1] * b[0];
+    }
+    if (inner_prod(newell_normal, outward_direction) < 0.0)
+    {
+        std::reverse(rOrderedNodes.begin(), rOrderedNodes.end());
+    }
+
+    return true;
+}
+
 void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace)
 {
     const std::set<unsigned>& set_tmp = pFace->rFaceGetContainingElementIndices();
@@ -458,6 +588,61 @@ void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFac
         if (IsLateralFace(pFace))
         {
             pFace->LateralFaceRearrangeNodes();
+        }
+    }
+}
+
+/**
+ * \todo #2850 Whether an apical/basal face's stored node order is consistent with the element's
+ * lateral faces: every consecutive pair of nodes must share exactly one lateral face. This is the
+ * prism invariant that DivideElementAlongGivenAxis() (via GetSharedLateralFace()) relies on.
+ */
+static bool IsApicalBasalFaceConsistent(const VertexElement<3, 3>* pElement, const VertexElement<2, 3>* pFace)
+{
+    const unsigned num_nodes = pFace->GetNumNodes();
+    for (unsigned i = 0; i < num_nodes; ++i)
+    {
+        const std::set<VertexElement<2, 3>*> shared_lateral = GetFacesWithIndices(
+            GetSharedFaceIndices(pFace->GetNode(i), pFace->GetNode((i + 1) % num_nodes)),
+            pElement, Monolayer::LateralValue);
+        if (shared_lateral.size() != 1u)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void RepairApicalBasalFaceOrdering(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace)
+{
+    if (!(IsApicalFace(pFace) || IsBasalFace(pFace)))
+    {
+        return;
+    }
+    const std::set<unsigned>& set_tmp = pFace->rFaceGetContainingElementIndices();
+    if (set_tmp.empty())
+    {
+        return;
+    }
+    VertexElement<3, 3>* p_elem = pMesh->GetElement(no1(set_tmp));
+
+    /*
+     * The geometric angular sort in VertexElement<2,3>::FaceRearrangeNodes() is correct for planar,
+     * convex faces but can transpose nodes on curved or non-convex apical/basal faces, breaking the
+     * prism invariant. Only in that case do we re-derive the node order topologically from the
+     * lateral faces; consistent faces are left exactly as they are, so flat/convex meshes (and their
+     * stored reference outputs) are unaffected.
+     */
+    if (IsApicalBasalFaceConsistent(p_elem, pFace))
+    {
+        return;
+    }
+    std::vector<Node<3>*> ordered_nodes;
+    if (ComputeApicalBasalNodeOrderFromLateralFaces(p_elem, pFace, ordered_nodes))
+    {
+        if (pFace->FaceSetNodeOrder(ordered_nodes))
+        {
+            p_elem->CheckFaceOrientationOfElement(p_elem->GetFaceLocalIndex(pFace->GetIndex()));
         }
     }
 }

@@ -363,6 +363,18 @@ public:
     bool FaceRearrangeNodes(const c_vector<double, SPACE_DIM>& rPointOfView);
 
     /**
+     * Reorder this face's nodes into the given cyclic order, which must be a permutation of the
+     * face's current nodes. Unlike FaceRearrangeNodes(), which sorts nodes geometrically by angle
+     * (only valid for planar, convex faces), the order here is supplied by the caller. For monolayer
+     * apical/basal faces it is derived topologically from the element's lateral faces, which stays
+     * correct on curved or non-convex faces where the angular sort transposes nodes. #2850
+     *
+     * @param rOrderedNodes the desired node order (same node set the face currently holds)
+     * @return true if the order changed. Does not update the element about the changes.
+     */
+    bool FaceSetNodeOrder(const std::vector<Node<SPACE_DIM>*>& rOrderedNodes);
+
+    /**
      * face will add element index into its registry.
      * @param elementIndex  the index of the element
      */

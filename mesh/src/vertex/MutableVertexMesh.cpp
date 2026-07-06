@@ -4498,6 +4498,19 @@ void MutableVertexMesh<3, 3>::ReMesh(VertexElementMap& rElementMap)
             FaceRearrangeNodesInMesh(this, this->GetFace(i));
         }
     }
+
+    /*
+     * \todo #2850 Self-healing pass for apical/basal faces. The geometric angular sort used elsewhere
+     * can transpose nodes on curved or non-convex faces (e.g. on a cylindrical monolayer, or after a
+     * division/T1 swap leaves a face non-convex), breaking the prism invariant that every apical/basal
+     * edge has a matching lateral face - which later crashes DivideElementAlongGivenAxis(). Here we
+     * re-derive the node order topologically from the lateral faces, but only for faces that are
+     * actually inconsistent, so flat/convex meshes are left untouched.
+     */
+    for (unsigned i = 0; i < this->GetNumFaces(); ++i)
+    {
+        RepairApicalBasalFaceOrdering(this, this->GetFace(i));
+    }
 }
 
 template <>
