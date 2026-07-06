@@ -94,6 +94,26 @@ public:
         }
         builder.WriteVtk(output_filename, "After");
 
+        /*
+         * \todo #2850 Disable asynchronous T1 swaps for this growth-and-division simulation.
+         *
+         * An asynchronous T1 swap leaves a "scutoid" interface node on a single lateral face. Such
+         * nodes now evolve under the energy (see LateralNodeModifier), but a stable scutoid that
+         * coincides with a cell division makes DivideElementAlongGivenAxis() fail: it calls
+         * GetOppositeNode(), whose lateral-face-count heuristic in MonolayerVertexMeshCustomFunctions
+         * (num_lateral_faces = GetNumContainingFaces() - GetNumContainingElements()) is thrown off by
+         * the extra triangular face and raises "No Opposite Node".
+         *
+         * Approach B (future work) would let scutoids and cell division coexist by replacing that
+         * heuristic with a robust opposite-node lookup - e.g. following lateral-edge (VertexElement<1,3>)
+         * connectivity between apical and basal nodes, or selecting the opposite-type node that shares
+         * the greatest number of lateral faces - and then validating that divisions through/near a
+         * scutoid produce correct prism geometry. As this changes a core geometric primitive relied on
+         * throughout the monolayer code, it needs careful verification and is deferred. Until then this
+         * test takes approach A and simply disables asynchronous T1 swaps.
+         */
+        p_mesh->SetAllowAsynchronousT1Swaps(false);
+
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;

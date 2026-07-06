@@ -102,6 +102,17 @@ protected:
     /** Whether to check for T3 swaps (true) or not (false). */
     bool mCheckForT3Swaps;
 
+    /**
+     * Whether asynchronous T1 swaps are permitted in a 3D monolayer mesh (true) or not (false).
+     *
+     * An asynchronous T1 swap occurs when only one of the basal/apical edges of a lateral face is
+     * shorter than the cell rearrangement threshold; it performs a T1 swap on that side only,
+     * leaving a transient interface (lateral) node. If set to false, such a face is left unchanged
+     * (the swap is deferred) until both edges are short enough for an ordinary T1 swap, so that no
+     * interface nodes are created. Defaults to true. Only affects 3D (monolayer) meshes.
+     */
+    bool mAllowAsynchronousT1Swaps = true;
+
     /** Indices of nodes that have been deleted. These indices can be reused when adding new elements/nodes. */
     std::vector<unsigned> mDeletedNodeIndices;
 
@@ -470,6 +481,18 @@ public:
      * @param checkForT3Swaps
      */
     void SetCheckForT3Swaps(bool checkForT3Swaps);
+
+    /**
+     * Set method for mAllowAsynchronousT1Swaps.
+     *
+     * @param allowAsynchronousT1Swaps whether to permit asynchronous T1 swaps (3D monolayer meshes only)
+     */
+    void SetAllowAsynchronousT1Swaps(bool allowAsynchronousT1Swaps);
+
+    /**
+     * @return mAllowAsynchronousT1Swaps, whether asynchronous T1 swaps are permitted (3D monolayer meshes only)
+     */
+    bool GetAllowAsynchronousT1Swaps() const;
 
     /**
      * @return mCellRearrangementThreshold

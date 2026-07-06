@@ -168,6 +168,13 @@ public:
         MutableVertexMesh<3, 3>* p_mesh = sBuilder.MakeSphericalMesh33(p_dual_mesh, 5, 0.5);
         sBuilder.WriteVtk(output_filename, "InitialMesh");
 
+        // \todo #2850 Disable asynchronous T1 swaps defensively: this test uses a proliferative
+        // cell type, so should a division ever coincide with a scutoid interface node left by an
+        // async swap, DivideElementAlongGivenAxis() would fail in GetOppositeNode(). Changes
+        // nothing while no division completes. See TestMonolayerCylindricalMeshExample for the
+        // full explanation and the "approach B" that would let scutoids and division coexist.
+        p_mesh->SetAllowAsynchronousT1Swaps(false);
+
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;

@@ -299,6 +299,12 @@ public:
         HexagonalPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, target_area, z_height);
         MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
 
+        // \todo #2850 Disable asynchronous T1 swaps: this test grows and divides cells, and a
+        // scutoid interface node left by an async swap makes DivideElementAlongGivenAxis() fail
+        // in GetOppositeNode() ("No Opposite Node"). See TestMonolayerCylindricalMeshExample for
+        // the full explanation and the "approach B" that would let scutoids and division coexist.
+        p_mesh->SetAllowAsynchronousT1Swaps(false);
+
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;

@@ -97,18 +97,18 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
             NEVER_REACHED;
         }
 
-        const c_vector<double, 3> mid_apical = (apical_nodes[0]->rGetLocation() + apical_nodes[1]->rGetLocation()) / 2;
-        const c_vector<double, 3> mid_basal = (basal_nodes[0]->rGetLocation() + basal_nodes[1]->rGetLocation()) / 2;
-
         const double apical_length = p_mesh->GetDistanceBetweenNodes(apical_nodes[0]->GetIndex(), apical_nodes[1]->GetIndex());
         const double basal_length = p_mesh->GetDistanceBetweenNodes(basal_nodes[0]->GetIndex(), basal_nodes[1]->GetIndex());
 
-        // HOW_MANY_TIMES_HERE("bla bla bla");
-        // PRINT_CONTAINER(p_lateral_node->rGetLocation());
-        p_lateral_node->rGetModifiableLocation() = (basal_length * mid_apical + apical_length * mid_basal) / (apical_length + basal_length);
-        // PRINT_CONTAINER(p_lateral_node->rGetLocation());
+        /*
+         * #2850 The interface (lateral) node is no longer repositioned to a geometric midpoint here.
+         * Instead it is left to move under the ordinary force-based dynamics, which minimise the
+         * GeneralMonolayerVertexMeshForce energy. This represents a scutoid whose partial (asynchronous)
+         * T1 swap can "unzipper" up or down the lateral direction: when the resulting apical or basal
+         * edge falls below the cell rearrangement threshold, the swap is resolved into a full T1 below.
+         */
 
-        // Reverse AsynchronousT1 when the other edge is shorter than mCellRearrangementThreshold
+        // Resolve the asynchronous T1 (unzipper to a full T1) once the other edge falls below mCellRearrangementThreshold
         if (std::min(apical_length, basal_length) < p_mesh->GetCellRearrangementThreshold())
         {
             const bool reverse_t1_on_basal = basal_length < p_mesh->GetCellRearrangementThreshold();

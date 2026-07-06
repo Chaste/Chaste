@@ -293,6 +293,18 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetCheckForT3Swaps(bool checkFor
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetAllowAsynchronousT1Swaps(bool allowAsynchronousT1Swaps)
+{
+    mAllowAsynchronousT1Swaps = allowAsynchronousT1Swaps;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAllowAsynchronousT1Swaps() const
+{
+    return mAllowAsynchronousT1Swaps;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 {
     mDeletedNodeIndices.clear();
@@ -4443,6 +4455,14 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
             if (basal_edge_length > mCellRearrangementThreshold * mCellRearrangementRatio || apical_edge_length > mCellRearrangementThreshold * mCellRearrangementRatio)
             {
                 if (IsFaceOnBoundary(p_face))
+                {
+                    continue;
+                }
+
+                // If asynchronous T1 swaps are disabled, defer this swap: leave the lateral face
+                // unchanged (creating no interface node) until both its basal and apical edges are
+                // short enough for an ordinary T1 swap.
+                if (!mAllowAsynchronousT1Swaps)
                 {
                     continue;
                 }
