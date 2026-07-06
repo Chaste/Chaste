@@ -5580,7 +5580,23 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
         is_current_basal_node_on_normal_side = is_next_basal_node_on_normal_side;
     }
 
-    // If the axis of division does not cross two edges then we cannot proceed
+    /*
+     * \todo #2850 Division robustness on non-convex / non-planar monolayer cells (future work).
+     *
+     * This detects the two lateral faces to split by counting sign changes of the division axis
+     * separately around the apical and basal polygons, and requires exactly two crossings on each.
+     * That assumption breaks for distorted cells on a curved sheet: e.g. a cell whose basal polygon
+     * has become non-convex is crossed four times (a line through a convex polygon's centroid crosses
+     * exactly two edges), and because the axis is derived from the basal face alone it can miss the
+     * apical polygon entirely (zero crossings) when apical and basal are rotated/offset by curvature.
+     * Both occur in TestMonolayerCylindricalMeshExample after many divisions on the stretching cylinder.
+     *
+     * A more robust reformulation would choose the two lateral faces directly - each lateral face spans
+     * apical to basal, so working in terms of lateral faces unifies the apical/basal counts - and would
+     * pick a well-defined pair even for a non-convex cell (e.g. the two faces whose centroids straddle
+     * the division plane nearest the axis). Note this is genuinely geometric (division is by a plane),
+     * unlike the face-node ordering, which has been made geometry-independent (topological) under #2850.
+     */
     if (apical_intersecting_lateral_faces.size() != 2 || basal_intersecting_lateral_faces.size() != 2)
     {
         EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");

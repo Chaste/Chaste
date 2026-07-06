@@ -570,12 +570,92 @@ static bool ComputeApicalBasalNodeOrderFromLateralFaces(const VertexElement<3, 3
     return true;
 }
 
+/**
+ * \todo #2850 Whether a lateral quad's two basal nodes sit at cyclically consecutive positions
+ * (so the face reads basal-basal-apical-apical). The geometric angular sort can instead interleave
+ * them (basal-apical-basal-apical) on non-planar quads, which would trip the assertion in
+ * VertexElement<2,3>::LateralFaceRearrangeNodes(). Returns true for anything that is not a simple
+ * two-basal/two-apical quad, leaving the existing handling to deal with it.
+ */
+static bool AreLateralBasalNodesAdjacent(const VertexElement<2, 3>* pFace)
+{
+    const unsigned num_nodes = pFace->GetNumNodes();
+    std::vector<unsigned> basal_local_indices;
+    for (unsigned i = 0; i < num_nodes; ++i)
+    {
+        if (IsBasalNode(pFace->GetNode(i)))
+        {
+            basal_local_indices.push_back(i);
+        }
+    }
+    if (basal_local_indices.size() != 2u)
+    {
+        return true;
+    }
+    const unsigned gap = basal_local_indices[1] - basal_local_indices[0];
+    return (gap == 1u || gap == num_nodes - 1u);
+}
+
+/**
+ * \todo #2850 Compute a lateral quad's node order topologically from the opposite-node (vertical
+ * edge) relationship, independent of geometry: basal_a, basal_b, opposite(basal_b), opposite(basal_a).
+ * This keeps the two basal nodes adjacent and each basal node next to its apical partner, which is the
+ * invariant LateralFaceRearrangeNodes() and the lateral-face consumers expect. Returns false if the
+ * face is not a simple two-basal/two-apical quad, or if the opposite nodes are not this face's apical
+ * nodes, so the caller can leave the face alone.
+ *
+ * @param pMesh  the mesh owning the face (needed to resolve opposite nodes)
+ * @param pFace  the lateral face
+ * @param rOrderedNodes  filled with the topological node order on success
+ * @return whether a valid quad order was produced
+ */
+static bool ComputeLateralFaceNodeOrder(VertexMesh<3, 3>* pMesh, const VertexElement<2, 3>* pFace, std::vector<Node<3>*>& rOrderedNodes)
+{
+    const std::vector<Node<3>*> basal_nodes = GetNodesWithType(pFace, Monolayer::BasalValue);
+    const std::vector<Node<3>*> apical_nodes = GetNodesWithType(pFace, Monolayer::ApicalValue);
+    if (basal_nodes.size() != 2u || apical_nodes.size() != 2u)
+    {
+        return false;
+    }
+    Node<3>* p_basal_a = basal_nodes[0];
+    Node<3>* p_basal_b = basal_nodes[1];
+    Node<3>* p_apical_a = GetOppositeNode(p_basal_a, pMesh);
+    Node<3>* p_apical_b = GetOppositeNode(p_basal_b, pMesh);
+    const bool matches = (p_apical_a == apical_nodes[0] && p_apical_b == apical_nodes[1])
+        || (p_apical_a == apical_nodes[1] && p_apical_b == apical_nodes[0]);
+    if (!matches)
+    {
+        return false;
+    }
+    rOrderedNodes.clear();
+    rOrderedNodes.push_back(p_basal_a);
+    rOrderedNodes.push_back(p_basal_b);
+    rOrderedNodes.push_back(p_apical_b);
+    rOrderedNodes.push_back(p_apical_a);
+    return true;
+}
+
 void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace)
 {
     const std::set<unsigned>& set_tmp = pFace->rFaceGetContainingElementIndices();
     const c_vector<double, 3> centroid_tmp = pMesh->GetElement(no1(set_tmp))->GetCentroid();
 
-    const bool has_changes = pFace->FaceRearrangeNodes(centroid_tmp);
+    bool has_changes = pFace->FaceRearrangeNodes(centroid_tmp);
+
+    /*
+     * \todo #2850 The geometric angular sort can interleave a lateral quad's basal and apical nodes on
+     * non-planar (e.g. cylindrical) faces, which would trip the assertion in LateralFaceRearrangeNodes.
+     * When that has happened, re-derive the node order topologically from the opposite-node relationship.
+     * Faces the geometric sort ordered consistently (e.g. on flat meshes) are left untouched.
+     */
+    if (IsLateralFace(pFace) && !AreLateralBasalNodesAdjacent(pFace))
+    {
+        std::vector<Node<3>*> ordered_nodes;
+        if (ComputeLateralFaceNodeOrder(pMesh, pFace, ordered_nodes))
+        {
+            has_changes = pFace->FaceSetNodeOrder(ordered_nodes) || has_changes;
+        }
+    }
 
     if (has_changes)
     {
