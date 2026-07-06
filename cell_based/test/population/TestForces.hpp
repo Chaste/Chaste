@@ -2387,6 +2387,13 @@ public:
 
         // Set up the cell
         std::vector<CellPtr> cells;
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
+        CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(p_diff_type);
+        p_cell->SetBirthTime(-1.0);
+        cells.push_back(p_cell);
 
         // Create cell population
         VertexBasedCellPopulation<3> cell_population(mesh, cells, false, false);
