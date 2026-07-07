@@ -387,27 +387,80 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
         if (p_elem->IsDeleted())
             continue;
 
-        vtkCell* p_cell;
-        if (ELEMENT_DIM == 2)
+        if constexpr (ELEMENT_DIM == 3)
         {
-            p_cell = vtkPolygon::New();
+            if (p_elem->GetNumFaces() > 0)
+            {
+                // Write each 3D element as a VTK_POLYHEDRON defined by its faces, so that Paraview
+                // renders the true cell faces and edges - and handles non-convex cells correctly. This
+                // replaces vtkConvexPointSet, which stores only the element's points and is therefore
+                // drawn as a triangulated convex hull ("Surface With Edges" then shows the hull
+                // tessellation, not the cell edges). #2850
+                std::vector<vtkIdType> point_ids;
+                point_ids.reserve(p_elem->GetNumNodes());
+                for (unsigned j = 0; j < p_elem->GetNumNodes(); ++j)
+                {
+                    point_ids.push_back(static_cast<vtkIdType>(p_elem->GetNodeGlobalIndex(j)));
+                }
+                // The face stream lists, for each face, its number of nodes followed by those node ids.
+                std::vector<vtkIdType> face_stream;
+                for (unsigned face_local_index = 0; face_local_index < p_elem->GetNumFaces(); ++face_local_index)
+                {
+                    const VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* p_face = p_elem->GetFace(face_local_index);
+                    face_stream.push_back(static_cast<vtkIdType>(p_face->GetNumNodes()));
+                    for (unsigned j = 0; j < p_face->GetNumNodes(); ++j)
+                    {
+                        face_stream.push_back(static_cast<vtkIdType>(p_face->GetNodeGlobalIndex(j)));
+                    }
+                }
+                mpVtkUnstructedMesh->InsertNextCell(VTK_POLYHEDRON,
+                                                    static_cast<vtkIdType>(point_ids.size()), point_ids.data(),
+                                                    static_cast<vtkIdType>(p_elem->GetNumFaces()), face_stream.data());
+            }
+            else
+            {
+                // A 3D element with no explicit faces: fall back to a convex point set (points only).
+                vtkConvexPointSet* p_cell = vtkConvexPointSet::New();
+                vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+                p_cell_id_list->SetNumberOfIds(p_elem->GetNumNodes());
+                for (unsigned j = 0; j < p_elem->GetNumNodes(); ++j)
+                {
+                    p_cell_id_list->SetId(j, p_elem->GetNodeGlobalIndex(j));
+                }
+                mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+                p_cell->Delete(); // Reference counted
+            }
         }
         else
         {
-            p_cell = vtkConvexPointSet::New();
+            vtkCell* p_cell;
+            if (ELEMENT_DIM == 2)
+            {
+                p_cell = vtkPolygon::New();
+            }
+            else
+            {
+                p_cell = vtkConvexPointSet::New();
+            }
+            vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+            p_cell_id_list->SetNumberOfIds(p_elem->GetNumNodes());
+            for (unsigned j = 0; j < p_elem->GetNumNodes(); ++j)
+            {
+                p_cell_id_list->SetId(j, p_elem->GetNodeGlobalIndex(j));
+            }
+            mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+            p_cell->Delete(); // Reference counted
         }
-        vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-        p_cell_id_list->SetNumberOfIds(p_elem->GetNumNodes());
-        for (unsigned j = 0; j < p_elem->GetNumNodes(); ++j)
-        {
-            p_cell_id_list->SetId(j, p_elem->GetNodeGlobalIndex(j));
-        }
-        mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-        p_cell->Delete(); // Reference counted
     }
 
-    // For 3D elements, we create another VtkMesh with the faces, as it looks nicer in Paraview
-    // (otherwise 3D elements will have all of it faces triangulated when using the representation "Surface With Edges").
+    // For 3D elements, we also create a second VtkMesh made of the individual faces (each written as a
+    // polygon), together with per-face data ("Face IDs", "Element IDs").
+    //
+    // \todo #2850 This face mesh is now technically redundant for visualising cell edges: the element
+    // mesh above writes each 3D element as a VTK_POLYHEDRON, which Paraview already renders with its
+    // true faces and edges (this was originally a workaround for elements being written as convex point
+    // sets and hence triangulated under "Surface With Edges"). It is kept only as an optional view of
+    // per-face data, and we may wish to remove it at some point.
     if (ELEMENT_DIM == 3 && SPACE_DIM == 3)
     {
         {

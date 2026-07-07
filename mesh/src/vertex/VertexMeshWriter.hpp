@@ -47,6 +47,7 @@ class VertexMesh;
 #include <vtkPointData.h>
 #include <vtkConvexPointSet.h>
 #include <vtkPolygon.h>
+#include <vtkCellType.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
