@@ -64,11 +64,15 @@ class TestApicalConstrictionExample : public AbstractCellBasedTestSuite
 public:
     void TestApicalConstriction()
     {
-        // Make a mesh of 10x10
+        /*
+         * \todo #2850 Scaled down to run as a fast unit test of the patterned apical-constriction force
+         * on a monolayer. Originally 10x10 cells run to end_time = 4; the suite took ~917 sec. Restore
+         * these values and run in a user project for a production-scale simulation.
+         */
         const double z_height = 1;
         const double target_area = 1;
-        const unsigned num_cells_x = 10;
-        const unsigned num_cells_y = 10;
+        const unsigned num_cells_x = 4;
+        const unsigned num_cells_y = 4;
         HexagonalPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, target_area, z_height);
         MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
 
@@ -103,7 +107,7 @@ public:
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(tmp_name);
         simulator.SetSamplingTimestepMultiple(10);
-        const double end_time = 4;
+        const double end_time = 0.5; // \todo #2850 original: 4 (see note above)
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(PatternedApicalConstrictionForce, p_force3);
@@ -119,17 +123,21 @@ public:
 
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 100u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x * num_cells_y);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     void TestApicalConstrictionVoronoi()
     {
-        // Make a mesh of 10x10
+        /*
+         * \todo #2850 Scaled down to run as a fast unit test of the patterned apical-constriction force
+         * on a monolayer. Originally 10x10 cells run to end_time = 4; the suite took ~917 sec. Restore
+         * these values and run in a user project for a production-scale simulation.
+         */
         const double z_height = 1;
         const double target_area = 1;
-        const unsigned num_cells_x = 10;
-        const unsigned num_cells_y = 10;
+        const unsigned num_cells_x = 4;
+        const unsigned num_cells_y = 4;
         VoronoiPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, z_height, 5, target_area);
         MutableVertexMesh<3, 3>* p_mesh = generator.GetMeshAfterReMesh();
 
@@ -164,7 +172,7 @@ public:
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(tmp_name);
         simulator.SetSamplingTimestepMultiple(10);
-        const double end_time = 4;
+        const double end_time = 0.5; // \todo #2850 original: 4 (see note above)
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(PatternedApicalConstrictionForce, p_force3);
@@ -180,7 +188,7 @@ public:
 
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 100u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x * num_cells_y);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };

@@ -220,12 +220,117 @@ c_vector<double, SPACE_DIM> VertexElement<ELEMENT_DIM, SPACE_DIM>::GetCentroid()
         break;
         case 3:
         {
-            ///\todo compute centroid rather than centre of mass (see #1422)
-            for (unsigned local_index = 0; local_index < num_nodes; ++local_index)
+            // #1422 Compute the true centroid (area-weighted for a face, volume-weighted for a
+            // polyhedron), not the vertex centre-of-mass. The two coincide only for triangles/
+            // symmetric shapes; they differ whenever the vertices are unevenly distributed, which
+            // happens routinely in a vertex model as T1 swaps and cell division insert nodes on
+            // existing edges. The 2D branch above already computes the true (shoelace) centroid; this
+            // brings 3D to parity.
+            if constexpr (SPACE_DIM == 3)
             {
-                centroid += this->GetNodeLocation(local_index);
+                if constexpr (ELEMENT_DIM == 2)
+                {
+                    // A 2D face embedded in 3D space: area centroid, as the signed-area-weighted mean
+                    // of a triangle fan from node 0 (the 3D generalisation of the 2D shoelace formula).
+                    // Areas are signed by projecting onto the face's own (Newell) normal, so the result
+                    // is robust to non-convex and non-planar faces and independent of winding direction.
+                    const c_vector<double, SPACE_DIM> ref = this->GetNodeLocation(0);
+                    c_vector<double, SPACE_DIM> face_normal = zero_vector<double>(SPACE_DIM);
+                    for (unsigned i = 0; i < num_nodes; ++i)
+                    {
+                        const c_vector<double, SPACE_DIM> v_i = this->GetNodeLocation(i) - ref;
+                        const c_vector<double, SPACE_DIM> v_next = this->GetNodeLocation((i + 1) % num_nodes) - ref;
+                        face_normal += VectorProduct(v_i, v_next);
+                    }
+                    const double normal_norm = norm_2(face_normal);
+                    double total_area = 0.0;
+                    c_vector<double, SPACE_DIM> weighted = zero_vector<double>(SPACE_DIM);
+                    if (normal_norm > 1e-12)
+                    {
+                        const c_vector<double, SPACE_DIM> unit_normal = face_normal / normal_norm;
+                        for (unsigned j = 1; j + 1 < num_nodes; ++j)
+                        {
+                            const c_vector<double, SPACE_DIM> v_j = this->GetNodeLocation(j) - ref;
+                            const c_vector<double, SPACE_DIM> v_j1 = this->GetNodeLocation(j + 1) - ref;
+                            const double signed_area = 0.5 * inner_prod(VectorProduct(v_j, v_j1), unit_normal);
+                            weighted += signed_area * (v_j + v_j1) / 3.0;
+                            total_area += signed_area;
+                        }
+                    }
+                    if (fabs(total_area) > 1e-12)
+                    {
+                        centroid = ref + weighted / total_area;
+                    }
+                    else if (num_nodes > 0)
+                    {
+                        // Degenerate face; fall back to the vertex mean.
+                        for (unsigned i = 0; i < num_nodes; ++i)
+                        {
+                            centroid += this->GetNodeLocation(i);
+                        }
+                        centroid /= (double)num_nodes;
+                    }
+                }
+                else
+                {
+                    // A 3D polyhedron: volume centroid, computed by decomposing the element into one
+                    // cone per face from an interior reference point (the vertex mean), and taking the
+                    // volume-weighted mean of the cone centroids. Each cone volume is signed by the
+                    // face's own winding via a triangle fan; a face wound inward (negative cone volume)
+                    // is flipped so every cone contributes with a consistent outward sign. This does not
+                    // use the element's stored face-orientation flags, which are not always maintained
+                    // (e.g. a manually constructed element may leave them all default). It is exact for
+                    // any element that is star-shaped about the vertex mean (all cells in practice).
+                    c_vector<double, SPACE_DIM> centre = zero_vector<double>(SPACE_DIM);
+                    for (unsigned i = 0; i < num_nodes; ++i)
+                    {
+                        centre += this->GetNodeLocation(i);
+                    }
+                    centre /= (double)num_nodes;
+
+                    double total_volume = 0.0;
+                    c_vector<double, SPACE_DIM> weighted = zero_vector<double>(SPACE_DIM);
+                    for (unsigned face_index = 0; face_index < this->GetNumFaces(); ++face_index)
+                    {
+                        const VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* p_face = this->GetFace(face_index);
+                        const unsigned face_num_nodes = p_face->GetNumNodes();
+                        if (face_num_nodes < 3)
+                        {
+                            // A degenerate face (which can occur transiently during remesh) bounds no
+                            // volume, so it contributes nothing to the centroid.
+                            continue;
+                        }
+                        const c_vector<double, SPACE_DIM> f0 = p_face->GetNodeLocation(0) - centre;
+                        double face_volume = 0.0;
+                        c_vector<double, SPACE_DIM> face_weighted = zero_vector<double>(SPACE_DIM);
+                        for (unsigned j = 1; j + 1 < face_num_nodes; ++j)
+                        {
+                            const c_vector<double, SPACE_DIM> f_j = p_face->GetNodeLocation(j) - centre;
+                            const c_vector<double, SPACE_DIM> f_j1 = p_face->GetNodeLocation(j + 1) - centre;
+                            const double signed_volume = inner_prod(f0, VectorProduct(f_j, f_j1)) / 6.0;
+                            face_volume += signed_volume;
+                            face_weighted += signed_volume * (f0 + f_j + f_j1) / 4.0;
+                        }
+                        // Flip an inward-wound face so all cones share the outward (positive) sign.
+                        if (face_volume < 0.0)
+                        {
+                            face_volume = -face_volume;
+                            face_weighted = -face_weighted;
+                        }
+                        total_volume += face_volume;
+                        weighted += face_weighted;
+                    }
+                    if (total_volume > 1e-12)
+                    {
+                        centroid = centre + weighted / total_volume;
+                    }
+                    else
+                    {
+                        // Degenerate element; the vertex mean is the best available answer.
+                        centroid = centre;
+                    }
+                }
             }
-            centroid /= ((double)num_nodes);
         }
         break;
         default:

@@ -612,5 +612,61 @@ public:
         }
         DeleteElement(p_elem);
     }
+
+    void TestGetCentroidWithUnevenVertices()
+    {
+        // #1422 Adding a node on an existing edge (exactly what T1 swaps and cell division do) must not
+        // move the true centroid, even though it shifts the vertex centre-of-mass. Here we take a unit
+        // cube and add a node at the midpoint of edge 0-1: the true volume centroid stays (0.5,0.5,0.5)
+        // and the (extended) y=0 face's true area centroid stays (0.5,0,0.5), whereas the old
+        // centre-of-mass would give the element (0.5, 0.444.., 0.444..) and the face (0.5, 0, 0.4).
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, false, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, false, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(5, false, 1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(6, false, 1.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(7, false, 0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(8, false, 0.5, 0.0, 0.0)); // extra node on edge 0-1
+
+        // Two faces gain the extra node; the y=0 and z=0 faces both contain edge 0-1.
+        std::vector<std::vector<Node<3>*> > nodes_faces(6);
+        const unsigned face_0[5] = { 0, 8, 1, 5, 4 };
+        const unsigned face_1[4] = { 5, 6, 2, 1 };
+        const unsigned face_2[4] = { 2, 6, 7, 3 };
+        const unsigned face_3[4] = { 0, 3, 7, 4 };
+        const unsigned face_4[5] = { 3, 2, 1, 8, 0 };
+        const unsigned face_5[4] = { 5, 6, 7, 4 };
+        for (unsigned i = 0; i < 5; ++i)
+        {
+            nodes_faces[0].push_back(nodes[face_0[i]]);
+            nodes_faces[4].push_back(nodes[face_4[i]]);
+        }
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            nodes_faces[1].push_back(nodes[face_1[i]]);
+            nodes_faces[2].push_back(nodes[face_2[i]]);
+            nodes_faces[3].push_back(nodes[face_3[i]]);
+            nodes_faces[5].push_back(nodes[face_5[i]]);
+        }
+
+        std::vector<VertexElement<2, 3>*> faces;
+        for (unsigned i = 0; i < 6; ++i)
+        {
+            faces.push_back(new VertexElement<2, 3>(i, nodes_faces[i]));
+        }
+        const std::vector<bool> orientations(6, true);
+        VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(0, faces, orientations);
+
+        const double element_centroid[3] = { 0.5, 0.5, 0.5 };
+        TS_ASSERT_VECTORS_DELTA(p_elem->GetCentroid(), element_centroid, 1e-6);
+
+        const double face_0_centroid[3] = { 0.5, 0.0, 0.5 };
+        TS_ASSERT_VECTORS_DELTA(faces[0]->GetCentroid(), face_0_centroid, 1e-6);
+
+        DeleteElement(p_elem);
+    }
 };
 #endif /*TESTVERTEXELEMENT_HPP_*/
