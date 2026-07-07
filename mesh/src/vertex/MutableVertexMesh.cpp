@@ -5393,13 +5393,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3, 3>* pElement, u
         std::swap(p_apical_node1, p_apical_node2);
     }
 
-    Node<3>* p_basal_node1 = GetOppositeNode(p_apical_node1, p_new_lateral_face);
-    Node<3>* p_basal_node2 = GetOppositeNode(p_apical_node2, p_new_lateral_face);
     VertexElement<2, 3>* p_basal_face = GetBasalFace(pElement);
-    if (p_basal_face->GetNodeLocalIndex(p_basal_node1->GetIndex()) > p_basal_face->GetNodeLocalIndex(p_basal_node2->GetIndex()))
-    {
-        std::swap(p_basal_node1, p_basal_node2);
-    }
 
     /**
      *  Procedure:
@@ -5408,25 +5402,8 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3, 3>* pElement, u
      *  III create both new elements
      */
 
-    // I split apical and basal surfaces
-    std::vector<Node<3>*> new_elem_basal_nodes;
-    {
-        const unsigned node1_local_index = std::min(p_basal_face->GetNodeLocalIndex(p_basal_node1->GetIndex()),
-                                                    p_basal_face->GetNodeLocalIndex(p_basal_node2->GetIndex()));
-        const unsigned node2_local_index = std::max(p_basal_face->GetNodeLocalIndex(p_basal_node1->GetIndex()),
-                                                    p_basal_face->GetNodeLocalIndex(p_basal_node2->GetIndex()));
-        new_elem_basal_nodes.push_back(p_basal_face->GetNode(node2_local_index));
-        for (unsigned node_index = node2_local_index - 1; node_index > node1_local_index; --node_index)
-        {
-            new_elem_basal_nodes.push_back(p_basal_face->GetNode(node_index));
-            p_basal_face->FaceDeleteNode(node_index);
-        }
-        new_elem_basal_nodes.push_back(p_basal_face->GetNode(node1_local_index));
-    }
-    VertexElement<2, 3>* p_new_basal_face = new VertexElement<2, 3>(this->GetNumFaces(), new_elem_basal_nodes);
-    SetFaceAsBasal(p_new_basal_face);
-    this->AddFace(p_new_basal_face);
-
+    // I Split the apical surface: new_elem_apical_nodes is the arc of apical nodes between (and
+    // including) the two dividing nodes; the interior nodes are removed from the old apical face.
     std::vector<Node<3>*> new_elem_apical_nodes;
     {
         const unsigned node1_local_index = std::min(p_apical_face->GetNodeLocalIndex(p_apical_node1->GetIndex()),
@@ -5445,23 +5422,30 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3, 3>* pElement, u
     SetFaceAsApical(p_new_apical_face);
     this->AddFace(p_new_apical_face);
 
-    p_new_lateral_face->FaceRearrangeNodes(p_apical_face->GetCentroid());
-    c_vector<double, 3> normal_v;
-    this->CalculateUnitNormalToFaceWithArea(p_new_lateral_face, normal_v);
-    const c_vector<double, 3> centre_of_face = p_new_lateral_face->GetCentroid();
-    const bool apical_side = inner_prod(this->GetVectorFromAtoB(p_apical_face->GetCentroid(), centre_of_face), normal_v) > 0;
-    const bool basal_side = inner_prod(this->GetVectorFromAtoB(p_basal_face->GetCentroid(), centre_of_face), normal_v) > 0;
-    if (apical_side != basal_side)
+    /*
+     * #2850 Split the basal surface to correspond exactly to the apical split: the new basal face holds
+     * the basal partners (opposite nodes) of the new apical nodes, in the same order. Deriving the basal
+     * arc from the apical arc - rather than slicing the basal face independently by node index - keeps
+     * the two new faces consistent on curved or twisted cells, where the independent basal slice can
+     * pick the complementary arc and leave the element with mismatched apical/basal node counts.
+     */
+    std::vector<Node<3>*> new_elem_basal_nodes;
+    new_elem_basal_nodes.reserve(new_elem_apical_nodes.size());
+    for (Node<3>* p_apical_node : new_elem_apical_nodes)
     {
-        if (apical_side == (inner_prod(this->GetVectorFromAtoB(p_new_basal_face->GetCentroid(), centre_of_face), normal_v) > 0))
-        {
-            std::swap(p_basal_face, p_new_basal_face);
-        }
-        else
-        {
-            NEVER_REACHED;
-        }
+        new_elem_basal_nodes.push_back(GetOppositeNode(p_apical_node, p_basal_face));
     }
+    // Remove the interior basal nodes (partners of the interior apical nodes) from the old basal face;
+    // the two end nodes are the shared cut points and remain in both basal faces.
+    for (unsigned k = 1; k + 1 < new_elem_basal_nodes.size(); ++k)
+    {
+        p_basal_face->FaceDeleteNode(new_elem_basal_nodes[k]);
+    }
+    VertexElement<2, 3>* p_new_basal_face = new VertexElement<2, 3>(this->GetNumFaces(), new_elem_basal_nodes);
+    SetFaceAsBasal(p_new_basal_face);
+    this->AddFace(p_new_basal_face);
+
+    p_new_lateral_face->FaceRearrangeNodes(p_apical_face->GetCentroid());
 
     // Get the index of the new element
     unsigned new_element_index;
@@ -5478,35 +5462,82 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3, 3>* pElement, u
     // II, store old lateral faces before deleting the element
     const std::vector<VertexElement<2, 3>*> all_lateral_faces = GetFacesWithType(pElement, Monolayer::LateralValue);
     const unsigned old_element_index = pElement->GetIndex();
-    // this->DeleteElementPriorToReMesh(old_element_index);
-    // delete pElement;
 
-    // III
-    std::vector<VertexElement<2, 3>*> new_elem_faces;
-    new_elem_faces.push_back(p_new_basal_face);
-    new_elem_faces.push_back(p_new_apical_face);
-    new_elem_faces.push_back(p_new_lateral_face);
-    std::vector<VertexElement<2, 3>*> old_elem_faces;
-    old_elem_faces.push_back(p_basal_face);
-    old_elem_faces.push_back(p_apical_face);
-    old_elem_faces.push_back(p_new_lateral_face);
-
+    /*
+     * III Partition the faces between the old and new element topologically. A remaining lateral face
+     * belongs to whichever element's (split) apical face holds both of its apical nodes. The two split
+     * basal faces are then paired with the element holding the corresponding lateral faces. This is
+     * robust on curved cells, unlike testing which side of the dividing face's plane each face centroid
+     * falls on, which misassigns faces and produces an element that violates Euler's formula. #2850
+     *
+     * \todo #2850 This still assumes the apical arc (a contiguous range of the apical face's node list)
+     * corresponds to a contiguous set of lateral faces. A heavily distorted cell whose stored apical
+     * node order no longer matches its lateral-face connectivity can therefore have a single lateral
+     * face assigned to the wrong side, again violating Euler's formula (seen deep into a long,
+     * stretching, dividing cylinder simulation). A fully robust partition would walk the ring of lateral
+     * faces directly rather than relying on the apical node order.
+     */
+    const std::set<Node<3>*> new_apical_nodes(new_elem_apical_nodes.begin(), new_elem_apical_nodes.end());
+    std::vector<VertexElement<2, 3>*> new_side_lateral_faces;
+    std::vector<VertexElement<2, 3>*> old_side_lateral_faces;
     for (unsigned i = 0; i < all_lateral_faces.size(); ++i)
     {
         if (all_lateral_faces[i] == p_new_lateral_face)
         {
             continue;
         }
-
-        if (apical_side == (inner_prod(this->GetVectorFromAtoB(all_lateral_faces[i]->GetCentroid(), centre_of_face), normal_v) > 0))
+        const std::vector<Node<3>*> lateral_apical_nodes = GetNodesWithType(all_lateral_faces[i], Monolayer::ApicalValue);
+        assert(lateral_apical_nodes.size() == 2); // LCOV_EXCL_LINE
+        if (new_apical_nodes.count(lateral_apical_nodes[0]) == 1 && new_apical_nodes.count(lateral_apical_nodes[1]) == 1)
         {
-            old_elem_faces.push_back(all_lateral_faces[i]);
+            new_side_lateral_faces.push_back(all_lateral_faces[i]);
         }
         else
         {
-            new_elem_faces.push_back(all_lateral_faces[i]);
+            old_side_lateral_faces.push_back(all_lateral_faces[i]);
         }
     }
+
+    /*
+     * Pair the correct split basal face with the new element. The basal split may wind opposite to the
+     * apical split, so decide using a basal node that lies on the new element's lateral faces and in
+     * exactly one of the two split basal faces (i.e. is not a shared cut node).
+     */
+    Node<3>* p_decisive_basal_node = nullptr;
+    for (VertexElement<2, 3>* p_lateral : new_side_lateral_faces)
+    {
+        for (Node<3>* p_basal : GetNodesWithType(p_lateral, Monolayer::BasalValue))
+        {
+            const bool in_new_basal = (p_new_basal_face->GetNodeLocalIndex(p_basal->GetIndex()) != UINT_MAX);
+            const bool in_old_basal = (p_basal_face->GetNodeLocalIndex(p_basal->GetIndex()) != UINT_MAX);
+            if (in_new_basal != in_old_basal)
+            {
+                p_decisive_basal_node = p_basal;
+                break;
+            }
+        }
+        if (p_decisive_basal_node != nullptr)
+        {
+            break;
+        }
+    }
+    if (p_decisive_basal_node != nullptr
+        && p_new_basal_face->GetNodeLocalIndex(p_decisive_basal_node->GetIndex()) == UINT_MAX)
+    {
+        std::swap(p_basal_face, p_new_basal_face);
+    }
+
+    std::vector<VertexElement<2, 3>*> new_elem_faces;
+    new_elem_faces.push_back(p_new_basal_face);
+    new_elem_faces.push_back(p_new_apical_face);
+    new_elem_faces.push_back(p_new_lateral_face);
+    new_elem_faces.insert(new_elem_faces.end(), new_side_lateral_faces.begin(), new_side_lateral_faces.end());
+
+    std::vector<VertexElement<2, 3>*> old_elem_faces;
+    old_elem_faces.push_back(p_basal_face);
+    old_elem_faces.push_back(p_apical_face);
+    old_elem_faces.push_back(p_new_lateral_face);
+    old_elem_faces.insert(old_elem_faces.end(), old_side_lateral_faces.begin(), old_side_lateral_faces.end());
 
     const std::vector<bool> tmp_v1(new_elem_faces.size(), true);
     VertexElement<3, 3>* p_new_elem = new VertexElement<3, 3>(new_element_index, new_elem_faces, tmp_v1);
@@ -5539,7 +5570,6 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
     // Get the centroid of the element
     const c_vector<double, 3> centroid = pElement->GetCentroid();
     const VertexElement<2, 3>* p_apical_face = GetApicalFace(pElement);
-    const VertexElement<2, 3>* p_basal_face = GetBasalFace(pElement);
     /*
      * Find which edges the axis of division crosses by finding any node
      * that lies on the opposite side of the plane of division to its next
@@ -5554,165 +5584,145 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
      * When points lie at the opposite site of the plane, the signed distances will
      * have different parity.
      */
-    std::set<VertexElement<2, 3>*> apical_intersecting_lateral_faces;
-    bool is_current_apical_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_apical_face->GetNodeLocation(0)), axisOfDivision) >= 0);
-    for (unsigned i = 0; i < p_apical_face->GetNumNodes(); ++i)
+    /*
+     * #2850 Identify the two lateral faces the plane of division crosses, using the cell's vertical
+     * edges so that its apical and basal surfaces are cut consistently. A cell divides through its full
+     * thickness and stays a monolayer, so the cut is best located on the midline of each vertical edge -
+     * the midpoint between an apical node and its basal partner (via GetOppositeNode) - rather than on
+     * the apical or basal polygon alone. Two consecutive apical nodes whose vertical-edge midpoints fall
+     * on opposite sides of the plane bracket a lateral face that the plane crosses.
+     *
+     * This replaces testing the apical and basal polygons independently and requiring exactly two
+     * crossings on each: those two counts diverge on curved or non-convex cells (e.g. the apical polygon
+     * missed entirely while the basal polygon is crossed four times), because the plane meets the offset
+     * apical and basal surfaces differently. Working on the midline unifies them.
+     */
+    const unsigned num_apical_nodes = p_apical_face->GetNumNodes();
+    std::vector<c_vector<double, 3> > midpoints(num_apical_nodes);
+    std::vector<bool> midpoint_on_normal_side(num_apical_nodes);
+    for (unsigned i = 0; i < num_apical_nodes; ++i)
     {
-        Node<3>* p_next_node = GetNextNode(i, p_apical_face);
-        bool is_next_apical_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_next_node->rGetLocation()), axisOfDivision) >= 0);
-        if (is_current_apical_node_on_normal_side != is_next_apical_node_on_normal_side)
-        {
-            apical_intersecting_lateral_faces.insert(GetSharedLateralFace(p_next_node, p_apical_face->GetNode(i), this));
-        }
-        is_current_apical_node_on_normal_side = is_next_apical_node_on_normal_side;
+        const Node<3>* p_apical_i = p_apical_face->GetNode(i);
+        const Node<3>* p_basal_i = GetOppositeNode(p_apical_i, pElement);
+        midpoints[i] = 0.5 * (p_apical_i->rGetLocation() + p_basal_i->rGetLocation());
+        midpoint_on_normal_side[i] = (inner_prod(this->GetVectorFromAtoB(centroid, midpoints[i]), axisOfDivision) >= 0);
     }
 
-    std::set<VertexElement<2, 3>*> basal_intersecting_lateral_faces;
-    bool is_current_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_basal_face->GetNodeLocation(0)), axisOfDivision) >= 0);
-    for (unsigned i = 0; i < p_basal_face->GetNumNodes(); ++i)
+    // Collect every lateral face whose two vertical-edge midpoints fall on opposite sides of the plane,
+    // together with the point where the plane crosses that midline segment.
+    std::vector<VertexElement<2, 3>*> crossing_faces;
+    std::vector<c_vector<double, 3> > crossing_points;
+    for (unsigned i = 0; i < num_apical_nodes; ++i)
     {
-        Node<3>* p_next_node = GetNextNode(i, p_basal_face);
-        bool is_next_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_next_node->rGetLocation()), axisOfDivision) >= 0);
-        if (is_current_basal_node_on_normal_side != is_next_basal_node_on_normal_side)
+        const unsigned next_i = (i + 1) % num_apical_nodes;
+        if (midpoint_on_normal_side[i] != midpoint_on_normal_side[next_i])
         {
-            basal_intersecting_lateral_faces.insert(GetSharedLateralFace(p_next_node, p_basal_face->GetNode(i), this));
+            const c_vector<double, 3> mid_i_to_next = this->GetVectorFromAtoB(midpoints[i], midpoints[next_i]);
+            const double t = inner_prod(this->GetVectorFromAtoB(midpoints[i], centroid), axisOfDivision) / inner_prod(mid_i_to_next, axisOfDivision);
+            crossing_faces.push_back(GetSharedLateralFace(p_apical_face->GetNode(i), p_apical_face->GetNode(next_i), this));
+            crossing_points.push_back(midpoints[i] + t * mid_i_to_next);
         }
-        is_current_basal_node_on_normal_side = is_next_basal_node_on_normal_side;
     }
 
     /*
-     * \todo #2850 Division robustness on non-convex / non-planar monolayer cells (future work).
-     *
-     * This detects the two lateral faces to split by counting sign changes of the division axis
-     * separately around the apical and basal polygons, and requires exactly two crossings on each.
-     * That assumption breaks for distorted cells on a curved sheet: e.g. a cell whose basal polygon
-     * has become non-convex is crossed four times (a line through a convex polygon's centroid crosses
-     * exactly two edges), and because the axis is derived from the basal face alone it can miss the
-     * apical polygon entirely (zero crossings) when apical and basal are rotated/offset by curvature.
-     * Both occur in TestMonolayerCylindricalMeshExample after many divisions on the stretching cylinder.
-     *
-     * A more robust reformulation would choose the two lateral faces directly - each lateral face spans
-     * apical to basal, so working in terms of lateral faces unifies the apical/basal counts - and would
-     * pick a well-defined pair even for a non-convex cell (e.g. the two faces whose centroids straddle
-     * the division plane nearest the axis). Note this is genuinely geometric (division is by a plane),
-     * unlike the face-node ordering, which has been made geometry-independent (topological) under #2850.
+     * #2850 Going around the ring of lateral faces, the plane crosses it an even number of times: a
+     * convex cell exactly twice, a non-convex cell more often. For a non-convex cell we divide along the
+     * two crossings that are furthest apart, which gives the most balanced split and, for a mild
+     * concavity, keeps the new dividing wall inside the cell. (Fewer than two crossings would mean the
+     * plane misses the cell, which cannot happen for a plane through the centroid.)
      */
-    if (apical_intersecting_lateral_faces.size() != 2 || basal_intersecting_lateral_faces.size() != 2)
+    std::vector<VertexElement<2, 3>*> intersecting_lateral_faces;
+    if (crossing_faces.size() == 2)
     {
-        EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
+        intersecting_lateral_faces = crossing_faces;
     }
-    const bool apical_basal_splits_at_diff_location = apical_intersecting_lateral_faces != basal_intersecting_lateral_faces;
-    if (apical_basal_splits_at_diff_location)
+    else if (crossing_faces.size() > 2)
     {
-        TRACE("the plane of division splits apical and basal faces at different locations.");
-        apical_intersecting_lateral_faces = basal_intersecting_lateral_faces;
+        WARNING("Dividing a non-convex cell whose boundary the plane of division crosses more than twice; using the two furthest-apart crossings.");
+        unsigned index_a = 0;
+        unsigned index_b = 1;
+        double furthest_distance = -1.0;
+        for (unsigned i = 0; i < crossing_points.size(); ++i)
+        {
+            for (unsigned j = i + 1; j < crossing_points.size(); ++j)
+            {
+                const double distance = norm_2(this->GetVectorFromAtoB(crossing_points[i], crossing_points[j]));
+                if (distance > furthest_distance)
+                {
+                    furthest_distance = distance;
+                    index_a = i;
+                    index_b = j;
+                }
+            }
+        }
+        intersecting_lateral_faces.push_back(crossing_faces[index_a]);
+        intersecting_lateral_faces.push_back(crossing_faces[index_b]);
+    }
+    else
+    {
+        EXCEPTION("Cannot proceed with element division: the axis of division does not cross the element");
     }
 
     std::vector<Node<3>*> division_nodes;
 
-    // Find the intersections between the axis of division and the element edges
-    for (std::set<VertexElement<2, 3>*>::const_iterator it = apical_intersecting_lateral_faces.begin();
-         it != apical_intersecting_lateral_faces.end(); ++it)
+    // Insert one new node on each of the two lateral faces the plane of division crosses.
+    for (VertexElement<2, 3>* p_shared_face : intersecting_lateral_faces)
     {
-        /*
-         * Get pointers to the nodes forming the edge into which one new node will be inserted.
-         *
-         * Note that when we use the first entry of intersecting nodes to add a node,
-         * we change the local index of the second entry of intersecting_nodes in
-         * pElement, so must account for this by moving one entry further on.
-         */
-        VertexElement<2, 3>* p_shared_face = *it;
+        // The lateral face has two apical nodes and their two basal partners (its two vertical edges).
         const std::vector<Node<3>*> v_apical = GetNodesWithType(p_shared_face, Monolayer::ApicalValue);
-        assert(v_apical.size() == 2);
+        assert(v_apical.size() == 2); // LCOV_EXCL_LINE
         const Node<3>* p_apical_node_a = v_apical[0];
         Node<3>* p_apical_node_b = v_apical[1];
         const Node<3>* p_basal_node_a = GetOppositeNode(p_apical_node_a, this);
         Node<3>* p_basal_node_b = GetOppositeNode(p_apical_node_b, this);
 
-        // Calculate basal position of the intersection
-        const c_vector<double, 3>& position_basal_a = p_basal_node_a->rGetLocation();
-        const c_vector<double, 3>& position_basal_b = p_basal_node_b->rGetLocation();
-        const c_vector<double, 3> basal_a_to_b = this->GetVectorFromAtoB(position_basal_a, position_basal_b);
-        c_vector<double, 3> basal_intersection;
-        if (norm_2(basal_a_to_b) < 2.0 * mCellRearrangementRatio * mCellRearrangementThreshold)
-        {
-            WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
-            ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
-            basal_intersection = position_basal_a + 0.5 * basal_a_to_b;
-        }
-        else
-        {
-            /*
-             * Find the location of the intersection.
-             * Equation of line is r = r_a + t*v;
-             * v is the vector from a to b, can be override by subclasses for different metric.
-             * Equation of division plane is inner_prod(r-c,n) = 0;
-             */
-            basal_intersection = position_basal_a + basal_a_to_b / inner_prod(basal_a_to_b, axisOfDivision) * inner_prod(this->GetVectorFromAtoB(position_basal_a, centroid), axisOfDivision);
-
-            /*
-             * If then new node is too close to one of the edge nodes, then reposition it
-             * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
-             */
-            const c_vector<double, 3> a_to_intersection = this->GetVectorFromAtoB(position_basal_a, basal_intersection);
-            const c_vector<double, 3> b_to_intersection = this->GetVectorFromAtoB(position_basal_b, basal_intersection);
-            if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
-            {
-                assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                basal_intersection = position_basal_a + mCellRearrangementRatio * mCellRearrangementThreshold * basal_a_to_b / norm_2(basal_a_to_b);
-            }
-            if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
-            {
-                assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                basal_intersection = position_basal_b - mCellRearrangementRatio * mCellRearrangementThreshold * basal_a_to_b / norm_2(basal_a_to_b);
-            }
-        }
-
-        // Calculate apical position of the intersection
         const c_vector<double, 3>& position_apical_a = p_apical_node_a->rGetLocation();
         const c_vector<double, 3>& position_apical_b = p_apical_node_b->rGetLocation();
-        const c_vector<double, 3> apical_a_to_b = this->GetVectorFromAtoB(position_apical_a, position_apical_b);
-        c_vector<double, 3> apical_intersection;
-        if (norm_2(apical_a_to_b) < 2.0 * mCellRearrangementRatio * mCellRearrangementThreshold)
-        {
-            WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
-            ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
-            apical_intersection = position_apical_a + 0.5 * apical_a_to_b;
-        }
-        else if (apical_basal_splits_at_diff_location)
-        {
-            const double basal_length_a_to_i = norm_2(this->GetVectorFromAtoB(position_basal_a, basal_intersection));
-            const double basal_length_a_to_b = norm_2(this->GetVectorFromAtoB(position_basal_a, position_basal_b));
+        const c_vector<double, 3>& position_basal_a = p_basal_node_a->rGetLocation();
+        const c_vector<double, 3>& position_basal_b = p_basal_node_b->rGetLocation();
 
-            apical_intersection = position_apical_a + this->GetVectorFromAtoB(position_apical_a, position_apical_b) * basal_length_a_to_i / basal_length_a_to_b;
-        }
-        else
-        {
-            /*
-             * Find the location of the intersection.
-             * Equation of line is r = r_a + t*v;
-             * v is the vector from a to b, can be override by subclasses for different metric.
-             * Equation of division plane is inner_prod(r-c,n) = 0;
-             */
-            apical_intersection = position_apical_a + apical_a_to_b / inner_prod(apical_a_to_b, axisOfDivision) * inner_prod(this->GetVectorFromAtoB(position_apical_a, centroid), axisOfDivision);
+        /*
+         * #2850 Locate the cut along the midline of the two vertical edges (a: apical_a<->basal_a,
+         * b: apical_b<->basal_b): the fraction 'frac' at which the plane of division crosses the segment
+         * joining their midpoints. Placing the new apical and new basal nodes at that same fraction of
+         * the apical edge (a->b) and basal edge (a->b) keeps the new vertical edge vertical, so the
+         * tissue stays a monolayer. For a flat prism the midline crossing coincides with the plane
+         * crossing each edge separately, so this reproduces the previous behaviour.
+         */
+        const c_vector<double, 3> midline_a = 0.5 * (position_apical_a + position_basal_a);
+        const c_vector<double, 3> midline_b = 0.5 * (position_apical_b + position_basal_b);
+        const c_vector<double, 3> midline_a_to_b = this->GetVectorFromAtoB(midline_a, midline_b);
+        double frac = inner_prod(this->GetVectorFromAtoB(midline_a, centroid), axisOfDivision) / inner_prod(midline_a_to_b, axisOfDivision);
 
-            /*
-             * If then new node is too close to one of the edge nodes, then reposition it
-             * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
-             */
-            const c_vector<double, 3> a_to_intersection = this->GetVectorFromAtoB(position_apical_a, apical_intersection);
-            const c_vector<double, 3> b_to_intersection = this->GetVectorFromAtoB(position_apical_b, apical_intersection);
-            if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
+        /*
+         * Keep the new nodes clear of the existing edge endpoints - by mCellRearrangementRatio *
+         * mCellRearrangementThreshold measured along the shorter of the apical and basal edges - so we
+         * do not create a degenerate short edge. Clamping the shared fraction (rather than each edge
+         * independently) keeps the new edge vertical.
+         */
+        const double apical_edge_length = norm_2(this->GetVectorFromAtoB(position_apical_a, position_apical_b));
+        const double basal_edge_length = norm_2(this->GetVectorFromAtoB(position_basal_a, position_basal_b));
+        const double shorter_edge_length = std::min(apical_edge_length, basal_edge_length);
+        if (shorter_edge_length > 0.0)
+        {
+            const double margin_fraction = mCellRearrangementRatio * mCellRearrangementThreshold / shorter_edge_length;
+            if (margin_fraction >= 0.5)
             {
-                assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                apical_intersection = position_apical_a + mCellRearrangementRatio * mCellRearrangementThreshold * apical_a_to_b / norm_2(apical_a_to_b);
+                // The edge is too short to keep a margin at both ends, so cut it in the middle.
+                frac = 0.5;
             }
-            if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
+            else if (frac < margin_fraction)
             {
-                assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                apical_intersection = position_apical_b - mCellRearrangementRatio * mCellRearrangementThreshold * apical_a_to_b / norm_2(apical_a_to_b);
+                frac = margin_fraction;
+            }
+            else if (frac > 1.0 - margin_fraction)
+            {
+                frac = 1.0 - margin_fraction;
             }
         }
+
+        const c_vector<double, 3> basal_intersection = position_basal_a + frac * this->GetVectorFromAtoB(position_basal_a, position_basal_b);
+        const c_vector<double, 3> apical_intersection = position_apical_a + frac * this->GetVectorFromAtoB(position_apical_a, position_apical_b);
 
         /*
          * The new node is boundary node if the 2 nodes are boundary nodes and the elements don't look like
