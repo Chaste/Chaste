@@ -1095,71 +1095,34 @@ Node<3>* GetNextNode(const Node<3>* pNode, const VertexElement<ELEMENT_DIM, 3>* 
 template Node<3>* GetNextNode(const Node<3>*, const VertexElement<2, 3>*);
 template Node<3>* GetNextNode(const Node<3>*, const VertexElement<3, 3>*);
 
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/lu.hpp>
 #include "UblasCustomFunctions.hpp"
-using boost::numeric::ublas::permutation_matrix;
-using boost::numeric::ublas::matrix;
 
-///\todo #2850 revise this function to handle the case when like all nodes have z=0,
-/// making the matrix singular.
-// LCOV_EXCL_START
 c_vector<double, 3> CalculateUnitNormalToFace(const VertexElement<2, 3>* pFace)
 {
-    c_vector<double, 3> unit_vec = zero_vector<double>(3);
+    const unsigned num_nodes = pFace->GetNumNodes();
+    // A face in 3D needs at least three vertices to define a plane.
+    assert(num_nodes >= 3u); // LCOV_EXCL_LINE
 
-    // // As we are in 3D, the face must have at least three vertices
-    // if (pFace->GetNumNodes() < 3u)
-    // {
-    //     NEVER_REACHED;
-    // }
-    // else if (pFace->GetNumNodes() < 5u)
-    // {
-    //     c_vector<double, 3> v10 = pFace->GetNodeLocation(1) - pFace->GetNodeLocation(0);
-    //     c_vector<double, 3> v20 = pFace->GetNodeLocation(2) - pFace->GetNodeLocation(0);
-    //     unit_vec = VectorProduct(v10, v20);
-    // }
-    // else
-    // {
-    //     const unsigned n = pFace->GetNumNodes();
-    //     matrix<double> X_tmp(n, 4);
-    //     for (unsigned i = 0; i < pFace->GetNumNodes(); ++i)
-    //     {
-    //         const c_vector<double, 3>& loc_tmp = pFace->GetNodeLocation(i);
-    //         X_tmp(i, 0) = 1;
-    //         X_tmp(i, 1) = loc_tmp[0];
-    //         X_tmp(i, 2) = loc_tmp[1];
-    //         X_tmp(i, 3) = loc_tmp[2] + 1e-6 * i;
-    //     }
-    //     std::cout << X_tmp << std::endl;
-    //     matrix<double> A = prod(trans(X_tmp), X_tmp);
-    //     std::cout << A << std::endl;
-    //     boost::numeric::ublas::vector<double> constrain_vec(4);
-    //     constrain_vec[0] = 0;
-    //     constrain_vec[1] = 1;
-    //     constrain_vec[2] = 1;
-    //     constrain_vec[3] = 1;
-    //     boost::numeric::ublas::vector<double> XTX_constrain(constrain_vec);
-    //
-    //     permutation_matrix<size_t> pm(4);
-    //     lu_factorize(A, pm);
-    //     std::cout << A << std::endl;
-    //     std::cout << pm << std::endl;
-    //     try
-    //     {
-    //         lu_substitute(A, pm, XTX_constrain);
-    //     }
-    //     catch (boost::numeric::ublas::singular ss)
-    //     {
-    //         ///\todo work here!
-    //     }
-    //     std::cout << XTX_constrain << std::endl;
-    //     unit_vec[0] = XTX_constrain[1];
-    //     unit_vec[1] = XTX_constrain[2];
-    //     unit_vec[2] = XTX_constrain[3];
-    // }
-    //
-    // unit_vec /= norm_2(unit_vec);
-    return unit_vec;
+    /*
+     * #2850 Newell's method: accumulate the cross products of consecutive edge vectors, taken relative
+     * to node 0 for numerical robustness. Unlike the previous least-squares plane fit, this is
+     * well-conditioned for axis-aligned faces (e.g. every node at z = 0, which made that fit singular)
+     * and is correct for non-planar and non-convex faces. A degenerate (zero-area) face yields the
+     * zero vector.
+     */
+    const c_vector<double, 3> ref = pFace->GetNodeLocation(0);
+    c_vector<double, 3> normal = zero_vector<double>(3);
+    for (unsigned i = 0; i < num_nodes; ++i)
+    {
+        const c_vector<double, 3> v_this = pFace->GetNodeLocation(i) - ref;
+        const c_vector<double, 3> v_next = pFace->GetNodeLocation((i + 1) % num_nodes) - ref;
+        normal += VectorProduct(v_this, v_next);
+    }
+
+    const double magnitude = norm_2(normal);
+    if (magnitude > 1e-12)
+    {
+        normal /= magnitude;
+    }
+    return normal;
 }
-// LCOV_EXCL_STOP

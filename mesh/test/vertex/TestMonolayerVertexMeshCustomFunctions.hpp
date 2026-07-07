@@ -73,6 +73,51 @@ public:
         TS_ASSERT_EQUALS(ElementHasNode(&e66, 27u), false);
     }
 
+    void TestCalculateUnitNormalToFace()
+    {
+        // #2850 A flat face in the z = 0 plane - the axis-aligned case that used to make the
+        // least-squares plane fit singular - now has a well-defined unit normal (0, 0, 1).
+        {
+            Node<3> n0(0, false, 0.0, 0.0, 0.0);
+            Node<3> n1(1, false, 1.0, 0.0, 0.0);
+            Node<3> n2(2, false, 1.0, 1.0, 0.0);
+            Node<3> n3(3, false, 0.0, 1.0, 0.0);
+            std::vector<Node<3>*> nodes = { &n0, &n1, &n2, &n3 };
+            VertexElement<2, 3> face(0, nodes);
+            const c_vector<double, 3> normal = CalculateUnitNormalToFace(&face);
+            TS_ASSERT_DELTA(normal[0], 0.0, 1e-9);
+            TS_ASSERT_DELTA(normal[1], 0.0, 1e-9);
+            TS_ASSERT_DELTA(normal[2], 1.0, 1e-9);
+        }
+        // A flat face in the x = 0 plane -> unit normal (1, 0, 0).
+        {
+            Node<3> n0(0, false, 0.0, 0.0, 0.0);
+            Node<3> n1(1, false, 0.0, 1.0, 0.0);
+            Node<3> n2(2, false, 0.0, 1.0, 1.0);
+            Node<3> n3(3, false, 0.0, 0.0, 1.0);
+            std::vector<Node<3>*> nodes = { &n0, &n1, &n2, &n3 };
+            VertexElement<2, 3> face(0, nodes);
+            const c_vector<double, 3> normal = CalculateUnitNormalToFace(&face);
+            TS_ASSERT_DELTA(normal[0], 1.0, 1e-9);
+            TS_ASSERT_DELTA(normal[1], 0.0, 1e-9);
+            TS_ASSERT_DELTA(normal[2], 0.0, 1e-9);
+        }
+        // A tilted planar face -> unit normal (0, -1, 1)/sqrt(2).
+        {
+            Node<3> n0(0, false, 0.0, 0.0, 0.0);
+            Node<3> n1(1, false, 1.0, 0.0, 0.0);
+            Node<3> n2(2, false, 1.0, 1.0, 1.0);
+            Node<3> n3(3, false, 0.0, 1.0, 1.0);
+            std::vector<Node<3>*> nodes = { &n0, &n1, &n2, &n3 };
+            VertexElement<2, 3> face(0, nodes);
+            const c_vector<double, 3> normal = CalculateUnitNormalToFace(&face);
+            const double s = 1.0 / sqrt(2.0);
+            TS_ASSERT_DELTA(normal[0], 0.0, 1e-9);
+            TS_ASSERT_DELTA(normal[1], -s, 1e-9);
+            TS_ASSERT_DELTA(normal[2], s, 1e-9);
+        }
+    }
+
     void TestGetSharedElementnFaceIndicesAndBoundaryFace()
     {
         /*
