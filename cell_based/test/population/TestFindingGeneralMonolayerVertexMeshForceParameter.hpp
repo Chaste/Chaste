@@ -69,6 +69,14 @@ public:
 
     void TestAll()
     {
+        /*
+         * \todo #2850 Scaled down to run as a fast unit test (~15 s). This is a parameter-finding
+         * sweep: it runs many short simulations of a 5x5 monolayer and only checks that each runs and
+         * conserves the cell count (the per-element volumes it computes are for manual inspection, not
+         * asserted). Originally each of the three sweeps ran 10 iterations (for i = 0/1..30 step 3),
+         * with the middle sweep at end_time = 1, for a total of ~288 sec. Widen the loop ranges below
+         * (i < 30) and restore the middle end_time to 1 to run the full sweep in a user project.
+         */
         const double z_height = 1;
         const double target_area = 1;
         const unsigned num_cells_x = 5;
@@ -82,7 +90,7 @@ public:
 
         // Testing for lateral to volume parameter ratio
         char name_pattern_lateral_volume[] ("TestUniaxialLoad/TestForceParameter/VolumeVsLateral/param=%.2f");
-        for (unsigned i=0; i<30; i+=3)
+        for (unsigned i=0; i<10; i+=6) // \todo #2850 original: i<30 (see note at top of test)
         {
             char tmp_name[100];
             sprintf(tmp_name, name_pattern_lateral_volume, double(i));
@@ -124,7 +132,7 @@ public:
 
         // Testing for apical line to apical area
         char name_pattern_apical[] ("TestUniaxialLoad/TestForceParameter/ApicalLineVsArea/param=%.2f");
-        for (unsigned i=1; i<30; i+=3)
+        for (unsigned i=1; i<10; i+=6) // \todo #2850 original: i<30 (see note at top of test)
         {
             char tmp_name[100];
             sprintf(tmp_name, name_pattern_apical, double(i));
@@ -137,7 +145,7 @@ public:
             OffLatticeSimulation<3> simulator(cell_population);
             simulator.SetOutputDirectory(tmp_name);
             simulator.SetSamplingTimestepMultiple(10);
-            const double end_time = 1;
+            const double end_time = 0.1; // \todo #2850 original: 1 (see note at top of test)
             simulator.SetEndTime(end_time);
 
             MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
@@ -163,7 +171,7 @@ public:
 
         // Testing for apical line to apical area
         char name_pattern_apical_volume[] ("TestUniaxialLoad/TestForceParameter/ApicalVsVolume/param=%.2f");
-        for (unsigned i=1; i<30; i+=3)
+        for (unsigned i=1; i<10; i+=6) // \todo #2850 original: i<30 (see note at top of test)
         {
             char tmp_name[100];
             sprintf(tmp_name, name_pattern_apical_volume, double(i));
