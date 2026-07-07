@@ -989,8 +989,6 @@ std::vector<VertexElement<2, 3>*> GetFacesWithType(const VertexElement<3, 3>* pE
     return return_v;
 }
 
-///\todo: #2850 num_lateral_faces is obtained using heuristical method. If node were to have weak pointer of
-//          face&elements (using Boost or c++11)
 // Having overloaded functions so that Opposite node can be obtained in almost any scope.
 Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<2, 3>* pFace)
 {
@@ -1000,24 +998,42 @@ Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<2, 3>* pFace)
     }
 
     const Monolayer::v_type opposite_type = IsApicalNode(pNode) ? Monolayer::BasalValue : Monolayer::ApicalValue;
-    const unsigned num_lateral_faces = pNode->GetNumContainingFaces() - pNode->GetNumContainingElements();
 
-    Node<3>* p_return_node = nullptr;
+    /*
+     * #2850 The opposite node is the node of the opposite type (apical<->basal) joined to pNode by a
+     * vertical (lateral) edge. A basal node and an apical node can share only lateral faces, and the
+     * opposite node lies on *every* lateral face containing pNode, whereas any other node of the
+     * opposite type lies on strictly fewer. So the opposite node is the opposite-type node of pFace
+     * that shares the most faces with pNode.
+     *
+     * This replaces requiring an exact match against a lateral-face count inferred from
+     * (num containing faces - num containing elements): that count assumed exactly one basal/apical
+     * face per containing element and so broke near interface (scutoid) nodes, raising "No Opposite
+     * Node". Taking the maximum needs no such assumption and degrades gracefully.
+     */
+    Node<3>* p_opposite_node = nullptr;
+    unsigned max_num_shared_faces = 0;
     for (unsigned i = 0; i < pFace->GetNumNodes(); ++i)
     {
-        const Node<3>* p_tmp_node = pFace->GetNode(i);
-        if (GetNodeType(p_tmp_node) != opposite_type)
+        Node<3>* p_candidate_node = pFace->GetNode(i);
+        if (GetNodeType(p_candidate_node) != opposite_type)
         {
             continue;
         }
 
-        if (GetSharedFaceIndices(pNode, p_tmp_node).size() == num_lateral_faces)
+        const unsigned num_shared_faces = GetSharedFaceIndices(pNode, p_candidate_node).size();
+        if (num_shared_faces > max_num_shared_faces)
         {
-            return p_return_node = pFace->GetNode(i);
+            max_num_shared_faces = num_shared_faces;
+            p_opposite_node = p_candidate_node;
         }
     }
 
-    EXCEPTION("No Opposite Node"); // LCOV_EXCL_LINE
+    if (p_opposite_node == nullptr)
+    {
+        EXCEPTION("No Opposite Node"); // LCOV_EXCL_LINE
+    }
+    return p_opposite_node;
 }
 
 Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<3, 3>* pElement)

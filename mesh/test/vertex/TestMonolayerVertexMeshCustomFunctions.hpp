@@ -118,6 +118,42 @@ public:
         }
     }
 
+    void TestGetOppositeNode()
+    {
+        // Build a single square-prism monolayer cell and check that GetOppositeNode maps each basal
+        // node to the apical node directly above it (same x and y, different z) and back again. #2850
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<3>(3, true, 0.0, 1.0));
+        const unsigned node_indices_elem_0[4] = { 0, 1, 2, 3 };
+
+        MonolayerVertexMeshGenerator builder(nodes, "TestGetOppositeNode");
+        builder.BuildElementWith(4, node_indices_elem_0);
+        MutableVertexMesh<3, 3>& mesh = *builder.GenerateMesh();
+
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
+        {
+            Node<3>* p_node = mesh.GetNode(i);
+            if (!(IsApicalNode(p_node) || IsBasalNode(p_node)))
+            {
+                continue;
+            }
+
+            Node<3>* p_opposite = GetOppositeNode(p_node, &mesh);
+
+            // The opposite node is of the opposite type ...
+            TS_ASSERT_EQUALS(IsApicalNode(p_opposite), IsBasalNode(p_node));
+            // ... lies directly above/below (same x and y, different z) ...
+            TS_ASSERT_DELTA(p_opposite->rGetLocation()[0], p_node->rGetLocation()[0], 1e-9);
+            TS_ASSERT_DELTA(p_opposite->rGetLocation()[1], p_node->rGetLocation()[1], 1e-9);
+            TS_ASSERT(fabs(p_opposite->rGetLocation()[2] - p_node->rGetLocation()[2]) > 1e-6);
+            // ... and the mapping is an involution (opposite of the opposite is the original node).
+            TS_ASSERT_EQUALS(GetOppositeNode(p_opposite, &mesh), p_node);
+        }
+    }
+
     void TestGetSharedElementnFaceIndicesAndBoundaryFace()
     {
         /*
