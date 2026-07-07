@@ -989,7 +989,7 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
         this->CheckFaceOrientationOfElement(face_index);
     }
 
-    // #2850 The former assumptions of this method are resolved (see the hpp): the "basal/apical face
+    // #480 The former assumptions of this method are resolved (see the hpp): the "basal/apical face
     // nodes already in cyclic order" precondition is now guaranteed upstream by the topological face
     // ordering in FaceRearrangeNodesInMesh() / MutableVertexMesh<3,3>::ReMesh(), and the "apical and
     // basal faces synchronised" assumption is not relied upon here (the node list is built from each

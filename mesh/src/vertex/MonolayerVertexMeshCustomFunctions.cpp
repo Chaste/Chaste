@@ -442,7 +442,7 @@ bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace)
 }
 
 /**
- * \todo #2850 Compute the cyclic node order of a monolayer element's apical or basal face from
+ * \todo #480 Compute the cyclic node order of a monolayer element's apical or basal face from
  * the element's lateral faces, instead of sorting the nodes geometrically by angle.
  *
  * Each lateral face of a prism is a quad sharing exactly two nodes with the apical/basal face (its
@@ -571,7 +571,7 @@ static bool ComputeApicalBasalNodeOrderFromLateralFaces(const VertexElement<3, 3
 }
 
 /**
- * \todo #2850 Whether a lateral quad's two basal nodes sit at cyclically consecutive positions
+ * \todo #480 Whether a lateral quad's two basal nodes sit at cyclically consecutive positions
  * (so the face reads basal-basal-apical-apical). The geometric angular sort can instead interleave
  * them (basal-apical-basal-apical) on non-planar quads, which would trip the assertion in
  * VertexElement<2,3>::LateralFaceRearrangeNodes(). Returns true for anything that is not a simple
@@ -597,7 +597,7 @@ static bool AreLateralBasalNodesAdjacent(const VertexElement<2, 3>* pFace)
 }
 
 /**
- * \todo #2850 Compute a lateral quad's node order topologically from the opposite-node (vertical
+ * \todo #480 Compute a lateral quad's node order topologically from the opposite-node (vertical
  * edge) relationship, independent of geometry: basal_a, basal_b, opposite(basal_b), opposite(basal_a).
  * This keeps the two basal nodes adjacent and each basal node next to its apical partner, which is the
  * invariant LateralFaceRearrangeNodes() and the lateral-face consumers expect. Returns false if the
@@ -643,7 +643,7 @@ void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFac
     bool has_changes = pFace->FaceRearrangeNodes(centroid_tmp);
 
     /*
-     * \todo #2850 The geometric angular sort can interleave a lateral quad's basal and apical nodes on
+     * \todo #480 The geometric angular sort can interleave a lateral quad's basal and apical nodes on
      * non-planar (e.g. cylindrical) faces, which would trip the assertion in LateralFaceRearrangeNodes.
      * When that has happened, re-derive the node order topologically from the opposite-node relationship.
      * Faces the geometric sort ordered consistently (e.g. on flat meshes) are left untouched.
@@ -673,7 +673,7 @@ void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFac
 }
 
 /**
- * \todo #2850 Whether an apical/basal face's stored node order is consistent with the element's
+ * \todo #480 Whether an apical/basal face's stored node order is consistent with the element's
  * lateral faces: every consecutive pair of nodes must share exactly one lateral face. This is the
  * prism invariant that DivideElementAlongGivenAxis() (via GetSharedLateralFace()) relies on.
  */
@@ -1000,7 +1000,7 @@ Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<2, 3>* pFace)
     const Monolayer::v_type opposite_type = IsApicalNode(pNode) ? Monolayer::BasalValue : Monolayer::ApicalValue;
 
     /*
-     * #2850 The opposite node is the node of the opposite type (apical<->basal) joined to pNode by a
+     * #480 The opposite node is the node of the opposite type (apical<->basal) joined to pNode by a
      * vertical (lateral) edge. A basal node and an apical node can share only lateral faces, and the
      * opposite node lies on *every* lateral face containing pNode, whereas any other node of the
      * opposite type lies on strictly fewer. So the opposite node is the opposite-type node of pFace
@@ -1120,7 +1120,7 @@ c_vector<double, 3> CalculateUnitNormalToFace(const VertexElement<2, 3>* pFace)
     assert(num_nodes >= 3u); // LCOV_EXCL_LINE
 
     /*
-     * #2850 Newell's method: accumulate the cross products of consecutive edge vectors, taken relative
+     * #480 Newell's method: accumulate the cross products of consecutive edge vectors, taken relative
      * to node 0 for numerical robustness. Unlike the previous least-squares plane fit, this is
      * well-conditioned for axis-aligned faces (e.g. every node at z = 0, which made that fit singular)
      * and is correct for non-planar and non-convex faces. A degenerate (zero-area) face yields the

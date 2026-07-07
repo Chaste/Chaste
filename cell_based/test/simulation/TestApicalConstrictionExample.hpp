@@ -65,7 +65,7 @@ public:
     void TestApicalConstriction()
     {
         /*
-         * \todo #2850 Scaled down to run as a fast unit test of the patterned apical-constriction force
+         * \todo #480 Scaled down to run as a fast unit test of the patterned apical-constriction force
          * on a monolayer. Originally 10x10 cells run to end_time = 4; the suite took ~917 sec. Restore
          * these values and run in a user project for a production-scale simulation.
          */
@@ -107,7 +107,7 @@ public:
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(tmp_name);
         simulator.SetSamplingTimestepMultiple(10);
-        const double end_time = 0.5; // \todo #2850 original: 4 (see note above)
+        const double end_time = 0.5; // \todo #480 original: 4 (see note above)
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(PatternedApicalConstrictionForce, p_force3);
@@ -130,7 +130,7 @@ public:
     void TestApicalConstrictionVoronoi()
     {
         /*
-         * \todo #2850 Scaled down to run as a fast unit test of the patterned apical-constriction force
+         * \todo #480 Scaled down to run as a fast unit test of the patterned apical-constriction force
          * on a monolayer. Originally 10x10 cells run to end_time = 4; the suite took ~917 sec. Restore
          * these values and run in a user project for a production-scale simulation.
          */
@@ -172,7 +172,7 @@ public:
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(tmp_name);
         simulator.SetSamplingTimestepMultiple(10);
-        const double end_time = 0.5; // \todo #2850 original: 4 (see note above)
+        const double end_time = 0.5; // \todo #480 original: 4 (see note above)
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(PatternedApicalConstrictionForce, p_force3);

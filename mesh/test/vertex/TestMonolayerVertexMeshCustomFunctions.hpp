@@ -75,7 +75,7 @@ public:
 
     void TestCalculateUnitNormalToFace()
     {
-        // #2850 A flat face in the z = 0 plane - the axis-aligned case that used to make the
+        // #480 A flat face in the z = 0 plane - the axis-aligned case that used to make the
         // least-squares plane fit singular - now has a well-defined unit normal (0, 0, 1).
         {
             Node<3> n0(0, false, 0.0, 0.0, 0.0);
@@ -121,7 +121,7 @@ public:
     void TestGetOppositeNode()
     {
         // Build a single square-prism monolayer cell and check that GetOppositeNode maps each basal
-        // node to the apical node directly above it (same x and y, different z) and back again. #2850
+        // node to the apical node directly above it (same x and y, different z) and back again. #480
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, true, 1.0, 0.0));

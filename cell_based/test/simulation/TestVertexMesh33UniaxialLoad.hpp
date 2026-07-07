@@ -64,7 +64,7 @@ private:
     static constexpr double z_height = 2;
     static constexpr double target_area = 1;
     /*
-     * \todo #2850 Scaled down to run as fast unit tests. Originally num_cells_x = 20, num_cells_y = 10
+     * \todo #480 Scaled down to run as fast unit tests. Originally num_cells_x = 20, num_cells_y = 10
      * (a 200-cell sheet) run to end_time = 15; the suite took ~5485 sec. Restore these values (and see
      * the per-test notes below) and run in a user project for production-scale simulations.
      */
@@ -304,7 +304,7 @@ public:
         HexagonalPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, target_area, z_height);
         MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
 
-        // \todo #2850 Disable asynchronous T1 swaps: this test grows and divides cells, and a
+        // \todo #480 Disable asynchronous T1 swaps: this test grows and divides cells, and a
         // scutoid interface node left by an async swap makes DivideElementAlongGivenAxis() fail
         // in GetOppositeNode() ("No Opposite Node"). See TestMonolayerCylindricalMeshExample for
         // the full explanation and the "approach B" that would let scutoids and division coexist.
@@ -319,7 +319,7 @@ public:
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(10);
-        // \todo #2850 This method uses a longer end_time than the rest of the suite so that at least
+        // \todo #480 This method uses a longer end_time than the rest of the suite so that at least
         // one cell division occurs, exercising the division + remesh path (no division completes by
         // the class end_time of 0.5). The original suite ran to end_time = 15.
         const double end_time = 1.0;
@@ -338,7 +338,7 @@ public:
         simulator.AddForce(p_force2);
 
         simulator.Solve();
-        // \todo #2850 The final cell count depends on end_time: 25u here (one division) vs 55u at the
+        // \todo #480 The final cell count depends on end_time: 25u here (one division) vs 55u at the
         // original end_time = 15.
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 25u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);

@@ -101,7 +101,7 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
         const double basal_length = p_mesh->GetDistanceBetweenNodes(basal_nodes[0]->GetIndex(), basal_nodes[1]->GetIndex());
 
         /*
-         * #2850 The interface (lateral) node is no longer repositioned to a geometric midpoint here.
+         * #480 The interface (lateral) node is no longer repositioned to a geometric midpoint here.
          * Instead it is left to move under the ordinary force-based dynamics, which minimise the
          * GeneralMonolayerVertexMeshForce energy. This represents a scutoid whose partial (asynchronous)
          * T1 swap can "unzipper" up or down the lateral direction: when the resulting apical or basal

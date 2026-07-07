@@ -160,7 +160,7 @@ public:
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 14u);
         /*
-         * \todo #2850 These counts were originally 85u/88u, which assumed the asynchronous T1 swap
+         * \todo #480 These counts were originally 85u/88u, which assumed the asynchronous T1 swap
          * performed during the simulation is later undone by a reverse-asynchronous T1 swap in
          * LateralNodeModifier. Under the current (committed) dynamics the interface node reaches a
          * stable equilibrium with its shorter edge ~0.33, far above the reverse-async trigger

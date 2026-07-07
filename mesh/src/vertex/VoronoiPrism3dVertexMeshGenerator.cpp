@@ -117,7 +117,7 @@ std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution()
 
         // All polygons are assumed to have 3, 4, 5, ..., mMaxExpectedNumSidesPerPolygon sides
         // and since there should be an upper node for every lower node, it should be even number
-        assert(num_nodes_this_elem % 2 == 0); ///\todo check if the pairs is really lower and upper after simulation #2850
+        assert(num_nodes_this_elem % 2 == 0); ///\todo check if the pairs is really lower and upper after simulation #480
         assert(num_nodes_this_elem > 2);
         assert(num_nodes_this_elem / 2 <= mMaxExpectedNumSidesPerPolygon);
 

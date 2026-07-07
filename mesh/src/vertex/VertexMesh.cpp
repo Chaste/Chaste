@@ -1860,7 +1860,7 @@ c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index
     /*
     *   For now the return vector will be the normal of plane spanned by the the normal
     *   of basal face's short-axis and its face normal.
-    */ ///\todo: #2850
+    */ ///\todo: #480
     if (!IsMonolayerElement(this->GetElement(index)))
     {
         NEVER_REACHED;

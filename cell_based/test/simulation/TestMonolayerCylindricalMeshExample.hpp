@@ -60,9 +60,9 @@ class TestMonolayerCylindricalMeshExample : public AbstractCellBasedTestSuite
 {
 private:
     /*
-     * \todo #2850 Scaled down to run as a fast unit test of a dividing monolayer on a cylinder.
+     * \todo #480 Scaled down to run as a fast unit test of a dividing monolayer on a cylinder.
      * Originally x = 10, y = 11 (a 110-cell cylinder) run to end_time = 10; the suite took ~1851 sec
-     * and aborted on the #2850 division-robustness limitation (a flat division plane crossing a
+     * and aborted on the #480 division-robustness limitation (a flat division plane crossing a
      * distorted, non-convex cell != 2 edges). Restore these values and run in a user project for a
      * production-scale simulation.
      */
@@ -102,7 +102,7 @@ public:
         builder.WriteVtk(output_filename, "After");
 
         /*
-         * \todo #2850 Disable asynchronous T1 swaps for this growth-and-division simulation.
+         * \todo #480 Disable asynchronous T1 swaps for this growth-and-division simulation.
          *
          * An asynchronous T1 swap leaves a "scutoid" interface node on a single lateral face. Such
          * nodes now evolve under the energy (see LateralNodeModifier), but a stable scutoid that

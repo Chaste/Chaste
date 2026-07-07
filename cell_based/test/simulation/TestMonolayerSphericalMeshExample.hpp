@@ -59,7 +59,7 @@ class TestMonolayerSphericalMeshExample : public AbstractCellBasedTestSuite
 {
 private:
     static constexpr double target_area = 1;
-    static constexpr double end_time = 0.5; // \todo #2850 scaled down for a fast unit test; original: 10
+    static constexpr double end_time = 0.5; // \todo #480 scaled down for a fast unit test; original: 10
 
 public:
     void TestOnSphere1()
@@ -156,15 +156,15 @@ public:
     void TestOnSphere3()
     {
         /*
-         * \todo #2850 Scaled down to run as a fast unit test of the geodesic-sphere monolayer mesh and
+         * \todo #480 Scaled down to run as a fast unit test of the geodesic-sphere monolayer mesh and
          * the general force on it. Originally this ran two SubDivide() calls (a 162-cell sphere) to
          * end_time = 10 with proliferative cells (UniformG1GenerationalCellCycleModel +
-         * TransitCellProliferativeType); the suite took ~1781 sec and aborted on the #2850
+         * TransitCellProliferativeType); the suite took ~1781 sec and aborted on the #480
          * division-robustness limitation. Here we use one SubDivide() (a 42-cell sphere), the reduced
          * end_time, and NoCellCycleModel - the test's own assertion always expected the cell count to
          * stay constant, so no division is exercised. For a production-scale, dividing simulation add
          * the second SubDivide(), restore end_time and the proliferative cell type, and run it in a
-         * user project (division on a curved sheet is #2850 work in progress).
+         * user project (division on a curved sheet is #480 work in progress).
          */
         const std::string output_filename = "TestMonolayerSphericalMeshExample/Sphere3";
         GeodesicSphere23Generator builder;

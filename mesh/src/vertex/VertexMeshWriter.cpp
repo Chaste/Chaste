@@ -395,7 +395,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
                 // renders the true cell faces and edges - and handles non-convex cells correctly. This
                 // replaces vtkConvexPointSet, which stores only the element's points and is therefore
                 // drawn as a triangulated convex hull ("Surface With Edges" then shows the hull
-                // tessellation, not the cell edges). #2850
+                // tessellation, not the cell edges). #480
                 std::vector<vtkIdType> point_ids;
                 point_ids.reserve(p_elem->GetNumNodes());
                 for (unsigned j = 0; j < p_elem->GetNumNodes(); ++j)
@@ -456,7 +456,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
     // For 3D elements, we also create a second VtkMesh made of the individual faces (each written as a
     // polygon), together with per-face data ("Face IDs", "Element IDs").
     //
-    // \todo #2850 This face mesh is now technically redundant for visualising cell edges: the element
+    // \todo #480 This face mesh is now technically redundant for visualising cell edges: the element
     // mesh above writes each 3D element as a VTK_POLYHEDRON, which Paraview already renders with its
     // true faces and edges (this was originally a workaround for elements being written as convex point
     // sets and hence triangulated under "Surface With Edges"). It is kept only as an optional view of

@@ -2056,7 +2056,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(
             }
             rebuilt_elements.insert(this->mElements[*it]->GetIndex());
         }
-        // Sort out boundary nodes  ///\todo boundary problem with 3D #2850
+        // Sort out boundary nodes  ///\todo boundary problem with 3D #480
         if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
         {
             if (pNodeA->GetNumContainingElements() == 3)
@@ -4484,7 +4484,7 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
             // ...and if none of them are triangular, perform the required type of swap and halt the search, returning true
             if (!both_nodes_share_triangular_element)
             {
-                ///\todo Could have pass down the p_face as the p_lateral_swap_face, but much more modifications #2850
+                ///\todo Could have pass down the p_face as the p_lateral_swap_face, but much more modifications #480
                 IdentifySwapType(p_basal_node_1, p_basal_node_2);
                 return true;
             }
@@ -4520,7 +4520,7 @@ void MutableVertexMesh<3, 3>::ReMesh(VertexElementMap& rElementMap)
     }
 
     /*
-     * \todo #2850 Self-healing pass for apical/basal faces. The geometric angular sort used elsewhere
+     * \todo #480 Self-healing pass for apical/basal faces. The geometric angular sort used elsewhere
      * can transpose nodes on curved or non-convex faces (e.g. on a cylindrical monolayer, or after a
      * division/T1 swap leaves a face non-convex), breaking the prism invariant that every apical/basal
      * edge has a matching lateral face - which later crashes DivideElementAlongGivenAxis(). Here we
@@ -4565,7 +4565,7 @@ void MutableVertexMesh<3, 3>::PerformNodeMerge(Node<3>* pNodeA, Node<3>* pNodeB)
     this->DeleteFacePriorToReMesh(delete_lateral_face->GetIndex());
 }
 
-///\todo: #2850 change the input arguments
+///\todo: #480 change the input arguments
 template <>
 void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                                                         const std::set<unsigned>& rElementsContainingNodes)
@@ -4599,7 +4599,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
      *
      * For better illustration of the process, run ```TestMutableVertexMesh33ReMesh``` and
      * look at the face (no. ??) in /${Output}/TestMutableVertexMesh33ReMesh/T1NoSwap
-     * ///\todo #2850 update this documentation
+     * ///\todo #480 update this documentation
      *
      */
 
@@ -4964,7 +4964,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
             NEVER_REACHED;
         }
         /**
-        //\todo: #2850 write this in chaste trac wiki
+        //\todo: #480 write this in chaste trac wiki
          * In 3D, it does not make sense to say 'element 2 is on the left of node A and B',
          * because the orientation is reversed if we move to the other side of the face.
          * Besides, though is important that the nodes of each face should be in CW/CCW order,
@@ -5077,7 +5077,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         // p_this_face contains A or B, while p_other_face X or Y.
         VertexElement<2, 3>* p_this_face = GetBasalFace(p_elem);
         VertexElement<2, 3>* p_other_face = GetApicalFace(p_elem);
-        ///\todo: #2850 removed this check so that an element can have several Asynchronous T1 going on.
+        ///\todo: #480 removed this check so that an element can have several Asynchronous T1 going on.
         // assert(p_this_face->GetNumNodes() == p_other_face->GetNumNodes());
 
         switch (i)
@@ -5188,10 +5188,10 @@ void MutableVertexMesh<3, 3>::IdentifySwapType(Node<3>* pNodeA, Node<3>* pNodeB)
                    nodeB_elem_indices.begin(), nodeB_elem_indices.end(),
                    std::inserter(all_indices, all_indices.begin()));
 
-    // High-order junctions (rosettes) are not yet implemented for 3D monolayer meshes (#2850).
+    // High-order junctions (rosettes) are not yet implemented for 3D monolayer meshes (#480).
     if (nodeA_elem_indices.size() > 3 || nodeB_elem_indices.size() > 3)
     {
-        EXCEPTION("High-order junctions (rosettes) are not implemented for 3D monolayer meshes (#2850)");
+        EXCEPTION("High-order junctions (rosettes) are not implemented for 3D monolayer meshes (#480)");
     }
 
     switch (all_indices.size())
@@ -5270,7 +5270,7 @@ void MutableVertexMesh<3, 3>::IdentifySwapType(Node<3>* pNodeA, Node<3>* pNodeB)
                     }
 
                     // Removal of a (non-triangular-adjacent) void is not yet implemented in 3D.
-                    EXCEPTION("Void removal is not implemented for 3D monolayer meshes (#2850)");
+                    EXCEPTION("Void removal is not implemented for 3D monolayer meshes (#480)");
                 }
             }
 
@@ -5423,7 +5423,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3, 3>* pElement, u
     this->AddFace(p_new_apical_face);
 
     /*
-     * #2850 Split the basal surface to correspond exactly to the apical split: the new basal face holds
+     * #480 Split the basal surface to correspond exactly to the apical split: the new basal face holds
      * the basal partners (opposite nodes) of the new apical nodes, in the same order. Deriving the basal
      * arc from the apical arc - rather than slicing the basal face independently by node index - keeps
      * the two new faces consistent on curved or twisted cells, where the independent basal slice can
@@ -5468,9 +5468,9 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3, 3>* pElement, u
      * belongs to whichever element's (split) apical face holds both of its apical nodes. The two split
      * basal faces are then paired with the element holding the corresponding lateral faces. This is
      * robust on curved cells, unlike testing which side of the dividing face's plane each face centroid
-     * falls on, which misassigns faces and produces an element that violates Euler's formula. #2850
+     * falls on, which misassigns faces and produces an element that violates Euler's formula. #480
      *
-     * \todo #2850 This still assumes the apical arc (a contiguous range of the apical face's node list)
+     * \todo #480 This still assumes the apical arc (a contiguous range of the apical face's node list)
      * corresponds to a contiguous set of lateral faces. A heavily distorted cell whose stored apical
      * node order no longer matches its lateral-face connectivity can therefore have a single lateral
      * face assigned to the wrong side, again violating Euler's formula (seen deep into a long,
@@ -5585,7 +5585,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
      * have different parity.
      */
     /*
-     * #2850 Identify the two lateral faces the plane of division crosses, using the cell's vertical
+     * #480 Identify the two lateral faces the plane of division crosses, using the cell's vertical
      * edges so that its apical and basal surfaces are cut consistently. A cell divides through its full
      * thickness and stays a monolayer, so the cut is best located on the midline of each vertical edge -
      * the midpoint between an apical node and its basal partner (via GetOppositeNode) - rather than on
@@ -5625,7 +5625,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
     }
 
     /*
-     * #2850 Going around the ring of lateral faces, the plane crosses it an even number of times: a
+     * #480 Going around the ring of lateral faces, the plane crosses it an even number of times: a
      * convex cell exactly twice, a non-convex cell more often. For a non-convex cell we divide along the
      * two crossings that are furthest apart, which gives the most balanced split and, for a mild
      * concavity, keeps the new dividing wall inside the cell. (Fewer than two crossings would mean the
@@ -5682,7 +5682,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
         const c_vector<double, 3>& position_basal_b = p_basal_node_b->rGetLocation();
 
         /*
-         * #2850 Locate the cut along the midline of the two vertical edges (a: apical_a<->basal_a,
+         * #480 Locate the cut along the midline of the two vertical edges (a: apical_a<->basal_a,
          * b: apical_b<->basal_b): the fraction 'frac' at which the plane of division crosses the segment
          * joining their midpoints. Placing the new apical and new basal nodes at that same fraction of
          * the apical edge (a->b) and basal edge (a->b) keeps the new vertical edge vertical, so the
@@ -5742,7 +5742,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
                 is_boundary = true;
             }
         }
-        ///\todo #2850 use this to assign is_boundary
+        ///\todo #480 use this to assign is_boundary
         if (is_boundary != IsFaceOnBoundary(p_shared_face))
         {
             NEVER_REACHED;

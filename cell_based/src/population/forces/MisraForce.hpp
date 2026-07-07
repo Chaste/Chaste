@@ -101,11 +101,11 @@ protected:
     double mVolumeCompressibilityParameter;
 
     /**
-     * Temporary placeholder for target volume. (temporary value before GrowthModifier is implemented) ///\todo #2850
+     * Temporary placeholder for target volume. (temporary value before GrowthModifier is implemented) ///\todo #480
      * Initialised to 1.0 in the constructor.
      */
     double mTargetVolume;
-    ///\todo allow prepattern and eventually curved surfaces.  #2850
+    ///\todo allow prepattern and eventually curved surfaces.  #480
 
 public:
     /**
@@ -156,7 +156,7 @@ public:
     /**
      * @return mBoundaryLineTensionParameter
      */
-    double GetBoundaryLineTensionParameter() const; ///\todo do we really need this? #2850
+    double GetBoundaryLineTensionParameter() const; ///\todo do we really need this? #480
 
     /**
      * @return mBasalSurfaceEnergyParameter
