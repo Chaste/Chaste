@@ -97,6 +97,15 @@ private:
         archive& boost::serialization::base_object<MutableElement<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
+    /**
+     * Helper shared by the two AddFace() overloads: register pFace as belonging to this element and
+     * add any of pFace's nodes that this element does not already own. Assumes pFace has already been
+     * placed into mFaces / mOrientations by the caller. #2850
+     *
+     * @param pFace a pointer to the face just added to this element
+     */
+    void RegisterFaceAndAddItsNodes(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace);
+
 public:
     /**
      * Constructor.
@@ -255,19 +264,21 @@ public:
     void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pNewFace);
 
     /**
-     * Method for monolayer element to rearrange faces and nodes so that
-     * other operations can be done more efficiently (e.g. no need to loop
-     * through to find the next face of a node etc.)
+     * Method for a monolayer element to put its faces and nodes into a canonical order so that other
+     * operations can be done more efficiently. Specifically it:
+     * (1) moves the basal face to local index 0 and the apical face to local index 1;
+     * (2) orders the element's node list as [basal nodes][apical nodes][lateral nodes], where the
+     *     basal and apical nodes appear in the order they have on their respective faces.
      *
-     * 'Correct order' is defined as such:
-     * (1) basal face will be at the first place;
-     * (2) apical face will come second;
-     * (3) basal nodes come first before apical nodes, and in the same order as basal and apical face;
-     * (4) lateral faces are adjusted by LateralFaceRearrangeNodes;
-     * (5) lateral faces (after basal and apical faces) have the same order as the nodes, where
-     *     lateral_faces[i] contains nodes[i] and nodes[i+1].
-     * Assumption:  nodes within the faces are already in cyclic order;
-     *              the nodes in apical and basal faces are synchronised.
+     * The lateral faces are left in whatever order they occur - there is no longer a unique "correct"
+     * ordering of them - so this method establishes no correspondence between lateral-face position
+     * and node position.
+     *
+     * Precondition: the nodes within the basal and apical faces are already in cyclic order. This is
+     * guaranteed upstream by FaceRearrangeNodesInMesh() and the self-healing pass in
+     * MutableVertexMesh<3,3>::ReMesh(), which order apical/basal faces topologically before this
+     * method runs. The former "apical and basal faces are synchronised" assumption is not required:
+     * the node list is built from each face's own order independently. #2850
      */
     void MonolayerElementRearrangeFacesNodes();
 

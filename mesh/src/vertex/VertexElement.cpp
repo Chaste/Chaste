@@ -314,16 +314,8 @@ bool VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFaceOrientationWithGlobalIndex(co
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace)
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::RegisterFaceAndAddItsNodes(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace)
 {
-    ///\todo: duplicated code here because AddFace with the +1!!! #2850
-    // // Add pFace to the end of mFaces
-    // this->AddFace(pFace, false, this->GetNumFaces() - 1);
-    // return;
-
-    this->mFaces.push_back(pFace);
-    this->mOrientations.push_back(false);
-
     pFace->FaceAddElement(this->mIndex);
     pFace->RegisterFaceWithNodes();
 
@@ -338,13 +330,26 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM - 
     for (unsigned local_index = 0; local_index < pFace->GetNumNodes(); local_index++)
     {
         // If this node is not already owned by this element...
-        unsigned global_index = pFace->GetNodeGlobalIndex(local_index);
+        const unsigned global_index = pFace->GetNodeGlobalIndex(local_index);
         if (node_indices.find(global_index) == node_indices.end())
         {
             // ... then add it to the element (and vice versa)
             this->AddNode(pFace->GetNode(local_index), this->GetNumNodes() - 1);
         }
     }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace)
+{
+    // Append pFace to the end of mFaces; its orientation is corrected later (e.g. by the caller or
+    // CheckFaceOrientationOfElement during remesh). This cannot delegate to the indexed overload
+    // below because that inserts at rIndex+1, which has no valid rIndex for an empty face list.
+    this->mFaces.push_back(pFace);
+    this->mOrientations.push_back(false);
+    assert(mFaces.size() == mOrientations.size());
+
+    this->RegisterFaceAndAddItsNodes(pFace);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -356,30 +361,9 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM - 
     // Add pFace to rIndex+1 element of mFaces pushing the others up
     this->mFaces.insert(this->mFaces.begin() + rIndex + 1, pFace);
     this->mOrientations.insert(this->mOrientations.begin() + rIndex + 1, Orientation);
-
     assert(mFaces.size() == mOrientations.size());
 
-    pFace->FaceAddElement(this->mIndex);
-    pFace->RegisterFaceWithNodes();
-
-    // Create a set of indices of nodes currently owned by this element
-    std::set<unsigned> node_indices;
-    for (unsigned local_index = 0; local_index < this->GetNumNodes(); local_index++)
-    {
-        node_indices.insert(this->GetNodeGlobalIndex(local_index));
-    }
-
-    // Loop over nodes owned by pFace
-    for (unsigned local_index = 0; local_index < pFace->GetNumNodes(); local_index++)
-    {
-        // If this node is not already owned by this element...
-        unsigned global_index = pFace->GetNodeGlobalIndex(local_index);
-        if (node_indices.find(global_index) == node_indices.end())
-        {
-            // ... then add it to the element (and vice versa)
-            this->AddNode(pFace->GetNode(local_index), this->GetNumNodes() - 1);
-        }
-    }
+    this->RegisterFaceAndAddItsNodes(pFace);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -892,8 +876,7 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
         }
     }
 
-    // With new functionalities, it is not necessary to arrange faces in "correct" order, as there
-    // isn't unambiguous way to arrange faces anymore.
+    // The lateral faces are left in place: there is no longer a unique "correct" ordering of them.
 
     // Check Orientation
     for (unsigned face_index = 0; face_index < this->GetNumFaces(); ++face_index)
@@ -901,7 +884,11 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
         this->CheckFaceOrientationOfElement(face_index);
     }
 
-    ///\todo: #2850 remove the both assumptions of this function (refer to hpp)
+    // #2850 The former assumptions of this method are resolved (see the hpp): the "basal/apical face
+    // nodes already in cyclic order" precondition is now guaranteed upstream by the topological face
+    // ordering in FaceRearrangeNodesInMesh() / MutableVertexMesh<3,3>::ReMesh(), and the "apical and
+    // basal faces synchronised" assumption is not relied upon here (the node list is built from each
+    // face's own order).
 }
 
 ////////////////////////////////////////////////////////////////////////
