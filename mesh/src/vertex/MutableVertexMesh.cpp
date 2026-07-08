@@ -5700,29 +5700,9 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
         const c_vector<double, 3> basal_intersection = position_basal_a + frac * this->GetVectorFromAtoB(position_basal_a, position_basal_b);
         const c_vector<double, 3> apical_intersection = position_apical_a + frac * this->GetVectorFromAtoB(position_apical_a, position_apical_b);
 
-        /*
-         * The new node is boundary node if the 2 nodes are boundary nodes and the elements don't look like
-         *   ___A___
-         *  |   |   |
-         *  |___|___|
-         *      B
-         */
-        // Find the indices of the elements owned by each node on the edge into which one new node will be inserted
-        const std::set<unsigned>& elems_containing_node_A = const_cast<Node<3>*>(p_apical_node_a)->rGetContainingElementIndices();
-        const std::set<unsigned>& elems_containing_node_B = const_cast<Node<3>*>(p_apical_node_b)->rGetContainingElementIndices();
-        bool is_boundary = false;
-        if (p_apical_node_a->IsBoundaryNode() && p_apical_node_b->IsBoundaryNode())
-        {
-            if (elems_containing_node_A.size() != 2 || elems_containing_node_B.size() != 2 || elems_containing_node_A != elems_containing_node_B)
-            {
-                is_boundary = true;
-            }
-        }
-        ///\todo #480 use this to assign is_boundary
-        if (is_boundary != IsFaceOnBoundary(p_shared_face))
-        {
-            NEVER_REACHED;
-        }
+        // The new nodes are inserted on the lateral face being split, so they lie on the tissue
+        // boundary precisely when that face is a boundary face (i.e. belongs to a single cell).
+        const bool is_boundary = IsFaceOnBoundary(p_shared_face);
 
         // Add a new node to the mesh at the location of the intersection
         Node<3>* p_new_basal_node = new Node<3>(0, basal_intersection, is_boundary);
