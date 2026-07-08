@@ -115,9 +115,12 @@ std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution()
     {
         unsigned num_nodes_this_elem = mpMesh->GetElement(elem_idx)->GetNumNodes();
 
-        // All polygons are assumed to have 3, 4, 5, ..., mMaxExpectedNumSidesPerPolygon sides
-        // and since there should be an upper node for every lower node, it should be even number
-        assert(num_nodes_this_elem % 2 == 0); ///\todo check if the pairs is really lower and upper after simulation #480
+        // All polygons are assumed to have 3, 4, 5, ..., mMaxExpectedNumSidesPerPolygon sides.
+        // Each cell is a prism with an apical node for every basal node, so the total is even. This
+        // holds for a freshly generated mesh; after remeshing (e.g. asynchronous T1 swaps add an
+        // interface node) a cell may be a scutoid with an odd node count, so GetPolygonDistribution()
+        // is intended for use on a freshly generated mesh.
+        assert(num_nodes_this_elem % 2 == 0);
         assert(num_nodes_this_elem > 2);
         assert(num_nodes_this_elem / 2 <= mMaxExpectedNumSidesPerPolygon);
 

@@ -4479,7 +4479,9 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
             // ...and if none of them are triangular, perform the required type of swap and halt the search, returning true
             if (!both_nodes_share_triangular_element)
             {
-                ///\todo Could have pass down the p_face as the p_lateral_swap_face, but much more modifications #480
+                // IdentifySwapType re-derives the shared lateral face from the two nodes; passing
+                // p_face down from here would save the re-lookup but require signature changes
+                // through several swap methods for little gain.
                 IdentifySwapType(p_basal_node_1, p_basal_node_2);
                 return true;
             }
@@ -4556,10 +4558,9 @@ void MutableVertexMesh<3, 3>::PerformNodeMerge(Node<3>* pNodeA, Node<3>* pNodeB)
     this->DeleteFacePriorToReMesh(delete_lateral_face->GetIndex());
 }
 
-///\todo: #480 change the input arguments
 template <>
 void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
-                                                        const std::set<unsigned>& rElementsContainingNodes)
+                                                        [[maybe_unused]] const std::set<unsigned>& rElementsContainingNodes)
 {
     /*
      * An asynchronous T1 swap only occurs when the edge on one side is shorter than
@@ -4588,9 +4589,8 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
      *   |___/                            \__\
      *  (A)  Basal                           (A)
      *
-     * For better illustration of the process, run ```TestMutableVertexMesh33ReMesh``` and
-     * look at the face (no. ??) in /${Output}/TestMutableVertexMesh33ReMesh/T1NoSwap
-     * ///\todo #480 update this documentation
+     * The asynchronous T1 swap is exercised by TestT1SwapAsynchronous in TestMutableVertexMesh33ReMesh;
+     * its VTK output (written under TestMutableVertexMesh33ReMesh/) shows the interface node being created.
      *
      */
 
@@ -4929,8 +4929,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
             // in case of >2, error somewhere.
             NEVER_REACHED;
         }
-        /**
-        //\todo: #480 write this in chaste trac wiki
+        /*
          * In 3D, it does not make sense to say 'element 2 is on the left of node A and B',
          * because the orientation is reversed if we move to the other side of the face.
          * Besides, though is important that the nodes of each face should be in CW/CCW order,
@@ -5043,7 +5042,8 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         // p_this_face contains A or B, while p_other_face X or Y.
         VertexElement<2, 3>* p_this_face = GetBasalFace(p_elem);
         VertexElement<2, 3>* p_other_face = GetApicalFace(p_elem);
-        ///\todo: #480 removed this check so that an element can have several Asynchronous T1 going on.
+        // The basal and apical faces need not have equal node counts here: after one or more
+        // asynchronous T1 swaps a cell can be a scutoid, so the following check is intentionally omitted.
         // assert(p_this_face->GetNumNodes() == p_other_face->GetNumNodes());
 
         switch (i)
