@@ -101,8 +101,9 @@ protected:
     double mVolumeCompressibilityParameter;
 
     /**
-     * Temporary placeholder for target volume. (temporary value before GrowthModifier is implemented) ///\todo #480
-     * Initialised to 1.0 in the constructor.
+     * Default/fallback target volume, initialised to 1.0 in the constructor. Used for every cell
+     * unless a per-cell "target volume" has been set in CellData (e.g. by a SimpleTargetVolumeModifier
+     * to implement growth over the cell cycle), which then takes precedence in AddForceContribution().
      */
     double mTargetVolume;
     ///\todo allow prepattern and eventually curved surfaces.  #480

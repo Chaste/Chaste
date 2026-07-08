@@ -80,12 +80,21 @@ void GeneralMonolayerVertexMeshForce::AddVolumeContribution(VertexBasedCellPopul
         const VertexElement<3, 3>* p_elem = rMesh.GetElement(elem_index);
         const double elem_volume = rMesh.GetVolumeOfElement(elem_index);
 
+        // Use the cell's per-cell "target volume" (as set by a TargetVolumeModifier to implement
+        // growth) when it is available, otherwise fall back to the global mTargetVolume.
+        double target_volume = mTargetVolume;
+        CellPtr p_cell = pCellPopulation->GetCellUsingLocationIndex(p_elem->GetIndex());
+        if (p_cell->GetCellData()->HasItem("target volume"))
+        {
+            target_volume = p_cell->GetCellData()->GetItem("target volume");
+        }
+
         for (unsigned local_node_index = 0; local_node_index < p_elem->GetNumNodes(); ++local_node_index)
         {
             Node<3>* p_node = p_elem->GetNode(local_node_index);
 
             c_vector<double, 3> tmp_v = rMesh.GetVolumeGradientofElementAtNode(p_elem, p_node->GetIndex());
-            tmp_v *= -1 * mVolumeParameter * (elem_volume - mTargetVolume);
+            tmp_v *= -1 * mVolumeParameter * (elem_volume - target_volume);
 
             p_node->AddAppliedForceContribution(tmp_v);
         }

@@ -91,6 +91,7 @@ simulation/TestOnLatticeSimulationWithCaBasedCellPopulation.hpp
 simulation/TestOnLatticeSimulationWithPdes.hpp
 simulation/TestOnLatticeSimulationWithPottsBasedCellPopulation.hpp
 simulation/TestSimpleTargetAreaModifier.hpp
+simulation/TestSimpleTargetVolumeModifier.hpp
 simulation/TestStepSizeException.hpp
 simulation/TestTargetAreaLinearGrowthModifier.hpp
 simulation/TestVertexMesh33UniaxialLoad.hpp

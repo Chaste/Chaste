@@ -137,8 +137,17 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
             // Calculating volume contribution
             c_vector<double, 3> element_volume_gradient = rMesh.GetVolumeGradientofElementAtNode(p_element, node_global_index);
 
+            // Use the cell's per-cell "target volume" (as set by a TargetVolumeModifier to implement
+            // growth) when available, otherwise fall back to the global mTargetVolume.
+            double target_volume = mTargetVolume;
+            CellPtr p_cell = p_cell_population->GetCellUsingLocationIndex(elem_index);
+            if (p_cell->GetCellData()->HasItem("target volume"))
+            {
+                target_volume = p_cell->GetCellData()->GetItem("target volume");
+            }
+
             // Add the force contribution from this cell's volume compressibility (note the minus sign)
-            volume_elasticity_contribution -= GetVolumeCompressibilityParameter() * (element_volumes[elem_index] - mTargetVolume) * element_volume_gradient;
+            volume_elasticity_contribution -= GetVolumeCompressibilityParameter() * (element_volumes[elem_index] - target_volume) * element_volume_gradient;
 
             // Calculating apical line tension contribution
             ///\todo Maybe a refactoring similar to lateral will eliminate the trouble of getting previous and next

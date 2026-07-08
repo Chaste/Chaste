@@ -2368,6 +2368,60 @@ public:
         TS_ASSERT_EQUALS(force.GetPinnedElements(false).size(), 0u);
     }
 
+    void TestMonolayerVolumeForceUsesCellDataTargetVolume()
+    {
+        // #480 The monolayer volume force should use a per-cell "target volume" from CellData (as set
+        // by a TargetVolumeModifier to drive growth) in preference to its global mTargetVolume, and
+        // reproduce the global result when the two agree.
+        HexagonalPrism3dVertexMeshGenerator generator(2, 2, 1.0, 1.0);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        const double global_target = 0.7;
+        GeneralMonolayerVertexMeshForce force;
+        force.SetVolumeParameters(1.0, global_target); // only the volume term is active
+
+        // (a) No CellData "target volume": the force uses the global target.
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+        force.AddForceContribution(cell_population);
+        c_vector<double, 3> force_global = cell_population.GetNode(0)->rGetAppliedForce();
+
+        // (b) CellData "target volume" equal to the global target: the force is unchanged.
+        for (VertexBasedCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End(); ++cell_iter)
+        {
+            cell_iter->GetCellData()->SetItem("target volume", global_target);
+        }
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+        force.AddForceContribution(cell_population);
+        c_vector<double, 3> force_same = cell_population.GetNode(0)->rGetAppliedForce();
+        TS_ASSERT_DELTA(norm_2(force_same - force_global), 0.0, 1e-12);
+
+        // (c) A larger per-cell target volume changes the volume force on the node.
+        for (VertexBasedCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End(); ++cell_iter)
+        {
+            cell_iter->GetCellData()->SetItem("target volume", global_target + 1.0);
+        }
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+        force.AddForceContribution(cell_population);
+        c_vector<double, 3> force_diff = cell_population.GetNode(0)->rGetAppliedForce();
+        TS_ASSERT_LESS_THAN(1e-9, norm_2(force_diff - force_global));
+    }
+
     void TestMisraForceMethods()
     {
         // This is the same test as for other vertex based forces. It comprises a sanity check that forces point in the right direction.
