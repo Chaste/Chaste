@@ -278,6 +278,19 @@ bool IsBasalNode(const Node<3>* pNode);
  */
 bool IsLateralNode(const Node<3>* pNode);
 
+/**
+ * Whether a monolayer node lies on the tissue boundary. A basal/apical node is on the boundary iff at
+ * least one of the lateral faces containing it is itself a boundary face (belongs to a single cell).
+ * Apical and basal "cap" faces are ignored, since each is contained in exactly one element regardless
+ * of whether it is on the tissue rim. This is the monolayer-native replacement for element-count
+ * heuristics carried over from 2D.
+ *
+ * @param pNode  pointer of a node
+ * @param pMesh  the mesh owning the node (used to resolve the node's containing face indices)
+ * @return  whether the node lies on the tissue boundary
+ */
+bool IsNodeOnBoundary(const Node<3>* pNode, const VertexMesh<3, 3>* pMesh);
+
 //////////////////////////////////
 ///     Functions for face     ///
 //////////////////////////////////

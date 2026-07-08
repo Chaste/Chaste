@@ -790,6 +790,20 @@ bool IsLateralNode(const Node<3>* pNode)
     return GetNodeType(pNode) == Monolayer::LateralValue;
 }
 
+bool IsNodeOnBoundary(const Node<3>* pNode, const VertexMesh<3, 3>* pMesh)
+{
+    const std::set<unsigned>& containing_face_indices = const_cast<Node<3>*>(pNode)->rGetContainingFaceIndices();
+    const std::set<VertexElement<2, 3>*> lateral_faces = GetFacesWithIndices(containing_face_indices, pMesh, Monolayer::LateralValue);
+    for (VertexElement<2, 3>* p_face : lateral_faces)
+    {
+        if (IsFaceOnBoundary(p_face))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 //////////////////////////////////
 ///     Functions for face     ///
 //////////////////////////////////

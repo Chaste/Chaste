@@ -2054,7 +2054,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(
             }
             rebuilt_elements.insert(this->mElements[*it]->GetIndex());
         }
-        // Sort out boundary nodes  ///\todo boundary problem with 3D #480
+        // Sort out boundary nodes
         if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
         {
             if (pNodeA->GetNumContainingElements() == 3)
@@ -4828,26 +4828,13 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         p_elem->MonolayerElementRearrangeFacesNodes();
     }
 
-    // Sort out boundary nodes
-    if (p_node_a->IsBoundaryNode() || p_node_b->IsBoundaryNode())
-    {
-        if (p_node_a->GetNumContainingElements() == 3)
-        {
-            p_node_a->SetAsBoundaryNode(false);
-        }
-        else
-        {
-            p_node_a->SetAsBoundaryNode(true);
-        }
-        if (p_node_b->GetNumContainingElements() == 3)
-        {
-            p_node_b->SetAsBoundaryNode(false);
-        }
-        else
-        {
-            p_node_b->SetAsBoundaryNode(true);
-        }
-    }
+    // Sort out boundary nodes. Update the two basal nodes and their apical partners consistently
+    // from the monolayer-native boundary rule (a node is on the boundary iff it lies on a boundary
+    // lateral face), rather than an element-count heuristic carried over from 2D.
+    p_node_a->SetAsBoundaryNode(IsNodeOnBoundary(p_node_a, this));
+    p_node_b->SetAsBoundaryNode(IsNodeOnBoundary(p_node_b, this));
+    p_node_x->SetAsBoundaryNode(IsNodeOnBoundary(p_node_x, this));
+    p_node_y->SetAsBoundaryNode(IsNodeOnBoundary(p_node_y, this));
 }
 
 template <>
@@ -5119,30 +5106,14 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         this->DeleteFacePriorToReMesh(p_lateral_swap_face->GetIndex());
     }
 
-    // Sort out boundary nodes
-    if (p_node_a->IsBoundaryNode() || p_node_b->IsBoundaryNode())
-    {
-        if (p_node_a->GetNumContainingElements() == 3)
-        {
-            p_node_a->SetAsBoundaryNode(false);
-            p_node_x->SetAsBoundaryNode(false);
-        }
-        else
-        {
-            p_node_a->SetAsBoundaryNode(true);
-            p_node_x->SetAsBoundaryNode(true);
-        }
-        if (p_node_b->GetNumContainingElements() == 3)
-        {
-            p_node_b->SetAsBoundaryNode(false);
-            p_node_y->SetAsBoundaryNode(false);
-        }
-        else
-        {
-            p_node_b->SetAsBoundaryNode(true);
-            p_node_y->SetAsBoundaryNode(true);
-        }
-    }
+    // Sort out boundary nodes. Update the two basal nodes and their apical partners consistently
+    // from the monolayer-native boundary rule (a node is on the boundary iff it lies on a boundary
+    // lateral face), rather than an element-count heuristic carried over from 2D. (The new interface
+    // node is interior by construction, since asynchronous swaps are only performed on interior faces.)
+    p_node_a->SetAsBoundaryNode(IsNodeOnBoundary(p_node_a, this));
+    p_node_b->SetAsBoundaryNode(IsNodeOnBoundary(p_node_b, this));
+    p_node_x->SetAsBoundaryNode(IsNodeOnBoundary(p_node_x, this));
+    p_node_y->SetAsBoundaryNode(IsNodeOnBoundary(p_node_y, this));
 }
 
 template <>

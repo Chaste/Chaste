@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 
 #include "MonolayerVertexMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
 #include "Node.hpp"
 #include "VertexElement.hpp"
 
@@ -512,6 +513,65 @@ public:
             builder.WriteVtkWithSubfolder("MonolayerCustomFunctions", "time_" + boost::lexical_cast<std::string>(t));
 
             PRINT_2_VARIABLES(t, vertex_mesh.GetVolumeOfElement(0));
+        }
+    }
+
+    void TestIsNodeOnBoundary()
+    {
+        // #480 A single prism stands alone, so every lateral face belongs to just this one cell and
+        // every node is on the tissue boundary.
+        {
+            std::vector<Node<3>*> nodes;
+            nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+            nodes.push_back(new Node<3>(2, true, 1.0, 1.0));
+            nodes.push_back(new Node<3>(3, true, 0.0, 1.0));
+            const unsigned node_indices_elem_0[4] = { 0, 1, 2, 3 };
+
+            MonolayerVertexMeshGenerator builder(nodes, "TestIsNodeOnBoundarySingle");
+            builder.BuildElementWith(4, node_indices_elem_0);
+            MutableVertexMesh<3, 3>& mesh = *builder.GenerateMesh();
+
+            for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
+            {
+                TS_ASSERT(IsNodeOnBoundary(mesh.GetNode(i), &mesh));
+            }
+        }
+
+        // A 3x3 honeycomb monolayer has both interior and boundary nodes. A basal node and its apical
+        // partner sit on the same vertical edge, so they must always share boundary status; and the
+        // mesh must contain nodes of each kind.
+        {
+            HoneycombVertexMeshGenerator generator(3, 3);
+            MutableVertexMesh<2, 2>& mesh2d = *(generator.GetMesh());
+            MonolayerVertexMeshGenerator builder("TestIsNodeOnBoundaryHoneycomb");
+            MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(mesh2d, 1.0);
+
+            unsigned num_boundary = 0;
+            unsigned num_interior = 0;
+            for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
+            {
+                Node<3>* p_node = p_mesh->GetNode(i);
+                if (!IsBasalNode(p_node))
+                {
+                    continue;
+                }
+                Node<3>* p_apical = GetOppositeNode(p_node, p_mesh);
+
+                const bool basal_on_boundary = IsNodeOnBoundary(p_node, p_mesh);
+                TS_ASSERT_EQUALS(basal_on_boundary, IsNodeOnBoundary(p_apical, p_mesh));
+
+                if (basal_on_boundary)
+                {
+                    ++num_boundary;
+                }
+                else
+                {
+                    ++num_interior;
+                }
+            }
+            TS_ASSERT(num_boundary > 0u);
+            TS_ASSERT(num_interior > 0u);
         }
     }
 
