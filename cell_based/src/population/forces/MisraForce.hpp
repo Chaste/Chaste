@@ -154,9 +154,12 @@ public:
     double GetApicalLineTensionParameter() const;
 
     /**
-     * @return mBoundaryLineTensionParameter
+     * @return the line tension parameter applied to boundary edges (those belonging to a single
+     * element). This is called by GetApicalLineTensionParameter() when it detects a boundary edge.
+     * It currently returns the apical line tension; the separate accessor is retained as a hook for
+     * giving boundary edges a distinct tension in future.
      */
-    double GetBoundaryLineTensionParameter() const; ///\todo do we really need this? #480
+    double GetBoundaryLineTensionParameter() const;
 
     /**
      * @return mBasalSurfaceEnergyParameter
