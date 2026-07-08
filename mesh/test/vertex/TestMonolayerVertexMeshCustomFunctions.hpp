@@ -514,6 +514,49 @@ public:
             PRINT_2_VARIABLES(t, vertex_mesh.GetVolumeOfElement(0));
         }
     }
+
+    void TestGetShortAxisOfMonolayerElement()
+    {
+        // #480 The short axis of a 3D monolayer element is computed as the short axis of its (planar)
+        // basal face, within the plane of the tissue. A prism whose basal face is a rectangle
+        // elongated along x should have a short axis along +/- y, lying in the basal (z = 0) plane.
+        {
+            std::vector<Node<3>*> nodes;
+            nodes.push_back(new Node<3>(0, true, -2.0, -1.0));
+            nodes.push_back(new Node<3>(1, true, 2.0, -1.0));
+            nodes.push_back(new Node<3>(2, true, 2.0, 1.0));
+            nodes.push_back(new Node<3>(3, true, -2.0, 1.0));
+            const unsigned node_indices_elem_0[4] = { 0, 1, 2, 3 };
+
+            MonolayerVertexMeshGenerator builder(nodes, "TestShortAxisMonolayerX");
+            builder.BuildElementWith(4, node_indices_elem_0);
+            MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+
+            c_vector<double, 3> short_axis = vertex_mesh.GetShortAxisOfElement(0);
+            TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(fabs(short_axis[1]), 1.0, 1e-6);
+            TS_ASSERT_DELTA(short_axis[2], 0.0, 1e-6);
+        }
+
+        // A prism elongated along y instead should have a short axis along +/- x.
+        {
+            std::vector<Node<3>*> nodes;
+            nodes.push_back(new Node<3>(0, true, -1.0, -2.0));
+            nodes.push_back(new Node<3>(1, true, 1.0, -2.0));
+            nodes.push_back(new Node<3>(2, true, 1.0, 2.0));
+            nodes.push_back(new Node<3>(3, true, -1.0, 2.0));
+            const unsigned node_indices_elem_0[4] = { 0, 1, 2, 3 };
+
+            MonolayerVertexMeshGenerator builder(nodes, "TestShortAxisMonolayerY");
+            builder.BuildElementWith(4, node_indices_elem_0);
+            MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+
+            c_vector<double, 3> short_axis = vertex_mesh.GetShortAxisOfElement(0);
+            TS_ASSERT_DELTA(fabs(short_axis[0]), 1.0, 1e-6);
+            TS_ASSERT_DELTA(short_axis[1], 0.0, 1e-6);
+            TS_ASSERT_DELTA(short_axis[2], 0.0, 1e-6);
+        }
+    }
 };
 
 #endif /* TESTMONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_ */

@@ -88,7 +88,6 @@ private:
     }
 
 protected:
-    ///\todo #480 Consider target area/volume growth in 3D
 
     /**
      * Target area for each cell's apical surface.

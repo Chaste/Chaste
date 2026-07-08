@@ -1858,9 +1858,12 @@ template<>
 c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index) const
 {
     /*
-    *   For now the return vector will be the normal of plane spanned by the the normal
-    *   of basal face's short-axis and its face normal.
-    */ ///\todo: #480
+     * For a monolayer element the short axis lies in the plane of the tissue, so we compute it as the
+     * short axis of the element's basal face: build an orthonormal basis (e1, e2) in the plane of that
+     * face, compute the face's second moments of area in that basis, and take the principal axis of
+     * least second moment. This keeps division within the local tangent plane and so maintains the
+     * monolayer.
+     */
     if (!IsMonolayerElement(this->GetElement(index)))
     {
         NEVER_REACHED;
@@ -1930,11 +1933,14 @@ c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index
         moments(2) = -moments(2);
     }
 
+    // Normalise the moments vector to remove the problem of a very small discriminant (cf. the 2D case, #2874)
+    moments /= norm_2(moments);
+
     double short_axis_e1;
     double short_axis_e2;
     // If the principal moments are equal...
     double discriminant = (moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2);
-    if (fabs(discriminant) < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
+    if (fabs(discriminant) < DBL_EPSILON)
     {
         // ...then every axis through the centroid is a principal axis, so return a random unit vector
         short_axis_e1 = RandomNumberGenerator::Instance()->ranf();
@@ -1943,7 +1949,7 @@ c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index
     else
     {
         // If the product of inertia is zero, then the coordinate axes are the principal axes
-        if (moments(2) == 0.0)
+        if (fabs(moments(2)) < DBL_EPSILON)
         {
             if (moments(0) < moments(1))
             {
@@ -1966,7 +1972,9 @@ c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index
         }
     }
 
-    c_vector<double, 3> return_v = short_axis_e1*e2 + short_axis_e2*e1;
+    // short_axis_e1 and short_axis_e2 are the components of the short axis along e1 and e2 respectively
+    // (matching the calibrated 2D GetShortAxisOfElement, where x <-> e1 and y <-> e2).
+    c_vector<double, 3> return_v = short_axis_e1*e1 + short_axis_e2*e2;
     return_v /= norm_2(return_v);
     return return_v;
 }
