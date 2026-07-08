@@ -148,7 +148,7 @@ bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace);
 void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace);
 
 /**
- * \todo #480 Repair the node ordering of a monolayer apical or basal face if the geometric sort has
+ * Repair the node ordering of a monolayer apical or basal face if the geometric sort has
  * left it inconsistent with the element's lateral faces (which happens on curved or non-convex faces).
  * The order is re-derived topologically from the lateral faces so that every apical/basal edge again
  * has a matching lateral face. Consistent faces, and non apical/basal faces, are left unchanged. Used
