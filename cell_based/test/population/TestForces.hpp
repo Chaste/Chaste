@@ -71,6 +71,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleTargetAreaModifier.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "GeneralMonolayerVertexMeshForce.hpp"
+#include "BielmeierForce.hpp"
+#include "MonolayerVertexMeshCustomFunctions.hpp"
 #include "HorizontalStretchForce.hpp"
 #include "NoCellCycleModel.hpp"
 #include "Warnings.hpp"
@@ -2522,6 +2524,74 @@ public:
         force.OutputForceParameters(misra_parameter_file);
         misra_parameter_file->close();
         TS_ASSERT(misra_handler.FindFile("misra_results.parameters").Exists());
+    }
+
+    void TestBielmeierForceMethods()
+    {
+        // #480 Exercise BielmeierForce, a fully implemented but previously unused force. It layers two
+        // external terms (an ECM spring on basal nodes and a surface tension on apical faces) on top of
+        // the internal GeneralMonolayerVertexMeshForce.
+        HexagonalPrism3dVertexMeshGenerator generator(3, 2, 1.0, 1.0);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        BielmeierForce force;
+        TS_ASSERT_EQUALS(force.GetIdentifier(), "BielmeierForce");
+
+        // Zero the internal (parent) parameters so that only Bielmeier's external terms remain, letting
+        // them be checked in isolation. The parent contribution is purely multiplicative in these
+        // parameters, so this leaves it identically zero.
+        force.SetApicalParameters(0.0, 0.0, 0.0);
+        force.SetBasalParameters(0.0, 0.0, 0.0);
+        force.SetLateralParameter(0.0, 0.0);
+        force.SetVolumeParameters(0.0, 0.0);
+
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); i++)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+        force.AddForceContribution(cell_population);
+
+        // Each basal node feels only the ECM spring, F = -k * z e_z, with the default k = 5. Apical
+        // surface tension acts on apical faces only, so basal nodes have no in-plane force here.
+        const double ecm_spring_constant = 5.0;
+        unsigned num_basal_checked = 0;
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); i++)
+        {
+            Node<3>* p_node = cell_population.GetNode(i);
+            if (IsBasalNode(p_node))
+            {
+                c_vector<double, 3> f = p_node->rGetAppliedForce();
+                TS_ASSERT_DELTA(f[0], 0.0, 1e-9);
+                TS_ASSERT_DELTA(f[1], 0.0, 1e-9);
+                TS_ASSERT_DELTA(f[2], -ecm_spring_constant * p_node->rGetLocation()[2], 1e-9);
+                ++num_basal_checked;
+            }
+        }
+        TS_ASSERT(num_basal_checked > 0u);
+
+        // The apical surface tension gives at least one apical node a non-zero force.
+        double max_apical_force = 0.0;
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); i++)
+        {
+            Node<3>* p_node = cell_population.GetNode(i);
+            if (IsApicalNode(p_node))
+            {
+                max_apical_force = std::max(max_apical_force, norm_2(p_node->rGetAppliedForce()));
+            }
+        }
+        TS_ASSERT(max_apical_force > 0.0);
+
+        // Exercise OutputForceParameters.
+        OutputFileHandler bielmeier_handler("TestBielmeierForceMethods", false);
+        out_stream bielmeier_parameter_file = bielmeier_handler.OpenOutputFile("bielmeier_results.parameters");
+        force.OutputForceParameters(bielmeier_parameter_file);
+        bielmeier_parameter_file->close();
+        TS_ASSERT(bielmeier_handler.FindFile("bielmeier_results.parameters").Exists());
     }
 
     void TestMisraForceArchiving()

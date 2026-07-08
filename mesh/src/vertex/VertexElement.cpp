@@ -458,20 +458,6 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM - 
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace,
-                                                    bool Orientation, const unsigned& rIndex)
-{
-    assert(rIndex < this->mFaces.size());
-
-    // Add pFace to rIndex+1 element of mFaces pushing the others up
-    this->mFaces.insert(this->mFaces.begin() + rIndex + 1, pFace);
-    this->mOrientations.insert(this->mOrientations.begin() + rIndex + 1, Orientation);
-    assert(mFaces.size() == mOrientations.size());
-
-    this->RegisterFaceAndAddItsNodes(pFace);
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::DeleteFace(const unsigned index)
 {
     assert(index < this->mFaces.size());
@@ -687,91 +673,6 @@ bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceSetNodeOrder(const std::vector<N
     if (return_val)
     {
         this->mNodes = rOrderedNodes;
-    }
-    return return_val;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceRearrangeNodes()
-{
-    NEVER_REACHED;
-}
-
-/**
- * Template specialisation for FaceRearrangeNodes as face should be 2D element in 3D space.
- * @return
- */
-template <>
-bool VertexElement<2, 3>::FaceRearrangeNodes()
-{
-    const c_vector<double, 3> normal = CalculateUnitNormalToFace(this);
-    const c_vector<double, 3> centroid = this->GetCentroid();
-    c_vector<double, 3> e1 = this->mNodes[0]->rGetLocation() - centroid;
-    // Gramm-Schmidt Process
-    e1 -= inner_prod(e1, normal) * normal;
-    e1 /= norm_2(e1);
-    c_vector<double, 3> e2 = VectorProduct(normal, e1);
-
-    std::vector<std::pair<double, Node<3>*> > angles_and_nodes;
-    for (unsigned i = 0; i < this->GetNumNodes(); ++i)
-    {
-        const c_vector<double, 3> vec_tmp = this->GetNode(i)->rGetLocation() - centroid;
-        double tmp_angle = atan2(inner_prod(vec_tmp, e2), inner_prod(vec_tmp, e1));
-        if (tmp_angle < 0)
-        {
-            tmp_angle += 2 * M_PI;
-        }
-        angles_and_nodes.push_back(std::make_pair(tmp_angle, this->GetNode(i)));
-    }
-    std::sort(angles_and_nodes.begin(), angles_and_nodes.end());
-
-    std::vector<Node<3>*> nodes_tmp(this->GetNumNodes());
-    for (unsigned i = 0; i < nodes_tmp.size(); ++i)
-    {
-        nodes_tmp[i] = angles_and_nodes[i].second;
-    }
-
-    const bool return_val = (nodes_tmp != this->mNodes);
-    if (return_val)
-    {
-        std::swap(nodes_tmp, this->mNodes);
-    }
-    return return_val;
-}
-
-/**
- * Template specialisation for FaceRearrangeNodes as face should be 2D element in 3D space.
- * @return
- */
-
-template <>
-bool VertexElement<2, 2>::FaceRearrangeNodes()
-{
-    const c_vector<double, 2> centroid = this->GetCentroid();
-
-    std::vector<std::pair<double, Node<2>*> > angles_and_nodes;
-    for (unsigned i = 0; i < this->GetNumNodes(); ++i)
-    {
-        const c_vector<double, 2>& loc_tmp = this->GetNode(i)->rGetLocation() - centroid;
-        double tmp_angle = atan2(loc_tmp[1], loc_tmp[0]);
-        if (tmp_angle < 0)
-        {
-            tmp_angle += 2 * M_PI;
-        }
-        angles_and_nodes.push_back(std::make_pair(tmp_angle, this->GetNode(i)));
-    }
-    std::sort(angles_and_nodes.begin(), angles_and_nodes.end());
-
-    std::vector<Node<2>*> nodes_tmp(this->GetNumNodes());
-    for (unsigned i = 0; i < nodes_tmp.size(); ++i)
-    {
-        nodes_tmp[i] = angles_and_nodes[i].second;
-    }
-
-    const bool return_val = (nodes_tmp != this->mNodes);
-    if (return_val)
-    {
-        std::swap(nodes_tmp, this->mNodes);
     }
     return return_val;
 }
@@ -1048,11 +949,6 @@ c_vector<double, SPACE_DIM> VertexElement<1, SPACE_DIM>::GetCentroid() const
 
 template <unsigned SPACE_DIM>
 void VertexElement<1, SPACE_DIM>::AddFace(VertexElement<0, SPACE_DIM>* pFace)
-{
-    NEVER_REACHED;
-}
-template <unsigned SPACE_DIM>
-void VertexElement<1, SPACE_DIM>::AddFace(VertexElement<0, SPACE_DIM>* pFace, bool Orientation, const unsigned& rIndex)
 {
     NEVER_REACHED;
 }

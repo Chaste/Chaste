@@ -42,8 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include <algorithm>
 
-#include "Debug.hpp"
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                              std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements,
@@ -4466,9 +4464,6 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
                 {
                     continue;
                 }
-
-                MARK;
-                TRACE("Potential Async T1 in CheckAndIdentify: " << p_face->GetIndex());
             }
 
             bool both_nodes_share_triangular_element = false;
@@ -4552,10 +4547,6 @@ void MutableVertexMesh<3, 3>::PerformNodeMerge(Node<3>* pNodeA, Node<3>* pNodeB)
 
     VertexElement<2, 3>* delete_lateral_face = GetSharedLateralFace(pNodeA, pNodeB, this);
 
-    MARK;
-    TRACE("============== Merge Node ==============");
-    PRINT_VARIABLE(delete_lateral_face->GetIndex());
-
     // Update the faces with pNodeB first
     MeshUpdateNode(pNodeB, pNodeA, this);
     MeshUpdateNode(p_node_y, p_node_x, this);
@@ -4607,10 +4598,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     VertexElement<2, 3>* p_lateral_swap_face = GetSharedLateralFace(pNodeA, pNodeB, this);
     assert(p_lateral_swap_face->GetNumNodes() == 4u);
 
-    MARK;
-    TRACE("===============================Asynchronous============================================");
-    PRINT_VARIABLE(p_lateral_swap_face->GetIndex());
-
     const std::vector<Node<3>*> basal_nodes = GetNodesWithType(p_lateral_swap_face, Monolayer::BasalValue);
     assert(basal_nodes.size() == 2);
     Node<3>* p_node_a = basal_nodes.front();
@@ -4628,8 +4615,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     // so that all action just happens on p_node_a and p_node_b.
     if ((distance_ab > mCellRearrangementRatio * mCellRearrangementThreshold) && (distance_xy < mCellRearrangementThreshold))
     {
-        MARK;
-        TRACE("apical shorter, basal longer")
         t1_on_basal = false;
         std::swap(p_node_a, p_node_x);
         std::swap(p_node_b, p_node_y);
@@ -4737,8 +4722,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         p_new_swap = new VertexElement<2, 3>(this->GetNumFaces(), tmp_nodes);
         SetFaceAsLateral(p_new_swap);
         this->AddFace(p_new_swap);
-        MARK;
-        PRINT_VARIABLE(p_new_swap->GetIndex())
     }
 
     // Modify lateral face "share" by element 2 and element 3
@@ -4907,10 +4890,6 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     // Initialize some values that are commonly used.
     VertexElement<2, 3>* p_lateral_swap_face = GetSharedLateralFace(pNodeA, pNodeB, this);
     assert(p_lateral_swap_face->GetNumNodes() == 4u);
-
-    MARK;
-    TRACE("============== T1 Swap ==============");
-    PRINT_3_VARIABLES(p_lateral_swap_face->GetIndex(), pNodeA->GetIndex(), pNodeB->GetIndex());
 
     const std::vector<Node<3>*> basal_nodes = GetNodesWithType(p_lateral_swap_face, Monolayer::BasalValue);
     assert(basal_nodes.size() == 2u);
@@ -5564,9 +5543,6 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
                                                               c_vector<double, 3> axisOfDivision,
                                                               bool placeOriginalElementBelow)
 {
-    MARK;
-    TRACE("============== Cell Division ==============");
-    PRINT_VARIABLE(pElement->GetIndex());
     // Get the centroid of the element
     const c_vector<double, 3> centroid = pElement->GetCentroid();
     const VertexElement<2, 3>* p_apical_face = GetApicalFace(pElement);

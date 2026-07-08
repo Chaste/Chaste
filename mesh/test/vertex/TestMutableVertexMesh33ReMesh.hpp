@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "HexagonalPrism3dVertexMeshGenerator.hpp"
 #include "MonolayerVertexMeshGenerator.hpp"
+#include "MonolayerVertexMeshCustomFunctions.hpp"
 #include "MutableVertexMesh.hpp"
 #include "VertexMeshWriter.hpp"
 #include "FakePetscSetup.hpp"
@@ -332,20 +333,26 @@ public:
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "Initial_1");
         vertex_mesh.SetCellRearrangementThreshold(0.05);
         vertex_mesh.SetCellRearrangementRatio(2);
+
+        // The basal edge (nodes 4-5) is now shorter than the threshold while the apical edge
+        // (nodes 10-11) is still longer, so CheckForSwapsFromShortEdges() should trigger an
+        // asynchronous T1 swap: the shared lateral face splits and a new lateral "interface" node
+        // is created where the basal and apical triangular faces meet.
+        const unsigned num_nodes_before = vertex_mesh.GetNumNodes();
         vertex_mesh.CheckForSwapsFromShortEdges();
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After_1");
 
-        // Test that each moved node has the correct location following the rearrangement
+        // A single interface node is added by the asynchronous swap.
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), num_nodes_before + 1);
+        TS_ASSERT(IsLateralNode(vertex_mesh.GetNode(num_nodes_before)));
+
+        // Test that each moved (basal) node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.55, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.45, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[2], 0.0, 1e-8);
-
-        vertex_mesh.GetNode(4)->rGetModifiableLocation()[1] = 0.36;
-        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "Initial_2");
-        vertex_mesh.SetCellRearrangementThreshold(0.23);
     }
 
     void TestT1SwapNonEvenFace()

@@ -230,17 +230,6 @@ public:
     void AddFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace);
 
     /**
-     * Add a face of an element with given local index. This method will
-     * add the corresponding face orientation as well.
-     *
-     * @param pFace is the face to add
-     * @param Orientation is the orientation of pFace
-     * @param rIndex is the local index of the face to add
-     */
-    void AddFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace,
-                 bool Orientation, const unsigned& rIndex);
-
-    /**
      * Delete a face of an element with given local index. This method will
      * remove the corresponding face orientation as well.
      *
@@ -357,14 +346,6 @@ public:
     void MarkFaceAsDeleted();
 
     /**
-     * For VertexElement<2, 2> only.
-     * Arrange nodes of the faces so that they will be in correct order (CCW from top).
-     * @return true if there are changes to the order of nodes.
-     * This function does not update the element about the changes #2850
-     */
-    bool FaceRearrangeNodes();
-
-    /**
      * For VertexElement<2, 3> only.
      * Arrange nodes of the faces so that they will be in correct order (CCW from rPointOfView).
      * @param rPointOfView is the position from which the face is observed.
@@ -375,7 +356,7 @@ public:
 
     /**
      * Reorder this face's nodes into the given cyclic order, which must be a permutation of the
-     * face's current nodes. Unlike FaceRearrangeNodes(), which sorts nodes geometrically by angle
+     * face's current nodes. Unlike FaceRearrangeNodes(rPointOfView), which sorts nodes geometrically by angle
      * (only valid for planar, convex faces), the order here is supplied by the caller. For monolayer
      * apical/basal faces it is derived topologically from the element's lateral faces, which stays
      * correct on curved or non-convex faces where the angular sort transposes nodes. #2850
@@ -502,13 +483,6 @@ public:
      * @param pFace
      */
     void AddFace(VertexElement<0, SPACE_DIM>* pFace);
-    /**
-     * Dummy function declarations to satisfy compiler.
-     * @param pFace
-     * @param Orientation
-     * @param rIndex
-     */
-    void AddFace(VertexElement<0, SPACE_DIM>* pFace, bool Orientation, const unsigned& rIndex);
     /**
      * Dummy function declarations to satisfy compiler.
      * @param index
