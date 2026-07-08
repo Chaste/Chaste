@@ -134,13 +134,6 @@ public:
     double GetApicalAreaCoefficientOfVariation();
 
     /**
-     * Call GenerateVoronoiMesh().
-     *
-     * Allows the user to make a new mesh, for instance if trying to generate a specific polygon distribution.
-     */
-    void RefreshSeedsAndRegenerateMesh();
-
-    /**
      * Set mMaxNumSidesPerPolygon.
      *
      * @param maxExpectedNumSidesPerPolygon the new value of mMaxNumSidesPerPolygon

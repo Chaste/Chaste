@@ -71,6 +71,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleTargetAreaModifier.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "GeneralMonolayerVertexMeshForce.hpp"
+#include "HorizontalStretchForce.hpp"
+#include "NoCellCycleModel.hpp"
 #include "Warnings.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
@@ -2313,6 +2315,57 @@ public:
         }
     }
 
+    void TestHorizontalStretchForceMethods()
+    {
+        // #480 Cover the accessor / pinned-element methods of HorizontalStretchForce that are not
+        // exercised elsewhere: SetForceVector, rGetForceVector, GetPinnedElements, ClearPinnedElements.
+
+        // The constructor builds the force vector from the magnitude: (magnitude, 0, 0).
+        HorizontalStretchForce<3> force(1.0, 0.5);
+        TS_ASSERT_DELTA(force.rGetForceVector()[0], 1.0, 1e-12);
+        TS_ASSERT_DELTA(force.rGetForceVector()[1], 0.0, 1e-12);
+        TS_ASSERT_DELTA(force.rGetForceVector()[2], 0.0, 1e-12);
+
+        force.SetForceMagnitude(2.5);
+        TS_ASSERT_DELTA(force.rGetForceVector()[0], 2.5, 1e-12);
+
+        // SetForceVector overrides the default with a general (e.g. shear) force.
+        c_vector<double, 3> shear = zero_vector<double>(3);
+        shear[0] = 0.3;
+        shear[1] = 0.4;
+        force.SetForceVector(shear);
+        TS_ASSERT_DELTA(force.rGetForceVector()[0], 0.3, 1e-12);
+        TS_ASSERT_DELTA(force.rGetForceVector()[1], 0.4, 1e-12);
+        TS_ASSERT_DELTA(force.rGetForceVector()[2], 0.0, 1e-12);
+
+        // Build a small monolayer population to exercise the pinned-element methods.
+        HexagonalPrism3dVertexMeshGenerator generator(4, 2, 1.0, 1.0);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        // Before setup no elements are pinned.
+        TS_ASSERT_EQUALS(force.GetPinnedElements(true).size(), 0u);
+        TS_ASSERT_EQUALS(force.GetPinnedElements(false).size(), 0u);
+
+        force.SetUpPinnedElements(cell_population);
+
+        // With a relative width of 0.5 every element is pinned, split at the mid-plane into
+        // non-moving (left) and moving (right) sets.
+        const unsigned num_moving = force.GetPinnedElements(true).size();
+        const unsigned num_non_moving = force.GetPinnedElements(false).size();
+        TS_ASSERT(num_moving > 0u);
+        TS_ASSERT(num_non_moving > 0u);
+        TS_ASSERT_LESS_THAN_EQUALS(num_moving + num_non_moving, p_mesh->GetNumElements());
+
+        force.ClearPinnedElements();
+        TS_ASSERT_EQUALS(force.GetPinnedElements(true).size(), 0u);
+        TS_ASSERT_EQUALS(force.GetPinnedElements(false).size(), 0u);
+    }
+
     void TestMisraForceMethods()
     {
         // This is the same test as for other vertex based forces. It comprises a sanity check that forces point in the right direction.
@@ -2458,6 +2511,17 @@ public:
 
         force.SetTargetVolume(1234);
         TS_ASSERT_DELTA(force.mTargetVolume, 1234, 1e-12);
+
+        // #480 GetBoundaryLineTensionParameter returns the apical line tension (used for boundary edges).
+        force.SetApicalLineTensionParameter(0.7);
+        TS_ASSERT_DELTA(force.GetBoundaryLineTensionParameter(), 0.7, 1e-12);
+
+        // #480 Exercise OutputForceParameters (MisraForce is otherwise never run through a Solve()).
+        OutputFileHandler misra_handler("TestMisraForceMethods", false);
+        out_stream misra_parameter_file = misra_handler.OpenOutputFile("misra_results.parameters");
+        force.OutputForceParameters(misra_parameter_file);
+        misra_parameter_file->close();
+        TS_ASSERT(misra_handler.FindFile("misra_results.parameters").Exists());
     }
 
     void TestMisraForceArchiving()

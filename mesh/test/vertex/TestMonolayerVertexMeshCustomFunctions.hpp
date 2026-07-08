@@ -55,6 +55,27 @@ using boost::assign::list_of;
 
 class TestMonolayerVertexMeshCustomFunctions : public CxxTest::TestSuite
 {
+private:
+    /**
+     * #480 Whether every consecutive pair of nodes on an apical/basal face shares exactly one lateral
+     * face of the given element - the prism-consistency invariant that RepairApicalBasalFaceOrdering
+     * restores. Used by TestRepairApicalBasalFaceOrdering.
+     */
+    bool FaceConsecutivePairsShareLateralFace(const VertexElement<3, 3>* pElement, const VertexElement<2, 3>* pFace)
+    {
+        const unsigned num_nodes = pFace->GetNumNodes();
+        for (unsigned i = 0; i < num_nodes; ++i)
+        {
+            const std::set<unsigned> shared_faces = GetSharedFaceIndices(pFace->GetNode(i), pFace->GetNode((i + 1) % num_nodes));
+            const std::set<VertexElement<2, 3>*> shared_lateral = GetFacesWithIndices(shared_faces, pElement, Monolayer::LateralValue);
+            if (shared_lateral.size() != 1u)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 public:
     void TestElementHasNode()
     {
@@ -152,6 +173,56 @@ public:
             // ... and the mapping is an involution (opposite of the opposite is the original node).
             TS_ASSERT_EQUALS(GetOppositeNode(p_opposite, &mesh), p_node);
         }
+    }
+
+    void TestRepairApicalBasalFaceOrdering()
+    {
+        /*
+         * #480 Exercise the topological self-healing path for apical/basal faces
+         * (RepairApicalBasalFaceOrdering -> IsApicalBasalFaceConsistent ->
+         * ComputeApicalBasalNodeOrderFromLateralFaces -> VertexElement::FaceSetNodeOrder), which only
+         * runs when a face's stored node order is inconsistent with its lateral faces - something the
+         * flat ReMesh unit tests never trigger. We build a single square-prism cell, scramble its basal
+         * face's node order, and check the repair restores prism consistency.
+         *
+         * (The corresponding lateral-face repair, ComputeLateralFaceNodeOrder, only fires for a
+         * genuinely non-planar lateral quad and is exercised by TestMonolayerCylindricalMeshExample; it
+         * is impractical to isolate here because FaceRearrangeNodesInMesh's geometric sort first
+         * re-orders any flat quad correctly.)
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<3>(3, true, 0.0, 1.0));
+        const unsigned node_indices_elem_0[4] = { 0, 1, 2, 3 };
+
+        MonolayerVertexMeshGenerator builder(nodes, "TestRepairApicalBasalFaceOrdering");
+        builder.BuildElementWith(4, node_indices_elem_0);
+        MutableVertexMesh<3, 3>& mesh = *builder.GenerateMesh();
+
+        VertexElement<3, 3>* p_elem = mesh.GetElement(0);
+        VertexElement<2, 3>* p_basal_face = GetBasalFace(p_elem);
+        const unsigned num_nodes = p_basal_face->GetNumNodes();
+        TS_ASSERT_EQUALS(num_nodes, 4u);
+
+        // As generated, the basal face is consistent with the lateral faces.
+        TS_ASSERT(FaceConsecutivePairsShareLateralFace(p_elem, p_basal_face));
+
+        // Scramble the node order (swap two adjacent nodes) so it no longer matches the lateral faces.
+        std::vector<Node<3>*> scrambled_order;
+        for (unsigned i = 0; i < num_nodes; ++i)
+        {
+            scrambled_order.push_back(p_basal_face->GetNode(i));
+        }
+        std::swap(scrambled_order[1], scrambled_order[2]);
+        p_basal_face->FaceSetNodeOrder(scrambled_order);
+        TS_ASSERT(!FaceConsecutivePairsShareLateralFace(p_elem, p_basal_face));
+
+        // Repairing restores a consistent ordering (a permutation of the same nodes).
+        RepairApicalBasalFaceOrdering(&mesh, p_basal_face);
+        TS_ASSERT_EQUALS(p_basal_face->GetNumNodes(), num_nodes);
+        TS_ASSERT(FaceConsecutivePairsShareLateralFace(p_elem, p_basal_face));
     }
 
     void TestGetSharedElementnFaceIndicesAndBoundaryFace()
