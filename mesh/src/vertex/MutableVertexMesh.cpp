@@ -4517,12 +4517,13 @@ void MutableVertexMesh<3, 3>::ReMesh(VertexElementMap& rElementMap)
     }
 
     /*
-     * \todo #480 Self-healing pass for apical/basal faces. The geometric angular sort used elsewhere
-     * can transpose nodes on curved or non-convex faces (e.g. on a cylindrical monolayer, or after a
-     * division/T1 swap leaves a face non-convex), breaking the prism invariant that every apical/basal
-     * edge has a matching lateral face - which later crashes DivideElementAlongGivenAxis(). Here we
-     * re-derive the node order topologically from the lateral faces, but only for faces that are
-     * actually inconsistent, so flat/convex meshes are left untouched.
+     * #480 Repair the node ordering of apical/basal faces. The geometric angular sort used to order
+     * face nodes is correct for planar, convex faces but can transpose nodes on curved or non-convex
+     * faces (e.g. on a cylindrical monolayer, or after a division/T1 swap leaves a face non-convex). A
+     * transposed order gives a wrong Newell normal and area (hence wrong forces), so here we re-derive
+     * the node order topologically from the lateral faces - but only for faces that are actually
+     * inconsistent, so flat/convex meshes are left untouched. (Division no longer relies on this pass:
+     * both its crossing detection and its face partition are derived from the lateral-face connectivity.)
      */
     for (unsigned i = 0; i < this->GetNumFaces(); ++i)
     {
@@ -5533,58 +5534,47 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
 {
     // Get the centroid of the element
     const c_vector<double, 3> centroid = pElement->GetCentroid();
-    const VertexElement<2, 3>* p_apical_face = GetApicalFace(pElement);
     /*
-     * Find which edges the axis of division crosses by finding any node
-     * that lies on the opposite side of the plane of division to its next
-     * neighbour.
+     * Find which lateral faces the plane of division crosses. The plane passes through the element
+     * centroid with normal parallel to axisOfDivision; a point r is on the "normal side" of it when
+     * inner_prod(r - centroid, axisOfDivision) >= 0.
      *
-     * Plane of division is the plane that passes through the centroid of element
-     * and its normal is parallel to axis of division. Signed distance of a point
-     * from a plane can be calculated using d = inner_prod(r-c,n), where
-     * r is the position vector of the point,
-     * c is the position vector of a point in the plane,
-     * n is the (normalized) normal vector of the plane.
-     * When points lie at the opposite site of the plane, the signed distances will
-     * have different parity.
-     */
-    /*
-     * #480 Identify the two lateral faces the plane of division crosses, using the cell's vertical
-     * edges so that its apical and basal surfaces are cut consistently. A cell divides through its full
-     * thickness and stays a monolayer, so the cut is best located on the midline of each vertical edge -
-     * the midpoint between an apical node and its basal partner (via GetOppositeNode) - rather than on
-     * the apical or basal polygon alone. Two consecutive apical nodes whose vertical-edge midpoints fall
-     * on opposite sides of the plane bracket a lateral face that the plane crosses.
+     * #480 A cell divides through its full thickness and stays a monolayer, so the cut is located on
+     * the midline of each vertical edge - the midpoint between an apical node and its basal partner
+     * (via GetOppositeNode) - rather than on the apical or basal polygon alone. We iterate the ring of
+     * lateral faces directly and take each face whose two vertical-edge midpoints fall on opposite
+     * sides of the plane. Working from the lateral faces (rather than from consecutive nodes of the
+     * apical polygon in its stored order) makes the crossing detection independent of the apical face's
+     * node ordering, which can disagree with the lateral-face connectivity on a distorted cell.
      *
-     * This replaces testing the apical and basal polygons independently and requiring exactly two
-     * crossings on each: those two counts diverge on curved or non-convex cells (e.g. the apical polygon
-     * missed entirely while the basal polygon is crossed four times), because the plane meets the offset
-     * apical and basal surfaces differently. Working on the midline unifies them.
+     * This also replaces testing the apical and basal polygons independently and requiring exactly two
+     * crossings on each: those counts diverge on curved or non-convex cells (e.g. the apical polygon
+     * missed entirely while the basal polygon is crossed four times), because the plane meets the
+     * offset apical and basal surfaces differently. Working on the midline unifies them.
      */
-    const unsigned num_apical_nodes = p_apical_face->GetNumNodes();
-    std::vector<c_vector<double, 3> > midpoints(num_apical_nodes);
-    std::vector<bool> midpoint_on_normal_side(num_apical_nodes);
-    for (unsigned i = 0; i < num_apical_nodes; ++i)
-    {
-        const Node<3>* p_apical_i = p_apical_face->GetNode(i);
-        const Node<3>* p_basal_i = GetOppositeNode(p_apical_i, pElement);
-        midpoints[i] = 0.5 * (p_apical_i->rGetLocation() + p_basal_i->rGetLocation());
-        midpoint_on_normal_side[i] = (inner_prod(this->GetVectorFromAtoB(centroid, midpoints[i]), axisOfDivision) >= 0);
-    }
-
-    // Collect every lateral face whose two vertical-edge midpoints fall on opposite sides of the plane,
-    // together with the point where the plane crosses that midline segment.
+    const std::vector<VertexElement<2, 3>*> lateral_faces = GetFacesWithType(pElement, Monolayer::LateralValue);
     std::vector<VertexElement<2, 3>*> crossing_faces;
     std::vector<c_vector<double, 3> > crossing_points;
-    for (unsigned i = 0; i < num_apical_nodes; ++i)
+    for (VertexElement<2, 3>* p_lateral : lateral_faces)
     {
-        const unsigned next_i = (i + 1) % num_apical_nodes;
-        if (midpoint_on_normal_side[i] != midpoint_on_normal_side[next_i])
+        const std::vector<Node<3>*> lateral_apical_nodes = GetNodesWithType(p_lateral, Monolayer::ApicalValue);
+        assert(lateral_apical_nodes.size() == 2); // LCOV_EXCL_LINE
+
+        c_vector<double, 3> midpoint[2];
+        bool on_normal_side[2];
+        for (unsigned j = 0; j < 2; ++j)
         {
-            const c_vector<double, 3> mid_i_to_next = this->GetVectorFromAtoB(midpoints[i], midpoints[next_i]);
-            const double t = inner_prod(this->GetVectorFromAtoB(midpoints[i], centroid), axisOfDivision) / inner_prod(mid_i_to_next, axisOfDivision);
-            crossing_faces.push_back(GetSharedLateralFace(p_apical_face->GetNode(i), p_apical_face->GetNode(next_i), this));
-            crossing_points.push_back(midpoints[i] + t * mid_i_to_next);
+            const Node<3>* p_basal = GetOppositeNode(lateral_apical_nodes[j], pElement);
+            midpoint[j] = 0.5 * (lateral_apical_nodes[j]->rGetLocation() + p_basal->rGetLocation());
+            on_normal_side[j] = (inner_prod(this->GetVectorFromAtoB(centroid, midpoint[j]), axisOfDivision) >= 0);
+        }
+
+        if (on_normal_side[0] != on_normal_side[1])
+        {
+            const c_vector<double, 3> mid0_to_mid1 = this->GetVectorFromAtoB(midpoint[0], midpoint[1]);
+            const double t = inner_prod(this->GetVectorFromAtoB(midpoint[0], centroid), axisOfDivision) / inner_prod(mid0_to_mid1, axisOfDivision);
+            crossing_faces.push_back(p_lateral);
+            crossing_points.push_back(midpoint[0] + t * mid0_to_mid1);
         }
     }
 

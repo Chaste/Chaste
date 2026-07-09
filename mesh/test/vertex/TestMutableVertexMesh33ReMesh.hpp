@@ -1348,6 +1348,53 @@ public:
         }
     }
 
+    void TestDivideElementAlongGivenAxisRobustToApicalNodeOrder()
+    {
+        /*
+         * #480 Companion to TestDivideElementRobustToApicalNodeOrder, for the *crossing detection* in
+         * DivideElementAlongGivenAxis(). It previously identified the crossed lateral faces from
+         * consecutive nodes of the apical polygon in its stored order (via GetSharedLateralFace), which
+         * throws when that order disagrees with the lateral-face connectivity. It now iterates the
+         * lateral faces directly, so division works whatever the apical face's node order. We divide a
+         * hexagonal prism whose apical face order has been scrambled: with the old crossing detection
+         * this throws; with the new one it yields two valid daughters. Uses the public division method.
+         */
+        std::vector<Node<3>*> nodes;
+        for (unsigned k = 0; k < 6; ++k)
+        {
+            const double angle = k * M_PI / 3.0;
+            nodes.push_back(new Node<3>(k, true, cos(angle), sin(angle)));
+        }
+        const unsigned node_indices_elem_0[6] = { 0, 1, 2, 3, 4, 5 };
+
+        MonolayerVertexMeshGenerator builder(nodes, "DivideAlongAxisScrambledApical");
+        builder.BuildElementWith(6, node_indices_elem_0);
+        MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
+
+        VertexElement<2, 3>* p_apical_face = GetApicalFace(p_mesh->GetElement(0));
+        std::vector<Node<3>*> a(6);
+        for (unsigned i = 0; i < 6; ++i)
+        {
+            a[i] = p_apical_face->GetNode(i);
+        }
+        // Scramble the apical face node order so consecutive stored nodes are no longer all ring-adjacent
+        std::vector<Node<3>*> scrambled = { a[0], a[1], a[4], a[3], a[2], a[5] };
+        p_apical_face->FaceSetNodeOrder(scrambled);
+
+        c_vector<double, 3> axis_of_division = zero_vector<double>(3);
+        axis_of_division[0] = 1.0;
+        p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(0), axis_of_division);
+        p_mesh->ReMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
+        for (unsigned e = 0; e < p_mesh->GetNumElements(); ++e)
+        {
+            VertexElement<3, 3>* p_elem = p_mesh->GetElement(e);
+            TS_ASSERT_EQUALS(p_elem->GetNumNodes() % 2, 0u);
+            TS_ASSERT_EQUALS(p_elem->GetNumFaces(), p_elem->GetNumNodes() / 2 + 2);
+        }
+    }
+
     // // Commented this test as T2 Swap should only happen to triangular prism
     // // element in vertex model
     // void TestPerformT2SwapWithRosettes2()
