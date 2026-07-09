@@ -5345,28 +5345,63 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3, 3>* pElement, u
 
     VertexElement<2, 3>* p_basal_face = GetBasalFace(pElement);
 
-    /**
+    /*
      *  Procedure:
-     *  I split apical and basal surfaces
-     *  II delete old element
+     *  I   determine the arc of the cell that becomes the new element, and split the apical and
+     *      basal surfaces along it
+     *  II  delete the old element
      *  III create both new elements
      */
 
-    // I Split the apical surface: new_elem_apical_nodes is the arc of apical nodes between (and
-    // including) the two dividing nodes; the interior nodes are removed from the old apical face.
+    // Store the cell's lateral faces up front. Every lateral face other than the new dividing face
+    // forms a ring around the cell; the dividing face joins the two cut apical nodes and splits that
+    // ring into two arcs.
+    const std::vector<VertexElement<2, 3>*> all_lateral_faces = GetFacesWithType(pElement, Monolayer::LateralValue);
+
+    /*
+     * I Split the apical surface. Determine the arc of apical nodes belonging to the new element by
+     * walking one arc of the lateral-face ring, from p_apical_node1 to p_apical_node2. This derives
+     * the split purely from lateral-face connectivity, never from the stored apical node order: on a
+     * heavily distorted cell the stored order can disagree with the connectivity and put a lateral
+     * face on the wrong side, producing an element that violates Euler's formula. #480
+     */
     std::vector<Node<3>*> new_elem_apical_nodes;
+    std::vector<VertexElement<2, 3>*> new_side_lateral_faces;
     {
-        const unsigned node1_local_index = std::min(p_apical_face->GetNodeLocalIndex(p_apical_node1->GetIndex()),
-                                                    p_apical_face->GetNodeLocalIndex(p_apical_node2->GetIndex()));
-        const unsigned node2_local_index = std::max(p_apical_face->GetNodeLocalIndex(p_apical_node1->GetIndex()),
-                                                    p_apical_face->GetNodeLocalIndex(p_apical_node2->GetIndex()));
-        new_elem_apical_nodes.push_back(p_apical_face->GetNode(node2_local_index));
-        for (unsigned node_index = node2_local_index - 1; node_index > node1_local_index; --node_index)
+        Node<3>* p_current = p_apical_node1;
+        VertexElement<2, 3>* p_prev_face = nullptr;
+        new_elem_apical_nodes.push_back(p_current);
+        while (p_current != p_apical_node2)
         {
-            new_elem_apical_nodes.push_back(p_apical_face->GetNode(node_index));
-            p_apical_face->FaceDeleteNode(node_index);
+            // Step to the ring face at p_current that we did not arrive along
+            VertexElement<2, 3>* p_next_face = nullptr;
+            for (VertexElement<2, 3>* p_lateral : all_lateral_faces)
+            {
+                if (p_lateral == p_new_lateral_face || p_lateral == p_prev_face)
+                {
+                    continue;
+                }
+                const std::vector<Node<3>*> apical_nodes = GetNodesWithType(p_lateral, Monolayer::ApicalValue);
+                if (apical_nodes[0] == p_current || apical_nodes[1] == p_current)
+                {
+                    p_next_face = p_lateral;
+                    break;
+                }
+            }
+            assert(p_next_face != nullptr); // LCOV_EXCL_LINE
+            new_side_lateral_faces.push_back(p_next_face);
+
+            const std::vector<Node<3>*> apical_nodes = GetNodesWithType(p_next_face, Monolayer::ApicalValue);
+            p_current = (apical_nodes[0] == p_current) ? apical_nodes[1] : apical_nodes[0];
+            new_elem_apical_nodes.push_back(p_current);
+            p_prev_face = p_next_face;
         }
-        new_elem_apical_nodes.push_back(p_apical_face->GetNode(node1_local_index));
+    }
+    // Remove the interior arc nodes from the old apical face; the two end nodes are the shared cut
+    // points and remain in both apical faces.
+    for (unsigned k = 1; k + 1 < new_elem_apical_nodes.size(); ++k)
+    {
+        p_apical_face->FaceDeleteNode(new_elem_apical_nodes[k]);
     }
     VertexElement<2, 3>* p_new_apical_face = new VertexElement<2, 3>(this->GetNumFaces(), new_elem_apical_nodes);
     SetFaceAsApical(p_new_apical_face);
@@ -5409,43 +5444,25 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3, 3>* pElement, u
         mDeletedElementIndices.pop_back();
         delete this->mElements[new_element_index];
     }
-    // II, store old lateral faces before deleting the element
-    const std::vector<VertexElement<2, 3>*> all_lateral_faces = GetFacesWithType(pElement, Monolayer::LateralValue);
+    // II store the old element index before deleting the element
     const unsigned old_element_index = pElement->GetIndex();
 
     /*
-     * III Partition the faces between the old and new element topologically. A remaining lateral face
-     * belongs to whichever element's (split) apical face holds both of its apical nodes. The two split
-     * basal faces are then paired with the element holding the corresponding lateral faces. This is
-     * robust on curved cells, unlike testing which side of the dividing face's plane each face centroid
-     * falls on, which misassigns faces and produces an element that violates Euler's formula. #480
-     *
-     * \todo #480 This still assumes the apical arc (a contiguous range of the apical face's node list)
-     * corresponds to a contiguous set of lateral faces. A heavily distorted cell whose stored apical
-     * node order no longer matches its lateral-face connectivity can therefore have a single lateral
-     * face assigned to the wrong side, again violating Euler's formula (seen deep into a long,
-     * stretching, dividing cylinder simulation). A fully robust partition would walk the ring of lateral
-     * faces directly rather than relying on the apical node order.
+     * III Partition the lateral faces between the two elements. The arc walked in step I already
+     * gives the new element's lateral faces (new_side_lateral_faces); every other ring face (i.e. not
+     * the dividing face) belongs to the old element. The two split basal faces are then paired with
+     * the element holding the corresponding lateral faces. This is robust on curved or distorted
+     * cells, unlike testing which side of the dividing face's plane each face centroid falls on. #480
      */
-    const std::set<Node<3>*> new_apical_nodes(new_elem_apical_nodes.begin(), new_elem_apical_nodes.end());
-    std::vector<VertexElement<2, 3>*> new_side_lateral_faces;
+    const std::set<VertexElement<2, 3>*> new_side_set(new_side_lateral_faces.begin(), new_side_lateral_faces.end());
     std::vector<VertexElement<2, 3>*> old_side_lateral_faces;
-    for (unsigned i = 0; i < all_lateral_faces.size(); ++i)
+    for (VertexElement<2, 3>* p_lateral : all_lateral_faces)
     {
-        if (all_lateral_faces[i] == p_new_lateral_face)
+        if (p_lateral == p_new_lateral_face || new_side_set.count(p_lateral) == 1)
         {
             continue;
         }
-        const std::vector<Node<3>*> lateral_apical_nodes = GetNodesWithType(all_lateral_faces[i], Monolayer::ApicalValue);
-        assert(lateral_apical_nodes.size() == 2); // LCOV_EXCL_LINE
-        if (new_apical_nodes.count(lateral_apical_nodes[0]) == 1 && new_apical_nodes.count(lateral_apical_nodes[1]) == 1)
-        {
-            new_side_lateral_faces.push_back(all_lateral_faces[i]);
-        }
-        else
-        {
-            old_side_lateral_faces.push_back(all_lateral_faces[i]);
-        }
+        old_side_lateral_faces.push_back(p_lateral);
     }
 
     /*

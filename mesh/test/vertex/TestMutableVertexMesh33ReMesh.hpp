@@ -1281,6 +1281,73 @@ public:
         }
     }
 
+    void TestDivideElementRobustToApicalNodeOrder()
+    {
+        /*
+         * #480 Regression test for the division face-partition robustness fix. On a distorted cell the
+         * apical face's stored node order can disagree with the lateral-face connectivity. DivideElement
+         * must partition the lateral faces by connectivity (walking the lateral-face ring), not by the
+         * stored apical node order; otherwise a lateral face is assigned to the wrong daughter and the
+         * resulting element violates Euler's formula (the "element 85" crash seen in a long dividing
+         * cylinder simulation). Here we build a hexagonal prism, deliberately scramble its apical face
+         * node order, and divide it along an existing pair of vertical edges. With the old index-based
+         * partition this aborts in the VertexElement constructor; with the ring walk it succeeds.
+         *
+         * (This test calls the protected DivideElement() directly - TestMutableVertexMesh33ReMesh is a
+         * friend of MutableVertexMesh - because the public DivideElementAlongGivenAxis() would detect
+         * the crossing edges from the same scrambled apical order and throw before reaching the split.)
+         */
+        std::vector<Node<3>*> nodes;
+        for (unsigned k = 0; k < 6; ++k)
+        {
+            const double angle = k * M_PI / 3.0;
+            nodes.push_back(new Node<3>(k, true, cos(angle), sin(angle)));
+        }
+        const unsigned node_indices_elem_0[6] = { 0, 1, 2, 3, 4, 5 };
+
+        MonolayerVertexMeshGenerator builder(nodes, "DivideElementScrambledApical");
+        builder.BuildElementWith(6, node_indices_elem_0);
+        MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
+
+        VertexElement<3, 3>* p_element = p_mesh->GetElement(0);
+        VertexElement<2, 3>* p_apical_face = GetApicalFace(p_element);
+        TS_ASSERT_EQUALS(p_apical_face->GetNumNodes(), 6u);
+
+        // Grab the apical nodes in their (connectivity) built order a0..a5
+        std::vector<Node<3>*> a(6);
+        for (unsigned i = 0; i < 6; ++i)
+        {
+            a[i] = p_apical_face->GetNode(i);
+        }
+
+        // Scramble the apical face's stored node order so that it disagrees with the lateral-face ring:
+        // slicing the stored order between a0 and a3 would pick {a1, a4} as interior nodes, which is not
+        // a connectivity-contiguous arc, so an index-based partition misassigns a lateral face.
+        std::vector<Node<3>*> scrambled = { a[0], a[1], a[4], a[3], a[2], a[5] };
+        p_apical_face->FaceSetNodeOrder(scrambled);
+
+        // Build a dividing lateral face across the existing vertical edges at a0 and a3
+        Node<3>* b0 = GetOppositeNode(a[0], p_element);
+        Node<3>* b3 = GetOppositeNode(a[3], p_element);
+        std::vector<Node<3>*> dividing_face_nodes = { a[0], b0, a[3], b3 };
+        VertexElement<2, 3>* p_dividing_face = new VertexElement<2, 3>(p_mesh->GetNumFaces(), dividing_face_nodes);
+        SetFaceAsLateral(p_dividing_face);
+        p_mesh->AddFace(p_dividing_face);
+
+        // Divide. The connectivity-based partition keeps both daughters valid; the old stored-order
+        // partition would build an element violating Euler's formula and abort here.
+        p_mesh->DivideElement(p_element, p_dividing_face->GetIndex(), UINT_MAX, false);
+
+        // Two valid monolayer prisms result (equal basal/apical node counts, num_nodes/2 + 2 faces).
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
+        for (unsigned e = 0; e < p_mesh->GetNumElements(); ++e)
+        {
+            VertexElement<3, 3>* p_elem = p_mesh->GetElement(e);
+            TS_ASSERT_EQUALS(p_elem->GetNumNodes() % 2, 0u);
+            TS_ASSERT_EQUALS(p_elem->GetNumFaces(), p_elem->GetNumNodes() / 2 + 2);
+        }
+    }
+
     // // Commented this test as T2 Swap should only happen to triangular prism
     // // element in vertex model
     // void TestPerformT2SwapWithRosettes2()
