@@ -133,6 +133,7 @@ endif ()
 
 option (Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
 option (Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
+option (Chaste_ENABLE_PETSC_CUDA "Default PETSc Mat/Vec objects to CUDA types at runtime (requires a CUDA-enabled PETSc)" OFF)
 
 option (Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-linking of all Chaste libraries" ON)
 
@@ -484,6 +485,17 @@ message(STATUS "PETSc version: ${PETSc_VERSION}")
 target_link_libraries(Chaste_COMMON_DEPS INTERFACE PETSc::PETSc)
 #list(APPEND Chaste_LINK_LIBRARIES "${PETSc_LIBRARIES}")
 list(APPEND Chaste_INCLUDES "${PETSc_INCLUDE_DIRS}")
+
+# If Chaste_ENABLE_PETSC_CUDA is ON, make PETSc mat/vec objects default to CUDA types at runtime
+if (Chaste_ENABLE_PETSC_CUDA)
+    if (NOT PETSc_HAVE_CUDA)
+        message(FATAL_ERROR "Chaste_ENABLE_PETSC_CUDA is ON, but the configured PETSc (version ${PETSc_VERSION}, ${PETSc_INCLUDE_DIRS}) was not built with CUDA support.")
+    endif()
+    set(CHASTE_PETSC_DEFAULT_OPTIONS "-mat_type aijcusparse -vec_type cuda")
+else()
+    set(CHASTE_PETSC_DEFAULT_OPTIONS "")
+endif()
+add_compile_definitions(CHASTE_PETSC_DEFAULT_OPTIONS="${CHASTE_PETSC_DEFAULT_OPTIONS}")
 
 
 ################################
