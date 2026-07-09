@@ -48,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "MonolayerVertexMeshGenerator.hpp"
+#include "MonolayerVertexMeshCustomFunctions.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ArchiveOpener.hpp"
@@ -1753,6 +1755,49 @@ public:
         FileFinder vtk_file3(output_directory + "/results.pvd", RelativeTo::ChasteTestOutput);
         TS_ASSERT(vtk_file3.Exists());
 #endif //CHASTE_VTK
+    }
+
+    void TestRemoveDeadCellsIn3dMonolayer()
+    {
+        // #480 End-to-end check that the direct cell-removal path (Kill -> RemoveDeadCells ->
+        // DeleteElementPriorToReMesh) works for a 3D monolayer VertexBasedCellPopulation. Every cell in
+        // a 2x2 patch is on the boundary, so removing one leaves a notch rather than an interior void
+        // (void removal is not implemented in 3D).
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Build a small 3D monolayer by extruding a 2D honeycomb
+        HoneycombVertexMeshGenerator generator(2, 2);
+        MutableVertexMesh<2, 2>& mesh2d = *(generator.GetMesh());
+        MonolayerVertexMeshGenerator builder("RemoveDeadCells3dMonolayer");
+        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(mesh2d, 1.0);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        const unsigned num_cells_before = cell_population.GetNumRealCells();
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), num_cells_before);
+
+        // Kill one (boundary) cell outright
+        cell_population.GetCellUsingLocationIndex(0)->Kill();
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_before - 1);
+
+        // The direct-removal path deletes the dead cell's monolayer element
+        const unsigned num_removed = cell_population.RemoveDeadCells();
+        TS_ASSERT_EQUALS(num_removed, 1u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_before - 1);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), num_cells_before - 1);
+
+        // The mesh remains valid: the population updates (re-meshes) and every remaining element is
+        // still a monolayer prism.
+        cell_population.Update();
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), num_cells_before - 1);
+        for (unsigned i = 0; i < cell_population.GetNumElements(); ++i)
+        {
+            TS_ASSERT(IsMonolayerElement(cell_population.rGetMesh().GetElement(i)));
+        }
     }
 };
 

@@ -949,6 +949,48 @@ public:
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "AfterRemove");
     }
 
+    void TestCheckForT2SwapsDetectsSmallPrism()
+    {
+        /*
+         * #480 CheckForT2Swaps must detect a small triangular *prism* (a triangular monolayer cell has
+         * three basal and three apical nodes, i.e. six nodes), not a 2D triangle (three nodes). This is
+         * the detection step that the auto-added T2SwapCellKiller relies on to remove a cell that has
+         * shrunk below the T2 threshold. Build the same small central triangular-prism element as
+         * TestPerformT2Swap, set a T2 threshold above its volume, and check CheckForT2Swaps removes it.
+         * With the old three-node gate the six-node prism is never detected.
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 0.5, 0.5, 0.0));
+        nodes.push_back(new Node<3>(3, false, 0.4, 0.2, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.6, 0.2, 0.0));
+        nodes.push_back(new Node<3>(5, false, 0.5, 0.3, 0.0));
+
+        unsigned node_indices_elem_0[3] = { 3, 4, 5 };
+        unsigned node_indices_elem_1[4] = { 1, 2, 5, 4 };
+        unsigned node_indices_elem_2[4] = { 2, 0, 3, 5 };
+        unsigned node_indices_elem_3[4] = { 0, 1, 4, 3 };
+
+        MonolayerVertexMeshGenerator builder(nodes, "CheckForT2SwapsPrism");
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(4, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_3);
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+
+        // The central element is a triangular prism (six nodes) with a small volume (~0.01)
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 6u);
+        vertex_mesh.SetT2Threshold(0.05);
+
+        VertexElementMap element_map(vertex_mesh.GetNumElements());
+        const bool performed_swap = vertex_mesh.CheckForT2Swaps(element_map);
+
+        TS_ASSERT(performed_swap);
+        TS_ASSERT(element_map.IsDeleted(0));
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
+    }
+
     void TestPerformT2SwapOnBoundary()
     {
         /*

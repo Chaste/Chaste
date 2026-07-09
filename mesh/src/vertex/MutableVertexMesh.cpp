@@ -1185,15 +1185,16 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap
          elem_iter != this->GetElementIteratorEnd();
          ++elem_iter)
     {
-        // If this element is triangular...
-        if (elem_iter->GetNumNodes() == 3)
+        // If this element is triangular (a triangle in 2D, or a triangular prism - three basal and
+        // three apical nodes - in a 3D monolayer)...
+        const unsigned triangular_num_nodes = (ELEMENT_DIM == 3u) ? 6u : 3u;
+        if (elem_iter->GetNumNodes() == triangular_num_nodes)
         {
-            // ...and smaller than the threshold area...
+            // ...and smaller than the threshold area (2D) or volume (3D)...
             if (this->GetVolumeOfElement(elem_iter->GetIndex()) < GetT2Threshold())
             {
                 // ...then perform a T2 swap and break out of the loop
                 PerformT2Swap(*elem_iter);
-                ///\todo: cover this line in a test
                 rElementMap.SetDeleted(elem_iter->GetIndex());
                 return true;
             }
@@ -4313,7 +4314,10 @@ void MutableVertexMesh<3, 3>::DeleteFacePriorToReMesh(const unsigned index)
     }
 
     VertexElement<2, 3>* p_face = this->GetFace(index);
-    const std::set<unsigned>& elem_indices = p_face->rFaceGetContainingElementIndices();
+    // Take a copy: DeleteFace() below removes the element from the face's containing-element set (the
+    // set returned by rFaceGetContainingElementIndices()), so iterating that set directly would
+    // invalidate the iterator.
+    const std::set<unsigned> elem_indices = p_face->rFaceGetContainingElementIndices();
     for (std::set<unsigned>::const_iterator it = elem_indices.begin(); it != elem_indices.end(); ++it)
     {
         this->GetElement(*it)->DeleteFace(p_face);
