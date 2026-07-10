@@ -94,7 +94,7 @@ void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPo
             c_vector<double, DIM> force_on_node = zero_vector<double>(DIM);
 
             // Find the indices of the elements owned by this node
-            std::set<unsigned> containing_elem_indices = p_node->rGetContainingElementIndices();
+            const std::set<unsigned>& containing_elem_indices = p_node->rGetContainingElementIndices();
 
             // Iterate over these elements
             for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();

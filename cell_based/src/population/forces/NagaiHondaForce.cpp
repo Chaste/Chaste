@@ -120,7 +120,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
         c_vector<double, DIM> adhesion_contribution = zero_vector<double>(DIM);
 
         // Find the indices of the elements owned by this node
-        std::set<unsigned> containing_elem_indices = p_cell_population->GetNode(node_index)->rGetContainingElementIndices();
+        const std::set<unsigned>& containing_elem_indices = p_cell_population->GetNode(node_index)->rGetContainingElementIndices();
 
         // Iterate over these elements
         for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
@@ -173,8 +173,8 @@ template<unsigned DIM>
 double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
 {
     // Find the indices of the elements owned by each node
-    std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
-    std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
+    const std::set<unsigned>& elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
+    const std::set<unsigned>& elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
 
     // Find common elements
     std::set<unsigned> shared_elements;
