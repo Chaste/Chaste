@@ -64,7 +64,9 @@ void SlidingBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<
     double x_min = bounds.rGetLowerCorner()[0];
 
     // Loop over every node
-    for (unsigned node_index=0; node_index<this->mpCellPopulation->GetNumNodes(); node_index++)
+    unsigned num_nodes = this->mpCellPopulation->GetNumNodes();
+    #pragma omp parallel for
+    for (unsigned node_index=0; node_index<num_nodes; node_index++)
     {
         Node<DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
 
