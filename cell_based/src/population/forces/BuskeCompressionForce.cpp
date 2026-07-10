@@ -63,15 +63,20 @@ void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM
 
     NodeBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation);
 
-    c_vector<double, DIM> unit_vector;
-
-    // Loop over cells in the population
+    // Collect the node index for each cell so the loop below can be parallelised
+    std::vector<unsigned> node_indices;
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
-        // Get the node index corresponding to this cell
-        unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+        node_indices.push_back(rCellPopulation.GetLocationIndexUsingCell(*cell_iter));
+    }
+
+    // Loop over cells in the population
+    #pragma omp parallel for
+    for (unsigned int node_index : node_indices)
+    {
+        c_vector<double, DIM> unit_vector;
 
         Node<DIM>* p_node_i = rCellPopulation.GetNode(node_index);
 
