@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 
 ApcTwoHitCellMutationState::ApcTwoHitCellMutationState()
-    : AbstractCellMutationState(4)
+    : CellProperty<ApcTwoHitCellMutationState, AbstractCellMutationState>(4)
 {}
 
 #include "SerializationExportWrapperForCpp.hpp"

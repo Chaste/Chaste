@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 
 DifferentiatedCellProliferativeType::DifferentiatedCellProliferativeType()
-    : AbstractCellProliferativeType(2)
+    : CellProperty<DifferentiatedCellProliferativeType, AbstractCellProliferativeType>(2)
 {}
 
 #include "SerializationExportWrapperForCpp.hpp"

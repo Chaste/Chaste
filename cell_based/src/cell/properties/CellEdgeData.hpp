@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * represented as a VertexMesh. Each data item is an array that has the same
  * size and in the same order as edges in cell's associated VertexElement.
  */
-class CellEdgeData : public AbstractCellProperty
+class CellEdgeData : public CellProperty<CellEdgeData>
 {
 private:
 
