@@ -66,6 +66,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellBasedSimulation;
+
+/**
+ * Identifies the concrete type of a cell population. Lets code that needs to distinguish
+ * population types in a hot path (e.g. a force law called once per node pair) do so with a
+ * cheap value comparison instead of a dynamic_cast, which is comparatively expensive across
+ * shared library boundaries.
+ */
+enum class CellPopulationType
+{
+    UNSPECIFIED,
+    MESH_BASED,
+    NODE_BASED,
+    VERTEX_BASED,
+    POTTS_BASED,
+    CA_BASED,
+    IMMERSED_BOUNDARY_BASED
+};
+
 /**
  * An abstract facade class encapsulating a cell population.
  *
@@ -228,6 +246,17 @@ public:
      * Base class with virtual methods needs a virtual destructor.
      */
     virtual ~AbstractCellPopulation();
+
+    /**
+     * @return the concrete type of this cell population. Subclasses that need to be told
+     * apart cheaply (e.g. by a force law called once per node pair) should override this
+     * rather than relying on dynamic_cast, which is comparatively expensive across shared
+     * library boundaries.
+     */
+    virtual CellPopulationType GetCellPopulationType() const
+    {
+        return CellPopulationType::UNSPECIFIED;
+    }
 
     /**
      * Initialise each cell's cell-cycle model.
