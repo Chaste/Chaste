@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The CellAncestor object keeps track of the number of cells that have the same ancestor.
  */
-class CellAncestor : public AbstractCellProperty
+class CellAncestor : public CellProperty<CellAncestor>
 {
 private:
 

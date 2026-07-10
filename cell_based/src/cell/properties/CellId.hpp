@@ -54,7 +54,7 @@ class CellId;
  *
  * The CellId object that stores the value of a the cell identifier.
  */
-class CellId : public AbstractCellProperty
+class CellId : public CellProperty<CellId>
 {
 private:
 

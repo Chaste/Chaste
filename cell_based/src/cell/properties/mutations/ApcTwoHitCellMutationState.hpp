@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Subclass of AbstractCellMutationState defining a APC -/- mutation state.
  */
-class ApcTwoHitCellMutationState : public AbstractCellMutationState
+class ApcTwoHitCellMutationState : public CellProperty<ApcTwoHitCellMutationState, AbstractCellMutationState>
 {
 private:
     /** Needed for serialization. */

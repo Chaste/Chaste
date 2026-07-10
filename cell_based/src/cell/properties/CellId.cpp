@@ -39,7 +39,7 @@ unsigned CellId::mMaxCellId = 0;
 
 
 CellId::CellId()
-    : AbstractCellProperty()
+    : CellProperty<CellId>()
 {
     mCellId = UNSIGNED_UNSET;
 }

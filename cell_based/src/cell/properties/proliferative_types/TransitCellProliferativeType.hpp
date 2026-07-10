@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Subclass of AbstractCellProliferativeType defining a transit cell.
  */
-class TransitCellProliferativeType : public AbstractCellProliferativeType
+class TransitCellProliferativeType : public CellProperty<TransitCellProliferativeType, AbstractCellProliferativeType>
 {
 private:
     /** Needed for serialization. */

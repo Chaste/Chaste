@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApoptoticCellProperty.hpp"
 
 ApoptoticCellProperty::ApoptoticCellProperty(unsigned colour)
-    : AbstractCellProperty(),
+    : CellProperty<ApoptoticCellProperty>(),
       mColour(colour)
 {
 }

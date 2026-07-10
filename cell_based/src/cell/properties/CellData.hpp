@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Within the Cell constructor, an empty CellData object is created and passed to the Cell
  * (unless there is already a CellData object present in mCellPropertyCollection).
  */
-class CellData : public AbstractCellProperty
+class CellData : public CellProperty<CellData>
 {
 private:
 
