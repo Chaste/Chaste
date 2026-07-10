@@ -206,6 +206,14 @@ public:
     virtual ~MeshBasedCellPopulation();
 
     /**
+     * @return CellPopulationType::MESH_BASED
+     */
+    CellPopulationType GetCellPopulationType() const override
+    {
+        return CellPopulationType::MESH_BASED;
+    }
+
+    /**
      * @return reference to mrMesh.
      */
     MutableMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();

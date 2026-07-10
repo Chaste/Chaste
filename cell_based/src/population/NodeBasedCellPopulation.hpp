@@ -281,6 +281,14 @@ public:
     virtual ~NodeBasedCellPopulation();
 
     /**
+     * @return CellPopulationType::NODE_BASED
+     */
+    CellPopulationType GetCellPopulationType() const override
+    {
+        return CellPopulationType::NODE_BASED;
+    }
+
+    /**
      * @return reference to  mrMesh.
      */
     NodesOnlyMesh<DIM>& rGetMesh();
