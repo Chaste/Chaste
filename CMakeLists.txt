@@ -125,6 +125,16 @@ set (Chaste_NUM_CPUS_TEST 1 CACHE STRING "Number of cpus to use when running tes
 option (Chaste_USE_VTK "Compile Chaste with VTK support" ON)
 option (Chaste_USE_CVODE "Compile Chaste with CVODE support" ON)
 
+# Uses a pooled memory allocator (via boost::pool) for Node objects instead of the default
+# new/delete, trading higher peak memory (the pool never returns memory to the OS until program
+# exit) for much cheaper allocation/deallocation when many nodes are repeatedly constructed and
+# destroyed (e.g. mesh generation/teardown, VTK outline-mesh writing). Off by default until
+# validated more broadly.
+option (Chaste_USE_POOLED_NODE_ALLOCATOR "Use a pooled memory allocator for Node objects" OFF)
+if (Chaste_USE_POOLED_NODE_ALLOCATOR)
+    add_definitions(-DCHASTE_USE_POOLED_NODE_ALLOCATOR)
+endif ()
+
 if (NOT (WIN32 OR CYGWIN))
     option (Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
 else ()
