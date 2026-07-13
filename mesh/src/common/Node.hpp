@@ -41,6 +41,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <vector>
 
+#ifdef CHASTE_USE_POOLED_NODE_ALLOCATOR
+#include <new>
+#include <boost/pool/pool.hpp>
+#endif
+
 #include "ChasteSerialization.hpp"
 #include "ChastePoint.hpp"
 #include "NodeAttributes.hpp"
@@ -121,6 +126,14 @@ private:
      */
     void ConstructNodeAttributes();
 
+#ifdef CHASTE_USE_POOLED_NODE_ALLOCATOR
+    /**
+     * @return the memory pool used by operator new/delete for this SPACE_DIM, creating it
+     * (as a function-local static) on first use.
+     */
+    static boost::pool<>& rGetMemoryPool();
+#endif
+
     /**
      * Check that node attributes have been set up, and throw an exception if not.
      */
@@ -185,6 +198,27 @@ public:
      * Explicit destructor to free memory from mpNodeAttributes.
      */
     ~Node();
+
+#ifdef CHASTE_USE_POOLED_NODE_ALLOCATOR
+    /**
+     * Allocate memory for a Node from a per-SPACE_DIM pool (see Chaste_USE_POOLED_NODE_ALLOCATOR
+     * in the main CMakeLists.txt), rather than from the default allocator. This is a large win
+     * when many nodes are repeatedly constructed and destroyed (mesh generation/teardown, VTK
+     * outline-mesh writing), at the cost of higher peak memory, since the pool does not return
+     * memory to the OS until the program exits.
+     *
+     * @param size must equal sizeof(Node<SPACE_DIM>); asserted, since the pool is fixed-size
+     * @return the allocated memory
+     */
+    static void* operator new(std::size_t size);
+
+    /**
+     * Return memory for a Node to the pool.
+     *
+     * @param pNode the memory to free
+     */
+    static void operator delete(void* pNode);
+#endif
 
     /**
      * Set the node's location.
