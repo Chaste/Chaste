@@ -74,11 +74,15 @@ protected:
      */
     std::vector<unsigned> mDeletedElementIndices;
 
-    /** Vector of set of Von Neumann neighbours for each node. */
-    std::vector< std::set<unsigned> > mVonNeumannNeighbouringNodeIndices;
+    /**
+     * Vector of sorted, duplicate-free vectors of Von Neumann neighbours for each node.
+     * Limited to 6 neighbours, so vector is much faster. Could replace with std::flat_set
+     * or boost::flat_set
+     */
+    std::vector< std::vector<unsigned> > mVonNeumannNeighbouringNodeIndices;
 
-    /** Vector of set of Moore neighbours for each node. */
-    std::vector< std::set<unsigned> > mMooreNeighbouringNodeIndices;
+    /** As mVonNeumannNeighbouringNodeIndices, but for Moore neighbours (at most 26, in 3D). */
+    std::vector< std::vector<unsigned> > mMooreNeighbouringNodeIndices;
 
     /**
      * Solve node mapping method. This overridden method is required
@@ -188,8 +192,8 @@ public:
      */
     PottsMesh(std::vector<Node<DIM>*> nodes,
               std::vector<PottsElement<DIM>*> pottsElements,
-              std::vector< std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
-              std::vector< std::set<unsigned> > mooreNeighbouringNodeIndices);
+              std::vector< std::vector<unsigned> > vonNeumannNeighbouringNodeIndices,
+              std::vector< std::vector<unsigned> > mooreNeighbouringNodeIndices);
 
     /**
      * Default constructor for use by serializer.
@@ -274,7 +278,7 @@ public:
      * @param nodeIndex global index of the node
      * @return neighbouring node indices in Moore neighbourhood
      */
-    const std::set<unsigned>& GetMooreNeighbouringNodeIndices(unsigned nodeIndex);
+    const std::vector<unsigned>& GetMooreNeighbouringNodeIndices(unsigned nodeIndex);
 
     /**
      * Given a node, return a set containing the indices of its Von Neumann neighbouring nodes.
@@ -282,7 +286,7 @@ public:
      * @param nodeIndex global index of the node
      * @return neighbouring node indices in Von Neumann neighbourhood
      */
-    const std::set<unsigned>& GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex);
+    const std::vector<unsigned>& GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex);
 
     /**
      * Mark a node as deleted. Note that in a Potts mesh this requires the elements and connectivity to be updated accordingly.

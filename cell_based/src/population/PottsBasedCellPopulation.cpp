@@ -282,7 +282,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
         assert(p_node->GetNumContainingElements() <= 1);
 
         // Find a random available neighbouring node to overwrite current site
-        const std::set<unsigned>& neighbouring_node_indices = mpPottsMesh->GetMooreNeighbouringNodeIndices(node_index);
+        const std::vector<unsigned>& neighbouring_node_indices = mpPottsMesh->GetMooreNeighbouringNodeIndices(node_index);
         unsigned neighbour_location_index;
 
         if (!neighbouring_node_indices.empty())
@@ -290,13 +290,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             unsigned num_neighbours = neighbouring_node_indices.size();
             unsigned chosen_neighbour = p_gen->randMod(num_neighbours);
 
-            std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-            for (unsigned j=0; j<chosen_neighbour; j++)
-            {
-                neighbour_iter++;
-            }
-
-            neighbour_location_index = *neighbour_iter;
+            neighbour_location_index = neighbouring_node_indices[chosen_neighbour];
 
             std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
             std::set<unsigned> neighbour_containing_elements = GetNode(neighbour_location_index)->rGetContainingElementIndices();
@@ -643,9 +637,9 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
             unsigned node_index = iter->GetIndex();
             const std::set<unsigned>& element_indices = iter->rGetContainingElementIndices();
 
-            const std::set<unsigned>& target_neighbouring_node_indices = this->rGetMesh().GetVonNeumannNeighbouringNodeIndices(node_index);
+            const std::vector<unsigned>& target_neighbouring_node_indices = this->rGetMesh().GetVonNeumannNeighbouringNodeIndices(node_index);
 
-            for (std::set<unsigned>::iterator neighbour_iter = target_neighbouring_node_indices.begin();
+            for (std::vector<unsigned>::const_iterator neighbour_iter = target_neighbouring_node_indices.begin();
                  neighbour_iter != target_neighbouring_node_indices.end();
                  ++neighbour_iter)
             {

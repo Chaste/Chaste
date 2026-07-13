@@ -84,8 +84,8 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
     // Iterate over nodes neighbouring the target node to work out the change in surface area
     unsigned neighbours_in_same_element_as_current_node = 0;
     unsigned neighbours_in_same_element_as_target_node = 0;
-    const std::set<unsigned>& target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
-    for (std::set<unsigned>::iterator iter = target_neighbouring_node_indices.begin();
+    const std::vector<unsigned>& target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
+    for (std::vector<unsigned>::const_iterator iter = target_neighbouring_node_indices.begin();
          iter != target_neighbouring_node_indices.end();
          ++iter)
     {
