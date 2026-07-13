@@ -852,6 +852,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
     Clear();
 
     // Construct the nodes
+    this->mNodes.reserve(mesherOutput.numberofpoints);
     for (unsigned node_index = 0; node_index < (unsigned)mesherOutput.numberofpoints; node_index++)
     {
         this->mNodes.push_back(new Node<SPACE_DIM>(node_index, &mesherOutput.pointlist[node_index * SPACE_DIM], false));
