@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include <boost/scoped_array.hpp>
 #include "VtkMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
@@ -221,14 +223,13 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
+void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, const std::vector<double>& dataPayload)
 {
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
-    for (unsigned i=0; i<dataPayload.size(); i++)
-    {
-        p_scalars->InsertNextValue(dataPayload[i]);
-    }
+    p_scalars->SetNumberOfValues(dataPayload.size());
+    double* p_raw = p_scalars->WritePointer(0, dataPayload.size());
+    std::copy(dataPayload.begin(), dataPayload.end(), p_raw);
 
     vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
     p_cell_data->AddArray(p_scalars);
@@ -366,20 +367,26 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataNam
 
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, std::vector<double> dataPayload)
+void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, const std::vector<double>& dataPayload)
 {
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
+
+    // Only used (and only mutated) in the parallel branch below; the common, non-distributed case
+    // writes directly from dataPayload without copying it.
+    std::vector<double> local_payload;
+    const std::vector<double>* p_data_to_write = &dataPayload;
 
     if (mWriteParallelFiles && this->mpDistributedMesh != nullptr)
     {
         // In parallel, the vector we pass will only contain the values from the privately owned nodes.
         // To get the values from the halo nodes (which will be inserted at the end of the vector we need to
         // communicate with the equivalent vectors on other processes.
+        local_payload = dataPayload;
 
         // resize the payload data to include halos
-        assert( dataPayload.size() == this->mpDistributedMesh->GetNumLocalNodes() );
-        dataPayload.resize( this->mpDistributedMesh->GetNumLocalNodes() + this->mpDistributedMesh->GetNumHaloNodes() );
+        assert( local_payload.size() == this->mpDistributedMesh->GetNumLocalNodes() );
+        local_payload.resize( this->mpDistributedMesh->GetNumLocalNodes() + this->mpDistributedMesh->GetNumHaloNodes() );
 
 
         // then do the communication
@@ -399,7 +406,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                 unsigned global_node_index = mNodesToSendPerProcess[send_to][node];
                 unsigned local_node_index = global_node_index
                             - this->mpDistributedMesh->GetDistributedVectorFactory()->GetLow();
-                send_data[node] = dataPayload[local_node_index];
+                send_data[node] = local_payload[local_node_index];
             }
             {
                 // Send
@@ -422,16 +429,17 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                 unsigned global_node_index = mNodesToReceivePerProcess[receive_from][node];
                 unsigned halo_index = mGlobalToNodeIndexMap[global_node_index];
                 assert( halo_index >= this->mpDistributedMesh->GetNumLocalNodes() );
-                dataPayload[halo_index] = receive_data[node];
+                local_payload[halo_index] = receive_data[node];
             }
 
         }
+        p_data_to_write = &local_payload;
     }
 
-    for (unsigned i=0; i<dataPayload.size(); i++)
-    {
-        p_scalars->InsertNextValue(dataPayload[i]);
-    }
+    // Bulk-fill the array directly, rather than growing it one value at a time via InsertNextValue.
+    p_scalars->SetNumberOfValues(p_data_to_write->size());
+    double* p_raw = p_scalars->WritePointer(0, p_data_to_write->size());
+    std::copy(p_data_to_write->begin(), p_data_to_write->end(), p_raw);
 
     vtkPointData* p_point_data = mpVtkUnstructedMesh->GetPointData();
     p_point_data->AddArray(p_scalars);
@@ -440,20 +448,26 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
 
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload)
+void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, const std::vector<c_vector<double, SPACE_DIM> >& dataPayload)
 {
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
+
+    // Only used (and only mutated) in the parallel branch below; the common, non-distributed case
+    // writes directly from dataPayload without copying it.
+    std::vector<c_vector<double, SPACE_DIM> > local_payload;
+    const std::vector<c_vector<double, SPACE_DIM> >* p_data_to_write = &dataPayload;
 
     if (mWriteParallelFiles)
     {
         // In parallel, the vector we pass will only contain the values from the privately owned nodes.
         // To get the values from the halo nodes (which will be inserted at the end of the vector we need to
         // communicate with the equivalent vectors on other processes.
+        local_payload = dataPayload;
 
         // resize the payload data to include halos
-        assert( dataPayload.size() == this->mpDistributedMesh->GetNumLocalNodes() );
-        dataPayload.resize( this->mpDistributedMesh->GetNumLocalNodes() + this->mpDistributedMesh->GetNumHaloNodes() );
+        assert( local_payload.size() == this->mpDistributedMesh->GetNumLocalNodes() );
+        local_payload.resize( this->mpDistributedMesh->GetNumLocalNodes() + this->mpDistributedMesh->GetNumHaloNodes() );
 
         // then do the communication
         for ( unsigned rank_offset = 1; rank_offset < PetscTools::GetNumProcs(); rank_offset++ )
@@ -474,7 +488,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                             - this->mpDistributedMesh->GetDistributedVectorFactory()->GetLow();
                 for (unsigned j=0; j<SPACE_DIM; j++)
                 {
-                    send_data[ node*SPACE_DIM + j ] = dataPayload[local_node_index][j];
+                    send_data[ node*SPACE_DIM + j ] = local_payload[local_node_index][j];
                 }
             }
 
@@ -498,23 +512,27 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                 assert( halo_index >= this->mpDistributedMesh->GetNumLocalNodes() );
                 for (unsigned j=0; j<SPACE_DIM; j++)
                 {
-                    dataPayload[halo_index][j] = receive_data[ node*SPACE_DIM + j ];
+                    local_payload[halo_index][j] = receive_data[ node*SPACE_DIM + j ];
                 }
             }
         }
+        p_data_to_write = &local_payload;
     }
 
+    // Bulk-fill the array directly, rather than growing it one value at a time via InsertNextValue.
     p_vectors->SetNumberOfComponents(3);
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    p_vectors->SetNumberOfTuples(p_data_to_write->size());
+    double* p_raw = p_vectors->WritePointer(0, p_data_to_write->size()*3);
+    for (unsigned i=0; i<p_data_to_write->size(); i++)
     {
         for (unsigned j=0; j<SPACE_DIM; j++)
         {
-            p_vectors->InsertNextValue(dataPayload[i][j]);
+            p_raw[i*3 + j] = (*p_data_to_write)[i][j];
         }
-        //When SPACE_DIM<3, then pad
+        // When SPACE_DIM<3, then pad
         for (unsigned j=SPACE_DIM; j<3; j++)
         {
-            p_vectors->InsertNextValue(0.0);
+            p_raw[i*3 + j] = 0.0;
         }
     }
 
