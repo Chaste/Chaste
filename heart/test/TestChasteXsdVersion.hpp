@@ -33,43 +33,47 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCODEGENLONGANALYTICCVODE_HPP_
-#define TESTCODEGENLONGANALYTICCVODE_HPP_
+#ifndef TESTCHASTEXSDVERSION_HPP_
+#define TESTCHASTEXSDVERSION_HPP_
 
-#include "CodegenLongHelperTestSuite.hpp"
+#include <cxxtest/TestSuite.h>
 
-#include <vector>
+#include "ChasteXsdVersion.hpp"
 
-#include "HeartConfig.hpp"
-
-#include "PetscSetupAndFinalize.hpp"
-
-/**
- * Test chaste_codegen functionality to generate Analytic Cvode cells,
- * by dynamically loading (and hence converting) a wide range of cell models.
- */
-class TestCodegenLongAnalyticCvode : public CodegenLongHelperTestSuite
+class TestChasteXsdVersion : public CxxTest::TestSuite
 {
 public:
-    void TestAnalyticCvodeCells()
+
+    /*
+     * This test is performed entirely at compile time, so this test has passed if this test suite compiles
+     */
+    void TestChasteXsdVersionAtLeast()
     {
-#ifdef CHASTE_CVODE
-        std::string dirname("TestCodegenLongCvodeAnalyticJ");
-        std::vector<std::string> args;
-        args.push_back("--Wu");
-        args.push_back("--cvode");
-        args.push_back("--use-analytic-jacobian");
+#pragma push_macro("CHASTE_XSD_VERSION_MAJOR")
+#pragma push_macro("CHASTE_XSD_VERSION_MINOR")
+#pragma push_macro("CHASTE_XSD_VERSION_PATCH")
 
-        // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = special_treatment_models (models, {"hund_rudy_2004",
-                                                                                 "livshitz_rudy_2007",
-                                                                                 "difrancesco_noble_model_1985",
-                                                                                 "faber_rudy_2000"});
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        RunTests(dirname, models, args);
+#undef CHASTE_XSD_VERSION_MAJOR
+#undef CHASTE_XSD_VERSION_MINOR
+#undef CHASTE_XSD_VERSION_PATCH
 
-#endif
+#define CHASTE_XSD_VERSION_MAJOR 4
+#define CHASTE_XSD_VERSION_MINOR 2
+#define CHASTE_XSD_VERSION_PATCH 0
+
+static_assert(CHASTE_XSD_VERSION_AT_LEAST(4, 0, 0));
+static_assert(CHASTE_XSD_VERSION_AT_LEAST(4, 2, 0));
+static_assert(CHASTE_XSD_VERSION_AT_LEAST(4, 1, 9));
+static_assert(CHASTE_XSD_VERSION_AT_LEAST(3, 9, 9));
+static_assert(!CHASTE_XSD_VERSION_AT_LEAST(4, 2, 1));
+static_assert(!CHASTE_XSD_VERSION_AT_LEAST(4, 3, 0));
+static_assert(!CHASTE_XSD_VERSION_AT_LEAST(5, 0, 0));
+
+// Restore original values.
+#pragma pop_macro("CHASTE_XSD_VERSION_PATCH")
+#pragma pop_macro("CHASTE_XSD_VERSION_MINOR")
+#pragma pop_macro("CHASTE_XSD_VERSION_MAJOR")
     }
 };
 
-#endif // TESTCODEGENLONGANALYTICCVODE_HPP_
+#endif /*TESTCHASTEXSDVERSION_HPP_*/
