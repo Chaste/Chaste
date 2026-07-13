@@ -172,25 +172,25 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RevertToOldLocations(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions)
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RevertToOldLocations(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLoctions)
 {
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
         node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
         ++node_iter)
     {
-        (node_iter)->rGetModifiableLocation() = oldNodeLoctions[&(*node_iter)];
+        (node_iter)->rGetModifiableLocation() = rOldNodeLoctions.at(&(*node_iter));
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::ApplyBoundaries(std::map<Node<SPACE_DIM>*,c_vector<double, SPACE_DIM> > oldNodeLoctions)
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::ApplyBoundaries(const std::map<Node<SPACE_DIM>*,c_vector<double, SPACE_DIM> >& rOldNodeLoctions)
 {
     // Apply any boundary conditions
     for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
          bcs_iter != mBoundaryConditions.end();
          ++bcs_iter)
     {
-        (*bcs_iter)->ImposeBoundaryCondition(oldNodeLoctions);
+        (*bcs_iter)->ImposeBoundaryCondition(rOldNodeLoctions);
     }
 
     // Verify that each boundary condition is now satisfied
