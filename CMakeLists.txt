@@ -136,6 +136,14 @@ if (Chaste_USE_POOLED_NODE_ALLOCATOR)
     add_definitions(-DCHASTE_USE_POOLED_NODE_ALLOCATOR)
 endif ()
 
+# As Chaste_USE_POOLED_NODE_ALLOCATOR above, but for Element objects (used by TetrahedralMesh
+# and its subclasses, e.g. rebuilt from scratch on every remesh). Kept as a separate flag so
+# the two can be enabled/tested independently.
+option (Chaste_USE_POOLED_ELEMENT_ALLOCATOR "Use a pooled memory allocator for Element objects" OFF)
+if (Chaste_USE_POOLED_ELEMENT_ALLOCATOR)
+    add_definitions(-DCHASTE_USE_POOLED_ELEMENT_ALLOCATOR)
+endif ()
+
 if (NOT (WIN32 OR CYGWIN))
     option (Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
 else ()
