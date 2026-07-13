@@ -78,7 +78,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
             const c_vector<double, SPACE_DIM>& position = node_iter->rGetLocation();
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
-                *this->mpOutStream << position[i] << " ";
+                this->WriteDoubleAndSpace(position[i]);
             }
 
             // Write this node's velocity to file
@@ -87,7 +87,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
             c_vector<double, SPACE_DIM> velocity = time_step * node_iter->rGetAppliedForce() / damping_constant;
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
-                *this->mpOutStream << velocity[i] << " ";
+                this->WriteDoubleAndSpace(velocity[i]);
             }
         }
     }
@@ -129,7 +129,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<S
             const c_vector<double, SPACE_DIM>& position = node_iter->rGetLocation();
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
-                *this->mpOutStream << position[i] << " ";
+                this->WriteDoubleAndSpace(position[i]);
             }
 
             // Write this node's velocity to file
@@ -138,7 +138,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<S
             c_vector<double, SPACE_DIM> velocity = time_step * node_iter->rGetAppliedForce() / damping_constant;
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
-                *this->mpOutStream << velocity[i] << " ";
+                this->WriteDoubleAndSpace(velocity[i]);
             }
         }
     }
@@ -168,7 +168,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation
         const c_vector<double, SPACE_DIM>& position = node_iter->rGetLocation();
         for (unsigned i=0; i<SPACE_DIM; i++)
         {
-            *this->mpOutStream << position[i] << " ";
+            this->WriteDoubleAndSpace(position[i]);
         }
 
         // Write this node's velocity to file
@@ -177,7 +177,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation
         c_vector<double, SPACE_DIM> velocity = time_step * node_iter->rGetAppliedForce() / damping_constant;
         for (unsigned i=0; i<SPACE_DIM; i++)
         {
-            *this->mpOutStream << velocity[i] << " ";
+            this->WriteDoubleAndSpace(velocity[i]);
         }
     }
 }

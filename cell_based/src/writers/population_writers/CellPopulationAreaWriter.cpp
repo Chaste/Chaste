@@ -91,7 +91,8 @@ void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
                 }
             }
         }
-        *this->mpOutStream << total_area << " " << apoptotic_area;
+        this->WriteDoubleAndSpace(total_area);
+        this->WriteDouble(apoptotic_area);
     }
     else
     {

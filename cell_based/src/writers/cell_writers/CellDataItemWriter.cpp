@@ -66,12 +66,12 @@ void CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Abstra
     c_vector<double, SPACE_DIM> centre_location = pCellPopulation->GetLocationOfCellCentre(pCell);
     for (unsigned i=0; i<SPACE_DIM; i++)
     {
-        *this->mpOutStream << centre_location[i] << " ";
+        this->WriteDoubleAndSpace(centre_location[i]);
     }
 
     // Output this cell's level of mCellDataVariableName
     double value = pCell->GetCellData()->GetItem(mCellDataVariableName);
-    *this->mpOutStream << value << " ";
+    this->WriteDoubleAndSpace(value);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
