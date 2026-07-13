@@ -36,6 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCELLBASEDWRITER_HPP_
 #define ABSTRACTCELLBASEDWRITER_HPP_
 
+#ifdef CHASTE_HAS_FLOAT_TO_CHARS
+#include <charconv>
+#endif
+
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "Identifiable.hpp"
@@ -126,14 +130,27 @@ public:
      *
      * @param value the value to write
      */
-    void WriteDouble(double value);
+    inline void WriteDouble(double value)
+    {
+#ifdef CHASTE_HAS_FLOAT_TO_CHARS
+        char buffer[32];
+        std::to_chars_result result = std::to_chars(buffer, buffer + sizeof(buffer), value, std::chars_format::general, 6);
+        mpOutStream->write(buffer, result.ptr - buffer);
+#else
+        *mpOutStream << value;
+#endif
+    }
 
     /**
      * Equivalent to WriteDouble(value) followed by a space.
      *
      * @param value the value to write
      */
-    void WriteDoubleAndSpace(double value);
+    inline void WriteDoubleAndSpace(double value)
+    {
+        WriteDouble(value);
+        *mpOutStream << " ";
+    }
 
     /**
      * Set the output file name.
