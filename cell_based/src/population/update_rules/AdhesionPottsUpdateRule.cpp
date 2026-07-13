@@ -77,8 +77,8 @@ double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned cu
 
     // Iterate over nodes neighbouring the target node to work out the contact energy contribution
     double delta_H = 0.0;
-    const std::set<unsigned>& target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
-    for (std::set<unsigned>::iterator iter = target_neighbouring_node_indices.begin();
+    const std::vector<unsigned>& target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
+    for (std::vector<unsigned>::const_iterator iter = target_neighbouring_node_indices.begin();
          iter != target_neighbouring_node_indices.end();
          ++iter)
     {
