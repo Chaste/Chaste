@@ -82,7 +82,8 @@ void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(Vertex
     {
         for (unsigned i=0; i<SPACE_DIM; i++)
         {
-            *this->mpOutStream << intersection_swap_locations[index][i] << "\t";
+            this->WriteDouble(intersection_swap_locations[index][i]);
+            *this->mpOutStream << "\t";
         }
     }
 

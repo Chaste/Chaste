@@ -72,12 +72,13 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
             c_vector<double, SPACE_DIM> node_location = pCellPopulation->GetNode(node_index)->rGetLocation();
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
-                *this->mpOutStream << node_location[i] << " ";
+                this->WriteDoubleAndSpace(node_location[i]);
             }
 
             double cell_volume = voronoi_tesselation->GetVolumeOfElement(elem_index);
             double cell_surface_area = voronoi_tesselation->GetSurfaceAreaOfElement(elem_index);
-            *this->mpOutStream << cell_volume << " " << cell_surface_area << " ";
+            this->WriteDoubleAndSpace(cell_volume);
+            this->WriteDoubleAndSpace(cell_surface_area);
         }
     }
     else

@@ -77,7 +77,7 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, 
         mutation_state = p_label->GetColour();
     }
 
-    *this->mpOutStream << mutation_state << " ";
+    this->WriteDoubleAndSpace(mutation_state);
 }
 
 // Explicit instantiation

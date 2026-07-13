@@ -55,7 +55,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double phase = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel())->GetCurrentCellCyclePhase();
-    *this->mpOutStream << phase << " ";
+    this->WriteDoubleAndSpace(phase);
 }
 
 // Explicit instantiation

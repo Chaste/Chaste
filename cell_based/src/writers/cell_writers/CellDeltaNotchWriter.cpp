@@ -65,20 +65,20 @@ void CellDeltaNotchWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Abst
     c_vector<double, SPACE_DIM> centre_location = pCellPopulation->GetLocationOfCellCentre(pCell);
     for (unsigned i=0; i<SPACE_DIM; i++)
     {
-        *this->mpOutStream << centre_location[i] << " ";
+        this->WriteDoubleAndSpace(centre_location[i]);
     }
 
     // Output this cell's level of delta
     double delta = pCell->GetCellData()->GetItem("delta");
-    *this->mpOutStream << delta << " ";
+    this->WriteDoubleAndSpace(delta);
 
     // Output this cell's level of notch
     double notch = pCell->GetCellData()->GetItem("notch");
-    *this->mpOutStream << notch << " ";
+    this->WriteDoubleAndSpace(notch);
 
     // Output the mean level of delta among this cell's neighbours
     double mean_delta = pCell->GetCellData()->GetItem("mean delta");
-    *this->mpOutStream << mean_delta << " ";
+    this->WriteDoubleAndSpace(mean_delta);
 }
 
 // Explicit instantiation

@@ -116,6 +116,26 @@ public:
     virtual void WriteNewline();
 
     /**
+     * Write a double to mpOutStream, with no surrounding whitespace. Where the standard library
+     * implements floating-point std::to_chars (see CHASTE_HAS_FLOAT_TO_CHARS in
+     * ChasteCompilerFlags.cmake), this converts directly to text with the same
+     * "%.6g"-equivalent formatting that operator<< produces under the default stream precision
+     * (6), bypassing the locale-aware iostream num_put machinery that profiling showed to
+     * dominate the cost of writing doubles to file. Where it isn't available, this falls back
+     * to the original operator<< behaviour.
+     *
+     * @param value the value to write
+     */
+    void WriteDouble(double value);
+
+    /**
+     * Equivalent to WriteDouble(value) followed by a space.
+     *
+     * @param value the value to write
+     */
+    void WriteDoubleAndSpace(double value);
+
+    /**
      * Set the output file name.
      * This method allows the user to change mFileName from
      * its default value, which is set in each subclass's
