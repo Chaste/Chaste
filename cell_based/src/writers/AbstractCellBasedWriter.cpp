@@ -32,10 +32,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifdef CHASTE_HAS_FLOAT_TO_CHARS
-#include <charconv>
-#endif
-
 #include "AbstractCellBasedWriter.hpp"
 #include "SimulationTime.hpp"
 
@@ -78,25 +74,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::WriteNewline()
 {
     *mpOutStream << "\n";
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::WriteDouble(double value)
-{
-#ifdef CHASTE_HAS_FLOAT_TO_CHARS
-    char buffer[32];
-    std::to_chars_result result = std::to_chars(buffer, buffer + sizeof(buffer), value, std::chars_format::general, 6);
-    mpOutStream->write(buffer, result.ptr - buffer);
-#else
-    *mpOutStream << value;
-#endif
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::WriteDoubleAndSpace(double value)
-{
-    WriteDouble(value);
-    *mpOutStream << " ";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
