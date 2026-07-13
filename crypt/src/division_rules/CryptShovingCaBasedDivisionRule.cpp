@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool CryptShovingCaBasedDivisionRule::IsNodeOnBase(unsigned NodeIndex, PottsMesh<2>* pPottsMesh)
 {
-    std::set<unsigned> neighbouring_node_indices = pPottsMesh->GetVonNeumannNeighbouringNodeIndices(NodeIndex);
+    const std::set<unsigned>& neighbouring_node_indices = pPottsMesh->GetVonNeumannNeighbouringNodeIndices(NodeIndex);
     unsigned num_neighbours = neighbouring_node_indices.size();
 
     // No strange neighbourhoods and in 2D so need 3 or 4 neighbours
@@ -98,7 +98,7 @@ unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(CellPtr pNe
     }
 
 
-    std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(parent_node_index);
+    const std::set<unsigned>& neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(parent_node_index);
 
     std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
     for (unsigned  i=0; i<direction; i++)
@@ -124,7 +124,7 @@ unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(CellPtr pNe
         {
             current_node_index = target_node_index;
 
-            std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(current_node_index);
+            const std::set<unsigned>& neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(current_node_index);
             unsigned num_neighbours = neighbouring_node_indices.size();
 
             // Check to see if the current node is on the boundary

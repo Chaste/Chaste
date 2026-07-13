@@ -274,7 +274,7 @@ public:
      * @param nodeIndex global index of the node
      * @return neighbouring node indices in Moore neighbourhood
      */
-    std::set<unsigned> GetMooreNeighbouringNodeIndices(unsigned nodeIndex);
+    const std::set<unsigned>& GetMooreNeighbouringNodeIndices(unsigned nodeIndex);
 
     /**
      * Given a node, return a set containing the indices of its Von Neumann neighbouring nodes.
@@ -282,7 +282,7 @@ public:
      * @param nodeIndex global index of the node
      * @return neighbouring node indices in Von Neumann neighbourhood
      */
-    std::set<unsigned> GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex);
+    const std::set<unsigned>& GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex);
 
     /**
      * Mark a node as deleted. Note that in a Potts mesh this requires the elements and connectivity to be updated accordingly.
