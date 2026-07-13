@@ -166,6 +166,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
             case 2:
             {
                 assert(DIM == 2);
+                moore_neighbours[node_index].reserve(8);
                 /*
                  * This stores the available neighbours using the following numbering:
                  *
@@ -285,6 +286,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
             case 3:
             {
                 assert(DIM ==3);
+                moore_neighbours[node_index].reserve(26);
                 /*
                  * This stores the available neighbours using the following numbering:
                  *                      FRONT           BACK
@@ -567,6 +569,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
             case 2:
             {
                 assert(DIM == 2);
+                von_neumann_neighbours[node_index].reserve(4);
                 /*
                  * This stores the available neighbours using the following numbering:
                  *
@@ -644,6 +647,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
             case 3:
             {
                 assert(DIM == 3);
+                von_neumann_neighbours[node_index].reserve(6);
 
                 /*
                  * This stores the available neighbours using the following numbering:
