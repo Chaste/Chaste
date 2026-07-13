@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PottsMeshGenerator.hpp"
 
+#include <utility>
+
 #include <boost/make_shared.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
@@ -59,6 +61,8 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
     std::vector<std::set<unsigned> > von_neumann_neighbours;
 
     unsigned num_nodes = numNodesAcross*numNodesUp*numNodesDeep;
+    nodes.reserve(num_nodes);
+    elements.reserve(numElementsAcross*numElementsUp*numElementsDeep);
 
     unsigned next_node_index = 0;
     boost::scoped_array<unsigned> node_indices(new unsigned[elementWidth*elementHeight*elementDepth]);
@@ -736,7 +740,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
         }
     }
 
-    mpMesh = boost::make_shared<PottsMesh<DIM> >(nodes, elements, von_neumann_neighbours, moore_neighbours);
+    mpMesh = boost::make_shared<PottsMesh<DIM> >(std::move(nodes), std::move(elements), std::move(von_neumann_neighbours), std::move(moore_neighbours));
 }
 
 template<unsigned DIM>

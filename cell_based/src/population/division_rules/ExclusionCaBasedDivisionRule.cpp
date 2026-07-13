@@ -45,7 +45,7 @@ bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(CellPtr pParentCell
     unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
 
     // Get the set of neighbouring node indices
-    std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()))->GetMooreNeighbouringNodeIndices(node_index);
+    const std::set<unsigned>& neighbouring_node_indices = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()))->GetMooreNeighbouringNodeIndices(node_index);
 
     // Iterate through the neighbours to see if there are any available sites
     for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
@@ -76,7 +76,7 @@ unsigned ExclusionCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(Cel
     PottsMesh<SPACE_DIM>* static_cast_mesh = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()));
 
     // Get the set of neighbouring node indices
-    std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetMooreNeighbouringNodeIndices(parent_node_index);
+    const std::set<unsigned>& neighbouring_node_indices = static_cast_mesh->GetMooreNeighbouringNodeIndices(parent_node_index);
     unsigned num_neighbours = neighbouring_node_indices.size();
 
     // Each node must have at least one neighbour

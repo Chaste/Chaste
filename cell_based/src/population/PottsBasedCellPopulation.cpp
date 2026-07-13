@@ -282,7 +282,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
         assert(p_node->GetNumContainingElements() <= 1);
 
         // Find a random available neighbouring node to overwrite current site
-        std::set<unsigned> neighbouring_node_indices = mpPottsMesh->GetMooreNeighbouringNodeIndices(node_index);
+        const std::set<unsigned>& neighbouring_node_indices = mpPottsMesh->GetMooreNeighbouringNodeIndices(node_index);
         unsigned neighbour_location_index;
 
         if (!neighbouring_node_indices.empty())
@@ -643,7 +643,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
             unsigned node_index = iter->GetIndex();
             const std::set<unsigned>& element_indices = iter->rGetContainingElementIndices();
 
-            std::set<unsigned> target_neighbouring_node_indices = this->rGetMesh().GetVonNeumannNeighbouringNodeIndices(node_index);
+            const std::set<unsigned>& target_neighbouring_node_indices = this->rGetMesh().GetVonNeumannNeighbouringNodeIndices(node_index);
 
             for (std::set<unsigned>::iterator neighbour_iter = target_neighbouring_node_indices.begin();
                  neighbour_iter != target_neighbouring_node_indices.end();

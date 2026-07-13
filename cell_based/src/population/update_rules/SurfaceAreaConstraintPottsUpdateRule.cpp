@@ -59,8 +59,8 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
     // This method only works in 2D and 3D at present
     assert(DIM == 2 || DIM == 3); // LCOV_EXCL_LINE
 
-    std::set<unsigned> containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
-    std::set<unsigned> new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();
+    const std::set<unsigned>& containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
+    const std::set<unsigned>& new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();
 
     bool current_node_contained = !containing_elements.empty();
     bool target_node_contained = !new_location_containing_elements.empty();
@@ -84,12 +84,12 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
     // Iterate over nodes neighbouring the target node to work out the change in surface area
     unsigned neighbours_in_same_element_as_current_node = 0;
     unsigned neighbours_in_same_element_as_target_node = 0;
-    std::set<unsigned> target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
+    const std::set<unsigned>& target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
     for (std::set<unsigned>::iterator iter = target_neighbouring_node_indices.begin();
          iter != target_neighbouring_node_indices.end();
          ++iter)
     {
-        std::set<unsigned> neighbouring_node_containing_elements = rCellPopulation.rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
+        const std::set<unsigned>& neighbouring_node_containing_elements = rCellPopulation.rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
 
         // Every node must each be in at most one element
         assert(neighbouring_node_containing_elements.size() < 2);
