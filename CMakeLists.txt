@@ -452,7 +452,7 @@ endif ()
 ####  Find OpenMP
 ################################
 if (Chaste_USE_OPENMP)
-    find_package(OpenMP REQUIRED)
+    find_package(OpenMP REQUIRED COMPONENTS CXX)
     target_link_libraries(Chaste_COMMON_DEPS INTERFACE OpenMP::OpenMP_CXX)
 endif ()
 
