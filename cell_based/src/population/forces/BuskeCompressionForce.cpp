@@ -73,7 +73,9 @@ void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM
     }
 
     // Loop over cells in the population
+    #ifdef _OPENMP
     #pragma omp parallel for
+    #endif
     for (unsigned int node_index : node_indices)
     {
         c_vector<double, DIM> unit_vector;

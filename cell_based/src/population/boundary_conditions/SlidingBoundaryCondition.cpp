@@ -65,7 +65,9 @@ void SlidingBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<
 
     // Loop over every node
     unsigned num_nodes = this->mpCellPopulation->GetNumNodes();
+    #ifdef _OPENMP
     #pragma omp parallel for
+    #endif
     for (unsigned node_index=0; node_index<num_nodes; node_index++)
     {
         Node<DIM>* p_node = this->mpCellPopulation->GetNode(node_index);

@@ -1689,7 +1689,9 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
 
     if (mCalculateNodeNeighbours)
     {
+        #ifdef _OPENMP
         #pragma omp parallel for
+        #endif
         for (unsigned i = 0; i < rNodes.size(); i++)
         {
             // Get the box containing this node as only nodes on this process have NodeAttributes
@@ -1710,7 +1712,9 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
     rNodePairs.clear();
 
     // Create an empty neighbours set for each node
+    #ifdef _OPENMP
     #pragma omp parallel for
+    #endif
     for (unsigned i=0; i<rNodes.size(); i++)
     {
         // Get the box containing this node as only nodes on this process have NodeAttributes
@@ -1734,7 +1738,9 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
 
     if (mCalculateNodeNeighbours)
     {
+        #ifdef _OPENMP
         #pragma omp parallel for
+        #endif
         for (unsigned i = 0; i < rNodes.size(); i++)
         {
             // Get the box containing this node as only nodes on this process have NodeAttributes
@@ -1763,7 +1769,9 @@ void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<
 
     if (mCalculateNodeNeighbours)
     {
+        #ifdef _OPENMP
         #pragma omp parallel for
+        #endif
         for (unsigned i = 0; i < rNodes.size(); i++)
         {
             // Get the box containing this node as only nodes on this process have NodeAttributes
