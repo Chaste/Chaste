@@ -94,7 +94,9 @@ void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>
     }
 
     // Iterate over cell population
+    #ifdef _OPENMP
     #pragma omp parallel for
+    #endif
     for (const auto& p_cell : cells)
     {
         // Get the volume of this cell

@@ -85,7 +85,9 @@ template<unsigned SPACE_DIM>
 void NodeAttributes<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution)
 {
     for (unsigned int d = 0; d < SPACE_DIM; d++) {
+        #ifdef _OPENMP
         #pragma omp atomic update
+        #endif
         mAppliedForce[d] = mAppliedForce[d] + rForceContribution[d];
     }
 }

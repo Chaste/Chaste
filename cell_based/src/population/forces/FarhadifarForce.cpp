@@ -96,7 +96,9 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     }
 
     // Iterate over vertices in the cell population
+    #ifdef _OPENMP
     #pragma omp parallel for
+    #endif
     for (unsigned node_index=0; node_index<num_nodes; node_index++)
     {
         Node<DIM>* p_this_node = p_cell_population->GetNode(node_index);

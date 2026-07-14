@@ -85,7 +85,9 @@ void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPo
         // Iterate over nodes in the cell population, so that each node's total force is accumulated
         // and written exactly once (a node can belong to several elements, so looping over elements
         // instead would mean multiple iterations writing to the same node)
+        #ifdef _OPENMP
         #pragma omp parallel for
+        #endif
         for (unsigned node_global_index = 0; node_global_index < num_nodes; node_global_index++)
         {
             Node<DIM>* p_node = p_cell_population->GetNode(node_global_index);
