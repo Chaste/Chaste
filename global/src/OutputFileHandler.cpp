@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <sstream>
 #include <cassert>
+#include <iostream>
 
 #include "ArchiveLocationInfo.hpp"
 #include "ChasteBuildRoot.hpp"
@@ -259,7 +260,15 @@ out_stream OutputFileHandler::OpenOutputFile(const std::string& rFileName,
                                              std::ios_base::openmode mode) const
 {
     fs::path output_file(mDirectory);
-    output_file /= rFileName;
+     // Beware the /= operator with prefix /
+    if(rFileName.find('/') == 0)
+    {
+        output_file /= rFileName.substr(1);
+    }
+    else
+    {
+        output_file /= rFileName;
+    }
     out_stream p_output_file(new std::ofstream(output_file, mode));
     if (!p_output_file->is_open())
     {
