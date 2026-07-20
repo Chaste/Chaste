@@ -589,6 +589,22 @@ macro(Chaste_DO_TEST_COMMON component)
                             target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
                         endif()
                         set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
+                        # Reuse the library's precompiled header rather than
+                        # generating a fresh one for every test executable.
+                        if (TARGET chaste_${component})
+                            if (BUILD_SHARED_LIBS AND NOT MSVC)
+                                # Components are compiled with -fPIC. Executables
+                                # default to -fpie, which GCC/Clang treat as an incompatible
+                                # precompiled header. Use -fPIC for the test executable to match
+                                # the component library.
+                                target_compile_options(${exeTargetName} PRIVATE -fPIC)
+                                # CMake automatically defines <target>_EXPORTS when compiling a
+                                # shared library. Ensure compatibility with the component's
+                                # precompiled header by defining it for the test executable as well.
+                                target_compile_definitions(${exeTargetName} PRIVATE chaste_${component}_EXPORTS)
+                            endif()
+                            target_precompile_headers(${exeTargetName} REUSE_FROM chaste_${component})
+                        endif()
                     endif()
 
 
