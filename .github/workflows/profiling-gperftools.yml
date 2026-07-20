@@ -157,7 +157,7 @@ jobs:
           name: profile-files
           path: ./profile
 
-      - name: checkout results repo (dry run)
+      - name: checkout results repo
         uses: actions/checkout@v7
         with:
           repository: Chaste/profiling-gperftools
@@ -184,15 +184,12 @@ jobs:
           python write_index.py
         working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
 
-      # DRY RUN: commit locally and show what would be pushed, but do not push.
-      # Once the real repo exists, replace the last two lines with:
-      #   git push
       - name: commit results (dry run, no push)
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
           git add --all
-          git commit -m "upload gprof profiling results" || echo "No changes to commit"
+          git commit -m "upload gperftools profiling results" || echo "No changes to commit"
           git push
         working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
 
