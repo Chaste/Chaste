@@ -64,6 +64,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/access.hpp>
 
+// Archiving headers
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
 // Core PETSc headers, included directly or via PetscTools.hpp by most
 // linear algebra, mesh, ODE and PDE code
 #include <petsc.h>
