@@ -157,17 +157,13 @@ jobs:
           name: profile-files
           path: ./profile
 
-      # DRY RUN: Chaste/profiling-gperftools does not exist yet, so check out
-      # Chaste/profiling-gprof as a stand-in (public, no token needed).
-      # Once the real repo exists, switch to:
-      #   repository: Chaste/profiling-gperftools
-      #   token: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
-      #   fetch-depth: 0
       - name: checkout results repo (dry run)
         uses: actions/checkout@v7
         with:
-          repository: Chaste/profiling-gprof
+          repository: Chaste/profiling-gperftools
           path: profiling-gperftools
+          fetch-depth: 0
+          token: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
 
       - name: copy results
         # raw .prof files are deliberately not published: they are only useful with the
@@ -196,9 +192,8 @@ jobs:
           git config user.name "github-action"
           git config user.email "github-action"
           git add --all
-          git commit -m "upload gperftools profiling results" || echo "No changes to commit"
-          echo "DRY RUN: skipping git push; the commit that would be pushed is:"
-          git show --stat HEAD
+          git commit -m "upload gprof profiling results" || echo "No changes to commit"
+          git push
         working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
 
       - name: results URL on chaste.github.io
