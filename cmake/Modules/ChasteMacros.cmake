@@ -171,6 +171,16 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
     endif()
 
 
+    # Chaste_ADD_TEST is a macro, so these variables would otherwise leak between invocations
+    unset(post_command)
+    unset(post_args)
+    unset(output_file)
+    unset(post_command2)
+    unset(post_args2)
+    unset(output_file2)
+    unset(env_var)
+    unset(env_var_value)
+
     if (Chaste_MEMORY_TESTING AND NOT python)
         set(test_command ${VALGRIND_COMMAND})
         set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.txt")
@@ -182,11 +192,26 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             set(test_args "${test_args} --profile")
         elseif (Chaste_PROFILE_GPERFTOOLS)
             set(profile_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.prof)
-            set(post_command ${GPERFTOOLS_PPROF_EXE})
-            set(post_args "--svg --nodefraction=0.0001 --edgefraction=0.0001 $<TARGET_FILE:${exeTargetName}> ${profile_file}")
-            set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.svg)
             set(env_var CPUPROFILE)
             set(env_var_value ${profile_file})
+            # GPERFTOOLS_PPROF_EXE must be the Go pprof (github.com/google/pprof): flags are single-dash
+            set(post_command ${GPERFTOOLS_PPROF_EXE})
+            # text report sorted by cumulative time; svg call graph with low-level library
+            # frames hidden, so their time is attributed to the calling Chaste methods.
+            # External C libraries (PETSc, MPI, HDF5, ...) are matched by prefix plus the
+            # absence of '::', which keeps Chaste's own PETSc-style names visible
+            # (e.g. PetscTools::Destroy, PCBlockDiagonalApply).
+            # Note the hide regex must not contain spaces, as post_args is split on them.
+            set(pprof_hide "^std::|^__|^operator\\snew|^operator\\sdelete")
+            set(pprof_hide "${pprof_hide}|^boost::|^vtk")
+            set(pprof_hide "${pprof_hide}|^(Petsc|Mat|Vec|KSP|SNES|DM|IS)[A-Z][^:]*$")
+            set(pprof_hide "${pprof_hide}|^MPI_|^PMPI_|^ompi_|^opal_|^mca_")
+            set(pprof_hide "${pprof_hide}|^H5|^CVode[^:]*$|^N_V|^SUN[A-Z]")
+            set(post_args "-text -cum $<TARGET_FILE:${exeTargetName}> ${profile_file}")
+            set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.txt)
+            set(post_command2 ${GPERFTOOLS_PPROF_EXE})
+            set(post_args2 "-svg -hide=${pprof_hide} $<TARGET_FILE:${exeTargetName}> ${profile_file}")
+            set(output_file2 ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.svg)
         else()
             set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.txt)
             set(post_command ${GPROF_EXECUTABLE})
@@ -195,6 +220,13 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
     endif()
 
     if (post_command)
+        set(_extra_post_args "")
+        if (post_command2)
+            set(_extra_post_args
+                -Dpost_cmd2=${post_command2}
+                -Dpost_args2:string=${post_args2}
+                -Doutput_file2=${output_file2})
+        endif()
         add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/"
             COMMAND ${CMAKE_COMMAND}
             -Denv_var=${env_var}
@@ -204,6 +236,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             -Dpost_cmd=${post_command}
             -Dpost_args:string=${post_args}
             -Doutput_file=${output_file}
+            ${_extra_post_args}
             -P ${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake)
     else()
         separate_arguments(test_args)
