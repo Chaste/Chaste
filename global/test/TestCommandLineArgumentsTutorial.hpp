@@ -102,7 +102,10 @@ public:
            outp2 = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-opt2");
            outp3 = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-opt3");
         }
-
+        else
+        {
+            std::cout << "No command line arguments passed to TestCommandLineDefaultTutorial. Using default values.\n";
+        }
         unsigned sum = outp1 + outp2 + outp3;
 
         std::cout << "When we add "<< outp1 << " ,"<<  outp2 << " and "<< outp3 <<" we get " << sum <<"\n";
@@ -157,6 +160,10 @@ public:
            // Here we have chosen to set our precision to 4 to ensure the correct number of significant figures.
            std::cout << std::setprecision(5) << "When we add "<< vector_of_doubles[0] << ", " << vector_of_doubles[1] << " and " << vector_of_doubles[2] << " together from our vector we get " << sum  <<std::endl;
 
+        }
+        else
+        {
+            std::cout << "No vector passed to TestCommandLineDoubleTutorial.\n";
         }
     }
 };
