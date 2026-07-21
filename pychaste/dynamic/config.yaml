@@ -1,11 +1,29 @@
+# Package name; prepended to every module name (e.g. pychaste._pychaste_all).
 name: pychaste
 
+# Smart pointer holder type declared in every class wrapper.
 smart_ptr_type: boost::shared_ptr
+# Default pybind11 return_value_policy for methods returning a pointer.
 pointer_call_policy: reference
+# Default pybind11 return_value_policy for methods returning a reference.
 reference_call_policy: reference_internal
 
+# OFF: each wrapper includes only the headers it needs.
 common_include_file: OFF
 
+# Automatically include the headers each wrapper needs.
+auto_includes: True
+
+# Auto-include type-caster headers in wrappers who use their types.
+typecasters:
+  - header: PybindPetscTypeCaster.hpp
+    types: [Vec, Mat]
+  - header: PybindUblasTypeCaster.hpp
+    types: [boost::numeric::ublas::c_vector]
+  - header: PybindVTKTypeCaster.hpp
+    types: [vtkSmartPointer, vtkNew]
+
+# Headers added to every class wrapper.
 source_includes:
   - <map>
   - <set>
@@ -13,15 +31,17 @@ source_includes:
   - <vector>
   - SmartPointers.hpp
 
+# Discover explicit template instantiations from the source .cpp files except
+# for dimension 0.
+discover_template_instantiations: True
+discover_arg_excludes:
+  DIM: [0]
+  SPACE_DIM: [0]
+  ELEMENT_DIM: [0]
+
+# Special template substitutions for CellsGenerator<CELL_CYCLE_MODEL, DIM>
+# which is header-only and never explicitly instantiated.
 template_substitutions:
-  - signature: <unsigned DIM>
-    replacement: [[2], [3]]
-  - signature: <unsigned SPACE_DIM>
-    replacement: [[2], [3]]
-  - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-    replacement: [[2, 2], [3, 3]]
-  - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-    replacement: [[2, 2], [3, 3]]
   - signature: <class CELL_CYCLE_MODEL, unsigned DIM>
     replacement:
       - [Alarcon2004OxygenBasedCellCycleModel, 2]
@@ -57,13 +77,15 @@ template_substitutions:
       - [UniformG1GenerationalCellCycleModel, 2]
       - [UniformG1GenerationalCellCycleModel, 3]
 
-# Translate C++ exception into Python exceptions.
+# Translate Chaste C++ exceptions into Python exceptions.
 exceptions:
   - name: Exception
     message_method: GetMessage
 
+# The Python modules to build; pychaste uses a single module named `all`.
 modules:
   - name: all
+    # Directories (relative to the source root) whose classes this module wraps.
     source_locations:
       ##=== cell_based
       - cell_based/src
@@ -82,21 +104,21 @@ modules:
       ##=== visualization
       - pychaste/src/cpp/visualization
 
+    # The classes to wrap, grouped by Chaste component.
     classes:
       ##=== core: Chaste/global/src
-      - name: RelativeTo # enum
-        source_file: FileFinder.hpp
-
       - name: FileFinder
 
       - name: OutputFileHandler
-        source_includes:
-          - FileFinder.hpp # forward decl
         excluded_methods:
           - OpenOutputFile # std io not wrapped
 
       - name: ProgressReporter
       - name: RandomNumberGenerator
+
+      - name: RelativeTo # enum
+        source_file: FileFinder.hpp
+
       - name: TimeStepper
 
       - name: ChasteBuildInfo
@@ -116,9 +138,7 @@ modules:
           - ReadPetscObject
           - SetupMat
         excluded_variables:
-          - MASTER_RANK # MPI not wrapped here
-        source_includes:
-          - PybindPetscTypeCaster.hpp
+          - MASTER_RANK # part of the unwrapped MPI/parallel interface
 
       - name: ReplicatableVector
         custom_generator: "CPPWG_SOURCEROOT/pychaste/dynamic/templates/ReplicatableVectorCustomTemplate.py"
@@ -133,10 +153,10 @@ modules:
       - name: AbstractOdeSystem
 
       ##=== ode: Chaste/cell_based/src/ode
+      - name: Alarcon2004OxygenBasedCellCycleOdeSystem
       - name: DeltaNotchOdeSystem
       - name: DeltaNotchEdgeOdeSystem
       - name: DeltaNotchInteriorOdeSystem
-      - name: Alarcon2004OxygenBasedCellCycleOdeSystem
       - name: Goldbeter1991OdeSystem
 
       - name: TysonNovak2001OdeSystem
@@ -158,185 +178,106 @@ modules:
 
       - name: AbstractLinearParabolicPdeSystemForCoupledOdeSystem
         template_substitutions:
-          - signature:
-              <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM, unsigned PROBLEM_DIM=1>
+          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM, unsigned PROBLEM_DIM=1>
             replacement: [[2, 2, 1], [3, 3, 1]]
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: AbstractNonlinearEllipticPde
 
       #=== pde: Chaste/cell_based/src/cell_based_pde/pdes
-      - name: CellwiseSourceEllipticPde
       - name: AveragedSourceEllipticPde
-      - name: UniformSourceEllipticPde
-      - name: CellwiseSourceParabolicPde
-      - name: UniformSourceParabolicPde
       - name: AveragedSourceParabolicPde
+      - name: CellwiseSourceEllipticPde
+      - name: CellwiseSourceParabolicPde
+      - name: UniformSourceEllipticPde
+      - name: UniformSourceParabolicPde
 
       #=== pde: Chaste/cell_based/src/cell_based_pde
-      - name: CellBasedEllipticPdeSolver
-        source_includes:
-          - PybindPetscTypeCaster.hpp
-          - PybindUblasTypeCaster.hpp
-
-      - name: CellBasedParabolicPdeSolver
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: AbstractPdeModifier
         excluded_methods:
           - GetSolution
           - GetFeMesh
-        source_includes:
-          - PybindPetscTypeCaster.hpp
 
       - name: AbstractBoxDomainPdeModifier
-        source_includes:
-          - PybindPetscTypeCaster.hpp
-
       - name: AbstractGrowingDomainPdeModifier
-        source_includes:
-          - PybindPetscTypeCaster.hpp
+      - name: CellBasedEllipticPdeSolver
+      - name: CellBasedParabolicPdeSolver
 
       - name: EllipticGrowingDomainPdeModifier
-        source_includes:
-          - PybindPetscTypeCaster.hpp
         excluded_methods:
           - ConstructBoundaryConditionsContainer
 
       - name: ParabolicGrowingDomainPdeModifier
-        source_includes:
-          - PybindPetscTypeCaster.hpp
         excluded_methods:
           - ConstructBoundaryConditionsContainer
 
       - name: EllipticBoxDomainPdeModifier
-        source_includes:
-          - PybindPetscTypeCaster.hpp
         excluded_methods:
           - ConstructBoundaryConditionsContainer
 
       - name: ParabolicBoxDomainPdeModifier
-        source_includes:
-          - PybindPetscTypeCaster.hpp
         excluded_methods:
           - ConstructBoundaryConditionsContainer
 
       #=== mesh: Chaste/mesh/src/common
       - name: ChastePoint
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: AbstractChasteRegion
-
       - name: AbstractElement
-        template_substitutions:
-          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-            replacement: [[1, 2], [2, 2], [2, 3], [3, 3]]
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: AbstractMesh
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: NodeAttributes
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: Node
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: Edge
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: EdgeHelper
       - name: EdgeOperation
 
       - name: Element
         excluded_methods:
-          - CalculateCircumsphereVolume #  method not found!
-        source_includes:
-          - PybindUblasTypeCaster.hpp
+          - CalculateCircumsphereVolume # declared but never defined
 
       - name: MutableElement
-        template_substitutions:
-          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-            replacement: [[1, 2], [2, 2], [2, 3], [3, 3]]
         custom_generator: "CPPWG_SOURCEROOT/pychaste/dynamic/templates/MutableElementCustomTemplate.py"
         constructor_signature_excludes:
           - [unsigned]
 
       - name: AbstractTetrahedralMesh
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: TetrahedralMesh
         excluded_methods:
           - FreeTriangulateIo
           - InitialiseTriangulateIo
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: MutableMesh
         excluded_methods:
           - SplitLongEdges # can't work with vec<c_vec>
-          - RescaleMeshFromBoundaryNode # method not found!
-        source_includes:
-          - PybindUblasTypeCaster.hpp
+          - RescaleMeshFromBoundaryNode # only defined for 1D meshes
 
       - name: NodesOnlyMesh
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       #=== mesh: Chaste/mesh/src/immersed_boundary
       - name: FluidSource
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: ImmersedBoundaryElement
-        template_substitutions:
-          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-            replacement: [[1, 2], [2, 2], [2, 3], [3, 3]]
         excluded_methods: AddCornerNode # not implemented in 1D
 
       - name: ImmersedBoundaryMesh
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: ImmersedBoundaryHoneycombMeshGenerator
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: ImmersedBoundaryPalisadeMeshGenerator
 
       #=== mesh: Chaste/mesh/src/mutable
       - name: Cylindrical2dMesh
         excluded_methods:
           - GetInstanceOfMismatchedBoundaryNodes
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: Cylindrical2dNodesOnlyMesh
         excluded_methods:
           - SetUpBoxCollection # boost::numeric::ublas::unit_vector
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: PeriodicNodesOnlyMesh
         excluded_methods:
           - SetUpBoxCollection # boost::numeric::ublas::zero_vector
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: Toroidal2dMesh
         excluded_methods:
           - GetInstanceOfMismatchedBoundaryNodes
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: HoneycombMeshGenerator
       - name: CylindricalHoneycombMeshGenerator
@@ -354,21 +295,10 @@ modules:
         constructor_arg_type_excludes:
           - TetrahedralMesh<3, 3>
           - TetrahedralMesh<2, 2>
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: MutableVertexMesh
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: Cylindrical2dVertexMesh
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: Toroidal2dVertexMesh
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: HoneycombVertexMeshGenerator
       - name: CylindricalHoneycombVertexMeshGenerator
       - name: ToroidalHoneycombVertexMeshGenerator
@@ -376,10 +306,7 @@ modules:
 
       #=== mesh: Chaste/cell_based/src/mesh
       - name: PottsElement
-
       - name: PottsMesh
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: PottsMeshGenerator
         excluded_methods:
@@ -496,23 +423,13 @@ modules:
       - name: AbstractCellPopulation
         excluded_methods:
           - rGetCells
-        source_includes:
-          - AbstractCellBasedSimulation.hpp
-          - PybindUblasTypeCaster.hpp
 
       - name: AbstractOffLatticeCellPopulation
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: AbstractCentreBasedCellPopulation
-        template_substitutions:
-          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-            replacement: [[2, 2], [3, 3]]
         excluded_methods:
           - MarkSpring
           - UnmarkSpring
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       - name: AbstractOnLatticeCellPopulation
         excluded_methods:
@@ -527,53 +444,12 @@ modules:
           - GetNodeCorrespondingToCell
           - rGetAvailableSpaces
         custom_generator: &population_template "CPPWG_SOURCEROOT/pychaste/dynamic/templates/PopulationWriterCustomTemplate.py"
-        source_includes: &population_includes
-          - AbstractCellBasedSimulation.hpp
-          - AbstractImmersedBoundaryDivisionRule.hpp
-          - AbstractVertexBasedDivisionRule.hpp
-          - BoundaryNodeWriter.hpp
-          - CellAgesWriter.hpp
-          - CellAncestorWriter.hpp
-          - CellAppliedForceWriter.hpp
-          - CellCycleModelProteinConcentrationsWriter.hpp
-          - CellDataItemWriter.hpp
-          - CellDeltaNotchWriter.hpp
-          - CellDivisionLocationsWriter.hpp
-          - CellIdWriter.hpp
-          - CellLabelWriter.hpp
-          - CellLocationIndexWriter.hpp
-          - CellMutationStatesCountWriter.hpp
-          - CellMutationStatesWriter.hpp
-          - CellPopulationAdjacencyMatrixWriter.hpp
-          - CellPopulationAreaWriter.hpp
-          - CellPopulationElementWriter.hpp
-          - CellProliferativePhasesCountWriter.hpp
-          - CellProliferativePhasesWriter.hpp
-          - CellProliferativeTypesCountWriter.hpp
-          - CellProliferativeTypesWriter.hpp
-          - CellRadiusWriter.hpp
-          - CellRemovalLocationsWriter.hpp
-          - CellRosetteRankWriter.hpp
-          - CellVolumesWriter.hpp
-          - HeterotypicBoundaryLengthWriter.hpp
-          - LegacyCellProliferativeTypesWriter.hpp
-          - NodeLocationWriter.hpp
-          - NodeVelocityWriter.hpp
-          - PottsMeshWriter.hpp
-          - PybindUblasTypeCaster.hpp
-          - RadialCellDataDistributionWriter.hpp
-          - VertexIntersectionSwapLocationsWriter.hpp
-          - VertexT1SwapLocationsWriter.hpp
-          - VertexT2SwapLocationsWriter.hpp
-          - VertexT3SwapLocationsWriter.hpp
-          - VoronoiDataWriter.hpp
 
       - name: ImmersedBoundaryCellPopulation
         excluded_methods:
           - rGetMesh
           - GetTetrahedralMeshForPdeModifier
         custom_generator: *population_template
-        source_includes: *population_includes
 
       - name: MeshBasedCellPopulation
         excluded_methods:
@@ -582,11 +458,9 @@ modules:
           - GetTetrahedralMeshForPdeModifier
           - rGetMesh
         custom_generator: *population_template
-        source_includes: *population_includes
 
       - name: MeshBasedCellPopulationWithGhostNodes
         custom_generator: *population_template
-        source_includes: *population_includes
 
       - name: NodeBasedCellPopulation
         excluded_methods:
@@ -594,19 +468,16 @@ modules:
           - GetTetrahedralMeshForPdeModifier
           - rGetMesh
         custom_generator: *population_template
-        source_includes: *population_includes
 
       - name: NodeBasedCellPopulationWithBuskeUpdate
         excluded_methods:
           - rGetMesh
         custom_generator: *population_template
-        source_includes: *population_includes
 
       - name: NodeBasedCellPopulationWithParticles
         excluded_methods:
           - rGetMesh
         custom_generator: *population_template
-        source_includes: *population_includes
 
       - name: VertexBasedCellPopulation
         excluded_methods:
@@ -615,7 +486,6 @@ modules:
           - GetTetrahedralMeshForPdeModifier
           - rGetMesh
         custom_generator: *population_template
-        source_includes: *population_includes
 
       - name: PottsBasedCellPopulation
         excluded_methods:
@@ -626,101 +496,47 @@ modules:
           - GetElementTessellation
           - GetMutableMesh
         custom_generator: *population_template
-        source_includes: *population_includes
 
       - name: CellwiseDataGradient
         excluded: True
 
       ##=== cell_based: Chaste/cell_based/src/population/boundary_conditions
       - name: AbstractCellPopulationBoundaryCondition
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: PlaneBoundaryCondition
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: SlidingBoundaryCondition
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: SphereGeometryBoundaryCondition
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       ##=== cell_based: Chaste/cell_based/src/population/division_rules
       - name: AbstractCentreBasedDivisionRule
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: AbstractCaBasedDivisionRule
-
       - name: AbstractImmersedBoundaryDivisionRule
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: AbstractVertexBasedDivisionRule
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: ExclusionCaBasedDivisionRule
-
       - name: FixedCentreBasedDivisionRule
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: FixedVertexBasedDivisionRule
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: RandomDirectionCentreBasedDivisionRule
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: RandomDirectionVertexBasedDivisionRule
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: ShortAxisImmersedBoundaryDivisionRule
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: ShortAxisVertexBasedDivisionRule
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: ShovingCaBasedDivisionRule
-
       - name: VonMisesVertexBasedDivisionRule
-        source_includes:
-          - PybindUblasTypeCaster.hpp
 
       ##=== cell_based: Chaste/cell_based/src/population/forces
       - name: AbstractForce
       - name: AbstractTwoBodyInteractionForce
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: AbstractImmersedBoundaryForce
-
       - name: BuskeAdhesiveForce
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: BuskeCompressionForce
-
       - name: BuskeElasticForce
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: ChemotacticForce
+      - name: DifferentialAdhesionGeneralisedLinearSpringForce
       - name: DiffusionForce
+
+      - name: DiscreteSystemForceCalculator
+        excluded: True
+
       - name: FarhadifarForce
-
       - name: GeneralisedLinearSpringForce
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: ImmersedBoundaryKinematicFeedbackForce
       - name: ImmersedBoundaryLinearDifferentialAdhesionForce
       - name: ImmersedBoundaryLinearInteractionForce
@@ -728,36 +544,26 @@ modules:
       - name: ImmersedBoundaryMorseInteractionForce
       - name: ImmersedBoundaryMorseMembraneForce
 
-      - name: NagaiHondaForce
-      - name: RepulsionForce
-
-      - name: WelikyOsterForce
-        excluded_methods:
-          - GetLineTensionParameter
-
-      - name: DifferentialAdhesionGeneralisedLinearSpringForce
-
       - name: NagaiHondaDifferentialAdhesionForce
         excluded_methods:
           - GetAdhesionParameter
+
+      - name: NagaiHondaForce
+      - name: RepulsionForce
 
       - name: PlanarPolarisedFarhadifarForce
         excluded_methods:
           - GetLineTensionParameter
 
-      - name: DiscreteSystemForceCalculator
-        excluded: True
+      - name: WelikyOsterForce
+        excluded_methods:
+          - GetLineTensionParameter
 
       ##=== cell_based: Chaste/cell_based/src/population/killers
       - name: AbstractCellKiller
-
       - name: ApoptoticCellKiller
       - name: IsolatedLabelledCellKiller
-
       - name: PlaneBasedCellKiller
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: RandomCellKiller
       - name: T2SwapCellKiller
       - name: TargetedCellKiller
@@ -770,7 +576,6 @@ modules:
       - name: AbstractCaUpdateRule
       - name: AbstractPottsUpdateRule
       - name: AbstractCaSwitchingUpdateRule
-
       - name: AdhesionPottsUpdateRule
       - name: ChemotaxisPottsUpdateRule
       - name: DifferentialAdhesionPottsUpdateRule
@@ -795,9 +600,6 @@ modules:
 
       ##=== cell_based: Chaste/cell_based/src/simulation
       - name: AbstractCellBasedSimulation
-        template_substitutions:
-          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
-            replacement: [[2, 2], [3, 3]]
         excluded_methods:
           - GetSimulationModifiers
 
@@ -810,22 +612,13 @@ modules:
       ##=== cell_based: Chaste/cell_based/src/simulation/modifiers
       - name: AbstractCellBasedSimulationModifier
       - name: AbstractTargetAreaModifier
-
       - name: DeltaNotchTrackingModifier
       - name: DeltaNotchEdgeTrackingModifier
       - name: DeltaNotchEdgeInteriorTrackingModifier
-
       - name: DivisionBiasTrackingModifier
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: ExtrinsicPullModifier
       - name: ImmersedBoundarySimulationModifier
-
       - name: ImmersedBoundarySvgWriter
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: NormallyDistributedTargetAreaModifier
       - name: SimpleTargetAreaModifier
       - name: TargetAreaLinearGrowthModifier
@@ -834,7 +627,6 @@ modules:
       ##=== cell_based: Chaste/cell_based/src/simulation/numerical_methods
       - name: AbstractNumericalMethod
       - name: ForwardEulerNumericalMethod
-
       - name: StepSizeException
         excluded: True
 
@@ -853,181 +645,66 @@ modules:
 
       ##=== cell_based: Chaste/cell_based/src/writers/cell_writers
       - name: AbstractCellWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-          - PybindUblasTypeCaster.hpp
-
       - name: CellAgesWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellAncestorWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellAppliedForceWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-          - PybindUblasTypeCaster.hpp
-
       - name: CellCycleModelProteinConcentrationsWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellDataItemWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellDeltaNotchWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellIdWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellLabelWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellLocationIndexWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellMutationStatesWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellProliferativePhasesWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellProliferativeTypesWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellRadiusWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellRosetteRankWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: CellVolumesWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-
       - name: ImmersedBoundaryBoundaryCellWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-          - ImmersedBoundaryCellPopulation.hpp
-
       - name: ImmersedBoundaryNeighbourNumberWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
-          - ImmersedBoundaryCellPopulation.hpp
-
       - name: LegacyCellProliferativeTypesWriter
-        source_includes:
-          - AbstractCellPopulation.hpp
 
       ##=== cell_based: Chaste/cell_based/src/writers/population_writers
       - name: AbstractCellPopulationWriter
-        source_includes: &population_writer_includes
-          - AbstractCellPopulation.hpp
-          - MeshBasedCellPopulation.hpp
-          - PottsBasedCellPopulation.hpp
-          - CaBasedCellPopulation.hpp
-          - ImmersedBoundaryCellPopulation.hpp
-          - NodeBasedCellPopulation.hpp
-          - VertexBasedCellPopulation.hpp
-
       - name: BoundaryNodeWriter
-        source_includes: *population_writer_includes
-
       - name: CellPopulationAdjacencyMatrixWriter
-        source_includes: *population_writer_includes
-
       - name: CellPopulationAreaWriter
-        source_includes: *population_writer_includes
-
       - name: CellPopulationElementWriter
-        source_includes: *population_writer_includes
-
       - name: HeterotypicBoundaryLengthWriter
-        source_includes: *population_writer_includes
-
       - name: NodeLocationWriter
-        source_includes: *population_writer_includes
-
       - name: NodeVelocityWriter
-        source_includes: *population_writer_includes
-
       - name: RadialCellDataDistributionWriter
-        source_includes: *population_writer_includes
-
       - name: VertexIntersectionSwapLocationsWriter
-        source_includes: *population_writer_includes
-
       - name: VertexT1SwapLocationsWriter
-        source_includes: *population_writer_includes
-
       - name: VertexT2SwapLocationsWriter
-        source_includes: *population_writer_includes
-
       - name: VertexT3SwapLocationsWriter
-        source_includes: *population_writer_includes
-
       - name: VoronoiDataWriter
-        source_includes: *population_writer_includes
 
       ##=== cell_based: Chaste/cell_based/src/writers/population_count_writers
       - name: AbstractCellPopulationCountWriter
-        source_includes: *population_writer_includes
-
       - name: CellMutationStatesCountWriter
-        source_includes: *population_writer_includes
-
       - name: CellProliferativePhasesCountWriter
-        source_includes: *population_writer_includes
-
       - name: CellProliferativeTypesCountWriter
-        source_includes: *population_writer_includes
 
       ##=== cell_based: Chaste/cell_based/src/writers/population_event_writers
       - name: AbstractCellPopulationEventWriter
-        source_includes: *population_writer_includes
-
       - name: CellDivisionLocationsWriter
-        source_includes: *population_writer_includes
-
       - name: CellRemovalLocationsWriter
-        source_includes: *population_writer_includes
 
       ##=== cell_based: Chaste/pychaste/src/cpp/cell_based
       - name: AttractingPlaneBoundaryCondition
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: VtkSceneModifier
       - name: PythonSimulationModifier
 
       ##=== visualization: Chaste/pychaste/src/cpp/visualization
       - name: VtkScene
-        source_includes:
-          - PybindVTKTypeCaster.hpp
-
       - name: AbstractPyChasteActorGenerator
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: CellPopulationPyChasteActorGenerator
 
 prefix_text: |
   /*
 
-  Copyright (c) 2005-2024, University of Oxford.
+  Copyright (c) 2005-2026, University of Oxford.
   All rights reserved.
 
   University of Oxford means the Chancellor, Masters and Scholars of the
