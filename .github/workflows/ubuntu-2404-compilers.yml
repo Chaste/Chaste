@@ -54,7 +54,7 @@ jobs:
         echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
-        sudo apt install chaste-dependencies
+        sudo apt install chaste-dependencies mold
 
     - name: install and set up Intel LLVM compiler
       run: |
