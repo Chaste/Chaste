@@ -13,18 +13,23 @@ class CustomStoppingSimulation : public OffLatticeSimulation<2>
     void serialize(Archive& archive, unsigned int _)
     {
         archive & boost::serialization::base_object<OffLatticeSimulation>(*this);
+        archive & mMercyThreshold;
+        archive & mSeekRelease;
     }
 
     unsigned mMercyThreshold;
+    bool mSeekRelease;
+
+protected:
+    bool StoppingEventHasOccurred() override;
 
 public:
-    CustomStoppingSimulation(AbstractCellPopulation<2>& rCellPopulation,
+    explicit CustomStoppingSimulation(AbstractCellPopulation<2>& rCellPopulation,
                          bool deleteCellPopulationInDestructor=false,
                          bool initialiseCells=true,
                          unsigned lMercyThreshold=0);
 
 
-    bool StoppingEventHasOccurred() override;
     void OutputSimulationParameters(out_stream& rParamsFile) override;
 
     unsigned GetMercyThreshold() const;

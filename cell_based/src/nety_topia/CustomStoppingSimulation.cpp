@@ -4,13 +4,17 @@
 CustomStoppingSimulation::CustomStoppingSimulation(AbstractCellPopulation<2>& rCellPopulation,
     const bool deleteCellPopulationInDestructor, const bool initialiseCells, const unsigned lMercyThreshold)
         : OffLatticeSimulation(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells),
-        mMercyThreshold(lMercyThreshold)
-{
-}
+        mMercyThreshold(lMercyThreshold), mSeekRelease(false)
+{}
 
 bool CustomStoppingSimulation::StoppingEventHasOccurred()
 {
-    return mrCellPopulation.GetNumRealCells() <= mMercyThreshold;
+    if (mrCellPopulation.GetNumRealCells() <= mMercyThreshold)
+    {
+        mSeekRelease = true;
+    }
+
+    return mSeekRelease && SimulationTime::Instance()->GetTimeStepsElapsed() % mSamplingTimestepMultiple == 0;
 }
 
 unsigned CustomStoppingSimulation::GetMercyThreshold() const

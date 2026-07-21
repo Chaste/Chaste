@@ -16,8 +16,8 @@
 #include "CustomStoppingSimulation.hpp"
 
 
-// Structurally it's more 'chaste-appropriate' to store thigns like latency
-// or infected as cell properties.
+// Structurally it's more 'chaste-appropriate' to store things like latency
+// or 'infected' as cell properties than CellData properties (which are doubles)
 
 
 constexpr unsigned int sample_step = 25;
