@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The ApoptoticCellProperty object keeps track of the number of cells that are apoptotic, as well
  * as what colour should be used by the visualizer to display cells that are apoptotic.
  */
-class ApoptoticCellProperty : public AbstractCellProperty
+class ApoptoticCellProperty : public CellProperty<ApoptoticCellProperty>
 {
 private:
 

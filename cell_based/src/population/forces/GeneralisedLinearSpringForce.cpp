@@ -81,11 +81,18 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     const c_vector<double, SPACE_DIM>& r_node_a_location = p_node_a->rGetLocation();
     const c_vector<double, SPACE_DIM>& r_node_b_location = p_node_b->rGetLocation();
 
+    // This function is called once per node pair, so work out the population type just once
+    // here via a cheap enum comparison and reuse it below, rather than repeating several
+    // dynamic_casts (which are comparatively expensive across shared library boundaries).
+    CellPopulationType population_type = rCellPopulation.GetCellPopulationType();
+    bool is_node_based_cell_population = (population_type == CellPopulationType::NODE_BASED);
+    bool is_mesh_based_cell_population = (population_type == CellPopulationType::MESH_BASED);
+
     // Get the node radii for a NodeBasedCellPopulation
     double node_a_radius = 0.0;
     double node_b_radius = 0.0;
 
-    if (bool(dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
+    if (is_node_based_cell_population)
     {
         node_a_radius = p_node_a->GetRadius();
         node_b_radius = p_node_b->GetRadius();
@@ -126,11 +133,11 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
      */
     double rest_length_final = 1.0;
 
-    if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)))
+    if (is_mesh_based_cell_population)
     {
         rest_length_final = static_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)->GetRestLength(nodeAGlobalIndex, nodeBGlobalIndex);
     }
-    else if (bool(dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
+    else if (is_node_based_cell_population)
     {
         assert(node_a_radius > 0 && node_b_radius > 0);
         rest_length_final = node_a_radius+node_b_radius;
@@ -176,7 +183,7 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     double a_rest_length = rest_length*0.5;
     double b_rest_length = a_rest_length;
 
-    if (bool(dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
+    if (is_node_based_cell_population)
     {
         assert(node_a_radius > 0 && node_b_radius > 0);
         a_rest_length = (node_a_radius/(node_a_radius+node_b_radius))*rest_length;
@@ -208,7 +215,7 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     double multiplication_factor = VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
     double spring_stiffness = mMeinekeSpringStiffness;
 
-    if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)))
+    if (is_mesh_based_cell_population)
     {
         return multiplication_factor * spring_stiffness * unit_difference * overlap;
     }

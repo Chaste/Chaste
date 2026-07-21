@@ -138,7 +138,7 @@ public:
       * The length of the data vector is assumed to match the number of elements in the mesh.
       * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
       */
-     void AddCellData(std::string name, std::vector<double> data);
+     void AddCellData(std::string name, const std::vector<double>& data);
 
      /**
      * Add a vector data field to each element (known as "cell" in VTK).
@@ -176,7 +176,7 @@ public:
      * The length of the data vector is assumed to match the number of nodes in the mesh
      * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
      */
-    void AddPointData(std::string name, std::vector<double> data);
+    void AddPointData(std::string name, const std::vector<double>& data);
 
     /**
      * Add a vector data field to each node (known as "point" in VTK).
@@ -185,7 +185,7 @@ public:
      * The length of the data vector is assumed to match the number of nodes in the mesh
      * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
      */
-    void AddPointData(std::string name, std::vector<c_vector<double, SPACE_DIM> > data);
+    void AddPointData(std::string name, const std::vector<c_vector<double, SPACE_DIM> >& data);
 
     /**
      * Add a tensor data field to each point.

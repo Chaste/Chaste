@@ -46,6 +46,7 @@ NodeAttributes<SPACE_DIM>::NodeAttributes()
         mRadius(0.0),
         mNeighbourIndices(std::vector<unsigned>()),
         mNeighboursSetUp(false),
+        mNeighboursDirty(true),
         mIsParticle(false)
 {
 }
@@ -83,7 +84,12 @@ c_vector<double, SPACE_DIM>& NodeAttributes<SPACE_DIM>::rGetAppliedForce()
 template<unsigned SPACE_DIM>
 void NodeAttributes<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution)
 {
-    mAppliedForce += rForceContribution;
+    for (unsigned int d = 0; d < SPACE_DIM; d++) {
+        #ifdef _OPENMP
+        #pragma omp atomic update
+        #endif
+        mAppliedForce[d] = mAppliedForce[d] + rForceContribution[d];
+    }
 }
 
 template<unsigned SPACE_DIM>
@@ -99,19 +105,28 @@ template<unsigned SPACE_DIM>
 void NodeAttributes<SPACE_DIM>::AddNeighbour(unsigned index)
 {
     mNeighbourIndices.push_back(index);
+    mNeighboursDirty = true;
 }
 
 template<unsigned SPACE_DIM>
 void NodeAttributes<SPACE_DIM>::ClearNeighbours()
 {
     mNeighbourIndices.clear();
+    mNeighboursDirty = false;
 }
 
 template<unsigned SPACE_DIM>
 void NodeAttributes<SPACE_DIM>::RemoveDuplicateNeighbours()
 {
+    // Nothing has been added since the last call, so mNeighbourIndices is already sorted and unique
+    if (!mNeighboursDirty)
+    {
+        return;
+    }
+
     sort( mNeighbourIndices.begin(), mNeighbourIndices.end() );
     mNeighbourIndices.erase( unique( mNeighbourIndices.begin(), mNeighbourIndices.end() ), mNeighbourIndices.end() );
+    mNeighboursDirty = false;
 }
 
 template<unsigned SPACE_DIM>

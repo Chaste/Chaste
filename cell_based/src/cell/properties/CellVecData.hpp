@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * for example solutions to reaction-diffusion PDEs solved within the cell. Other classes may interrogate
  * or modify the values stored in this class.
  */
-class CellVecData : public AbstractCellProperty
+class CellVecData : public CellProperty<CellVecData>
 {
 private:
 

@@ -81,7 +81,8 @@ void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
         *this->mpOutStream << t2_swap_info[index].mCellId << "\t";
         for (unsigned i=0; i<SPACE_DIM; i++)
         {
-            *this->mpOutStream <<  t2_swap_info[index].mLocation[i] << "\t";
+            this->WriteDouble(t2_swap_info[index].mLocation[i]);
+            *this->mpOutStream << "\t";
         }
     }
 

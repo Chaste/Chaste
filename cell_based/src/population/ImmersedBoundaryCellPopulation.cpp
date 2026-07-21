@@ -988,7 +988,7 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCel
 
     if (pdeNodeIndex < this->GetNumNodes())
     {
-        std::set<unsigned> containing_element_indices = this->GetNode(pdeNodeIndex)->rGetContainingElementIndices();
+        const std::set<unsigned>& containing_element_indices = this->GetNode(pdeNodeIndex)->rGetContainingElementIndices();
 
         for (auto iter = containing_element_indices.begin();
              iter != containing_element_indices.end();
@@ -1050,7 +1050,7 @@ double ImmersedBoundaryCellPopulation<DIM>::GetCellDataItemAtPdeNode(
             Node<DIM>* p_node = this->GetNode(pdeNodeIndex);
 
             // Average over data from containing elements (cells)
-            std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
+            const std::set<unsigned>& containing_elements = p_node->rGetContainingElementIndices();
             for (auto index_iter = containing_elements.begin();
                  index_iter != containing_elements.end();
                  ++index_iter)

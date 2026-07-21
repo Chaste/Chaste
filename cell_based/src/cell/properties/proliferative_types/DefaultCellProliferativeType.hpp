@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Subclass of AbstractCellProliferativeType defining a 'default' cell.
  * This means a cell that is not of type stem, transit or differentiated.
  */
-class DefaultCellProliferativeType : public AbstractCellProliferativeType
+class DefaultCellProliferativeType : public CellProperty<DefaultCellProliferativeType, AbstractCellProliferativeType>
 {
 private:
     /** Needed for serialization. */

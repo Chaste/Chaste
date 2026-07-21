@@ -82,6 +82,9 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::AddForceContributi
                        " Currently this force class works only with NodeBased and MeshBased cell populations.");
     }
 
+    #ifdef _OPENMP
+    #pragma omp parallel for
+    #endif
     for (const auto& [p_node_a, p_node_b] : r_node_pairs)
     {
         unsigned node_a_index = p_node_a->GetIndex();

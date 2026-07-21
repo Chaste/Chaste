@@ -37,8 +37,43 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTCELLPROPERTY_HPP_
 
 #include <boost/shared_ptr.hpp>
+#include <type_traits>
 #include "ChasteSerialization.hpp"
 #include "Identifiable.hpp"
+
+/**
+ * Generates a value that is unique per template instantiation and stable for the life of
+ * the process, without using RTTI. Comparing two of these is a plain pointer comparison,
+ * unlike comparing std::type_info objects, which can fall back to a string comparison when
+ * the types being compared live in different shared libraries.
+ */
+class CellPropertyTypeId
+{
+public:
+    /**
+     * @return an ID unique to CLASS, ignoring any top-level cv-qualification on CLASS (so
+     * Get<CellLabel>() and Get<const CellLabel>() return the same value, matching the
+     * behaviour of typeid(), which this class replaces).
+     */
+    template<typename CLASS>
+    static const void* Get()
+    {
+        return GetUnqualified<typename std::remove_cv<CLASS>::type>();
+    }
+
+private:
+
+    /**
+     * @return an ID unique to CLASS. Only ever instantiated with a non-cv-qualified CLASS,
+     * so that differently cv-qualified spellings of the same type share one marker.
+     */
+    template<typename CLASS>
+    static const void* GetUnqualified()
+    {
+        static char s_marker;
+        return &s_marker;
+    }
+};
 
 /**
  * Base class for cell properties.
@@ -84,9 +119,10 @@ public:
      * @return whether this property is a particular class.  This tests for exact
      * run-time class identity, and doesn't match subclasses.
      *
-     * The current implementation requires that all cell properties have a default
-     * constructor.  For this method to be efficient, the default constructor must
-     * also be cheap.
+     * Subclasses that derive from the CellProperty<CONCRETE> mixin (rather than from
+     * AbstractCellProperty directly) get this comparison via a cheap pointer comparison.
+     * Subclasses that don't fall back to the slower typeid-based comparison, which requires
+     * a default constructor and is comparatively expensive across shared library boundaries.
      *
      * It should be called like:
      *   bool healthy = p_property->IsType<HealthyMutationState>();
@@ -94,6 +130,12 @@ public:
     template<class CLASS>
     bool IsType() const
     {
+        const void* p_this_type_id = GetTypeId();
+        if (p_this_type_id != nullptr)
+        {
+            return p_this_type_id == CellPropertyTypeId::Get<CLASS>();
+        }
+
         CLASS ref_obj;
         return IsSame(&ref_obj);
     }
@@ -140,6 +182,43 @@ public:
      * @return #mCellCount
      */
     unsigned GetCellCount() const;
+
+protected:
+
+    /**
+     * @return an ID unique to this object's concrete class, for use by IsType(), or nullptr
+     * if the concrete class hasn't opted into the fast comparison path (see CellProperty).
+     */
+    virtual const void* GetTypeId() const
+    {
+        return nullptr;
+    }
+};
+
+/**
+ * Mixin that gives a concrete cell property class a fast, RTTI-free identity for IsType() to
+ * compare against, by overriding GetTypeId(). Concrete property classes should derive from
+ * this instead of from AbstractCellProperty (or another abstract property base) directly, e.g.
+ *   class CellLabel : public CellProperty<CellLabel> { ... };
+ *   class WildTypeCellMutationState : public CellProperty<WildTypeCellMutationState, AbstractCellMutationState> { ... };
+ *
+ * @tparam CONCRETE the concrete (most-derived) class inheriting this mixin.
+ * @tparam BASE the class CONCRETE would otherwise have derived from directly.
+ */
+template<typename CONCRETE, typename BASE = AbstractCellProperty>
+class CellProperty : public BASE
+{
+public:
+
+    // Inherit BASE's constructors
+    using BASE::BASE;
+
+protected:
+
+    const void* GetTypeId() const override
+    {
+        return CellPropertyTypeId::Get<CONCRETE>();
+    }
 };
 
 #endif /* ABSTRACTCELLPROPERTY_HPP_ */

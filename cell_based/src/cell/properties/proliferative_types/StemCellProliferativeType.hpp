@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Subclass of AbstractCellProliferativeType defining a stem cell.
  */
-class StemCellProliferativeType : public AbstractCellProliferativeType
+class StemCellProliferativeType : public CellProperty<StemCellProliferativeType, AbstractCellProliferativeType>
 {
 private:
     /** Needed for serialization. */

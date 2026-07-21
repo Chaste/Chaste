@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcOneHitCellMutationState.hpp"
 
 ApcOneHitCellMutationState::ApcOneHitCellMutationState()
-    : AbstractCellMutationState(3)
+    : CellProperty<ApcOneHitCellMutationState, AbstractCellMutationState>(3)
 {}
 
 #include "SerializationExportWrapperForCpp.hpp"

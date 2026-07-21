@@ -905,13 +905,37 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOffsetNewBoundaryNodes()
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshPeriodicityType
+MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetMeshPeriodicityType() const
+{
+    if (mMeshPeriodicityType == MeshPeriodicityType::UNKNOWN)
+    {
+        // The mesh's dynamic type cannot change after construction, so this dynamic_cast-based
+        // check only ever needs to run once per population, however many times it's queried.
+        if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
+        {
+            mMeshPeriodicityType = MeshPeriodicityType::CYLINDRICAL;
+        }
+        else if (dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh)))
+        {
+            mMeshPeriodicityType = MeshPeriodicityType::TOROIDAL;
+        }
+        else
+        {
+            mMeshPeriodicityType = MeshPeriodicityType::NONE;
+        }
+    }
+    return mMeshPeriodicityType;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
-    if (bool(dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh))))
+    if (GetMeshPeriodicityType() == MeshPeriodicityType::CYLINDRICAL)
     {
         *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
     }
-    if (bool(dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh))))
+    if (GetMeshPeriodicityType() == MeshPeriodicityType::TOROIDAL)
     {
         *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
         *pVizSetupFile << "MeshHeight\t" << this->GetWidth(1) << "\n";
@@ -932,7 +956,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateVoronoiTessellation(
 
         // Check if the mesh associated with this cell population is periodic
         bool is_mesh_periodic = false;
-        if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
+        if (GetMeshPeriodicityType() == MeshPeriodicityType::CYLINDRICAL)
         {
             if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX || mOffsetNewBoundaryNodes)
             {
@@ -942,7 +966,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateVoronoiTessellation(
             is_mesh_periodic = true;
             mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
         }
-        else if (dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh)))
+        else if (GetMeshPeriodicityType() == MeshPeriodicityType::TOROIDAL)
         {
             if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX || mOffsetNewBoundaryNodes)
             {
