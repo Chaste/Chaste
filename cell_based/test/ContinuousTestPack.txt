@@ -89,6 +89,8 @@ simulation/TestSimpleTargetAreaModifier.hpp
 simulation/TestStepSizeException.hpp
 simulation/TestTargetAreaLinearGrowthModifier.hpp
 simulation/TestVolumeTrackingModifier.hpp
+tutorial/TestAdlam.hpp
+tutorial/TestCellBasedPlayground.hpp
 tutorial/TestCreatingAndUsingANewCellBasedSimulationModifierTutorial.hpp
 tutorial/TestCreatingAndUsingANewCellCycleModelTutorial.hpp
 tutorial/TestCreatingAndUsingANewCellKillerTutorial.hpp
@@ -108,4 +110,3 @@ tutorial/TestRunningPottsBasedSimulationsTutorial.hpp
 tutorial/TestRunningTumourSpheroidSimulationsTutorial.hpp
 tutorial/TestRunningVertexBasedSimulationsTutorial.hpp
 tutorial/TestVisualizingWithParaviewTutorial.hpp
-
