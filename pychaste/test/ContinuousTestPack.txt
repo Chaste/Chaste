@@ -1,3 +1,4 @@
+cell_based/TestAttractingPlaneBoundaryCondition.hpp
 cell_based/TestPyCaBasedCellPopulation.py
 cell_based/TestPyMeshBasedCellPopulation.py
 cell_based/TestPyNodeBasedCellPopulation.py

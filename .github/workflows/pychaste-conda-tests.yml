@@ -18,12 +18,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # 3.14 dropped for now: conda-forge does not yet have a full Python 3.14 stack
         python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     runs-on: ubuntu-24.04
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/testoutput
+      # Force mesa software rendering (llvmpipe) so VTK off-screen rendering
+      # does not pick up an unstable GPU/DRI path on the runner.
+      LIBGL_ALWAYS_SOFTWARE: "1"
 
     defaults:
       run:
@@ -41,7 +45,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y castxml clang cmake libosmesa6-dev libpthread-stubs0-dev libx11-dev pkg-config xvfb
+          sudo apt-get install -y cmake libosmesa6-dev libpthread-stubs0-dev libx11-dev pkg-config xvfb
 
       - name: Setup Miniconda Python ${{ matrix.python-version }}
         uses: conda-incubator/setup-miniconda@v4
@@ -49,7 +53,7 @@ jobs:
           auto-update-conda: true
           use-mamba: true
           miniforge-version: latest
-          environment-file: pychaste/src/py/conda/envs/env_python${{ matrix.python-version }}.yaml
+          environment-file: pychaste/infra/conda/envs/env_python${{ matrix.python-version }}.yaml
           python-version: ${{ matrix.python-version }}
           channels: conda-forge,pychaste
 
