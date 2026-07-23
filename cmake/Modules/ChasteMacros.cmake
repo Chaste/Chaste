@@ -468,9 +468,6 @@ macro(Chaste_DO_APPS_COMMON component)
         else()
             target_link_libraries(${appName} LINK_PUBLIC ${component_library} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
         endif()
-        if(MSVC)
-            set_target_properties(${appName} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /IGNORE:4217 /IGNORE:4049")
-        endif()
     endforeach(app)
     if (Chaste_ENABLE_TESTING AND TEXTTEST_FOUND AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/texttest)
         configure_file(texttest/chaste/wrapper.cmake.in texttest/chaste/wrapper)
@@ -567,31 +564,9 @@ macro(Chaste_DO_TEST_COMMON component)
     #set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} ${Chaste_DEPENDS_${component}})
     # Generate test suites
 
-    if(MSVC)
-        if(NOT HAS_OWN_LINKER_FLAGS)
-            set(LINKER_FLAGS "/NODEFAULTLIB:LIBCMT")
-        endif(NOT HAS_OWN_LINKER_FLAGS)
-
-        #disable linker warnings 4217, 4049: locally-defined symbol imported in function ...
-        set(LINKER_FLAGS "${LINKER_FLAGS} /IGNORE:4217 /IGNORE:4049")
-        #message("Linker flags for project ${PROJECT_NAME} = ${LINKER_FLAGS}")
-    endif(MSVC)
-
-
     foreach(type ${TestPackTypes})
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
             file(STRINGS "${type}TestPack.txt" testpack)
-
-            # remove python tests from windows builds
-            if (WIN32 OR CYGWIN)
-                set(testpack_new "")
-                foreach(filename ${testpack})
-                    if (NOT filename MATCHES ".py$")
-                        list(APPEND testpack_new ${filename})
-                    endif()
-                endforeach()
-                set(testpack ${testpack_new})
-            endif(WIN32 OR CYGWIN)
 
             foreach(filename ${testpack})
                 string(STRIP ${filename} filename)
@@ -620,7 +595,6 @@ macro(Chaste_DO_TEST_COMMON component)
                         else()
                             target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
                         endif()
-                        set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
                     endif()
 
 
