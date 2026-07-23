@@ -53,7 +53,7 @@ jobs:
         run: sudo apt install autoconf automake libtool libunwind-dev graphviz
 
       - name: setup go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version: 'stable'
 
@@ -173,7 +173,7 @@ jobs:
           cp ./profile/*.txt ./profile/*.svg ./profile/index.html ${GPERFTOOLS_RESULTS_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
 
       - name: setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.x'
 

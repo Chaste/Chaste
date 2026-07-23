@@ -33,7 +33,7 @@ jobs:
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
       - name: checkout Chaste
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -108,7 +108,7 @@ jobs:
           path: ./profile
 
       - name: checkout profiling-gprof
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Chaste/profiling-gprof
           path: profiling-gprof
@@ -121,7 +121,7 @@ jobs:
           cp ./profile/* ${GPROF_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
 
       - name: setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.x'
 
