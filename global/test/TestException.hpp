@@ -147,13 +147,16 @@ public:
         TS_ASSERT_THROWS_THIS(EXCEPT_IF_NOT(false), "Assertion tripped: false");
         TS_ASSERT_THROWS_NOTHING(EXCEPT_IF_NOT(true));
 
+        // Derive the expected line number from __LINE__ (the throw is 3 lines below) so this
+        // test is robust to edits elsewhere in the file rather than hard-coding a line number.
+        const unsigned expected_line = __LINE__ + 3;
         try
         {
             EXCEPTION("Testing what");
         }
         catch (const Exception& e)
         {
-            std::string s1("\nChaste error: ./global/test/TestException.hpp:154: Testing what");
+            std::string s1("\nChaste error: ./global/test/TestException.hpp:" + std::to_string(expected_line) + ": Testing what");
             std::string s2(e.what());
             TS_ASSERT_EQUALS(s1, s2);
         }
