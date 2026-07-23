@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <sstream>
 #include <cassert>
-#include <iostream>
 
 #include "ArchiveLocationInfo.hpp"
 #include "ChasteBuildRoot.hpp"
@@ -259,29 +258,21 @@ std::string OutputFileHandler::GetRelativePath() const
 out_stream OutputFileHandler::OpenOutputFile(const std::string& rFileName,
                                              std::ios_base::openmode mode) const
 {
-    fs::path output_file(mDirectory);
-     // Beware the /= operator with prefix /
-    if(rFileName.find('/') == 0)
+    // A leading '/' in rFileName would make operator/= treat it as an absolute path and
+    // discard mDirectory, so strip any root component before appending.
+    fs::path file_name(rFileName);
+    if (file_name.has_root_path())
     {
-        output_file /= rFileName.substr(1);
+        file_name = file_name.relative_path();
     }
-    else
-    {
-        output_file /= rFileName;
-    }
+    fs::path output_file = fs::path(mDirectory) / file_name;
+
     out_stream p_output_file(new std::ofstream(output_file, mode));
     if (!p_output_file->is_open())
     {
         EXCEPTION("Could not open file \"" + rFileName + "\" in " + mDirectory);
     }
-    try
-    {
-        FilesystemPermissions::SetFilePermissions(output_file);
-    }
-    catch (const fs::filesystem_error& e)
-    {
-        EXCEPTION("Could not set permissions on file \"" + output_file.string() + "\": " + e.what());
-    }
+    FilesystemPermissions::SetFilePermissions(output_file);
     return p_output_file;
 }
 
