@@ -3,8 +3,10 @@ name: pychaste
 
 # Smart pointer holder type declared in every class wrapper.
 smart_ptr_type: boost::shared_ptr
+
 # Default pybind11 return_value_policy for methods returning a pointer.
 pointer_call_policy: reference
+
 # Default pybind11 return_value_policy for methods returning a reference.
 reference_call_policy: reference_internal
 
@@ -31,8 +33,8 @@ source_includes:
   - <vector>
   - SmartPointers.hpp
 
-# Discover explicit template instantiations from the source .cpp files except
-# for dimension 0.
+# Automatically discover explicit template instantiations from the source .cpp
+# files (except for dimension 0).
 discover_template_instantiations: True
 discover_arg_excludes:
   DIM: [0]
@@ -135,8 +137,8 @@ modules:
         excluded_methods:
           - GetWorld # MPI not wrapped here
           - Destroy # No non-const ref to PETSc types
-          - ReadPetscObject
-          - SetupMat
+          - ReadPetscObject # non-const ref to PETSc Mat/Vec
+          - SetupMat # non-const ref to PETSc Mat
         excluded_variables:
           - MASTER_RANK # part of the unwrapped MPI/parallel interface
 
@@ -194,29 +196,33 @@ modules:
       #=== pde: Chaste/cell_based/src/cell_based_pde
       - name: AbstractPdeModifier
         excluded_methods:
-          - GetSolution
-          - GetFeMesh
+          - GetSolution # Vec return not castable
+          - GetFeMesh # raw ptr to owned FE mesh
 
       - name: AbstractBoxDomainPdeModifier
       - name: AbstractGrowingDomainPdeModifier
+
+      - name: BoundaryConditionsContainer
+        excluded: True # internal PDE-solver plumbing; not exposed to Python
+
       - name: CellBasedEllipticPdeSolver
       - name: CellBasedParabolicPdeSolver
 
       - name: EllipticGrowingDomainPdeModifier
         excluded_methods:
-          - ConstructBoundaryConditionsContainer
+          - ConstructBoundaryConditionsContainer # BoundaryConditionsContainer not wrapped
 
       - name: ParabolicGrowingDomainPdeModifier
         excluded_methods:
-          - ConstructBoundaryConditionsContainer
+          - ConstructBoundaryConditionsContainer # BoundaryConditionsContainer not wrapped
 
       - name: EllipticBoxDomainPdeModifier
         excluded_methods:
-          - ConstructBoundaryConditionsContainer
+          - ConstructBoundaryConditionsContainer # BoundaryConditionsContainer not wrapped
 
       - name: ParabolicBoxDomainPdeModifier
         excluded_methods:
-          - ConstructBoundaryConditionsContainer
+          - ConstructBoundaryConditionsContainer # BoundaryConditionsContainer not wrapped
 
       #=== mesh: Chaste/mesh/src/common
       - name: ChastePoint
@@ -242,8 +248,8 @@ modules:
 
       - name: TetrahedralMesh
         excluded_methods:
-          - FreeTriangulateIo
-          - InitialiseTriangulateIo
+          - FreeTriangulateIo # raw triangulateio C struct
+          - InitialiseTriangulateIo # raw triangulateio C struct
 
       - name: MutableMesh
         excluded_methods:
@@ -265,7 +271,7 @@ modules:
       #=== mesh: Chaste/mesh/src/mutable
       - name: Cylindrical2dMesh
         excluded_methods:
-          - GetInstanceOfMismatchedBoundaryNodes
+          - GetInstanceOfMismatchedBoundaryNodes # declared but not defined
 
       - name: Cylindrical2dNodesOnlyMesh
         excluded_methods:
@@ -277,7 +283,7 @@ modules:
 
       - name: Toroidal2dMesh
         excluded_methods:
-          - GetInstanceOfMismatchedBoundaryNodes
+          - GetInstanceOfMismatchedBoundaryNodes # declared but not defined
 
       - name: HoneycombMeshGenerator
       - name: CylindricalHoneycombMeshGenerator
@@ -291,7 +297,7 @@ modules:
       - name: VertexMesh
         excluded_methods:
           - GetFace # dont have mixed dim elements
-          - rGetEdgeHelper
+          - rGetEdgeHelper # ref to internal EdgeHelper
         constructor_arg_type_excludes:
           - TetrahedralMesh<3, 3>
           - TetrahedralMesh<2, 2>
@@ -323,8 +329,7 @@ modules:
       ##=== cell_based: Chaste/cell_based/src/cell
       - name: Cell
         excluded_methods:
-          - rGetCellPropertyCollection
-          - GetSrnModel
+          - rGetCellPropertyCollection # non-const ref to collection
 
       - name: CellsGenerator
         custom_generator: "CPPWG_SOURCEROOT/pychaste/dynamic/templates/CellsGeneratorCustomTemplate.py"
@@ -396,7 +401,7 @@ modules:
 
       - name: CellPropertyCollection
         excluded_methods:
-          - GetCellPropertyRegistry
+          - GetCellPropertyRegistry # raw ptr to registry singleton
 
       - name: CellData
       - name: CellLabel
@@ -406,9 +411,9 @@ modules:
 
       - name: CellPropertyRegistry
         excluded_methods:
-          - rGetAllCellProperties
-          - TakeOwnership
-          - Get
+          - rGetAllCellProperties # ref to internal registry list
+          - TakeOwnership # raw ptr to registry singleton
+          - Get # templated method
 
       - name: CellVecData
         excluded: True
@@ -422,41 +427,37 @@ modules:
       ##=== cell_based: Chaste/cell_based/src/population
       - name: AbstractCellPopulation
         excluded_methods:
-          - rGetCells
+          - rGetCells # non-const ref to cell list
 
       - name: AbstractOffLatticeCellPopulation
 
       - name: AbstractCentreBasedCellPopulation
         excluded_methods:
-          - MarkSpring
-          - UnmarkSpring
+          - MarkSpring # non-const ref to cell pair
+          - UnmarkSpring # non-const ref to cell pair
 
       - name: AbstractOnLatticeCellPopulation
-        excluded_methods:
-          - GetNodeCorrespondingToCell
-          - MarkSpring
-          - UnmarkSpring
 
       - name: CaBasedCellPopulation
         excluded_methods:
-          - rGetMesh
-          - GetTetrahedralMeshForPdeModifier
-          - GetNodeCorrespondingToCell
-          - rGetAvailableSpaces
+          - rGetMesh # non-const ref to mesh
+          - GetTetrahedralMeshForPdeModifier # pure-virtual base already wrapped; override redundant
+          - GetNodeCorrespondingToCell # raw ptr to internal node
+          - rGetAvailableSpaces # non-const ref to vector
         custom_generator: &population_template "CPPWG_SOURCEROOT/pychaste/dynamic/templates/PopulationWriterCustomTemplate.py"
 
       - name: ImmersedBoundaryCellPopulation
         excluded_methods:
-          - rGetMesh
-          - GetTetrahedralMeshForPdeModifier
+          - rGetMesh # non-const ref to mesh
+          - GetTetrahedralMeshForPdeModifier # override; throws if not 2D
         custom_generator: *population_template
 
       - name: MeshBasedCellPopulation
         excluded_methods:
-          - GetVoronoiTessellation
-          - rGetNodePairs
-          - GetTetrahedralMeshForPdeModifier
-          - rGetMesh
+          - GetVoronoiTessellation # raw ptr to cached tessellation
+          - rGetNodePairs # vector of raw node pairs
+          - GetTetrahedralMeshForPdeModifier # pure-virtual base already wrapped; override redundant
+          - rGetMesh # non-const ref to mesh
         custom_generator: *population_template
 
       - name: MeshBasedCellPopulationWithGhostNodes
@@ -464,37 +465,37 @@ modules:
 
       - name: NodeBasedCellPopulation
         excluded_methods:
-          - rGetNodePairs
-          - GetTetrahedralMeshForPdeModifier
-          - rGetMesh
+          - rGetNodePairs # vector of raw node pairs
+          - GetTetrahedralMeshForPdeModifier # pure-virtual base already wrapped; override redundant
+          - rGetMesh # non-const ref to mesh
         custom_generator: *population_template
 
       - name: NodeBasedCellPopulationWithBuskeUpdate
         excluded_methods:
-          - rGetMesh
+          - rGetMesh # non-const ref to mesh
         custom_generator: *population_template
 
       - name: NodeBasedCellPopulationWithParticles
         excluded_methods:
-          - rGetMesh
+          - rGetMesh # non-const ref to mesh
         custom_generator: *population_template
 
       - name: VertexBasedCellPopulation
         excluded_methods:
-          - GetElementCorrespondingToCell
-          - GetElement
-          - GetTetrahedralMeshForPdeModifier
-          - rGetMesh
+          - GetElementCorrespondingToCell # VertexElement not wrapped
+          - GetElement # VertexElement not wrapped
+          - GetTetrahedralMeshForPdeModifier # override; throws if not 2D
+          - rGetMesh # non-const ref to mesh
         custom_generator: *population_template
 
       - name: PottsBasedCellPopulation
         excluded_methods:
-          - GetElementCorrespondingToCell
-          - GetElement
-          - GetTetrahedralMeshForPdeModifier
-          - rGetMesh
-          - GetElementTessellation
-          - GetMutableMesh
+          - GetElementCorrespondingToCell # raw ptr to internal element
+          - GetElement # raw ptr to internal element
+          - GetTetrahedralMeshForPdeModifier # pure-virtual base already wrapped; override redundant
+          - rGetMesh # non-const ref to mesh
+          - GetElementTessellation # raw ptr to cached tessellation
+          - GetMutableMesh # raw ptr to internal mesh
         custom_generator: *population_template
 
       - name: CellwiseDataGradient
@@ -546,18 +547,16 @@ modules:
 
       - name: NagaiHondaDifferentialAdhesionForce
         excluded_methods:
-          - GetAdhesionParameter
+          - GetAdhesionParameter # override of wrapped base method
 
       - name: NagaiHondaForce
       - name: RepulsionForce
 
       - name: PlanarPolarisedFarhadifarForce
         excluded_methods:
-          - GetLineTensionParameter
+          - GetLineTensionParameter # override of wrapped base method
 
       - name: WelikyOsterForce
-        excluded_methods:
-          - GetLineTensionParameter
 
       ##=== cell_based: Chaste/cell_based/src/population/killers
       - name: AbstractCellKiller
@@ -601,7 +600,7 @@ modules:
       ##=== cell_based: Chaste/cell_based/src/simulation
       - name: AbstractCellBasedSimulation
         excluded_methods:
-          - GetSimulationModifiers
+          - GetSimulationModifiers # returns pointer to std::vector
 
       - name: OffLatticeSimulation
       - name: OnLatticeSimulation
