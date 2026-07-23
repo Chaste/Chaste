@@ -15,7 +15,7 @@ jobs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
@@ -52,17 +52,10 @@ jobs:
 
       - name: install dependencies
         run: |
-          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu resolute/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
           sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
           sudo apt update
           sudo apt install chaste-dependencies
-
-      - name: Downgrade libexpat1 (native ubuntu-22.04 only)
-        # if: ${{ matrix.os == 'ubuntu-22.04' }}
-        run: |
-          if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
-            sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
-          fi
 
       - name: make build and test directories
         run: |
