@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FILESYSTEMPERMISSIONS_HPP_
 #define FILESYSTEMPERMISSIONS_HPP_
 
+#include <system_error>
+
 #include "FileFinder.hpp"
 
 /**
@@ -69,7 +71,12 @@ public:
      */
     static void SetFilePermissions(const fs::path& rPath)
     {
-        fs::permissions(rPath, GetFilePermissions(), fs::perm_options::replace);
+        // Best-effort: some filesystems (e.g. macOS Docker bind mounts) do not support
+        // changing permissions, so use the non-throwing overload and ignore any failure.
+        // Correct permissions are desirable but are not required for correctness, so this
+        // must never cause an abort.
+        std::error_code ec;
+        fs::permissions(rPath, GetFilePermissions(), fs::perm_options::replace, ec);
     }
 
     /**
@@ -79,7 +86,9 @@ public:
      */
     static void SetDirectoryPermissions(const fs::path& rPath)
     {
-        fs::permissions(rPath, GetDirectoryPermissions(), fs::perm_options::replace);
+        // Best-effort; see SetFilePermissions for the rationale.
+        std::error_code ec;
+        fs::permissions(rPath, GetDirectoryPermissions(), fs::perm_options::replace, ec);
     }
 
     /**
