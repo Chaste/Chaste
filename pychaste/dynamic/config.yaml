@@ -41,44 +41,6 @@ discover_arg_excludes:
   SPACE_DIM: [0]
   ELEMENT_DIM: [0]
 
-# Special template substitutions for CellsGenerator<CELL_CYCLE_MODEL, DIM>
-# which is header-only and never explicitly instantiated.
-template_substitutions:
-  - signature: <class CELL_CYCLE_MODEL, unsigned DIM>
-    replacement:
-      - [Alarcon2004OxygenBasedCellCycleModel, 2]
-      - [Alarcon2004OxygenBasedCellCycleModel, 3]
-      - [AlwaysDivideCellCycleModel, 2]
-      - [AlwaysDivideCellCycleModel, 3]
-      - [BernoulliTrialCellCycleModel, 2]
-      - [BernoulliTrialCellCycleModel, 3]
-      - [BiasedBernoulliTrialCellCycleModel, 2]
-      - [BiasedBernoulliTrialCellCycleModel, 3]
-      - [ContactInhibitionCellCycleModel, 2]
-      - [ContactInhibitionCellCycleModel, 3]
-      - [ExponentialG1GenerationalCellCycleModel, 2]
-      - [ExponentialG1GenerationalCellCycleModel, 3]
-      - [FixedG1GenerationalCellCycleModel, 2]
-      - [FixedG1GenerationalCellCycleModel, 3]
-      - [FixedSequenceCellCycleModel, 2]
-      - [FixedSequenceCellCycleModel, 3]
-      - [GammaG1CellCycleModel, 2]
-      - [GammaG1CellCycleModel, 3]
-      - [LabelDependentBernoulliTrialCellCycleModel, 2]
-      - [LabelDependentBernoulliTrialCellCycleModel, 3]
-      - [NoCellCycleModel, 2]
-      - [NoCellCycleModel, 3]
-      - [SimpleOxygenBasedCellCycleModel, 2]
-      - [SimpleOxygenBasedCellCycleModel, 3]
-      - [StochasticOxygenBasedCellCycleModel, 2]
-      - [StochasticOxygenBasedCellCycleModel, 3]
-      - [TysonNovakCellCycleModel, 2]
-      - [TysonNovakCellCycleModel, 3]
-      - [UniformCellCycleModel, 2]
-      - [UniformCellCycleModel, 3]
-      - [UniformG1GenerationalCellCycleModel, 2]
-      - [UniformG1GenerationalCellCycleModel, 3]
-
 # Translate Chaste C++ exceptions into Python exceptions.
 exceptions:
   - name: Exception
@@ -331,25 +293,45 @@ modules:
         excluded_methods:
           - rGetCellPropertyCollection # non-const ref to collection
 
+      # Header-only CellsGenerator is never explicitly instantiated, so its
+      # instantiations are listed below.
       - name: CellsGenerator
         custom_generator: "CPPWG_SOURCEROOT/pychaste/dynamic/templates/CellsGeneratorCustomTemplate.py"
-        source_includes:
-          - NoCellCycleModel.hpp
-          - UniformCellCycleModel.hpp
-          - SimpleOxygenBasedCellCycleModel.hpp
-          - UniformG1GenerationalCellCycleModel.hpp
-          - BiasedBernoulliTrialCellCycleModel.hpp
-          - LabelDependentBernoulliTrialCellCycleModel.hpp
-          - AlwaysDivideCellCycleModel.hpp
-          - ContactInhibitionCellCycleModel.hpp
-          - StochasticOxygenBasedCellCycleModel.hpp
-          - GammaG1CellCycleModel.hpp
-          - ExponentialG1GenerationalCellCycleModel.hpp
-          - TysonNovakCellCycleModel.hpp
-          - Alarcon2004OxygenBasedCellCycleModel.hpp
-          - FixedSequenceCellCycleModel.hpp
-          - BernoulliTrialCellCycleModel.hpp
-          - FixedG1GenerationalCellCycleModel.hpp
+        template_substitutions:
+          - signature: <class CELL_CYCLE_MODEL, unsigned DIM>
+            replacement:
+              - [Alarcon2004OxygenBasedCellCycleModel, 2]
+              - [Alarcon2004OxygenBasedCellCycleModel, 3]
+              - [AlwaysDivideCellCycleModel, 2]
+              - [AlwaysDivideCellCycleModel, 3]
+              - [BernoulliTrialCellCycleModel, 2]
+              - [BernoulliTrialCellCycleModel, 3]
+              - [BiasedBernoulliTrialCellCycleModel, 2]
+              - [BiasedBernoulliTrialCellCycleModel, 3]
+              - [ContactInhibitionCellCycleModel, 2]
+              - [ContactInhibitionCellCycleModel, 3]
+              - [ExponentialG1GenerationalCellCycleModel, 2]
+              - [ExponentialG1GenerationalCellCycleModel, 3]
+              - [FixedG1GenerationalCellCycleModel, 2]
+              - [FixedG1GenerationalCellCycleModel, 3]
+              - [FixedSequenceCellCycleModel, 2]
+              - [FixedSequenceCellCycleModel, 3]
+              - [GammaG1CellCycleModel, 2]
+              - [GammaG1CellCycleModel, 3]
+              - [LabelDependentBernoulliTrialCellCycleModel, 2]
+              - [LabelDependentBernoulliTrialCellCycleModel, 3]
+              - [NoCellCycleModel, 2]
+              - [NoCellCycleModel, 3]
+              - [SimpleOxygenBasedCellCycleModel, 2]
+              - [SimpleOxygenBasedCellCycleModel, 3]
+              - [StochasticOxygenBasedCellCycleModel, 2]
+              - [StochasticOxygenBasedCellCycleModel, 3]
+              - [TysonNovakCellCycleModel, 2]
+              - [TysonNovakCellCycleModel, 3]
+              - [UniformCellCycleModel, 2]
+              - [UniformCellCycleModel, 3]
+              - [UniformG1GenerationalCellCycleModel, 2]
+              - [UniformG1GenerationalCellCycleModel, 3]
 
       - name: ParallelCellsGenerator
         excluded: True
