@@ -195,13 +195,9 @@ public:
         if (PetscTools::AmMaster())
         {
             std::string dir_path =  handler6.GetOutputDirectoryFullPath();
-#ifndef _MSC_VER
-            // This test can never pass on modern Windows OS! See: http://support.microsoft.com/kb/326549
-            // You can't change DIRECTORY attributes
             chmod(dir_path.c_str(), CHASTE_READONLY);
             TS_ASSERT_THROWS_CONTAINS(p_file_stream = handler6.OpenOutputFile("test_file"),
                                       "Could not open file");
-#endif
             chmod(dir_path.c_str(), CHASTE_READ_WRITE_EXECUTE);
             fs::remove(dir_path + ".chaste_deletable_folder");
             fs::remove(dir_path);
