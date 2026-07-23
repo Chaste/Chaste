@@ -94,8 +94,7 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
     mLocationCellMap.clear();
     mCellLocationMap.clear();
 
-    std::list<CellPtr>::iterator it = mCells.begin();
-    for (unsigned i=0; it != mCells.end(); ++it, ++i)
+    for (auto it = mCells.begin(); it != mCells.end(); ++it)
     {
         // Give each cell a pointer to the property registry (we have taken ownership in this constructor)
         (*it)->rGetCellPropertyCollection().SetCellPropertyRegistry(mpCellPropertyRegistry.get());
