@@ -15,7 +15,7 @@ jobs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
 
     # Split the Continuous memory test pack across parallel runners. Each component
     # builds only the component(s) it needs and runs only the matching tests,
@@ -61,24 +61,17 @@ jobs:
         if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
 
       - name: checkout Chaste
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Chaste/Chaste
           path: Chaste
 
       - name: install dependencies
         run: |
-          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu resolute/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
           sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
           sudo apt update
           sudo apt install chaste-dependencies
-
-      - name: Downgrade libexpat1 (native ubuntu-22.04 only)
-        # if: ${{ matrix.os == 'ubuntu-22.04' }}
-        run: |
-          if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
-            sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
-          fi
 
       - name: make build and test directories
         run: |
@@ -127,7 +120,7 @@ jobs:
 
     name: Aggregate memtest results
     needs: build-and-test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     # Run even if one or more components failed (e.g. found a leak), so the combined
     # report is always produced. Skip only if the whole run was cancelled or CI
     # is disabled for this PR.
@@ -159,7 +152,7 @@ jobs:
         if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
 
       - name: checkout Chaste
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -229,7 +222,7 @@ jobs:
           path: ./memtest
 
       - name: checkout memory-testing
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Chaste/memory-testing
           path: memory-testing
@@ -242,7 +235,7 @@ jobs:
           cp ./memtest/* ${MEMTEST_DIR}/log-files/${{ needs.aggregate.outputs.datetime }}/
 
       - name: setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.x'
 
