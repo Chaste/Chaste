@@ -9,6 +9,15 @@ on:
     branches:
       - develop
 
+env:
+  # Read by cmake/process_valgrind_output.py to label the generated report. head_ref and
+  # pull_request.head.sha are only set for pull_request events, so they fall back to the
+  # push/workflow_dispatch equivalents.
+  Chaste_GH_WORKFLOW_BRANCH: ${{ github.head_ref || github.ref_name }}
+  Chaste_GH_WORKFLOW_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  # Core count of the runners used below, for cmake, make and ctest.
+  CHASTE_NUM_CPUS: 4
+
 jobs:
 
   build-and-test:
@@ -17,29 +26,13 @@ jobs:
 
     runs-on: ubuntu-26.04
 
-    # Split the Continuous memory test pack across parallel runners. Each component
-    # builds only the component(s) it needs and runs only the matching tests,
-    # selected via the per-test ctest labels (Continuous_<component>, plus the
-    # Continuous_core label shared by all core components).
+    # Split the Continuous test pack across parallel runners. Each leg builds and
+    # runs exactly one component's Continuous tests, selected by the Continuous_<component>
+    # build target and the matching ctest label.
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - component: cell_based
-            build_target: cell_based
-            label: Continuous_cell_based
-          - component: heart
-            build_target: heart
-            label: Continuous_heart
-          - component: crypt
-            build_target: crypt
-            label: Continuous_crypt
-          - component: lung
-            build_target: lung
-            label: Continuous_lung
-          - component: core
-            build_target: core
-            label: Continuous_core
+        component: [cell_based, heart, crypt, lung, core]
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
@@ -48,22 +41,9 @@ jobs:
 
     steps:
 
-      - name: set environment for pull request
-        run: |
-          echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
-          echo "Chaste_GH_WORKFLOW_SHA=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
-        if: github.event_name == 'pull_request'
-
-      - name: set environment for push or workflow dispatch
-        run: |
-          echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
-          echo "Chaste_GH_WORKFLOW_SHA=${{ github.sha }}" >> $GITHUB_ENV
-        if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
-
       - name: checkout Chaste
         uses: actions/checkout@v7
         with:
-          repository: Chaste/Chaste
           path: Chaste
 
       - name: install dependencies
@@ -79,11 +59,11 @@ jobs:
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
       - name: cmake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=4 ..
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=${CHASTE_NUM_CPUS} ..
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
-      - name: build component
-        run: cmake --build . --target ${{ matrix.build_target }} --parallel 4
+      - name: build component test pack
+        run: cmake --build . --target Continuous_${{ matrix.component }} --parallel ${CHASTE_NUM_CPUS}
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: run TestChasteBuildInfo
@@ -92,20 +72,10 @@ jobs:
         if: matrix.component == 'core'
 
       - name: run memtest for component
-        # Run this component's tests with valgrind, then process the output. A
-        # non-zero exit from either ctest (a test failed/crashed) or the valgrind
-        # processing (a memory problem was found) fails this component's job.
-        # The raw *_valgrind.txt logs are always produced by ctest and are uploaded
-        # regardless of the outcome below.
-        run: |
-          set +e
-          ctest -j4 -L "${{ matrix.label }}" --output-on-failure
-          ctest_rc=$?
-          python "${CHASTE_DIR}/cmake/process_valgrind_output.py" "${CHASTE_BUILD_DIR}/memtest"
-          process_rc=$?
-          if [ "${ctest_rc}" -ne 0 ] || [ "${process_rc}" -ne 0 ]; then
-            exit 1
-          fi
+        # Run this component's tests under valgrind. This fails the leg only if a test
+        # itself fails or crashes; memory problems are found by the aggregate job below,
+        # which processes the raw logs uploaded here.
+        run: ctest -j${CHASTE_NUM_CPUS} -L Continuous_${{ matrix.component }} --output-on-failure
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: upload component valgrind logs
@@ -139,23 +109,12 @@ jobs:
         id: get-datetime
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
-      - name: set environment for pull request
-        run: |
-          echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
-          echo "Chaste_GH_WORKFLOW_SHA=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
-        if: github.event_name == 'pull_request'
-
-      - name: set environment for push or workflow dispatch
-        run: |
-          echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
-          echo "Chaste_GH_WORKFLOW_SHA=${{ github.sha }}" >> $GITHUB_ENV
-        if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
-
-      - name: checkout Chaste
+      - name: checkout valgrind output processor
         uses: actions/checkout@v7
         with:
-          repository: Chaste/Chaste
           path: Chaste
+          sparse-checkout: cmake/process_valgrind_output.py
+          sparse-checkout-cone-mode: false
 
       - name: download all component logs
         uses: actions/download-artifact@v8
@@ -165,10 +124,10 @@ jobs:
           merge-multiple: true
 
       - name: process combined valgrind output
-        # Regenerate the combined index/summaries over the merged logs from every
-        # component. This is the authoritative pass/fail: a non-zero exit here (a
-        # memory problem in any component) fails the workflow.
-        run: python "${{ github.workspace }}/Chaste/cmake/process_valgrind_output.py" "${MEMTEST_DIR}"
+        # Generate the index/summaries over the merged logs from every component. This is
+        # the authoritative pass/fail: a non-zero exit here (a memory problem in any
+        # component) fails the workflow.
+        run: python3 "${{ github.workspace }}/Chaste/cmake/process_valgrind_output.py" "${MEMTEST_DIR}"
 
       - name: check if index file successfully created
         id: index-exists
@@ -206,9 +165,11 @@ jobs:
 
     name: Publish results (non-fork PRs only)
     needs: aggregate
-    runs-on: ubuntu-latest
-    # only when index exists AND it's being run from the primary repo (Chaste/Chaste)
-    if: ${{ needs.aggregate.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
+    runs-on: ubuntu-26.04
+    # Publish whenever a report was produced, including when the aggregate job failed
+    # because a memory problem was found - those are the results most worth publishing.
+    # Only from the primary repo (Chaste/Chaste), which holds the push token.
+    if: ${{ !cancelled() && needs.aggregate.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
 
     env:
       MEMTEST_DIR: ${{ github.workspace }}/memory-testing
