@@ -16,7 +16,11 @@ common_include_file: OFF
 # Automatically include the headers each wrapper needs.
 auto_includes: True
 
-# Auto-include type-caster headers in wrappers who use their types.
+# Skip bindings for methods that only override a virtual base class method that
+# is already wrapped on the base class as these are redundant.
+exclude_inherited_overrides: True
+
+# Auto-include type-caster headers in wrappers that use their types.
 typecasters:
   - header: PybindPetscTypeCaster.hpp
     types: [Vec, Mat]
@@ -44,7 +48,7 @@ discover_arg_excludes:
 # Translate Chaste C++ exceptions into Python exceptions.
 exceptions:
   - name: Exception
-    message_method: GetMessage
+    message_method: GetMessage # method returning the exception's message string
 
 # The Python modules to build; pychaste uses a single module named `all`.
 modules:
@@ -81,6 +85,7 @@ modules:
       - name: RandomNumberGenerator
 
       - name: RelativeTo # enum
+        # source_file: attribute the class to this header (class name != file name)
         source_file: FileFinder.hpp
 
       - name: TimeStepper
@@ -105,6 +110,7 @@ modules:
           - MASTER_RANK # part of the unwrapped MPI/parallel interface
 
       - name: ReplicatableVector
+        # custom_generator: Python template injecting binding code cppwg can't auto-generate
         custom_generator: "CPPWG_SOURCEROOT/pychaste/dynamic/templates/ReplicatableVectorCustomTemplate.py"
         source_includes:
           - PybindPetscTypeCaster.hpp
@@ -128,7 +134,7 @@ modules:
           - AnalyticJacobian # double ** jacobian
 
       - name: CellwiseOdeSystemInformation
-        excluded: True
+        excluded: True # templated internal ODE-system info helper
 
       #=== pde: Chaste/pde/src/common
       - name: AbstractBoundaryCondition
@@ -141,6 +147,7 @@ modules:
       - name: AbstractLinearEllipticPde
 
       - name: AbstractLinearParabolicPdeSystemForCoupledOdeSystem
+        # template_substitutions: explicit template instantiations to wrap (signature -> replacement arg-lists)
         template_substitutions:
           - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM, unsigned PROBLEM_DIM=1>
             replacement: [[2, 2, 1], [3, 3, 1]]
@@ -203,6 +210,9 @@ modules:
 
       - name: MutableElement
         custom_generator: "CPPWG_SOURCEROOT/pychaste/dynamic/templates/MutableElementCustomTemplate.py"
+        # [unsigned] is the no-node constructor (internal mesh assembly) which
+        # builds an incomplete element. The useful index+nodes constructor is
+        # injected by the custom generator instead.
         constructor_signature_excludes:
           - [unsigned]
 
@@ -256,10 +266,18 @@ modules:
       - name: ChasteEllipsoid
 
       #=== mesh: Chaste/mesh/src/vertex
+      - name: VertexElement
+        # Internal building block of VertexMesh, not exposed to Python. All
+        # methods that take/return one are excluded e.g. VertexMesh::GetFace.
+        excluded: True
+
       - name: VertexMesh
         excluded_methods:
-          - GetFace # dont have mixed dim elements
+          - GetFace # don't have mixed-dim elements
           - rGetEdgeHelper # ref to internal EdgeHelper
+        # Drop the two 'Voronoi' constructors: each stores a raw pointer to the
+        # passed mesh and reads from it for the VertexMesh's lifetime, resulting
+        # in a dangling-pointer hazard if Python garbage collects the mesh.
         constructor_arg_type_excludes:
           - TetrahedralMesh<3, 3>
           - TetrahedralMesh<2, 2>
@@ -283,10 +301,10 @@ modules:
       - name: PottsMeshWriter
 
       - name: PottsMeshReader
-        excluded: True
+        excluded: True # internal stateful file-reader iterator API
 
       - name: PottsElementData
-        excluded: True
+        excluded: True # internal data struct used by PottsMeshReader
 
       ##=== cell_based: Chaste/cell_based/src/cell
       - name: Cell
@@ -334,10 +352,10 @@ modules:
               - [UniformG1GenerationalCellCycleModel, 3]
 
       - name: ParallelCellsGenerator
-        excluded: True
+        excluded: True # MPI/parallel-only archive helper
 
       - name: null_deleter
-        excluded: True
+        excluded: True # boost null-deleter functor; no Python meaning
 
       ##=== cell_based: Chaste/cell_based/src/cell/cycle
       - name: AbstractCellCycleModel
@@ -366,18 +384,18 @@ modules:
       - name: FixedG1GenerationalCellCycleModel
 
       - name: CellCycleModelOdeSolver
-        excluded: True
+        excluded: True # templated internal ODE-solver singleton
 
       - name: CellCycleModelOdeHandler
-        excluded: True
+        excluded: True # internal ODE mix-in base; raw AbstractOdeSystem*
 
       - name: CellCycleTimesGenerator
-        excluded: True
+        excluded: True # internal singleton helper
 
       ##=== cell_based: Chaste/cell_based/src/cell_based/properties
       - name: AbstractCellProperty
         excluded_methods:
-          - IsType # exclude templated method
+          - IsType # function template (IsType<CLASS>()); no concrete signature to bind
 
       - name: ApoptoticCellProperty
 
@@ -398,13 +416,13 @@ modules:
           - Get # templated method
 
       - name: CellVecData
-        excluded: True
+        excluded: True # stores PETSc Vec in a std::map; caster is call-boundary only
 
       ##=== cell_based: Chaste/cell_based/src/common
       - name: SimulationTime
 
       - name: OdeLinearSystemSolver
-        excluded: True
+        excluded: True # Vec/Mat solver state; caster is boundary-only, not stored Vec/Mat
 
       ##=== cell_based: Chaste/cell_based/src/population
       - name: AbstractCellPopulation
@@ -423,7 +441,6 @@ modules:
       - name: CaBasedCellPopulation
         excluded_methods:
           - rGetMesh # non-const ref to mesh
-          - GetTetrahedralMeshForPdeModifier # pure-virtual base already wrapped; override redundant
           - GetNodeCorrespondingToCell # raw ptr to internal node
           - rGetAvailableSpaces # non-const ref to vector
         custom_generator: &population_template "CPPWG_SOURCEROOT/pychaste/dynamic/templates/PopulationWriterCustomTemplate.py"
@@ -431,14 +448,12 @@ modules:
       - name: ImmersedBoundaryCellPopulation
         excluded_methods:
           - rGetMesh # non-const ref to mesh
-          - GetTetrahedralMeshForPdeModifier # override; throws if not 2D
         custom_generator: *population_template
 
       - name: MeshBasedCellPopulation
         excluded_methods:
           - GetVoronoiTessellation # raw ptr to cached tessellation
           - rGetNodePairs # vector of raw node pairs
-          - GetTetrahedralMeshForPdeModifier # pure-virtual base already wrapped; override redundant
           - rGetMesh # non-const ref to mesh
         custom_generator: *population_template
 
@@ -448,7 +463,6 @@ modules:
       - name: NodeBasedCellPopulation
         excluded_methods:
           - rGetNodePairs # vector of raw node pairs
-          - GetTetrahedralMeshForPdeModifier # pure-virtual base already wrapped; override redundant
           - rGetMesh # non-const ref to mesh
         custom_generator: *population_template
 
@@ -464,9 +478,8 @@ modules:
 
       - name: VertexBasedCellPopulation
         excluded_methods:
-          - GetElementCorrespondingToCell # VertexElement not wrapped
-          - GetElement # VertexElement not wrapped
-          - GetTetrahedralMeshForPdeModifier # override; throws if not 2D
+          - GetElementCorrespondingToCell # raw ptr to internal element
+          - GetElement # raw ptr to internal element
           - rGetMesh # non-const ref to mesh
         custom_generator: *population_template
 
@@ -474,14 +487,13 @@ modules:
         excluded_methods:
           - GetElementCorrespondingToCell # raw ptr to internal element
           - GetElement # raw ptr to internal element
-          - GetTetrahedralMeshForPdeModifier # pure-virtual base already wrapped; override redundant
           - rGetMesh # non-const ref to mesh
           - GetElementTessellation # raw ptr to cached tessellation
           - GetMutableMesh # raw ptr to internal mesh
         custom_generator: *population_template
 
       - name: CellwiseDataGradient
-        excluded: True
+        excluded: True # internal helper; non-const c_vector& ref API
 
       ##=== cell_based: Chaste/cell_based/src/population/boundary_conditions
       - name: AbstractCellPopulationBoundaryCondition
@@ -516,7 +528,7 @@ modules:
       - name: DiffusionForce
 
       - name: DiscreteSystemForceCalculator
-        excluded: True
+        excluded: True # internal calculator; returns vector<vector<double>>
 
       - name: FarhadifarForce
       - name: GeneralisedLinearSpringForce
@@ -526,18 +538,10 @@ modules:
       - name: ImmersedBoundaryLinearMembraneForce
       - name: ImmersedBoundaryMorseInteractionForce
       - name: ImmersedBoundaryMorseMembraneForce
-
       - name: NagaiHondaDifferentialAdhesionForce
-        excluded_methods:
-          - GetAdhesionParameter # override of wrapped base method
-
       - name: NagaiHondaForce
-      - name: RepulsionForce
-
       - name: PlanarPolarisedFarhadifarForce
-        excluded_methods:
-          - GetLineTensionParameter # override of wrapped base method
-
+      - name: RepulsionForce
       - name: WelikyOsterForce
 
       ##=== cell_based: Chaste/cell_based/src/population/killers
@@ -584,11 +588,11 @@ modules:
         excluded_methods:
           - GetSimulationModifiers # returns pointer to std::vector
 
+      - name: CellBasedSimulationArchiver
+        excluded: True # static boost-archive (de)serialization helper
+
       - name: OffLatticeSimulation
       - name: OnLatticeSimulation
-
-      - name: CellBasedSimulationArchiver
-        excluded: True
 
       ##=== cell_based: Chaste/cell_based/src/simulation/modifiers
       - name: AbstractCellBasedSimulationModifier
@@ -609,7 +613,7 @@ modules:
       - name: AbstractNumericalMethod
       - name: ForwardEulerNumericalMethod
       - name: StepSizeException
-        excluded: True
+        excluded: True # internal control-flow exception, not user-facing
 
       ##=== cell_based: Chaste/cell_based/src/srn
       - name: AbstractSrnModel
