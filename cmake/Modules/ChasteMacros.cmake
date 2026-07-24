@@ -185,6 +185,10 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
         set(test_command ${VALGRIND_COMMAND})
         set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.txt")
         set(test_args "${test_args} --track-fds=yes --leak-check=yes --num-callers=50 ${Chaste_MEMORY_TESTING_SUPPS}")
+        # By default valgrind neither shows indirect losses nor treats them as errors, which
+        # means they can never be matched against the suppression files but are still counted
+        # in the leak summary. Including them here makes them both visible and suppressible.
+        set(test_args "${test_args} --show-leak-kinds=definite,indirect,possible --errors-for-leak-kinds=definite,indirect,possible")
         set(test_args "${test_args} --gen-suppressions=all $<TARGET_FILE:${exeTargetName}> -malloc_debug -malloc_dump -memory_info")
         set(num_cpus 1)
     elseif (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
