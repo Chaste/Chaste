@@ -661,6 +661,11 @@ macro(Chaste_DO_TEST_COMMON component)
                 if ((NOT ${component} STREQUAL python) AND (NOT (${filename} MATCHES ".py$")))
                     add_dependencies(${component} ${exeTargetName})
                     add_dependencies(${type} ${exeTargetName})
+                    # ...and to the combined target for this test pack of this component,
+                    # so that e.g. Continuous_cell_based builds only what it will run.
+                    if (TARGET ${type}_${component})
+                        add_dependencies(${type}_${component} ${exeTargetName})
+                    endif()
                 endif()
             endforeach(filename ${testpack})
         endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
