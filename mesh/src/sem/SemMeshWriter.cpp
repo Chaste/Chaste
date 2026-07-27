@@ -298,6 +298,10 @@ void SemMeshWriter<DIM>::MakeVtkMesh(SemMesh<DIM>& rMesh)
     vtkDoubleArray* p_sem_output_kinds = vtkDoubleArray::New();
     p_sem_output_kinds->SetName("SemOutputKind");
 
+    // The element each VTK cell belongs to, in cell-insertion order; used to expand per-element
+    // scalar data (mElementDataForVtk) to one value per VTK cell below.
+    std::vector<unsigned> cell_element_indices;
+
     for (typename SemMesh<DIM>::SemElementIterator iter = rMesh.GetElementIteratorBegin();
          iter != rMesh.GetElementIteratorEnd();
          ++iter)
@@ -312,6 +316,7 @@ void SemMeshWriter<DIM>::MakeVtkMesh(SemMesh<DIM>& rMesh)
         mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
         p_sem_element_indices->InsertNextValue(iter->GetIndex());
         p_sem_output_kinds->InsertNextValue(0.0);
+        cell_element_indices.push_back(iter->GetIndex());
         p_cell->Delete(); // Reference counted
     }
 
@@ -334,6 +339,7 @@ void SemMeshWriter<DIM>::MakeVtkMesh(SemMesh<DIM>& rMesh)
                 mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
                 p_sem_element_indices->InsertNextValue(iter->GetIndex());
                 p_sem_output_kinds->InsertNextValue(1.0);
+                cell_element_indices.push_back(iter->GetIndex());
                 p_cell->Delete(); // Reference counted
             }
 
@@ -347,6 +353,7 @@ void SemMeshWriter<DIM>::MakeVtkMesh(SemMesh<DIM>& rMesh)
                 mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
                 p_sem_element_indices->InsertNextValue(iter->GetIndex());
                 p_sem_output_kinds->InsertNextValue(1.0);
+                cell_element_indices.push_back(iter->GetIndex());
                 p_cell->Delete(); // Reference counted
             }
         }
@@ -358,6 +365,28 @@ void SemMeshWriter<DIM>::MakeVtkMesh(SemMesh<DIM>& rMesh)
     p_cell_data->AddArray(p_sem_output_kinds);
     p_sem_element_indices->Delete(); // Reference counted
     p_sem_output_kinds->Delete(); // Reference counted
+
+    // Expand each per-element payload to one value per VTK cell, so that every cell (point-cloud
+    // and surface) belonging to an element carries that element's value.
+    for (const auto& r_element_data : mElementDataForVtk)
+    {
+        const std::string& r_name = r_element_data.first;
+        const std::vector<double>& r_payload = r_element_data.second;
+        if (r_payload.size() != rMesh.GetNumElements())
+        {
+            EXCEPTION("SemMeshWriter: per-element VTK data '" + r_name + "' must have one entry per element");
+        }
+
+        vtkDoubleArray* p_element_data = vtkDoubleArray::New();
+        p_element_data->SetName(r_name.c_str());
+        for (unsigned cell = 0; cell < cell_element_indices.size(); ++cell)
+        {
+            assert(cell_element_indices[cell] < r_payload.size());
+            p_element_data->InsertNextValue(r_payload[cell_element_indices[cell]]);
+        }
+        p_cell_data->AddArray(p_element_data);
+        p_element_data->Delete(); // Reference counted
+    }
 #else
     (void)rMesh;
     EXCEPTION("SEM VTK output requires Chaste to be compiled with VTK");
@@ -406,6 +435,14 @@ void SemMeshWriter<DIM>::AddCellData(std::string dataName, std::vector<double> d
     (void)dataPayload;
     EXCEPTION("SEM VTK output requires Chaste to be compiled with VTK");
 #endif //CHASTE_VTK
+}
+
+template<unsigned DIM>
+void SemMeshWriter<DIM>::AddElementData(std::string dataName, std::vector<double> dataPayload)
+{
+    // Stash the per-element payload; MakeVtkMesh() expands it to per-VTK-cell data. This is not
+    // guarded by CHASTE_VTK because it stores plain data; WriteVtkUsingMesh() enforces VTK.
+    mElementDataForVtk.emplace_back(std::move(dataName), std::move(dataPayload));
 }
 
 template<unsigned DIM>

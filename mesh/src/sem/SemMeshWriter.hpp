@@ -36,6 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SEMMESHWRITER_HPP_
 #define SEMMESHWRITER_HPP_
 
+#include <string>
+#include <utility>
+#include <vector>
+
 // Forward declaration prevents circular include chain
 template<unsigned DIM>
 class SemMesh;
@@ -89,6 +93,13 @@ private:
 
     /** The last index written to mpNodeMap. */
     unsigned mNodeMapCurrentIndex;
+
+    /**
+     * Per-element scalar data to write as VTK cell data, as (name, one value per element) pairs.
+     * MakeVtkMesh() expands each payload to one value per VTK cell (point-cloud and surface)
+     * using the element each cell belongs to.
+     */
+    std::vector<std::pair<std::string, std::vector<double> > > mElementDataForVtk;
 
 #ifdef CHASTE_VTK
     /** A VTK unstructured grid holding the mesh for VTK output. */
@@ -150,9 +161,22 @@ public:
      * Add data to a future VTK file.
      *
      * @param dataName a tag to go into the VTK file
-     * @param dataPayload a pay-load of length (number of elements)
+     * @param dataPayload a pay-load of length (number of VTK cells)
      */
     void AddCellData(std::string dataName, std::vector<double> dataPayload);
+
+    /**
+     * Add per-element scalar data to a future VTK file.
+     *
+     * Unlike AddCellData() (which expects one value per VTK cell), this takes one value per SEM
+     * element and the writer expands it, during MakeVtkMesh(), to every VTK cell (both the
+     * point-cloud cell and any surface cells) belonging to that element, so element surfaces are
+     * coloured by the value too.
+     *
+     * @param dataName a tag to go into the VTK file
+     * @param dataPayload a pay-load of length (number of elements)
+     */
+    void AddElementData(std::string dataName, std::vector<double> dataPayload);
 
     /**
      * Add data to a future VTK file.

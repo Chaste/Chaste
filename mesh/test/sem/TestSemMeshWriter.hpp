@@ -127,6 +127,65 @@ public:
         TS_ASSERT_THROWS_CONTAINS(writer.WriteVtkUsingMesh(mesh), "requires Chaste to be compiled with VTK");
 #endif // CHASTE_VTK
     }
+
+    void TestPerElementDataToVtk()
+    {
+#ifdef CHASTE_VTK
+        // Two square elements (four nodes each), offset along x
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, false, 3.0, 0.0));
+        nodes.push_back(new Node<2>(5, false, 4.0, 0.0));
+        nodes.push_back(new Node<2>(6, false, 4.0, 1.0));
+        nodes.push_back(new Node<2>(7, false, 3.0, 1.0));
+
+        std::vector<Node<2>*> element_0_nodes(nodes.begin(), nodes.begin() + 4);
+        std::vector<Node<2>*> element_1_nodes(nodes.begin() + 4, nodes.end());
+        std::vector<SemElement<2>*> elements;
+        elements.push_back(new SemElement<2>(0, element_0_nodes));
+        elements.push_back(new SemElement<2>(1, element_1_nodes));
+        SemMesh<2> mesh(nodes, elements);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
+
+        SemMeshWriter<2> writer("TestSemMeshWriterElementData", "element_data_results", false);
+        std::vector<double> element_values;
+        element_values.push_back(10.0);
+        element_values.push_back(20.0);
+        writer.AddElementData("element colour", element_values);
+        writer.WriteVtkUsingMesh(mesh);
+
+        std::string results_file = OutputFileHandler::GetChasteTestOutputDirectory()
+                                   + "TestSemMeshWriterElementData/element_data_results.vtu";
+        vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+        p_reader->SetFileName(results_file.c_str());
+        p_reader->Update();
+        vtkUnstructuredGrid* p_grid = p_reader->GetOutput();
+
+        vtkDataArray* p_element_index = p_grid->GetCellData()->GetArray("SemElementIndex");
+        vtkDataArray* p_colour = p_grid->GetCellData()->GetArray("element colour");
+        TS_ASSERT(p_element_index != nullptr);
+        TS_ASSERT(p_colour != nullptr);
+        TS_ASSERT_EQUALS(p_colour->GetNumberOfTuples(), p_grid->GetNumberOfCells());
+
+        // Every VTK cell (point-cloud and surface) must carry its element's value
+        for (unsigned cell = 0u; cell < static_cast<unsigned>(p_grid->GetNumberOfCells()); ++cell)
+        {
+            unsigned element_index = static_cast<unsigned>(p_element_index->GetTuple1(cell));
+            double expected = (element_index == 0u) ? 10.0 : 20.0;
+            TS_ASSERT_DELTA(p_colour->GetTuple1(cell), expected, 1e-12);
+        }
+
+        // A per-element payload of the wrong length is rejected when the VTK mesh is built
+        SemMeshWriter<2> bad_writer("TestSemMeshWriterElementDataBad", "bad_results", false);
+        std::vector<double> wrong_length_values;
+        wrong_length_values.push_back(1.0);
+        bad_writer.AddElementData("bad", wrong_length_values);
+        TS_ASSERT_THROWS_CONTAINS(bad_writer.WriteVtkUsingMesh(mesh), "must have one entry per element");
+#endif // CHASTE_VTK
+    }
 };
 
 #endif /*TESTSEMMESHWRITER_HPP_*/
