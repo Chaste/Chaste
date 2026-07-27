@@ -247,6 +247,28 @@ public:
         TS_ASSERT_THROWS_THIS(cell_population.AddCell(new_cells[0], cell_population.GetCellUsingLocationIndex(0u)),
                               "SemBasedCellPopulation does not support AddCell() because SEM element division is not implemented");
     }
+
+    void TestCheckForStepSizeException()
+    {
+        TwoElementSemMesh fixture;
+        std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
+        SemBasedCellPopulation<2> cell_population(fixture.mesh, cells);
+
+        fixture.mesh.SetMaximumInteractionDistance(0.5);
+
+        // A displacement smaller than the interaction distance must not throw
+        c_vector<double, 2> small_displacement;
+        small_displacement[0] = 0.1;
+        small_displacement[1] = 0.1;
+        TS_ASSERT_THROWS_NOTHING(cell_population.CheckForStepSizeException(0u, small_displacement, 0.01));
+
+        // A displacement larger than the interaction distance must throw a StepSizeException,
+        // signalling to the numerical method that the timestep is too large
+        c_vector<double, 2> large_displacement;
+        large_displacement[0] = 0.6;
+        large_displacement[1] = 0.6;
+        TS_ASSERT_THROWS_ANYTHING(cell_population.CheckForStepSizeException(0u, large_displacement, 0.01));
+    }
 };
 
 #endif /*TESTSEMBASEDCELLPOPULATION_HPP_*/

@@ -34,11 +34,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SemBasedCellPopulation.hpp"
+#include "StepSizeException.hpp"
 #include "VtkMeshWriter.hpp"
 #include "WildTypeCellMutationState.hpp"
 
 #include <list>
 #include <set>
+#include <sstream>
 
 template<unsigned DIM>
 SemBasedCellPopulation<DIM>::SemBasedCellPopulation(SemMesh<DIM>& rMesh,
@@ -389,7 +391,24 @@ void SemBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCel
 template<unsigned DIM>
 void SemBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt)
 {
+    // A node moving further than the box-collection interaction distance in a single step
+    // invalidates the neighbour search (potential interactions would be missed), so treat
+    // this as a step-size error rather than allowing a silent node explosion.
+    double length = norm_2(rDisplacement);
+    double max_interaction_distance = mpSemMesh->GetMaximumInteractionDistance();
 
+    if (length > max_interaction_distance)
+    {
+        std::ostringstream message;
+        message << "Node " << nodeIndex << " is moving by " << length
+                << ", which is more than the SEM maximum interaction distance (" << max_interaction_distance
+                << "): use a smaller timestep or diffusion constant to avoid this exception.";
+
+        // Suggest a net time step that will give a movement smaller than the interaction distance
+        double new_step = 0.95*dt*(max_interaction_distance/length);
+
+        throw StepSizeException(new_step, message.str(), true); // terminate
+    }
 }
 
 template<unsigned DIM>
