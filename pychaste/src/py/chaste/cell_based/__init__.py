@@ -274,8 +274,8 @@ from chaste._pychaste_all import (
     SemGaussianRandomForce_3,
     SemLinearForce_2,
     SemLinearForce_3,
-    SemRegionalForce_2_2,
-    SemRegionalForce_3_3,
+    SemRegionalForce_2,
+    SemRegionalForce_3,
     SemSpatiallyCorrelatedRandomForce_2,
     SemSpatiallyCorrelatedRandomForce_3,
     ShortAxisImmersedBoundaryDivisionRule_2,
@@ -1161,10 +1161,8 @@ SemLinearForce = TemplateClassDict(
 
 SemRegionalForce = TemplateClassDict(
     {
-        ("2",): SemRegionalForce_2_2,
-        ("2", "2"): SemRegionalForce_2_2,
-        ("3",): SemRegionalForce_3_3,
-        ("3", "3"): SemRegionalForce_3_3,
+        ("2",): SemRegionalForce_2,
+        ("3",): SemRegionalForce_3,
     }
 )
 

@@ -35,68 +35,155 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemRegionalForce.hpp"
 
-#include "SemEnumerations.hpp"
+#include "SemBasedCellPopulation.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-SemRegionalForce<ELEMENT_DIM,SPACE_DIM>::SemRegionalForce()
-   : AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>()
+#include <cmath>
+
+template<unsigned DIM>
+SemRegionalForce<DIM>::SemRegionalForce()
+   : AbstractTwoBodyInteractionForce<DIM>(),
+     mSpringConstants{1.0, 2.0},
+     mRestLengths{0.2, 0.15},
+     mCutOffDistance(0.5)
 {
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> SemRegionalForce<ELEMENT_DIM,SPACE_DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                                                    unsigned nodeBGlobalIndex,
-                                                                                    AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
+template<unsigned DIM>
+c_vector<double, DIM> SemRegionalForce<DIM>::CalculateForceVector(const c_vector<double, DIM>& rVectorAtoB,
+                                                                  double distanceSq,
+                                                                  double springConstant,
+                                                                  double restLength) const
+{
+    /*
+     * Harmonic spring force (identical in form to SemLinearForce):
+     *   F_A = springConstant * (r - restLength) * r_hat
+     *       = springConstant * (1 - restLength / r) * (r_B - r_A)
+     * where r = |r_B - r_A| and r_hat = (r_B - r_A) / r.
+     *
+     *   r < restLength => repulsive (force away from B)
+     *   r > restLength => attractive (force toward B)
+     */
+    const double distance = std::sqrt(distanceSq);
+
+    // Guard against division by zero if nodes are coincident
+    if (distance < 1e-15)
+    {
+        return zero_vector<double>(DIM);
+    }
+
+    const double coefficient = springConstant * (1.0 - restLength / distance);
+
+    return coefficient * rVectorAtoB;
+}
+
+template<unsigned DIM>
+void SemRegionalForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+{
+    if (dynamic_cast<SemBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
+    {
+        EXCEPTION("SemRegionalForce is to be used with a SemBasedCellPopulation only");
+    }
+
+    if (mSpringConstants.empty() || mSpringConstants.size() != mRestLengths.size())
+    {
+        EXCEPTION("SemRegionalForce: the spring-constant and rest-length arrays must be non-empty "
+                  "and of equal length (one entry per region)");
+    }
+
+    AbstractTwoBodyInteractionForce<DIM>::AddForceContribution(rCellPopulation);
+}
+
+template<unsigned DIM>
+c_vector<double, DIM> SemRegionalForce<DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
+                                                                        unsigned nodeBGlobalIndex,
+                                                                        AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
 
-    const double distance =  rCellPopulation.rGetMesh().GetDistanceBetweenNodes(nodeAGlobalIndex, nodeBGlobalIndex);
+    Node<DIM>* p_node_a = rCellPopulation.GetNode(nodeAGlobalIndex);
+    Node<DIM>* p_node_b = rCellPopulation.GetNode(nodeBGlobalIndex);
 
-    Node<SPACE_DIM>* p_node_a = rCellPopulation.GetNode(nodeAGlobalIndex);
-    Node<SPACE_DIM>* p_node_b = rCellPopulation.GetNode(nodeBGlobalIndex);
+    const c_vector<double, DIM>& r_loc_a = p_node_a->rGetLocation();
+    const c_vector<double, DIM>& r_loc_b = p_node_b->rGetLocation();
+    const c_vector<double, DIM> vec_a_to_b = r_loc_b - r_loc_a;
+    const double dist_sq = inner_prod(vec_a_to_b, vec_a_to_b);
 
-    // Get the node locations
-    const c_vector<double, SPACE_DIM>& r_node_a_location = p_node_a->rGetLocation();
-    const c_vector<double, SPACE_DIM>& r_node_b_location = p_node_b->rGetLocation();
-
-    const SemNodeRegion node_a_region = static_cast<SemNodeRegion>(p_node_a->GetRegion());
-    const SemNodeRegion node_b_region = static_cast<SemNodeRegion>(p_node_b->GetRegion());
-
-    if (distance < 0.5)
+    if (dist_sq >= mCutOffDistance * mCutOffDistance)
     {
-        const double rest_length = 0.5 * (mRestLengths[node_a_region] + mRestLengths[node_b_region]);
-        const double spring_const = 0.5 * (mSpringConstants[node_a_region] + mSpringConstants[node_b_region]);
-
-        const double overlap = distance - rest_length;
-        c_vector<double, SPACE_DIM> calculated_force = rCellPopulation.rGetMesh().GetVectorFromAtoB(r_node_a_location, r_node_b_location) * (spring_const * overlap / distance);
-
-        return calculated_force;
+        return zero_vector<double>(DIM);
     }
-    else
-    {
-        return zero_vector<double>(SPACE_DIM);
-    }
+
+    // Every node region must have a configured spring constant and rest length (the array sizes
+    // are validated once per step in AddForceContribution()).
+    const unsigned region_a = p_node_a->GetRegion();
+    const unsigned region_b = p_node_b->GetRegion();
+    assert(region_a < mSpringConstants.size());
+    assert(region_b < mSpringConstants.size());
+
+    const double spring_const = 0.5 * (mSpringConstants[region_a] + mSpringConstants[region_b]);
+    const double rest_length = 0.5 * (mRestLengths[region_a] + mRestLengths[region_b]);
+
+    return CalculateForceVector(vec_a_to_b, dist_sq, spring_const, rest_length);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void SemRegionalForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
+template<unsigned DIM>
+void SemRegionalForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<SpringConstantInterior>" << mSpringConstants[SEM_INTERIOR_REGION] << "</SpringConstantInterior>\n";
-    *rParamsFile << "\t\t\t<SpringConstantBoundary>" << mSpringConstants[SEM_BOUNDARY_REGION] << "</SpringConstantBoundary>\n";
-    *rParamsFile << "\t\t\t<RestLengthInterior>" << mRestLengths[SEM_INTERIOR_REGION] << "</RestLengthInterior>\n";
-    *rParamsFile << "\t\t\t<RestLengthBoundary>" << mRestLengths[SEM_BOUNDARY_REGION] << "</RestLengthBoundary>\n";
-    AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);
+    for (unsigned region = 0; region < mSpringConstants.size(); ++region)
+    {
+        *rParamsFile << "\t\t\t<SpringConstant_" << region << ">" << mSpringConstants[region] << "</SpringConstant_" << region << ">\n";
+    }
+    for (unsigned region = 0; region < mRestLengths.size(); ++region)
+    {
+        *rParamsFile << "\t\t\t<RestLength_" << region << ">" << mRestLengths[region] << "</RestLength_" << region << ">\n";
+    }
+    *rParamsFile << "\t\t\t<CutOffDistance>" << mCutOffDistance << "</CutOffDistance>\n";
+
+    AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
+}
+
+template<unsigned DIM>
+void SemRegionalForce<DIM>::SetSpringConstants(const std::vector<double>& rSpringConstants)
+{
+    mSpringConstants = rSpringConstants;
+}
+
+template<unsigned DIM>
+std::vector<double> SemRegionalForce<DIM>::GetSpringConstants() const
+{
+    return mSpringConstants;
+}
+
+template<unsigned DIM>
+void SemRegionalForce<DIM>::SetRestLengths(const std::vector<double>& rRestLengths)
+{
+    mRestLengths = rRestLengths;
+}
+
+template<unsigned DIM>
+std::vector<double> SemRegionalForce<DIM>::GetRestLengths() const
+{
+    return mRestLengths;
+}
+
+template<unsigned DIM>
+void SemRegionalForce<DIM>::SetCutOffDistance(double cutOffDistance)
+{
+    mCutOffDistance = cutOffDistance;
+}
+
+template<unsigned DIM>
+double SemRegionalForce<DIM>::GetCutOffDistance() const
+{
+    return mCutOffDistance;
 }
 
 // Explicit instantiation
-template class SemRegionalForce<1,1>;
-template class SemRegionalForce<1,2>;
-template class SemRegionalForce<2,2>;
-template class SemRegionalForce<1,3>;
-template class SemRegionalForce<2,3>;
-template class SemRegionalForce<3,3>;
+template class SemRegionalForce<1>;
+template class SemRegionalForce<2>;
+template class SemRegionalForce<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(SemRegionalForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(SemRegionalForce)
