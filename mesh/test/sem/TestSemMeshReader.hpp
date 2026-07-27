@@ -38,6 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "SemMeshReader.hpp"
+#include "SemMeshWriter.hpp"
+#include "SemMesh.hpp"
+#include "SemSingleElementMeshGenerator.hpp"
+#include "OutputFileHandler.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 
@@ -45,9 +49,24 @@ class TestSemMeshReader : public CxxTest::TestSuite
 {
 public:
 
-    void TestFilesOpen()
+    void TestDimensionMismatchThrows()
     {
-        ///\todo
+        EXIT_IF_PARALLEL;  // Writes and reads mesh files
+
+        // Write a 2D SEM mesh to file
+        SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
+        auto p_mesh = generator.GetMesh();
+        SemMeshWriter<2> writer("TestSemMeshReaderDimension", "sem_mesh", true);
+        writer.WriteFilesUsingMesh(*p_mesh);
+
+        std::string mesh_base = OutputFileHandler::GetChasteTestOutputDirectory() + "TestSemMeshReaderDimension/sem_mesh";
+
+        // Reading a 2D mesh file with a reader of a different dimension must throw
+        TS_ASSERT_THROWS_CONTAINS((SemMeshReader<3>(mesh_base)), "does not match the reader's DIM");
+        TS_ASSERT_THROWS_CONTAINS((SemMeshReader<1>(mesh_base)), "does not match the reader's DIM");
+
+        // Reading with the matching dimension must succeed
+        TS_ASSERT_THROWS_NOTHING((SemMeshReader<2>(mesh_base)));
     }
 };
 

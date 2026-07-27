@@ -197,7 +197,17 @@ void SemMeshReader<DIM>::ReadHeaders()
 
     GetNextLineFromStream(mNodesFile, buffer);
     std::stringstream buffer_stream(buffer);
-    buffer_stream >> mNumNodes >> mNumNodeAttributes;
+
+    // The node header has four fields: num_nodes, dimension, num_attributes, max_boundary_marker.
+    // We read the first three and validate the dimension; the trailing boundary-marker field is
+    // not needed here (the boundary-marker column holds the per-node SEM region, which is parsed
+    // per node in GetNextNode()).
+    unsigned dimension;
+    buffer_stream >> mNumNodes >> dimension >> mNumNodeAttributes;
+    if (dimension != DIM)
+    {
+        EXCEPTION("SemMeshReader: mesh file dimension (" << dimension << ") does not match the reader's DIM (" << DIM << ")");
+    }
 
     // Get the next line to see if nodes are indexed from zero or not
     GetNextLineFromStream(mNodesFile, buffer);
