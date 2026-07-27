@@ -91,7 +91,6 @@ from chaste._pychaste_all import (
     SemElement_3,
     SemMesh_2,
     SemMesh_3,
-    SemMeshGenerator,
     SemMultiElementMeshGenerator_2,
     SemMultiElementMeshGenerator_3,
     SemSingleElementMeshGenerator_2,

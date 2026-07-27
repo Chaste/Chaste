@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CheckpointArchiveTypes.hpp"
 #include "OffLatticeSimulation.hpp"
-#include "SemMeshGenerator.hpp"
 #include "SemSingleElementMeshGenerator.hpp"
 #include "SemMultiElementMeshGenerator.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"

@@ -403,8 +403,6 @@ modules:
         source_includes:
           - PybindUblasTypeCaster.hpp
 
-      - name: SemMeshGenerator
-
       - name: SemSingleElementMeshGenerator
 
       - name: SemMultiElementMeshGenerator
