@@ -122,6 +122,10 @@ c_vector<double, DIM> SemLinearForce<DIM>::CalculateForceBetweenNodes(unsigned n
     const c_vector<double, DIM> vec_a_to_b = r_loc_b - r_loc_a;
     const double dist_sq = inner_prod(vec_a_to_b, vec_a_to_b);
 
+    // Each SEM node belongs to exactly one element (its cell), so these membership sets are
+    // non-empty; assert before dereferencing begin() to guard against a corrupted membership.
+    assert(!p_node_a->rGetContainingElementIndices().empty());
+    assert(!p_node_b->rGetContainingElementIndices().empty());
     const unsigned elem_a = *p_node_a->rGetContainingElementIndices().begin();
     const unsigned elem_b = *p_node_b->rGetContainingElementIndices().begin();
     const bool same_cell = (elem_a == elem_b);
