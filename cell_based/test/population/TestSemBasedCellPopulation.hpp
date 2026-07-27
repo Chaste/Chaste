@@ -46,11 +46,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "NoCellCycleModel.hpp"
 #include "ApcOneHitCellMutationState.hpp"
+#include "CellVolumesWriter.hpp"
+#include "OutputFileHandler.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
+
+#ifdef CHASTE_VTK
+#define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
+#include <vtkCellData.h>
+#include <vtkDataArray.h>
+#include <vtkSmartPointer.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkXMLUnstructuredGridReader.h>
+#endif // CHASTE_VTK
 
 class TestSemBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -268,6 +279,76 @@ public:
         large_displacement[0] = 0.6;
         large_displacement[1] = 0.6;
         TS_ASSERT_THROWS_ANYTHING(cell_population.CheckForStepSizeException(0u, large_displacement, 0.01));
+    }
+
+    void TestWriteVtkResultsWithPerElementData()
+    {
+#ifdef CHASTE_VTK
+        // Two disjoint triangular elements, offset along x
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0u, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1u, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2u, false, 0.5, 1.0));
+        nodes.push_back(new Node<2>(3u, false, 5.0, 0.0));
+        nodes.push_back(new Node<2>(4u, false, 6.0, 0.0));
+        nodes.push_back(new Node<2>(5u, false, 5.5, 1.0));
+
+        std::vector<Node<2>*> element_0_nodes(nodes.begin(), nodes.begin() + 3);
+        std::vector<Node<2>*> element_1_nodes(nodes.begin() + 3, nodes.end());
+        std::vector<SemElement<2>*> elements;
+        elements.push_back(new SemElement<2>(0u, element_0_nodes));
+        elements.push_back(new SemElement<2>(1u, element_1_nodes));
+        SemMesh<2> mesh(nodes, elements);
+
+        // One VTK cell (a point-cloud cell) per element, so cell data maps one-to-one to elements
+        mesh.SetOutputElementSurfacesToVtk(false);
+
+        std::vector<CellPtr> cells = CreateCells(mesh.GetNumElements());
+        SemBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // A per-cell CellData item, and the cell volume (via CellVolumesWriter)
+        for (unsigned elem_index = 0u; elem_index < mesh.GetNumElements(); ++elem_index)
+        {
+            cell_population.GetCellUsingLocationIndex(elem_index)->GetCellData()->SetItem("my data", 100.0 + elem_index);
+        }
+        cell_population.AddCellWriter<CellVolumesWriter>();
+
+        // The VTK writer stamps files with the elapsed step count, so set up the time stepper
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        std::string output_directory = "TestSemBasedCellPopulationVtk";
+        OutputFileHandler output_file_handler(output_directory, false);
+        cell_population.OpenWritersFiles(output_file_handler);
+        cell_population.WriteVtkResultsToFile(output_directory);
+        cell_population.CloseWritersFiles();
+
+        // Read the VTK output back and check the per-element cell-data arrays
+        std::string results_file = OutputFileHandler::GetChasteTestOutputDirectory()
+                                   + output_directory + "/results_0.vtu";
+        vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+        p_reader->SetFileName(results_file.c_str());
+        p_reader->Update();
+        vtkUnstructuredGrid* p_grid = p_reader->GetOutput();
+
+        TS_ASSERT_EQUALS(p_grid->GetNumberOfCells(), 2);
+
+        vtkDataArray* p_element_index = p_grid->GetCellData()->GetArray("SemElementIndex");
+        vtkDataArray* p_my_data = p_grid->GetCellData()->GetArray("my data");
+        vtkDataArray* p_volumes = p_grid->GetCellData()->GetArray("Cell volumes");
+        TS_ASSERT(p_my_data != nullptr);
+        TS_ASSERT(p_volumes != nullptr);
+
+        for (unsigned cell = 0u; cell < 2u; ++cell)
+        {
+            unsigned elem_index = static_cast<unsigned>(p_element_index->GetTuple1(cell));
+            TS_ASSERT_DELTA(p_my_data->GetTuple1(cell), 100.0 + elem_index, 1e-12);
+
+            // The written volume must equal GetVolumeOfCell() for the corresponding cell
+            double expected_volume = cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(elem_index));
+            TS_ASSERT_LESS_THAN(0.0, expected_volume);
+            TS_ASSERT_DELTA(p_volumes->GetTuple1(cell), expected_volume, 1e-6);
+        }
+#endif // CHASTE_VTK
     }
 };
 

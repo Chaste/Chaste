@@ -266,6 +266,49 @@ void SemBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDire
         mesh_writer.AddPointData(p_writer->rGetFieldName(), p_writer->GetPointData(this));
     }
 
+    // Write per-cell quantities as per-element VTK cell data. One cell maps to one SemElement, so
+    // each array has one value per element, indexed by element (location) index; SemMeshWriter
+    // expands these to the element's point-cloud and surface VTK cells.
+    unsigned num_elements = mpSemMesh->GetNumElements();
+    if (num_elements > 0)
+    {
+        // Any registered cell writers (e.g. CellVolumesWriter, which uses GetVolumeOfCell())
+        for (const auto& p_cell_writer : this->mCellWriters)
+        {
+            std::vector<double> vtk_element_data(num_elements);
+            for (typename SemMesh<DIM>::SemElementIterator elem_iter = mpSemMesh->GetElementIteratorBegin();
+                 elem_iter != mpSemMesh->GetElementIteratorEnd();
+                 ++elem_iter)
+            {
+                unsigned elem_index = elem_iter->GetIndex();
+                CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+                vtk_element_data[elem_index] = p_cell_writer->GetCellDataForVtkOutput(p_cell, this);
+            }
+            mesh_writer.AddElementData(p_cell_writer->GetVtkCellDataName(), vtk_element_data);
+        }
+
+        // Any CellData items (assuming the first cell is representative of all cells)
+        unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+
+        std::vector<std::vector<double> > cell_data(num_cell_data_items, std::vector<double>(num_elements));
+        for (typename SemMesh<DIM>::SemElementIterator elem_iter = mpSemMesh->GetElementIteratorBegin();
+             elem_iter != mpSemMesh->GetElementIteratorEnd();
+             ++elem_iter)
+        {
+            unsigned elem_index = elem_iter->GetIndex();
+            CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+            for (unsigned var = 0; var < num_cell_data_items; ++var)
+            {
+                cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+            }
+        }
+        for (unsigned var = 0; var < num_cell_data_items; ++var)
+        {
+            mesh_writer.AddElementData(cell_data_names[var], cell_data[var]);
+        }
+    }
+
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
     time << num_timesteps;

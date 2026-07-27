@@ -89,7 +89,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * (2008) with separate intra- and inter-cellular parameters. The two random force classes
  * provide the overdamped Langevin noise term: `SemGaussianRandomForce` generates independent
  * (uncorrelated) noise at each node, while `SemSpatiallyCorrelatedRandomForce` generates
- * noise that is spatially correlated between nearby nodes. */
+ * noise that is spatially correlated between nearby nodes.
+ *
+ * Other SEM force laws are available but not used in this tutorial: `SemLinearForce` is a
+ * harmonic approximation to the Morse force sharing the same intra-/inter-cellular parameters,
+ * and `SemRegionalForce` is a harmonic spring whose spring constant and rest length depend on
+ * each node's region and can be configured for any number of regions. */
 #include "SemForce.hpp"
 #include "SemGaussianRandomForce.hpp"
 #include "SemSpatiallyCorrelatedRandomForce.hpp"
@@ -106,6 +111,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * region within that element. These are useful for visualizing cell boundaries in Paraview. */
 #include "ElementIdNodePointDataWriter.hpp"
 #include "NodeRegionPointDataWriter.hpp"
+
+/* A cell writer that records the volume of each cell. Cell writers produce *cell data* in the
+ * VTK output (one value per cell), in contrast to the *point data* produced by the node point
+ * data writers above. See Test 1 for how this is used. */
+#include "CellVolumesWriter.hpp"
 
 /*
  * Next, we define the test class.
@@ -162,6 +172,16 @@ public:
          * to colour-code cells during visualisation. */
         cell_population.AddNodePointDataWriter<ElementIdNodePointDataWriter>();
         cell_population.AddNodePointDataWriter<NodeRegionPointDataWriter>();
+
+        /* In addition to per-node point data, the SEM VTK output can carry per-cell scalars as
+         * *cell data*. Any cell writer added to the population is written out this way, with one
+         * value per cell. Here we add `CellVolumesWriter`, which records each cell's volume
+         * (computed from the convex hull of its subcellular nodes). Any items a modifier or force
+         * stores in a cell's `CellData` are written as cell data too. Because one SEM cell spans
+         * many VTK cells (a point-cloud cell plus the reconstructed surface), each per-cell value
+         * is copied onto every VTK cell of that element, so both the nodes and the cell surface
+         * can be coloured by it in Paraview. */
+        cell_population.AddCellWriter<CellVolumesWriter>();
 
         /* We create an `OffLatticeSimulation` and set output directory, time step,
          * sampling interval, and end time. */
@@ -230,8 +250,10 @@ public:
     /*
      * To visualize the results, open Paraview and load
      * `$CHASTE_TEST_OUTPUT/SemSingleCell2D/results_from_time_0/results.pvd`.
-     * Colour points by the `element_id` or `node_region` arrays to see the subcellular
-     * node structure within the cell. See the
+     * Colour points by the `element_id` or `node_region` point arrays to see the subcellular
+     * node structure within the cell. The per-cell scalars written above appear as *cell*
+     * arrays: colour by `Cell volumes` to shade each cell (and its reconstructed surface) by its
+     * volume, or by `SemElementIndex` to distinguish cells. See the
      * [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
      *
      * ### Test 2 - a 2D multi-cell SEM simulation with spatially correlated noise
