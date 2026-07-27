@@ -109,6 +109,27 @@ jobs:
       run: ctest -j4 -L Continuous --output-on-failure
       working-directory: chaste-build-dir
 
+    # Diagnostic (temporary): the four cell_based failures on the 26.04 gcc leg are
+    # suspected to come from glibc's amd64v3 (FMA/AVX2) libm transcendentals, not from
+    # Chaste's own code. Re-run just those tests with the CPU-optimised libm paths
+    # disabled via GLIBC_TUNABLES. If they PASS here but FAIL in the baseline above,
+    # the glibc FMA libm is confirmed as the cause (and explains why the icx leg,
+    # which uses Intel libimf rather than glibc libm, is unaffected).
+    - name: diagnose libm FP divergence (glibc hwcaps)
+      if: ${{ always() && matrix.cc == 'gcc' && matrix.codename == 'resolute' }}
+      working-directory: chaste-build-dir
+      run: |
+        echo "===== CPU features of interest ====="
+        grep -m1 '^flags' /proc/cpuinfo | tr ' ' '\n' | grep -E '^(fma|avx2|avx|avx512f|sse4_2)$' | sort -u | paste -sd' '
+        echo "===== glibc version ====="
+        ldd --version | head -1
+        FAILING='^(TestCellPopulationWriters|TestOffLatticeSimulation|TestOffLatticeSimulationWithNodeBasedCellPopulation|TestVolumeTrackingModifier)$'
+        echo "===== BASELINE: default glibc libm ====="
+        ctest -j4 -R "$FAILING" --output-on-failure || true
+        echo "===== FORCED: AVX2/FMA/AVX/AVX512 libm paths disabled ====="
+        GLIBC_TUNABLES=glibc.cpu.hwcaps=-AVX512F,-AVX512VL,-AVX512DQ,-AVX512BW,-AVX2,-AVX,-FMA,-FMA4 \
+          ctest -j4 -R "$FAILING" --output-on-failure || true
+
     - name: run Nightly test pack
       run: ctest -j4 -L Nightly --output-on-failure
       working-directory: chaste-build-dir
