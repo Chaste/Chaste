@@ -67,6 +67,26 @@ public:
         }
     }
 
+    void Test1DMultipleElements()
+    {
+        // A 1D mesh with more than one element previously indexed mElemSpacing (an array of
+        // length DIM=1) out of bounds; check the element offsets, and hence node positions,
+        // are laid out correctly.
+        SemMultiElementMeshGenerator<1> generator({3}, {2}, 3.0);
+        auto p_mesh = generator.GetMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 6u);
+
+        // Node spacing = scaleFactor / numNodesPerElem = 3.0 / 3 = 1.0; element spacing = 3.0,
+        // so the two three-node elements sit at x in {0,1,2} and {3,4,5} respectively.
+        const double expected_x[6] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0};
+        for (unsigned i = 0; i < 6u; ++i)
+        {
+            TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetLocation()[0], expected_x[i], 1e-6);
+        }
+    }
+
     void Test2DOneElem()
     {
         // Mesh should be identical to the single element generator when generating one element

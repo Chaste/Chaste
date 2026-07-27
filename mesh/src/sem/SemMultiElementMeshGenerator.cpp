@@ -155,7 +155,7 @@ std::vector<c_vector<double, DIM>> SemMultiElementMeshGenerator<DIM>::GenerateEl
         for (unsigned i = 0; i < mNumElems[0]; ++i)
         {
             c_vector<double,1> v;
-            v[0] = static_cast<double>(i) * mElemSpacing[i];
+            v[0] = static_cast<double>(i) * mElemSpacing[0];
             offsets.push_back(v);
         }
     }
