@@ -36,17 +36,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PYTHONSIMULATIONMODIFIER_HPP_
 #define PYTHONSIMULATIONMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include "ChasteSerialization.hpp"
 
 #include "AbstractCellBasedSimulationModifier.hpp"
-#include "VtkScene.hpp"
 
 /**
- * Update a vtk scene at each simulation time step.
+ * Simulation modifier that can be subclassed in Python. It does nothing in C++
+ * beyond keeping the cell population up to date each time step. From Python,
+ * override UpdateAtEndOfTimeStep() and/or SetupSolve() to run custom code as a
+ * simulation progresses (e.g. time-varying boundary conditions or plotting).
  */
-template<unsigned DIM>
-class PythonSimulationModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+template <unsigned DIM>
+class PythonSimulationModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -57,14 +59,13 @@ class PythonSimulationModifier : public AbstractCellBasedSimulationModifier<DIM,
      * @param archive  The boost archive.
      * @param version  The current version of this class.
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+        archive& boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM, DIM> >(*this);
     }
 
 public:
-
     /**
      * Default constructor.
      */
@@ -73,16 +74,15 @@ public:
     /**
      * Destructor.
      */
-    virtual ~PythonSimulationModifier();
+    virtual ~PythonSimulationModifier() = default;
 
     /**
-     * Overridden UpdateAtEndOfTimeStep() method.
+     * Overridden OutputSimulationModifierParameters() method.
+     * Output any simulation modifier parameters to file.
      *
-     * Specifies what to do in the simulation at the end of each time step.
-     *
-     * @param rCellPopulation reference to the cell population
+     * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -92,27 +92,23 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    virtual void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory) override;
 
     /**
-     * Helper method to compute the mean level of Delta in each cell's neighbours and store these in the CellData.
+     * Overridden UpdateAtEndOfTimeStep() method.
      *
-     * Note: If using a CaBasedCellPopulation, we assume a Moore neighbourhood and unit carrying capacity.
-     * If a cell has no neighbours (such as an isolated cell in a CaBasedCellPopulation), we store the
-     * value -1 in the CellData.
+     * Specifies what to do in the simulation at the end of each time step.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
-     * Overridden OutputSimulationModifierParameters() method.
-     * Output any simulation modifier parameters to file.
+     * Bring the cell population's internal state up to date.
      *
-     * @param rParamsFile the file stream to which the parameters are output
+     * @param rCellPopulation reference to the cell population
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
-
+    virtual void UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

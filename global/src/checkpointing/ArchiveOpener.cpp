@@ -211,11 +211,7 @@ public:
         else
         {
             // Non-master processes need to go through the serialization methods, but not write any data
-#ifdef _MSC_VER
-            mpCommonStream = new std::ofstream("NUL", std::ios::binary | std::ios::trunc);
-#else
             mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
-#endif
             // LCOV_EXCL_START
             if (!mpCommonStream->is_open())
             {
