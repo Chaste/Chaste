@@ -213,6 +213,107 @@ public:
         simulator.Solve();
     }
 
+    void TestSemBasedSimulationArchiving()
+    {
+        EXIT_IF_PARALLEL;  // Cell-based archiving does not work in parallel
+
+        const unsigned num_nodes = 9u;  // 3x3 single element
+
+        // Reference run: solve uninterrupted from 0 to 0.2 and record the final node positions.
+        // A deterministic SemForce (no random force) is used so the archived run must match exactly.
+        std::vector<c_vector<double, 2> > reference_positions(num_nodes);
+        {
+            SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
+            auto p_mesh = generator.GetMesh();
+            c_vector<double, 4> domain{};
+            domain[0] = -1.0; domain[1] = 2.0; domain[2] = -1.0; domain[3] = 2.0;
+            p_mesh->SetUpBoxCollection(0.5, domain);
+
+            std::vector<CellPtr> cells;
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+            SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+            OffLatticeSimulation<2> simulator(cell_population);
+            simulator.SetOutputDirectory("TestSemBasedSimulationArchiveReference");
+            simulator.SetDt(0.01);
+            simulator.SetSamplingTimestepMultiple(10);
+            simulator.SetEndTime(0.2);
+            simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2>>());
+            simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
+
+            // Use N-scaled parameters (packing=1 for the regular grid) so the Morse dynamics
+            // are stable at the generator's node spacing.
+            MAKE_PTR(SemForce<2>, p_sem_force);
+            const SemNScaledParameters params = p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
+            p_sem_force->SetIntraCutOffDistance(0.5);
+            cell_population.SetDampingConstantNormal(params.DampingConstant);
+            simulator.AddForce(p_sem_force);
+
+            simulator.Solve();
+
+            for (unsigned i = 0; i < num_nodes; ++i)
+            {
+                reference_positions[i] = simulator.rGetCellPopulation().GetNode(i)->rGetLocation();
+            }
+        }
+
+        // Reset the SimulationTime singleton so the save/restart run starts afresh at t = 0
+        SimulationTime::Destroy();
+        SimulationTime::Instance()->SetStartTime(0.0);
+
+        // Save/restart run: solve from 0 to 0.1, checkpoint, then reload and continue to 0.2.
+        // Saving exercises SemMesh's write-to-file archiving and reloading exercises the reader.
+        {
+            SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
+            auto p_mesh = generator.GetMesh();
+            c_vector<double, 4> domain{};
+            domain[0] = -1.0; domain[1] = 2.0; domain[2] = -1.0; domain[3] = 2.0;
+            p_mesh->SetUpBoxCollection(0.5, domain);
+
+            std::vector<CellPtr> cells;
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+            SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+            OffLatticeSimulation<2> simulator(cell_population);
+            simulator.SetOutputDirectory("TestSemBasedSimulationArchive");
+            simulator.SetDt(0.01);
+            simulator.SetSamplingTimestepMultiple(10);
+            simulator.SetEndTime(0.1);
+            simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2>>());
+            simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
+
+            MAKE_PTR(SemForce<2>, p_sem_force);
+            const SemNScaledParameters params = p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
+            p_sem_force->SetIntraCutOffDistance(0.5);
+            cell_population.SetDampingConstantNormal(params.DampingConstant);
+            simulator.AddForce(p_sem_force);
+
+            simulator.Solve();
+            CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
+        }
+
+        OffLatticeSimulation<2>* p_simulator =
+            CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestSemBasedSimulationArchive", 0.1);
+
+        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumNodes(), num_nodes);
+
+        p_simulator->SetEndTime(0.2);
+        p_simulator->Solve();
+
+        // The restarted run must reproduce the uninterrupted reference run. The tolerance
+        // allows for the six-significant-figure precision of the archived mesh node positions.
+        for (unsigned i = 0; i < num_nodes; ++i)
+        {
+            c_vector<double, 2> loaded_position = p_simulator->rGetCellPopulation().GetNode(i)->rGetLocation();
+            TS_ASSERT_DELTA(loaded_position[0], reference_positions[i][0], 1e-4);
+            TS_ASSERT_DELTA(loaded_position[1], reference_positions[i][1], 1e-4);
+        }
+
+        delete p_simulator;
+    }
+
 };
 
 #endif /*TESTSEMBASEDSIMULATION_HPP_*/

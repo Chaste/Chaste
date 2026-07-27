@@ -148,6 +148,15 @@ private:
     {
         archive& boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
 
+        // Node positions, regions and element membership are persisted via the mesh file
+        // below; the remaining SEM-specific scalar state is archived here. The box
+        // collection is not archived: it is rebuilt from the node locations on load.
+        archive& mMaximumInteractionDistance;
+        archive& mOutputElementSurfacesToVtk;
+        archive& mSemSurfaceAlphaMultiplier;
+        archive& mSemSurfaceExpansionMultiplier;
+        archive& mUseExpandedSemSurfaceForVolume;
+
         // Create a mesh writer pointing to the correct file and directory
         SemMeshWriter<DIM> writer(ArchiveLocationInfo::GetArchiveRelativePath(),
                                   ArchiveLocationInfo::GetMeshFilename(),
@@ -166,9 +175,19 @@ private:
     {
         archive& boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
 
+        archive& mMaximumInteractionDistance;
+        archive& mOutputElementSurfacesToVtk;
+        archive& mSemSurfaceAlphaMultiplier;
+        archive& mSemSurfaceExpansionMultiplier;
+        archive& mUseExpandedSemSurfaceForVolume;
+
         SemMeshReader<DIM> reader(ArchiveLocationInfo::GetArchiveDirectory()
                                   + ArchiveLocationInfo::GetMeshFilename());
         this->ConstructFromMeshReader(reader);
+
+        // The box collection is not archived, so rebuild it from the loaded node locations
+        // using the restored interaction distance.
+        SetUpBoxCollection(this->mNodes);
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
