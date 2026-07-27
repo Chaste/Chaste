@@ -57,12 +57,6 @@ SemElement<DIM>::~SemElement()
 }
 
 template<unsigned DIM>
-void SemElement<DIM>::SetCellId(unsigned int cellId)
-{
-  this->mCellId = cellId;
-}
-
-template<unsigned DIM>
 void SemElement<DIM>::UpdateNode(const unsigned& rIndex, Node<DIM>* pNode)
 {
     assert(rIndex < this->mNodes.size());

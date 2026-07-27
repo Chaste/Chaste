@@ -138,7 +138,6 @@ void SemMeshGenerator::GenerateSingleCell(std::array<double, 2> center, std::arr
     // Single cell is represented by a single SemElement
     unsigned int new_element_id = mpMesh->GetNumElements();
     auto new_element = new SemElement<2>(new_element_id, {});
-    new_element->SetCellId(new_element_id);
 
     // Generate the nodes
     for (unsigned x = 0; x < num_nodes_on_axis[0]; x++) {

@@ -228,7 +228,6 @@ template <unsigned DIM> void SemMultiElementMeshGenerator<DIM>::GenerateMesh(
     {
         unsigned int new_element_id = mpMesh->GetNumElements();
         auto new_element = new SemElement<DIM>(new_element_id, {});
-        new_element->SetCellId(new_element_id);
 
         for (unsigned i = 0; i < positions.size(); ++i)
         {

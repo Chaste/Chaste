@@ -54,11 +54,6 @@ class SemElement : public AbstractElement<DIM, DIM>
 {
 private:
 
-    /**
-     * The id of the biological cell represented by this SEM element.
-     */
-    unsigned mCellId;
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -105,17 +100,6 @@ public:
      * The element does not own its nodes; node memory is managed by SemMesh.
      */
     ~SemElement();
-
-    /**
-     * Set the id of the biological cell represented by this element.
-     *
-     * This records an external cell identifier on the SEM element for force,
-     * output, or bookkeeping code that needs to associate element state with a
-     * cell id.
-     *
-     * @param id the new cell id
-     */
-    void SetCellId(unsigned int id);
 
     /**
      * Get the element's node vector.
