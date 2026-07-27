@@ -108,7 +108,9 @@ std::vector<double> SemMeshWriter<DIM>::GetNextNode()
         {
             coordinates[j] = (*(mpIters->pNodeIter))->GetPoint()[j];
         }
-        coordinates[DIM] = (*(mpIters->pNodeIter))->IsBoundaryNode();
+        // The final column stores the per-node SEM region (interior/boundary) so it survives
+        // the mesh file round-trip; SemMesh::ConstructFromMeshReader restores it via SetRegion().
+        coordinates[DIM] = (*(mpIters->pNodeIter))->GetRegion();
 
         ++(*(mpIters->pNodeIter));
 
@@ -135,8 +137,6 @@ ElementData SemMeshWriter<DIM>::GetNextElement()
             elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
         }
 
-        // Set attribute
-        elem_data.AttributeValue = (*(mpIters->pElemIter))->GetAttribute();
         ++(*(mpIters->pElemIter));
 
         return elem_data;
@@ -495,8 +495,8 @@ void SemMeshWriter<DIM>::WriteFiles()
     std::string element_file_name = this->mBaseName + ".cell";
     out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name);
 
-    // Write the element header
-    num_attr = 1; //Always write element attributes
+    // Write the element header. SEM elements carry no per-element attributes.
+    num_attr = 0;
     unsigned num_elements = this->GetNumElements();
     *p_element_file << num_elements << "\t" << num_attr << "\n";
 
@@ -517,8 +517,6 @@ void SemMeshWriter<DIM>::WriteFiles()
         {
             *p_element_file << "\t" << node_indices[i];
         }
-
-        *p_element_file << "\t" << elem_data.AttributeValue;
 
         // New line
         *p_element_file << "\n";

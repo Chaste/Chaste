@@ -336,6 +336,10 @@ void SemMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshRe
         coords = rMeshReader.GetNextNode();
         Node<DIM>* p_node = new Node<DIM>(node_index, coords, false);
 
+        // The final entry returned by GetNextNode() is the per-node SEM region
+        // (interior/boundary); restore it so region-dependent forces behave as before the round-trip.
+        p_node->SetRegion(static_cast<unsigned>(coords[DIM]));
+
         for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); i++)
         {
             double attribute = rMeshReader.GetNodeAttributes()[i];
@@ -356,13 +360,7 @@ void SemMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshRe
         ElementData element_data = rMeshReader.GetNextElementData();
         std::vector<Node<DIM>*> nodes;
 
-        /*
-         * NOTE: currently just reading element vertices from mesh reader - even if it
-         * does contain information about internal nodes (ie for quadratics) this is
-         * ignored here and used elsewhere: ie don't do this:
-         *   unsigned nodes_size = node_indices.size();
-         */
-        for (unsigned j = 0; j < DIM + 1; j++) // num vertices=DIM+1, may not be equal to nodes_size.
+        for (unsigned j = 0; j < element_data.NodeIndices.size(); j++)
         {
             assert(element_data.NodeIndices[j] < this->mNodes.size());
             nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);
@@ -371,13 +369,6 @@ void SemMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshRe
         SemElement<DIM>* p_element = new SemElement<DIM>(element_index, nodes);
 
         this->mElements.push_back(p_element);
-
-        if (rMeshReader.GetNumElementAttributes() > 0)
-        {
-            assert(rMeshReader.GetNumElementAttributes() == 1);
-            double attribute_value = element_data.AttributeValue;
-            p_element->SetAttribute(attribute_value);
-        }
     }
 
     // Add boundary elements and nodes

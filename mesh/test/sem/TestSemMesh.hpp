@@ -43,8 +43,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemMesh.hpp"
 #include "SemElementGeometry.hpp"
+#include "SemMeshReader.hpp"
+#include "SemMeshWriter.hpp"
 #include "ArchiveOpener.hpp"
+#include "OutputFileHandler.hpp"
 #include "SemSingleElementMeshGenerator.hpp"
+#include "SemMultiElementMeshGenerator.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -126,7 +130,72 @@ public:
 
     void TestConstructFromMeshReader()
     {
-        ///\todo
+        // Build a two-element 2D mesh; 3x3 nodes per element gives a mix of interior
+        // (region 0) and boundary (region 1) nodes to exercise region persistence.
+        SemMultiElementMeshGenerator<2> generator({3, 3}, {2, 1}, 0.5);
+        auto p_original_mesh = generator.GetMesh();
+
+        const unsigned num_nodes = p_original_mesh->GetNumNodes();
+        const unsigned num_elements = p_original_mesh->GetNumElements();
+
+        // Sanity check that both regions are actually present in the original mesh
+        bool has_interior = false;
+        bool has_boundary = false;
+        for (unsigned i = 0; i < num_nodes; ++i)
+        {
+            has_interior = has_interior || (p_original_mesh->GetNode(i)->GetRegion() == 0u);
+            has_boundary = has_boundary || (p_original_mesh->GetNode(i)->GetRegion() == 1u);
+        }
+        TS_ASSERT(has_interior);
+        TS_ASSERT(has_boundary);
+
+        // Write the mesh to file, then read it back into a fresh mesh
+        SemMeshWriter<2> writer("TestSemMeshRoundTrip", "sem_mesh", true);
+        writer.WriteFilesUsingMesh(*p_original_mesh);
+
+        std::string mesh_base = OutputFileHandler::GetChasteTestOutputDirectory() + "TestSemMeshRoundTrip/sem_mesh";
+        SemMeshReader<2> reader(mesh_base);
+        SemMesh<2> read_mesh;
+        read_mesh.ConstructFromMeshReader(reader);
+
+        // Element and node counts are preserved
+        TS_ASSERT_EQUALS(read_mesh.GetNumNodes(), num_nodes);
+        TS_ASSERT_EQUALS(read_mesh.GetNumElements(), num_elements);
+
+        // Node positions and regions are preserved
+        for (unsigned i = 0; i < num_nodes; ++i)
+        {
+            Node<2>* p_orig = p_original_mesh->GetNode(i);
+            Node<2>* p_read = read_mesh.GetNode(i);
+            TS_ASSERT_DELTA(p_read->rGetLocation()[0], p_orig->rGetLocation()[0], 1e-6);
+            TS_ASSERT_DELTA(p_read->rGetLocation()[1], p_orig->rGetLocation()[1], 1e-6);
+            TS_ASSERT_EQUALS(p_read->GetRegion(), p_orig->GetRegion());
+        }
+
+        // Per-element node count and node membership are preserved
+        for (unsigned e = 0; e < num_elements; ++e)
+        {
+            SemElement<2>* p_orig = p_original_mesh->GetElement(e);
+            SemElement<2>* p_read = read_mesh.GetElement(e);
+
+            TS_ASSERT_EQUALS(p_read->GetNumNodes(), p_orig->GetNumNodes());
+
+            for (unsigned j = 0; j < p_orig->GetNumNodes(); ++j)
+            {
+                TS_ASSERT_EQUALS(p_read->GetNodeGlobalIndex(j), p_orig->GetNodeGlobalIndex(j));
+            }
+        }
+
+        // Node -> element membership is rebuilt by RegisterWithNodes() during construction
+        for (unsigned e = 0; e < num_elements; ++e)
+        {
+            SemElement<2>* p_read = read_mesh.GetElement(e);
+            for (unsigned j = 0; j < p_read->GetNumNodes(); ++j)
+            {
+                std::set<unsigned> containing_elements = p_read->GetNode(j)->rGetContainingElementIndices();
+                TS_ASSERT_EQUALS(containing_elements.count(e), 1u);
+            }
+        }
     }
 
     void TestClear()
