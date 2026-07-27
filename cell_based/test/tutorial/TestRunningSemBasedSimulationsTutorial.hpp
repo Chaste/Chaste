@@ -152,10 +152,10 @@ public:
         CellsGenerator<NoCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
 
-        /* We create the cell population, passing the mesh and cells. We also set the
-         * node damping constant η used in the Langevin equation F = η * (velocity). */
+        /* We create the cell population, passing the mesh and cells. The node damping
+         * constant η used in the Langevin equation F = η ẋ is set further below, from the
+         * same N-scaling as the force, so that η = η₀ N stays consistent with the stiffness. */
         SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetDampingConstantNormal(1.0);
 
         /* We attach per-node data writers so that Paraview output includes the element
          * ID and region of each subcellular node. These are optional but make it easy
@@ -197,9 +197,15 @@ public:
         const double packing = 1.0;        // regular square grid
 
         MAKE_PTR(SemForce<2>, p_sem_force);
-        p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), cell_radius, kappa0, 0.0, packing);
+        const SemNScaledParameters intra_params =
+            p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), cell_radius, kappa0, 0.0, packing);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
         simulator.AddForce(p_sem_force);
+
+        /* `ApplyNScaledIntraParameters` also returns the consistent damping constant
+         * η = η₀ N (with the default η₀ = 1), which we apply to the population so the
+         * Langevin dynamics are scaled with N exactly as the force stiffness is. */
+        cell_population.SetDampingConstantNormal(intra_params.DampingConstant);
 
         /* We add `SemGaussianRandomForce`, which applies independent Gaussian noise
          * to each node. The diffusion constant D controls the magnitude: the force
@@ -258,7 +264,6 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
 
         SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetDampingConstantNormal(1.0);
         cell_population.AddNodePointDataWriter<ElementIdNodePointDataWriter>();
         cell_population.AddNodePointDataWriter<NodeRegionPointDataWriter>();
 
@@ -283,11 +288,17 @@ public:
         const double packing = 1.0;        // regular square grid
 
         MAKE_PTR(SemForce<2>, p_sem_force);
-        p_sem_force->ApplyNScaledIntraParameters(nodes_per_cell, cell_radius, kappa0, 0.0, packing);
+        const SemNScaledParameters intra_params =
+            p_sem_force->ApplyNScaledIntraParameters(nodes_per_cell, cell_radius, kappa0, 0.0, packing);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
         p_sem_force->ApplyNScaledInterParameters(nodes_per_cell, cell_radius, kappa0, 0.0, packing);
         p_sem_force->SetInterCutOffDistance(interaction_cutoff);
         simulator.AddForce(p_sem_force);
+
+        /* The damping constant η = η₀ N is scaled per-cell (N is the nodes-per-cell count
+         * used for the intra scaling), keeping the Langevin dynamics consistent with the
+         * force stiffness as N is varied. */
+        cell_population.SetDampingConstantNormal(intra_params.DampingConstant);
 
         /* `SemSpatiallyCorrelatedRandomForce` requires the domain bounds and a correlation
          * length. Nodes closer together than `correlationLength` will receive similar noise
@@ -339,30 +350,25 @@ public:
         box_domain[5] =  2.0;
         p_mesh->SetUpBoxCollection(interaction_cutoff, box_domain);
 
-        /* We compute the full N-scaled parameter set using `SemComputeNScaledParameters`.
-         * This returns all four N-dependent quantities at once: the equilibrium distance
-         * r_eq, the Morse well depth u₀, the harmonic spring constant κ, and the damping
-         * constant η = η₀ N. Setting the cell population's damping constant to the N-scaled
-         * value η ensures that the Langevin equation η ẋ = F_det + ξ is correctly balanced
-         * as N changes. The rho parameter must match the force's scaling factor (default 5.0);
-         * η₀ is the per-node reference damping. Here we choose η₀ = 1/N so that the
-         * total damping η = η₀ N = 1 is independent of N; different N values can then be
-         * compared directly without re-tuning the diffusion constant. */
+        /* We define the physical inputs for the N-dependent scaling. The rho parameter
+         * must match the force's scaling factor, so we set it on the force explicitly
+         * below. η₀ is the per-node reference damping: here we choose η₀ = 1/N so that
+         * the total damping η = η₀ N = 1 is independent of N, letting different N values
+         * be compared directly without re-tuning the diffusion constant. The scaled
+         * parameters (including the damping constant η) are obtained from
+         * `ApplyNScaledIntraParameters` below, avoiding a separate scaling computation. */
         const unsigned num_nodes = p_mesh->GetNumNodes();
         const double cell_radius = 0.25;   // half the scale factor
         const double kappa0 = 20.0;
         const double rho = 5.0;
         const double packing = 1.0;        // regular cubic grid
         const double eta0 = 1.0 / static_cast<double>(num_nodes);
-        const SemNScaledParameters nscaled =
-            SemComputeNScaledParameters<3>(num_nodes, cell_radius, kappa0, rho, 0.0, eta0, packing);
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
 
         SemBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        cell_population.SetDampingConstantNormal(nscaled.DampingConstant);
         cell_population.AddNodePointDataWriter<ElementIdNodePointDataWriter>();
         cell_population.AddNodePointDataWriter<NodeRegionPointDataWriter>();
 
@@ -375,14 +381,18 @@ public:
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<3>>());
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
-        /* We configure the force using the same N-scaling parameters. Setting
+        /* We configure the force using the N-scaling parameters. Setting
          * `IntraScalingFactor` to `rho` before calling `ApplyNScaledIntraParameters`
-         * ensures both the force and the damping calculation use the same ρ. For a
-         * single cell only intra-cellular interactions are relevant. */
+         * ensures both the force and the damping calculation use the same ρ. The call
+         * returns the full N-scaled parameter set, from which we take the damping constant
+         * η = η₀ N and apply it to the population. For a single cell only intra-cellular
+         * interactions are relevant. */
         MAKE_PTR(SemForce<3>, p_sem_force);
         p_sem_force->SetIntraScalingFactor(rho);
-        p_sem_force->ApplyNScaledIntraParameters(num_nodes, cell_radius, kappa0, 0.0, packing);
+        const SemNScaledParameters nscaled =
+            p_sem_force->ApplyNScaledIntraParameters(num_nodes, cell_radius, kappa0, 0.0, packing, eta0);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
+        cell_population.SetDampingConstantNormal(nscaled.DampingConstant);
         simulator.AddForce(p_sem_force);
 
         /* For the 3D spatially correlated noise we must supply 3D corners. The

@@ -212,23 +212,25 @@ template<unsigned DIM>
 void SemLinearForce<DIM>::SetInterCutOffDistance(double cutOffDistance) { mInterCutOffDistance = cutOffDistance; }
 
 template<unsigned DIM>
-void SemLinearForce<DIM>::ApplyNScaledIntraParameters(
-    unsigned numNodes, double cellRadius, double kappa0, double lambda, double packingDensity)
+SemNScaledParameters SemLinearForce<DIM>::ApplyNScaledIntraParameters(
+    unsigned numNodes, double cellRadius, double kappa0, double lambda, double packingDensity, double eta0)
 {
     const SemNScaledParameters params = SemComputeNScaledParameters<DIM>(
-        numNodes, cellRadius, kappa0, mIntraScalingFactor, lambda, 1.0, packingDensity);
+        numNodes, cellRadius, kappa0, mIntraScalingFactor, lambda, eta0, packingDensity);
     mIntraEquilibriumDistance = params.EquilibriumDistance;
     mIntraWellDepth = params.WellDepth;
+    return params;
 }
 
 template<unsigned DIM>
-void SemLinearForce<DIM>::ApplyNScaledInterParameters(
-    unsigned numNodes, double cellRadius, double kappa0, double lambda, double packingDensity)
+SemNScaledParameters SemLinearForce<DIM>::ApplyNScaledInterParameters(
+    unsigned numNodes, double cellRadius, double kappa0, double lambda, double packingDensity, double eta0)
 {
     const SemNScaledParameters params = SemComputeNScaledParameters<DIM>(
-        numNodes, cellRadius, kappa0, mInterScalingFactor, lambda, 1.0, packingDensity);
+        numNodes, cellRadius, kappa0, mInterScalingFactor, lambda, eta0, packingDensity);
     mInterEquilibriumDistance = params.EquilibriumDistance;
     mInterWellDepth = params.WellDepth;
+    return params;
 }
 
 // Explicit instantiation

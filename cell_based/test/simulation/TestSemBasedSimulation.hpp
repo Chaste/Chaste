@@ -173,7 +173,6 @@ public:
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
         SemBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        cell_population.SetDampingConstantNormal(1.0);
         cell_population.AddNodePointDataWriter<NodeRegionPointDataWriter>();
         cell_population.AddNodePointDataWriter<ElementIdNodePointDataWriter>();
 
@@ -192,12 +191,15 @@ public:
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         // Create some force laws and pass them to the simulation.
-        // R_cell = scaleFactor/2, packing=1 (regular cubic grid), kappa0 chosen to match well_depth~0.001
+        // R_cell = scaleFactor/2, packing=1 (regular cubic grid), kappa0 chosen to match well_depth~0.001.
+        // The intra scaling also yields the consistent damping constant eta = eta0*N, which we
+        // apply to the population so the Langevin dynamics are scaled as in Sandersius 2008 Section 2.
         MAKE_PTR(SemForce<3>, p_sem_force);
-        p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
+        const SemNScaledParameters intra_params = p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
         p_sem_force->ApplyNScaledInterParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
         p_sem_force->SetInterCutOffDistance(interaction_cutoff);
+        cell_population.SetDampingConstantNormal(intra_params.DampingConstant);
         simulator.AddForce(p_sem_force);
 
         MAKE_PTR(SemSpatiallyCorrelatedRandomForce<3>, p_random_force);

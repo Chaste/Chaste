@@ -266,34 +266,52 @@ public:
      * parameters, using the current mIntraScalingFactor (rho). Sets
      * mIntraEquilibriumDistance and mIntraWellDepth.
      *
-     * @param numNodes       number of subcellular nodes N
-     * @param cellRadius     cell radius R_cell
-     * @param kappa0         reference spring constant κ₀
-     * @param lambda         correction factor λ (default 0)
-     * @param packingDensity packing density p (0 → dimension-specific default)
-     */
-    void ApplyNScaledIntraParameters(unsigned numNodes,
-                                     double cellRadius,
-                                     double kappa0,
-                                     double lambda = 0.0,
-                                     double packingDensity = 0.0);
-
-    /**
-     * Apply N-dependent scaling (Sandersius 2008 Section 2) to the inter-cellular
-     * parameters, using the current mInterScalingFactor (rho). Sets
-     * mInterEquilibriumDistance and mInterWellDepth.
+     * The full scaled parameter set is returned so the caller can apply the
+     * consistent damping constant eta = eta0*N to the cell population, e.g.
+     * rPopulation.SetDampingConstantNormal(ApplyNScaledIntraParameters(...).DampingConstant).
+     * The damping constant is not applied automatically, but returning it here
+     * avoids recomputing (and possibly mismatching) the scaling.
      *
      * @param numNodes       number of subcellular nodes N
      * @param cellRadius     cell radius R_cell
      * @param kappa0         reference spring constant κ₀
      * @param lambda         correction factor λ (default 0)
      * @param packingDensity packing density p (0 → dimension-specific default)
+     * @param eta0           reference damping constant per element η₀ (default 1)
+     *
+     * @return the full N-scaled parameter set (including the damping constant)
      */
-    void ApplyNScaledInterParameters(unsigned numNodes,
-                                     double cellRadius,
-                                     double kappa0,
-                                     double lambda = 0.0,
-                                     double packingDensity = 0.0);
+    SemNScaledParameters ApplyNScaledIntraParameters(unsigned numNodes,
+                                                     double cellRadius,
+                                                     double kappa0,
+                                                     double lambda = 0.0,
+                                                     double packingDensity = 0.0,
+                                                     double eta0 = 1.0);
+
+    /**
+     * Apply N-dependent scaling (Sandersius 2008 Section 2) to the inter-cellular
+     * parameters, using the current mInterScalingFactor (rho). Sets
+     * mInterEquilibriumDistance and mInterWellDepth.
+     *
+     * As with ApplyNScaledIntraParameters(), the full scaled parameter set is
+     * returned so the caller can apply the consistent damping constant to the
+     * cell population.
+     *
+     * @param numNodes       number of subcellular nodes N
+     * @param cellRadius     cell radius R_cell
+     * @param kappa0         reference spring constant κ₀
+     * @param lambda         correction factor λ (default 0)
+     * @param packingDensity packing density p (0 → dimension-specific default)
+     * @param eta0           reference damping constant per element η₀ (default 1)
+     *
+     * @return the full N-scaled parameter set (including the damping constant)
+     */
+    SemNScaledParameters ApplyNScaledInterParameters(unsigned numNodes,
+                                                     double cellRadius,
+                                                     double kappa0,
+                                                     double lambda = 0.0,
+                                                     double packingDensity = 0.0,
+                                                     double eta0 = 1.0);
 };
 
 #include "SerializationExportWrapper.hpp"

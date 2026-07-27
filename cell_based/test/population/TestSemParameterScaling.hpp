@@ -175,7 +175,8 @@ public:
         force.SetIntraWellDepth(99.0);           // sentinel — should be overwritten
         force.SetIntraEquilibriumDistance(99.0); // sentinel — should be overwritten
 
-        force.ApplyNScaledIntraParameters(27u, 1.0, 9.0, 1.0, 0.7405);
+        // eta0 = 2.0, so the returned damping constant should be eta0*N = 54
+        const SemNScaledParameters returned = force.ApplyNScaledIntraParameters(27u, 1.0, 9.0, 1.0, 0.7405, 2.0);
 
         // kappa = 9*(1/3)*(1 - 1/3) = 2
         const double r_eq = 2.0 * std::pow(0.7405 / 27.0, 1.0/3.0);
@@ -183,6 +184,12 @@ public:
         TS_ASSERT_DELTA(force.GetIntraEquilibriumDistance(), r_eq, 1e-9);
         TS_ASSERT_DELTA(force.GetIntraWellDepth(), u0, 1e-9);
         TS_ASSERT_DELTA(force.GetIntraScalingFactor(), 5.0, 1e-9);  // rho unchanged
+
+        // The returned parameter set should match the force state and carry the damping constant
+        TS_ASSERT_DELTA(returned.EquilibriumDistance, r_eq, 1e-9);
+        TS_ASSERT_DELTA(returned.WellDepth, u0, 1e-9);
+        TS_ASSERT_DELTA(returned.SpringConstant, 2.0, 1e-9);
+        TS_ASSERT_DELTA(returned.DampingConstant, 54.0, 1e-9);
     }
 
     /**
@@ -210,12 +217,14 @@ public:
     {
         SemLinearForce<3> force;
         force.SetIntraScalingFactor(5.0);
-        force.ApplyNScaledIntraParameters(27u, 1.0, 9.0, 1.0, 0.7405);
+        // Default eta0 = 1.0, so the returned damping constant should be N = 27
+        const SemNScaledParameters returned = force.ApplyNScaledIntraParameters(27u, 1.0, 9.0, 1.0, 0.7405);
 
         const double r_eq = 2.0 * std::pow(0.7405 / 27.0, 1.0/3.0);
         const double u0 = 2.0 * r_eq * r_eq / (8.0 * 25.0);
         TS_ASSERT_DELTA(force.GetIntraEquilibriumDistance(), r_eq, 1e-9);
         TS_ASSERT_DELTA(force.GetIntraWellDepth(), u0, 1e-9);
+        TS_ASSERT_DELTA(returned.DampingConstant, 27.0, 1e-9);
     }
 };
 
