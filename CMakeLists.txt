@@ -337,7 +337,7 @@ if (Chaste_ENABLE_PYCHASTE)
     FetchContent_Declare(
         cppwg
         GIT_REPOSITORY https://github.com/Chaste/cppwg.git
-        GIT_TAG stable
+        GIT_TAG develop
         GIT_SHALLOW 1
     )
     FetchContent_MakeAvailable(cppwg)

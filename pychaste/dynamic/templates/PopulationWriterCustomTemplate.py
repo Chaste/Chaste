@@ -38,7 +38,7 @@ class PopulationWriterCustomTemplate(cppwg.templates.custom.Custom):
     # The writer types this generator instantiates via AddCellWriter<...> etc.
     # These names appear only in the generated code below, never in the parsed
     # C++ signatures, so cppwg cannot auto-include their headers - the generator
-    # supplies them itself via get_source_includes().
+    # supplies them itself via get_class_cpp_source_includes().
     cell_writers = [
         "CellAgesWriter",
         "CellAncestorWriter",
@@ -97,7 +97,7 @@ class PopulationWriterCustomTemplate(cppwg.templates.custom.Custom):
             + self.population_writers
         )
 
-    def get_source_includes(self, *args, **kwargs):
+    def get_class_cpp_source_includes(self, *args, **kwargs):
         """
         Return the writer headers the generated AddCellWriter<...> code needs.
 
