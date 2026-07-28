@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveLocationInfo.hpp"
 #include "ArchiveOpener.hpp"
 #include "Exception.hpp"
+#include "FilesystemPermissions.hpp"
 #include "OutputFileHandler.hpp"
 #include "ProcessSpecificArchive.hpp"
 
@@ -207,6 +208,7 @@ public:
                 delete mpCommonStream;
                 EXCEPTION("Failed to open main archive file for writing: " + common_path.str());
             }
+            FilesystemPermissions::SetFilePermissions(common_path.str());
         }
         else
         {
@@ -231,6 +233,7 @@ public:
             delete mpCommonStream;
             EXCEPTION("Failed to open secondary archive file for writing: " + private_path);
         }
+        FilesystemPermissions::SetFilePermissions(private_path);
         mpPrivateArchive = new OutputArchive(*mpPrivateStream);
         ProcessSpecificArchive<OutputArchive>::Set(mpPrivateArchive);
     }
