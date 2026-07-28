@@ -43,8 +43,6 @@ include (EnsureOutOfSourceBuild)
 ensure_out_of_source_build ()
 include (CheckIncludeFile)
 
-include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/overrides.cmake)
-
 message ("\n####################################")
 message ("# Setting compilers and build type")
 message ("####################################\n")
@@ -63,10 +61,6 @@ include (ChasteBuildTypes)
 
 option (Chaste_ERROR_ON_WARNING "Error on compiler warnings" ON)
 option (Chaste_VERBOSE "Provide extra information when building Chaste" OFF)
-if (Chaste_VERBOSE AND MSVC)
-    set (CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "/VERBOSE")
-    set (CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS} "/VERBOSE")
-endif ()
 if (UNIX)
     # Memory testing
     option (Chaste_MEMORY_TESTING "Run tests using valgrind for memory testing" OFF)
@@ -126,11 +120,7 @@ option (Chaste_USE_VTK "Compile Chaste with VTK support" ON)
 option (Chaste_USE_CVODE "Compile Chaste with CVODE support" ON)
 option (Chaste_USE_OPENMP "Compile Chaste with OpenMP support" OFF)
 
-if (NOT (WIN32 OR CYGWIN))
-    option (Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
-else ()
-    option (Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" OFF)
-endif ()
+option (Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
 
 option (Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
 option (Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
@@ -147,11 +137,7 @@ if (RUN_TESTS)
         message (FATAL_ERROR "Test family ${TEST_FAMILY} does not exist. Must be one of ${TestPackTypes}. Aborting.")
     else (found EQUAL -1)
         #get date and time, to append to test result filename
-        execute_process (COMMAND cmd /c echo %DATE% %TIME%
-                         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                         OUTPUT_VARIABLE date_time
-                         )
-        string (REGEX REPLACE "[:/. \n]" "_" date_time "${date_time}")
+        string (TIMESTAMP date_time "%Y_%m_%d_%H_%M_%S")
         # Note: set 6 minute (360s) timeout for each test
         execute_process (COMMAND ctest -C Debug --output-on-failure -O ${TEST_FAMILY}TestOutputs_${date_time}.txt --timeout 360 -L ${TEST_FAMILY}
                          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -164,23 +150,10 @@ if (RUN_TESTS)
     endif (found EQUAL -1)
 endif (RUN_TESTS)
 
-if (WIN32 OR CYGWIN)
-    option (Chaste_AUTO_INSTALL_DEPS
-            "Set whether we will automatically download and install Chaste dependences (windows-only option). ON by default"
-            ON)
-endif ()
-
-
 #Set whether this is a statically or dynamically-linked build
-if (WIN32 OR CYGWIN)
-    option (BUILD_SHARED_LIBS
-            "Set whether we are set whether to generate dynamic-linked libraries. OFF by default"
-            OFF)
-else ()
-    option (BUILD_SHARED_LIBS
-            "Set whether we are set whether to generate dynamic-linked libraries. ON by default"
-            ON)
-endif ()
+option (BUILD_SHARED_LIBS
+        "Set whether we are set whether to generate dynamic-linked libraries. ON by default"
+        ON)
 
 option (Chaste_ENABLE_TESTING "Enable Chaste Testing" ON)
 option (Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
@@ -191,12 +164,6 @@ option (Chaste_ENABLE_PYCHASTE "Enable PyChaste" OFF)
 
 #Some Chaste-specific #defines
 add_definitions (-DCHASTE_CMAKE)
-
-if (WIN32 OR CYGWIN)
-    add_definitions (-D_WIN64 -D_AMD64_)
-    # Ensure M_PI is always defined in cmath
-    add_definitions (-D_USE_MATH_DEFINES)
-endif (WIN32 OR CYGWIN)
 
 
 ###############################################
@@ -250,7 +217,9 @@ endif ()
 ################################
 if (Chaste_PROFILE_GPERFTOOLS)
     find_package (Gperftools REQUIRED)
-    list (APPEND Chaste_LINK_LIBRARIES "-Wl,--no-as-needed ${GPERFTOOLS_PROFILER} -Wl,--as-needed")
+    # rpath so that binaries can find libprofiler at runtime when gperftools is in a non-system prefix
+    get_filename_component (GPERFTOOLS_LIBRARY_DIR ${GPERFTOOLS_PROFILER} DIRECTORY)
+    list (APPEND Chaste_LINK_LIBRARIES "-Wl,--no-as-needed ${GPERFTOOLS_PROFILER} -Wl,--as-needed -Wl,-rpath,${GPERFTOOLS_LIBRARY_DIR}")
 endif ()
 
 #Gprof executable
@@ -353,27 +322,6 @@ if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     if (NOT TEXTTEST_FOUND)
         message (WARNING "Texttest not found, turning off acceptance tests")
     endif ()
-endif ()
-
-if (Chaste_AUTO_INSTALL_DEPS)
-    set (Chaste_DEPS_ROOT_DIR "${Chaste_BINARY_DIR}/../install/third_party_libs" CACHE PATH "Root directory for installed third party libraries")
-    file (GLOB children RELATIVE ${Chaste_DEPS_ROOT_DIR} ${Chaste_DEPS_ROOT_DIR}/*)
-    foreach (subdir ${children})
-        if (IS_DIRECTORY ${Chaste_DEPS_ROOT_DIR}/${subdir})
-            if (${subdir} MATCHES ".*boost.*" AND NOT BOOST_ROOT)
-                set (BOOST_ROOT "${Chaste_DEPS_ROOT_DIR}/${subdir}")
-                #elseif (${subdir} MATCHES ".*petsc.*" AND NOT ENV{PETSC_DIR})
-                #    set(ENV{PETSC_DIR} "${Chaste_DEPS_ROOT_DIR}/${subdir}")
-                #    set(PETSC_ARCH "")
-            elseif (${subdir} MATCHES ".*vtk.*" AND NOT VTK_DIR)
-                set (VTK_DIR "${Chaste_DEPS_ROOT_DIR}/${subdir}/lib/vtk-5.8")
-            elseif (${subdir} MATCHES ".*sundials.*" AND NOT ENV{SUNDIALS_ROOT})
-                set (ENV{SUNDIALS_ROOT} "${Chaste_DEPS_ROOT_DIR}/${subdir}")
-            elseif (${subdir} MATCHES ".*hdf5.*" AND NOT ENV{HDF5_ROOT})
-                set (ENV{HDF5_ROOT} "${Chaste_DEPS_ROOT_DIR}/${subdir}")
-            endif ()
-        endif ()
-    endforeach ()
 endif ()
 
 ################################
@@ -505,7 +453,14 @@ message(STATUS "HDF5 version: ${HDF5_VERSION}")
 target_link_libraries(Chaste_COMMON_DEPS INTERFACE HDF5::HDF5)
 
 # Chaste requires a parallel HDF5 library
-if (NOT HDF5_IS_PARALLEL)
+set(Chaste_HDF5_HAS_PARALLEL FALSE)
+if (HDF5_VERSION VERSION_LESS "2.0.0")
+    set(Chaste_HDF5_HAS_PARALLEL ${HDF5_IS_PARALLEL})
+else ()
+    set(Chaste_HDF5_HAS_PARALLEL ${HDF5_PROVIDES_PARALLEL})
+endif ()
+
+if (NOT Chaste_HDF5_HAS_PARALLEL)
     message(SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
 endif ()
 list(APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
@@ -604,26 +559,6 @@ add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
 set (CXXTEST_INCLUDES "${Chaste_BINARY_DIR}/cxxtest")
 set (CXXTEST_PYTHON_TESTGEN_EXECUTABLE ${CXXTEST_INCLUDES}/cxxtestgen.py)
 
-if (WIN32 OR CYGWIN)
-    #MS Includes
-    set (MS_MPI_INCLUDES "C:/MS_HPC_PACK_2012/Inc" CACHE PATH "Path to MS HPC Pack header files.")
-    set (WINDOWS_SDK "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Include" CACHE PATH "Path to Windows SDK headers.")
-    set (WINDOWS_KITS "C:/Program Files (x86)/Windows Kits/8.0/Include" CACHE PATH "Path to Windows kits headers.")
-
-    if (MSVC11)
-        set (VS_11_INCLUDES "C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/include" CACHE PATH "You are compiling with MSVC 2012. Set Visual Studio 11 header files.")
-        set (VS_INCLUDES "${VS_11_INCLUnstalled libvtk-java and libvtk5-qt4-devDES}")
-    endif (MSVC11)
-
-    if (MSVC10)
-        set (VS_10_INCLUDES "C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" CACHE PATH "You are compiling with MSVC 2010. Set Visual Studio 10 header files.")
-        set (VS_INCLUDES "${VS_10_INCLUDES}")
-    endif (MSVC10)
-
-    list (APPEND Chaste_INCLUDES "${WINDOWS_SDK}" "${VS_INCLUDES}" "${MS_MPI_INCLUDES}")
-
-endif (WIN32 OR CYGWIN)
-
 if (Chaste_ENABLE_TESTING)
     enable_testing ()
     list (APPEND CMAKE_INCLUDE_PATH "${Chaste_SOURCE_DIR}/cxxtest")
@@ -644,9 +579,7 @@ if (Chaste_ENABLE_PYCHASTE)
     list (APPEND Chaste_COMPONENTS pychaste)
 endif ()
 
-if (NOT (WIN32 OR CYGWIN))
-    set (Chaste_COMPONENTS ${Chaste_COMPONENTS} lung heart)
-endif ()
+set (Chaste_COMPONENTS ${Chaste_COMPONENTS} lung heart)
 
 # Find any projects
 file (GLOB potential_dirs RELATIVE "${Chaste_SOURCE_DIR}/projects" "${Chaste_SOURCE_DIR}/projects/*")
@@ -804,10 +737,7 @@ endforeach ()
 #  BUILD MAIN APPS #
 ####################
 
-#note, heart not supported in windows
-if (NOT (WIN32 OR CYGWIN))
-    add_subdirectory (apps)
-endif ()
+add_subdirectory (apps)
 
 ####################
 # RUN PYTHON TESTS #
@@ -1046,7 +976,7 @@ endif ()
 
 if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     if (Chaste_PROFILE_GPERFTOOLS)
-        set (extension svg)
+        set (extension "txt;svg")
         set (NUM_CPUS ${Chaste_PROFILE_GPERFTOOLS_CPUS})
     else ()
         set (extension txt)
