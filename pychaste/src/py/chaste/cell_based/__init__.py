@@ -33,81 +33,183 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from chaste._pychaste_all import (
+    AdhesionPottsUpdateRule_1,
     AdhesionPottsUpdateRule_2,
     AdhesionPottsUpdateRule_3,
     Alarcon2004OxygenBasedCellCycleModel,
     AlwaysDivideCellCycleModel,
     ApcOneHitCellMutationState,
     ApcTwoHitCellMutationState,
+    ApoptoticCellKiller_1,
     ApoptoticCellKiller_2,
     ApoptoticCellKiller_3,
     ApoptoticCellProperty,
+    AttractingPlaneBoundaryCondition_1_1,
+    AttractingPlaneBoundaryCondition_1_2,
+    AttractingPlaneBoundaryCondition_1_3,
     AttractingPlaneBoundaryCondition_2_2,
+    AttractingPlaneBoundaryCondition_2_3,
     AttractingPlaneBoundaryCondition_3_3,
     BernoulliTrialCellCycleModel,
     BetaCateninOneHitCellMutationState,
     BiasedBernoulliTrialCellCycleModel,
+    BoundaryNodeWriter_1_1,
+    BoundaryNodeWriter_1_2,
+    BoundaryNodeWriter_1_3,
     BoundaryNodeWriter_2_2,
+    BoundaryNodeWriter_2_3,
     BoundaryNodeWriter_3_3,
+    BuskeAdhesiveForce_1,
     BuskeAdhesiveForce_2,
     BuskeAdhesiveForce_3,
+    BuskeCompressionForce_1,
     BuskeCompressionForce_2,
     BuskeCompressionForce_3,
+    BuskeElasticForce_1,
     BuskeElasticForce_2,
     BuskeElasticForce_3,
+    CaBasedCellPopulation_1,
     CaBasedCellPopulation_2,
     CaBasedCellPopulation_3,
     Cell,
+    CellAgesWriter_1_1,
+    CellAgesWriter_1_2,
+    CellAgesWriter_1_3,
     CellAgesWriter_2_2,
+    CellAgesWriter_2_3,
     CellAgesWriter_3_3,
     CellAncestor,
+    CellAncestorWriter_1_1,
+    CellAncestorWriter_1_2,
+    CellAncestorWriter_1_3,
     CellAncestorWriter_2_2,
+    CellAncestorWriter_2_3,
     CellAncestorWriter_3_3,
+    CellAppliedForceWriter_1_1,
+    CellAppliedForceWriter_1_2,
+    CellAppliedForceWriter_1_3,
     CellAppliedForceWriter_2_2,
+    CellAppliedForceWriter_2_3,
     CellAppliedForceWriter_3_3,
+    CellCycleModelProteinConcentrationsWriter_1_1,
+    CellCycleModelProteinConcentrationsWriter_1_2,
+    CellCycleModelProteinConcentrationsWriter_1_3,
     CellCycleModelProteinConcentrationsWriter_2_2,
+    CellCycleModelProteinConcentrationsWriter_2_3,
     CellCycleModelProteinConcentrationsWriter_3_3,
     CellData,
+    CellDataItemWriter_1_1,
+    CellDataItemWriter_1_2,
+    CellDataItemWriter_1_3,
     CellDataItemWriter_2_2,
+    CellDataItemWriter_2_3,
     CellDataItemWriter_3_3,
+    CellDeltaNotchWriter_1_1,
+    CellDeltaNotchWriter_1_2,
+    CellDeltaNotchWriter_1_3,
     CellDeltaNotchWriter_2_2,
+    CellDeltaNotchWriter_2_3,
     CellDeltaNotchWriter_3_3,
+    CellDivisionLocationsWriter_1_1,
+    CellDivisionLocationsWriter_1_2,
+    CellDivisionLocationsWriter_1_3,
     CellDivisionLocationsWriter_2_2,
+    CellDivisionLocationsWriter_2_3,
     CellDivisionLocationsWriter_3_3,
     CellEdgeData,
     CellId,
+    CellIdWriter_1_1,
+    CellIdWriter_1_2,
+    CellIdWriter_1_3,
     CellIdWriter_2_2,
+    CellIdWriter_2_3,
     CellIdWriter_3_3,
     CellLabel,
+    CellLabelWriter_1_1,
+    CellLabelWriter_1_2,
+    CellLabelWriter_1_3,
     CellLabelWriter_2_2,
+    CellLabelWriter_2_3,
     CellLabelWriter_3_3,
+    CellLocationIndexWriter_1_1,
+    CellLocationIndexWriter_1_2,
+    CellLocationIndexWriter_1_3,
     CellLocationIndexWriter_2_2,
+    CellLocationIndexWriter_2_3,
     CellLocationIndexWriter_3_3,
+    CellMutationStatesCountWriter_1_1,
+    CellMutationStatesCountWriter_1_2,
+    CellMutationStatesCountWriter_1_3,
     CellMutationStatesCountWriter_2_2,
+    CellMutationStatesCountWriter_2_3,
     CellMutationStatesCountWriter_3_3,
+    CellMutationStatesWriter_1_1,
+    CellMutationStatesWriter_1_2,
+    CellMutationStatesWriter_1_3,
     CellMutationStatesWriter_2_2,
+    CellMutationStatesWriter_2_3,
     CellMutationStatesWriter_3_3,
+    CellPopulationAdjacencyMatrixWriter_1_1,
+    CellPopulationAdjacencyMatrixWriter_1_2,
+    CellPopulationAdjacencyMatrixWriter_1_3,
     CellPopulationAdjacencyMatrixWriter_2_2,
+    CellPopulationAdjacencyMatrixWriter_2_3,
     CellPopulationAdjacencyMatrixWriter_3_3,
+    CellPopulationAreaWriter_1_1,
+    CellPopulationAreaWriter_1_2,
+    CellPopulationAreaWriter_1_3,
     CellPopulationAreaWriter_2_2,
+    CellPopulationAreaWriter_2_3,
     CellPopulationAreaWriter_3_3,
+    CellPopulationElementWriter_1_1,
+    CellPopulationElementWriter_1_2,
+    CellPopulationElementWriter_1_3,
     CellPopulationElementWriter_2_2,
+    CellPopulationElementWriter_2_3,
     CellPopulationElementWriter_3_3,
+    CellProliferativePhasesCountWriter_1_1,
+    CellProliferativePhasesCountWriter_1_2,
+    CellProliferativePhasesCountWriter_1_3,
     CellProliferativePhasesCountWriter_2_2,
+    CellProliferativePhasesCountWriter_2_3,
     CellProliferativePhasesCountWriter_3_3,
+    CellProliferativePhasesWriter_1_1,
+    CellProliferativePhasesWriter_1_2,
+    CellProliferativePhasesWriter_1_3,
     CellProliferativePhasesWriter_2_2,
+    CellProliferativePhasesWriter_2_3,
     CellProliferativePhasesWriter_3_3,
+    CellProliferativeTypesCountWriter_1_1,
+    CellProliferativeTypesCountWriter_1_2,
+    CellProliferativeTypesCountWriter_1_3,
     CellProliferativeTypesCountWriter_2_2,
+    CellProliferativeTypesCountWriter_2_3,
     CellProliferativeTypesCountWriter_3_3,
+    CellProliferativeTypesWriter_1_1,
+    CellProliferativeTypesWriter_1_2,
+    CellProliferativeTypesWriter_1_3,
     CellProliferativeTypesWriter_2_2,
+    CellProliferativeTypesWriter_2_3,
     CellProliferativeTypesWriter_3_3,
     CellPropertyCollection,
     CellPropertyRegistry,
+    CellRadiusWriter_1_1,
+    CellRadiusWriter_1_2,
+    CellRadiusWriter_1_3,
     CellRadiusWriter_2_2,
+    CellRadiusWriter_2_3,
     CellRadiusWriter_3_3,
+    CellRemovalLocationsWriter_1_1,
+    CellRemovalLocationsWriter_1_2,
+    CellRemovalLocationsWriter_1_3,
     CellRemovalLocationsWriter_2_2,
+    CellRemovalLocationsWriter_2_3,
     CellRemovalLocationsWriter_3_3,
+    CellRosetteRankWriter_1_1,
+    CellRosetteRankWriter_1_2,
+    CellRosetteRankWriter_1_3,
     CellRosetteRankWriter_2_2,
+    CellRosetteRankWriter_2_3,
     CellRosetteRankWriter_3_3,
     CellsGenerator_Alarcon2004OxygenBasedCellCycleModel_2,
     CellsGenerator_Alarcon2004OxygenBasedCellCycleModel_3,
@@ -142,180 +244,318 @@ from chaste._pychaste_all import (
     CellsGenerator_UniformG1GenerationalCellCycleModel_2,
     CellsGenerator_UniformG1GenerationalCellCycleModel_3,
     CellSrnModel,
+    CellVolumesWriter_1_1,
+    CellVolumesWriter_1_2,
+    CellVolumesWriter_1_3,
     CellVolumesWriter_2_2,
+    CellVolumesWriter_2_3,
     CellVolumesWriter_3_3,
+    ChemotacticForce_1,
     ChemotacticForce_2,
     ChemotacticForce_3,
+    ChemotaxisPottsUpdateRule_1,
     ChemotaxisPottsUpdateRule_2,
     ChemotaxisPottsUpdateRule_3,
     ContactInhibitionCellCycleModel,
     DefaultCellProliferativeType,
+    DeltaNotchEdgeInteriorTrackingModifier_1,
     DeltaNotchEdgeInteriorTrackingModifier_2,
     DeltaNotchEdgeInteriorTrackingModifier_3,
     DeltaNotchEdgeSrnModel,
+    DeltaNotchEdgeTrackingModifier_1,
     DeltaNotchEdgeTrackingModifier_2,
     DeltaNotchEdgeTrackingModifier_3,
     DeltaNotchInteriorSrnModel,
     DeltaNotchSrnModel,
+    DeltaNotchTrackingModifier_1,
     DeltaNotchTrackingModifier_2,
     DeltaNotchTrackingModifier_3,
+    DifferentialAdhesionGeneralisedLinearSpringForce_1_1,
+    DifferentialAdhesionGeneralisedLinearSpringForce_1_2,
+    DifferentialAdhesionGeneralisedLinearSpringForce_1_3,
     DifferentialAdhesionGeneralisedLinearSpringForce_2_2,
+    DifferentialAdhesionGeneralisedLinearSpringForce_2_3,
     DifferentialAdhesionGeneralisedLinearSpringForce_3_3,
+    DifferentialAdhesionPottsUpdateRule_1,
     DifferentialAdhesionPottsUpdateRule_2,
     DifferentialAdhesionPottsUpdateRule_3,
     DifferentiatedCellProliferativeType,
+    DiffusionCaUpdateRule_1,
     DiffusionCaUpdateRule_2,
     DiffusionCaUpdateRule_3,
+    DiffusionForce_1,
     DiffusionForce_2,
     DiffusionForce_3,
+    DivisionBiasTrackingModifier_1,
     DivisionBiasTrackingModifier_2,
     DivisionBiasTrackingModifier_3,
+    ExclusionCaBasedDivisionRule_1,
     ExclusionCaBasedDivisionRule_2,
     ExclusionCaBasedDivisionRule_3,
     ExponentialG1GenerationalCellCycleModel,
+    ExtrinsicPullModifier_1,
     ExtrinsicPullModifier_2,
     ExtrinsicPullModifier_3,
+    FarhadifarForce_1,
     FarhadifarForce_2,
     FarhadifarForce_3,
+    FixedCentreBasedDivisionRule_1_1,
+    FixedCentreBasedDivisionRule_1_2,
+    FixedCentreBasedDivisionRule_1_3,
     FixedCentreBasedDivisionRule_2_2,
+    FixedCentreBasedDivisionRule_2_3,
     FixedCentreBasedDivisionRule_3_3,
     FixedG1GenerationalCellCycleModel,
     FixedSequenceCellCycleModel,
+    FixedVertexBasedDivisionRule_1,
     FixedVertexBasedDivisionRule_2,
     FixedVertexBasedDivisionRule_3,
+    ForwardEulerNumericalMethod_1_1,
+    ForwardEulerNumericalMethod_1_2,
+    ForwardEulerNumericalMethod_1_3,
     ForwardEulerNumericalMethod_2_2,
+    ForwardEulerNumericalMethod_2_3,
     ForwardEulerNumericalMethod_3_3,
     GammaG1CellCycleModel,
+    GeneralisedLinearSpringForce_1_1,
+    GeneralisedLinearSpringForce_1_2,
+    GeneralisedLinearSpringForce_1_3,
     GeneralisedLinearSpringForce_2_2,
+    GeneralisedLinearSpringForce_2_3,
     GeneralisedLinearSpringForce_3_3,
     Goldbeter1991SrnModel,
+    HeterotypicBoundaryLengthWriter_1_1,
+    HeterotypicBoundaryLengthWriter_1_2,
+    HeterotypicBoundaryLengthWriter_1_3,
     HeterotypicBoundaryLengthWriter_2_2,
+    HeterotypicBoundaryLengthWriter_2_3,
     HeterotypicBoundaryLengthWriter_3_3,
+    ImmersedBoundaryBoundaryCellWriter_1_1,
+    ImmersedBoundaryBoundaryCellWriter_1_2,
+    ImmersedBoundaryBoundaryCellWriter_1_3,
     ImmersedBoundaryBoundaryCellWriter_2_2,
+    ImmersedBoundaryBoundaryCellWriter_2_3,
     ImmersedBoundaryBoundaryCellWriter_3_3,
+    ImmersedBoundaryCellPopulation_1,
     ImmersedBoundaryCellPopulation_2,
     ImmersedBoundaryCellPopulation_3,
+    ImmersedBoundaryKinematicFeedbackForce_1,
     ImmersedBoundaryKinematicFeedbackForce_2,
     ImmersedBoundaryKinematicFeedbackForce_3,
+    ImmersedBoundaryLinearDifferentialAdhesionForce_1,
     ImmersedBoundaryLinearDifferentialAdhesionForce_2,
     ImmersedBoundaryLinearDifferentialAdhesionForce_3,
+    ImmersedBoundaryLinearInteractionForce_1,
     ImmersedBoundaryLinearInteractionForce_2,
     ImmersedBoundaryLinearInteractionForce_3,
+    ImmersedBoundaryLinearMembraneForce_1,
     ImmersedBoundaryLinearMembraneForce_2,
     ImmersedBoundaryLinearMembraneForce_3,
+    ImmersedBoundaryMorseInteractionForce_1,
     ImmersedBoundaryMorseInteractionForce_2,
     ImmersedBoundaryMorseInteractionForce_3,
+    ImmersedBoundaryMorseMembraneForce_1,
     ImmersedBoundaryMorseMembraneForce_2,
     ImmersedBoundaryMorseMembraneForce_3,
+    ImmersedBoundaryNeighbourNumberWriter_1_1,
+    ImmersedBoundaryNeighbourNumberWriter_1_2,
+    ImmersedBoundaryNeighbourNumberWriter_1_3,
     ImmersedBoundaryNeighbourNumberWriter_2_2,
+    ImmersedBoundaryNeighbourNumberWriter_2_3,
     ImmersedBoundaryNeighbourNumberWriter_3_3,
+    ImmersedBoundarySimulationModifier_1,
     ImmersedBoundarySimulationModifier_2,
     ImmersedBoundarySimulationModifier_3,
+    ImmersedBoundarySvgWriter_1,
     ImmersedBoundarySvgWriter_2,
     ImmersedBoundarySvgWriter_3,
+    IsolatedLabelledCellKiller_1,
     IsolatedLabelledCellKiller_2,
     IsolatedLabelledCellKiller_3,
     LabelDependentBernoulliTrialCellCycleModel,
+    LegacyCellProliferativeTypesWriter_1_1,
+    LegacyCellProliferativeTypesWriter_1_2,
+    LegacyCellProliferativeTypesWriter_1_3,
     LegacyCellProliferativeTypesWriter_2_2,
+    LegacyCellProliferativeTypesWriter_2_3,
     LegacyCellProliferativeTypesWriter_3_3,
+    MeshBasedCellPopulation_1_1,
+    MeshBasedCellPopulation_1_2,
+    MeshBasedCellPopulation_1_3,
     MeshBasedCellPopulation_2_2,
+    MeshBasedCellPopulation_2_3,
     MeshBasedCellPopulation_3_3,
+    MeshBasedCellPopulationWithGhostNodes_1,
     MeshBasedCellPopulationWithGhostNodes_2,
     MeshBasedCellPopulationWithGhostNodes_3,
+    NagaiHondaDifferentialAdhesionForce_1,
     NagaiHondaDifferentialAdhesionForce_2,
     NagaiHondaDifferentialAdhesionForce_3,
+    NagaiHondaForce_1,
     NagaiHondaForce_2,
     NagaiHondaForce_3,
     NoCellCycleModel,
+    NodeBasedCellPopulation_1,
     NodeBasedCellPopulation_2,
     NodeBasedCellPopulation_3,
+    NodeBasedCellPopulationWithBuskeUpdate_1,
     NodeBasedCellPopulationWithBuskeUpdate_2,
     NodeBasedCellPopulationWithBuskeUpdate_3,
+    NodeBasedCellPopulationWithParticles_1,
     NodeBasedCellPopulationWithParticles_2,
     NodeBasedCellPopulationWithParticles_3,
+    NodeLocationWriter_1_1,
+    NodeLocationWriter_1_2,
+    NodeLocationWriter_1_3,
     NodeLocationWriter_2_2,
+    NodeLocationWriter_2_3,
     NodeLocationWriter_3_3,
+    NodeVelocityWriter_1_1,
+    NodeVelocityWriter_1_2,
+    NodeVelocityWriter_1_3,
     NodeVelocityWriter_2_2,
+    NodeVelocityWriter_2_3,
     NodeVelocityWriter_3_3,
+    NormallyDistributedTargetAreaModifier_1,
     NormallyDistributedTargetAreaModifier_2,
     NormallyDistributedTargetAreaModifier_3,
     NullSrnModel,
+    OffLatticeSimulation_1_1,
+    OffLatticeSimulation_1_2,
+    OffLatticeSimulation_1_3,
     OffLatticeSimulation_2_2,
+    OffLatticeSimulation_2_3,
     OffLatticeSimulation_3_3,
+    OnLatticeSimulation_1,
     OnLatticeSimulation_2,
     OnLatticeSimulation_3,
+    PlanarPolarisedFarhadifarForce_1,
     PlanarPolarisedFarhadifarForce_2,
     PlanarPolarisedFarhadifarForce_3,
+    PlaneBasedCellKiller_1,
     PlaneBasedCellKiller_2,
     PlaneBasedCellKiller_3,
+    PlaneBoundaryCondition_1_1,
+    PlaneBoundaryCondition_1_2,
+    PlaneBoundaryCondition_1_3,
     PlaneBoundaryCondition_2_2,
+    PlaneBoundaryCondition_2_3,
     PlaneBoundaryCondition_3_3,
+    PottsBasedCellPopulation_1,
     PottsBasedCellPopulation_2,
     PottsBasedCellPopulation_3,
     PythonSimulationModifier_2,
     PythonSimulationModifier_3,
+    RadialCellDataDistributionWriter_1_1,
+    RadialCellDataDistributionWriter_1_2,
+    RadialCellDataDistributionWriter_1_3,
     RadialCellDataDistributionWriter_2_2,
+    RadialCellDataDistributionWriter_2_3,
     RadialCellDataDistributionWriter_3_3,
+    RandomCaSwitchingUpdateRule_1,
     RandomCaSwitchingUpdateRule_2,
     RandomCaSwitchingUpdateRule_3,
+    RandomCellKiller_1,
     RandomCellKiller_2,
     RandomCellKiller_3,
+    RandomDirectionCentreBasedDivisionRule_1_1,
+    RandomDirectionCentreBasedDivisionRule_1_2,
+    RandomDirectionCentreBasedDivisionRule_1_3,
     RandomDirectionCentreBasedDivisionRule_2_2,
+    RandomDirectionCentreBasedDivisionRule_2_3,
     RandomDirectionCentreBasedDivisionRule_3_3,
+    RandomDirectionVertexBasedDivisionRule_1,
     RandomDirectionVertexBasedDivisionRule_2,
     RandomDirectionVertexBasedDivisionRule_3,
+    RepulsionForce_1,
     RepulsionForce_2,
     RepulsionForce_3,
+    ShortAxisImmersedBoundaryDivisionRule_1,
     ShortAxisImmersedBoundaryDivisionRule_2,
     ShortAxisImmersedBoundaryDivisionRule_3,
+    ShortAxisVertexBasedDivisionRule_1,
     ShortAxisVertexBasedDivisionRule_2,
     ShortAxisVertexBasedDivisionRule_3,
+    ShovingCaBasedDivisionRule_1,
     ShovingCaBasedDivisionRule_2,
     ShovingCaBasedDivisionRule_3,
     SimpleOxygenBasedCellCycleModel,
+    SimpleTargetAreaModifier_1,
     SimpleTargetAreaModifier_2,
     SimpleTargetAreaModifier_3,
     SimulationTime,
+    SlidingBoundaryCondition_1,
     SlidingBoundaryCondition_2,
     SlidingBoundaryCondition_3,
+    SphereGeometryBoundaryCondition_1,
     SphereGeometryBoundaryCondition_2,
     SphereGeometryBoundaryCondition_3,
     StemCellProliferativeType,
     StochasticOxygenBasedCellCycleModel,
+    SurfaceAreaConstraintPottsUpdateRule_1,
     SurfaceAreaConstraintPottsUpdateRule_2,
     SurfaceAreaConstraintPottsUpdateRule_3,
+    T2SwapCellKiller_1,
     T2SwapCellKiller_2,
     T2SwapCellKiller_3,
+    TargetAreaLinearGrowthModifier_1,
     TargetAreaLinearGrowthModifier_2,
     TargetAreaLinearGrowthModifier_3,
+    TargetedCellKiller_1,
     TargetedCellKiller_2,
     TargetedCellKiller_3,
     TransitCellProliferativeType,
     TysonNovakCellCycleModel,
     UniformCellCycleModel,
     UniformG1GenerationalCellCycleModel,
+    VertexBasedCellPopulation_1,
     VertexBasedCellPopulation_2,
     VertexBasedCellPopulation_3,
+    VertexBasedPopulationSrn_1,
     VertexBasedPopulationSrn_2,
     VertexBasedPopulationSrn_3,
+    VertexIntersectionSwapLocationsWriter_1_1,
+    VertexIntersectionSwapLocationsWriter_1_2,
+    VertexIntersectionSwapLocationsWriter_1_3,
     VertexIntersectionSwapLocationsWriter_2_2,
+    VertexIntersectionSwapLocationsWriter_2_3,
     VertexIntersectionSwapLocationsWriter_3_3,
+    VertexT1SwapLocationsWriter_1_1,
+    VertexT1SwapLocationsWriter_1_2,
+    VertexT1SwapLocationsWriter_1_3,
     VertexT1SwapLocationsWriter_2_2,
+    VertexT1SwapLocationsWriter_2_3,
     VertexT1SwapLocationsWriter_3_3,
+    VertexT2SwapLocationsWriter_1_1,
+    VertexT2SwapLocationsWriter_1_2,
+    VertexT2SwapLocationsWriter_1_3,
     VertexT2SwapLocationsWriter_2_2,
+    VertexT2SwapLocationsWriter_2_3,
     VertexT2SwapLocationsWriter_3_3,
+    VertexT3SwapLocationsWriter_1_1,
+    VertexT3SwapLocationsWriter_1_2,
+    VertexT3SwapLocationsWriter_1_3,
     VertexT3SwapLocationsWriter_2_2,
+    VertexT3SwapLocationsWriter_2_3,
     VertexT3SwapLocationsWriter_3_3,
+    VolumeConstraintPottsUpdateRule_1,
     VolumeConstraintPottsUpdateRule_2,
     VolumeConstraintPottsUpdateRule_3,
+    VolumeTrackingModifier_1,
     VolumeTrackingModifier_2,
     VolumeTrackingModifier_3,
+    VonMisesVertexBasedDivisionRule_1,
     VonMisesVertexBasedDivisionRule_2,
     VonMisesVertexBasedDivisionRule_3,
+    VoronoiDataWriter_1_1,
+    VoronoiDataWriter_1_2,
+    VoronoiDataWriter_1_3,
     VoronoiDataWriter_2_2,
+    VoronoiDataWriter_2_3,
     VoronoiDataWriter_3_3,
     VtkSceneModifier_2,
     VtkSceneModifier_3,
+    WelikyOsterForce_1,
     WelikyOsterForce_2,
     WelikyOsterForce_3,
     WildTypeCellMutationState,
@@ -331,6 +571,7 @@ from chaste.cell_based._fortests import (
 # Template Class Syntax
 AdhesionPottsUpdateRule = TemplateClassDict(
     {
+        ("1",): AdhesionPottsUpdateRule_1,
         ("2",): AdhesionPottsUpdateRule_2,
         ("3",): AdhesionPottsUpdateRule_3,
     }
@@ -338,6 +579,7 @@ AdhesionPottsUpdateRule = TemplateClassDict(
 
 ApoptoticCellKiller = TemplateClassDict(
     {
+        ("1",): ApoptoticCellKiller_1,
         ("2",): ApoptoticCellKiller_2,
         ("3",): ApoptoticCellKiller_3,
     }
@@ -345,8 +587,13 @@ ApoptoticCellKiller = TemplateClassDict(
 
 AttractingPlaneBoundaryCondition = TemplateClassDict(
     {
+        ("1",): AttractingPlaneBoundaryCondition_1_1,
+        ("1", "1"): AttractingPlaneBoundaryCondition_1_1,
+        ("1", "2"): AttractingPlaneBoundaryCondition_1_2,
+        ("1", "3"): AttractingPlaneBoundaryCondition_1_3,
         ("2",): AttractingPlaneBoundaryCondition_2_2,
         ("2", "2"): AttractingPlaneBoundaryCondition_2_2,
+        ("2", "3"): AttractingPlaneBoundaryCondition_2_3,
         ("3",): AttractingPlaneBoundaryCondition_3_3,
         ("3", "3"): AttractingPlaneBoundaryCondition_3_3,
     }
@@ -354,8 +601,13 @@ AttractingPlaneBoundaryCondition = TemplateClassDict(
 
 BoundaryNodeWriter = TemplateClassDict(
     {
+        ("1",): BoundaryNodeWriter_1_1,
+        ("1", "1"): BoundaryNodeWriter_1_1,
+        ("1", "2"): BoundaryNodeWriter_1_2,
+        ("1", "3"): BoundaryNodeWriter_1_3,
         ("2",): BoundaryNodeWriter_2_2,
         ("2", "2"): BoundaryNodeWriter_2_2,
+        ("2", "3"): BoundaryNodeWriter_2_3,
         ("3",): BoundaryNodeWriter_3_3,
         ("3", "3"): BoundaryNodeWriter_3_3,
     }
@@ -363,6 +615,7 @@ BoundaryNodeWriter = TemplateClassDict(
 
 BuskeAdhesiveForce = TemplateClassDict(
     {
+        ("1",): BuskeAdhesiveForce_1,
         ("2",): BuskeAdhesiveForce_2,
         ("3",): BuskeAdhesiveForce_3,
     }
@@ -370,6 +623,7 @@ BuskeAdhesiveForce = TemplateClassDict(
 
 BuskeCompressionForce = TemplateClassDict(
     {
+        ("1",): BuskeCompressionForce_1,
         ("2",): BuskeCompressionForce_2,
         ("3",): BuskeCompressionForce_3,
     }
@@ -377,6 +631,7 @@ BuskeCompressionForce = TemplateClassDict(
 
 BuskeElasticForce = TemplateClassDict(
     {
+        ("1",): BuskeElasticForce_1,
         ("2",): BuskeElasticForce_2,
         ("3",): BuskeElasticForce_3,
     }
@@ -384,6 +639,7 @@ BuskeElasticForce = TemplateClassDict(
 
 CaBasedCellPopulation = TemplateClassDict(
     {
+        ("1",): CaBasedCellPopulation_1,
         ("2",): CaBasedCellPopulation_2,
         ("3",): CaBasedCellPopulation_3,
     }
@@ -391,8 +647,13 @@ CaBasedCellPopulation = TemplateClassDict(
 
 CellAgesWriter = TemplateClassDict(
     {
+        ("1",): CellAgesWriter_1_1,
+        ("1", "1"): CellAgesWriter_1_1,
+        ("1", "2"): CellAgesWriter_1_2,
+        ("1", "3"): CellAgesWriter_1_3,
         ("2",): CellAgesWriter_2_2,
         ("2", "2"): CellAgesWriter_2_2,
+        ("2", "3"): CellAgesWriter_2_3,
         ("3",): CellAgesWriter_3_3,
         ("3", "3"): CellAgesWriter_3_3,
     }
@@ -400,8 +661,13 @@ CellAgesWriter = TemplateClassDict(
 
 CellAncestorWriter = TemplateClassDict(
     {
+        ("1",): CellAncestorWriter_1_1,
+        ("1", "1"): CellAncestorWriter_1_1,
+        ("1", "2"): CellAncestorWriter_1_2,
+        ("1", "3"): CellAncestorWriter_1_3,
         ("2",): CellAncestorWriter_2_2,
         ("2", "2"): CellAncestorWriter_2_2,
+        ("2", "3"): CellAncestorWriter_2_3,
         ("3",): CellAncestorWriter_3_3,
         ("3", "3"): CellAncestorWriter_3_3,
     }
@@ -409,8 +675,13 @@ CellAncestorWriter = TemplateClassDict(
 
 CellAppliedForceWriter = TemplateClassDict(
     {
+        ("1",): CellAppliedForceWriter_1_1,
+        ("1", "1"): CellAppliedForceWriter_1_1,
+        ("1", "2"): CellAppliedForceWriter_1_2,
+        ("1", "3"): CellAppliedForceWriter_1_3,
         ("2",): CellAppliedForceWriter_2_2,
         ("2", "2"): CellAppliedForceWriter_2_2,
+        ("2", "3"): CellAppliedForceWriter_2_3,
         ("3",): CellAppliedForceWriter_3_3,
         ("3", "3"): CellAppliedForceWriter_3_3,
     }
@@ -418,8 +689,13 @@ CellAppliedForceWriter = TemplateClassDict(
 
 CellCycleModelProteinConcentrationsWriter = TemplateClassDict(
     {
+        ("1",): CellCycleModelProteinConcentrationsWriter_1_1,
+        ("1", "1"): CellCycleModelProteinConcentrationsWriter_1_1,
+        ("1", "2"): CellCycleModelProteinConcentrationsWriter_1_2,
+        ("1", "3"): CellCycleModelProteinConcentrationsWriter_1_3,
         ("2",): CellCycleModelProteinConcentrationsWriter_2_2,
         ("2", "2"): CellCycleModelProteinConcentrationsWriter_2_2,
+        ("2", "3"): CellCycleModelProteinConcentrationsWriter_2_3,
         ("3",): CellCycleModelProteinConcentrationsWriter_3_3,
         ("3", "3"): CellCycleModelProteinConcentrationsWriter_3_3,
     }
@@ -427,8 +703,13 @@ CellCycleModelProteinConcentrationsWriter = TemplateClassDict(
 
 CellDataItemWriter = TemplateClassDict(
     {
+        ("1",): CellDataItemWriter_1_1,
+        ("1", "1"): CellDataItemWriter_1_1,
+        ("1", "2"): CellDataItemWriter_1_2,
+        ("1", "3"): CellDataItemWriter_1_3,
         ("2",): CellDataItemWriter_2_2,
         ("2", "2"): CellDataItemWriter_2_2,
+        ("2", "3"): CellDataItemWriter_2_3,
         ("3",): CellDataItemWriter_3_3,
         ("3", "3"): CellDataItemWriter_3_3,
     }
@@ -436,8 +717,13 @@ CellDataItemWriter = TemplateClassDict(
 
 CellDeltaNotchWriter = TemplateClassDict(
     {
+        ("1",): CellDeltaNotchWriter_1_1,
+        ("1", "1"): CellDeltaNotchWriter_1_1,
+        ("1", "2"): CellDeltaNotchWriter_1_2,
+        ("1", "3"): CellDeltaNotchWriter_1_3,
         ("2",): CellDeltaNotchWriter_2_2,
         ("2", "2"): CellDeltaNotchWriter_2_2,
+        ("2", "3"): CellDeltaNotchWriter_2_3,
         ("3",): CellDeltaNotchWriter_3_3,
         ("3", "3"): CellDeltaNotchWriter_3_3,
     }
@@ -445,8 +731,13 @@ CellDeltaNotchWriter = TemplateClassDict(
 
 CellDivisionLocationsWriter = TemplateClassDict(
     {
+        ("1",): CellDivisionLocationsWriter_1_1,
+        ("1", "1"): CellDivisionLocationsWriter_1_1,
+        ("1", "2"): CellDivisionLocationsWriter_1_2,
+        ("1", "3"): CellDivisionLocationsWriter_1_3,
         ("2",): CellDivisionLocationsWriter_2_2,
         ("2", "2"): CellDivisionLocationsWriter_2_2,
+        ("2", "3"): CellDivisionLocationsWriter_2_3,
         ("3",): CellDivisionLocationsWriter_3_3,
         ("3", "3"): CellDivisionLocationsWriter_3_3,
     }
@@ -454,8 +745,13 @@ CellDivisionLocationsWriter = TemplateClassDict(
 
 CellIdWriter = TemplateClassDict(
     {
+        ("1",): CellIdWriter_1_1,
+        ("1", "1"): CellIdWriter_1_1,
+        ("1", "2"): CellIdWriter_1_2,
+        ("1", "3"): CellIdWriter_1_3,
         ("2",): CellIdWriter_2_2,
         ("2", "2"): CellIdWriter_2_2,
+        ("2", "3"): CellIdWriter_2_3,
         ("3",): CellIdWriter_3_3,
         ("3", "3"): CellIdWriter_3_3,
     }
@@ -463,8 +759,13 @@ CellIdWriter = TemplateClassDict(
 
 CellLabelWriter = TemplateClassDict(
     {
+        ("1",): CellLabelWriter_1_1,
+        ("1", "1"): CellLabelWriter_1_1,
+        ("1", "2"): CellLabelWriter_1_2,
+        ("1", "3"): CellLabelWriter_1_3,
         ("2",): CellLabelWriter_2_2,
         ("2", "2"): CellLabelWriter_2_2,
+        ("2", "3"): CellLabelWriter_2_3,
         ("3",): CellLabelWriter_3_3,
         ("3", "3"): CellLabelWriter_3_3,
     }
@@ -472,8 +773,13 @@ CellLabelWriter = TemplateClassDict(
 
 CellLocationIndexWriter = TemplateClassDict(
     {
+        ("1",): CellLocationIndexWriter_1_1,
+        ("1", "1"): CellLocationIndexWriter_1_1,
+        ("1", "2"): CellLocationIndexWriter_1_2,
+        ("1", "3"): CellLocationIndexWriter_1_3,
         ("2",): CellLocationIndexWriter_2_2,
         ("2", "2"): CellLocationIndexWriter_2_2,
+        ("2", "3"): CellLocationIndexWriter_2_3,
         ("3",): CellLocationIndexWriter_3_3,
         ("3", "3"): CellLocationIndexWriter_3_3,
     }
@@ -481,8 +787,13 @@ CellLocationIndexWriter = TemplateClassDict(
 
 CellMutationStatesCountWriter = TemplateClassDict(
     {
+        ("1",): CellMutationStatesCountWriter_1_1,
+        ("1", "1"): CellMutationStatesCountWriter_1_1,
+        ("1", "2"): CellMutationStatesCountWriter_1_2,
+        ("1", "3"): CellMutationStatesCountWriter_1_3,
         ("2",): CellMutationStatesCountWriter_2_2,
         ("2", "2"): CellMutationStatesCountWriter_2_2,
+        ("2", "3"): CellMutationStatesCountWriter_2_3,
         ("3",): CellMutationStatesCountWriter_3_3,
         ("3", "3"): CellMutationStatesCountWriter_3_3,
     }
@@ -490,8 +801,13 @@ CellMutationStatesCountWriter = TemplateClassDict(
 
 CellMutationStatesWriter = TemplateClassDict(
     {
+        ("1",): CellMutationStatesWriter_1_1,
+        ("1", "1"): CellMutationStatesWriter_1_1,
+        ("1", "2"): CellMutationStatesWriter_1_2,
+        ("1", "3"): CellMutationStatesWriter_1_3,
         ("2",): CellMutationStatesWriter_2_2,
         ("2", "2"): CellMutationStatesWriter_2_2,
+        ("2", "3"): CellMutationStatesWriter_2_3,
         ("3",): CellMutationStatesWriter_3_3,
         ("3", "3"): CellMutationStatesWriter_3_3,
     }
@@ -499,8 +815,13 @@ CellMutationStatesWriter = TemplateClassDict(
 
 CellPopulationAdjacencyMatrixWriter = TemplateClassDict(
     {
+        ("1",): CellPopulationAdjacencyMatrixWriter_1_1,
+        ("1", "1"): CellPopulationAdjacencyMatrixWriter_1_1,
+        ("1", "2"): CellPopulationAdjacencyMatrixWriter_1_2,
+        ("1", "3"): CellPopulationAdjacencyMatrixWriter_1_3,
         ("2",): CellPopulationAdjacencyMatrixWriter_2_2,
         ("2", "2"): CellPopulationAdjacencyMatrixWriter_2_2,
+        ("2", "3"): CellPopulationAdjacencyMatrixWriter_2_3,
         ("3",): CellPopulationAdjacencyMatrixWriter_3_3,
         ("3", "3"): CellPopulationAdjacencyMatrixWriter_3_3,
     }
@@ -508,8 +829,13 @@ CellPopulationAdjacencyMatrixWriter = TemplateClassDict(
 
 CellPopulationAreaWriter = TemplateClassDict(
     {
+        ("1",): CellPopulationAreaWriter_1_1,
+        ("1", "1"): CellPopulationAreaWriter_1_1,
+        ("1", "2"): CellPopulationAreaWriter_1_2,
+        ("1", "3"): CellPopulationAreaWriter_1_3,
         ("2",): CellPopulationAreaWriter_2_2,
         ("2", "2"): CellPopulationAreaWriter_2_2,
+        ("2", "3"): CellPopulationAreaWriter_2_3,
         ("3",): CellPopulationAreaWriter_3_3,
         ("3", "3"): CellPopulationAreaWriter_3_3,
     }
@@ -517,8 +843,13 @@ CellPopulationAreaWriter = TemplateClassDict(
 
 CellPopulationElementWriter = TemplateClassDict(
     {
+        ("1",): CellPopulationElementWriter_1_1,
+        ("1", "1"): CellPopulationElementWriter_1_1,
+        ("1", "2"): CellPopulationElementWriter_1_2,
+        ("1", "3"): CellPopulationElementWriter_1_3,
         ("2",): CellPopulationElementWriter_2_2,
         ("2", "2"): CellPopulationElementWriter_2_2,
+        ("2", "3"): CellPopulationElementWriter_2_3,
         ("3",): CellPopulationElementWriter_3_3,
         ("3", "3"): CellPopulationElementWriter_3_3,
     }
@@ -526,8 +857,13 @@ CellPopulationElementWriter = TemplateClassDict(
 
 CellProliferativePhasesCountWriter = TemplateClassDict(
     {
+        ("1",): CellProliferativePhasesCountWriter_1_1,
+        ("1", "1"): CellProliferativePhasesCountWriter_1_1,
+        ("1", "2"): CellProliferativePhasesCountWriter_1_2,
+        ("1", "3"): CellProliferativePhasesCountWriter_1_3,
         ("2",): CellProliferativePhasesCountWriter_2_2,
         ("2", "2"): CellProliferativePhasesCountWriter_2_2,
+        ("2", "3"): CellProliferativePhasesCountWriter_2_3,
         ("3",): CellProliferativePhasesCountWriter_3_3,
         ("3", "3"): CellProliferativePhasesCountWriter_3_3,
     }
@@ -535,8 +871,13 @@ CellProliferativePhasesCountWriter = TemplateClassDict(
 
 CellProliferativePhasesWriter = TemplateClassDict(
     {
+        ("1",): CellProliferativePhasesWriter_1_1,
+        ("1", "1"): CellProliferativePhasesWriter_1_1,
+        ("1", "2"): CellProliferativePhasesWriter_1_2,
+        ("1", "3"): CellProliferativePhasesWriter_1_3,
         ("2",): CellProliferativePhasesWriter_2_2,
         ("2", "2"): CellProliferativePhasesWriter_2_2,
+        ("2", "3"): CellProliferativePhasesWriter_2_3,
         ("3",): CellProliferativePhasesWriter_3_3,
         ("3", "3"): CellProliferativePhasesWriter_3_3,
     }
@@ -544,8 +885,13 @@ CellProliferativePhasesWriter = TemplateClassDict(
 
 CellProliferativeTypesCountWriter = TemplateClassDict(
     {
+        ("1",): CellProliferativeTypesCountWriter_1_1,
+        ("1", "1"): CellProliferativeTypesCountWriter_1_1,
+        ("1", "2"): CellProliferativeTypesCountWriter_1_2,
+        ("1", "3"): CellProliferativeTypesCountWriter_1_3,
         ("2",): CellProliferativeTypesCountWriter_2_2,
         ("2", "2"): CellProliferativeTypesCountWriter_2_2,
+        ("2", "3"): CellProliferativeTypesCountWriter_2_3,
         ("3",): CellProliferativeTypesCountWriter_3_3,
         ("3", "3"): CellProliferativeTypesCountWriter_3_3,
     }
@@ -553,8 +899,13 @@ CellProliferativeTypesCountWriter = TemplateClassDict(
 
 CellProliferativeTypesWriter = TemplateClassDict(
     {
+        ("1",): CellProliferativeTypesWriter_1_1,
+        ("1", "1"): CellProliferativeTypesWriter_1_1,
+        ("1", "2"): CellProliferativeTypesWriter_1_2,
+        ("1", "3"): CellProliferativeTypesWriter_1_3,
         ("2",): CellProliferativeTypesWriter_2_2,
         ("2", "2"): CellProliferativeTypesWriter_2_2,
+        ("2", "3"): CellProliferativeTypesWriter_2_3,
         ("3",): CellProliferativeTypesWriter_3_3,
         ("3", "3"): CellProliferativeTypesWriter_3_3,
     }
@@ -562,8 +913,13 @@ CellProliferativeTypesWriter = TemplateClassDict(
 
 CellRadiusWriter = TemplateClassDict(
     {
+        ("1",): CellRadiusWriter_1_1,
+        ("1", "1"): CellRadiusWriter_1_1,
+        ("1", "2"): CellRadiusWriter_1_2,
+        ("1", "3"): CellRadiusWriter_1_3,
         ("2",): CellRadiusWriter_2_2,
         ("2", "2"): CellRadiusWriter_2_2,
+        ("2", "3"): CellRadiusWriter_2_3,
         ("3",): CellRadiusWriter_3_3,
         ("3", "3"): CellRadiusWriter_3_3,
     }
@@ -571,8 +927,13 @@ CellRadiusWriter = TemplateClassDict(
 
 CellRemovalLocationsWriter = TemplateClassDict(
     {
+        ("1",): CellRemovalLocationsWriter_1_1,
+        ("1", "1"): CellRemovalLocationsWriter_1_1,
+        ("1", "2"): CellRemovalLocationsWriter_1_2,
+        ("1", "3"): CellRemovalLocationsWriter_1_3,
         ("2",): CellRemovalLocationsWriter_2_2,
         ("2", "2"): CellRemovalLocationsWriter_2_2,
+        ("2", "3"): CellRemovalLocationsWriter_2_3,
         ("3",): CellRemovalLocationsWriter_3_3,
         ("3", "3"): CellRemovalLocationsWriter_3_3,
     }
@@ -580,8 +941,13 @@ CellRemovalLocationsWriter = TemplateClassDict(
 
 CellRosetteRankWriter = TemplateClassDict(
     {
+        ("1",): CellRosetteRankWriter_1_1,
+        ("1", "1"): CellRosetteRankWriter_1_1,
+        ("1", "2"): CellRosetteRankWriter_1_2,
+        ("1", "3"): CellRosetteRankWriter_1_3,
         ("2",): CellRosetteRankWriter_2_2,
         ("2", "2"): CellRosetteRankWriter_2_2,
+        ("2", "3"): CellRosetteRankWriter_2_3,
         ("3",): CellRosetteRankWriter_3_3,
         ("3", "3"): CellRosetteRankWriter_3_3,
     }
@@ -704,8 +1070,13 @@ CellsGenerator = TemplateClassDict(
 
 CellVolumesWriter = TemplateClassDict(
     {
+        ("1",): CellVolumesWriter_1_1,
+        ("1", "1"): CellVolumesWriter_1_1,
+        ("1", "2"): CellVolumesWriter_1_2,
+        ("1", "3"): CellVolumesWriter_1_3,
         ("2",): CellVolumesWriter_2_2,
         ("2", "2"): CellVolumesWriter_2_2,
+        ("2", "3"): CellVolumesWriter_2_3,
         ("3",): CellVolumesWriter_3_3,
         ("3", "3"): CellVolumesWriter_3_3,
     }
@@ -713,6 +1084,7 @@ CellVolumesWriter = TemplateClassDict(
 
 ChemotacticForce = TemplateClassDict(
     {
+        ("1",): ChemotacticForce_1,
         ("2",): ChemotacticForce_2,
         ("3",): ChemotacticForce_3,
     }
@@ -720,6 +1092,7 @@ ChemotacticForce = TemplateClassDict(
 
 ChemotaxisPottsUpdateRule = TemplateClassDict(
     {
+        ("1",): ChemotaxisPottsUpdateRule_1,
         ("2",): ChemotaxisPottsUpdateRule_2,
         ("3",): ChemotaxisPottsUpdateRule_3,
     }
@@ -727,6 +1100,7 @@ ChemotaxisPottsUpdateRule = TemplateClassDict(
 
 DeltaNotchEdgeInteriorTrackingModifier = TemplateClassDict(
     {
+        ("1",): DeltaNotchEdgeInteriorTrackingModifier_1,
         ("2",): DeltaNotchEdgeInteriorTrackingModifier_2,
         ("3",): DeltaNotchEdgeInteriorTrackingModifier_3,
     }
@@ -734,6 +1108,7 @@ DeltaNotchEdgeInteriorTrackingModifier = TemplateClassDict(
 
 DeltaNotchTrackingModifier = TemplateClassDict(
     {
+        ("1",): DeltaNotchTrackingModifier_1,
         ("2",): DeltaNotchTrackingModifier_2,
         ("3",): DeltaNotchTrackingModifier_3,
     }
@@ -741,6 +1116,7 @@ DeltaNotchTrackingModifier = TemplateClassDict(
 
 DeltaNotchEdgeTrackingModifier = TemplateClassDict(
     {
+        ("1",): DeltaNotchEdgeTrackingModifier_1,
         ("2",): DeltaNotchEdgeTrackingModifier_2,
         ("3",): DeltaNotchEdgeTrackingModifier_3,
     }
@@ -748,8 +1124,13 @@ DeltaNotchEdgeTrackingModifier = TemplateClassDict(
 
 DifferentialAdhesionGeneralisedLinearSpringForce = TemplateClassDict(
     {
+        ("1",): DifferentialAdhesionGeneralisedLinearSpringForce_1_1,
+        ("1", "1"): DifferentialAdhesionGeneralisedLinearSpringForce_1_1,
+        ("1", "2"): DifferentialAdhesionGeneralisedLinearSpringForce_1_2,
+        ("1", "3"): DifferentialAdhesionGeneralisedLinearSpringForce_1_3,
         ("2",): DifferentialAdhesionGeneralisedLinearSpringForce_2_2,
         ("2", "2"): DifferentialAdhesionGeneralisedLinearSpringForce_2_2,
+        ("2", "3"): DifferentialAdhesionGeneralisedLinearSpringForce_2_3,
         ("3",): DifferentialAdhesionGeneralisedLinearSpringForce_3_3,
         ("3", "3"): DifferentialAdhesionGeneralisedLinearSpringForce_3_3,
     }
@@ -757,6 +1138,7 @@ DifferentialAdhesionGeneralisedLinearSpringForce = TemplateClassDict(
 
 DifferentialAdhesionPottsUpdateRule = TemplateClassDict(
     {
+        ("1",): DifferentialAdhesionPottsUpdateRule_1,
         ("2",): DifferentialAdhesionPottsUpdateRule_2,
         ("3",): DifferentialAdhesionPottsUpdateRule_3,
     }
@@ -764,6 +1146,7 @@ DifferentialAdhesionPottsUpdateRule = TemplateClassDict(
 
 DiffusionCaUpdateRule = TemplateClassDict(
     {
+        ("1",): DiffusionCaUpdateRule_1,
         ("2",): DiffusionCaUpdateRule_2,
         ("3",): DiffusionCaUpdateRule_3,
     }
@@ -771,6 +1154,7 @@ DiffusionCaUpdateRule = TemplateClassDict(
 
 DiffusionForce = TemplateClassDict(
     {
+        ("1",): DiffusionForce_1,
         ("2",): DiffusionForce_2,
         ("3",): DiffusionForce_3,
     }
@@ -778,6 +1162,7 @@ DiffusionForce = TemplateClassDict(
 
 DivisionBiasTrackingModifier = TemplateClassDict(
     {
+        ("1",): DivisionBiasTrackingModifier_1,
         ("2",): DivisionBiasTrackingModifier_2,
         ("3",): DivisionBiasTrackingModifier_3,
     }
@@ -785,6 +1170,7 @@ DivisionBiasTrackingModifier = TemplateClassDict(
 
 ExclusionCaBasedDivisionRule = TemplateClassDict(
     {
+        ("1",): ExclusionCaBasedDivisionRule_1,
         ("2",): ExclusionCaBasedDivisionRule_2,
         ("3",): ExclusionCaBasedDivisionRule_3,
     }
@@ -792,6 +1178,7 @@ ExclusionCaBasedDivisionRule = TemplateClassDict(
 
 ExtrinsicPullModifier = TemplateClassDict(
     {
+        ("1",): ExtrinsicPullModifier_1,
         ("2",): ExtrinsicPullModifier_2,
         ("3",): ExtrinsicPullModifier_3,
     }
@@ -799,6 +1186,7 @@ ExtrinsicPullModifier = TemplateClassDict(
 
 FarhadifarForce = TemplateClassDict(
     {
+        ("1",): FarhadifarForce_1,
         ("2",): FarhadifarForce_2,
         ("3",): FarhadifarForce_3,
     }
@@ -806,8 +1194,13 @@ FarhadifarForce = TemplateClassDict(
 
 FixedCentreBasedDivisionRule = TemplateClassDict(
     {
+        ("1",): FixedCentreBasedDivisionRule_1_1,
+        ("1", "1"): FixedCentreBasedDivisionRule_1_1,
+        ("1", "2"): FixedCentreBasedDivisionRule_1_2,
+        ("1", "3"): FixedCentreBasedDivisionRule_1_3,
         ("2",): FixedCentreBasedDivisionRule_2_2,
         ("2", "2"): FixedCentreBasedDivisionRule_2_2,
+        ("2", "3"): FixedCentreBasedDivisionRule_2_3,
         ("3",): FixedCentreBasedDivisionRule_3_3,
         ("3", "3"): FixedCentreBasedDivisionRule_3_3,
     }
@@ -815,6 +1208,7 @@ FixedCentreBasedDivisionRule = TemplateClassDict(
 
 FixedVertexBasedDivisionRule = TemplateClassDict(
     {
+        ("1",): FixedVertexBasedDivisionRule_1,
         ("2",): FixedVertexBasedDivisionRule_2,
         ("3",): FixedVertexBasedDivisionRule_3,
     }
@@ -822,8 +1216,13 @@ FixedVertexBasedDivisionRule = TemplateClassDict(
 
 ForwardEulerNumericalMethod = TemplateClassDict(
     {
+        ("1",): ForwardEulerNumericalMethod_1_1,
+        ("1", "1"): ForwardEulerNumericalMethod_1_1,
+        ("1", "2"): ForwardEulerNumericalMethod_1_2,
+        ("1", "3"): ForwardEulerNumericalMethod_1_3,
         ("2",): ForwardEulerNumericalMethod_2_2,
         ("2", "2"): ForwardEulerNumericalMethod_2_2,
+        ("2", "3"): ForwardEulerNumericalMethod_2_3,
         ("3",): ForwardEulerNumericalMethod_3_3,
         ("3", "3"): ForwardEulerNumericalMethod_3_3,
     }
@@ -831,8 +1230,13 @@ ForwardEulerNumericalMethod = TemplateClassDict(
 
 GeneralisedLinearSpringForce = TemplateClassDict(
     {
+        ("1",): GeneralisedLinearSpringForce_1_1,
+        ("1", "1"): GeneralisedLinearSpringForce_1_1,
+        ("1", "2"): GeneralisedLinearSpringForce_1_2,
+        ("1", "3"): GeneralisedLinearSpringForce_1_3,
         ("2",): GeneralisedLinearSpringForce_2_2,
         ("2", "2"): GeneralisedLinearSpringForce_2_2,
+        ("2", "3"): GeneralisedLinearSpringForce_2_3,
         ("3",): GeneralisedLinearSpringForce_3_3,
         ("3", "3"): GeneralisedLinearSpringForce_3_3,
     }
@@ -840,8 +1244,13 @@ GeneralisedLinearSpringForce = TemplateClassDict(
 
 HeterotypicBoundaryLengthWriter = TemplateClassDict(
     {
+        ("1",): HeterotypicBoundaryLengthWriter_1_1,
+        ("1", "1"): HeterotypicBoundaryLengthWriter_1_1,
+        ("1", "2"): HeterotypicBoundaryLengthWriter_1_2,
+        ("1", "3"): HeterotypicBoundaryLengthWriter_1_3,
         ("2",): HeterotypicBoundaryLengthWriter_2_2,
         ("2", "2"): HeterotypicBoundaryLengthWriter_2_2,
+        ("2", "3"): HeterotypicBoundaryLengthWriter_2_3,
         ("3",): HeterotypicBoundaryLengthWriter_3_3,
         ("3", "3"): HeterotypicBoundaryLengthWriter_3_3,
     }
@@ -849,8 +1258,13 @@ HeterotypicBoundaryLengthWriter = TemplateClassDict(
 
 ImmersedBoundaryBoundaryCellWriter = TemplateClassDict(
     {
+        ("1",): ImmersedBoundaryBoundaryCellWriter_1_1,
+        ("1", "1"): ImmersedBoundaryBoundaryCellWriter_1_1,
+        ("1", "2"): ImmersedBoundaryBoundaryCellWriter_1_2,
+        ("1", "3"): ImmersedBoundaryBoundaryCellWriter_1_3,
         ("2",): ImmersedBoundaryBoundaryCellWriter_2_2,
         ("2", "2"): ImmersedBoundaryBoundaryCellWriter_2_2,
+        ("2", "3"): ImmersedBoundaryBoundaryCellWriter_2_3,
         ("3",): ImmersedBoundaryBoundaryCellWriter_3_3,
         ("3", "3"): ImmersedBoundaryBoundaryCellWriter_3_3,
     }
@@ -858,6 +1272,7 @@ ImmersedBoundaryBoundaryCellWriter = TemplateClassDict(
 
 ImmersedBoundaryCellPopulation = TemplateClassDict(
     {
+        ("1",): ImmersedBoundaryCellPopulation_1,
         ("2",): ImmersedBoundaryCellPopulation_2,
         ("3",): ImmersedBoundaryCellPopulation_3,
     }
@@ -865,6 +1280,7 @@ ImmersedBoundaryCellPopulation = TemplateClassDict(
 
 ImmersedBoundaryKinematicFeedbackForce = TemplateClassDict(
     {
+        ("1",): ImmersedBoundaryKinematicFeedbackForce_1,
         ("2",): ImmersedBoundaryKinematicFeedbackForce_2,
         ("3",): ImmersedBoundaryKinematicFeedbackForce_3,
     }
@@ -872,6 +1288,7 @@ ImmersedBoundaryKinematicFeedbackForce = TemplateClassDict(
 
 ImmersedBoundaryLinearDifferentialAdhesionForce = TemplateClassDict(
     {
+        ("1",): ImmersedBoundaryLinearDifferentialAdhesionForce_1,
         ("2",): ImmersedBoundaryLinearDifferentialAdhesionForce_2,
         ("3",): ImmersedBoundaryLinearDifferentialAdhesionForce_3,
     }
@@ -879,6 +1296,7 @@ ImmersedBoundaryLinearDifferentialAdhesionForce = TemplateClassDict(
 
 ImmersedBoundaryLinearInteractionForce = TemplateClassDict(
     {
+        ("1",): ImmersedBoundaryLinearInteractionForce_1,
         ("2",): ImmersedBoundaryLinearInteractionForce_2,
         ("3",): ImmersedBoundaryLinearInteractionForce_3,
     }
@@ -886,6 +1304,7 @@ ImmersedBoundaryLinearInteractionForce = TemplateClassDict(
 
 ImmersedBoundaryLinearMembraneForce = TemplateClassDict(
     {
+        ("1",): ImmersedBoundaryLinearMembraneForce_1,
         ("2",): ImmersedBoundaryLinearMembraneForce_2,
         ("3",): ImmersedBoundaryLinearMembraneForce_3,
     }
@@ -893,6 +1312,7 @@ ImmersedBoundaryLinearMembraneForce = TemplateClassDict(
 
 ImmersedBoundaryMorseInteractionForce = TemplateClassDict(
     {
+        ("1",): ImmersedBoundaryMorseInteractionForce_1,
         ("2",): ImmersedBoundaryMorseInteractionForce_2,
         ("3",): ImmersedBoundaryMorseInteractionForce_3,
     }
@@ -900,6 +1320,7 @@ ImmersedBoundaryMorseInteractionForce = TemplateClassDict(
 
 ImmersedBoundaryMorseMembraneForce = TemplateClassDict(
     {
+        ("1",): ImmersedBoundaryMorseMembraneForce_1,
         ("2",): ImmersedBoundaryMorseMembraneForce_2,
         ("3",): ImmersedBoundaryMorseMembraneForce_3,
     }
@@ -907,8 +1328,13 @@ ImmersedBoundaryMorseMembraneForce = TemplateClassDict(
 
 ImmersedBoundaryNeighbourNumberWriter = TemplateClassDict(
     {
+        ("1",): ImmersedBoundaryNeighbourNumberWriter_1_1,
+        ("1", "1"): ImmersedBoundaryNeighbourNumberWriter_1_1,
+        ("1", "2"): ImmersedBoundaryNeighbourNumberWriter_1_2,
+        ("1", "3"): ImmersedBoundaryNeighbourNumberWriter_1_3,
         ("2",): ImmersedBoundaryNeighbourNumberWriter_2_2,
         ("2", "2"): ImmersedBoundaryNeighbourNumberWriter_2_2,
+        ("2", "3"): ImmersedBoundaryNeighbourNumberWriter_2_3,
         ("3",): ImmersedBoundaryNeighbourNumberWriter_3_3,
         ("3", "3"): ImmersedBoundaryNeighbourNumberWriter_3_3,
     }
@@ -916,6 +1342,7 @@ ImmersedBoundaryNeighbourNumberWriter = TemplateClassDict(
 
 ImmersedBoundarySimulationModifier = TemplateClassDict(
     {
+        ("1",): ImmersedBoundarySimulationModifier_1,
         ("2",): ImmersedBoundarySimulationModifier_2,
         ("3",): ImmersedBoundarySimulationModifier_3,
     }
@@ -923,6 +1350,7 @@ ImmersedBoundarySimulationModifier = TemplateClassDict(
 
 ImmersedBoundarySvgWriter = TemplateClassDict(
     {
+        ("1",): ImmersedBoundarySvgWriter_1,
         ("2",): ImmersedBoundarySvgWriter_2,
         ("3",): ImmersedBoundarySvgWriter_3,
     }
@@ -930,6 +1358,7 @@ ImmersedBoundarySvgWriter = TemplateClassDict(
 
 IsolatedLabelledCellKiller = TemplateClassDict(
     {
+        ("1",): IsolatedLabelledCellKiller_1,
         ("2",): IsolatedLabelledCellKiller_2,
         ("3",): IsolatedLabelledCellKiller_3,
     }
@@ -937,8 +1366,13 @@ IsolatedLabelledCellKiller = TemplateClassDict(
 
 LegacyCellProliferativeTypesWriter = TemplateClassDict(
     {
+        ("1",): LegacyCellProliferativeTypesWriter_1_1,
+        ("1", "1"): LegacyCellProliferativeTypesWriter_1_1,
+        ("1", "2"): LegacyCellProliferativeTypesWriter_1_2,
+        ("1", "3"): LegacyCellProliferativeTypesWriter_1_3,
         ("2",): LegacyCellProliferativeTypesWriter_2_2,
         ("2", "2"): LegacyCellProliferativeTypesWriter_2_2,
+        ("2", "3"): LegacyCellProliferativeTypesWriter_2_3,
         ("3",): LegacyCellProliferativeTypesWriter_3_3,
         ("3", "3"): LegacyCellProliferativeTypesWriter_3_3,
     }
@@ -946,8 +1380,13 @@ LegacyCellProliferativeTypesWriter = TemplateClassDict(
 
 MeshBasedCellPopulation = TemplateClassDict(
     {
+        ("1",): MeshBasedCellPopulation_1_1,
+        ("1", "1"): MeshBasedCellPopulation_1_1,
+        ("1", "2"): MeshBasedCellPopulation_1_2,
+        ("1", "3"): MeshBasedCellPopulation_1_3,
         ("2",): MeshBasedCellPopulation_2_2,
         ("2", "2"): MeshBasedCellPopulation_2_2,
+        ("2", "3"): MeshBasedCellPopulation_2_3,
         ("3",): MeshBasedCellPopulation_3_3,
         ("3", "3"): MeshBasedCellPopulation_3_3,
     }
@@ -955,6 +1394,7 @@ MeshBasedCellPopulation = TemplateClassDict(
 
 MeshBasedCellPopulationWithGhostNodes = TemplateClassDict(
     {
+        ("1",): MeshBasedCellPopulationWithGhostNodes_1,
         ("2",): MeshBasedCellPopulationWithGhostNodes_2,
         ("3",): MeshBasedCellPopulationWithGhostNodes_3,
     }
@@ -962,6 +1402,7 @@ MeshBasedCellPopulationWithGhostNodes = TemplateClassDict(
 
 NagaiHondaDifferentialAdhesionForce = TemplateClassDict(
     {
+        ("1",): NagaiHondaDifferentialAdhesionForce_1,
         ("2",): NagaiHondaDifferentialAdhesionForce_2,
         ("3",): NagaiHondaDifferentialAdhesionForce_3,
     }
@@ -969,6 +1410,7 @@ NagaiHondaDifferentialAdhesionForce = TemplateClassDict(
 
 NagaiHondaForce = TemplateClassDict(
     {
+        ("1",): NagaiHondaForce_1,
         ("2",): NagaiHondaForce_2,
         ("3",): NagaiHondaForce_3,
     }
@@ -976,6 +1418,7 @@ NagaiHondaForce = TemplateClassDict(
 
 NodeBasedCellPopulation = TemplateClassDict(
     {
+        ("1",): NodeBasedCellPopulation_1,
         ("2",): NodeBasedCellPopulation_2,
         ("3",): NodeBasedCellPopulation_3,
     }
@@ -983,6 +1426,7 @@ NodeBasedCellPopulation = TemplateClassDict(
 
 NodeBasedCellPopulationWithBuskeUpdate = TemplateClassDict(
     {
+        ("1",): NodeBasedCellPopulationWithBuskeUpdate_1,
         ("2",): NodeBasedCellPopulationWithBuskeUpdate_2,
         ("3",): NodeBasedCellPopulationWithBuskeUpdate_3,
     }
@@ -990,6 +1434,7 @@ NodeBasedCellPopulationWithBuskeUpdate = TemplateClassDict(
 
 NodeBasedCellPopulationWithParticles = TemplateClassDict(
     {
+        ("1",): NodeBasedCellPopulationWithParticles_1,
         ("2",): NodeBasedCellPopulationWithParticles_2,
         ("3",): NodeBasedCellPopulationWithParticles_3,
     }
@@ -997,8 +1442,13 @@ NodeBasedCellPopulationWithParticles = TemplateClassDict(
 
 NodeLocationWriter = TemplateClassDict(
     {
+        ("1",): NodeLocationWriter_1_1,
+        ("1", "1"): NodeLocationWriter_1_1,
+        ("1", "2"): NodeLocationWriter_1_2,
+        ("1", "3"): NodeLocationWriter_1_3,
         ("2",): NodeLocationWriter_2_2,
         ("2", "2"): NodeLocationWriter_2_2,
+        ("2", "3"): NodeLocationWriter_2_3,
         ("3",): NodeLocationWriter_3_3,
         ("3", "3"): NodeLocationWriter_3_3,
     }
@@ -1006,8 +1456,13 @@ NodeLocationWriter = TemplateClassDict(
 
 NodeVelocityWriter = TemplateClassDict(
     {
+        ("1",): NodeVelocityWriter_1_1,
+        ("1", "1"): NodeVelocityWriter_1_1,
+        ("1", "2"): NodeVelocityWriter_1_2,
+        ("1", "3"): NodeVelocityWriter_1_3,
         ("2",): NodeVelocityWriter_2_2,
         ("2", "2"): NodeVelocityWriter_2_2,
+        ("2", "3"): NodeVelocityWriter_2_3,
         ("3",): NodeVelocityWriter_3_3,
         ("3", "3"): NodeVelocityWriter_3_3,
     }
@@ -1015,6 +1470,7 @@ NodeVelocityWriter = TemplateClassDict(
 
 NormallyDistributedTargetAreaModifier = TemplateClassDict(
     {
+        ("1",): NormallyDistributedTargetAreaModifier_1,
         ("2",): NormallyDistributedTargetAreaModifier_2,
         ("3",): NormallyDistributedTargetAreaModifier_3,
     }
@@ -1022,8 +1478,13 @@ NormallyDistributedTargetAreaModifier = TemplateClassDict(
 
 OffLatticeSimulation = TemplateClassDict(
     {
+        ("1",): OffLatticeSimulation_1_1,
+        ("1", "1"): OffLatticeSimulation_1_1,
+        ("1", "2"): OffLatticeSimulation_1_2,
+        ("1", "3"): OffLatticeSimulation_1_3,
         ("2",): OffLatticeSimulation_2_2,
         ("2", "2"): OffLatticeSimulation_2_2,
+        ("2", "3"): OffLatticeSimulation_2_3,
         ("3",): OffLatticeSimulation_3_3,
         ("3", "3"): OffLatticeSimulation_3_3,
     }
@@ -1031,6 +1492,7 @@ OffLatticeSimulation = TemplateClassDict(
 
 OnLatticeSimulation = TemplateClassDict(
     {
+        ("1",): OnLatticeSimulation_1,
         ("2",): OnLatticeSimulation_2,
         ("3",): OnLatticeSimulation_3,
     }
@@ -1038,6 +1500,7 @@ OnLatticeSimulation = TemplateClassDict(
 
 PlanarPolarisedFarhadifarForce = TemplateClassDict(
     {
+        ("1",): PlanarPolarisedFarhadifarForce_1,
         ("2",): PlanarPolarisedFarhadifarForce_2,
         ("3",): PlanarPolarisedFarhadifarForce_3,
     }
@@ -1045,6 +1508,7 @@ PlanarPolarisedFarhadifarForce = TemplateClassDict(
 
 PlaneBasedCellKiller = TemplateClassDict(
     {
+        ("1",): PlaneBasedCellKiller_1,
         ("2",): PlaneBasedCellKiller_2,
         ("3",): PlaneBasedCellKiller_3,
     }
@@ -1052,8 +1516,13 @@ PlaneBasedCellKiller = TemplateClassDict(
 
 PlaneBoundaryCondition = TemplateClassDict(
     {
+        ("1",): PlaneBoundaryCondition_1_1,
+        ("1", "1"): PlaneBoundaryCondition_1_1,
+        ("1", "2"): PlaneBoundaryCondition_1_2,
+        ("1", "3"): PlaneBoundaryCondition_1_3,
         ("2",): PlaneBoundaryCondition_2_2,
         ("2", "2"): PlaneBoundaryCondition_2_2,
+        ("2", "3"): PlaneBoundaryCondition_2_3,
         ("3",): PlaneBoundaryCondition_3_3,
         ("3", "3"): PlaneBoundaryCondition_3_3,
     }
@@ -1061,6 +1530,7 @@ PlaneBoundaryCondition = TemplateClassDict(
 
 PottsBasedCellPopulation = TemplateClassDict(
     {
+        ("1",): PottsBasedCellPopulation_1,
         ("2",): PottsBasedCellPopulation_2,
         ("3",): PottsBasedCellPopulation_3,
     }
@@ -1075,8 +1545,13 @@ PythonSimulationModifier = TemplateClassDict(
 
 RadialCellDataDistributionWriter = TemplateClassDict(
     {
+        ("1",): RadialCellDataDistributionWriter_1_1,
+        ("1", "1"): RadialCellDataDistributionWriter_1_1,
+        ("1", "2"): RadialCellDataDistributionWriter_1_2,
+        ("1", "3"): RadialCellDataDistributionWriter_1_3,
         ("2",): RadialCellDataDistributionWriter_2_2,
         ("2", "2"): RadialCellDataDistributionWriter_2_2,
+        ("2", "3"): RadialCellDataDistributionWriter_2_3,
         ("3",): RadialCellDataDistributionWriter_3_3,
         ("3", "3"): RadialCellDataDistributionWriter_3_3,
     }
@@ -1084,6 +1559,7 @@ RadialCellDataDistributionWriter = TemplateClassDict(
 
 RandomCaSwitchingUpdateRule = TemplateClassDict(
     {
+        ("1",): RandomCaSwitchingUpdateRule_1,
         ("2",): RandomCaSwitchingUpdateRule_2,
         ("3",): RandomCaSwitchingUpdateRule_3,
     }
@@ -1091,6 +1567,7 @@ RandomCaSwitchingUpdateRule = TemplateClassDict(
 
 RandomCellKiller = TemplateClassDict(
     {
+        ("1",): RandomCellKiller_1,
         ("2",): RandomCellKiller_2,
         ("3",): RandomCellKiller_3,
     }
@@ -1098,8 +1575,13 @@ RandomCellKiller = TemplateClassDict(
 
 RandomDirectionCentreBasedDivisionRule = TemplateClassDict(
     {
+        ("1",): RandomDirectionCentreBasedDivisionRule_1_1,
+        ("1", "1"): RandomDirectionCentreBasedDivisionRule_1_1,
+        ("1", "2"): RandomDirectionCentreBasedDivisionRule_1_2,
+        ("1", "3"): RandomDirectionCentreBasedDivisionRule_1_3,
         ("2",): RandomDirectionCentreBasedDivisionRule_2_2,
         ("2", "2"): RandomDirectionCentreBasedDivisionRule_2_2,
+        ("2", "3"): RandomDirectionCentreBasedDivisionRule_2_3,
         ("3",): RandomDirectionCentreBasedDivisionRule_3_3,
         ("3", "3"): RandomDirectionCentreBasedDivisionRule_3_3,
     }
@@ -1107,6 +1589,7 @@ RandomDirectionCentreBasedDivisionRule = TemplateClassDict(
 
 RandomDirectionVertexBasedDivisionRule = TemplateClassDict(
     {
+        ("1",): RandomDirectionVertexBasedDivisionRule_1,
         ("2",): RandomDirectionVertexBasedDivisionRule_2,
         ("3",): RandomDirectionVertexBasedDivisionRule_3,
     }
@@ -1114,6 +1597,7 @@ RandomDirectionVertexBasedDivisionRule = TemplateClassDict(
 
 RepulsionForce = TemplateClassDict(
     {
+        ("1",): RepulsionForce_1,
         ("2",): RepulsionForce_2,
         ("3",): RepulsionForce_3,
     }
@@ -1121,6 +1605,7 @@ RepulsionForce = TemplateClassDict(
 
 ShortAxisImmersedBoundaryDivisionRule = TemplateClassDict(
     {
+        ("1",): ShortAxisImmersedBoundaryDivisionRule_1,
         ("2",): ShortAxisImmersedBoundaryDivisionRule_2,
         ("3",): ShortAxisImmersedBoundaryDivisionRule_3,
     }
@@ -1128,6 +1613,7 @@ ShortAxisImmersedBoundaryDivisionRule = TemplateClassDict(
 
 ShortAxisVertexBasedDivisionRule = TemplateClassDict(
     {
+        ("1",): ShortAxisVertexBasedDivisionRule_1,
         ("2",): ShortAxisVertexBasedDivisionRule_2,
         ("3",): ShortAxisVertexBasedDivisionRule_3,
     }
@@ -1135,6 +1621,7 @@ ShortAxisVertexBasedDivisionRule = TemplateClassDict(
 
 ShovingCaBasedDivisionRule = TemplateClassDict(
     {
+        ("1",): ShovingCaBasedDivisionRule_1,
         ("2",): ShovingCaBasedDivisionRule_2,
         ("3",): ShovingCaBasedDivisionRule_3,
     }
@@ -1142,6 +1629,7 @@ ShovingCaBasedDivisionRule = TemplateClassDict(
 
 SimpleTargetAreaModifier = TemplateClassDict(
     {
+        ("1",): SimpleTargetAreaModifier_1,
         ("2",): SimpleTargetAreaModifier_2,
         ("3",): SimpleTargetAreaModifier_3,
     }
@@ -1149,6 +1637,7 @@ SimpleTargetAreaModifier = TemplateClassDict(
 
 SlidingBoundaryCondition = TemplateClassDict(
     {
+        ("1",): SlidingBoundaryCondition_1,
         ("2",): SlidingBoundaryCondition_2,
         ("3",): SlidingBoundaryCondition_3,
     }
@@ -1156,6 +1645,7 @@ SlidingBoundaryCondition = TemplateClassDict(
 
 SphereGeometryBoundaryCondition = TemplateClassDict(
     {
+        ("1",): SphereGeometryBoundaryCondition_1,
         ("2",): SphereGeometryBoundaryCondition_2,
         ("3",): SphereGeometryBoundaryCondition_3,
     }
@@ -1163,6 +1653,7 @@ SphereGeometryBoundaryCondition = TemplateClassDict(
 
 SurfaceAreaConstraintPottsUpdateRule = TemplateClassDict(
     {
+        ("1",): SurfaceAreaConstraintPottsUpdateRule_1,
         ("2",): SurfaceAreaConstraintPottsUpdateRule_2,
         ("3",): SurfaceAreaConstraintPottsUpdateRule_3,
     }
@@ -1170,6 +1661,7 @@ SurfaceAreaConstraintPottsUpdateRule = TemplateClassDict(
 
 T2SwapCellKiller = TemplateClassDict(
     {
+        ("1",): T2SwapCellKiller_1,
         ("2",): T2SwapCellKiller_2,
         ("3",): T2SwapCellKiller_3,
     }
@@ -1177,6 +1669,7 @@ T2SwapCellKiller = TemplateClassDict(
 
 TargetAreaLinearGrowthModifier = TemplateClassDict(
     {
+        ("1",): TargetAreaLinearGrowthModifier_1,
         ("2",): TargetAreaLinearGrowthModifier_2,
         ("3",): TargetAreaLinearGrowthModifier_3,
     }
@@ -1184,6 +1677,7 @@ TargetAreaLinearGrowthModifier = TemplateClassDict(
 
 TargetedCellKiller = TemplateClassDict(
     {
+        ("1",): TargetedCellKiller_1,
         ("2",): TargetedCellKiller_2,
         ("3",): TargetedCellKiller_3,
     }
@@ -1191,6 +1685,7 @@ TargetedCellKiller = TemplateClassDict(
 
 VertexBasedCellPopulation = TemplateClassDict(
     {
+        ("1",): VertexBasedCellPopulation_1,
         ("2",): VertexBasedCellPopulation_2,
         ("3",): VertexBasedCellPopulation_3,
     }
@@ -1198,6 +1693,7 @@ VertexBasedCellPopulation = TemplateClassDict(
 
 VertexBasedPopulationSrn = TemplateClassDict(
     {
+        ("1",): VertexBasedPopulationSrn_1,
         ("2",): VertexBasedPopulationSrn_2,
         ("3",): VertexBasedPopulationSrn_3,
     }
@@ -1205,8 +1701,13 @@ VertexBasedPopulationSrn = TemplateClassDict(
 
 VertexIntersectionSwapLocationsWriter = TemplateClassDict(
     {
+        ("1",): VertexIntersectionSwapLocationsWriter_1_1,
+        ("1", "1"): VertexIntersectionSwapLocationsWriter_1_1,
+        ("1", "2"): VertexIntersectionSwapLocationsWriter_1_2,
+        ("1", "3"): VertexIntersectionSwapLocationsWriter_1_3,
         ("2",): VertexIntersectionSwapLocationsWriter_2_2,
         ("2", "2"): VertexIntersectionSwapLocationsWriter_2_2,
+        ("2", "3"): VertexIntersectionSwapLocationsWriter_2_3,
         ("3",): VertexIntersectionSwapLocationsWriter_3_3,
         ("3", "3"): VertexIntersectionSwapLocationsWriter_3_3,
     }
@@ -1214,8 +1715,13 @@ VertexIntersectionSwapLocationsWriter = TemplateClassDict(
 
 VertexT1SwapLocationsWriter = TemplateClassDict(
     {
+        ("1",): VertexT1SwapLocationsWriter_1_1,
+        ("1", "1"): VertexT1SwapLocationsWriter_1_1,
+        ("1", "2"): VertexT1SwapLocationsWriter_1_2,
+        ("1", "3"): VertexT1SwapLocationsWriter_1_3,
         ("2",): VertexT1SwapLocationsWriter_2_2,
         ("2", "2"): VertexT1SwapLocationsWriter_2_2,
+        ("2", "3"): VertexT1SwapLocationsWriter_2_3,
         ("3",): VertexT1SwapLocationsWriter_3_3,
         ("3", "3"): VertexT1SwapLocationsWriter_3_3,
     }
@@ -1223,8 +1729,13 @@ VertexT1SwapLocationsWriter = TemplateClassDict(
 
 VertexT2SwapLocationsWriter = TemplateClassDict(
     {
+        ("1",): VertexT2SwapLocationsWriter_1_1,
+        ("1", "1"): VertexT2SwapLocationsWriter_1_1,
+        ("1", "2"): VertexT2SwapLocationsWriter_1_2,
+        ("1", "3"): VertexT2SwapLocationsWriter_1_3,
         ("2",): VertexT2SwapLocationsWriter_2_2,
         ("2", "2"): VertexT2SwapLocationsWriter_2_2,
+        ("2", "3"): VertexT2SwapLocationsWriter_2_3,
         ("3",): VertexT2SwapLocationsWriter_3_3,
         ("3", "3"): VertexT2SwapLocationsWriter_3_3,
     }
@@ -1232,8 +1743,13 @@ VertexT2SwapLocationsWriter = TemplateClassDict(
 
 VertexT3SwapLocationsWriter = TemplateClassDict(
     {
+        ("1",): VertexT3SwapLocationsWriter_1_1,
+        ("1", "1"): VertexT3SwapLocationsWriter_1_1,
+        ("1", "2"): VertexT3SwapLocationsWriter_1_2,
+        ("1", "3"): VertexT3SwapLocationsWriter_1_3,
         ("2",): VertexT3SwapLocationsWriter_2_2,
         ("2", "2"): VertexT3SwapLocationsWriter_2_2,
+        ("2", "3"): VertexT3SwapLocationsWriter_2_3,
         ("3",): VertexT3SwapLocationsWriter_3_3,
         ("3", "3"): VertexT3SwapLocationsWriter_3_3,
     }
@@ -1241,6 +1757,7 @@ VertexT3SwapLocationsWriter = TemplateClassDict(
 
 VolumeConstraintPottsUpdateRule = TemplateClassDict(
     {
+        ("1",): VolumeConstraintPottsUpdateRule_1,
         ("2",): VolumeConstraintPottsUpdateRule_2,
         ("3",): VolumeConstraintPottsUpdateRule_3,
     }
@@ -1248,6 +1765,7 @@ VolumeConstraintPottsUpdateRule = TemplateClassDict(
 
 VolumeTrackingModifier = TemplateClassDict(
     {
+        ("1",): VolumeTrackingModifier_1,
         ("2",): VolumeTrackingModifier_2,
         ("3",): VolumeTrackingModifier_3,
     }
@@ -1255,6 +1773,7 @@ VolumeTrackingModifier = TemplateClassDict(
 
 VonMisesVertexBasedDivisionRule = TemplateClassDict(
     {
+        ("1",): VonMisesVertexBasedDivisionRule_1,
         ("2",): VonMisesVertexBasedDivisionRule_2,
         ("3",): VonMisesVertexBasedDivisionRule_3,
     }
@@ -1262,8 +1781,13 @@ VonMisesVertexBasedDivisionRule = TemplateClassDict(
 
 VoronoiDataWriter = TemplateClassDict(
     {
+        ("1",): VoronoiDataWriter_1_1,
+        ("1", "1"): VoronoiDataWriter_1_1,
+        ("1", "2"): VoronoiDataWriter_1_2,
+        ("1", "3"): VoronoiDataWriter_1_3,
         ("2",): VoronoiDataWriter_2_2,
         ("2", "2"): VoronoiDataWriter_2_2,
+        ("2", "3"): VoronoiDataWriter_2_3,
         ("3",): VoronoiDataWriter_3_3,
         ("3", "3"): VoronoiDataWriter_3_3,
     }
@@ -1278,6 +1802,7 @@ VtkSceneModifier = TemplateClassDict(
 
 WelikyOsterForce = TemplateClassDict(
     {
+        ("1",): WelikyOsterForce_1,
         ("2",): WelikyOsterForce_2,
         ("3",): WelikyOsterForce_3,
     }

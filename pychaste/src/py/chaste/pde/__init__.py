@@ -33,31 +33,44 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from chaste._pychaste_all import (
+    AveragedSourceEllipticPde_1,
     AveragedSourceEllipticPde_2,
     AveragedSourceEllipticPde_3,
+    AveragedSourceParabolicPde_1,
     AveragedSourceParabolicPde_2,
     AveragedSourceParabolicPde_3,
+    CellBasedEllipticPdeSolver_1,
     CellBasedEllipticPdeSolver_2,
     CellBasedEllipticPdeSolver_3,
+    CellBasedParabolicPdeSolver_1,
     CellBasedParabolicPdeSolver_2,
     CellBasedParabolicPdeSolver_3,
+    CellwiseSourceEllipticPde_1,
     CellwiseSourceEllipticPde_2,
     CellwiseSourceEllipticPde_3,
+    CellwiseSourceParabolicPde_1,
     CellwiseSourceParabolicPde_2,
     CellwiseSourceParabolicPde_3,
+    ConstBoundaryCondition_1,
     ConstBoundaryCondition_2,
     ConstBoundaryCondition_3,
+    EllipticBoxDomainPdeModifier_1,
     EllipticBoxDomainPdeModifier_2,
     EllipticBoxDomainPdeModifier_3,
+    EllipticGrowingDomainPdeModifier_1,
     EllipticGrowingDomainPdeModifier_2,
     EllipticGrowingDomainPdeModifier_3,
+    ParabolicBoxDomainPdeModifier_1,
     ParabolicBoxDomainPdeModifier_2,
     ParabolicBoxDomainPdeModifier_3,
+    ParabolicGrowingDomainPdeModifier_1,
     ParabolicGrowingDomainPdeModifier_2,
     ParabolicGrowingDomainPdeModifier_3,
     PdeSimulationTime,
+    UniformSourceEllipticPde_1,
     UniformSourceEllipticPde_2,
     UniformSourceEllipticPde_3,
+    UniformSourceParabolicPde_1,
     UniformSourceParabolicPde_2,
     UniformSourceParabolicPde_3,
 )
@@ -66,6 +79,7 @@ from chaste._syntax import DeprecatedClass, TemplateClassDict
 # Template Class Syntax
 AveragedSourceEllipticPde = TemplateClassDict(
     {
+        ("1",): AveragedSourceEllipticPde_1,
         ("2",): AveragedSourceEllipticPde_2,
         ("3",): AveragedSourceEllipticPde_3,
     }
@@ -73,6 +87,7 @@ AveragedSourceEllipticPde = TemplateClassDict(
 
 AveragedSourceParabolicPde = TemplateClassDict(
     {
+        ("1",): AveragedSourceParabolicPde_1,
         ("2",): AveragedSourceParabolicPde_2,
         ("3",): AveragedSourceParabolicPde_3,
     }
@@ -80,6 +95,7 @@ AveragedSourceParabolicPde = TemplateClassDict(
 
 CellBasedEllipticPdeSolver = TemplateClassDict(
     {
+        ("1",): CellBasedEllipticPdeSolver_1,
         ("2",): CellBasedEllipticPdeSolver_2,
         ("3",): CellBasedEllipticPdeSolver_3,
     }
@@ -87,6 +103,7 @@ CellBasedEllipticPdeSolver = TemplateClassDict(
 
 CellBasedParabolicPdeSolver = TemplateClassDict(
     {
+        ("1",): CellBasedParabolicPdeSolver_1,
         ("2",): CellBasedParabolicPdeSolver_2,
         ("3",): CellBasedParabolicPdeSolver_3,
     }
@@ -94,6 +111,7 @@ CellBasedParabolicPdeSolver = TemplateClassDict(
 
 CellwiseSourceEllipticPde = TemplateClassDict(
     {
+        ("1",): CellwiseSourceEllipticPde_1,
         ("2",): CellwiseSourceEllipticPde_2,
         ("3",): CellwiseSourceEllipticPde_3,
     }
@@ -101,6 +119,7 @@ CellwiseSourceEllipticPde = TemplateClassDict(
 
 CellwiseSourceParabolicPde = TemplateClassDict(
     {
+        ("1",): CellwiseSourceParabolicPde_1,
         ("2",): CellwiseSourceParabolicPde_2,
         ("3",): CellwiseSourceParabolicPde_3,
     }
@@ -108,6 +127,7 @@ CellwiseSourceParabolicPde = TemplateClassDict(
 
 ConstBoundaryCondition = TemplateClassDict(
     {
+        ("1",): ConstBoundaryCondition_1,
         ("2",): ConstBoundaryCondition_2,
         ("3",): ConstBoundaryCondition_3,
     }
@@ -115,6 +135,7 @@ ConstBoundaryCondition = TemplateClassDict(
 
 EllipticBoxDomainPdeModifier = TemplateClassDict(
     {
+        ("1",): EllipticBoxDomainPdeModifier_1,
         ("2",): EllipticBoxDomainPdeModifier_2,
         ("3",): EllipticBoxDomainPdeModifier_3,
     }
@@ -122,6 +143,7 @@ EllipticBoxDomainPdeModifier = TemplateClassDict(
 
 EllipticGrowingDomainPdeModifier = TemplateClassDict(
     {
+        ("1",): EllipticGrowingDomainPdeModifier_1,
         ("2",): EllipticGrowingDomainPdeModifier_2,
         ("3",): EllipticGrowingDomainPdeModifier_3,
     }
@@ -129,6 +151,7 @@ EllipticGrowingDomainPdeModifier = TemplateClassDict(
 
 ParabolicBoxDomainPdeModifier = TemplateClassDict(
     {
+        ("1",): ParabolicBoxDomainPdeModifier_1,
         ("2",): ParabolicBoxDomainPdeModifier_2,
         ("3",): ParabolicBoxDomainPdeModifier_3,
     }
@@ -136,6 +159,7 @@ ParabolicBoxDomainPdeModifier = TemplateClassDict(
 
 ParabolicGrowingDomainPdeModifier = TemplateClassDict(
     {
+        ("1",): ParabolicGrowingDomainPdeModifier_1,
         ("2",): ParabolicGrowingDomainPdeModifier_2,
         ("3",): ParabolicGrowingDomainPdeModifier_3,
     }
@@ -144,6 +168,7 @@ ParabolicGrowingDomainPdeModifier = TemplateClassDict(
 
 UniformSourceEllipticPde = TemplateClassDict(
     {
+        ("1",): UniformSourceEllipticPde_1,
         ("2",): UniformSourceEllipticPde_2,
         ("3",): UniformSourceEllipticPde_3,
     }
@@ -151,6 +176,7 @@ UniformSourceEllipticPde = TemplateClassDict(
 
 UniformSourceParabolicPde = TemplateClassDict(
     {
+        ("1",): UniformSourceParabolicPde_1,
         ("2",): UniformSourceParabolicPde_2,
         ("3",): UniformSourceParabolicPde_3,
     }
