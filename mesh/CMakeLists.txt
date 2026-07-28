@@ -63,3 +63,11 @@ endif()
 set_source_files_properties(src/3rdparty/tetgen1.4.2/predicates.cpp PROPERTIES COMPILE_FLAGS "${PREDICATES_FLAGS}")
 set_source_files_properties(src/3rdparty/tetgen1.4.2/tetgen.cpp PROPERTIES COMPILE_FLAGS "${TETGEN_FLAGS}")
 set_source_files_properties(src/3rdparty/triangle/triangle.cpp PROPERTIES COMPILE_FLAGS "${TRIANGLE_FLAGS}")
+
+# These three files are deliberately compiled at -O0 (see above) while the rest of chaste_mesh
+# uses the build type's normal optimisation level. Clang's precompiled header validation treats
+# a differing __OPTIMIZE__ state as a hard error ("OptimizationLevel differs in precompiled
+# file"), so skip the target's shared PCH for just these files rather than for the whole target.
+set_source_files_properties(src/3rdparty/tetgen1.4.2/predicates.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+set_source_files_properties(src/3rdparty/tetgen1.4.2/tetgen.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+set_source_files_properties(src/3rdparty/triangle/triangle.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
