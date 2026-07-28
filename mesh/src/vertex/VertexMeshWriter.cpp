@@ -225,6 +225,8 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEM
     // **** REMOVE WITH CAUTION *****
     p_writer->SetCompressor(nullptr);
     // **** REMOVE WITH CAUTION *****
+    // Switch off base 64 compression - increases file size but improves performance
+    p_writer->EncodeAppendedDataOff();
 
     std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
     if (stamp != "")
@@ -266,6 +268,8 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::str
     // **** REMOVE WITH CAUTION *****
     p_writer->SetCompressor(nullptr);
     // **** REMOVE WITH CAUTION *****
+    // Switch off base 64 compression - increases file size but improves performance
+    p_writer->EncodeAppendedDataOff();
 
     std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
     if (stamp != "")
@@ -308,28 +312,21 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
 
     mpVtkUnstructedMesh->SetPoints(p_pts);
     p_pts->Delete(); // Reference counted
+
+    int cell_type = (SPACE_DIM == 2) ? VTK_POLYGON : VTK_CONVEX_POINT_SET;
+    vtkIdList* p_cell_id_list = vtkIdList::New();
     for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator iter = rMesh.GetElementIteratorBegin();
          iter != rMesh.GetElementIteratorEnd();
          ++iter)
     {
-        vtkCell* p_cell;
-        if (SPACE_DIM == 2)
-        {
-            p_cell = vtkPolygon::New();
-        }
-        else
-        {
-            p_cell = vtkConvexPointSet::New();
-        }
-        vtkIdList* p_cell_id_list = p_cell->GetPointIds();
         p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
         for (unsigned j=0; j<iter->GetNumNodes(); ++j)
         {
             p_cell_id_list->SetId(j, iter->GetNodeGlobalIndex(j));
         }
-        mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-        p_cell->Delete(); // Reference counted
+        mpVtkUnstructedMesh->InsertNextCell(cell_type, p_cell_id_list);
     }
+    p_cell_id_list->Delete(); // Reference counted
 #endif //CHASTE_VTK
 }
 

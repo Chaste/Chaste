@@ -89,6 +89,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
     mpVtkUnstructedMesh->SetPoints(p_pts);
     p_pts->Delete(); //Reference counted
 
+    vtkIdList* p_cell_id_list = vtkIdList::New();
+
     if (mWriteMeshCells == true)
     {
         //Construct elements aka Cells
@@ -98,30 +100,30 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
 
             assert((current_element.size() == ELEMENT_DIM + 1) || (current_element.size() == (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2));
 
-            vtkCell* p_cell=nullptr;
+            int cell_type = 0;
             if (ELEMENT_DIM == 3 && current_element.size() == 4)
             {
-                p_cell = vtkTetra::New();
+                cell_type = VTK_TETRA;
             }
             else if (ELEMENT_DIM == 3 && current_element.size() == 10)
             {
-                p_cell = vtkQuadraticTetra::New();
+                cell_type = VTK_QUADRATIC_TETRA;
             }
             else if (ELEMENT_DIM == 2 && current_element.size() == 3)
             {
-                p_cell = vtkTriangle::New();
+                cell_type = VTK_TRIANGLE;
             }
             else if (ELEMENT_DIM == 2 && current_element.size() == 6)
             {
-                p_cell = vtkQuadraticTriangle::New();
+                cell_type = VTK_QUADRATIC_TRIANGLE;
             }
             else if (ELEMENT_DIM == 1)
             {
-                p_cell = vtkLine::New();
+                cell_type = VTK_LINE;
             }
 
             //Set the linear nodes
-            vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+            p_cell_id_list->SetNumberOfIds(current_element.size());
             for (unsigned j = 0; j < current_element.size(); ++j)
             {
                 p_cell_id_list->SetId(j, current_element[j]);
@@ -135,8 +137,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
                 p_cell_id_list->SetId(5, current_element[4]);
             }
 
-            mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-            p_cell->Delete(); //Reference counted
+            mpVtkUnstructedMesh->InsertNextCell(cell_type, p_cell_id_list);
         }
     }
 
@@ -155,25 +156,24 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         AugmentCellData();
         //Make a blank cell radius data for the regular elements
         std::vector<double> radii(this->GetNumElements(), 0.0);
+        p_cell_id_list->SetNumberOfIds(2);
         for (unsigned item_num=0; item_num<this->GetNumCableElements(); item_num++)
         {
             ElementData cable_element_data = this->GetNextCableElement();
             std::vector<unsigned> current_element = cable_element_data.NodeIndices;
             radii.push_back(cable_element_data.AttributeValue);
             assert(current_element.size() == 2);
-            vtkCell* p_cell=vtkLine::New();
-            vtkIdList* p_cell_id_list = p_cell->GetPointIds();
             for (unsigned j = 0; j < 2; ++j)
             {
                 p_cell_id_list->SetId(j, current_element[j]);
             }
-            mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-            p_cell->Delete(); //Reference counted
+            mpVtkUnstructedMesh->InsertNextCell(VTK_LINE, p_cell_id_list);
         }
         AddCellData("Cable radius", radii);
 
     }
 
+    p_cell_id_list->Delete(); //Reference counted
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -201,6 +201,10 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
         MakeVtkMesh();
         assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
         vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
+        // Avoid the CPU cost of base64-encoding and zlib-compressing the (already binary,
+        // appended-mode) output data on every write, at the cost of larger output files.
+        p_writer->EncodeAppendedDataOff();
+        p_writer->SetCompressorTypeToNone();
 #if VTK_MAJOR_VERSION >= 6
         p_writer->SetInputData(mpVtkUnstructedMesh);
 #else
@@ -670,33 +674,19 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
         mpVtkUnstructedMesh->SetPoints(p_pts);
         p_pts->Delete(); //Reference counted
 
+        int element_cell_type = (ELEMENT_DIM == 3) ? VTK_TETRA : ((ELEMENT_DIM == 2) ? VTK_TRIANGLE : VTK_LINE);
+        vtkIdList* p_cell_id_list = vtkIdList::New();
+        p_cell_id_list->SetNumberOfIds(ELEMENT_DIM+1);
         for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator elem_iter = rMesh.GetElementIteratorBegin();
              elem_iter != rMesh.GetElementIteratorEnd();
              ++elem_iter)
         {
-
-            vtkCell* p_cell=nullptr;
-            ///\todo This ought to look exactly like the other MakeVtkMesh
-            if (ELEMENT_DIM == 3)
-            {
-                p_cell = vtkTetra::New();
-            }
-            else if (ELEMENT_DIM == 2)
-            {
-                p_cell = vtkTriangle::New();
-            }
-            else //(ELEMENT_DIM == 1)
-            {
-                p_cell = vtkLine::New();
-            }
-            vtkIdList* p_cell_id_list = p_cell->GetPointIds();
             for (unsigned j = 0; j < ELEMENT_DIM+1; ++j)
             {
                 unsigned global_node_index = elem_iter->GetNodeGlobalIndex(j);
                 p_cell_id_list->SetId(j, mGlobalToNodeIndexMap[global_node_index]);
             }
-            mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-            p_cell->Delete(); //Reference counted
+            mpVtkUnstructedMesh->InsertNextCell(element_cell_type, p_cell_id_list);
         }
         //If necessary, construct cables
         if (this->mpMixedMesh )
@@ -704,23 +694,22 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
             AugmentCellData();
             //Make a blank cell radius data for the regular elements
             std::vector<double> radii(this->mpMixedMesh->GetNumLocalElements(), 0.0);
+            p_cell_id_list->SetNumberOfIds(2);
             for (typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableElementIterator elem_iter = this->mpMixedMesh->GetCableElementIteratorBegin();
                  elem_iter != this->mpMixedMesh->GetCableElementIteratorEnd();
                  ++elem_iter)
             {
                 radii.push_back((*elem_iter)->GetAttribute());
-                vtkCell* p_cell=vtkLine::New();
-                vtkIdList* p_cell_id_list = p_cell->GetPointIds();
                 for (unsigned j = 0; j < 2; ++j)
                 {
                     unsigned global_node_index = (*elem_iter)->GetNodeGlobalIndex(j);
                     p_cell_id_list->SetId(j, mGlobalToNodeIndexMap[global_node_index]);
                 }
-                mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-                p_cell->Delete(); //Reference counted
+                mpVtkUnstructedMesh->InsertNextCell(VTK_LINE, p_cell_id_list);
             }
             AddCellData("Cable radius", radii);
         }
+        p_cell_id_list->Delete(); //Reference counted
 
 
         //This block is to guard the mesh writers (vtkXMLPUnstructuredGridWriter) so that they
