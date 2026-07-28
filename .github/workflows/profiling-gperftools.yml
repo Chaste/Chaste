@@ -1,0 +1,198 @@
+name: Profiling GPerftools
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - develop
+
+jobs:
+
+  build-and-test:
+
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    runs-on: ubuntu-24.04
+
+    env:
+      CHASTE_DIR: ${{ github.workspace }}/Chaste
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
+      GPERFTOOLS_VERSION: gperftools-2.18.1
+      GPERFTOOLS_PREFIX: ${{ github.workspace }}/gperftools-install
+      GO_PPROF_VERSION: v0.0.0-20260604005048-7023385849c0
+      CPUPROFILE_FREQUENCY: 1000
+
+    outputs:
+      index: ${{ steps.index-exists.outputs.index }}
+      datetime: ${{ steps.get-datetime.outputs.datetime }}
+
+    steps:
+
+      - name: get current datetime
+        id: get-datetime
+        run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
+
+      - name: checkout Chaste
+        uses: actions/checkout@v7
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
+
+      - name: install dependencies
+        run: |
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          sudo apt update
+          sudo apt install chaste-dependencies
+
+      - name: install gperftools build dependencies and graphviz
+        run: sudo apt install autoconf automake libtool libunwind-dev graphviz
+
+      - name: setup go
+        uses: actions/setup-go@v6
+        with:
+          go-version: 'stable'
+
+      - name: cache go pprof
+        id: cache-pprof
+        uses: actions/cache@v6
+        with:
+          path: ~/go/bin/pprof
+          key: go-pprof-${{ runner.os }}-${{ env.GO_PPROF_VERSION }}
+
+      - name: install go pprof
+        if: steps.cache-pprof.outputs.cache-hit != 'true'
+        run: go install github.com/google/pprof@${GO_PPROF_VERSION}
+
+      - name: add go bin to path
+        run: echo "${HOME}/go/bin" >> $GITHUB_PATH
+
+      - name: cache gperftools
+        id: cache-gperftools
+        uses: actions/cache@v6
+        with:
+          path: ${{ env.GPERFTOOLS_PREFIX }}
+          key: gperftools-${{ runner.os }}-${{ env.GPERFTOOLS_VERSION }}
+
+      - name: build gperftools from source
+        if: steps.cache-gperftools.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 --branch ${GPERFTOOLS_VERSION} https://github.com/gperftools/gperftools.git gperftools-src
+          cd gperftools-src
+          ./autogen.sh
+          ./configure --prefix=${GPERFTOOLS_PREFIX} --enable-libunwind
+          make -j4
+          make install
+
+      - name: make build and test directories
+        run: |
+          mkdir -p ${CHASTE_BUILD_DIR}
+          mkdir -p ${CHASTE_TEST_OUTPUT}
+
+      - name: cmake configure
+        run: >-
+          cmake
+          -DCMAKE_BUILD_TYPE=Debug
+          -DChaste_ERROR_ON_WARNING=OFF
+          -DChaste_PROFILE_GPERFTOOLS=ON
+          -DGperftools_ROOT_DIR=${GPERFTOOLS_PREFIX}
+          -DCMAKE_PREFIX_PATH=${GPERFTOOLS_PREFIX}
+          ..
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: run TestChasteBuildInfo
+        run: |
+          cmake --build . --target TestChasteBuildInfo --parallel 4
+          ctest -V -R TestChasteBuildInfo
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: build profiling test pack
+        run: cmake --build . --target Profile --parallel 4
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: run profiling tests
+        run: cmake --build . --target profile --parallel 1
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: check if index file successfully created
+        id: index-exists
+        run: |
+          if [ -e ${CHASTE_BUILD_DIR}/profile/index.html ]; then
+            echo "Index file exists"
+            echo "index=True"  >> $GITHUB_OUTPUT
+          else
+            echo "Index file does not exist"
+            echo "index=False"  >> $GITHUB_OUTPUT
+          fi
+        if: always()
+
+      - name: upload profile artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: profile-files
+          path: ${{ env.CHASTE_BUILD_DIR }}/profile
+        if: always() && steps.index-exists.outputs.index == 'True'
+
+
+  publish-results:
+
+    name: Publish results (non-fork PRs only)
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    # only when index exists AND it's being run from the primary repo (Chaste/Chaste)
+    if: ${{needs.build-and-test.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
+
+    env:
+      GPERFTOOLS_RESULTS_DIR: ${{ github.workspace }}/profiling-gperftools
+
+    steps:
+
+      - name: download profile artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: profile-files
+          path: ./profile
+
+      - name: checkout results repo
+        uses: actions/checkout@v7
+        with:
+          repository: Chaste/profiling-gperftools
+          path: profiling-gperftools
+          fetch-depth: 0
+          token: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
+
+      - name: copy results
+        # raw .prof files are deliberately not published: they are only useful with the
+        # matching test binaries, and remain available in the workflow artifact
+        run: |
+          mkdir ${GPERFTOOLS_RESULTS_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}
+          cp ./profile/*.txt ./profile/*.svg ./profile/index.html ${GPERFTOOLS_RESULTS_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
+
+      - name: setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: generate index file
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install dominate
+          python write_index.py
+        working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
+
+      - name: commit results (dry run, no push)
+        run: |
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git add --all
+          git commit -m "upload gperftools profiling results" || echo "No changes to commit"
+          git push
+        working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
+
+      - name: results URL on chaste.github.io
+        run: |
+          echo https://chaste.github.io/profiling-gperftools/${{ needs.build-and-test.outputs.datetime }}/index.html
