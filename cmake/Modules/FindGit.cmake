@@ -61,24 +61,7 @@
 #
 set(git_names git eg)
 
-# Prefer .cmd variants on Windows unless running in a Makefile
-# in the MSYS shell.
-#
-if(WIN32)
-  if(NOT CMAKE_GENERATOR MATCHES "MSYS")
-    # Note: Due to a bug in 'git.cmd' preventing it from returning the exit code of 'git',
-    #       we excluded it from the list of executables to search.
-    # See http://code.google.com/p/msysgit/issues/detail?id=428
-    # TODO Check if 'git' exists, get the associated version, if the corresponding version
-    #      is known to have a working version of 'git.cmd', use it.
-    set(git_names git eg.cmd eg)
-  endif()
-endif()
-
 find_program(GIT_EXECUTABLE ${git_names}
-  PATHS
-    "C:/Program Files/Git/bin"
-    "C:/Program Files (x86)/Git/bin"
   DOC "git command line client")
 mark_as_advanced(GIT_EXECUTABLE)
 
