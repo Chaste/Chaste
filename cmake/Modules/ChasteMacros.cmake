@@ -344,6 +344,7 @@ macro(Chaste_DO_COMMON component)
     if (NOT Chaste_${component}_SOURCES STREQUAL "")
         add_library(chaste_${component} ${Chaste_${component}_SOURCES} ${ARGN})
         target_link_libraries(chaste_${component} PRIVATE Chaste_COMMON_DEPS)
+        target_precompile_headers(chaste_${component} PRIVATE "${Chaste_SOURCE_DIR}/cmake/pch/ChastePCH.hpp")
         if (BUILD_SHARED_LIBS)
             target_link_options(chaste_${component} PRIVATE "${Chaste_SHARED_LINKER_FLAGS}")
             target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_LIBRARIES})
@@ -594,6 +595,26 @@ macro(Chaste_DO_TEST_COMMON component)
                             target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES})
                         else()
                             target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
+                        endif()
+                        set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
+                        # Reuse the library's precompiled header rather than
+                        # generating a fresh one for every test executable.
+                        if (TARGET chaste_${component})
+                            if (BUILD_SHARED_LIBS AND NOT MSVC)
+                                # Components are compiled with -fPIC. Executables
+                                # default to -fpie, which GCC/Clang treat as an incompatible
+                                # precompiled header. Use -fPIC for the test executable to match
+                                # the component library.
+                                target_compile_options(${exeTargetName} PRIVATE -fPIC)
+                                # CMake automatically defines <target>_EXPORTS when compiling a
+                                # shared library, sanitising the target name into a valid
+                                # identifier (e.g. a project directory name containing a hyphen).
+                                # Reproduce that sanitisation so the define matches exactly what
+                                # the library's precompiled header was actually built with.
+                                string(MAKE_C_IDENTIFIER "chaste_${component}" _chaste_export_symbol)
+                                target_compile_definitions(${exeTargetName} PRIVATE ${_chaste_export_symbol}_EXPORTS)
+                            endif()
+                            target_precompile_headers(${exeTargetName} REUSE_FROM chaste_${component})
                         endif()
                     endif()
 

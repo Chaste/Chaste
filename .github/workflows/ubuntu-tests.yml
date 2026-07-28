@@ -48,7 +48,7 @@ jobs:
         echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
-        sudo apt install chaste-dependencies
+        sudo apt install chaste-dependencies mold
 
     - name: Downgrade libexpat1 (native ubuntu-22.04 only)
       if: ${{ matrix.os == 'ubuntu-22.04' }}

@@ -94,12 +94,27 @@ MARK_AS_ADVANCED(
         CMAKE_SHARED_LINKER_FLAGS_AGGRESSIVEOPT)
 
 
+########################################################################
+#  Split DWARF debug info for Debug builds                             #
+########################################################################
+# Chaste links a large number of executables against a common set of large shared libraries.
+# Splitting debug info out into separate .dwo files means the linker only has to merge small
+# skeleton debug sections rather than the full DWARF data for every executable, which
+# significantly cuts link time for Debug builds without changing debuggability.
+if ((${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -gsplit-dwarf" CACHE STRING
+            "Flags used by the compiler during debug builds." FORCE)
+    set(CMAKE_C_FLAGS_DEBUG "-g -gsplit-dwarf" CACHE STRING
+            "Flags used by the compiler during debug builds." FORCE)
+endif ()
+
+
 #############################################
 #  DEBUGOPT for edit-compile-debug workflow #
 #############################################
 
 if ((${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
-    set(DEBUGOPT_OPT_FLAGS "-Og -g")
+    set(DEBUGOPT_OPT_FLAGS "-Og -g -gsplit-dwarf")
 else ()
     set(DEBUGOPT_OPT_FLAGS "${CMAKE_CXX_FLAGS_DEBUG}")
 endif ()
