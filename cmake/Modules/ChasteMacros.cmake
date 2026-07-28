@@ -607,9 +607,12 @@ macro(Chaste_DO_TEST_COMMON component)
                                 # the component library.
                                 target_compile_options(${exeTargetName} PRIVATE -fPIC)
                                 # CMake automatically defines <target>_EXPORTS when compiling a
-                                # shared library. Ensure compatibility with the component's
-                                # precompiled header by defining it for the test executable as well.
-                                target_compile_definitions(${exeTargetName} PRIVATE chaste_${component}_EXPORTS)
+                                # shared library, sanitising the target name into a valid
+                                # identifier (e.g. a project directory name containing a hyphen).
+                                # Reproduce that sanitisation so the define matches exactly what
+                                # the library's precompiled header was actually built with.
+                                string(MAKE_C_IDENTIFIER "chaste_${component}" _chaste_export_symbol)
+                                target_compile_definitions(${exeTargetName} PRIVATE ${_chaste_export_symbol}_EXPORTS)
                             endif()
                             target_precompile_headers(${exeTargetName} REUSE_FROM chaste_${component})
                         endif()
