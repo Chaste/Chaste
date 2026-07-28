@@ -544,7 +544,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
         {
             // Get the index of this node in the mesh and those elements (i.e. cells) that contain this node
             unsigned node_index = iter->GetIndex();
-            std::set<unsigned> element_indices = iter->rGetContainingElementIndices();
+            const std::set<unsigned>& element_indices = iter->rGetContainingElementIndices();
 
             // If there are no elements associated with this node, then we set the value of any VTK cell data to be -1 at this node...
             if (element_indices.empty())
@@ -584,7 +584,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     {
         // Get the index of this node in the mesh and those elements (i.e. cells) that contain this node
         unsigned node_index = iter->GetIndex();
-        std::set<unsigned> element_indices = iter->rGetContainingElementIndices();
+        const std::set<unsigned>& element_indices = iter->rGetContainingElementIndices();
 
         // If there are no elements associated with this node, then we set the value of any VTK cell data to be -1 at this node...
         if (element_indices.empty())
@@ -641,7 +641,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
         {
             // Get the index of this node in the mesh and those elements (i.e. cells) that contain this node
             unsigned node_index = iter->GetIndex();
-            std::set<unsigned> element_indices = iter->rGetContainingElementIndices();
+            const std::set<unsigned>& element_indices = iter->rGetContainingElementIndices();
 
             std::set<unsigned> target_neighbouring_node_indices = this->rGetMesh().GetVonNeumannNeighbouringNodeIndices(node_index);
 
@@ -649,7 +649,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
                  neighbour_iter != target_neighbouring_node_indices.end();
                  ++neighbour_iter)
             {
-                std::set<unsigned> neighbouring_element_indices = this->rGetMesh().GetNode(*neighbour_iter)->rGetContainingElementIndices();
+                const std::set<unsigned>& neighbouring_element_indices = this->rGetMesh().GetNode(*neighbour_iter)->rGetContainingElementIndices();
 
                 // If different cells add a line
                 if (element_indices != neighbouring_element_indices)

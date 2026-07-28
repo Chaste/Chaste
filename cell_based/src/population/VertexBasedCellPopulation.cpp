@@ -115,7 +115,7 @@ double VertexBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
     // Take the average of the cells containing this vertex
     double average_damping_constant = 0.0;
 
-    std::set<unsigned> containing_elements = GetNode(nodeIndex)->rGetContainingElementIndices();
+    const std::set<unsigned>& containing_elements = GetNode(nodeIndex)->rGetContainingElementIndices();
 
     unsigned num_containing_elements = containing_elements.size();
     if (num_containing_elements == 0)
@@ -1067,7 +1067,7 @@ bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(uns
 
     if (pdeNodeIndex < this->GetNumNodes())
     {
-        std::set<unsigned> containing_element_indices = this->GetNode(pdeNodeIndex)->rGetContainingElementIndices();
+        const std::set<unsigned>& containing_element_indices = this->GetNode(pdeNodeIndex)->rGetContainingElementIndices();
 
         for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
              iter != containing_element_indices.end();
@@ -1126,7 +1126,7 @@ double VertexBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
             Node<DIM>* p_node = this->GetNode(pdeNodeIndex);
 
             // Average over data from containing elements (cells)
-            std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
+            const std::set<unsigned>& containing_elements = p_node->rGetContainingElementIndices();
             for (std::set<unsigned>::iterator index_iter = containing_elements.begin();
                  index_iter != containing_elements.end();
                  ++index_iter)
