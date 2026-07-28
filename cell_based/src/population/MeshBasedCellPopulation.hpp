@@ -159,6 +159,26 @@ protected:
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
 
+    /**
+     * Classifies the periodicity of the mesh (#AbstractCellPopulation::mrMesh). Used to select
+     * the correct Voronoi-tessellation construction path.
+     */
+    enum class MeshPeriodicityType { UNKNOWN, NONE, CYLINDRICAL, TOROIDAL };
+
+    /**
+     * Cache for GetMeshPeriodicityType(); UNKNOWN until first computed. The mesh's dynamic type
+     * cannot change after construction, so this only needs computing once, avoiding a repeated
+     * dynamic_cast on every call to CreateVoronoiTessellation() (called every timestep by, e.g.,
+     * HeterotypicBoundaryLengthWriter and VolumeTrackingModifier).
+     */
+    mutable MeshPeriodicityType mMeshPeriodicityType = MeshPeriodicityType::UNKNOWN;
+
+    /**
+     * @return the periodicity type of the mesh, computing and caching it via dynamic_cast on
+     * the first call only.
+     */
+    MeshPeriodicityType GetMeshPeriodicityType() const;
+
     /** Update mNodePairs using the SpringIterator. */
     virtual void UpdateNodePairs();
 
