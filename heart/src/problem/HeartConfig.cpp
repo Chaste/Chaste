@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChastePoint.hpp"
 #include "ChasteXsdVersion.hpp"
 #include "Exception.hpp"
+#include "FilesystemPermissions.hpp"
 #include "HeartConfig.hpp"
 #include "HeartFileFinder.hpp"
 #include "OutputFileHandler.hpp"
@@ -280,6 +281,7 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
     {
         EXCEPTION("Could not open XML file in HeartConfig");
     }
+    FilesystemPermissions::SetFilePermissions(output_dirname + "ChasteParameters.xml");
 
     //Schema map
     //Note - this location is relative to where we are storing the xml

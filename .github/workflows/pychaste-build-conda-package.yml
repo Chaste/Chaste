@@ -1,0 +1,156 @@
+name: PyChaste build conda package
+
+on:
+  workflow_dispatch:
+    inputs:
+      python-version:
+        description: Python version to build for
+        required: true
+        type: choice
+        options:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
+        default: "3.12"
+      chaste-ref:
+        description: Chaste branch, tag, or commit ref to build
+        required: true
+        type: string
+        default: develop
+      upload:
+        description: Upload package to Anaconda
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build-conda-package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Each target is built natively on a runner of the matching architecture.
+          - target: linux-64
+            runner: ubuntu-24.04
+            variant-prefix: linux_64
+          - target: linux-aarch64
+            runner: ubuntu-24.04-arm
+            variant-prefix: linux_aarch64
+          # Intel mac (osx-64) is not built in CI; build it locally with
+          # build-package-osx.sh --target=osx-64 if needed.
+          - target: osx-arm64
+            runner: macos-15
+            variant-prefix: osx_arm64
+
+    runs-on: ${{ matrix.runner }}
+
+    env:
+      PYTHON_VERSION: ${{ inputs.python-version }}
+      DO_UPLOAD: ${{ inputs.upload }}
+
+    defaults:
+      run:
+        shell: bash -el {0} # -l needed to activate conda
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.chaste-ref }}
+          submodules: recursive
+          # Full history (not a shallow clone) so package-version.sh's
+          # `git describe --tags` can reach the latest tag; otherwise the version
+          # falls back to 0 (e.g. chaste-0.devN...).
+          fetch-depth: 0
+
+      - name: Determine package version
+        run: |
+          version=$(bash pychaste/infra/conda/package-version.sh "$GITHUB_WORKSPACE")
+          echo "CHASTE_VERSION=${version}" >> "$GITHUB_ENV"
+
+      - name: Install system dependencies (Linux)
+        if: ${{ startsWith(matrix.target, 'linux') }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y castxml libx11-dev xvfb
+
+      - name: Set up macOS SDK
+        if: ${{ startsWith(matrix.target, 'osx') }}
+        run: |
+          # conda-forge's clang activation expects an older macOS SDK than the
+          # runner ships, matching the deployment target. osx-64 uses 10.15 (the
+          # minimum providing aligned_alloc, used by bundled pocketfft); osx-arm64
+          # uses 11.0, the floor for Apple Silicon. The SDK is exposed as
+          # CONDA_BUILD_SYSROOT and forwarded into the build by recipe.yaml.
+          if [ "${{ matrix.target }}" = "osx-arm64" ]; then
+            sdk_name=MacOSX11.3.sdk
+            deployment=11.0
+          else
+            sdk_name=MacOSX10.15.sdk
+            deployment=10.15
+          fi
+          sdk_dir="${RUNNER_TEMP}/MacOSX-SDKs"
+          mkdir -p "${sdk_dir}"
+          curl -fsSL \
+            "https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/${sdk_name}.tar.xz" \
+            | tar -xJ -C "${sdk_dir}"
+          echo "CONDA_BUILD_SYSROOT=${sdk_dir}/${sdk_name}" >> "$GITHUB_ENV"
+          echo "MACOSX_DEPLOYMENT_TARGET=${deployment}" >> "$GITHUB_ENV"
+          echo "MACOSX_SDK_VERSION=${deployment}" >> "$GITHUB_ENV"
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v4
+        with:
+          auto-update-conda: true
+          use-mamba: true
+          miniforge-version: latest
+          channels: conda-forge,pychaste
+
+      - name: Install rattler-build and anaconda-client
+        run: mamba install --yes -c conda-forge rattler-build anaconda-client
+
+      - name: Show conda configuration
+        run: |
+          conda info
+          conda list
+
+      - name: Build conda package
+        env:
+          CHASTE_SOURCE_DIR: ${{ github.workspace }}
+        run: |
+          export CPU_COUNT=$(getconf _NPROCESSORS_ONLN)
+          rattler-build build \
+            --recipe pychaste/infra/conda/recipe/recipe.yaml \
+            --variant-config pychaste/infra/conda/variants/${{ matrix.variant-prefix }}_python${PYTHON_VERSION}_cpython.yaml \
+            --target-platform ${{ matrix.target }} \
+            --output-dir output/ \
+            --channel conda-forge \
+            --channel pychaste
+
+      - name: Smoke test
+        run: |
+          conda create -n smoke-test --yes -c ./output -c conda-forge -c pychaste chaste
+          conda run -n smoke-test python -c "
+          import chaste
+          import chaste.cell_based
+          import chaste.mesh
+          import chaste.ode
+          import chaste.pde
+          print('Smoke test passed')
+          "
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chaste-conda-${{ matrix.target }}-py${{ env.PYTHON_VERSION }}
+          path: output/${{ matrix.target }}/chaste-*.conda
+          if-no-files-found: error
+
+      - name: Upload to Anaconda channel
+        if: ${{ env.DO_UPLOAD == 'true' }}
+        env:
+          ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+        run: |
+          anaconda --token "${ANACONDA_TOKEN}" upload -u pychaste output/${{ matrix.target }}/chaste-*.conda
