@@ -596,7 +596,6 @@ macro(Chaste_DO_TEST_COMMON component)
                         else()
                             target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
                         endif()
-<<<<<<< HEAD
                         set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
                         # Reuse the library's precompiled header rather than
                         # generating a fresh one for every test executable.
@@ -617,8 +616,6 @@ macro(Chaste_DO_TEST_COMMON component)
                             endif()
                             target_precompile_headers(${exeTargetName} REUSE_FROM chaste_${component})
                         endif()
-=======
->>>>>>> develop
                     endif()
 
 
