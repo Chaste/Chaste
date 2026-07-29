@@ -114,9 +114,12 @@ class PopulationWriterCustomTemplate(cppwg.templates.custom.Custom):
 
         code = ""
 
-        # Add cell writers
+        # Add cell writers. The binding name puts an underscore between the base
+        # method and the writer type (AddCellWriter_CellVolumesWriter), matching
+        # cppwg's instantiation naming (Foo_2) so the TemplateMethod descriptor
+        # exposes it as AddCellWriter[CellVolumesWriter]().
         cell_writer_template = """\
-        .def("AddCellWriter{writer}", &{class_name}::AddCellWriter<{writer}>)
+        .def("AddCellWriter_{writer}", &{class_name}::AddCellWriter<{writer}>)
 """
 
         for writer in self.cell_writers:
@@ -125,7 +128,7 @@ class PopulationWriterCustomTemplate(cppwg.templates.custom.Custom):
 
         # Add cell population count writers
         cell_population_count_writer_template = """\
-        .def("AddCellPopulationCountWriter{writer}", &{class_name}::AddCellPopulationCountWriter<{writer}>)
+        .def("AddCellPopulationCountWriter_{writer}", &{class_name}::AddCellPopulationCountWriter<{writer}>)
 """
         for writer in self.cell_population_count_writers:
             replacements = {"class_name": class_name, "writer": writer}
@@ -133,7 +136,7 @@ class PopulationWriterCustomTemplate(cppwg.templates.custom.Custom):
 
         # Add cell population event writers
         cell_population_event_writer_template = """\
-        .def("AddCellPopulationEventWriter{writer}", &{class_name}::AddCellPopulationEventWriter<{writer}>)
+        .def("AddCellPopulationEventWriter_{writer}", &{class_name}::AddCellPopulationEventWriter<{writer}>)
 """
         for writer in self.cell_population_event_writers:
             replacements = {"class_name": class_name, "writer": writer}
@@ -141,7 +144,7 @@ class PopulationWriterCustomTemplate(cppwg.templates.custom.Custom):
 
         # Add population writers
         population_writer_template = """\
-        .def("AddPopulationWriter{writer}", &{class_name}::AddPopulationWriter<{writer}>)
+        .def("AddPopulationWriter_{writer}", &{class_name}::AddPopulationWriter<{writer}>)
 """
         for writer in self.population_writers:
             replacements = {"class_name": class_name, "writer": writer}

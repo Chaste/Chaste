@@ -70,6 +70,62 @@ class TemplateClassDict:
         return self._dict[key]
 
 
+def _normalize_key(key) -> Tuple[str, ...]:
+    """Normalize a template-argument subscript key to a tuple of strings.
+
+    A scalar key becomes a 1-tuple; each argument maps to its ``__name__`` (for a
+    class) or ``str`` otherwise - matching the suffix cppwg appends when it names
+    an instantiated class or method. A string is treated as a single scalar (not
+    iterated character by character).
+    """
+    if isinstance(key, str) or not isinstance(key, Iterable):
+        key = (key,)
+    return tuple(arg.__name__ if inspect.isclass(arg) else str(arg) for arg in key)
+
+
+class TemplateMethod:
+    """Subscript syntax for a templated method (the method analogue of
+    TemplateClassDict).
+
+    Assign it as a class attribute so ``obj.<base>[Arg]()`` dispatches to the
+    mangled binding ``obj.<base><Arg>()`` that cppwg generates for the templated
+    C++ method - e.g. ``population.AddCellWriter[CellVolumesWriter]()`` calls
+    ``population.AddCellWriterCellVolumesWriter()``. When the name is also a plain
+    (non-templated) overload, pass it as ``fallback`` so ``obj.<base>(...)`` keeps
+    working alongside the subscript form.
+
+    Usage:
+    >>> Foo.AddCellWriter = TemplateMethod("AddCellWriter", Foo.AddCellWriter)
+    """
+
+    def __init__(self, base_name: str, fallback=None):
+        self._base_name = base_name
+        self._fallback = fallback
+
+    def __get__(self, obj, owner=None):
+        target = obj if obj is not None else owner
+        return _BoundTemplateMethod(target, self._base_name, self._fallback)
+
+
+class _BoundTemplateMethod:
+    def __init__(self, target, base_name: str, fallback):
+        self._target = target
+        self._base_name = base_name
+        self._fallback = fallback
+
+    def __getitem__(self, key):
+        # Mangled binding is <base>_<arg1>_<arg2>..., matching cppwg's Foo_2 style.
+        suffix = "_" + "_".join(_normalize_key(key))
+        return getattr(self._target, self._base_name + suffix)
+
+    def __call__(self, *args, **kwargs):
+        if self._fallback is None:
+            raise TypeError(
+                f"{self._base_name} is templated; use {self._base_name}[Arg](...)"
+            )
+        return self._fallback(self._target, *args, **kwargs)
+
+
 class DeprecatedClass:
     """
     Warns when a deprecated class is used and switches to the correct class.
