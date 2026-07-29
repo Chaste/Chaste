@@ -38,3 +38,16 @@ chaste_do_test_component(pychaste)
 
 set_tests_properties(TestPyImports PROPERTIES WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pychaste")
 set_tests_properties(TestPyWrapperChanges PROPERTIES WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pychaste")
+
+# The visualization tests each render a VTK scene off-screen. Under parallel
+# ctest they share a single Xvfb display, and concurrent renders collide on the
+# older VTK/mesa stack (VTK7 on Ubuntu 22.04), giving an intermittent SEGV. Run
+# them serially so no two scene renders overlap. The rest of the suite still runs
+# in parallel.
+set_tests_properties(
+    TestPyJupyterNotebookManager
+    TestVtkSceneWithCaBased
+    TestVtkSceneWithMeshBased
+    TestVtkSceneWithPottsBased
+    PROPERTIES RUN_SERIAL ON
+)
