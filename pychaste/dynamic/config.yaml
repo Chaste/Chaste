@@ -143,7 +143,24 @@ modules:
 
       #=== pde: Chaste/pde/src/problem
       - name: AbstractLinearPde
+        # AbstractLinearPde<ELEMENT_DIM, SPACE_DIM=ELEMENT_DIM> has a defaulted
+        # second template parameter and is never explicitly instantiated.
+        # It is wrapped via implicit instantiations pulled in by concrete PDEs
+        # in method arguments. This causes problems in CastXML<0.6.0 which drops
+        # the defaulted trailing argument so cppwg only sees AbstractLinearPde<N>
+        # and not AbstractLinearPde<N,N>. Listing the instantiations explicitly
+        # makes the wrapping independent of the CastXML version.
+        template_substitutions:
+          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+            replacement: [[1, 1], [2, 2], [3, 3]]
+
       - name: AbstractLinearParabolicPde
+        # Same case as AbstractLinearPde above. List the instantiations to avoid
+        # issues with finding AbstractLinearParabolicPde<N,N> in CastXML<0.6.0.
+        template_substitutions:
+          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+            replacement: [[1, 1], [2, 2], [3, 3]]
+
       - name: AbstractLinearEllipticPde
 
       - name: AbstractLinearParabolicPdeSystemForCoupledOdeSystem
