@@ -69,8 +69,8 @@ class AbstractCellBasedWithTimingsTestSuite(AbstractCellBasedTestSuite):
 
     def setUp(self):
         chaste.core.Timer().Reset()
-        super(AbstractCellBasedWithTimingsTestSuite, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(AbstractCellBasedWithTimingsTestSuite, self).tearDown()
+        super().tearDown()
         chaste.core.Timer().Print("Test elapsed")

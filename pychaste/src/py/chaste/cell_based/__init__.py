@@ -1814,7 +1814,7 @@ class WelikyOsterForce(TemplateClass):
 # the PopulationWriter custom generator. Attach a TemplateMethod descriptor for
 # each family so the C++-style subscript form works, e.g.
 # population.AddCellWriter[CellVolumesWriter]() in place of the mangled
-# population.AddCellWriterCellVolumesWriter(). The plain non-templated overload
+# population.AddCellWriter_CellVolumesWriter(). The plain non-templated overload
 # inherited from AbstractCellPopulation is kept as a fallback, so the instance
 # form population.AddCellWriter(writer) still works. A class is recognised as a
 # population by carrying at least one such mangled binding.

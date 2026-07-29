@@ -33,10 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from collections.abc import Iterable
-from typing import Tuple
 
 
-def _normalize_key(key) -> Tuple[str, ...]:
+def _normalize_key(key) -> tuple[str, ...]:
     """Normalize a template-argument subscript key to a tuple of strings.
 
     A scalar key becomes a 1-tuple; each argument maps to its ``__name__`` (for a
@@ -82,11 +81,12 @@ class TemplateMethod:
     TemplateClass).
 
     Assign it as a class attribute so ``obj.<base>[Arg]()`` dispatches to the
-    mangled binding ``obj.<base><Arg>()`` that cppwg generates for the templated
-    C++ method - e.g. ``population.AddCellWriter[CellVolumesWriter]()`` calls
-    ``population.AddCellWriterCellVolumesWriter()``. When the name is also a plain
-    (non-templated) overload, pass it as ``fallback`` so ``obj.<base>(...)`` keeps
-    working alongside the subscript form.
+    per-instantiation binding ``obj.<base>_<Arg>()`` that cppwg generates for the
+    templated C++ method - e.g. ``population.AddCellWriter[CellVolumesWriter]()``
+    calls ``population.AddCellWriter_CellVolumesWriter()`` (arguments joined with
+    underscores, matching cppwg's ``Foo_2`` instantiation naming). When the name is
+    also a plain (non-templated) overload, pass it as ``fallback`` so
+    ``obj.<base>(...)`` keeps working alongside the subscript form.
 
     Usage:
     >>> Foo.AddCellWriter = TemplateMethod("AddCellWriter", Foo.AddCellWriter)
