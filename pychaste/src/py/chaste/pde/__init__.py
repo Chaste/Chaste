@@ -74,110 +74,109 @@ from chaste._pychaste_all import (
     UniformSourceParabolicPde_2,
     UniformSourceParabolicPde_3,
 )
-from chaste._syntax import TemplateClassDict
+from chaste._syntax import TemplateClass
+
 
 # Template Class Syntax
-AveragedSourceEllipticPde = TemplateClassDict(
-    {
+class AveragedSourceEllipticPde(TemplateClass):
+    _instantiations = {
         ("1",): AveragedSourceEllipticPde_1,
         ("2",): AveragedSourceEllipticPde_2,
         ("3",): AveragedSourceEllipticPde_3,
     }
-)
 
-AveragedSourceParabolicPde = TemplateClassDict(
-    {
+
+class AveragedSourceParabolicPde(TemplateClass):
+    _instantiations = {
         ("1",): AveragedSourceParabolicPde_1,
         ("2",): AveragedSourceParabolicPde_2,
         ("3",): AveragedSourceParabolicPde_3,
     }
-)
 
-CellBasedEllipticPdeSolver = TemplateClassDict(
-    {
+
+class CellBasedEllipticPdeSolver(TemplateClass):
+    _instantiations = {
         ("1",): CellBasedEllipticPdeSolver_1,
         ("2",): CellBasedEllipticPdeSolver_2,
         ("3",): CellBasedEllipticPdeSolver_3,
     }
-)
 
-CellBasedParabolicPdeSolver = TemplateClassDict(
-    {
+
+class CellBasedParabolicPdeSolver(TemplateClass):
+    _instantiations = {
         ("1",): CellBasedParabolicPdeSolver_1,
         ("2",): CellBasedParabolicPdeSolver_2,
         ("3",): CellBasedParabolicPdeSolver_3,
     }
-)
 
-CellwiseSourceEllipticPde = TemplateClassDict(
-    {
+
+class CellwiseSourceEllipticPde(TemplateClass):
+    _instantiations = {
         ("1",): CellwiseSourceEllipticPde_1,
         ("2",): CellwiseSourceEllipticPde_2,
         ("3",): CellwiseSourceEllipticPde_3,
     }
-)
 
-CellwiseSourceParabolicPde = TemplateClassDict(
-    {
+
+class CellwiseSourceParabolicPde(TemplateClass):
+    _instantiations = {
         ("1",): CellwiseSourceParabolicPde_1,
         ("2",): CellwiseSourceParabolicPde_2,
         ("3",): CellwiseSourceParabolicPde_3,
     }
-)
 
-ConstBoundaryCondition = TemplateClassDict(
-    {
+
+class ConstBoundaryCondition(TemplateClass):
+    _instantiations = {
         ("1",): ConstBoundaryCondition_1,
         ("2",): ConstBoundaryCondition_2,
         ("3",): ConstBoundaryCondition_3,
     }
-)
 
-EllipticBoxDomainPdeModifier = TemplateClassDict(
-    {
+
+class EllipticBoxDomainPdeModifier(TemplateClass):
+    _instantiations = {
         ("1",): EllipticBoxDomainPdeModifier_1,
         ("2",): EllipticBoxDomainPdeModifier_2,
         ("3",): EllipticBoxDomainPdeModifier_3,
     }
-)
 
-EllipticGrowingDomainPdeModifier = TemplateClassDict(
-    {
+
+class EllipticGrowingDomainPdeModifier(TemplateClass):
+    _instantiations = {
         ("1",): EllipticGrowingDomainPdeModifier_1,
         ("2",): EllipticGrowingDomainPdeModifier_2,
         ("3",): EllipticGrowingDomainPdeModifier_3,
     }
-)
 
-ParabolicBoxDomainPdeModifier = TemplateClassDict(
-    {
+
+class ParabolicBoxDomainPdeModifier(TemplateClass):
+    _instantiations = {
         ("1",): ParabolicBoxDomainPdeModifier_1,
         ("2",): ParabolicBoxDomainPdeModifier_2,
         ("3",): ParabolicBoxDomainPdeModifier_3,
     }
-)
 
-ParabolicGrowingDomainPdeModifier = TemplateClassDict(
-    {
+
+class ParabolicGrowingDomainPdeModifier(TemplateClass):
+    _instantiations = {
         ("1",): ParabolicGrowingDomainPdeModifier_1,
         ("2",): ParabolicGrowingDomainPdeModifier_2,
         ("3",): ParabolicGrowingDomainPdeModifier_3,
     }
-)
 
 
-UniformSourceEllipticPde = TemplateClassDict(
-    {
+class UniformSourceEllipticPde(TemplateClass):
+    _instantiations = {
         ("1",): UniformSourceEllipticPde_1,
         ("2",): UniformSourceEllipticPde_2,
         ("3",): UniformSourceEllipticPde_3,
     }
-)
 
-UniformSourceParabolicPde = TemplateClassDict(
-    {
+
+class UniformSourceParabolicPde(TemplateClass):
+    _instantiations = {
         ("1",): UniformSourceParabolicPde_1,
         ("2",): UniformSourceParabolicPde_2,
         ("3",): UniformSourceParabolicPde_3,
     }
-)

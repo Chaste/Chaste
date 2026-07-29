@@ -41,7 +41,7 @@ from chaste._pychaste_all import (
     VtkScene_2,
     VtkScene_3,
 )
-from chaste._syntax import TemplateClassDict
+from chaste._syntax import TemplateClass
 
 ipython_spec = importlib.util.find_spec("IPython")
 if ipython_spec is None:
@@ -54,27 +54,29 @@ else:
         JupyterSceneModifier_3,
     )
 
+
 # Template Class Syntax
-CellPopulationPyChasteActorGenerator = TemplateClassDict(
-    {
+class CellPopulationPyChasteActorGenerator(TemplateClass):
+    _instantiations = {
         ("2",): CellPopulationPyChasteActorGenerator_2,
         ("3",): CellPopulationPyChasteActorGenerator_3,
     }
-)
 
-VtkScene = TemplateClassDict(
-    {
+
+class VtkScene(TemplateClass):
+    _instantiations = {
         ("2",): VtkScene_2,
         ("3",): VtkScene_3,
     }
-)
+
 
 if ipython_spec is not None:
-    JupyterSceneModifier = TemplateClassDict(
-        {
+
+    class JupyterSceneModifier(TemplateClass):
+        _instantiations = {
             ("2",): JupyterSceneModifier_2,
             ("3",): JupyterSceneModifier_3,
         }
-    )
+
 
 del ipython_spec

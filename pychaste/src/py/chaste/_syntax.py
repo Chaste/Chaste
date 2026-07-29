@@ -32,59 +32,54 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import inspect
 from collections.abc import Iterable
-from typing import Dict, Tuple, Type
-
-
-class TemplateClassDict:
-    """
-    Allows using class syntax like Foo[2, 2](...) in place of Foo_2_2(...)
-
-    Usage:
-    >>> Foo = TemplateClassDict({ ("2", "2"): Foo_2_2, ("3", "3"): Foo_3_3 })
-    """
-
-    def __init__(self, template_dict: Dict[Tuple[str, ...], Type]) -> None:
-        """
-        :param template_dict: A dictionary mapping template arg tuples to classes
-        """
-        self._dict = {}
-        for arg_tuple, cls in template_dict.items():
-            if not inspect.isclass(cls):
-                raise TypeError("Expected class, got {}".format(type(cls)))
-            if not isinstance(arg_tuple, Iterable):
-                arg_tuple = (arg_tuple,)
-            key = tuple(
-                arg.__name__ if inspect.isclass(arg) else str(arg) for arg in arg_tuple
-            )
-            self._dict[key] = cls
-
-    def __getitem__(self, arg_tuple: Tuple[str, ...]) -> Type:
-        if not isinstance(arg_tuple, Iterable):
-            arg_tuple = (arg_tuple,)
-        key = tuple(
-            arg.__name__ if inspect.isclass(arg) else str(arg) for arg in arg_tuple
-        )
-        return self._dict[key]
+from typing import Tuple
 
 
 def _normalize_key(key) -> Tuple[str, ...]:
     """Normalize a template-argument subscript key to a tuple of strings.
 
     A scalar key becomes a 1-tuple; each argument maps to its ``__name__`` (for a
-    class) or ``str`` otherwise - matching the suffix cppwg appends when it names
-    an instantiated class or method. A string is treated as a single scalar (not
-    iterated character by character).
+    class, including a TemplateClass stub) or ``str`` otherwise - matching the
+    suffix cppwg appends when it names an instantiated class or method. A string
+    is treated as a single scalar (not iterated character by character).
     """
     if isinstance(key, str) or not isinstance(key, Iterable):
         key = (key,)
-    return tuple(arg.__name__ if inspect.isclass(arg) else str(arg) for arg in key)
+    return tuple(arg.__name__ if hasattr(arg, "__name__") else str(arg) for arg in key)
+
+
+class TemplateClass:
+    """Stub base giving a templated class Python subscript syntax.
+
+    Subclass it with an ``_instantiations`` map from template-argument tuples to
+    the concrete wrapped classes; ``Foo[args]`` then resolves the instantiation -
+    e.g. ``Node[2]`` -> ``Node_2`` - mirroring ``list[int]`` via
+    ``__class_getitem__``. Subclassing makes ``Foo`` a real class object with a
+    ``__name__``, so it can itself be used as a template argument, e.g.
+    ``population.AddCellWriter[CellVolumesWriter]()``. Keys are normalized once at
+    subclass creation.
+
+    Usage:
+    >>> class Foo(TemplateClass):
+    ...     _instantiations = {("2", "2"): Foo_2_2, ("3", "3"): Foo_3_3}
+    """
+
+    _instantiations = {}
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls._instantiations = {
+            _normalize_key(args): cls_ for args, cls_ in cls._instantiations.items()
+        }
+
+    def __class_getitem__(cls, key):
+        return cls._instantiations[_normalize_key(key)]
 
 
 class TemplateMethod:
     """Subscript syntax for a templated method (the method analogue of
-    TemplateClassDict).
+    TemplateClass).
 
     Assign it as a class attribute so ``obj.<base>[Arg]()`` dispatches to the
     mangled binding ``obj.<base><Arg>()`` that cppwg generates for the templated

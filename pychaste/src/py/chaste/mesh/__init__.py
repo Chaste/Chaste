@@ -136,51 +136,52 @@ from chaste._pychaste_all import (
     VertexMesh_3_3,
     VoronoiVertexMeshGenerator,
 )
-from chaste._syntax import TemplateClassDict
+from chaste._syntax import TemplateClass
+
 
 # Template Class Syntax
-ChasteCuboid = TemplateClassDict(
-    {
+class ChasteCuboid(TemplateClass):
+    _instantiations = {
         ("1",): ChasteCuboid_1,
         ("2",): ChasteCuboid_2,
         ("3",): ChasteCuboid_3,
     }
-)
 
-ChasteEllipsoid = TemplateClassDict(
-    {
+
+class ChasteEllipsoid(TemplateClass):
+    _instantiations = {
         ("1",): ChasteEllipsoid_1,
         ("2",): ChasteEllipsoid_2,
         ("3",): ChasteEllipsoid_3,
     }
-)
 
-ChastePoint = TemplateClassDict(
-    {
+
+class ChastePoint(TemplateClass):
+    _instantiations = {
         ("1",): ChastePoint_1,
         ("2",): ChastePoint_2,
         ("3",): ChastePoint_3,
     }
-)
 
-Edge = TemplateClassDict(
-    {
+
+class Edge(TemplateClass):
+    _instantiations = {
         ("1",): Edge_1,
         ("2",): Edge_2,
         ("3",): Edge_3,
     }
-)
 
-EdgeHelper = TemplateClassDict(
-    {
+
+class EdgeHelper(TemplateClass):
+    _instantiations = {
         ("1",): EdgeHelper_1,
         ("2",): EdgeHelper_2,
         ("3",): EdgeHelper_3,
     }
-)
 
-Element = TemplateClassDict(
-    {
+
+class Element(TemplateClass):
+    _instantiations = {
         ("1",): Element_1_1,
         ("1", "1"): Element_1_1,
         ("1", "2"): Element_1_2,
@@ -191,18 +192,18 @@ Element = TemplateClassDict(
         ("3",): Element_3_3,
         ("3", "3"): Element_3_3,
     }
-)
 
-FluidSource = TemplateClassDict(
-    {
+
+class FluidSource(TemplateClass):
+    _instantiations = {
         ("1",): FluidSource_1,
         ("2",): FluidSource_2,
         ("3",): FluidSource_3,
     }
-)
 
-ImmersedBoundaryElement = TemplateClassDict(
-    {
+
+class ImmersedBoundaryElement(TemplateClass):
+    _instantiations = {
         ("1",): ImmersedBoundaryElement_1_1,
         ("1", "1"): ImmersedBoundaryElement_1_1,
         ("1", "2"): ImmersedBoundaryElement_1_2,
@@ -213,10 +214,10 @@ ImmersedBoundaryElement = TemplateClassDict(
         ("3",): ImmersedBoundaryElement_3_3,
         ("3", "3"): ImmersedBoundaryElement_3_3,
     }
-)
 
-ImmersedBoundaryMesh = TemplateClassDict(
-    {
+
+class ImmersedBoundaryMesh(TemplateClass):
+    _instantiations = {
         ("1",): ImmersedBoundaryMesh_1_1,
         ("1", "1"): ImmersedBoundaryMesh_1_1,
         ("1", "2"): ImmersedBoundaryMesh_1_2,
@@ -227,10 +228,10 @@ ImmersedBoundaryMesh = TemplateClassDict(
         ("3",): ImmersedBoundaryMesh_3_3,
         ("3", "3"): ImmersedBoundaryMesh_3_3,
     }
-)
 
-MutableElement = TemplateClassDict(
-    {
+
+class MutableElement(TemplateClass):
+    _instantiations = {
         ("1",): MutableElement_1_1,
         ("1", "1"): MutableElement_1_1,
         ("1", "2"): MutableElement_1_2,
@@ -241,10 +242,10 @@ MutableElement = TemplateClassDict(
         ("3",): MutableElement_3_3,
         ("3", "3"): MutableElement_3_3,
     }
-)
 
-MutableMesh = TemplateClassDict(
-    {
+
+class MutableMesh(TemplateClass):
+    _instantiations = {
         ("1",): MutableMesh_1_1,
         ("1", "1"): MutableMesh_1_1,
         ("1", "2"): MutableMesh_1_2,
@@ -255,10 +256,10 @@ MutableMesh = TemplateClassDict(
         ("3",): MutableMesh_3_3,
         ("3", "3"): MutableMesh_3_3,
     }
-)
 
-MutableVertexMesh = TemplateClassDict(
-    {
+
+class MutableVertexMesh(TemplateClass):
+    _instantiations = {
         ("1",): MutableVertexMesh_1_1,
         ("1", "1"): MutableVertexMesh_1_1,
         ("1", "2"): MutableVertexMesh_1_2,
@@ -269,74 +270,74 @@ MutableVertexMesh = TemplateClassDict(
         ("3",): MutableVertexMesh_3_3,
         ("3", "3"): MutableVertexMesh_3_3,
     }
-)
 
-Node = TemplateClassDict(
-    {
+
+class Node(TemplateClass):
+    _instantiations = {
         ("1",): Node_1,
         ("2",): Node_2,
         ("3",): Node_3,
     }
-)
 
-NodeAttributes = TemplateClassDict(
-    {
+
+class NodeAttributes(TemplateClass):
+    _instantiations = {
         ("1",): NodeAttributes_1,
         ("2",): NodeAttributes_2,
         ("3",): NodeAttributes_3,
     }
-)
 
-NodesOnlyMesh = TemplateClassDict(
-    {
+
+class NodesOnlyMesh(TemplateClass):
+    _instantiations = {
         ("1",): NodesOnlyMesh_1,
         ("2",): NodesOnlyMesh_2,
         ("3",): NodesOnlyMesh_3,
     }
-)
 
-PeriodicNodesOnlyMesh = TemplateClassDict(
-    {
+
+class PeriodicNodesOnlyMesh(TemplateClass):
+    _instantiations = {
         ("1",): PeriodicNodesOnlyMesh_1,
         ("2",): PeriodicNodesOnlyMesh_2,
         ("3",): PeriodicNodesOnlyMesh_3,
     }
-)
 
-PottsElement = TemplateClassDict(
-    {
+
+class PottsElement(TemplateClass):
+    _instantiations = {
         ("1",): PottsElement_1,
         ("2",): PottsElement_2,
         ("3",): PottsElement_3,
     }
-)
 
-PottsMesh = TemplateClassDict(
-    {
+
+class PottsMesh(TemplateClass):
+    _instantiations = {
         ("1",): PottsMesh_1,
         ("2",): PottsMesh_2,
         ("3",): PottsMesh_3,
     }
-)
 
-PottsMeshGenerator = TemplateClassDict(
-    {
+
+class PottsMeshGenerator(TemplateClass):
+    _instantiations = {
         ("1",): PottsMeshGenerator_1,
         ("2",): PottsMeshGenerator_2,
         ("3",): PottsMeshGenerator_3,
     }
-)
 
-PottsMeshWriter = TemplateClassDict(
-    {
+
+class PottsMeshWriter(TemplateClass):
+    _instantiations = {
         ("1",): PottsMeshWriter_1,
         ("2",): PottsMeshWriter_2,
         ("3",): PottsMeshWriter_3,
     }
-)
 
-TetrahedralMesh = TemplateClassDict(
-    {
+
+class TetrahedralMesh(TemplateClass):
+    _instantiations = {
         ("1",): TetrahedralMesh_1_1,
         ("1", "1"): TetrahedralMesh_1_1,
         ("1", "2"): TetrahedralMesh_1_2,
@@ -347,14 +348,13 @@ TetrahedralMesh = TemplateClassDict(
         ("3",): TetrahedralMesh_3_3,
         ("3", "3"): TetrahedralMesh_3_3,
     }
-)
 
-VertexMesh = TemplateClassDict(
-    {
+
+class VertexMesh(TemplateClass):
+    _instantiations = {
         ("2",): VertexMesh_2_2,
         ("2", "2"): VertexMesh_2_2,
         ("2", "3"): VertexMesh_2_3,
         ("3",): VertexMesh_3_3,
         ("3", "3"): VertexMesh_3_3,
     }
-)
