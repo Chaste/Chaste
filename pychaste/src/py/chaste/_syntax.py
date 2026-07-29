@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import inspect
-import warnings
 from collections.abc import Iterable
 from typing import Dict, Tuple, Type
 
@@ -124,31 +123,3 @@ class _BoundTemplateMethod:
                 f"{self._base_name} is templated; use {self._base_name}[Arg](...)"
             )
         return self._fallback(self._target, *args, **kwargs)
-
-
-class DeprecatedClass:
-    """
-    Warns when a deprecated class is used and switches to the correct class.
-
-    Usage:
-    >>> Foo2_2 = DeprecatedClass("Foo2_2", Foo_2_2)
-    """
-    def __init__(self, old_name: str, new_class: Type):
-        self.old_name = old_name
-        self.new_class = new_class
-
-        self.new_syntax = self.new_class.__name__
-        if "_" in self.new_syntax:
-            # Recommend using Foo["2", "2"]() instead of Foo2_2()
-            base_name, *params = self.new_syntax.split("_")
-            params = [f'"{param}"' for param in params]
-            self.new_syntax = f'{base_name}[{", ".join(params)}]'
-
-    def __call__(self, *args, **kwargs):
-        warnings.warn(
-            f"{self.old_name} is deprecated and will be removed in a future version. "
-            f"Please use {self.new_syntax} instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.new_class(*args, **kwargs)

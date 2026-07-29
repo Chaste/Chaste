@@ -136,7 +136,7 @@ from chaste._pychaste_all import (
     VertexMesh_3_3,
     VoronoiVertexMeshGenerator,
 )
-from chaste._syntax import DeprecatedClass, TemplateClassDict
+from chaste._syntax import TemplateClassDict
 
 # Template Class Syntax
 ChasteCuboid = TemplateClassDict(
@@ -358,53 +358,3 @@ VertexMesh = TemplateClassDict(
         ("3", "3"): VertexMesh_3_3,
     }
 )
-
-# Deprecated Class Syntax
-ChasteCuboid2 = DeprecatedClass("ChasteCuboid2", ChasteCuboid_2)
-ChasteCuboid3 = DeprecatedClass("ChasteCuboid3", ChasteCuboid_3)
-ChasteEllipsoid2 = DeprecatedClass("ChasteEllipsoid2", ChasteEllipsoid_2)
-ChasteEllipsoid3 = DeprecatedClass("ChasteEllipsoid3", ChasteEllipsoid_3)
-ChastePoint2 = DeprecatedClass("ChastePoint2", ChastePoint_2)
-ChastePoint3 = DeprecatedClass("ChastePoint3", ChastePoint_3)
-Edge2 = DeprecatedClass("Edge2", Edge_2)
-Edge3 = DeprecatedClass("Edge3", Edge_3)
-EdgeHelper2 = DeprecatedClass("EdgeHelper2", EdgeHelper_2)
-EdgeHelper3 = DeprecatedClass("EdgeHelper3", EdgeHelper_3)
-Element2_2 = DeprecatedClass("Element2_2", Element_2_2)
-Element3_3 = DeprecatedClass("Element3_3", Element_3_3)
-FluidSource2 = DeprecatedClass("FluidSource2", FluidSource_2)
-FluidSource3 = DeprecatedClass("FluidSource3", FluidSource_3)
-ImmersedBoundaryElement1_2 = DeprecatedClass("ImmersedBoundaryElement1_2", ImmersedBoundaryElement_1_2)
-ImmersedBoundaryElement2_2 = DeprecatedClass("ImmersedBoundaryElement2_2", ImmersedBoundaryElement_2_2)
-ImmersedBoundaryElement2_3 = DeprecatedClass("ImmersedBoundaryElement2_3", ImmersedBoundaryElement_2_3)
-ImmersedBoundaryElement3_3 = DeprecatedClass("ImmersedBoundaryElement3_3", ImmersedBoundaryElement_3_3)
-ImmersedBoundaryMesh2_2 = DeprecatedClass("ImmersedBoundaryMesh2_2", ImmersedBoundaryMesh_2_2)
-ImmersedBoundaryMesh3_3 = DeprecatedClass("ImmersedBoundaryMesh3_3", ImmersedBoundaryMesh_3_3)
-MutableElement1_2 = DeprecatedClass("MutableElement1_2", MutableElement_1_2)
-MutableElement2_2 = DeprecatedClass("MutableElement2_2", MutableElement_2_2)
-MutableElement2_3 = DeprecatedClass("MutableElement2_3", MutableElement_2_3)
-MutableElement3_3 = DeprecatedClass("MutableElement3_3", MutableElement_3_3)
-MutableMesh2_2 = DeprecatedClass("MutableMesh2_2", MutableMesh_2_2)
-MutableMesh3_3 = DeprecatedClass("MutableMesh3_3", MutableMesh_3_3)
-MutableVertexMesh2_2 = DeprecatedClass("MutableVertexMesh2_2", MutableVertexMesh_2_2)
-MutableVertexMesh3_3 = DeprecatedClass("MutableVertexMesh3_3", MutableVertexMesh_3_3)
-Node2 = DeprecatedClass("Node2", Node_2)
-Node3 = DeprecatedClass("Node3", Node_3)
-NodeAttributes2 = DeprecatedClass("NodeAttributes2", NodeAttributes_2)
-NodeAttributes3 = DeprecatedClass("NodeAttributes3", NodeAttributes_3)
-NodesOnlyMesh2 = DeprecatedClass("NodesOnlyMesh2", NodesOnlyMesh_2)
-NodesOnlyMesh3 = DeprecatedClass("NodesOnlyMesh3", NodesOnlyMesh_3)
-PeriodicNodesOnlyMesh2 = DeprecatedClass("PeriodicNodesOnlyMesh2", PeriodicNodesOnlyMesh_2)
-PeriodicNodesOnlyMesh3 = DeprecatedClass("PeriodicNodesOnlyMesh3", PeriodicNodesOnlyMesh_3)
-PottsElement2 = DeprecatedClass("PottsElement2", PottsElement_2)
-PottsElement3 = DeprecatedClass("PottsElement3", PottsElement_3)
-PottsMesh2 = DeprecatedClass("PottsMesh2", PottsMesh_2)
-PottsMesh3 = DeprecatedClass("PottsMesh3", PottsMesh_3)
-PottsMeshGenerator2 = DeprecatedClass("PottsMeshGenerator2", PottsMeshGenerator_2)
-PottsMeshGenerator3 = DeprecatedClass("PottsMeshGenerator3", PottsMeshGenerator_3)
-PottsMeshWriter2 = DeprecatedClass("PottsMeshWriter2", PottsMeshWriter_2)
-PottsMeshWriter3 = DeprecatedClass("PottsMeshWriter3", PottsMeshWriter_3)
-TetrahedralMesh2_2 = DeprecatedClass("TetrahedralMesh2_2", TetrahedralMesh_2_2)
-TetrahedralMesh3_3 = DeprecatedClass("TetrahedralMesh3_3", TetrahedralMesh_3_3)
-VertexMesh2_2 = DeprecatedClass("VertexMesh2_2", VertexMesh_2_2)
-VertexMesh3_3 = DeprecatedClass("VertexMesh3_3", VertexMesh_3_3)

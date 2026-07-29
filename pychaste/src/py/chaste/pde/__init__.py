@@ -74,7 +74,7 @@ from chaste._pychaste_all import (
     UniformSourceParabolicPde_2,
     UniformSourceParabolicPde_3,
 )
-from chaste._syntax import DeprecatedClass, TemplateClassDict
+from chaste._syntax import TemplateClassDict
 
 # Template Class Syntax
 AveragedSourceEllipticPde = TemplateClassDict(
@@ -181,31 +181,3 @@ UniformSourceParabolicPde = TemplateClassDict(
         ("3",): UniformSourceParabolicPde_3,
     }
 )
-
-# Deprecated Class Syntax
-AveragedSourceEllipticPde2 = DeprecatedClass("AveragedSourceEllipticPde2", AveragedSourceEllipticPde_2)
-AveragedSourceEllipticPde3 = DeprecatedClass("AveragedSourceEllipticPde3", AveragedSourceEllipticPde_3)
-AveragedSourceParabolicPde2 = DeprecatedClass("AveragedSourceParabolicPde2", AveragedSourceParabolicPde_2)
-AveragedSourceParabolicPde3 = DeprecatedClass("AveragedSourceParabolicPde3", AveragedSourceParabolicPde_3)
-CellBasedEllipticPdeSolver2 = DeprecatedClass("CellBasedEllipticPdeSolver2", CellBasedEllipticPdeSolver_2)
-CellBasedEllipticPdeSolver3 = DeprecatedClass("CellBasedEllipticPdeSolver3", CellBasedEllipticPdeSolver_3)
-CellBasedParabolicPdeSolver2 = DeprecatedClass("CellBasedParabolicPdeSolver2", CellBasedParabolicPdeSolver_2)
-CellBasedParabolicPdeSolver3 = DeprecatedClass("CellBasedParabolicPdeSolver3", CellBasedParabolicPdeSolver_3)
-CellwiseSourceEllipticPde2 = DeprecatedClass("CellwiseSourceEllipticPde2", CellwiseSourceEllipticPde_2)
-CellwiseSourceEllipticPde3 = DeprecatedClass("CellwiseSourceEllipticPde3", CellwiseSourceEllipticPde_3)
-CellwiseSourceParabolicPde2 = DeprecatedClass("CellwiseSourceParabolicPde2", CellwiseSourceParabolicPde_2)
-CellwiseSourceParabolicPde3 = DeprecatedClass("CellwiseSourceParabolicPde3", CellwiseSourceParabolicPde_3)
-ConstBoundaryCondition2 = DeprecatedClass("ConstBoundaryCondition2", ConstBoundaryCondition_2)
-ConstBoundaryCondition3 = DeprecatedClass("ConstBoundaryCondition3", ConstBoundaryCondition_3)
-EllipticBoxDomainPdeModifier2 = DeprecatedClass("EllipticBoxDomainPdeModifier2", EllipticBoxDomainPdeModifier_2)
-EllipticBoxDomainPdeModifier3 = DeprecatedClass("EllipticBoxDomainPdeModifier3", EllipticBoxDomainPdeModifier_3)
-EllipticGrowingDomainPdeModifier2 = DeprecatedClass("EllipticGrowingDomainPdeModifier2", EllipticGrowingDomainPdeModifier_2)
-EllipticGrowingDomainPdeModifier3 = DeprecatedClass("EllipticGrowingDomainPdeModifier3", EllipticGrowingDomainPdeModifier_3)
-ParabolicBoxDomainPdeModifier2 = DeprecatedClass("ParabolicBoxDomainPdeModifier2", ParabolicBoxDomainPdeModifier_2)
-ParabolicBoxDomainPdeModifier3 = DeprecatedClass("ParabolicBoxDomainPdeModifier3", ParabolicBoxDomainPdeModifier_3)
-ParabolicGrowingDomainPdeModifier2 = DeprecatedClass("ParabolicGrowingDomainPdeModifier2", ParabolicGrowingDomainPdeModifier_2)
-ParabolicGrowingDomainPdeModifier3 = DeprecatedClass("ParabolicGrowingDomainPdeModifier3", ParabolicGrowingDomainPdeModifier_3)
-UniformSourceEllipticPde2 = DeprecatedClass("UniformSourceEllipticPde2", UniformSourceEllipticPde_2)
-UniformSourceEllipticPde3 = DeprecatedClass("UniformSourceEllipticPde3", UniformSourceEllipticPde_3)
-UniformSourceParabolicPde2 = DeprecatedClass("UniformSourceParabolicPde2", UniformSourceParabolicPde_2)
-UniformSourceParabolicPde3 = DeprecatedClass("UniformSourceParabolicPde3", UniformSourceParabolicPde_3)
