@@ -403,6 +403,9 @@ modules:
         source_includes:
           - PybindUblasTypeCaster.hpp
 
+      - name: SemLatticeType # enum
+        source_file: SemEnumerations.hpp
+
       - name: SemSingleElementMeshGenerator
 
       - name: SemMultiElementMeshGenerator
