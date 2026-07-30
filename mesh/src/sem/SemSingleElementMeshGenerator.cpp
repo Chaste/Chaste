@@ -119,7 +119,6 @@ template <unsigned DIM> void SemSingleElementMeshGenerator<DIM>::GenerateMesh(st
         unsigned new_node_index = mpMesh->GetNumNodes();
         Node<DIM>* new_node = new Node<DIM>(new_node_index, positions[i]);
         new_node->SetRegion(IsBoundaryNode(i) ? SEM_BOUNDARY_REGION : SEM_INTERIOR_REGION);
-        new_node->SetRadius(0.05);
         new_node->AddElement(new_element_id);
 
         mpMesh->AddNode(new_node);
