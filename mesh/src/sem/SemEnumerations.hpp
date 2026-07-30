@@ -51,4 +51,23 @@ enum SemNodeRegion : unsigned
     SEM_BOUNDARY_REGION  ///< subcellular nodes on the cell surface / cortex
 };
 
+/**
+ * Regular lattices available to the SEM mesh generators, used both for the
+ * arrangement of subcellular nodes within an element and for the arrangement of
+ * elements within a multi-element mesh.
+ *
+ * SEM_LATTICE_CUBIC places points on an axis-aligned grid, so each point has
+ * 2*DIM nearest neighbours. SEM_LATTICE_CLOSE_PACKED staggers successive rows
+ * (and, in 3D, successive layers) to give the densest regular packing of equal
+ * spheres: a triangular lattice in 2D (6 nearest neighbours) and hexagonal
+ * close packing in 3D (12 nearest neighbours). Both lattices place nearest
+ * neighbours exactly one spacing apart. In 1D the two are identical, as there
+ * is only one way to space points along a line.
+ */
+enum SemLatticeType : unsigned
+{
+    SEM_LATTICE_CUBIC,       ///< axis-aligned grid
+    SEM_LATTICE_CLOSE_PACKED ///< triangular lattice in 2D, hexagonal close packed in 3D
+};
+
 #endif // SEMENUMERATIONS_HPP_

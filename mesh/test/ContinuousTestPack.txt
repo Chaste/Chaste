@@ -28,6 +28,7 @@ reader/TestMemfemMeshReader.hpp
 reader/TestTrianglesMeshReader.hpp
 reader/TestVtkMeshReader.hpp
 sem/TestSemElement.hpp
+sem/TestSemLatticeGeometry.hpp
 sem/TestSemMesh.hpp
 sem/TestSemMeshReader.hpp
 sem/TestSemMeshWriter.hpp
