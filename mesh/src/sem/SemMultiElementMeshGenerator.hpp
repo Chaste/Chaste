@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <array>
 #include <memory>
 
+#include "SemEnumerations.hpp"
 #include "UblasVectorInclude.hpp"
 
 // Forward declarations
@@ -48,8 +49,9 @@ template <unsigned DIM> class SemMesh;
 
 
 /**
- * Sem mesh generator that creates multiple SEM element, in either 1D, 2D, or 3D,
- * in a regular cubic lattice.
+ * Sem mesh generator that creates multiple SEM elements, in either 1D, 2D, or 3D,
+ * on a regular lattice. The subcellular nodes within an element and the elements
+ * themselves are laid out independently, so either may be cubic or close packed.
  */
 template <unsigned DIM> class SemMultiElementMeshGenerator
 {
@@ -63,12 +65,6 @@ private:
     /** Number of elements in each dimension 0 <= dim < DIM */
     std::array<unsigned, DIM> mNumElems;
 
-    /** Number of nodes in total per element */
-    unsigned mNumAllNodesPerElem;
-
-    /** Number of elements in total */
-    unsigned mNumAllElems;
-
     /** The target diameter of a single element in the x-direction */
     double mScaleFactor;
 
@@ -77,6 +73,12 @@ private:
 
     /** Spacing between elements in each dimension 0 <= dim < DIM */
     std::array<double, DIM> mElemSpacing;
+
+    /** The lattice on which the subcellular nodes within each element are placed */
+    SemLatticeType mNodeLattice;
+
+    /** The lattice on which the elements are placed */
+    SemLatticeType mElementLattice;
 
     /**
      * Generate uniformly spaced node positions.
@@ -116,9 +118,13 @@ public:
      * @param numNodesPerElem number of nodes per element in each direction (x, y, z)
      * @param numElems number of elements in each direction (x, y, z)
      * @param scaleFactor the target diameter of each element in the x-direction
+     * @param nodeLattice the lattice on which to place the nodes within each element (defaults to SEM_LATTICE_CUBIC)
+     * @param elementLattice the lattice on which to place the elements (defaults to SEM_LATTICE_CUBIC)
      */
     SemMultiElementMeshGenerator(const std::array<unsigned, DIM>& numNodesPerElem,
-        const std::array<unsigned, DIM>& numElems, double scaleFactor = 1.0);
+        const std::array<unsigned, DIM>& numElems, double scaleFactor = 1.0,
+        SemLatticeType nodeLattice = SEM_LATTICE_CUBIC,
+        SemLatticeType elementLattice = SEM_LATTICE_CUBIC);
 
     /**
      * Default constructor

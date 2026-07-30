@@ -38,6 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <algorithm>
+#include <cfloat>
+#include <cmath>
+
+#include "SemEnumerations.hpp"
 #include "SemMultiElementMeshGenerator.hpp"
 #include "SemSingleElementMeshGenerator.hpp"
 #include "SemMesh.hpp"
@@ -48,6 +53,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestSemMultiElementMeshGenerator : public CxxTest::TestSuite
 {
+private:
+
+    /**
+     * @param rMesh the mesh to inspect
+     * @return the smallest distance between any two nodes in the mesh
+     */
+    template <unsigned DIM>
+    double GetMinimumNodeSeparation(SemMesh<DIM>& rMesh)
+    {
+        double min_separation = DBL_MAX;
+        for (unsigned i = 0; i < rMesh.GetNumNodes(); ++i)
+        {
+            for (unsigned j = i + 1u; j < rMesh.GetNumNodes(); ++j)
+            {
+                const double separation = norm_2(rMesh.GetNode(i)->rGetLocation() - rMesh.GetNode(j)->rGetLocation());
+                min_separation = std::min(min_separation, separation);
+            }
+        }
+        return min_separation;
+    }
+
 public:
     void Test1DOneElem()
     {
@@ -123,6 +149,89 @@ public:
             TS_ASSERT_DELTA(p_mesh_single->GetNode(i)->rGetLocation()[0], p_mesh_multi->GetNode(i)->rGetLocation()[0], 1e-6);
             TS_ASSERT_DELTA(p_mesh_single->GetNode(i)->rGetLocation()[1], p_mesh_multi->GetNode(i)->rGetLocation()[1], 1e-6);
             TS_ASSERT_DELTA(p_mesh_single->GetNode(i)->rGetLocation()[2], p_mesh_multi->GetNode(i)->rGetLocation()[2], 1e-6);
+        }
+    }
+
+    void TestClosePackedElementLattice2D()
+    {
+        // Node spacing = 2.0 / 2 = 1.0, so each element is a unit square of four nodes
+        SemMultiElementMeshGenerator<2> generator({2, 2}, {2, 2}, 2.0,
+            SEM_LATTICE_CUBIC, SEM_LATTICE_CLOSE_PACKED);
+        auto p_mesh = generator.GetMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
+
+        // The limiting direction is the diagonal to a staggered neighbour, along which a unit
+        // square is (0.5 + sqrt(3)/2) wide; adding one node spacing of clearance gives the spacing
+        const double elem_spacing = 1.5 + 0.5 * sqrt(3.0);
+
+        // The first node of each element sits on the element offset, as the first node of an
+        // element is at the element's local origin
+        const double expected_x[4] = {0.0, elem_spacing, 0.5 * elem_spacing, 1.5 * elem_spacing};
+        const double expected_y[4] = {0.0, 0.0, 0.5 * sqrt(3.0) * elem_spacing, 0.5 * sqrt(3.0) * elem_spacing};
+
+        for (unsigned elem = 0; elem < 4u; ++elem)
+        {
+            const unsigned first_node = 4u * elem;
+            TS_ASSERT_DELTA(p_mesh->GetNode(first_node)->rGetLocation()[0], expected_x[elem], 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(first_node)->rGetLocation()[1], expected_y[elem], 1e-6);
+        }
+    }
+
+    void TestClosePackedNodeLatticeTightensElementSpacing()
+    {
+        // Node spacing = 3.0 / 3 = 1.0. Close packing the nodes brings the three rows of an
+        // element from two node spacings apart to sqrt(3) apart, so the elements above and below
+        // may move closer by the same amount.
+        SemMultiElementMeshGenerator<2> cubic_gen({3, 3}, {1, 2}, 3.0, SEM_LATTICE_CUBIC);
+        SemMultiElementMeshGenerator<2> packed_gen({3, 3}, {1, 2}, 3.0, SEM_LATTICE_CLOSE_PACKED);
+
+        auto p_cubic_mesh = cubic_gen.GetMesh();
+        auto p_packed_mesh = packed_gen.GetMesh();
+
+        // The first node of the second element is offset by the element spacing in y
+        TS_ASSERT_DELTA(p_cubic_mesh->GetNode(9u)->rGetLocation()[1], 3.0, 1e-6);
+        TS_ASSERT_DELTA(p_packed_mesh->GetNode(9u)->rGetLocation()[1], sqrt(3.0) + 1.0, 1e-6);
+    }
+
+    void TestElementsNeverOverlapForAnyLatticeCombination()
+    {
+        // Node spacing = 3.0 / 3 = 1.0. However the nodes and the elements are laid out, nodes in
+        // different elements must be no closer than nodes within an element, so that the mesh is
+        // usable as an initial condition without the intercellular forces blowing up.
+        const SemLatticeType lattices[2] = {SEM_LATTICE_CUBIC, SEM_LATTICE_CLOSE_PACKED};
+
+        for (const SemLatticeType node_lattice : lattices)
+        {
+            for (const SemLatticeType element_lattice : lattices)
+            {
+                SemMultiElementMeshGenerator<3> generator({3, 3, 3}, {2, 2, 2}, 3.0,
+                    node_lattice, element_lattice);
+                auto p_mesh = generator.GetMesh();
+
+                TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 8u);
+                TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 216u);
+                TS_ASSERT_DELTA(GetMinimumNodeSeparation<3>(*p_mesh), 1.0, 1e-6);
+            }
+        }
+    }
+
+    void TestCubicLatticesAreTheDefault()
+    {
+        // Omitting the lattice arguments must reproduce the original axis-aligned layout
+        SemMultiElementMeshGenerator<3> default_gen({2, 3, 2}, {2, 1, 2}, 4.0);
+        SemMultiElementMeshGenerator<3> cubic_gen({2, 3, 2}, {2, 1, 2}, 4.0,
+            SEM_LATTICE_CUBIC, SEM_LATTICE_CUBIC);
+
+        auto p_default_mesh = default_gen.GetMesh();
+        auto p_cubic_mesh = cubic_gen.GetMesh();
+
+        TS_ASSERT_EQUALS(p_default_mesh->GetNumNodes(), p_cubic_mesh->GetNumNodes());
+        for (unsigned i = 0; i < p_cubic_mesh->GetNumNodes(); ++i)
+        {
+            TS_ASSERT_DELTA(norm_2(p_default_mesh->GetNode(i)->rGetLocation()
+                                   - p_cubic_mesh->GetNode(i)->rGetLocation()), 0.0, 1e-6);
         }
     }
 

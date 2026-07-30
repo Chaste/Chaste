@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <array>
 #include <memory>
 
+#include "SemEnumerations.hpp"
 #include "UblasVectorInclude.hpp"
 
 // Forward declarations
@@ -59,14 +60,14 @@ private:
     /** Number of nodes in each dimension 0 <= dim < DIM */
     std::array<unsigned, DIM> mNumNodes;
 
-    /** Number of nodes in total */
-    unsigned mNumAllNodes;
-
     /** The target diameter of the element in the x-direction */
     double mScaleFactor;
 
     /** The node spacing necessary to achieve the target diameter */
     double mNodeSpacing;
+
+    /** The lattice on which the subcellular nodes are placed */
+    SemLatticeType mNodeLattice;
 
     /**
      * Generate uniformly spaced node positions.
@@ -97,8 +98,10 @@ public:
      *
      * @param numNodes number of nodes in each direction (x, y, z)
      * @param scaleFactor the target diameter of the element in the x-direction
+     * @param nodeLattice the lattice on which to place the subcellular nodes (defaults to SEM_LATTICE_CUBIC)
      */
-    SemSingleElementMeshGenerator(const std::array<unsigned, DIM>& numNodes, double scaleFactor = 1.0);
+    SemSingleElementMeshGenerator(const std::array<unsigned, DIM>& numNodes, double scaleFactor = 1.0,
+        SemLatticeType nodeLattice = SEM_LATTICE_CUBIC);
 
     /**
      * Default constructor

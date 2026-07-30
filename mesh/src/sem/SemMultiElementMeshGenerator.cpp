@@ -38,35 +38,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Exception.hpp"
 #include "SemEnumerations.hpp"
+#include "SemLatticeGeometry.hpp"
 #include "SemMesh.hpp"
 
 
 template <unsigned DIM> SemMultiElementMeshGenerator<DIM>::SemMultiElementMeshGenerator(
-    const std::array<unsigned, DIM>& numNodesPerElem, const std::array<unsigned, DIM>& numElems, double scaleFactor)
+    const std::array<unsigned, DIM>& numNodesPerElem, const std::array<unsigned, DIM>& numElems, double scaleFactor,
+    SemLatticeType nodeLattice, SemLatticeType elementLattice)
     : mpMesh{std::make_shared<SemMesh<DIM>>()},
       mNumNodesPerElem{ numNodesPerElem },
       mNumElems{ numElems },
-      mScaleFactor{ scaleFactor }
+      mScaleFactor{ scaleFactor },
+      mNodeLattice{ nodeLattice },
+      mElementLattice{ elementLattice }
 {
-    unsigned num_all_nodes_per_elem = 1;
-    unsigned num_all_elems = 1;
     for (unsigned i = 0; i < DIM; ++i)
     {
         if (mNumNodesPerElem[i] == 0u)
         {
             EXCEPTION("SemMultiElementMeshGenerator: each entry of numNodesPerElem must be >= 1");
         }
-        num_all_nodes_per_elem *= mNumNodesPerElem[i];
 
         if (mNumElems[i] == 0u)
         {
             EXCEPTION("SemMultiElementMeshGenerator: each entry of numElems must be >= 1");
         }
-        num_all_elems *= mNumElems[i];
     }
-
-    mNumAllNodesPerElem = num_all_nodes_per_elem;
-    mNumAllElems = num_all_elems;
 
     if (scaleFactor <= 0.0)
     {
@@ -75,12 +72,26 @@ template <unsigned DIM> SemMultiElementMeshGenerator<DIM>::SemMultiElementMeshGe
 
     mNodeSpacing = mScaleFactor / static_cast<double>(mNumNodesPerElem[0]);
 
-    for (unsigned i = 0; i < DIM; ++i)
+    std::vector<c_vector<double, DIM>> positions = GenerateNodePositions();
+
+    // Space elements so that nodes in adjacent elements are no closer than nodes within an
+    // element, whichever lattice either is placed on. On a cubic lattice each dimension can be
+    // spaced by its own extent plus one node spacing, which for cubic nodes recovers the original
+    // spacing mNodeSpacing * mNumNodesPerElem[i]; a close-packed lattice staggers its rows, so it
+    // needs a single spacing accounting for the directions in which elements interlock.
+    const c_vector<double, DIM> element_extent = GetSemLatticeExtent<DIM>(positions);
+    if (mElementLattice == SEM_LATTICE_CLOSE_PACKED)
     {
-        mElemSpacing[i] = mNodeSpacing * static_cast<double>(mNumNodesPerElem[i]);
+        mElemSpacing.fill(GetSemClosePackedSpacing<DIM>(element_extent, mNodeSpacing));
+    }
+    else
+    {
+        for (unsigned i = 0; i < DIM; ++i)
+        {
+            mElemSpacing[i] = element_extent[i] + mNodeSpacing;
+        }
     }
 
-    std::vector<c_vector<double, DIM>> positions = GenerateNodePositions();
     std::vector<c_vector<double, DIM>> offsets = GenerateElementOffsets();
     GenerateMesh(positions, offsets);
 }
@@ -94,107 +105,16 @@ std::shared_ptr<SemMesh<DIM>> SemMultiElementMeshGenerator<DIM>::GetMesh()
 template <unsigned DIM>
 std::vector<c_vector<double, DIM>> SemMultiElementMeshGenerator<DIM>::GenerateNodePositions() const
 {
-    std::vector<c_vector<double, DIM>> positions;
-    positions.reserve(mNumAllNodesPerElem);
+    std::array<double, DIM> spacing;
+    spacing.fill(mNodeSpacing);
 
-    if constexpr (DIM == 1)
-    {
-        for (unsigned i = 0; i < mNumNodesPerElem[0]; ++i)
-        {
-            c_vector<double,1> v;
-            v[0] = static_cast<double>(i) * mNodeSpacing;
-            positions.push_back(v);
-        }
-    }
-    else if constexpr (DIM == 2)
-    {
-        for (unsigned j = 0; j < mNumNodesPerElem[1]; ++j)
-        {
-            for (unsigned i = 0; i < mNumNodesPerElem[0]; ++i)
-            {
-                c_vector<double,2> v;
-                v[0] = static_cast<double>(i) * mNodeSpacing;
-                v[1] = static_cast<double>(j) * mNodeSpacing;
-                positions.push_back(v);
-            }
-        }
-    }
-    else if constexpr (DIM == 3)
-    {
-        for (unsigned k = 0; k < mNumNodesPerElem[2]; ++k)
-        {
-            for (unsigned j = 0; j < mNumNodesPerElem[1]; ++j)
-            {
-                for (unsigned i = 0; i < mNumNodesPerElem[0]; ++i)
-                {
-                    c_vector<double,3> v;
-                    v[0] = static_cast<double>(i) * mNodeSpacing;
-                    v[1] = static_cast<double>(j) * mNodeSpacing;
-                    v[2] = static_cast<double>(k) * mNodeSpacing;
-                    positions.push_back(v);
-                }
-            }
-        }
-    }
-    else
-    {
-        NEVER_REACHED;
-    }
-
-    return positions;
+    return GenerateSemLatticePositions<DIM>(mNumNodesPerElem, spacing, mNodeLattice);
 }
 
 template <unsigned DIM>
 std::vector<c_vector<double, DIM>> SemMultiElementMeshGenerator<DIM>::GenerateElementOffsets() const
 {
-    std::vector<c_vector<double, DIM>> offsets;
-    offsets.reserve(mNumAllElems);
-
-    if constexpr (DIM == 1)
-    {
-        for (unsigned i = 0; i < mNumElems[0]; ++i)
-        {
-            c_vector<double,1> v;
-            v[0] = static_cast<double>(i) * mElemSpacing[0];
-            offsets.push_back(v);
-        }
-    }
-    else if constexpr (DIM == 2)
-    {
-        for (unsigned j = 0; j < mNumElems[1]; ++j)
-        {
-            for (unsigned i = 0; i < mNumElems[0]; ++i)
-            {
-                c_vector<double,2> v;
-                v[0] = static_cast<double>(i) * mElemSpacing[0];
-                v[1] = static_cast<double>(j) * mElemSpacing[1];
-                offsets.push_back(v);
-            }
-        }
-    }
-    else if constexpr (DIM == 3)
-    {
-        for (unsigned k = 0; k < mNumElems[2]; ++k)
-        {
-            for (unsigned j = 0; j < mNumElems[1]; ++j)
-            {
-                for (unsigned i = 0; i < mNumElems[0]; ++i)
-                {
-                    c_vector<double,3> v;
-                    v[0] = static_cast<double>(i) * mElemSpacing[0];
-                    v[1] = static_cast<double>(j) * mElemSpacing[1];
-                    v[2] = static_cast<double>(k) * mElemSpacing[2];
-                    offsets.push_back(v);
-                }
-            }
-        }
-    }
-    else
-    {
-        NEVER_REACHED;
-    }
-
-    return offsets;
+    return GenerateSemLatticePositions<DIM>(mNumElems, mElemSpacing, mElementLattice);
 }
 
 template <unsigned DIM>

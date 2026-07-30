@@ -38,27 +38,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Exception.hpp"
 #include "SemEnumerations.hpp"
+#include "SemLatticeGeometry.hpp"
 #include "SemMesh.hpp"
 
 
 template <unsigned DIM> SemSingleElementMeshGenerator<DIM>::SemSingleElementMeshGenerator(
     const std::array<unsigned, DIM>& numNodes,
-    double scaleFactor)
+    double scaleFactor,
+    SemLatticeType nodeLattice)
     : mpMesh{std::make_shared<SemMesh<DIM>>()},
       mNumNodes{ numNodes },
-      mScaleFactor{ scaleFactor }
+      mScaleFactor{ scaleFactor },
+      mNodeLattice{ nodeLattice }
 {
-    unsigned num_all_nodes = 1;
     for (unsigned i = 0; i < DIM; ++i)
     {
         if (mNumNodes[i] == 0u)
         {
             EXCEPTION("SemSingleElementMeshGenerator: each entry of numNodes must be >= 1");
         }
-        num_all_nodes *= mNumNodes[i];
     }
-
-    mNumAllNodes = num_all_nodes;
 
     if (scaleFactor <= 0.0)
     {
@@ -80,54 +79,10 @@ std::shared_ptr<SemMesh<DIM>> SemSingleElementMeshGenerator<DIM>::GetMesh()
 template <unsigned DIM>
 std::vector<c_vector<double, DIM>> SemSingleElementMeshGenerator<DIM>::GenerateNodePositions() const
 {
-    std::vector<c_vector<double, DIM>> positions;
-    positions.reserve(mNumAllNodes);
+    std::array<double, DIM> spacing;
+    spacing.fill(mNodeSpacing);
 
-    if constexpr (DIM == 1)
-    {
-        for (unsigned i = 0; i < mNumNodes[0]; ++i)
-        {
-            c_vector<double,1> v;
-            v[0] = static_cast<double>(i) * mNodeSpacing;
-            positions.push_back(v);
-        }
-    }
-    else if constexpr (DIM == 2)
-    {
-        for (unsigned j = 0; j < mNumNodes[1]; ++j)
-        {
-            for (unsigned i = 0; i < mNumNodes[0]; ++i)
-            {
-                c_vector<double,2> v;
-                v[0] = static_cast<double>(i) * mNodeSpacing;
-                v[1] = static_cast<double>(j) * mNodeSpacing;
-                positions.push_back(v);
-            }
-        }
-    }
-    else if constexpr (DIM == 3)
-    {
-        for (unsigned k = 0; k < mNumNodes[2]; ++k)
-        {
-            for (unsigned j = 0; j < mNumNodes[1]; ++j)
-            {
-                for (unsigned i = 0; i < mNumNodes[0]; ++i)
-                {
-                    c_vector<double,3> v;
-                    v[0] = static_cast<double>(i) * mNodeSpacing;
-                    v[1] = static_cast<double>(j) * mNodeSpacing;
-                    v[2] = static_cast<double>(k) * mNodeSpacing;
-                    positions.push_back(v);
-                }
-            }
-        }
-    }
-    else
-    {
-        NEVER_REACHED;
-    }
-
-    return positions;
+    return GenerateSemLatticePositions<DIM>(mNumNodes, spacing, mNodeLattice);
 }
 
 template <unsigned DIM>
