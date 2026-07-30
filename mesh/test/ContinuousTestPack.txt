@@ -34,6 +34,7 @@ sem/TestSemMeshReader.hpp
 sem/TestSemMeshWriter.hpp
 sem/TestSemMultiElementMeshGenerator.hpp
 sem/TestSemSingleElementMeshGenerator.hpp
+sem/TestSemSphericalElementMeshGenerator.hpp
 utilities/TestDistributedBoxCollection.hpp
 utilities/TestDistanceMapCalculator.hpp
 utilities/TestMeshUtilityFunctions.hpp
