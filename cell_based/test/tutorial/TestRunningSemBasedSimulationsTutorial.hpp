@@ -114,8 +114,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* A cell writer that records the volume of each cell. Cell writers produce *cell data* in the
  * VTK output (one value per cell), in contrast to the *point data* produced by the node point
- * data writers above. See Test 1 for how this is used. */
+ * data writers above. See Test 1 for how this is used. A SEM cell's volume is computed from an
+ * alpha shape of its subcellular nodes, which needs VTK, so this writer is only used when Chaste
+ * is compiled with VTK support. */
+#ifdef CHASTE_VTK
 #include "CellVolumesWriter.hpp"
+#endif // CHASTE_VTK
 
 /*
  * Next, we define the test class.
@@ -181,7 +185,9 @@ public:
          * many VTK cells (a point-cloud cell plus the reconstructed surface), each per-cell value
          * is copied onto every VTK cell of that element, so both the nodes and the cell surface
          * can be coloured by it in Paraview. */
+#ifdef CHASTE_VTK
         cell_population.AddCellWriter<CellVolumesWriter>();
+#endif // CHASTE_VTK
 
         /* We create an `OffLatticeSimulation` and set output directory, time step,
          * sampling interval, and end time. */
