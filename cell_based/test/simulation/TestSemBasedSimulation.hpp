@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "SemSingleElementMeshGenerator.hpp"
 #include "SemMultiElementMeshGenerator.hpp"
+#include "SemSphericalElementMeshGenerator.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "ToroidalHoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
@@ -94,6 +95,44 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestSemBasedSimulation : public AbstractCellBasedWithTimingsTestSuite
 {
+private:
+
+    /**
+     * The RMS distance of the population's nodes from their centroid. Used in preference to a
+     * bounding box because a bounding box is fixed by whichever two nodes happen to lie furthest
+     * apart, and a close packing has a systematically different reach along different axes.
+     *
+     * @param rCellPopulation the population to measure
+     *
+     * @return the radius of gyration
+     */
+    double CalculateRadiusOfGyration(AbstractCellPopulation<3>& rCellPopulation)
+    {
+        c_vector<double, 3> centroid = zero_vector<double>(3);
+        unsigned num_nodes = 0u;
+
+        for (auto node_iter = rCellPopulation.rGetMesh().GetNodeIteratorBegin();
+             node_iter != rCellPopulation.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            centroid += node_iter->rGetLocation();
+            num_nodes++;
+        }
+        assert(num_nodes > 0u);
+        centroid /= static_cast<double>(num_nodes);
+
+        double sum_of_squares = 0.0;
+        for (auto node_iter = rCellPopulation.rGetMesh().GetNodeIteratorBegin();
+             node_iter != rCellPopulation.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            sum_of_squares += norm_2(node_iter->rGetLocation() - centroid)
+                              * norm_2(node_iter->rGetLocation() - centroid);
+        }
+
+        return std::sqrt(sum_of_squares / static_cast<double>(num_nodes));
+    }
+
 public:
 
     void TestSemBasedSimulationExample2D()
@@ -210,6 +249,106 @@ public:
 
         // Run the simulation
         simulator.Solve();
+    }
+
+    /**
+     * The spherical generator is the paper-faithful initial condition, but it is otherwise only
+     * tested at mesh level. This case runs it through a population and a short relaxation, and in
+     * doing so checks the generator's own node spacing against the paper's r_eq relation on a mesh
+     * that actually has that spacing -- elsewhere that consistency is asserted only in the abstract
+     * by TestSemParameterScaling.
+     */
+    void TestSemBasedSimulationWithSphericalElement()
+    {
+        const unsigned num_nodes = 200u;
+        const double cell_radius = 0.25;
+
+        // p = pi/(3*sqrt(2)), the FCC/HCP close packing density. The generator carves the cell out
+        // of a perfect close packing, so this is the packing that applies -- not the p = 0.64 of a
+        // random close packing that the paper's own equilibrated aggregates reach.
+        const double packing_density = M_PI / (3.0 * std::sqrt(2.0));
+
+        SemSphericalElementMeshGenerator<3> generator(num_nodes, cell_radius);
+        auto p_mesh = generator.GetMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
+
+        /*
+         * The generator's spacing comes from geometry (carve N sites out of a close packing, scale
+         * so the outermost sits at cell_radius); the paper's r_eq comes from a packing argument.
+         * They are independent derivations, and agree to about 2%.
+         */
+        const double paper_r_eq = 2.0 * cell_radius
+            * std::pow(packing_density / static_cast<double>(num_nodes), 1.0 / 3.0);
+        TS_ASSERT_DELTA(generator.GetNodeSpacing(), paper_r_eq, 0.02 * paper_r_eq);
+
+        const double interaction_cutoff = 2.0 * generator.GetNodeSpacing();
+
+        c_vector<double, 6> box_domain{};
+        for (unsigned dim = 0; dim < 3; ++dim)
+        {
+            box_domain[2 * dim] = -2.0 * cell_radius;
+            box_domain[2 * dim + 1] = 2.0 * cell_radius;
+        }
+        p_mesh->SetUpBoxCollection(interaction_cutoff, box_domain);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), num_nodes);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
+
+        const double initial_gyration_radius = CalculateRadiusOfGyration(cell_population);
+        TS_ASSERT(initial_gyration_radius > 0.0);
+
+        OffLatticeSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory("TestSemBasedSimulationWithSphericalElement");
+        simulator.SetDt(0.005);
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(0.05);
+        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<3>>());
+        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
+
+        MAKE_PTR(SemForce<3>, p_sem_force);
+        const double rho = 5.0;
+        p_sem_force->SetIntraScalingFactor(rho);
+        p_sem_force->SetInterScalingFactor(rho);
+        const SemNScaledParameters intra_params = p_sem_force->ApplyNScaledIntraParameters(
+            num_nodes, cell_radius, 20.0, 0.0, packing_density, 1.0);
+        p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
+        p_sem_force->ApplyNScaledInterParameters(num_nodes, cell_radius, 20.0, 0.0, packing_density, 1.0);
+        p_sem_force->SetInterCutOffDistance(interaction_cutoff);
+        cell_population.SetDampingConstantNormal(intra_params.DampingConstant);
+        simulator.AddForce(p_sem_force);
+
+        /*
+         * The scaled r_eq the force derives from N and the cell radius must match the spacing the
+         * generator actually built, or the cell would start far from mechanical equilibrium.
+         */
+        TS_ASSERT_DELTA(p_sem_force->GetIntraEquilibriumDistance(), paper_r_eq, 1e-9);
+
+        simulator.Solve();
+
+        /*
+         * The initial condition is a close packing, which is already at or near a minimum of the
+         * pair potential, so the cell should barely move: surface nodes pull inward a little and
+         * that is all. Assert it neither evaporates nor collapses. A wrong cut-off or a mismatched
+         * r_eq shows up here as a large change in either direction.
+         */
+        const double final_gyration_radius = CalculateRadiusOfGyration(simulator.rGetCellPopulation());
+        TS_ASSERT_DELTA(final_gyration_radius, initial_gyration_radius, 0.05 * initial_gyration_radius);
+
+        // No node may leave the neighbourhood of the cell
+        for (auto node_iter = simulator.rGetCellPopulation().rGetMesh().GetNodeIteratorBegin();
+             node_iter != simulator.rGetCellPopulation().rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            TS_ASSERT_LESS_THAN(norm_2(node_iter->rGetLocation()), 2.0 * cell_radius);
+        }
     }
 
     void TestSemBasedSimulationArchiving()
