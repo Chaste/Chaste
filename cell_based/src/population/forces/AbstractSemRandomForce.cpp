@@ -35,12 +35,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractSemRandomForce.hpp"
 
+#include "Exception.hpp"
 #include "SimulationTime.hpp"
 
 template<unsigned DIM>
 AbstractSemRandomForce<DIM>::AbstractSemRandomForce()
     : AbstractForce<DIM>(),
-      mDiffusionConstant(0.0)
+      mDiffusionConstant(0.0),
+      mCoolingStartTime(0.0),
+      mCoolingEndTime(0.0)
 {
 }
 
@@ -55,6 +58,42 @@ void AbstractSemRandomForce<DIM>::SetDiffusionConstant(double diffusionConstant)
 {
     assert(diffusionConstant >= 0.0);
     mDiffusionConstant = diffusionConstant;
+}
+
+template<unsigned DIM>
+void AbstractSemRandomForce<DIM>::SetCoolingWindow(double startTime, double endTime)
+{
+    if (endTime < startTime)
+    {
+        EXCEPTION("AbstractSemRandomForce: the cooling window must not end before it starts");
+    }
+    mCoolingStartTime = startTime;
+    mCoolingEndTime = endTime;
+}
+
+template<unsigned DIM>
+double AbstractSemRandomForce<DIM>::GetCurrentDiffusionConstant() const
+{
+    // A window of zero width means no cooling was requested, so the noise never changes
+    if (mCoolingEndTime <= mCoolingStartTime)
+    {
+        return mDiffusionConstant;
+    }
+
+    const double time = SimulationTime::Instance()->GetTime();
+
+    if (time <= mCoolingStartTime)
+    {
+        return mDiffusionConstant;
+    }
+    if (time >= mCoolingEndTime)
+    {
+        return 0.0;
+    }
+
+    const double fraction_remaining
+        = (mCoolingEndTime - time) / (mCoolingEndTime - mCoolingStartTime);
+    return mDiffusionConstant * fraction_remaining;
 }
 
 template<unsigned DIM>
@@ -79,7 +118,7 @@ void AbstractSemRandomForce<DIM>::AddForceContribution(AbstractCellPopulation<DI
     assert(unit_noise.size() == nodes.size());
 
     const double dt = SimulationTime::Instance()->GetTimeStep();
-    const double force_scale = std::sqrt(2.0 * mDiffusionConstant / dt);
+    const double force_scale = std::sqrt(2.0 * GetCurrentDiffusionConstant() / dt);
 
     for (unsigned node_index = 0; node_index < nodes.size(); ++node_index)
     {
@@ -92,6 +131,8 @@ template<unsigned DIM>
 void AbstractSemRandomForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<DiffusionConstant>" << mDiffusionConstant << "</DiffusionConstant>\n";
+    *rParamsFile << "\t\t\t<CoolingStartTime>" << mCoolingStartTime << "</CoolingStartTime>\n";
+    *rParamsFile << "\t\t\t<CoolingEndTime>" << mCoolingEndTime << "</CoolingEndTime>\n";
 
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }

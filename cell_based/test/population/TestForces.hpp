@@ -2893,6 +2893,113 @@ public:
     }
 
     /**
+     * The noise can be cooled towards zero over a window of simulation time, so that an anneal, a
+     * ramped quench and a subsequent noise-free relaxation all happen within one call to Solve().
+     */
+    void TestSemRandomForceCoolingWindow()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
+
+        SemGaussianRandomForce<2> force;
+        force.SetDiffusionConstant(0.8);
+
+        // With no cooling window set, the diffusion constant never changes
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.8, 1e-12);
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.8, 1e-12);
+
+        // Cool from t = 2 to t = 6: full strength before, linearly down across, nothing after
+        force.SetCoolingWindow(2.0, 6.0);
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.8, 1e-12);
+
+        SimulationTime::Instance()->IncrementTimeOneStep(); // t = 2
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.8, 1e-12);
+
+        SimulationTime::Instance()->IncrementTimeOneStep(); // t = 3, a quarter of the way through
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.6, 1e-12);
+
+        SimulationTime::Instance()->IncrementTimeOneStep(); // t = 4, halfway
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.4, 1e-12);
+
+        while (SimulationTime::Instance()->GetTime() < 6.0)
+        {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+        }
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.0, 1e-12);
+
+        SimulationTime::Instance()->IncrementTimeOneStep(); // t = 7, past the end of the window
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.0, 1e-12);
+
+        // The value set by SetDiffusionConstant() is left alone throughout
+        TS_ASSERT_DELTA(force.GetDiffusionConstant(), 0.8, 1e-12);
+
+        TS_ASSERT_THROWS_THIS(force.SetCoolingWindow(6.0, 2.0),
+            "AbstractSemRandomForce: the cooling window must not end before it starts");
+    }
+
+    /**
+     * A cooled force must apply correspondingly smaller forces, and none at all once the window
+     * has passed.
+     */
+    void TestSemRandomForceCoolingWindowScalesTheAppliedForce()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(8.0, 8);
+
+        SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        SemGaussianRandomForce<2> force;
+        force.SetDiffusionConstant(1.0);
+        force.SetCoolingWindow(0.0, 4.0);
+
+        // At t = 1 the window is a quarter spent, so D is 0.75 of its full value and the force,
+        // which goes as the square root of D, is scaled by sqrt(0.75)
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        RandomNumberGenerator::Instance()->Reseed(123u);
+        force.AddForceContribution(cell_population);
+
+        std::vector<c_vector<double, 2> > cooled_forces(cell_population.GetNumNodes());
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
+        {
+            cooled_forces[i] = cell_population.GetNode(i)->rGetAppliedForce();
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+
+        SemGaussianRandomForce<2> uncooled_force;
+        uncooled_force.SetDiffusionConstant(1.0);
+        RandomNumberGenerator::Instance()->Reseed(123u);
+        uncooled_force.AddForceContribution(cell_population);
+
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
+        {
+            const c_vector<double, 2>& r_full = cell_population.GetNode(i)->rGetAppliedForce();
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                TS_ASSERT_DELTA(cooled_forces[i][dim], sqrt(0.75) * r_full[dim], 1e-12);
+            }
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+
+        // Once the window has passed there is no noise at all
+        while (SimulationTime::Instance()->GetTime() < 5.0)
+        {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+        }
+        force.AddForceContribution(cell_population);
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
+        {
+            TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), 0.0, 1e-12);
+        }
+    }
+
+    /**
      * Test the SEM spatially correlated random force with a real SEM population.
      */
     void TestSemSpatiallyCorrelatedRandomForceWithPopulation()

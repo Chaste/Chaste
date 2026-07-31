@@ -76,12 +76,20 @@ private:
     {
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
         archive & mDiffusionConstant;
+        archive & mCoolingStartTime;
+        archive & mCoolingEndTime;
     }
 
 protected:
 
     /** Diffusion constant used in the SEM Langevin noise term. */
     double mDiffusionConstant;
+
+    /** Time at which the diffusion constant starts to be cooled towards zero. */
+    double mCoolingStartTime;
+
+    /** Time at which the diffusion constant reaches zero; equal to the start time if not cooling. */
+    double mCoolingEndTime;
 
     /**
      * Generate dimensionless unit random noise for each supplied node.
@@ -113,6 +121,29 @@ public:
      * @param diffusionConstant the new diffusion constant
      */
     void SetDiffusionConstant(double diffusionConstant);
+
+    /**
+     * Cool the noise towards zero over a window of simulation time, as in a simulated annealing
+     * schedule. Before the start time the full diffusion constant is used; between the two times
+     * it falls linearly to zero; after the end time there is no noise at all.
+     *
+     * This lets an anneal, a ramped quench and a subsequent relaxation all take place within a
+     * single call to Solve(), rather than needing the simulation to be stopped and restarted to
+     * change the diffusion constant by hand.
+     *
+     * @param startTime the time at which cooling begins
+     * @param endTime the time at which the diffusion constant reaches zero, which must not be
+     *     before the start time
+     */
+    void SetCoolingWindow(double startTime, double endTime);
+
+    /**
+     * The diffusion constant currently in effect, i.e. the value set by SetDiffusionConstant()
+     * scaled down by however far through the cooling window the simulation has reached.
+     *
+     * @return the diffusion constant at the current simulation time
+     */
+    double GetCurrentDiffusionConstant() const;
 
     /**
      * Overridden AddForceContribution() method.
