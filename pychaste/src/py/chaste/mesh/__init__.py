@@ -95,6 +95,8 @@ from chaste._pychaste_all import (
     SemMultiElementMeshGenerator_3,
     SemSingleElementMeshGenerator_2,
     SemSingleElementMeshGenerator_3,
+    SemSphericalElementMeshGenerator_2,
+    SemSphericalElementMeshGenerator_3,
     TetrahedralMesh_2_2,
     TetrahedralMesh_3_3,
     Toroidal2dMesh,
@@ -289,6 +291,13 @@ SemSingleElementMeshGenerator = TemplateClassDict(
     {
         ("2",): SemSingleElementMeshGenerator_2,
         ("3",): SemSingleElementMeshGenerator_3,
+    }
+)
+
+SemSphericalElementMeshGenerator = TemplateClassDict(
+    {
+        ("2",): SemSphericalElementMeshGenerator_2,
+        ("3",): SemSphericalElementMeshGenerator_3,
     }
 )
 

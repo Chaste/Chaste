@@ -410,6 +410,8 @@ modules:
 
       - name: SemMultiElementMeshGenerator
 
+      - name: SemSphericalElementMeshGenerator
+
       - name: SemMeshReader
         excluded: True
 
@@ -570,6 +572,7 @@ modules:
           - CellPopulationAdjacencyMatrixWriter.hpp
           - CellPopulationAreaWriter.hpp
           - CellPopulationElementWriter.hpp
+          - CellPopulationExtentWriter.hpp
           - CellProliferativePhasesCountWriter.hpp
           - CellProliferativePhasesWriter.hpp
           - CellProliferativeTypesCountWriter.hpp
@@ -781,6 +784,10 @@ modules:
           - PybindUblasTypeCaster.hpp
 
       - name: SemSpatiallyCorrelatedRandomForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: UniaxialLoadForce
         source_includes:
           - PybindUblasTypeCaster.hpp
 
@@ -1010,6 +1017,9 @@ modules:
         source_includes: *population_writer_includes
 
       - name: CellPopulationElementWriter
+        source_includes: *population_writer_includes
+
+      - name: CellPopulationExtentWriter
         source_includes: *population_writer_includes
 
       - name: HeterotypicBoundaryLengthWriter

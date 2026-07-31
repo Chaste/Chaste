@@ -93,6 +93,8 @@ from chaste._pychaste_all import (
     CellPopulationAreaWriter_3_3,
     CellPopulationElementWriter_2_2,
     CellPopulationElementWriter_3_3,
+    CellPopulationExtentWriter_2_2,
+    CellPopulationExtentWriter_3_3,
     CellProliferativePhasesCountWriter_2_2,
     CellProliferativePhasesCountWriter_3_3,
     CellProliferativePhasesWriter_2_2,
@@ -304,6 +306,8 @@ from chaste._pychaste_all import (
     TargetedCellKiller_3,
     TransitCellProliferativeType,
     TysonNovakCellCycleModel,
+    UniaxialLoadForce_2,
+    UniaxialLoadForce_3,
     UniformCellCycleModel,
     UniformG1GenerationalCellCycleModel,
     VertexBasedCellPopulation_2,
@@ -533,6 +537,15 @@ CellPopulationElementWriter = TemplateClassDict(
         ("2", "2"): CellPopulationElementWriter_2_2,
         ("3",): CellPopulationElementWriter_3_3,
         ("3", "3"): CellPopulationElementWriter_3_3,
+    }
+)
+
+CellPopulationExtentWriter = TemplateClassDict(
+    {
+        ("2",): CellPopulationExtentWriter_2_2,
+        ("2", "2"): CellPopulationExtentWriter_2_2,
+        ("3",): CellPopulationExtentWriter_3_3,
+        ("3", "3"): CellPopulationExtentWriter_3_3,
     }
 )
 
@@ -1240,6 +1253,13 @@ TargetedCellKiller = TemplateClassDict(
     {
         ("2",): TargetedCellKiller_2,
         ("3",): TargetedCellKiller_3,
+    }
+)
+
+UniaxialLoadForce = TemplateClassDict(
+    {
+        ("2",): UniaxialLoadForce_2,
+        ("3",): UniaxialLoadForce_3,
     }
 )
 
