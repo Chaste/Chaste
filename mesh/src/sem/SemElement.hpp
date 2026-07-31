@@ -130,6 +130,11 @@ public:
      * This removes the SEM element from active population use and unregisters
      * it from all of its nodes so later containing-element queries do not
      * include deleted cells.
+     *
+     * The element is not removed from the mesh and its index is not reused, so
+     * SemMesh::GetNumElements() is unchanged by this call; the element iterator
+     * skips it thereafter. The element's own node vector is left intact, so
+     * GetNumNodes() also still reports the original count.
      */
     void MarkAsDeleted() override;
 

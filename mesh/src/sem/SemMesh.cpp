@@ -445,20 +445,6 @@ unsigned SemMesh<DIM>::SolveNodeMapping(unsigned index) const
 }
 
 template<unsigned DIM>
-unsigned SemMesh<DIM>::SolveElementMapping(unsigned index) const
-{
-    assert(index < this->mElements.size());
-    return index;
-}
-
-template<unsigned DIM>
-unsigned SemMesh<DIM>::SolveBoundaryElementMapping(unsigned index) const
-{
-    return index;
-}
-
-
-template<unsigned DIM>
 unsigned SemMesh<DIM>::AddElement(SemElement<DIM>* pNewElement)
 {
     unsigned int new_element_index = mElements.size();

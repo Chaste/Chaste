@@ -104,34 +104,17 @@ private:
     void SetUpBoxCollection(const std::vector<Node<DIM>*>& rNodes);
 
     /**
-     * Solve node mapping method. This overridden method is required as it is
-     * pure virtual in the base class.
+     * Map a global node index to a local one. This overridden method is required as it is pure
+     * virtual in AbstractMesh.
+     *
+     * A SemMesh holds every node on every process, so the mapping is the identity. It is
+     * exercised on every call to GetNode().
      *
      * @param index the global index of the node
      *
-     * @return local index
+     * @return local index, which is equal to the global index
      */
     unsigned SolveNodeMapping(unsigned index) const override;
-
-    /**
-     * Solve element mapping method. This overridden method is required as it is
-     * pure virtual in the base class.
-     *
-     * @param index the global index of the element
-     *
-     * @return local index
-     */
-    unsigned SolveElementMapping(unsigned index) const;
-
-    /**
-     * Solve boundary element mapping method. This overridden method is required
-     * as it is pure virtual in the base class.
-     *
-     * @param index the global index of the boundary element
-     *
-     * @return local index
-     */
-    unsigned SolveBoundaryElementMapping(unsigned index) const;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -272,12 +255,24 @@ public:
     virtual unsigned AddNode(Node<DIM>* pNewNode);
 
     /**
-     * @return the number of SemElements in the mesh.
+     * The number of SemElement slots in the mesh, counting those marked as deleted.
+     *
+     * SemMesh never removes an element or reuses an index: SemBasedCellPopulation uses the element
+     * index as its location index, so indices must stay stable for the lifetime of the mesh, and
+     * cell removal only sets the deleted flag (see SemElement::MarkAsDeleted). This method is
+     * therefore an upper bound on the element index, not a count of live cells — it does not change
+     * when a cell dies. To count or visit only live elements, test SemElement::IsDeleted() or use
+     * GetElementIteratorBegin(), which skips deleted elements by default.
+     *
+     * @return the number of SemElements in the mesh, including those marked as deleted
      */
     virtual unsigned GetNumElements() const;
 
     /**
-     * @return the number of SemElements in the mesh, including those marked as deleted.
+     * Identical to GetNumElements(), and retained because AbstractCellPopulation-facing code uses
+     * both names. See GetNumElements() for why neither excludes deleted elements.
+     *
+     * @return the number of SemElements in the mesh, including those marked as deleted
      */
     unsigned GetNumAllElements() const;
 
