@@ -38,27 +38,186 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-
 #include "SemElement.hpp"
-#include "ArchiveOpener.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestSemElement : public CxxTest::TestSuite
 {
-public:
+private:
 
-    void TestDefaultConstructorAndDestructor()
+    /**
+     * Make four 2D nodes at the corners of the unit square. The caller takes ownership: SemElement
+     * does not own its nodes (SemMesh does), so every test that builds nodes must delete them.
+     */
+    std::vector<Node<2>*> MakeUnitSquareNodes()
     {
-        ///\todo
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+        return nodes;
     }
 
-    void TestDefaultConstructor()
+public:
+
+    void TestConstructorWithIndexOnly()
     {
-        ///\todo
+        SemElement<2> element(3);
+
+        TS_ASSERT_EQUALS(element.GetIndex(), 3u);
+        TS_ASSERT_EQUALS(element.GetNumNodes(), 0u);
+        TS_ASSERT_EQUALS(element.IsDeleted(), false);
+        TS_ASSERT(element.rGetNodes().empty());
+    }
+
+    void TestConstructorWithNodes()
+    {
+        std::vector<Node<2>*> nodes = MakeUnitSquareNodes();
+
+        {
+            SemElement<2> element(7, nodes);
+
+            TS_ASSERT_EQUALS(element.GetIndex(), 7u);
+            TS_ASSERT_EQUALS(element.GetNumNodes(), 4u);
+            TS_ASSERT_EQUALS(element.IsDeleted(), false);
+            TS_ASSERT_EQUALS(element.rGetNodes().size(), 4u);
+
+            for (unsigned i = 0; i < 4; ++i)
+            {
+                TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(i), i);
+
+                // This constructor calls RegisterWithNodes(), so membership is already in place
+                std::set<unsigned> containing = nodes[i]->rGetContainingElementIndices();
+                TS_ASSERT_EQUALS(containing.size(), 1u);
+                TS_ASSERT_EQUALS(containing.count(7u), 1u);
+            }
+        }
+
+        for (unsigned i = 0; i < nodes.size(); ++i)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestConstructorWithNodesIn3d()
+    {
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
+
+        {
+            SemElement<3> element(0, nodes);
+
+            TS_ASSERT_EQUALS(element.GetNumNodes(), 4u);
+            for (unsigned i = 0; i < 4; ++i)
+            {
+                TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(i), i);
+                TS_ASSERT_EQUALS(nodes[i]->rGetContainingElementIndices().count(0u), 1u);
+            }
+        }
+
+        for (unsigned i = 0; i < nodes.size(); ++i)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestRegisterWithNodes()
+    {
+        std::vector<Node<2>*> nodes = MakeUnitSquareNodes();
+
+        {
+            // Build the element via the index-only constructor, which does not register
+            SemElement<2> element(2);
+            for (unsigned i = 0; i < nodes.size(); ++i)
+            {
+                element.AddNode(nodes[i]);
+            }
+
+            TS_ASSERT_EQUALS(element.GetNumNodes(), 4u);
+            for (unsigned i = 0; i < nodes.size(); ++i)
+            {
+                TS_ASSERT(nodes[i]->rGetContainingElementIndices().empty());
+            }
+
+            element.RegisterWithNodes();
+
+            for (unsigned i = 0; i < nodes.size(); ++i)
+            {
+                TS_ASSERT_EQUALS(nodes[i]->rGetContainingElementIndices().count(2u), 1u);
+            }
+        }
+
+        for (unsigned i = 0; i < nodes.size(); ++i)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestUpdateNode()
+    {
+        std::vector<Node<2>*> nodes = MakeUnitSquareNodes();
+        Node<2>* p_replacement = new Node<2>(4, false, 0.5, 0.5);
+
+        {
+            SemElement<2> element(1, nodes);
+
+            element.UpdateNode(1, p_replacement);
+
+            // The element now holds the replacement in that slot, with its size unchanged
+            TS_ASSERT_EQUALS(element.GetNumNodes(), 4u);
+            TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(1), 4u);
+            TS_ASSERT_EQUALS(element.rGetNodes()[1], p_replacement);
+
+            // Membership follows the swap in both directions
+            TS_ASSERT(nodes[1]->rGetContainingElementIndices().empty());
+            TS_ASSERT_EQUALS(p_replacement->rGetContainingElementIndices().count(1u), 1u);
+
+            // The nodes that were not touched are unaffected
+            TS_ASSERT_EQUALS(nodes[0]->rGetContainingElementIndices().count(1u), 1u);
+            TS_ASSERT_EQUALS(nodes[2]->rGetContainingElementIndices().count(1u), 1u);
+            TS_ASSERT_EQUALS(nodes[3]->rGetContainingElementIndices().count(1u), 1u);
+        }
+
+        for (unsigned i = 0; i < nodes.size(); ++i)
+        {
+            delete nodes[i];
+        }
+        delete p_replacement;
+    }
+
+    void TestMarkAsDeleted()
+    {
+        std::vector<Node<2>*> nodes = MakeUnitSquareNodes();
+
+        {
+            SemElement<2> element(5, nodes);
+            TS_ASSERT_EQUALS(element.IsDeleted(), false);
+
+            element.MarkAsDeleted();
+
+            TS_ASSERT_EQUALS(element.IsDeleted(), true);
+
+            // Every node must be unregistered, so that containing-element queries made by the
+            // forces and by damping no longer see the deleted cell
+            for (unsigned i = 0; i < nodes.size(); ++i)
+            {
+                TS_ASSERT(nodes[i]->rGetContainingElementIndices().empty());
+            }
+
+            // The element keeps its own node vector; only the registration is undone
+            TS_ASSERT_EQUALS(element.GetNumNodes(), 4u);
+        }
+
+        for (unsigned i = 0; i < nodes.size(); ++i)
+        {
+            delete nodes[i];
+        }
     }
 };
 
