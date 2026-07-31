@@ -67,6 +67,7 @@ population/TestPottsUpdateRules.hpp
 population/TestSemBasedCellPopulation.hpp
 population/TestSemParameterScaling.hpp
 population/TestSemRegionalForce.hpp
+population/TestUniaxialLoadForce.hpp
 population/TestT2SwapCellKiller.hpp
 population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
