@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-"""Copyright (c) 2005-2024, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,31 +32,77 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-"""Script to 
+"""Script to
 i) replace tabs with 4 spaces - calls "sed -i 's/\t/    /g'" on all source files.
 ii) remove any trailing whitespace - calls " sed -i 's/[ \\t]*$//' "
 """
 
 
-import os, sys
+import subprocess
+from pathlib import Path
 
-exts = ['.cpp', '.hpp']
-dir_ignores = ['build', 'cxxtest', 'testoutput', 'docs', 'doxygen', 'projects', 'data']
+# List of files to include, and the number of spaces to replace tabs with (None means ignore tabs)
+include_filenames: dict[str, str] = {
+    '.clang-format': None,
+    '.clang-tidy': None,
+    '.gitignore': None,
+    'CITATION.cff': ' ' * 2,
+    'CMakeLists.txt': ' ' * 4,
+    'ChasteBuildInfo_cmake.cpp.in': ' ' * 4,
+    'ChasteConfig.cmake.in': ' ' * 4,
+    'Dockerfile': None,
+    'Doxyfile': None,
+    'Makefile': None,
+    'README': ' ' * 4,
+    'Version.cpp.in': ' ' * 4,
+}
+
+# List of file extensions to include, and the number of spaces to replace tabs with (None means ignore tabs)
+include_extensions: dict[str, str] = {
+    '.cellml': 3,
+    '.cfg': None,
+    '.cmake': ' ' * 4,
+    '.cpp': ' ' * 4,
+    '.hpp': ' ' * 4,
+    '.ipynb': ' ' * 4,
+    '.java': ' ' * 4,
+    '.json': ' ' * 4,
+    '.m': ' ' * 3,
+    '.md': ' ' * 4,
+    '.py': ' ' * 4,
+    '.rst': ' ' * 4,
+    '.sh': ' ' * 2,
+    '.toml': None,
+    '.txt': None,
+    '.xml': ' ' * 4,
+    '.yaml': ' ' * 2,
+    '.yml': ' ' * 2,
+}
+
+dir_ignores = ['cxxtest', 'docs', 'data', 'third_party_libs', '3rdparty', 'external', 'texttest']
+
 tab_spaces = ' ' * 4
-chaste_dir = '.'
-    
-for root, dirs, files in os.walk(chaste_dir):
-    for dir in dir_ignores:
-        if dir in dirs:
-            dirs.remove(dir)
-    # Check for source files
-    for file in files:
-        name, ext = os.path.splitext(file)
-        if ext in exts:
-            file_name = os.path.join(root, file)
-            command = "sed -i 's/\\t/%s/g' %s" % (tab_spaces, file_name)
-            print("Checking %s" % file_name)
-            os.system(command)
-            ### for removing trailing whitespace
-            command = " sed -i 's/[ \\t]*$//' " + file_name
-            os.system(command)
+tracked_files = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
+
+exts = set()
+
+for file_name in tracked_files:
+    file_path = Path(file_name)
+
+    if any(dir_ignore in file_path.parts for dir_ignore in dir_ignores):
+        continue
+
+    process = False
+
+    if file_path.name in include_filenames:
+        process = True
+        process_tabs = include_filenames[file_path.name]
+    elif file_path.suffix in include_extensions:
+        process = True
+        process_tabs = include_extensions[file_path.suffix]
+
+    if process:
+        print("Checking %s" % file_path)
+        if process_tabs is not None:
+            subprocess.run(['sed', '-i', 's/\\t/%s/g' % tab_spaces, file_name], check=True)
+        subprocess.run(['sed', '-i', 's/[ \\t]*$//', file_name], check=True)

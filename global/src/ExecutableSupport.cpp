@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -87,9 +87,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Check whether the version of ParMETIS being used is the one we wanted
 #ifdef CHASTE_PARMETIS_REQUIRED
+#ifdef PARMETIS_MAJOR_VERSION
 #if PARMETIS_MAJOR_VERSION != CHASTE_PARMETIS_REQUIRED
 #error "Wrong ParMETIS version found: " #CHASTE_PARMETIS_REQUIRED " requested but " #PARMETIS_MAJOR_VERSION " present"
 #endif
+#endif
+#endif
+
+#ifndef PARMETIS_MAJOR_VERSION
+// If there's no PARMETIS then assume we have Scotch
+#include <scotch/ptscotch.h>
 #endif
 
 FileFinder ExecutableSupport::mOutputDirectory;
@@ -409,11 +416,18 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t\t<PETSc>" << PETSC_VERSION_MAJOR << "." << PETSC_VERSION_MINOR << "." << PETSC_VERSION_SUBMINOR << "</PETSc>\n";
     output << "\t\t\t<Boost>" << BOOST_VERSION / 100000 << "." << BOOST_VERSION / 100 % 1000 << "." << BOOST_VERSION % 100 << "</Boost>\n";
     output << "\t\t\t<HDF5>" << H5_VERS_MAJOR << "." << H5_VERS_MINOR << "." << H5_VERS_RELEASE << "</HDF5>\n";
+#ifdef PARMETIS_MAJOR_VERSION
     output << "\t\t\t<Parmetis>" << PARMETIS_MAJOR_VERSION << "." << PARMETIS_MINOR_VERSION;
 #ifdef PARMETIS_SUBMINOR_VERSION // they only added this in v4.? !!
     output << "." << PARMETIS_SUBMINOR_VERSION;
 #endif
     output << "</Parmetis>" << std::endl;
+#else //PARMETIS_MAJOR_VERSION
+    // Assume we have Scotch
+    output << "\t\t\t<Parmetis>[NONE]</Parmetis>" << std::endl;
+    output << "\t\t\t<PT-Scotch>" << SCOTCH_VERSION<<"."<<SCOTCH_RELEASE<<"."<<SCOTCH_PATCHLEVEL<<"</PT-Scotch>"<< std::endl;
+#endif //no PARMETIS_MAJOR_VERSION
+
     output << "\t\t</CompiledIn>\n";
 
     output << "\t\t<Binaries>\n";

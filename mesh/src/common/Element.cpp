@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Element.hpp"
-
+#include <algorithm>
 #include <cfloat>
 #include <cassert>
 
@@ -136,9 +136,9 @@ c_vector<double,SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsph
         rhs[j]=squared_location/2.0;
     }
 
-    c_vector<double, SPACE_DIM> centre;
+    c_vector<double, SPACE_DIM> centre = zero_vector<double>(SPACE_DIM);
     centre = prod(rhs, rInverseJacobian);
-    c_vector<double, SPACE_DIM+1> circum;
+    c_vector<double, SPACE_DIM+1> circum = zero_vector<double>(SPACE_DIM+1);
     double squared_radius = 0.0;
     for (unsigned i=0; i<SPACE_DIM; i++)
     {
@@ -207,14 +207,8 @@ c_vector <double, 2> Element<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths
         for (unsigned j=i+1; j<=ELEMENT_DIM; j++)
         {
             double length = norm_2(this->GetNodeLocation(j) - loc_i);
-            if (length < min_max[0])
-            {
-                min_max[0] = length;
-            }
-            if (length > min_max[1])
-            {
-                min_max[1] = length;
-            }
+            min_max[0] = std::min(min_max[0], length);
+            min_max[1] = std::max(min_max[1], length);
         }
     }
     return min_max;
@@ -291,11 +285,12 @@ c_vector<double, SPACE_DIM> Element<ELEMENT_DIM, SPACE_DIM>::CalculateXi(const C
     // Find the location with respect to node 0
 ///\todo: #1361 ComputeContainingElements and related methods, and methods called by that down to
 /// here, should really take in const c_vector& rather than ChastePoints.
-    c_vector<double, SPACE_DIM> test_location=rTestPoint.rGetLocation()-this->GetNodeLocation(0);
+    c_vector<double, SPACE_DIM> test_location = zero_vector<double>(SPACE_DIM);
+    test_location = rTestPoint.rGetLocation()-this->GetNodeLocation(0);
 
     //Multiply by inverse Jacobian
-    c_matrix<double, SPACE_DIM, ELEMENT_DIM> jacobian;
-    c_matrix<double, ELEMENT_DIM, SPACE_DIM> inverse_jacobian;
+    c_matrix<double, SPACE_DIM, ELEMENT_DIM> jacobian = zero_matrix<double>(SPACE_DIM, ELEMENT_DIM);
+    c_matrix<double, ELEMENT_DIM, SPACE_DIM> inverse_jacobian = zero_matrix<double>(ELEMENT_DIM, SPACE_DIM);
     double jacobian_determinant;
 
     ///\todo #1326 This method shouldn't need a new Jacobian inverse for every Xi

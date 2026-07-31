@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCachedMeshReader.hpp"
 #include "Exception.hpp"
-
+#include <algorithm>
 #include <fstream>
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -103,22 +103,11 @@ std::vector<std::string> AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetRa
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex()
 {
-    // Initialize an interator for the vector of nodes
-    std::vector<std::vector<unsigned> >::iterator the_iterator;
+    unsigned max_node_index = 0;
 
-    unsigned max_node_index = 0; // Nice if it were negative
-
-    for (the_iterator = mElementData.begin(); the_iterator < mElementData.end(); the_iterator++)
+    for (const auto& indices : mElementData)
     {
-        std::vector<unsigned> indices = *the_iterator; // the_iterator points at each line in turn
-
-        for (unsigned i = 0; i < ELEMENT_DIM+1; i++)
-        {
-            if (indices[i] > max_node_index)
-            {
-                max_node_index = indices[i];
-            }
-        }
+        max_node_index = std::max(max_node_index, *std::max_element(indices.begin(), indices.begin() + (ELEMENT_DIM+1)));
     }
 
     return max_node_index;
@@ -127,22 +116,11 @@ unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMinNodeIndex()
 {
-    // Initialize an interator for the vector of nodes
-    std::vector<std::vector<unsigned> >::iterator the_iterator;
+    unsigned min_node_index = UINT_MAX;
 
-    unsigned min_node_index = UINT_MAX; // A large integer
-
-    for (the_iterator = mElementData.begin(); the_iterator < mElementData.end(); the_iterator++)
+    for (const auto& indices : mElementData)
     {
-        std::vector<unsigned> indices = *the_iterator; // the_iterator points at each line in turn
-
-        for (unsigned i = 0; i < ELEMENT_DIM+1; i++)
-        {
-            if (indices[i] < min_node_index)
-            {
-                min_node_index = indices[i];
-            }
-        }
+        min_node_index = std::min(min_node_index, *std::min_element(indices.begin(), indices.begin() + (ELEMENT_DIM+1)));
     }
 
     return min_node_index;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -161,12 +161,12 @@ public:
      * the simulation. The cell population and force collection pointers are then set by the simulation in
      * its constructor.
      */
-    AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>();
+    AbstractNumericalMethod();
 
     /**
      * Destructor.
      */
-    virtual ~AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>();
+    virtual ~AbstractNumericalMethod();
 
     /**
      * Sets the pointer to the cell population updated by this method

@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2024, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -114,24 +114,24 @@ def TidyFile(filepath):
             #end if
     # Sort the list of tuples by the body (lexicographically)
     suppressions.sort()
-    
+
     # Make note of all suppression bodies seen so far
     seen_set = set()
-    
+
     # Write out - overwrites the original file
     for (library_call, body, comment, name, memcheck, match) in suppressions:
         if (not (match, body) in seen_set):
             seen_set.add((match, body))
-            
+
             # Top of suppression
             out.write(comment)
             out.write("{\n")
-            
+
             # Optional name - add in the type if it's not already there
             if (not library_call in name):
                 out.write("   "+library_call+" ")
             out.write(name)
-            
+
             # Main part of suppression
             out.write(memcheck)
             out.write(match)

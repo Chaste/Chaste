@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2024, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -216,7 +216,7 @@ class ProcessValgrind:
         return branch, commit
 
     @staticmethod
-    def get_index_heading():
+    def get_index_heading_html():
         branch, commit = ProcessValgrind._get_git_info()
 
         if commit == "unknown commit":
@@ -224,15 +224,47 @@ class ProcessValgrind:
         else:
             return f'Memtest output for commit <a href="https://github.com/Chaste/Chaste/commit/{commit}">{commit}</a> on branch {branch}'
 
+    @staticmethod
+    def get_index_heading_md():
+        branch, commit = ProcessValgrind._get_git_info()
+
+        if commit == "unknown commit":
+            return f'Memtest output for {commit} on {branch}'
+        else:
+            return f'Memtest output for commit [{commit}](https://github.com/Chaste/Chaste/commit/{commit}) on branch {branch}'
+
+    @staticmethod
+    def get_index_heading_txt():
+        branch, commit = ProcessValgrind._get_git_info()
+        return f'Memtest output for commit {commit} on branch {branch}'
+
 
 if __name__ == "__main__":
 
     files = glob.glob(sys.argv[1] + '/*_valgrind.txt')
     procVal = ProcessValgrind()
 
-    green_lines = []
-    orange_lines = []
-    red_lines = []
+    green_lines_html = []
+    orange_lines_html = []
+    red_lines_html = []
+
+    green_lines_md = []
+    orange_lines_md = []
+    red_lines_md = []
+
+    green_lines_txt = []
+    orange_lines_txt = []
+    red_lines_txt = []
+
+    longest_testname = -1
+    for file in files:
+        filename = os.path.basename(file)
+        testname = re.match('(.*)_valgrind.txt', filename).group(1)
+
+        if len(testname) > longest_testname:
+            longest_testname = len(testname)
+
+
 
     for file in files:
         filename = os.path.basename(file)
@@ -242,13 +274,19 @@ if __name__ == "__main__":
         disp_status = procVal.display_status(status)
 
         if colour == 'green':
-            green_lines.append(f'  <p class="test-green">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>')
+            green_lines_html.append(f'  <p class="test-green">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>')
+            green_lines_md.append(f'| {testname} | 🟢 {disp_status} |')
+            green_lines_txt.append(f'{testname.ljust(1 + longest_testname)} 🟢  {disp_status}')
         elif colour == 'orange':
-            orange_lines.append(f'  <p class="test-orange">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>')
+            orange_lines_html.append(f'  <p class="test-orange">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>')
+            orange_lines_md.append(f'| {testname} | 🟠 {disp_status} |')
+            orange_lines_txt.append(f'{testname.ljust(1 + longest_testname)} 🟠  {disp_status}')
         else:  # colour == 'red'
-            red_lines.append(f'  <p class="test-red">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>')
+            red_lines_html.append(f'  <p class="test-red">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>')
+            red_lines_md.append(f'| {testname} | 🔴 {disp_status} |')
+            red_lines_txt.append(f'{testname.ljust(1 + longest_testname)} 🔴  {disp_status}')
 
-    num_tests = len(green_lines) + len(orange_lines) + len(red_lines)
+    num_tests = len(green_lines_html) + len(orange_lines_html) + len(red_lines_html)
 
     with open(sys.argv[1] + '/index.html', 'w') as index_file:
 
@@ -258,35 +296,91 @@ if __name__ == "__main__":
         index_file.write('<body>\n')
 
         # Write heading
-        index_file.write(f'  <h2>{ProcessValgrind.get_index_heading()}</h2>\n')
+        index_file.write(f'  <h2>{ProcessValgrind.get_index_heading_html()}</h2>\n')
         index_file.write(f'  <br>\n')
 
         # Write summary
         index_file.write(f'  <p><strong>Summary of {num_tests} tests:</strong></p>\n')
-        index_file.write(f'  <p class="test-green"><strong>green: {len(green_lines)}</strong></p>\n')
-        index_file.write(f'  <p class="test-orange"><strong>orange: {len(orange_lines)}</strong></p>\n')
-        index_file.write(f'  <p class="test-red"><strong>red: {len(red_lines)}</strong></p>\n')
+        index_file.write(f'  <p class="test-green"><strong>green: {len(green_lines_html)}</strong></p>\n')
+        index_file.write(f'  <p class="test-orange"><strong>orange: {len(orange_lines_html)}</strong></p>\n')
+        index_file.write(f'  <p class="test-red"><strong>red: {len(red_lines_html)}</strong></p>\n')
         index_file.write(f'  <br>\n')
 
         # Write red lines
-        if len(red_lines) > 0:
-            index_file.write('\n'.join(sorted(red_lines)))
+        if len(red_lines_html) > 0:
+            index_file.write('\n'.join(sorted(red_lines_html)))
             index_file.write(f'  <br>\n')
 
         # Write orange lines
-        if len(orange_lines) > 0:
-            index_file.write('\n'.join(sorted(orange_lines)))
+        if len(orange_lines_html) > 0:
+            index_file.write('\n'.join(sorted(orange_lines_html)))
             index_file.write(f'  <br>\n')
 
         # Write green lines
-        if len(green_lines) > 0:
-            index_file.write('\n'.join(sorted(green_lines)))
+        if len(green_lines_html) > 0:
+            index_file.write('\n'.join(sorted(green_lines_html)))
             index_file.write(f'  <br>\n')
 
         index_file.write('</body>\n')
         index_file.write('</html>\n')
 
-    if len(red_lines) > 0:
+    with open(sys.argv[1] + '/github_summary.md', 'w') as summary_file:
+
+        # Write heading
+        summary_file.write(f'## {ProcessValgrind.get_index_heading_md()}\n\n')
+
+        # Write summary
+        summary_file.write(f'**Summary of {num_tests} tests:**\n')
+        summary_file.write(f' - **🟢 green: {len(green_lines_html)} (omitted from summary)**\n')
+        summary_file.write(f' - **🟠 orange: {len(orange_lines_html)}**\n')
+        summary_file.write(f' - **🔴 red: {len(red_lines_html)}**\n\n')
+
+        summary_file.write(f'Download raw valgrind output for all tests at the bottom of the GitHub job Summary page, under `Artifacts -> memtest-files`\n\n')
+
+        if len(green_lines_html) < num_tests:
+
+            summary_file.write(f'| Test name | Status |\n')
+            summary_file.write(f'|---|---|\n')
+
+            # Write red lines
+            if len(red_lines_html) > 0:
+                summary_file.write('\n'.join(sorted(red_lines_md)))
+
+            # Write orange lines
+            if len(orange_lines_html) > 0:
+                summary_file.write( '\n'.join(sorted(orange_lines_md)))
+
+            summary_file.write('\n')
+
+    with open(sys.argv[1] + '/txt_summary.txt', 'w') as summary_file:
+
+        # Write heading
+        summary_file.write(f'{ProcessValgrind.get_index_heading_txt()}\n\n')
+
+        # Write summary
+        summary_file.write(f'Summary of {num_tests} tests:\n')
+        summary_file.write(f'  🟢 green: {len(green_lines_html)} (omitted from summary)\n')
+        summary_file.write(f'  🟠 orange: {len(orange_lines_html)}\n')
+        summary_file.write(f'  🔴 red: {len(red_lines_html)}\n\n')
+
+        summary_file.write(f'Download raw valgrind output for all tests at the bottom of the GitHub job Summary page, under Artifacts -> memtest-files\n\n')
+
+        if len(green_lines_html) < num_tests:
+
+            summary_file.write(f'{"== Test name ==".ljust(1 + longest_testname)} == Status ==\n')
+
+            # Write red lines
+            if len(red_lines_html) > 0:
+                summary_file.write('\n'.join(sorted(red_lines_txt)))
+
+            # Write orange lines
+            if len(orange_lines_html) > 0:
+                summary_file.write( '\n'.join(sorted(orange_lines_txt)))
+
+            summary_file.write('\n')
+
+
+    if len(red_lines_html) > 0:
         print('Memory testing not 100% pass rate - failing memory testing.')
         sys.exit(1)
     else:

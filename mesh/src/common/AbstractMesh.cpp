@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractMesh.hpp"
 #include "Exception.hpp"
+#include "UblasCustomFunctions.hpp"
+#include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -227,8 +229,8 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBox(const std::vector<Node<SPACE_DIM>*>& rNodes) const
 {
     // Work out the max and min location in each co-ordinate direction.
-    c_vector<double, SPACE_DIM> minimum_point;
-    c_vector<double, SPACE_DIM> maximum_point;
+    c_vector<double, SPACE_DIM> minimum_point = zero_vector<double>(SPACE_DIM);
+    c_vector<double, SPACE_DIM> maximum_point = zero_vector<double>(SPACE_DIM);
 
     // Deal with the special case of no nodes by returning a cuboid with zero volume.
     if (rNodes.empty())
@@ -247,9 +249,7 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
         {
             if (!rNodes[index]->IsDeleted())
             {
-                // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
-                c_vector<double, SPACE_DIM> position;
-                position = rNodes[index]->rGetLocation();
+                c_vector<double, SPACE_DIM> position = rNodes[index]->rGetLocation();
 
                 // Update max/min
                 for (unsigned i = 0; i < SPACE_DIM; i++)
@@ -490,16 +490,15 @@ bool AbstractMesh<ELEMENT_DIM, SPACE_DIM>::IsMeshChanging() const
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumContainingElementsPerProcess() const
 {
-    unsigned max_num = 0u;
-    for (unsigned local_node_index = 0; local_node_index < mNodes.size(); local_node_index++)
+    if (mNodes.empty())
     {
-        unsigned num = mNodes[local_node_index]->GetNumContainingElements();
-        if (num > max_num)
-        {
-            max_num = num;
-        }
+        return 0u;
     }
-    return max_num;
+    return (*std::max_element(mNodes.begin(), mNodes.end(),
+                              [](const Node<SPACE_DIM>* a, const Node<SPACE_DIM>* b)
+                              {
+                                  return a->GetNumContainingElements() < b->GetNumContainingElements();
+                              }))->GetNumContainingElements();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

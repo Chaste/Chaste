@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -103,6 +103,9 @@ protected:
     /** The numerical method to use in this simulation. Defaults to the explicit forward Euler method. */
     boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
 
+    /** Variable for the allowed number of adaptive time step changes before outputting underlying exception. */
+    unsigned mMaxAdaptiveTimeSteps = 5;
+
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
      *
@@ -185,6 +188,18 @@ public:
      * @return the current numerical method.
      */
     const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > GetNumericalMethod() const;
+
+    /**
+     * Set the maximum number of adaptive timesteps that can be attempted before outputting the underlying exception.
+     *
+     * @param maxAdaptiveTimeStep max adaptive timestep parameter
+     */
+    void SetMaxAdaptiveTimeStep(const unsigned maxAdaptiveTimeStep);
+
+    /**
+     * @return the maximum allowed number of attempted timestep reductions.
+     */
+    unsigned GetMaxAdaptiveTimeStep() const;
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method.

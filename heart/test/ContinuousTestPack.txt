@@ -29,6 +29,7 @@ ionicmodels/TestModifiers.hpp
 ionicmodels/TestCodegen.hpp
 ionicmodels/TestRushLarsen.hpp
 ionicmodels/TestSteadyStateRunner.hpp
+mechanics/TestCardiacElectroMechanicsVtkHandler.hpp
 mechanics/TestCardiacElectroMechanicsProblem.hpp
 mechanics/TestCardiacElectroMechanicsFurtherFunctionality.hpp
 mechanics/TestContractionModels.hpp
@@ -65,6 +66,7 @@ TestAbstractContractionCellFactory.hpp
 TestAbstractPurkinjeCellFactory.hpp
 TestCardiacSimulation.hpp
 TestCardiacSimulationArchiver.hpp
+TestChasteXsdVersion.hpp
 TestCheckpointing.hpp
 TestConductivityTensors.hpp
 TestElectrodes.hpp

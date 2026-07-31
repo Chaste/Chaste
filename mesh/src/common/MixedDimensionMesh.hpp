@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,9 +55,9 @@ public:
     /**
      * Constructor.
      *
-     * @param partitioningMethod  defaults to METIS_LIBRARY, but in 1-D is always overridden in this constructor to be the DUMB partition
+     * @param partitioningMethod  defaults to PARMETIS_LIBRARY, but in 1-D is always overridden in this constructor to be the DUMB partition
      */
-    MixedDimensionMesh(DistributedTetrahedralMeshPartitionType::type partitioningMethod=DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+    MixedDimensionMesh(DistributedTetrahedralMeshPartitionType::type partitioningMethod=DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
 
     /**
      * Destructor - cleans up the cables

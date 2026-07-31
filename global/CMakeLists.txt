@@ -1,12 +1,12 @@
-# Copyright (c) 2005-2024, University of Oxford.
+# Copyright (c) 2005-2026, University of Oxford.
 # All rights reserved.
-# 
+#
 # University of Oxford means the Chancellor, Masters and Scholars of the
 # University of Oxford, having an administrative office at Wellington
 # Square, Oxford OX1 2JD, UK.
-# 
+#
 # This file is part of Chaste.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #  * Redistributions of source code must retain the above copyright notice,
@@ -17,7 +17,7 @@
 #  * Neither the name of the University of Oxford nor the names of its
 #    contributors may be used to endorse or promote products derived from this
 #    software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -69,10 +69,10 @@ string(STRIP ${CMAKE_CXX_FLAGS} STRIPPED_CXX_FLAGS)
 string(STRIP ${CMAKE_CXX_FLAGS_${UPPERCASE_BUILD_TYPE}} STRIPPED_BUILD_TYPE_FLAGS)
 set(ALL_CXX_FLAGS "${STRIPPED_CXX_FLAGS} ${STRIPPED_BUILD_TYPE_FLAGS}")
 
-add_custom_command(OUTPUT 
+add_custom_command(OUTPUT
     ${generate_dir}/Version.cpp
     ${generate_dir}/ChasteBuildInfo.cpp
-    COMMAND ${CMAKE_COMMAND} 
+    COMMAND ${CMAKE_COMMAND}
         "-DChaste_SOURCE_DIR=${Chaste_SOURCE_DIR}"
         "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
         "-DChaste_BUILD_DIR_NAME=${CMAKE_CFG_INTDIR}"
@@ -97,7 +97,7 @@ add_custom_command(OUTPUT
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     DEPENDS timekeeper
     COMMENT "Generating Build Config and Version Info"
-    VERBATIM 
+    VERBATIM
     )
 
 

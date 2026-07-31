@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <xsd/cxx/xml/dom/bits/error-handler-proxy.hxx>
 #include <xsd/cxx/tree/exceptions.hxx>
 
+#include "ChasteXsdVersion.hpp"
 #include "Exception.hpp"
 
 XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadXmlFile(
@@ -71,7 +72,7 @@ XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadXmlFile(
     {
         Finalize();
         // Test for missing schema/xml file
-#if (XSD_INT_VERSION >= 3000000L)
+#if CHASTE_XSD_VERSION_AT_LEAST(3, 0, 0)
         const ::xsd::cxx::tree::diagnostics<char>& diags = e.diagnostics();
         const ::xsd::cxx::tree::error<char>& first_error = diags[0];
 #else

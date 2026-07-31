@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,12 +40,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Convenience header for including ublas types in default namespace
  */
 
+#include "ChastePragmas.hpp"
+
 #include "UblasVectorInclude.hpp"
 #include "UblasMatrixInclude.hpp"
 
+CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/matrix_expression.hpp>
 #include <boost/numeric/ublas/io.hpp>
+CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END
 
 namespace ublas = boost::numeric::ublas;
 

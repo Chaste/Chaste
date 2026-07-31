@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractFileComparison.hpp"
 #include <vector>
-#include <boost/foreach.hpp>
 
 #include <cxxtest/TestSuite.h>
 
@@ -228,7 +227,7 @@ public:
             if (!mIgnorableContent.empty())
             {
                 bool skip_this_line = false;
-                BOOST_FOREACH(const std::string& rText, mIgnorableContent)
+                for (const std::string& rText : mIgnorableContent)
                 {
                     size_t found1 = buffer1.find(rText);
                     size_t found2 = buffer2.find(rText);

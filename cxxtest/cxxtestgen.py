@@ -162,7 +162,7 @@ def expandWildcards( patterns ):
 
 def fixBackslashes( fileName ):
     '''Convert backslashes to slashes in file name'''
-    return re.sub( r'\\', '/', fileName, 0 )
+    return re.sub( r'\\', '/', fileName, count=0 )
 
 def scanInputFiles(files):
     '''Scan all input files for test suites'''
@@ -299,7 +299,7 @@ def fixBlockLine( suite, lineNo, line):
     '''Change all [E]TS_ macros used in a line to _[E]TS_ macros with the correct file/line'''
     return re.sub( r'\b(E?TSM?_(ASSERT[A-Z_]*|FAIL))\s*\(',
                    r'_\1(%s,%s,' % (suite['cfile'], lineNo),
-                   line, 0 )
+                   line, count=0 )
 
 create_re = re.compile( r'\bstatic\s+\w+\s*\*\s*createSuite\s*\(\s*(void)?\s*\)' )
 def scanLineForCreate( suite, lineNo, line ):

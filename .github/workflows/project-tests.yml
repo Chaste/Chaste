@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  
+
   build-and-test:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
@@ -23,6 +23,7 @@ jobs:
         include:
           - project_org: "Chaste"
             project_repo: "CellBasedComparison2017"
+            ref: ""
             build_target: "project_CellBasedComparison2017"
             test_target: "project_CellBasedComparison2017"
 
@@ -31,7 +32,7 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: install dependencies
       run: |
@@ -39,12 +40,13 @@ jobs:
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
-    
+
     - name: checkout project
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: ${{ matrix.project_org }}/${{ matrix.project_repo }}
         path: projects/${{ matrix.project_repo }}
+        ref: ${{ matrix.ref }}
 
     - name: compiler version
       run: |
@@ -57,6 +59,12 @@ jobs:
 
     - name: cmake configure
       run: cmake -DCMAKE_BUILD_TYPE=Release -DChaste_ERROR_ON_WARNING=OFF ..
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
+        ctest -V -R TestChasteBuildInfo
       working-directory: chaste-build-dir
 
     - name: build targets

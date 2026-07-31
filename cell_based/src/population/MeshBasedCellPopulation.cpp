@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,6 +61,9 @@ MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(Mutable
           mAreaBasedDampingConstantParameter(0.1),
           mWriteVtkAsPoints(false),
           mBoundVoronoiTessellation(false),
+          mScaleBoundByEdgeLength(false),
+          mBoundedVoroniTesselationLengthCutoff(DBL_MAX),
+          mOffsetNewBoundaryNodes(false),
           mHasVariableRestLength(false)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
@@ -71,6 +74,8 @@ MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(Mutable
     {
         Validate();
     }
+
+    UpdateNodePairs();
 
     // Initialise the applied force at each node to zero
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
@@ -88,6 +93,7 @@ MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableM
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
     mpVoronoiTessellation = nullptr;
     mDeleteMesh = true;
+    UpdateNodePairs();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -283,6 +289,16 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::RemoveDeadCells()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePairs()
+{
+    this->mNodePairs.clear();
+    for (SpringIterator spring_it = SpringsBegin(); spring_it != SpringsEnd(); ++spring_it)
+    {
+        this->mNodePairs.emplace_back(spring_it.GetNodeA(), spring_it.GetNodeB());
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrDeaths)
 {
     ///\todo check if there is a more efficient way of keeping track of node velocity information (#2404)
@@ -430,6 +446,9 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
     {
         this->mMarkedSprings.erase(**spring_it);
     }
+
+    // Update node pairs. Note, this must happen after remeshing.
+    UpdateNodePairs();
 
     // Tessellate if needed
     TessellateIfNeeded();
@@ -847,6 +866,45 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetBoundVoronoiTessellation
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetScaleBoundByEdgeLength(bool scaleBoundByEdgeLength)
+{
+    mScaleBoundByEdgeLength = scaleBoundByEdgeLength;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetScaleBoundByEdgeLength()
+{
+    return mScaleBoundByEdgeLength;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetBoundedVoroniTesselationLengthCutoff(double boundedVoroniTesselationLengthCutoff)
+{
+    assert(boundedVoroniTesselationLengthCutoff>0);
+    mBoundedVoroniTesselationLengthCutoff = boundedVoroniTesselationLengthCutoff;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetBoundedVoroniTesselationLengthCutoff()
+{
+    return mBoundedVoroniTesselationLengthCutoff;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOffsetNewBoundaryNodes(bool offsetNewBoundaryNodes)
+{
+    mOffsetNewBoundaryNodes = offsetNewBoundaryNodes;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOffsetNewBoundaryNodes()
+{
+    return mOffsetNewBoundaryNodes;
+}
+
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
     if (bool(dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh))))
@@ -876,17 +934,27 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateVoronoiTessellation(
         bool is_mesh_periodic = false;
         if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
         {
+            if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX || mOffsetNewBoundaryNodes)
+            {
+                // Not implemented for Cylindrical meshes yet see Issue 305
+                NEVER_REACHED;
+            }
             is_mesh_periodic = true;
             mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
         }
         else if (dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh)))
         {
+            if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX || mOffsetNewBoundaryNodes)
+            {
+                // Not implemented for Toroidal meshes yet see Issue 305
+                NEVER_REACHED;
+            }
             is_mesh_periodic = true;
             mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
         }
         else
         {
-            mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2>&>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation);
+            mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2>&>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation, mScaleBoundByEdgeLength, mBoundedVoroniTesselationLengthCutoff, mOffsetNewBoundaryNodes);
         }
     }
     else if constexpr (ELEMENT_DIM == 3)
@@ -1123,16 +1191,6 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant
     assert(areaBasedDampingConstantParameter >= 0.0);
     mAreaBasedDampingConstantParameter = areaBasedDampingConstantParameter;
 }
-
-// LCOV_EXCL_START
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetNodePairs()
-{
-    //mNodePairs.Clear();
-    NEVER_REACHED;
-    return mNodePairs;
-}
-// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)

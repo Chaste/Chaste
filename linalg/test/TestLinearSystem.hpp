@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1073,7 +1073,6 @@ public:
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             VecCreate(PETSC_COMM_WORLD, &new_vec);
-            VecSetType(new_vec, CHASTE_PETSC_NULLPTR);
             VecLoad(new_vec, vec_viewer);
 #else
             VecLoad(vec_viewer, CHASTE_PETSC_NULLPTR, &new_vec);
@@ -1103,7 +1102,6 @@ public:
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             MatCreate(PETSC_COMM_WORLD, &new_mat);
-            MatSetType(new_mat, CHASTE_PETSC_NULLPTR);
             MatLoad(new_mat, mat_viewer);
 #else
             MatLoad(mat_viewer, CHASTE_PETSC_NULLPTR, &new_mat);
@@ -1175,12 +1173,13 @@ public:
                     ls.SetMatrixElement(row, col, (row == col)?(row+1.0):0.0);
                 }
             }
-            ls.AssembleFinalLinearSystem();
 
             for (unsigned i=0; i<size; i++)
             {
                 ls.SetRhsVectorElement(i, rhs_values[i]);
             }
+            ls.AssembleFinalLinearSystem();
+
             ls.SetKspType("cg");
             ls.SetPcType("none");
 
@@ -1374,12 +1373,8 @@ public:
             TS_ASSERT_THROWS_THIS(ls_diff_precond.rGetPrecondMatrix(), "LHS matrix used for preconditioner construction");
 
             ls_diff_precond.SetPrecondMatrixIsDifferentFromLhs();
-
-#if PETSC_VERSION_GE(3, 11, 2) // PETSc 3.11.2 or newer
-            PetscTools::ChasteMatCopy(ls_diff_precond.GetLhsMatrix(), ls_diff_precond.rGetPrecondMatrix(), DIFFERENT_NONZERO_PATTERN);
-#else
+            PetscMatTools::Finalise(ls_diff_precond.rGetPrecondMatrix());
             MatCopy(ls_diff_precond.GetLhsMatrix(), ls_diff_precond.rGetPrecondMatrix(), DIFFERENT_NONZERO_PATTERN);
-#endif
 
             Vec solution = ls_diff_precond.Solve();
             num_it_diff_mat = ls_diff_precond.GetNumIterations();
@@ -1621,6 +1616,7 @@ public:
 
         Vec init_cond = PetscTools::CreateAndSetVec(2, 0.0);
         PetscVecTools::SetElement(init_cond, 0, 0.01);
+        PetscVecTools::Finalise(init_cond);
 
         ls.AssembleFinalLinearSystem();
 

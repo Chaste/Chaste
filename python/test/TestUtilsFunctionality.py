@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2024, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,7 @@ import sys
 import filecmp
 
 class TestUtilsFunctionality(unittest.TestCase):
-    
+
     def TestAddingVtuAnnotationsMonodomain2d(self):
         #without suffices (input and output file names)
         original_vtu1 = 'python/test/data/input/Monodomain2d_before_annotations'
@@ -48,7 +48,7 @@ class TestUtilsFunctionality(unittest.TestCase):
         rc = os.system(sys.executable + ' python/utils/AddVtuTimeAnnotations.py ' + original_vtu1 + ' ' + output_vtu1)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output_vtu1+'.vtu','python/test/data/output/Monodomain2d_after_annotations.vtu'))
-        
+
         #with suffices
         original_vtu2 = 'python/test/data/input/Monodomain2d_before_annotations.vtu'
         output_vtu2 = os.path.join(CHASTE_TEST_OUTPUT, 'MonodomainAddingAnnotationsTest2.vtu')
@@ -62,14 +62,14 @@ class TestUtilsFunctionality(unittest.TestCase):
         rc = os.system(sys.executable + ' python/utils/AddVtuTimeAnnotations.py ' + original_vtu + ' ' + output_vtu)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output_vtu,'python/test/data/output/Bidomain3d_after_annotations.vtu'))
-        
+
     def TestAddingVtuAnnotationsAirway(self):
         original_vtu = 'python/test/data/input/ThreeBifurcations_before_annotations.vtu'
         output_vtu = os.path.join(CHASTE_TEST_OUTPUT, 'ThreeBifurcationsAddingAnnotationsTest.vtu')
         rc = os.system(sys.executable + ' python/utils/AddVtuTimeAnnotations.py ' + original_vtu + ' ' + output_vtu)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output_vtu, 'python/test/data/output/ThreeBifurcations_after_annotations.vtu'))
-        
+
     def TestAddingVtuAnnotationsParallelPieces(self):
         original_pvtu = 'python/test/data/input/monodomain3d.pvtu'
         output_base_name = os.path.join(CHASTE_TEST_OUTPUT, 'MonodomainAddingAnnotations')
@@ -79,7 +79,7 @@ class TestUtilsFunctionality(unittest.TestCase):
         self.assertTrue(filecmp.cmp(output_pvtu,'python/test/data/output/MonodomainAddingAnnotations.pvtu'))
         self.assertTrue(filecmp.cmp(output_base_name+'_0.vtu','python/test/data/output/MonodomainAddingAnnotations_0.vtu'))
         self.assertTrue(filecmp.cmp(output_base_name+'_1.vtu','python/test/data/output/MonodomainAddingAnnotations_1.vtu'))
-        
+
     def TestAddingVtuAnnotationsBidomainWithApdMap_Fails(self):
         #The script returns a file that seg faults in Paraview
         original_vtu = 'python/test/data/input/bidomain2d_with_apd_map.vtu'
@@ -116,5 +116,5 @@ class TestUtilsFunctionality(unittest.TestCase):
         # Byte-for-byte comparion
         self.assertTrue(filecmp.cmp(output, converted))
 
-                     
-        
+
+

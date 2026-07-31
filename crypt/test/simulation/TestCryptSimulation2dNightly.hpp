@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,6 +56,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 
 // Cell population writers
+#include <cxxtest/cxxtest/TestSuite.h>
+
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 
@@ -534,6 +536,8 @@ public:
                 number_of_mutant_cells++;
             }
         }
+
+        TS_ASSERT_LESS_THAN_EQUALS(number_of_mutant_cells, number_of_cells);
 
         // Tidy up
         WntConcentration<2>::Destroy();

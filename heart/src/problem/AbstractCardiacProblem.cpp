@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -457,7 +457,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
     {
         progress_reporter_dir = ""; // progress printed to CHASTE_TEST_OUTPUT
     }
-    BOOST_FOREACH (boost::shared_ptr<AbstractOutputModifier> p_output_modifier, mOutputModifiers)
+    for (boost::shared_ptr<AbstractOutputModifier> p_output_modifier : mOutputModifiers)
     {
         p_output_modifier->InitialiseAtStart(this->mpMesh->GetDistributedVectorFactory(), this->mpMesh->rGetNodePermutation());
         p_output_modifier->ProcessSolutionAtTimeStep(stepper.GetTime(), initial_condition, PROBLEM_DIM);
@@ -549,7 +549,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
             HeartEventHandler::EndEvent(HeartEventHandler::WRITE_OUTPUT);
         }
 
-        BOOST_FOREACH (boost::shared_ptr<AbstractOutputModifier> p_output_modifier, mOutputModifiers)
+        for (boost::shared_ptr<AbstractOutputModifier> p_output_modifier : mOutputModifiers)
         {
             p_output_modifier->ProcessSolutionAtTimeStep(stepper.GetTime(), mSolution, PROBLEM_DIM);
         }
@@ -575,7 +575,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
 
     // Close the file that stores voltage values
     progress_reporter.PrintFinalising();
-    BOOST_FOREACH (boost::shared_ptr<AbstractOutputModifier> p_output_modifier, mOutputModifiers)
+    for (boost::shared_ptr<AbstractOutputModifier> p_output_modifier : mOutputModifiers)
     {
         p_output_modifier->FinaliseAtEnd();
     }

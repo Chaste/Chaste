@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,12 +54,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * CellBasedSimulationArchiver handles the checkpointing (saving and loading)
  * of all the various AbstractCellBasedSimulation objects. It has no explicit constructor
  * (just uses a default one) and no member variables.
+ *
+ * The template options for INPUT_ARCHIVE_TYPE and OUTPUT_ARCHIVE_TYPE can (in theory) be set independently but should be chosen accordingly.
+ * To help with this, below, we define type aliases to set both archive types for text and binary I/O respectively.
+ * Default settings are chosen such that existing implementations depending on text format as default are kept intact.
  */
-template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM=ELEMENT_DIM>
+template <unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM = ELEMENT_DIM, class INPUT_ARCHIVE_TYPE = boost::archive::text_iarchive, class OUTPUT_ARCHIVE_TYPE = boost::archive::text_oarchive>
 class CellBasedSimulationArchiver
 {
 public:
-
     /**
      * Loads a saved cell-based simulation to run further.
      *
@@ -86,8 +89,8 @@ public:
     static void Save(SIM* pSim);
 };
 
-template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM>
-SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Load(const std::string& rArchiveDirectory, const double& rTimeStamp)
+template <unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM, class INPUT_ARCHIVE_TYPE, class OUTPUT_ARCHIVE_TYPE>
+SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM, INPUT_ARCHIVE_TYPE, OUTPUT_ARCHIVE_TYPE>::Load(const std::string& rArchiveDirectory, const double& rTimeStamp)
 {
     /**
      * Find the right archive (and mesh) to load.  The files are contained within
@@ -105,8 +108,8 @@ SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Load(const std::s
     ArchiveLocationInfo::SetMeshPathname(archive_dir, mesh_filename);
 
     // Create an input archive
-    ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_filename);
-    boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+    ArchiveOpener<INPUT_ARCHIVE_TYPE, std::ifstream> arch_opener(archive_dir, archive_filename);
+    INPUT_ARCHIVE_TYPE* p_arch = arch_opener.GetCommonArchive();
 
     // Load the simulation
     SIM* p_sim;
@@ -114,8 +117,8 @@ SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Load(const std::s
     return p_sim;
 }
 
-template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM>
-void CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Save(SIM* pSim)
+template <unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM, class INPUT_ARCHIVE_TYPE, class OUTPUT_ARCHIVE_TYPE>
+void CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM, INPUT_ARCHIVE_TYPE, OUTPUT_ARCHIVE_TYPE>::Save(SIM* pSim)
 {
     // Get the simulation time as a string
     const SimulationTime* p_sim_time = SimulationTime::Instance();
@@ -129,11 +132,23 @@ void CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Save(SIM* pSim)
     ArchiveLocationInfo::SetMeshFilename(std::string("mesh_") + time_stamp.str());
 
     // Create output archive
-    ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_filename);
-    boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+    ArchiveOpener<OUTPUT_ARCHIVE_TYPE, std::ofstream> arch_opener(archive_dir, archive_filename);
+    OUTPUT_ARCHIVE_TYPE* p_arch = arch_opener.GetCommonArchive();
 
     // Archive the simulation (const-ness would be a pain here)
     (*p_arch) & pSim;
 }
+
+/*
+ * Specialization of the CellBasedSimulationArchiver for text based formats to reduce requirement to set both archive type template parameters
+ */
+template <unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM = ELEMENT_DIM>
+using CellBasedSimulationArchiverText = CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM, boost::archive::text_iarchive, boost::archive::text_oarchive>;
+
+/*
+ * Specialization of the CellBasedSimulationArchiver for binary based formats to reduce requirement to set both archive type template parameters
+ */
+template <unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM = ELEMENT_DIM>
+using CellBasedSimulationArchiverBinary = CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM, boost::archive::binary_iarchive, boost::archive::binary_oarchive>;
 
 #endif /*CELLBASEDSIMULATIONARCHIVER_HPP_*/

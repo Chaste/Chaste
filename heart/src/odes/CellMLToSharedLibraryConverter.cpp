@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring> // For strerror()
 #include <cerrno> // For errno
 
-#include <boost/foreach.hpp>
 
 #include "ChasteSyscalls.hpp"
 #include "Exception.hpp"
@@ -191,7 +190,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             std::string cellml_leaf_name = cellml_file.GetLeafNameNoExtension();
             std::vector<FileFinder> cellml_files = cellml_folder.FindMatches(cellml_leaf_name + "*");
 
-            BOOST_FOREACH(const FileFinder& r_cellml_file, cellml_files)
+            for (const FileFinder& r_cellml_file : cellml_files)
             {
                 r_cellml_file.CopyTo(tmp_folder);
             }
@@ -204,7 +203,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "set(CMAKE_CXX_EXTENSIONS OFF)\n" <<
                                       "project (ChasteCellMLToSharedLibraryConverter)\n" <<
                                       "find_package(Python3 3.5 REQUIRED)\n" <<
-                                      "set(codegen_python3_venv " + chaste_root.GetAbsolutePath() + "/codegen_python3_venv/bin)\n" <<
+                                      "set(chaste_python3_venv " + chaste_root.GetAbsolutePath() + "/chaste_python3_venv/bin)\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
                                       "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON " << codegen_args << ")\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<

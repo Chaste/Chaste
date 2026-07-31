@@ -13,7 +13,7 @@ function ret = LoadNonConstantLengthData(filename)
 %
 %   has x{1} = [1 2 3], x{2} = [4], x{3} = [5 6 7 8].
 %
- 
+
 fid = fopen(filename);
 
 if(fid<0)

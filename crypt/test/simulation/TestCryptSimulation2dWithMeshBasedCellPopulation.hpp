@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -309,7 +309,7 @@ public:
        }
 
        // Check no nodes have been created
-       TS_ASSERT_EQUALS(num_ghosts_after, num_ghosts_after);
+       TS_ASSERT_EQUALS(num_ghosts_before, num_ghosts_after);
 
        // All cells should have been removed in this time
        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), num_cells-2u);

@@ -10,159 +10,159 @@ CellML 1.0 was used to generate this model
 http://www.cellml.org/
 -->
 <model xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqs="http://www.cellml.org/bqs/1.0#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:ns7="http://www.cellml.org/metadata/simulation/1.0#" xml:base="http://models.cellml.org/workspace/maleckar_greenstein_trayanova_giles_2009/@@rawfile/c446ef4d188574654356f9edbfb8f10711209357/" name="Maleckar2008" cmeta:id="Maleckar2008" xmlns="http://www.cellml.org/cellml/1.0#" xmlns:cellml="http://www.cellml.org/cellml/1.0#" xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
-	<documentation xmlns="http://cellml.org/tmp-documentation">
-		<article>
-			<articleinfo>
-				<title>Mathematical simulations of ligand-gated and cell-type specific effects on the action potential of human atrium</title>
-				<author>
-					<firstname>Catherine</firstname>
-					<surname>Lloyd</surname>
-					<affiliation>
-						<shortaffil>ABI</shortaffil>
-					</affiliation>
-				</author>
-			</articleinfo>
-			<section id="sec_status">
-				<title>Model Status</title>
-				<para>
+    <documentation xmlns="http://cellml.org/tmp-documentation">
+        <article>
+            <articleinfo>
+                <title>Mathematical simulations of ligand-gated and cell-type specific effects on the action potential of human atrium</title>
+                <author>
+                    <firstname>Catherine</firstname>
+                    <surname>Lloyd</surname>
+                    <affiliation>
+                        <shortaffil>ABI</shortaffil>
+                    </affiliation>
+                </author>
+            </articleinfo>
+            <section id="sec_status">
+                <title>Model Status</title>
+                <para>
             This CellML model is known to run in PCEnv and COR to recreate the published results.  The units have been checked and are consistent.
           </para>
-			</section>
-			<sect1 id="sec_structure">
-				<title>Model Structure</title>
-				<para>
+            </section>
+            <sect1 id="sec_structure">
+                <title>Model Structure</title>
+                <para>
 ABSTRACT: In the mammalian heart, myocytes and fibroblasts can communicate via gap junction, or connexin-mediated current flow. Some of the effects of this electrotonic coupling on the action potential waveform of the human ventricular myocyte have been analyzed in detail. The present study employs a recently developed mathematical model of the human atrial myocyte to investigate the consequences of this heterogeneous cell-cell interaction on the action potential of the human atrium. Two independent physiological processes which alter the physiology of the human atrium have been studied. i) The effects of the autonomic transmitter acetylcholine on the atrial action potential have been investigated by inclusion of a time-independent, acetylcholine-activated K+ current in this mathematical model of the atrial myocyte. ii) A non-selective cation current which is activated by natriuretic peptides has been incorporated into a previously published mathematical model of the cardiac fibroblast. These results identify subtle effects of acetylcholine, which arise from the nonlinear interactions between ionic currents in the human atrial myocyte. They also illustrate marked alterations in the action potential waveform arising from fibroblast-myocyte source-sink principles when the natriuretic peptide-mediated cation conductance is activated. Additional calculations also illustrate the effects of simultaneous activation of both of these cell-type specific conductances within the atrial myocardium. This study provides a basis for beginning to assess the utility of mathematical modeling in understanding detailed cell-cell interactions within the complex paracrine environment of the human atrial myocardium.
 </para>
-				<para>
+                <para>
 The complete original paper reference is cited below:
 </para>
-				<para>
-					<ulink url="http://www.ncbi.nlm.nih.gov/pubmed/19186188?ordinalpos=1&amp;itool=EntrezSystem2.PEntrez.Pubmed.Pubmed_ResultsPanel.Pubmed_DefaultReportPanel.Pubmed_RVDocSum">Mathematical simulations of ligand-gated and cell-type specific effects on the action potential of human atrium</ulink>, Mary M. Maleckara, Joseph L. Greensteina, Natalia A. Trayanova and Wayne R. Giles, 2009, <ulink url="http://www.sciencedirect.com/science/journal/00796107">
-						<emphasis>Progress in Biophysics and Molecular Biology</emphasis>
-					</ulink>, Currently in press (available online). (<ulink url="http://www.sciencedirect.com/science?_ob=ArticleURL&amp;_udi=B6TBN-4VGVH2H-1&amp;_user=140507&amp;_rdoc=1&amp;_fmt=&amp;_orig=search&amp;_sort=d&amp;view=c&amp;_acct=C000011498&amp;_version=1&amp;_urlVersion=0&amp;_userid=140507&amp;md5=c651b6d18883c1195d9bd715f07e0b76">Full text</ulink> and PDF versions of the article are available to subscribers on the journal website.)  <ulink url="http://www.ncbi.nlm.nih.gov/pubmed/19186188?ordinalpos=1&amp;itool=EntrezSystem2.PEntrez.Pubmed.Pubmed_ResultsPanel.Pubmed_DefaultReportPanel.Pubmed_RVDocSum">PubMed ID: 19186188</ulink>
-				</para>
-				<informalfigure float="0" id="fig_cell_diagram">
-					<mediaobject>
-						<imageobject>
-							<objectinfo>
-								<title>cell diagram</title>
-							</objectinfo>
-							<imagedata fileref="maleckar_2009.png"/>
-						</imageobject>
-					</mediaobject>
-					<caption>Schematic diagram of the human atrial myocyte model. It includes the main time- and voltage-dependent ion currents which contribute to the generation of the human atrial action potential: INa, ICa,L, It, Ikur, IK1, IKr, and IKs. This model also includes electrogenic pump and exchanger currents: the sarcolemmal Ca2+ pump current (ICa,P), the Na+-Ca2+ exchanger current (INaCa), and the Na+-K+ pump current (INaK). These transporters are responsible for the maintenance of intracellular ion concentrations, and are balanced by Na+ and Ca2+ time-independent or background currents, IBNa and IBCa.</caption>
-				</informalfigure>
-			</sect1>
-		</article>
-	</documentation>
-	<rdf:RDF>
-		<rdf:Seq rdf:about="rdf:#d003b9eb-7e64-407f-80b4-2fd29cc9216a">
-			<rdf:li rdf:resource="rdf:#071d5810-0c3c-4785-9f97-32accb68d991"/>
-			<rdf:li rdf:resource="rdf:#4727ac8f-7792-4894-bec1-132532d3884c"/>
-			<rdf:li rdf:resource="rdf:#ba64d1c7-f3b6-440d-ba05-6b0600e3e746"/>
-			<rdf:li rdf:resource="rdf:#49befdfa-e6a0-4e09-88c2-dc408caf401e"/>
-		</rdf:Seq>
-		<rdf:Description rdf:about="rdf:#cc3e99e0-fb91-4408-818a-2448a7799488">
-			<vCard:Given>Wayne</vCard:Given>
-			<vCard:Family>Giles</vCard:Family>
-			<vCard:Other>R</vCard:Other>
-		</rdf:Description>
-		<rdf:Description rdf:about="">
-			<dc:publisher/>
-			<cmeta:comment xmlns:cmeta="http://www.cellml.org/metadata/1.0#" rdf:resource="rdf:#eb1f9b9d-62b6-4a84-8357-c34e6c749266"/>
-			<dcterms:created rdf:resource="rdf:#36cd6b5a-8e68-4e53-aaba-1fb61e89be9e"/>
-			<dc:creator rdf:resource="rdf:#98654bc3-25a2-42ec-ad8a-d0b19d26b5eb"/>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#3df1a0e6-429f-45fb-9835-4d1a5a7a03a5">
-			<dc:title>Progress in Biophysics and Molecular Biology</dc:title>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#35d9a3fb-dc30-4ac3-b7aa-5459e4390d73">
-			<vCard:Given>Martin</vCard:Given>
-			<vCard:Family>Fink</vCard:Family>
-			<vCard:Other/>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#3456f3e3-1fd6-46a1-9431-826a91b2fdc4">
-			<dc:creator rdf:resource="rdf:#f77cc7c2-e7f4-4355-8293-aa52767984d4"/>
-			<rdf:value>This CellML model is known to run in PCEnv and COR to recreate the published results.  The units have been checked and are consistent.</rdf:value>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#a9c6dbea-3d60-4fe6-a078-3e3534ca6b80">
-			<vCard:Given>Joseph</vCard:Given>
-			<vCard:Family>Greenstein</vCard:Family>
-			<vCard:Other>L</vCard:Other>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#a1e769e0-89f9-42cf-9f1a-a590377a26cf">
-			<vCard:Orgname>University of Oxford</vCard:Orgname>
-			<vCard:Orgunit>Department of Physiology, Anatomy &amp; Genetics</vCard:Orgunit>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#ba64d1c7-f3b6-440d-ba05-6b0600e3e746">
-			<rdf:type rdf:resource="http://www.cellml.org/bqs/1.0#Person"/>
-			<vCard:N rdf:resource="rdf:#0d716739-22fe-4388-a239-07ac4ef766dd"/>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#283e45fe-74ed-422c-beff-b5bccdd0c5a9">
-			<dcterms:W3CDTF>2009-01-00 00:00</dcterms:W3CDTF>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#071d5810-0c3c-4785-9f97-32accb68d991">
-			<rdf:type rdf:resource="http://www.cellml.org/bqs/1.0#Person"/>
-			<vCard:N rdf:resource="rdf:#4a210c2c-d4a2-4181-8741-5571688c4a83"/>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#36cd6b5a-8e68-4e53-aaba-1fb61e89be9e">
-			<dcterms:W3CDTF>2009-03-03T00:00:00+00:00</dcterms:W3CDTF>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#0d716739-22fe-4388-a239-07ac4ef766dd">
-			<vCard:Given>Natalia</vCard:Given>
-			<vCard:Family>Trayanova</vCard:Family>
-			<vCard:Other>A</vCard:Other>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#4a210c2c-d4a2-4181-8741-5571688c4a83">
-			<vCard:Given>Mary</vCard:Given>
-			<vCard:Family>Maleckar</vCard:Family>
-			<vCard:Other>M</vCard:Other>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#f1256798-93e5-44b7-bc0c-b2901425a65e">
-			<rdf:type rdf:resource="http://imc.org/vCard/3.0#internet"/>
-			<rdf:value>martin.fink@dpag.ox.ac.uk</rdf:value>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#eb1f9b9d-62b6-4a84-8357-c34e6c749266">
-			<dc:creator rdf:resource="rdf:#49690bf0-0b8d-4a2a-9a93-d346a0e03318"/>
-			<rdf:value/>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#a8048547-b2dd-4007-835b-d347327b350f">
-			<dc:creator rdf:resource="rdf:#d003b9eb-7e64-407f-80b4-2fd29cc9216a"/>
-			<dc:title>Mathematical simulations of ligand-gated and cell-type specific effects on the action potential of human atrium</dc:title>
-			<bqs:volume/>
-			<bqs:first_page/>
-			<bqs:Journal rdf:resource="rdf:#3df1a0e6-429f-45fb-9835-4d1a5a7a03a5"/>
-			<dcterms:issued rdf:resource="rdf:#283e45fe-74ed-422c-beff-b5bccdd0c5a9"/>
-			<bqs:last_page/>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#4727ac8f-7792-4894-bec1-132532d3884c">
-			<rdf:type rdf:resource="http://www.cellml.org/bqs/1.0#Person"/>
-			<vCard:N rdf:resource="rdf:#a9c6dbea-3d60-4fe6-a078-3e3534ca6b80"/>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#98654bc3-25a2-42ec-ad8a-d0b19d26b5eb">
-			<vCard:ORG rdf:resource="rdf:#a1e769e0-89f9-42cf-9f1a-a590377a26cf"/>
-			<vCard:EMAIL rdf:resource="rdf:#f1256798-93e5-44b7-bc0c-b2901425a65e"/>
-			<vCard:N rdf:resource="rdf:#35d9a3fb-dc30-4ac3-b7aa-5459e4390d73"/>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#f77cc7c2-e7f4-4355-8293-aa52767984d4">
-			<vCard:FN>Catherine Lloyd</vCard:FN>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#49befdfa-e6a0-4e09-88c2-dc408caf401e">
-			<rdf:type rdf:resource="http://www.cellml.org/bqs/1.0#Person"/>
-			<vCard:N rdf:resource="rdf:#cc3e99e0-fb91-4408-818a-2448a7799488"/>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#113722f0-be00-4c1e-a108-540fe0939647">
-			<bqs:Pubmed_id>19186188</bqs:Pubmed_id>
-			<bqs:JournalArticle rdf:resource="rdf:#a8048547-b2dd-4007-835b-d347327b350f"/>
-		</rdf:Description>
-		<rdf:Description rdf:about="#Maleckar">
-			<bqs:reference rdf:resource="rdf:#113722f0-be00-4c1e-a108-540fe0939647"/>
-			<cmeta:comment xmlns:cmeta="http://www.cellml.org/metadata/1.0#" rdf:resource="rdf:#3456f3e3-1fd6-46a1-9431-826a91b2fdc4"/>
-		</rdf:Description>
-		<rdf:Description rdf:about="rdf:#49690bf0-0b8d-4a2a-9a93-d346a0e03318">
-			<vCard:FN/>
-		</rdf:Description>
-	</rdf:RDF>   
+                <para>
+                    <ulink url="http://www.ncbi.nlm.nih.gov/pubmed/19186188?ordinalpos=1&amp;itool=EntrezSystem2.PEntrez.Pubmed.Pubmed_ResultsPanel.Pubmed_DefaultReportPanel.Pubmed_RVDocSum">Mathematical simulations of ligand-gated and cell-type specific effects on the action potential of human atrium</ulink>, Mary M. Maleckara, Joseph L. Greensteina, Natalia A. Trayanova and Wayne R. Giles, 2009, <ulink url="http://www.sciencedirect.com/science/journal/00796107">
+                        <emphasis>Progress in Biophysics and Molecular Biology</emphasis>
+                    </ulink>, Currently in press (available online). (<ulink url="http://www.sciencedirect.com/science?_ob=ArticleURL&amp;_udi=B6TBN-4VGVH2H-1&amp;_user=140507&amp;_rdoc=1&amp;_fmt=&amp;_orig=search&amp;_sort=d&amp;view=c&amp;_acct=C000011498&amp;_version=1&amp;_urlVersion=0&amp;_userid=140507&amp;md5=c651b6d18883c1195d9bd715f07e0b76">Full text</ulink> and PDF versions of the article are available to subscribers on the journal website.)  <ulink url="http://www.ncbi.nlm.nih.gov/pubmed/19186188?ordinalpos=1&amp;itool=EntrezSystem2.PEntrez.Pubmed.Pubmed_ResultsPanel.Pubmed_DefaultReportPanel.Pubmed_RVDocSum">PubMed ID: 19186188</ulink>
+                </para>
+                <informalfigure float="0" id="fig_cell_diagram">
+                    <mediaobject>
+                        <imageobject>
+                            <objectinfo>
+                                <title>cell diagram</title>
+                            </objectinfo>
+                            <imagedata fileref="maleckar_2009.png"/>
+                        </imageobject>
+                    </mediaobject>
+                    <caption>Schematic diagram of the human atrial myocyte model. It includes the main time- and voltage-dependent ion currents which contribute to the generation of the human atrial action potential: INa, ICa,L, It, Ikur, IK1, IKr, and IKs. This model also includes electrogenic pump and exchanger currents: the sarcolemmal Ca2+ pump current (ICa,P), the Na+-Ca2+ exchanger current (INaCa), and the Na+-K+ pump current (INaK). These transporters are responsible for the maintenance of intracellular ion concentrations, and are balanced by Na+ and Ca2+ time-independent or background currents, IBNa and IBCa.</caption>
+                </informalfigure>
+            </sect1>
+        </article>
+    </documentation>
+    <rdf:RDF>
+        <rdf:Seq rdf:about="rdf:#d003b9eb-7e64-407f-80b4-2fd29cc9216a">
+            <rdf:li rdf:resource="rdf:#071d5810-0c3c-4785-9f97-32accb68d991"/>
+            <rdf:li rdf:resource="rdf:#4727ac8f-7792-4894-bec1-132532d3884c"/>
+            <rdf:li rdf:resource="rdf:#ba64d1c7-f3b6-440d-ba05-6b0600e3e746"/>
+            <rdf:li rdf:resource="rdf:#49befdfa-e6a0-4e09-88c2-dc408caf401e"/>
+        </rdf:Seq>
+        <rdf:Description rdf:about="rdf:#cc3e99e0-fb91-4408-818a-2448a7799488">
+            <vCard:Given>Wayne</vCard:Given>
+            <vCard:Family>Giles</vCard:Family>
+            <vCard:Other>R</vCard:Other>
+        </rdf:Description>
+        <rdf:Description rdf:about="">
+            <dc:publisher/>
+            <cmeta:comment xmlns:cmeta="http://www.cellml.org/metadata/1.0#" rdf:resource="rdf:#eb1f9b9d-62b6-4a84-8357-c34e6c749266"/>
+            <dcterms:created rdf:resource="rdf:#36cd6b5a-8e68-4e53-aaba-1fb61e89be9e"/>
+            <dc:creator rdf:resource="rdf:#98654bc3-25a2-42ec-ad8a-d0b19d26b5eb"/>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#3df1a0e6-429f-45fb-9835-4d1a5a7a03a5">
+            <dc:title>Progress in Biophysics and Molecular Biology</dc:title>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#35d9a3fb-dc30-4ac3-b7aa-5459e4390d73">
+            <vCard:Given>Martin</vCard:Given>
+            <vCard:Family>Fink</vCard:Family>
+            <vCard:Other/>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#3456f3e3-1fd6-46a1-9431-826a91b2fdc4">
+            <dc:creator rdf:resource="rdf:#f77cc7c2-e7f4-4355-8293-aa52767984d4"/>
+            <rdf:value>This CellML model is known to run in PCEnv and COR to recreate the published results.  The units have been checked and are consistent.</rdf:value>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#a9c6dbea-3d60-4fe6-a078-3e3534ca6b80">
+            <vCard:Given>Joseph</vCard:Given>
+            <vCard:Family>Greenstein</vCard:Family>
+            <vCard:Other>L</vCard:Other>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#a1e769e0-89f9-42cf-9f1a-a590377a26cf">
+            <vCard:Orgname>University of Oxford</vCard:Orgname>
+            <vCard:Orgunit>Department of Physiology, Anatomy &amp; Genetics</vCard:Orgunit>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#ba64d1c7-f3b6-440d-ba05-6b0600e3e746">
+            <rdf:type rdf:resource="http://www.cellml.org/bqs/1.0#Person"/>
+            <vCard:N rdf:resource="rdf:#0d716739-22fe-4388-a239-07ac4ef766dd"/>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#283e45fe-74ed-422c-beff-b5bccdd0c5a9">
+            <dcterms:W3CDTF>2009-01-00 00:00</dcterms:W3CDTF>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#071d5810-0c3c-4785-9f97-32accb68d991">
+            <rdf:type rdf:resource="http://www.cellml.org/bqs/1.0#Person"/>
+            <vCard:N rdf:resource="rdf:#4a210c2c-d4a2-4181-8741-5571688c4a83"/>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#36cd6b5a-8e68-4e53-aaba-1fb61e89be9e">
+            <dcterms:W3CDTF>2009-03-03T00:00:00+00:00</dcterms:W3CDTF>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#0d716739-22fe-4388-a239-07ac4ef766dd">
+            <vCard:Given>Natalia</vCard:Given>
+            <vCard:Family>Trayanova</vCard:Family>
+            <vCard:Other>A</vCard:Other>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#4a210c2c-d4a2-4181-8741-5571688c4a83">
+            <vCard:Given>Mary</vCard:Given>
+            <vCard:Family>Maleckar</vCard:Family>
+            <vCard:Other>M</vCard:Other>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#f1256798-93e5-44b7-bc0c-b2901425a65e">
+            <rdf:type rdf:resource="http://imc.org/vCard/3.0#internet"/>
+            <rdf:value>martin.fink@dpag.ox.ac.uk</rdf:value>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#eb1f9b9d-62b6-4a84-8357-c34e6c749266">
+            <dc:creator rdf:resource="rdf:#49690bf0-0b8d-4a2a-9a93-d346a0e03318"/>
+            <rdf:value/>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#a8048547-b2dd-4007-835b-d347327b350f">
+            <dc:creator rdf:resource="rdf:#d003b9eb-7e64-407f-80b4-2fd29cc9216a"/>
+            <dc:title>Mathematical simulations of ligand-gated and cell-type specific effects on the action potential of human atrium</dc:title>
+            <bqs:volume/>
+            <bqs:first_page/>
+            <bqs:Journal rdf:resource="rdf:#3df1a0e6-429f-45fb-9835-4d1a5a7a03a5"/>
+            <dcterms:issued rdf:resource="rdf:#283e45fe-74ed-422c-beff-b5bccdd0c5a9"/>
+            <bqs:last_page/>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#4727ac8f-7792-4894-bec1-132532d3884c">
+            <rdf:type rdf:resource="http://www.cellml.org/bqs/1.0#Person"/>
+            <vCard:N rdf:resource="rdf:#a9c6dbea-3d60-4fe6-a078-3e3534ca6b80"/>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#98654bc3-25a2-42ec-ad8a-d0b19d26b5eb">
+            <vCard:ORG rdf:resource="rdf:#a1e769e0-89f9-42cf-9f1a-a590377a26cf"/>
+            <vCard:EMAIL rdf:resource="rdf:#f1256798-93e5-44b7-bc0c-b2901425a65e"/>
+            <vCard:N rdf:resource="rdf:#35d9a3fb-dc30-4ac3-b7aa-5459e4390d73"/>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#f77cc7c2-e7f4-4355-8293-aa52767984d4">
+            <vCard:FN>Catherine Lloyd</vCard:FN>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#49befdfa-e6a0-4e09-88c2-dc408caf401e">
+            <rdf:type rdf:resource="http://www.cellml.org/bqs/1.0#Person"/>
+            <vCard:N rdf:resource="rdf:#cc3e99e0-fb91-4408-818a-2448a7799488"/>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#113722f0-be00-4c1e-a108-540fe0939647">
+            <bqs:Pubmed_id>19186188</bqs:Pubmed_id>
+            <bqs:JournalArticle rdf:resource="rdf:#a8048547-b2dd-4007-835b-d347327b350f"/>
+        </rdf:Description>
+        <rdf:Description rdf:about="#Maleckar">
+            <bqs:reference rdf:resource="rdf:#113722f0-be00-4c1e-a108-540fe0939647"/>
+            <cmeta:comment xmlns:cmeta="http://www.cellml.org/metadata/1.0#" rdf:resource="rdf:#3456f3e3-1fd6-46a1-9431-826a91b2fdc4"/>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#49690bf0-0b8d-4a2a-9a93-d346a0e03318">
+            <vCard:FN/>
+        </rdf:Description>
+    </rdf:RDF>   
    <units xmlns="http://www.cellml.org/cellml/1.0#" name="pA_per_pF">
       <unit units="ampere" prefix="pico"/>
       <unit units="farad" prefix="pico" exponent="-1"/>
@@ -422,8 +422,8 @@ The complete original paper reference is cited below:
       <variable name="P_Na" units="nanolitre_per_second" initial_value="0.0018"/>
       <variable units="dimensionless" name="ScaleFactorGna" initial_value="1.0" cmeta:id="ScaleFactorGna">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGna">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorGna">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -780,8 +780,8 @@ The complete original paper reference is cited below:
       <variable name="g_Ca_L" units="nanoS" initial_value="6.75"/>
       <variable units="dimensionless" name="ScaleFactorGCaL" initial_value="1.0" cmeta:id="ScaleFactorGCaL">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGCaL">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorGCaL">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -1093,8 +1093,8 @@ The complete original paper reference is cited below:
       <variable name="g_t" units="nanoS" initial_value="8.25"/>
       <variable units="dimensionless" name="ScaleFactorIto" initial_value="1.0" cmeta:id="ScaleFactorIto">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorIto">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorIto">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -1330,8 +1330,8 @@ The complete original paper reference is cited below:
       <variable name="g_kur" units="nanoS" initial_value="2.25"/>
       <variable units="dimensionless" name="ScaleFactorGKur" initial_value="1.0" cmeta:id="ScaleFactorGKur">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGKur">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorGKur">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -1527,8 +1527,8 @@ The complete original paper reference is cited below:
       <variable name="g_K1" units="nanoS" initial_value="3.1"/>
       <variable units="dimensionless" name="ScaleFactorGK1" initial_value="1.0" cmeta:id="ScaleFactorGK1">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGK1">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorGK1">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -1603,16 +1603,16 @@ The complete original paper reference is cited below:
       <variable name="g_Ks" units="nanoS" initial_value="1"/>
       <variable units="dimensionless" name="ScaleFactorGks" initial_value="1.0" cmeta:id="ScaleFactorGks">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGks">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorGks">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
       <variable name="g_Kr" units="nanoS" initial_value="0.5"/>
       <variable units="dimensionless" name="ScaleFactorGkr" initial_value="1.0" cmeta:id="ScaleFactorGkr">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGkr">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorGkr">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -1795,8 +1795,8 @@ The complete original paper reference is cited below:
       <variable name="time" units="second" public_interface="in"/>
       <variable name="AZD" units="dimensionless" initial_value="0" public_interface="out" cmeta:id="ScaleFactorAZD">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorAZD">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorAZD">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -1998,8 +1998,8 @@ The complete original paper reference is cited below:
       <variable name="i_NaK_max" units="picoA" initial_value="68.55"/>
       <variable units="dimensionless" name="ScaleFactorGNaK" initial_value="1.0" cmeta:id="ScaleFactorGNaK">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGNaK">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorGNaK">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -2097,8 +2097,8 @@ The complete original paper reference is cited below:
       <variable name="i_NaCa" units="picoA" public_interface="out"/>
       <variable units="dimensionless" name="ScaleFactorGNaCa" initial_value="1.0" cmeta:id="ScaleFactorGNaCa">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGNaCa">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorGNaCa">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -2216,8 +2216,8 @@ The complete original paper reference is cited below:
       <variable name="i_KACh" units="picoA" public_interface="out"/>
       <variable name="ACh" units="millimolar" initial_value="1e-24" cmeta:id="ScaleFactorAch">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorAch">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorAch">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>  
       </variable>

@@ -30,6 +30,6 @@ and an RDF annotation added, e.g.
     <derived-quantity xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</derived-quantity>
 </rdf:Description>
 }}}
-which for convenience can be placed at the end of the CellML file.  See ["ChasteGuides/CodeGenerationFromCellML"] for full details of the functionality available.  The [ChasteGuides/TroubleShooting#PyCmlerrors PyCml section of the TroubleShooting page] may be useful if you experience problems.
+which for convenience can be placed at the end of the CellML file.  See [CodeGenerationFromCellML](/docs/user-guides/code-generation-from-cellml/) for full details of the functionality available.  
 
 The attached files run a simple one-dimensional simulation, with the `LuoRudy1991.cellml` file modified in order to allow the output ot the intracellular calcium and sodium concentrations. Ionic currents and other quantities of interest can be also selected in the same way.

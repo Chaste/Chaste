@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  
+
   build-and-test:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
@@ -19,9 +19,12 @@ jobs:
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
-      MEMTEST_DIR: ${{ github.workspace }}/memory-testing
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
+
+    outputs:
+      index: ${{ steps.index-exists.outputs.index }}
+      datetime: ${{ steps.get-datetime.outputs.datetime }}
 
     steps:
 
@@ -42,7 +45,7 @@ jobs:
         if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
 
       - name: checkout Chaste
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -57,7 +60,7 @@ jobs:
       - name: Downgrade libexpat1 (native ubuntu-22.04 only)
         # if: ${{ matrix.os == 'ubuntu-22.04' }}
         run: |
-          if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu0.3; then
+          if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
             sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
           fi
 
@@ -74,6 +77,11 @@ jobs:
         run: cmake --build . --target Continuous --parallel 4
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
+      - name: run TestChasteBuildInfo
+        run: |
+          ctest -V -R TestChasteBuildInfo
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
       - name: run memtest
         run: cmake --build . --target memtest --parallel 4
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
@@ -88,25 +96,68 @@ jobs:
             echo "Index file does not exist"
             echo "index=False"  >> $GITHUB_OUTPUT
           fi
+          if [ -e ${CHASTE_BUILD_DIR}/memtest/github_summary.md ]; then
+            echo "github_summary=True"  >> $GITHUB_OUTPUT
+          fi
+          if [ -e ${CHASTE_BUILD_DIR}/memtest/txt_summary.txt ]; then
+            echo "txt_summary=True"  >> $GITHUB_OUTPUT
+          fi
         if: always()
-        
+
+      - name: display memtest summary in terminal
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+        run: |
+          cat memtest/txt_summary.txt
+        if: always() && steps.index-exists.outputs.txt_summary == 'True'
+
+      - name: display memtest summary in job summary
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+        run: |
+          cat memtest/github_summary.md >> $GITHUB_STEP_SUMMARY
+        if: always() && steps.index-exists.outputs.github_summary == 'True'
+
+      - name: upload memtest artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: memtest-files
+          path: ${{ env.CHASTE_BUILD_DIR }}/memtest
+        if: always() && steps.index-exists.outputs.index == 'True'
+
+
+  publish-results:
+
+    name: Publish results (non-fork PRs only)
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    # only when index exists AND it's being run from the primary repo (Chaste/Chaste)
+    if: ${{ needs.build-and-test.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
+
+    env:
+      MEMTEST_DIR: ${{ github.workspace }}/memory-testing
+
+    steps:
+
+      - name: download memtest artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: memtest-files
+          path: ./memtest
+
       - name: checkout memory-testing
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/memory-testing
           path: memory-testing
           fetch-depth: 0
           token: ${{ secrets.MEMORY_TESTING_ACCESS }}
-        if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: copy results
         run: |
-          mkdir ${MEMTEST_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}
-          cp ${CHASTE_BUILD_DIR}/memtest/* ${MEMTEST_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}/
-        if: always() && steps.index-exists.outputs.index == 'True'
+          mkdir ${MEMTEST_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}
+          cp ./memtest/* ${MEMTEST_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
 
       - name: setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -116,7 +167,6 @@ jobs:
           python -m pip install dominate
           python write_index.py
         working-directory: ${{ env.MEMTEST_DIR }}
-        if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: commit and push results
         run: |
@@ -126,9 +176,7 @@ jobs:
           git commit -m "upload memtest results" || echo "No changes to commit"
           git push
         working-directory: ${{ env.MEMTEST_DIR }}
-        if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: results URL on chaste.github.io
         run: |
           echo https://chaste.github.io/memory-testing/${{ steps.get-datetime.outputs.datetime }}/index.html
-        if: always() && steps.index-exists.outputs.index == 'True'

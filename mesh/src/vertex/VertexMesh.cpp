@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "Warnings.hpp"
+
+#include "VtkMeshWriter.hpp"
+#include "NodesOnlyMesh.hpp"
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -150,7 +154,12 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 template <>
-VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool isBounded)
+VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
+                             bool isPeriodic,
+                             bool isBounded,
+                             bool scaleBoundByEdgeLength,
+                             double maxDelaunayEdgeLength,
+                             bool offsetNewBoundaryNodes)
         : mpDelaunayMesh(&rMesh)
 {
     //Note  !isPeriodic is not used except through polymorphic calls in rMesh
@@ -205,10 +214,25 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
 
         // Add new nodes
         unsigned new_node_index = mpDelaunayMesh->GetNumNodes();
+
+        // Lop over elements to work out boundary edges
         for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
         {
+            bool bad_element = false;
+
+            for (unsigned j=0; j<3; j++)
+            {
+                Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
+                Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
+                if (norm_2(mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation()))>maxDelaunayEdgeLength)
+                {
+                    bad_element = true;
+                    break;
+                }
+            }
+
             for (unsigned j=0; j<3; j++)
             {
                 Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
@@ -224,17 +248,34 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
                                       node_b_element_indices.end(),
                                       std::inserter(shared_elements, shared_elements.begin()));
 
+                c_vector<double,2> edge = p_node_b->rGetLocation() - p_node_a->rGetLocation();
+                double edge_length = norm_2(edge);
 
                 /*
                  * Note using boundary nodes to identify the boundary edges won't work with
                  * triangles which have 3 boundary nodes
                  * if ((p_node_a->IsBoundaryNode() && p_node_b->IsBoundaryNode()))
                  */
-
-                if (shared_elements.size() == 1) // It's a boundary edge
+                bool is_boundary_edge = false;
+                double direction_of_normal = 1.0;
+                if ((edge_length < maxDelaunayEdgeLength) && (shared_elements.size() == 1)) // its a boundary edge
                 {
-                    c_vector<double,2> edge = p_node_b->rGetLocation() - p_node_a->rGetLocation();
-                    double edge_length = norm_2(edge);
+                    is_boundary_edge = true;
+                }
+                if (bad_element && (edge_length < maxDelaunayEdgeLength))
+                {
+                    /*
+                    * Here one or more of the edges in the element is longer than maxDelaunayEdgeLength so the other edges are boundary edges
+                    */
+
+                    assert(!is_boundary_edge); // We shouldnt have short edged which are in 2 elements.
+                    is_boundary_edge = true;
+                    // Here we're pointing in to the element
+                    direction_of_normal = -1.0;
+                }
+
+                if (is_boundary_edge)
+                {
                     c_vector<double,2> normal_vector;
 
                     normal_vector[0]= edge[1];
@@ -244,19 +285,48 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
                     assert(dij>1e-5); //Sanity check
                     normal_vector /= dij;
 
-                    double extra_node_scaling = 1.0;  // increase to add more points per external edge (makes rounder cells)
+                    double new_node_distance = 1.0;
 
-                    int num_sections = ceil(edge_length*extra_node_scaling);
+                    if (scaleBoundByEdgeLength)
+                    {
+                        new_node_distance = edge_length;
+                    }
+
+                    int num_sections = 1;
                     for (int section=0; section<=num_sections; section++)
                     {
-                        double ratio = (double)section/(double)num_sections;
-                        c_vector<double,2> new_node_location = normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
-                        nodes.push_back(new Node<2>(new_node_index, new_node_location));
-                        new_node_index++;
+                        double ratio;
+                        if (offsetNewBoundaryNodes)
+                        {
+                            ratio = ((double)section+0.5)/((double)num_sections+1);
+                        }
+                        else
+                        {
+                            ratio = ((double)section)/((double)num_sections);
+                        }
+
+                        assert(ratio>=0.0);
+                        assert(ratio<=1.0);
+                        c_vector<double,2> new_node_location = direction_of_normal * new_node_distance * normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
+
+                        //Check if near other nodes (could be inefficient)
+                        double node_clearance = 0.01;
+                        if (!IsNearExistingNodes(new_node_location,nodes,node_clearance))
+                        {
+                            nodes.push_back(new Node<2>(new_node_index, new_node_location));
+                            new_node_index++;
+                        }
                     }
                 }
             }
         }
+
+// // Plot new nodes
+// NodesOnlyMesh<2> temp_mesh;
+// temp_mesh.ConstructNodesWithoutMesh(nodes, 1.0);
+// VtkMeshWriter<2, 2> mesh_writer("tempMesh", "ExtendedMesh", false);
+// mesh_writer.WriteFilesUsingMesh(temp_mesh);
+
         MutableMesh<2,2> extended_mesh(nodes);
 
         unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
@@ -336,6 +406,7 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
 
     this->mMeshChangesDuringSimulation = false;
 }
+
 /**
  * \endcond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
@@ -586,20 +657,32 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1,
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(unsigned index)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement([[maybe_unused]] const unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
+    if constexpr (SPACE_DIM == 2)
+    {
+        c_vector<double, 3> moments = CalculateMomentsOfElement(elementIndex);
 
-    c_vector<double, 3> moments = CalculateMomentsOfElement(index);
+        const double discriminant = sqrt((moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2));
 
-    double discriminant = sqrt((moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2));
+        // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
+        // Use std::max to guard against floating point imprecision causing the smallest eigenvalue being small and negative
+        const double largest_eigenvalue = (moments(0) + moments(1) + discriminant) * 0.5;
+        const double smallest_eigenvalue = std::max(0.0, (moments(0) + moments(1) - discriminant) * 0.5);
 
-    // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
-    double largest_eigenvalue = (moments(0) + moments(1) + discriminant) * 0.5;
-    double smallest_eigenvalue = (moments(0) + moments(1) - discriminant) * 0.5;
+        // Prevent division by zero
+        if (smallest_eigenvalue == 0.0)
+        {
+            WARNING("Infinite elongation shape factor: element likely to be co-linear");
+            return std::numeric_limits<double>::infinity();
+        }
 
-    double elongation_shape_factor = sqrt(largest_eigenvalue / smallest_eigenvalue);
-    return elongation_shape_factor;
+        return sqrt(largest_eigenvalue / smallest_eigenvalue);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -959,6 +1042,24 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetMeshF
     return this;
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::IsNearExistingNodes(c_vector<double,SPACE_DIM> newNodeLocation, std::vector<Node<SPACE_DIM> *> nodesToCheck, double minClearance)
+{
+    bool node_near = false;
+
+    for (unsigned i=0; i<nodesToCheck.size(); i++)
+    {
+        double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodesToCheck[i]->rGetLocation(), newNodeLocation));
+        if (distance < minClearance)
+        {
+            node_near = true;
+            break;
+        }
+    }
+
+    return node_near;
+}
+
 /// \cond Get Doxygen to ignore, since it's confused by these templates
 template <>
 void VertexMesh<1, 1>::ConstructFromMeshReader(AbstractMeshReader<1, 1>& rMeshReader)
@@ -1170,7 +1271,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(
     const c_vector<double, SPACE_DIM>& rLocationA, const c_vector<double, SPACE_DIM>& rLocationB)
 {
-    c_vector<double, SPACE_DIM> vector;
+    c_vector<double, SPACE_DIM> vector {};
     if (mpDelaunayMesh)
     {
         vector = mpDelaunayMesh->GetVectorFromAtoB(rLocationA, rLocationB);

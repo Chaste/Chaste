@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
-#include <boost/foreach.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <boost/version.hpp>
 
 #include "ArchiveLocationInfo.hpp"
@@ -58,6 +59,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Save typing, and allow the use of these in cxxtest macros
 typedef ArchiveOpener<boost::archive::text_iarchive, std::ifstream> InputArchiveOpener;
 typedef ArchiveOpener<boost::archive::text_oarchive, std::ofstream> OutputArchiveOpener;
+typedef ArchiveOpener<boost::archive::binary_iarchive, std::ifstream> InputBinaryArchiveOpener;
+typedef ArchiveOpener<boost::archive::binary_oarchive, std::ofstream> OutputBinaryArchiveOpener;
 
 class TestArchivingHelperClasses : public CxxTest::TestSuite
 {
@@ -204,6 +207,59 @@ public:
         PetscTools::Barrier(); // Make sure all processes have finished this test before proceeding
     }
 
+    void TestBinaryArchiveOpenerReadAndWrite()
+    {
+        // Should this test fail with an exception involving
+        // apps/texttest/chaste/resume_bidomain/save_bidomain
+        // then look at TestCardiacSimulationArchiver
+        mArchiveDir = "archiving_helpers";
+        FileFinder archive_dir(mArchiveDir, RelativeTo::ChasteTestOutput);
+        std::string archive_file = "archive_opener_binary.arch";
+        const unsigned test_int = 4444251;
+
+        // Write
+        {
+            OutputBinaryArchiveOpener archive_opener_out(archive_dir, archive_file);
+            boost::archive::binary_oarchive* p_arch = archive_opener_out.GetCommonArchive();
+            boost::archive::binary_oarchive* p_process_arch = ProcessSpecificArchive<boost::archive::binary_oarchive>::Get();
+
+            (*p_arch) & test_int; // All can write to the common archive - non-masters will write to /dev/null.
+            (*p_process_arch) & test_int;
+
+            // archive_opener_out will do a PetscTools::Barrier when it is destructed
+        }
+
+        // Read
+        {
+            TS_ASSERT_THROWS_THIS(ProcessSpecificArchive<boost::archive::binary_oarchive>::Get(),
+                                "A ProcessSpecificArchive has not been set up.");
+            TS_ASSERT_THROWS_THIS(ProcessSpecificArchive<boost::archive::binary_iarchive>::Get(),
+                                "A ProcessSpecificArchive has not been set up.");
+
+            InputBinaryArchiveOpener archive_opener_in(archive_dir, archive_file);
+            boost::archive::binary_iarchive* p_arch = archive_opener_in.GetCommonArchive();
+            boost::archive::binary_iarchive* p_process_arch = ProcessSpecificArchive<boost::archive::binary_iarchive>::Get();
+
+            unsigned test_int1, test_int2;
+            (*p_arch) & test_int1;
+            (*p_process_arch) & test_int2;
+
+            TS_ASSERT_EQUALS(test_int1, test_int);
+            TS_ASSERT_EQUALS(test_int2, test_int);
+        }
+
+        // Cover the case of an archive in the chaste folder (i.e. a path relative to the working directory)
+        // TODO: We probably want to add a sample binary test file, but as it is not plattform agnostic, it does not seem doable.
+        /*if (PetscTools::IsSequential())
+        {
+            // Read
+            FileFinder save_bidomain_dir("apps/texttest/chaste/resume_bidomain/save_bidomain", RelativeTo::ChasteSourceRoot);
+            InputBinaryArchiveOpener archive_opener_relative(save_bidomain_dir, "archive.arch");
+        }*/
+
+        PetscTools::Barrier(); // Make sure all processes have finished this test before proceeding
+    }
+
     // This test relies on TestArchiveOpenerReadAndWrite succeeding
     void TestArchiveOpenerExceptions()
     {
@@ -315,44 +371,26 @@ public:
         //Check testout/archive/specific_secondary.arch
         FileFinder archive_dir("global/test/data", RelativeTo::ChasteSourceRoot);
         std::string archive_file = "future_boost.arch";
-        // future_boost has got archive version 20 in it
+        //See  https://github.com/boostorg/serialization/blob/develop/src/basic_archive.cpp
         // 1.33 => 3
         // 1.34 => 4
-        // 1.36 => 5
-        // 1.37 => 5
-        // 1.40 => 5
+        // 1.36 => 5,  1.37 => 5,  1.40 => 5
         // 1.42 => 7
-        // 1.46 => 9
-        // 1.48 => 9
-        // 1.49 => 9
-        // 1.51 => 9
+        // 1.46 => 9,  1.48 => 9,  1.49 => 9,  1.51 => 9
         // 1.52 => ??
-        // 1.53 => 10
-        // 1.54 => 10
-        // 1.55 => 10
-        // 1.56 => 11
-        // 1.57 => 11
+        // 1.53 => 10, 1.54 => 10, 1.55 => 10
+        // 1.56 => 11, 1.57 => 11
         // 1.58 => 12
         // 1.59 => 13
-        // 1.60 => 14
-        // 1.61 => 14
-        // 1.62 => 14
-        // 1.63 => 14
-        // 1.64 => 15
-        // 1.65 => 15
-        // 1.66 => 16
-        // 1.67 => 16
-        // 1.68 => 17
-        // 1.69 => 17
-        // 1.70 => 17
-        // 1.71 => 17
-        // 1.72 => 17
-        // 1.73 => 18
-        // 1.74 => 18
-        // 1.75 => 18
-        // 1.76 => 19
-        // 1.77 => 19
-        // 1.78 => 19
+        // 1.60 => 14, 1.61 => 14, 1.62 => 14, 1.63 => 14
+        // 1.64 => 15, 1.65 => 15
+        // 1.66 => 16, 1.67 => 16
+        // 1.68 => 17, 1.69 => 17, 1.70 => 17, 1.71 => 17, 1.72 => 17
+        // 1.73 => 18, 1.74 => 18, 1.75 => 18
+        // 1.76 => 19, 1.77 => 19, 1.78 => 19, 1.79 => 19, 1.80 => 19, 1.81 => 19, 1.82 => 19, 1.83 => 19
+        // 1.84 => 20, 1.85 => 20, 1.86 => 20, 1.87 => 20, 1.88 => 20, 1.89 => 20
+        // future_boost has got archive version 21 in it
+
 
 #ifndef BOOST_VERSION
         TS_FAIL("This test needs to know the version of Boost with which it was compiled.");

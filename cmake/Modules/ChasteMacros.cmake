@@ -19,7 +19,7 @@
 
 ##########################################################
 # header_dirs
-# 
+#
 # A macro to recursively find Chaste header locations
 ##########################################################
 macro(HEADER_DIRS base_dir return_list)
@@ -39,7 +39,7 @@ endmacro()
 
 ##########################################################
 # cellml_dirs
-# 
+#
 # A macro to recursively find Chaste cellml locations
 ##########################################################
 macro(CELLML_DIRS base_dir return_list)
@@ -58,8 +58,8 @@ macro(CELLML_DIRS base_dir return_list)
 endmacro()
 
 ##########################################################
-# chaste_do_cellml 
-# 
+# chaste_do_cellml
+#
 # convert cellml file to source files
 ##########################################################
 macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
@@ -74,8 +74,8 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
         set(codegen_args ${codegen_args} "--normal" "--opt" "--cvode" "--backward-euler" "--use-analytic-jacobian")
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
-    
-    execute_process(COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
+
+    execute_process(COMMAND "${chaste_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
         OUTPUT_VARIABLE ConvertCellModelDepends
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
@@ -88,7 +88,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
 
     add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp}
-        COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
+        COMMAND "${chaste_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
         COMMENT "Processing CellML file ${cellml_file_rel}"
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
@@ -100,9 +100,9 @@ endmacro()
 
 ##########################################################
 # chaste_add_test
-# 
-# Chaste Testing Macro. The predefined cxxtest_add_test is 
-# not suitable because of little control over the test's 
+#
+# Chaste Testing Macro. The predefined cxxtest_add_test is
+# not suitable because of little control over the test's
 # working directory
 ##########################################################
 macro(Chaste_ADD_TEST _testTargetName _filename)
@@ -112,15 +112,6 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
         string(REGEX REPLACE "(Parallel)$" "" _testname "${_testTargetName}")
     else()
         set(parallel OFF)
-        set(_testname ${_testTargetName})
-    endif()
-
-    string(REGEX MATCH "^.*Codegen$" foundCodegen ${_testTargetName})
-    if (foundCodegen)
-        set(codegen ON)
-        string(REGEX REPLACE "(Codegen)$" "" _testname "${_testTargetName}")
-    else()
-        set(codegen OFF)
         set(_testname ${_testTargetName})
     endif()
 
@@ -180,9 +171,19 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
     endif()
 
 
+    # Chaste_ADD_TEST is a macro, so these variables would otherwise leak between invocations
+    unset(post_command)
+    unset(post_args)
+    unset(output_file)
+    unset(post_command2)
+    unset(post_args2)
+    unset(output_file2)
+    unset(env_var)
+    unset(env_var_value)
+
     if (Chaste_MEMORY_TESTING AND NOT python)
         set(test_command ${VALGRIND_COMMAND})
-        set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.txt") 
+        set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.txt")
         set(test_args "${test_args} --track-fds=yes --leak-check=yes --num-callers=50 ${Chaste_MEMORY_TESTING_SUPPS}")
         set(test_args "${test_args} --gen-suppressions=all $<TARGET_FILE:${exeTargetName}> -malloc_debug -malloc_dump -memory_info")
         set(num_cpus 1)
@@ -191,11 +192,26 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             set(test_args "${test_args} --profile")
         elseif (Chaste_PROFILE_GPERFTOOLS)
             set(profile_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.prof)
-            set(post_command ${GPERFTOOLS_PPROF_EXE})
-            set(post_args "--svg --nodefraction=0.0001 --edgefraction=0.0001 $<TARGET_FILE:${exeTargetName}> ${profile_file}")
-            set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.svg)
             set(env_var CPUPROFILE)
             set(env_var_value ${profile_file})
+            # GPERFTOOLS_PPROF_EXE must be the Go pprof (github.com/google/pprof): flags are single-dash
+            set(post_command ${GPERFTOOLS_PPROF_EXE})
+            # text report sorted by cumulative time; svg call graph with low-level library
+            # frames hidden, so their time is attributed to the calling Chaste methods.
+            # External C libraries (PETSc, MPI, HDF5, ...) are matched by prefix plus the
+            # absence of '::', which keeps Chaste's own PETSc-style names visible
+            # (e.g. PetscTools::Destroy, PCBlockDiagonalApply).
+            # Note the hide regex must not contain spaces, as post_args is split on them.
+            set(pprof_hide "^std::|^__|^operator\\snew|^operator\\sdelete")
+            set(pprof_hide "${pprof_hide}|^boost::|^vtk")
+            set(pprof_hide "${pprof_hide}|^(Petsc|Mat|Vec|KSP|SNES|DM|IS)[A-Z][^:]*$")
+            set(pprof_hide "${pprof_hide}|^MPI_|^PMPI_|^ompi_|^opal_|^mca_")
+            set(pprof_hide "${pprof_hide}|^H5|^CVode[^:]*$|^N_V|^SUN[A-Z]")
+            set(post_args "-text -cum $<TARGET_FILE:${exeTargetName}> ${profile_file}")
+            set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.txt)
+            set(post_command2 ${GPERFTOOLS_PPROF_EXE})
+            set(post_args2 "-svg -hide=${pprof_hide} $<TARGET_FILE:${exeTargetName}> ${profile_file}")
+            set(output_file2 ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.svg)
         else()
             set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.txt)
             set(post_command ${GPROF_EXECUTABLE})
@@ -204,7 +220,14 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
     endif()
 
     if (post_command)
-        add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/" 
+        set(_extra_post_args "")
+        if (post_command2)
+            set(_extra_post_args
+                -Dpost_cmd2=${post_command2}
+                -Dpost_args2:string=${post_args2}
+                -Doutput_file2=${output_file2})
+        endif()
+        add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/"
             COMMAND ${CMAKE_COMMAND}
             -Denv_var=${env_var}
             -Denv_var_value=${env_var_value}
@@ -213,10 +236,11 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             -Dpost_cmd=${post_command}
             -Dpost_args:string=${post_args}
             -Doutput_file=${output_file}
+            ${_extra_post_args}
             -P ${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake)
     else()
         separate_arguments(test_args)
-        add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/" 
+        add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/"
             COMMAND ${test_command} ${test_args})
     endif()
     set_property(TEST ${_testTargetName} PROPERTY PROCESSORS ${num_cpus})
@@ -231,7 +255,7 @@ endmacro(Chaste_ADD_TEST)
 
 ##########################################################
 # chaste_generate_test_name
-# 
+#
 # returns the test name (in outTestName) from the source
 # hpp file (in test)
 ##########################################################
@@ -259,8 +283,8 @@ endmacro(Chaste_GENERATE_TEST_NAME test outTestName)
 
 ##########################################################
 # chaste_do_common
-# 
-# processes a component directory, generating libraries, 
+#
+# processes a component directory, generating libraries,
 # tests and apps according to the standard Chaste directory
 # layout
 ##########################################################
@@ -288,9 +312,9 @@ macro(Chaste_DO_COMMON component)
     endif()
 
     # Find source files
-    file(GLOB_RECURSE Chaste_${component}_SOURCES 
-        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
+    file(GLOB_RECURSE Chaste_${component}_SOURCES
+        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
 
     # Generate additional source files from cellml
@@ -321,6 +345,7 @@ macro(Chaste_DO_COMMON component)
         add_library(chaste_${component} ${Chaste_${component}_SOURCES} ${ARGN})
         target_link_libraries(chaste_${component} PRIVATE Chaste_COMMON_DEPS)
         if (BUILD_SHARED_LIBS)
+            target_link_options(chaste_${component} PRIVATE "${Chaste_SHARED_LINKER_FLAGS}")
             target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_LIBRARIES})
             set(static_extension "a")
             set(keyword "")
@@ -364,7 +389,7 @@ macro(Chaste_DO_COMMON component)
         endif()
     endif()
 
-    if (Chaste_ENABLE_TESTING) 
+    if (Chaste_ENABLE_TESTING)
         if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
             set(Chaste_ENABLE_${component}_TESTING ON CACHE BOOL "Generate the test infrastructure for ${component} ")
         else()
@@ -396,7 +421,7 @@ endmacro(Chaste_DO_COMMON)
 
 ##########################################################
 # chaste_do_component and chaste_do_project
-# 
+#
 # wrapper for chaste_do_common for main Chaste components
 # and other project directories
 ##########################################################
@@ -414,7 +439,7 @@ endmacro(Chaste_DO_PROJECT)
 
 ##########################################################
 # chaste_do_apps_common
-# 
+#
 # process the apps folder
 ##########################################################
 macro(Chaste_DO_APPS_COMMON component)
@@ -463,7 +488,7 @@ macro(Chaste_DO_APPS_COMMON component)
                 file(REMOVE_RECURSE ${texttest_output_dir})
                 file(MAKE_DIRECTORY ${texttest_report_dir})
                 file(MAKE_DIRECTORY ${texttest_output_dir})
-                execute_process(COMMAND  ${Python3_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} 
+                execute_process(COMMAND  ${Python3_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR}
                     RESULT_VARIABLE result)
                 execute_process(COMMAND  ${Python3_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} -coll web)
                 if (result)
@@ -472,7 +497,7 @@ macro(Chaste_DO_APPS_COMMON component)
                 "
                 )
 
-            add_test(NAME acceptance_${acceptance_test} 
+            add_test(NAME acceptance_${acceptance_test}
                 COMMAND ${CMAKE_COMMAND} -P ${tests_dir}/run_acceptance.cmake
                 )
             if (${acceptance_test} STREQUAL "weekly")
@@ -487,7 +512,7 @@ endmacro(Chaste_DO_APPS_COMMON)
 
 ##########################################################
 # chaste_do_apps_main and chaste_do_apps_project
-# 
+#
 # these wrap chaste_do_apps_common for both the main
 # Chaste apps directory and external project apps dirs
 ##########################################################
@@ -503,7 +528,7 @@ endmacro(Chaste_DO_APPS_MAIN)
 
 ##########################################################
 # chaste_do_test_common
-# 
+#
 # process the tests directory, generating tests for all
 # enabled test packs.
 ##########################################################
@@ -531,6 +556,9 @@ macro(Chaste_DO_TEST_COMMON component)
     file(GLOB_RECURSE test_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
     if(test_sources)
         add_library(test${component} STATIC ${test_sources})
+        if (BUILD_SHARED_LIBS)
+            target_link_options(test${component} PRIVATE "${Chaste_SHARED_LINKER_FLAGS}")
+        endif ()
         target_link_libraries(test${component} PRIVATE Chaste_COMMON_DEPS)
         set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} test${component})
     endif()
@@ -555,11 +583,11 @@ macro(Chaste_DO_TEST_COMMON component)
             file(STRINGS "${type}TestPack.txt" testpack)
 
             # remove python tests from windows builds
-            if (WIN32 OR CYGWIN) 
+            if (WIN32 OR CYGWIN)
                 set(testpack_new "")
                 foreach(filename ${testpack})
                     if (NOT filename MATCHES ".py$")
-                        list(APPEND testpack_new ${filename}) 
+                        list(APPEND testpack_new ${filename})
                     endif()
                 endforeach()
                 set(testpack ${testpack_new})
@@ -575,14 +603,14 @@ macro(Chaste_DO_TEST_COMMON component)
                     set(testTargetName ${testTargetName}Parallel)
                     set(parallel ON)
                 endif()
-                set(codegen OFF)
-                set(exeTargetName ${testTargetName})
-                if (${type} STREQUAL "Codegen")
-                    set(testTargetName ${testTargetName}Codegen)
-                    set(codegen ON)
-                endif()
 
-                if (NOT DEFINED ${testTargetName})
+                if (DEFINED ${testTargetName})
+                    # if the test has already been defined, add it to this test pack
+                    get_property(test_labels TEST ${testTargetName} PROPERTY LABELS)
+                    list(APPEND test_labels ${type}_${component})
+                    set_property(TEST ${testTargetName} PROPERTY LABELS "${test_labels}")
+
+                else()
                     set(${testTargetName} ON)
                     chaste_add_test(${testTargetName} "${CMAKE_CURRENT_SOURCE_DIR}/${filename}")
 
@@ -598,7 +626,7 @@ macro(Chaste_DO_TEST_COMMON component)
 
                     set_property(TEST ${testTargetName} PROPERTY LABELS ${type}_${component})
 
-                    if (Chaste_INSTALL_TESTS AND NOT(${component} MATCHES "^project")) 
+                    if (Chaste_INSTALL_TESTS AND NOT(${component} MATCHES "^project"))
                         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${old_testTargetName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
                             DESTINATION lib/chaste/tests/${component} COMPONENT  ${component}_tests)
                     endif()
@@ -627,10 +655,10 @@ macro(Chaste_DO_TEST_COMMON component)
                     endif()
 
                     # filename is a paper tutorial
-                    if(filename MATCHES "Test(.*)LiteratePaper.(hpp|py)") 
+                    if(filename MATCHES "Test(.*)LiteratePaper.(hpp|py)")
                         set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1}.md)
                         add_custom_command(OUTPUT ${out_filename}
-                            COMMAND ${Python3_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
+                            COMMAND ${Python3_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename}
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
                             COMMENT "Generating paper tutorial ${out_filename}" VERBATIM)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
@@ -650,7 +678,7 @@ endmacro(Chaste_DO_TEST_COMMON)
 
 ##########################################################
 # chaste_do_test_component and chaste_do_test_project
-# 
+#
 # wrapper for chaste_do_test_common for main Chaste tests
 # and external project tests
 ##########################################################

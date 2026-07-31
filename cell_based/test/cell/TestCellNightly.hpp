@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -126,7 +126,6 @@ public:
             p_simulation_time->IncrementTimeOneStep();
             times[i] = p_simulation_time->GetTime();
             cell_iterator = cells.begin();
-            unsigned j = 0;
             while (cell_iterator < cells.end())
             {
                 if ((*cell_iterator)->ReadyToDivide())
@@ -134,7 +133,6 @@ public:
                     newly_born.push_back((*cell_iterator)->Divide());
                 }
                 ++cell_iterator;
-                j++;
             }
 
             // Copy offspring in newly_born vector to cells vector

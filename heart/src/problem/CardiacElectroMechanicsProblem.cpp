@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -273,7 +273,8 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
         mIsWatchedLocation(false),
         mWatchedElectricsNodeIndex(UNSIGNED_UNSET),
         mWatchedMechanicsNodeIndex(UNSIGNED_UNSET),
-        mNumTimestepsToOutputDeformationGradientsAndStress(UNSIGNED_UNSET)
+        mNumTimestepsToOutputDeformationGradientsAndStress(UNSIGNED_UNSET),
+        mpCardiacVtkWriter(NULL)
 {
     // Do some initial set up...
     // However, NOTE, we don't use either the passed in meshes or the problem_definition.
@@ -337,6 +338,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProbl
     delete mpElectricsProblem;
     delete mpCardiacMechSolver;
     delete mpMeshPair;
+    delete mpCardiacVtkWriter;
 
     LogFile::Close();
 }
@@ -525,6 +527,14 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     if (mWriteOutput)
     {
+#ifdef CHASTE_VTK
+        if (HeartConfig::Instance()->GetVisualizeWithVtk())
+        {
+            ReplicatableVector ic(initial_voltage);
+            mpCardiacVtkWriter = new CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>(*mpMechanicsSolver,
+                *mpMechanicsMesh,*mpElectricsMesh, ic, mDeformationOutputDirectory);
+        }
+#endif
         mpMechanicsSolver->SetWriteOutput();
         mpMechanicsSolver->WriteCurrentSpatialSolution("undeformed","nodes");
 
@@ -532,6 +542,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
                                                                "solution",
                                                                *(this->mpMechanicsMesh),
                                                                WRITE_QUADRATIC_MESH);
+
         variable_names.push_back("V");
         if (ELEC_PROB_DIM==2)
         {
@@ -760,7 +771,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         ReplicatableVector electrics_solution_repl(electrics_solution);//size=(number of electrics nodes)*ELEC_PROB_DIM
         ReplicatableVector calcium_repl(calcium_data);//size = number of electrics nodes
 
-        //interpolate values onto mechanics mesh
+        //interpolate values onto the quad points of the mechanics mesh
         for (unsigned i=0; i<mpMeshPair->rGetElementsAndWeights().size(); i++)
         {
             double interpolated_CaI = 0;
@@ -858,6 +869,12 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
             p_cmgui_writer->WriteDeformationPositions(rGetDeformedPosition(), counter);
 
+#ifdef CHASTE_VTK
+            if (HeartConfig::Instance()->GetVisualizeWithVtk())
+            {
+                mpCardiacVtkWriter->WriteSolution(counter,electrics_solution_repl);//writer will pick up mech solution from solver
+            }
+#endif
             if (!mNoElectricsOutput)
             {
                 mpElectricsProblem->mpWriter->AdvanceAlongUnlimitedDimension();
@@ -881,7 +898,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
         // write the total elapsed time..
         LogFile::Instance()->WriteElapsedTime("  ");
-    }
+    } // end of main solve time loop
 
     if ((mWriteOutput) && (!mNoElectricsOutput))
     {
@@ -899,12 +916,6 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 //                                                              "voltage", mpElectricsMesh,
 //                                                                HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
 //                                                                HeartConfig::Instance()->GetVisualizerOutputPrecision() );
-
-        // convert output to CMGUI format
-        Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
-                                                      "voltage", mpElectricsMesh, mHasBath,
-                                                      HeartConfig::Instance()->GetVisualizerOutputPrecision());
-
         // Write mesh in a suitable form for meshalyzer
         //std::string output_directory =  mOutputDirectory + "/electrics/output";
         // Write the mesh
@@ -913,11 +924,17 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         // Write the parameters out
         //HeartConfig::Instance()->Write();
 
+        // convert output to CMGUI format
+        Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
+                                                      "voltage", mpElectricsMesh, mHasBath,
+                                                      HeartConfig::Instance()->GetVisualizerOutputPrecision());
+
         // interpolate the electrical data onto the mechanics mesh nodes and write CMGUI...
         // Note: this calculates the data on ALL nodes of the mechanics mesh (incl internal,
         // non-vertex ones), which won't be used if linear CMGUI visualisation
         // of the mechanics solution is used.
-        VoltageInterpolaterOntoMechanicsMesh<DIM> converter(*mpElectricsMesh,*mpMechanicsMesh,variable_names,input_dir,"voltage");
+        VoltageInterpolaterOntoMechanicsMesh<DIM> converter(*mpElectricsMesh,*mpMechanicsMesh);
+        converter.OutputToCmgui(variable_names,input_dir,"voltage");
 
         // reset to the default value
         HeartConfig::Instance()->SetOutputDirectory(config_directory);

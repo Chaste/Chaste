@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -166,20 +166,9 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                     c_vector<double,2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio * edge;
 
                     // Check if near other nodes
-                    bool node_clear = true;
                     double node_clearance = 0.01;
 
-                    for (unsigned i=0; i<nodes.size(); i++)
-                    {
-                        double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
-                        if (distance < node_clearance)
-                        {
-                            node_clear = false;
-                            break;
-                        }
-                    }
-
-                    if (node_clear)
+                    if (!IsNearExistingNodes(new_node_location,nodes,node_clearance))
                     {
                         nodes.push_back(new Node<2>(new_node_index, new_node_location));
                         new_node_index++;

@@ -15,6 +15,9 @@ if (UNIX)
     endif()
 endif()
 
+# Define a custom project-wide variable for linker flags
+set(Chaste_SHARED_LINKER_FLAGS "${default_shared_link_flags}")
+
 if (Chaste_COVERAGE)
     message(STATUS "adding --coverage to CXX flags for coverage checking")
     #--coverage seems to be the preferred flag
@@ -38,24 +41,39 @@ if (Chaste_PROFILE_GPERFTOOLS)
     set(default_flags "${default_flags} -O3")
 endif()
 
+# Allow easier checks in source files for specific compilers. See here for possible
+# values: https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
+add_compile_definitions(Chaste_COMPILER_IS_${CMAKE_CXX_COMPILER_ID})
+
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Cray")
     message(STATUS "\t...for Cray compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags} -Wextra -Wno-unused-parameter -Wvla")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     message(STATUS "\t...for GNU compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-attributes -Wno-unused-parameter -Wvla")
     if (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7))
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough=2")  # See https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
     endif (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7))
+
+    # The following flags allow us to ignore (in a judicious manner) some spurious GCC warnings about potentially
+    # uninitialised c_vectors in Release mode. See https://github.com/Chaste/Chaste/issues/231 for full details.
+    if (CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo|MinSizeRel"
+            AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4
+            AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16)
+
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.1)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-maybe-uninitialized -Wno-array-bounds -Wno-stringop-overflow")
+        else ()
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-maybe-uninitialized -Wno-array-bounds -Wno-stringop-overflow -Wno-stringop-overread")
+        endif ()
+    endif ()
+
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags}  -Wextra -Wno-unused-parameter -Wvla")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "IntelLLVM")
     message(STATUS "\t... for ${CMAKE_CXX_COMPILER_ID} compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-undefined-var-template -Wno-unknown-warning-option -Wno-tautological-constant-compare -ftemplate-depth-512")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags}  -Wextra -Wno-unused-parameter -Wno-unused-variable -ftemplate-depth-512")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${default_exe_linker_flags}")
     if (${CMAKE_CXX_COMPILER_ID} STREQUAL "IntelLLVM")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rno-debug-disables-optimization -Wno-unused-but-set-variable")
@@ -74,10 +92,10 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     set(Intel_flags
         # Not available on 10.0
         -Wnon-virtual-dtor -Woverloaded-virtual -Wno-unused-parameter
-        
+
         -wr2304 #2304: non-explicit constructor with single argument
-        
-        # Switch these ones on for compatibility 
+
+        # Switch these ones on for compatibility
         -wr271 #271: trailing comma is nonstandard
 
         #Following doesn't seem to play
@@ -123,9 +141,8 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
          #2305: declaration of 'explicit' constructor without a single argument is redundant
         )
     string (REPLACE ";" " " Intel_flags_str "${Intel_flags}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} ${Intel_flags_str}") 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags} ${Intel_flags_str}") 
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} ${Intel_flags_str}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags} ${Intel_flags_str}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${default_exe_linker_flags}")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
     message(STATUS "\t... for MSVC compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
@@ -156,3 +173,5 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 else()
     message(WARNING "Unknown CXX compiler type ${CMAKE_CXX_COMPILER_ID}")
 endif()
+
+set(Chaste_SHARED_LINKER_FLAGS "${Chaste_SHARED_LINKER_FLAGS}" CACHE STRING "Project-wide shared linker flags" FORCE)

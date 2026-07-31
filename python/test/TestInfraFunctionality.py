@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2024, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,7 @@ import sys
 import filecmp
 
 class TestInfraFunctionality(unittest.TestCase):
-    
+
     def TestRoundResultsFiles(self):
         original = 'python/test/data/input/rounding_input.txt'
         output = os.path.join(CHASTE_TEST_OUTPUT, 'rounding_output.txt')
@@ -49,4 +49,3 @@ class TestInfraFunctionality(unittest.TestCase):
         rc = os.system(sys.executable + ' python/infra/RoundResultsFiles.py 6 <' + original + ' > '+ output)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output,'python/test/data/output/rounding_output6.txt'))
-        

@@ -6,7 +6,7 @@ Copyright (C) Fujitsu Laboratories of Europe, 2009
 
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,8 +64,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkMeshReader.hpp"
 #include "GenericMeshReader.hpp"
 #include "TrianglesMeshWriter.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "UblasVectorInclude.hpp"
+#include "PetscSetupAndFinalize.hpp"
+
 
 #ifdef CHASTE_VTK
 typedef VtkMeshReader<3,3> MESH_READER3;
@@ -208,37 +209,86 @@ public:
     void TestGetNextFaceData(void)
     {
 #ifdef CHASTE_VTK
+
+        /*
+         * Several points to note:
+         *
+         * 1. GetNextFaceData and GetNextEdgeData are synonyms, and this test verifies both
+         *    yield the same behaviour
+         *
+         * 2. GetNextFaceData uses a vtkGeometryFilter which was updated after v9.1: faces are
+         *    now calculated in a different order. See https://github.com/Chaste/Chaste/issues/298
+         *
+         * 3. We don't care which order the nodes are in the face data, as long as they are correct
+         *    up to a rotation. For instance, here, first_face_data.NodeIndices could either be
+         *    {11, 3, 0}, {0, 11, 3} or {3, 0, 11}. VTK 9.2 started producing a different ordering,
+         *    which necessitated updating this test. See https://github.com/Chaste/Chaste/issues/36
+         */
+
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 20u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumEdges(), 20u);
 
-        // We don't care which order the nodes are in the face data, as long as they are correct up to a rotation.
-        // For instance, here, first_face_data.NodeIndices could either be {11, 3, 0}, {0, 11, 3} or {3, 0, 11}.
-        // VTK 9.2 started producing a different ordering, which necessitated updating this test.
-        // See https://github.com/Chaste/Chaste/issues/36
+        // This is a list of all faces that should be read from the vtu file:
+        std::vector<std::vector<unsigned>> all_faces = {
+            {0u, 4u, 11u},
+            {0u, 8u, 4u},
+            {0u, 3u, 8u},
+            {0u, 11u, 3u},
+            {1u, 5u, 8u},
+            {1u, 9u, 5u},
+            {1u, 8u, 9u},
+            {2u, 9u, 3u},
+            {2u, 3u, 10u},
+            {2u, 10u, 6u},
+            {2u, 6u, 9u},
+            {3u, 9u, 8u},
+            {3u, 7u, 10u},
+            {3u, 11u, 7u},
+            {4u, 5u, 11u},
+            {4u, 8u, 5u},
+            {5u, 9u, 6u},
+            {5u, 6u, 10u},
+            {5u, 10u, 11u},
+            {7u, 11u, 10u}
+        };
 
-        ElementData first_face_data = mesh_reader.GetNextFaceData();
-        TS_ASSERT(IsRotation(first_face_data.NodeIndices, {11u, 3u, 0u}))
-
-        ElementData next_face_data = mesh_reader.GetNextFaceData();
-        TS_ASSERT(IsRotation(next_face_data.NodeIndices, {3u, 8u, 0u}))
-
-        mesh_reader.Reset();
-
-        first_face_data = mesh_reader.GetNextEdgeData();
-        TS_ASSERT(IsRotation(first_face_data.NodeIndices, {11u, 3u, 0u}))
-
-        next_face_data = mesh_reader.GetNextEdgeData();
-        TS_ASSERT(IsRotation(next_face_data.NodeIndices, {3u, 8u, 0u}))
-
-        for (unsigned face=2; face<mesh_reader.GetNumFaces(); face++)
+        // For each of the 20 faces calculated, verify that (up to rotation) it occurs exactly
+        // once in the list above.
+        for (unsigned i = 0u; i < 20; ++i)
         {
-            next_face_data = mesh_reader.GetNextEdgeData();
+            ElementData ed = mesh_reader.GetNextFaceData();
+            const std::vector<unsigned>& node_indices = ed.NodeIndices;
+
+            const long count = std::count_if(all_faces.begin(), all_faces.end(),
+                                             [&node_indices, this](const std::vector<unsigned>& face)
+                                             {
+                                                 return IsRotation(face, node_indices);
+                                             });
+
+            TS_ASSERT_EQUALS(count, 1l);
         }
 
-        TS_ASSERT_THROWS_THIS( next_face_data = mesh_reader.GetNextEdgeData(),
-                               "Trying to read data for a boundary element that doesn't exist" );
+        // Reset the reader and verify that calling GetNextEdgeData instead of GetNextFaceData
+        // yields identical results
+        mesh_reader.Reset();
+        for (unsigned i = 0u; i < 20; ++i)
+        {
+            ElementData ed = mesh_reader.GetNextEdgeData();
+            const std::vector<unsigned>& node_indices = ed.NodeIndices;
+
+            const long count = std::count_if(all_faces.begin(), all_faces.end(),
+                                             [&node_indices, this](const std::vector<unsigned>& face)
+                                             {
+                                                 return IsRotation(face, node_indices);
+                                             });
+
+            TS_ASSERT_EQUALS(count, 1l);
+        }
+
+        // Finally, if we read an additional face, we expect an exception.
+        TS_ASSERT_THROWS_THIS(mesh_reader.GetNextFaceData(), "Trying to read data for a boundary element that doesn't exist");
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
@@ -315,6 +365,19 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 173u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 610u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 312u);
+
+        // Check that the boundary is properly marked
+        /* Change to indexing in vtkGeometryFilter happened in VTK 9.1
+         * This means that when the boundary faces are extracted by vtkGeometryFilter
+         * the mesh of faces has the subset of boundary nodes reindexed, so the
+         * following checks we are using the original numbering */
+        TS_ASSERT_EQUALS(mesh.GetNode(27)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(mesh.GetNode(49)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(mesh.GetNode(170)->IsBoundaryNode(), false);
+
+        TS_ASSERT_EQUALS(mesh.GetNode(0)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(mesh.GetNode(171)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(mesh.GetNode(172)->IsBoundaryNode(), true);
 
         // Check some node co-ordinates
         TS_ASSERT_DELTA(mesh.GetNode(0)->GetPoint()[0], 0.0963, 1e-4);
@@ -410,6 +473,30 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 173u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 610u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 312u);
+
+        // Check that the boundary is properly marked
+        /* Change to indexing in vtkGeometryFilter happened in VTK 9.1
+         * This means that when the boundary faces are extracted by vtkGeometryFilter
+         * the mesh of faces has the subset of boundary nodes reindexed, so the
+         * following checks we are using the original numbering */
+        try
+        {
+            Node<3> *node = mesh.GetNode(27);
+            TS_ASSERT_EQUALS(node->IsBoundaryNode(), false);
+        }
+        catch (Exception&)
+        {
+            // Don't own this node
+        }
+        try
+        {
+            Node<3> *node = mesh.GetNode(172);
+            TS_ASSERT_EQUALS(node->IsBoundaryNode(), true);
+        }
+        catch (Exception&)
+        {
+            // Don't own this node
+        }
 
         // Check some node co-ordinates
         try

@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  
+
   build-and-test:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
@@ -21,10 +21,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "ubuntu-20.04"
-            codename: "focal"
-            cc: "gcc"
-            cxx: "g++"
           - os: "ubuntu-22.04"
             codename: "jammy"
             cc: "gcc"
@@ -33,6 +29,10 @@ jobs:
             codename: "jammy"
             cc: "icx"
             cxx: "icpx"
+          - os: "ubuntu-24.04"
+            codename: "noble"
+            cc: "gcc"
+            cxx: "g++"
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
@@ -41,7 +41,7 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: install dependencies
       run: |
@@ -53,7 +53,7 @@ jobs:
     - name: Downgrade libexpat1 (native ubuntu-22.04 only)
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       run: |
-        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu0.3; then
+        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
           sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
         fi
 
@@ -108,10 +108,23 @@ jobs:
       run: cmake --build . --parallel 4 --target Nightly
       working-directory: chaste-build-dir
 
+    - name: build parallel test pack
+      run: cmake --build . --parallel 4 --target Parallel
+      working-directory: chaste-build-dir
+
     - name: run Continuous test pack
       run: ctest -j4 -L Continuous --output-on-failure
       working-directory: chaste-build-dir
 
     - name: run Nightly test pack
       run: ctest -j4 -L Nightly --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run Parallel test pack
+      run: ctest -j4 -L Parallel --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        ctest -V -R TestChasteBuildInfo
       working-directory: chaste-build-dir
