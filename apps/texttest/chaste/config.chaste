@@ -180,6 +180,9 @@ output:RunXsd\(\[.*\], \[(.*)\]\){REPLACE Run Xsd on \1}
 output:[^ ]*mpicxx .*(/[^/]+\.[a-zA-Z]+){REPLACE mpicxx <args> <path>\1}
 output:Running \['.*/chaste_python3_venv/bin/chaste_codegen', '-A', '-p', '--output-dir', '<chaste_dir>/<build_path>', '-y', '<build_path>/(.*).cellml'\]{REPLACE Running chaste_codegen on \1}
 
-output:scons: building associated
-output:scons: Reading SConscript files ...{LINES 10}
-output:-- The C compiler identification is{LINES 19}
+#output:scons: building associated
+#output:scons: Reading SConscript files ...{LINES 10}
+output:-- The C compiler identification is{LINES 22}
+
+# Why is CMake writing to stderr?
+errors:-- Found Chaste libraries in /
