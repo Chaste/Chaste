@@ -15,8 +15,13 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # Do not move this job to a plain Ubuntu runner with `apt install chaste-dependencies`.
+    # That was the original setup and was deliberately abandoned in #32: Ubuntu's system
+    # PETSc lacks ParMetis and Hypre, which stops PetscMatrixPartitioning from running and
+    # silently under-reports coverage rather than failing. The portability-* images build
+    # PETSc from source with --download-parmetis=1 --download-hypre=1.
     container:
-      image: chaste/runner:coverage-runner
+      image: chaste/runner:portability-tip
       env:
         RUNNER_OFF: 1
       options: --user 0 --cpus 4
@@ -61,9 +66,14 @@ jobs:
         run: |
           chown -R runner:runner .
 
+      # Each `su runner` heredoc below starts with `set -e`. The heredoc shell does not
+      # inherit the outer shell's -e, so without it only the last command's exit status
+      # propagates and an earlier failure is silently ignored.
+
       - name: CMake Configure
         run: |
           su runner << 'EOF'
+          set -e
           source load_modules.sh
           cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=4 ..
           EOF
@@ -72,6 +82,7 @@ jobs:
       - name: Build Continuous
         run: |
           su runner << 'EOF'
+          set -e
           source load_modules.sh
           cmake --build . --target Continuous --parallel 4
           EOF
@@ -80,6 +91,7 @@ jobs:
       - name: Build Parallel
         run: |
           su runner << 'EOF'
+          set -e
           source load_modules.sh
           cmake --build . --target Parallel --parallel 4
           EOF
@@ -88,6 +100,7 @@ jobs:
       - name: Run TestChasteBuildInfo
         run: |
           su runner << 'EOF'
+          set -e
           source load_modules.sh
           ctest -V -R TestChasteBuildInfo
           EOF
@@ -96,6 +109,7 @@ jobs:
       - name: Run Continuous
         run: |
           su runner << 'EOF'
+          set -e
           source load_modules.sh
           ctest -j4 -L Continuous --output-on-failure
           EOF
@@ -104,30 +118,51 @@ jobs:
       - name: Run Parallel
         run: |
           su runner << 'EOF'
+          set -e
           source load_modules.sh
           ctest -L Parallel --output-on-failure
           EOF
         working-directory: chaste-build-dir
 
       - name: Run coverage
+        # --exclude drops system and module (boost/petsc/...) headers at capture time, so
+        # geninfo never processes them and never emits their thousands of consistency
+        # warnings. These external paths are not Chaste's code and would be stripped anyway;
+        # filtering them here rather than after --capture keeps the log readable and removes
+        # the source of the fatal lcov 2.x `inconsistent`/`mismatch` errors on STL headers.
+        #
+        # lcov 2.x makes fatal several conditions 1.x only warned about; --ignore-errors
+        # demotes them back to warnings.
+        #   mismatch: bad data or overlapping exclusions, expected given the LCOV_EXCL_*
+        #             markers and the lcov_excl_line regex in cmake/Config/lcovrc.
+        #   unused:   a --remove pattern below matched no file.
         run: |
           su runner << 'EOF'
-          lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info
-          lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info
+          set -e
+          lcov --config-file ../cmake/Config/lcovrc --directory . --capture --exclude '/usr/*' --exclude '*/modules/*' --ignore-errors mismatch --output-file coverage.info
+          lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --ignore-errors unused --output-file coverage.info
           EOF
         working-directory: chaste-build-dir
 
-      - name: Upload to codecov
-        run: |
-          su runner << 'EOF'
-          curl -Os https://uploader.codecov.io/latest/linux/codecov
-          chmod +x codecov
-          ./codecov
-          EOF
-        working-directory: chaste-build-dir
-
+      # Uploaded before the codecov step so the coverage data is retained even if the
+      # upload below fails.
       - name: Upload as artifact
         uses: actions/upload-artifact@v7
         with:
           name: coverage-info
           path: chaste-build-dir/coverage.info
+
+      - name: Upload to codecov
+        uses: codecov/codecov-action@v7
+        # Skip on forks running this workflow against their own repository, where the upload
+        # has nowhere useful to go. Note this does not skip pull requests from forks, which
+        # run in the upstream repository's context and whose coverage we do want.
+        if: github.repository == 'Chaste/Chaste'
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: chaste-build-dir/coverage.info
+          disable_search: true
+          # Pull requests from forks cannot read secrets, so they upload tokenlessly and are
+          # subject to codecov's global rate limit. Don't fail those runs for something the
+          # contributor cannot fix.
+          fail_ci_if_error: ${{ secrets.CODECOV_TOKEN != '' }}
