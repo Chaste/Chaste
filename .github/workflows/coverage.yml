@@ -131,15 +131,15 @@ jobs:
         # filtering them here rather than after --capture keeps the log readable and removes
         # the source of the fatal lcov 2.x `inconsistent`/`mismatch` errors on STL headers.
         #
-        # lcov 2.x makes fatal several conditions 1.x only warned about; --ignore-errors
-        # demotes them back to warnings.
-        #   mismatch: bad data or overlapping exclusions, expected given the LCOV_EXCL_*
-        #             markers and the lcov_excl_line regex in cmake/Config/lcovrc.
-        #   unused:   a --remove pattern below matched no file.
+        # lcov 2.x makes fatal several conditions 1.x only warned about. `mismatch` and
+        # `inconsistent` are demoted back to warnings via `ignore_errors` in
+        # cmake/Config/lcovrc, which both commands below load; see there for why they are
+        # benign. `unused` (a --remove pattern matching no file) is demoted here on the CLI,
+        # next to the patterns it refers to.
         run: |
           su runner << 'EOF'
           set -e
-          lcov --config-file ../cmake/Config/lcovrc --directory . --capture --exclude '/usr/*' --exclude '*/modules/*' --ignore-errors mismatch --output-file coverage.info
+          lcov --config-file ../cmake/Config/lcovrc --directory . --capture --exclude '/usr/*' --exclude '*/modules/*' --output-file coverage.info
           lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --ignore-errors unused --output-file coverage.info
           EOF
         working-directory: chaste-build-dir
