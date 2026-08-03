@@ -270,20 +270,25 @@ public:
     }
 
     /**
-     * SEM populations do not support PDE modifiers. Both hooks exist only to satisfy the abstract
-     * interface and return sentinels; a modifier attached to a SEM population would silently see a
-     * null mesh and zero data rather than being rejected, so pin that behaviour.
+     * The growing-domain PDE modifiers build their finite element mesh from the population, which
+     * a SEM population cannot supply. Both hooks must say so rather than returning a sentinel: the
+     * caller dereferences the returned mesh immediately without a null check, so returning nullptr
+     * segfaults instead of reporting the problem.
+     *
+     * The box-domain PDE modifiers generate their own mesh and call neither of these.
      */
-    void TestPdeModifierHooksReturnSentinels()
+    void TestGrowingDomainPdeModifierHooksAreRejected()
     {
         TwoElementSemMesh fixture;
         std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
         SemBasedCellPopulation<2> cell_population(fixture.mesh, cells);
 
-        TS_ASSERT(cell_population.GetTetrahedralMeshForPdeModifier() == nullptr);
+        TS_ASSERT_THROWS_CONTAINS(cell_population.GetTetrahedralMeshForPdeModifier(),
+                                  "Currently can't solve PDEs on a SemMesh");
 
         std::string item = "unused";
-        TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0u, item, false, 0.0), 0.0, 1e-12);
+        TS_ASSERT_THROWS_CONTAINS(cell_population.GetCellDataItemAtPdeNode(0u, item, false, 0.0),
+                                  "Currently can't solve PDEs on a SemMesh");
     }
 
     /**

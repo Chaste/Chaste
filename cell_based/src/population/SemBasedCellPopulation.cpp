@@ -333,13 +333,24 @@ void SemBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDire
 template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>* SemBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
+    /*
+     * This is only used by the growing-domain PDE modifiers, which build their finite element mesh
+     * from the population. Doing so for a SEM population needs a triangulation of each element's
+     * node cloud: unlike a VertexElement, whose nodes form an ordered ring that can be fanned into
+     * triangles about its centroid, a SemElement holds an unordered cloud with no connectivity.
+     *
+     * The box-domain PDE modifiers do not call this, and generate their own mesh instead.
+     */
+    EXCEPTION("Currently can't solve PDEs on a SemMesh: use a box domain PDE modifier instead of a growing domain one");
     return nullptr;
 }
 
 template<unsigned DIM>
 double SemBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,std::string& item, bool, double)
 {
-    return 0.0;
+    // Only reached via a growing-domain PDE modifier, which fails in GetTetrahedralMeshForPdeModifier() first
+    EXCEPTION("Currently can't solve PDEs on a SemMesh: use a box domain PDE modifier instead of a growing domain one"); // LCOV_EXCL_LINE
+    return 0.0; // LCOV_EXCL_LINE
 }
 
 template<unsigned DIM>
