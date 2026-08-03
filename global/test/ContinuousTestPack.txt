@@ -12,6 +12,7 @@ TestException.hpp
 TestExecutableSupport.hpp
 TestFileFinder.hpp
 TestFileComparison.hpp
+TestFilesystemPermissions.hpp
 TestFloatingPointDivisionByZero.hpp
 TestFloatingPointDivisionByZeroPetsc.hpp
 TestGenericEventHandler.hpp
