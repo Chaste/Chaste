@@ -98,6 +98,19 @@ genhtml_branch_coverage = 1
 # of geninfo if non-zero, same as --no-compat-libtool if zero)
 #geninfo_compat_libtool = 0
 
+# Demote lcov 2.x's stricter fatal conditions back to warnings. Loaded by both the
+# --capture and --remove lcov calls in .github/workflows/coverage.yml.
+#   mismatch:     exception-tag / block metadata disagreements when merging heavily
+#                 inlined templates across many object files. Cosmetic: line hit counts
+#                 still merge correctly.
+#   inconsistent: branch-consistency false positive, e.g. a line whose only branches are
+#                 compiler-generated exception edges (a local declaration whose
+#                 constructor may throw) reading as hit-but-no-branches-evaluated. Not a
+#                 coverage-data problem.
+# `unused` (a --remove pattern matching no file) is left on the coverage.yml command line,
+# next to the patterns it refers to.
+ignore_errors = mismatch,inconsistent
+
 # Directory containing gcov kernel files
 # lcov_gcov_dir = /proc/gcov
 
