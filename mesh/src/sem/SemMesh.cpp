@@ -148,12 +148,6 @@ SemMesh<DIM>* SemMesh<DIM>::GetMeshForVtk()
 }
 
 template<unsigned DIM>
-DistributedBoxCollection<DIM>* SemMesh<DIM>::GetBoxCollection()
-{
-    return mpBoxCollection.get();
-}
-
-template<unsigned DIM>
 void SemMesh<DIM>::UpdateBoxCollection()
 {
     assert(mpBoxCollection);
@@ -340,11 +334,6 @@ void SemMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshRe
         // (interior/boundary); restore it so region-dependent forces behave as before the round-trip.
         p_node->SetRegion(static_cast<unsigned>(coords[DIM]));
 
-        for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); i++)
-        {
-            double attribute = rMeshReader.GetNodeAttributes()[i];
-            p_node->AddNodeAttribute(attribute);
-        }
         this->mNodes.push_back(p_node);
     }
 
@@ -371,39 +360,8 @@ void SemMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshRe
         this->mElements.push_back(p_element);
     }
 
-    // Add boundary elements and nodes
-    for (unsigned face_index = 0; face_index < (unsigned)rMeshReader.GetNumFaces(); face_index++)
-    {
-        ElementData face_data = rMeshReader.GetNextFaceData();
-        std::vector<unsigned> node_indices = face_data.NodeIndices;
-
-        /*
-         * NOTE: unlike the above where we just read element *vertices* from mesh reader, here we are
-         * going to read a quadratic mesh with internal elements.
-         * (There are only a few meshes with internals in the face file that we might as well use them.)
-         *
-         */
-        std::vector<Node<DIM>*> nodes;
-        for (unsigned node_index = 0; node_index < node_indices.size(); node_index++)
-        {
-            assert(node_indices[node_index] < this->mNodes.size());
-            // Add Node pointer to list for creating an element
-            nodes.push_back(this->mNodes[node_indices[node_index]]);
-        }
-
-        // This is a boundary face, so ensure all its nodes are marked as boundary nodes
-        for (unsigned j = 0; j < nodes.size(); j++)
-        {
-            if (!nodes[j]->IsBoundaryNode())
-            {
-                nodes[j]->SetAsBoundaryNode();
-                this->mBoundaryNodes.push_back(nodes[j]);
-            }
-
-            // Register the index that this bounday element will have with the node
-            nodes[j]->AddBoundaryElement(face_index);
-        }
-    }
+    // A SEM mesh has no faces: SemMeshWriter never writes a face file and SemMeshReader reports
+    // GetNumFaces() as zero, so there are no boundary elements or boundary nodes to read back.
 
     rMeshReader.Reset();
 }

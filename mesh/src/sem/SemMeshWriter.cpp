@@ -58,9 +58,7 @@ SemMeshWriter<DIM>::SemMeshWriter(const std::string& rDirectory,
                                   const bool clearOutputDir)
     : AbstractMeshWriter<DIM, DIM>(rDirectory, rBaseName, clearOutputDir),
       mpMesh(nullptr),
-      mpIters(new MeshWriterIterators<DIM, DIM>),
-      mpNodeMap(nullptr),
-      mNodeMapCurrentIndex(0)
+      mpIters(new MeshWriterIterators<DIM, DIM>)
 {
     mpIters->pNodeIter = nullptr;
     mpIters->pElemIter = nullptr;
@@ -81,11 +79,6 @@ SemMeshWriter<DIM>::~SemMeshWriter()
     }
 
     delete mpIters;
-
-    if (mpNodeMap)
-    {
-        delete mpNodeMap;
-    }
 
 #ifdef CHASTE_VTK
      // Dubious, since we shouldn't yet know what any details of the mesh are
@@ -129,12 +122,12 @@ ElementData SemMeshWriter<DIM>::GetNextElement()
     {
         assert(this->mNumElements == mpMesh->GetNumElements());
 
+        // A SemMesh never removes a node, so global node indices are stable and need no remapping
         ElementData elem_data;
         elem_data.NodeIndices.resize((*(mpIters->pElemIter))->GetNumNodes());
         for (unsigned j = 0; j < elem_data.NodeIndices.size(); ++j)
         {
-            unsigned old_index = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
-            elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
+            elem_data.NodeIndices[j] = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
         }
 
         ++(*(mpIters->pElemIter));
@@ -481,16 +474,6 @@ void SemMeshWriter<DIM>::WriteFilesUsingMesh(SemMesh<DIM>& rMesh)
     typedef typename SemMesh<DIM>::SemElementIterator ElemIterType;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
 
-    // Set up node map if we might have deleted nodes
-    mNodeMapCurrentIndex = 0;
-    if (mpMesh->IsMeshChanging())
-    {
-        mpNodeMap = new NodeMap(mpMesh->GetNumAllNodes());
-        for (NodeIterType it = mpMesh->GetNodeIteratorBegin(); it != mpMesh->GetNodeIteratorEnd(); ++it)
-        {
-            mpNodeMap->SetNewIndex(it->GetIndex(), mNodeMapCurrentIndex++);
-        }
-    }
     WriteFiles();
 }
 

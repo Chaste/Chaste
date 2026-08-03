@@ -174,9 +174,6 @@ private:
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-    /** @return mpBoxCollection */
-    DistributedBoxCollection<DIM>* GetBoxCollection();
-
 public:
     /** Forward declaration of SemElement iterator. */
     class SemElementIterator;

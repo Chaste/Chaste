@@ -63,7 +63,6 @@ class SemMesh;
 
 #include "SemMesh.hpp"
 #include "AbstractMeshWriter.hpp"
-#include "NodeMap.hpp"
 
 // Forward declaration prevents circular include chain
 template<unsigned DIM>
@@ -87,12 +86,6 @@ private:
 
     /** Iterators over the mesh. */
     MeshWriterIterators<DIM, DIM>* mpIters;
-
-    /** Track deleted nodes so they don't get written. */
-    NodeMap* mpNodeMap;
-
-    /** The last index written to mpNodeMap. */
-    unsigned mNodeMapCurrentIndex;
 
     /**
      * Per-element scalar data to write as VTK cell data, as (name, one value per element) pairs.
