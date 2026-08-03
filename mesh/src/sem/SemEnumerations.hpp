@@ -52,22 +52,32 @@ enum SemNodeRegion : unsigned
 };
 
 /**
- * Regular lattices available to the SEM mesh generators, used both for the
- * arrangement of subcellular nodes within an element and for the arrangement of
- * elements within a multi-element mesh.
+ * Structure encapsulating the regular lattices available to the SEM mesh generators, used both for
+ * the arrangement of subcellular nodes within an element and for the arrangement of elements within
+ * a multi-element mesh.
  *
- * SEM_LATTICE_CUBIC places points on an axis-aligned grid, so each point has
- * 2*DIM nearest neighbours. SEM_LATTICE_CLOSE_PACKED staggers successive rows
- * (and, in 3D, successive layers) to give the densest regular packing of equal
- * spheres: a triangular lattice in 2D (6 nearest neighbours) and hexagonal
- * close packing in 3D (12 nearest neighbours). Both lattices place nearest
- * neighbours exactly one spacing apart. In 1D the two are identical, as there
- * is only one way to space points along a line.
+ * This is a struct wrapping an enum, rather than a bare enum, so that it can be exposed to Python:
+ * the wrapper generator recognises only this pattern (see RelativeTo in FileFinder.hpp, which is
+ * wrapped the same way). It also lets values be written as SemLatticeType::SEM_LATTICE_CUBIC.
  */
-enum SemLatticeType : unsigned
+struct SemLatticeType
 {
-    SEM_LATTICE_CUBIC,       ///< axis-aligned grid
-    SEM_LATTICE_CLOSE_PACKED ///< triangular lattice in 2D, hexagonal close packed in 3D
+    /**
+     * The lattices available.
+     *
+     * SEM_LATTICE_CUBIC places points on an axis-aligned grid, so each point has
+     * 2*DIM nearest neighbours. SEM_LATTICE_CLOSE_PACKED staggers successive rows
+     * (and, in 3D, successive layers) to give the densest regular packing of equal
+     * spheres: a triangular lattice in 2D (6 nearest neighbours) and hexagonal
+     * close packing in 3D (12 nearest neighbours). Both lattices place nearest
+     * neighbours exactly one spacing apart. In 1D the two are identical, as there
+     * is only one way to space points along a line.
+     */
+    enum Value : unsigned
+    {
+        SEM_LATTICE_CUBIC,       ///< axis-aligned grid
+        SEM_LATTICE_CLOSE_PACKED ///< triangular lattice in 2D, hexagonal close packed in 3D
+    };
 };
 
 #endif // SEMENUMERATIONS_HPP_

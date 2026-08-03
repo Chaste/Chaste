@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The point at grid coordinate zero is always placed at the origin, and all
  * positions have non-negative components.
  *
- * For SEM_LATTICE_CLOSE_PACKED the returned lattice is a true close packing
+ * For SemLatticeType::SEM_LATTICE_CLOSE_PACKED the returned lattice is a true close packing
  * only when every entry of rSpacing is equal; unequal spacings stretch the
  * lattice along the corresponding axes.
  *
@@ -77,7 +77,7 @@ template <unsigned DIM>
 std::vector<c_vector<double, DIM>> GenerateSemLatticePositions(
     const std::array<unsigned, DIM>& rNumPerDim,
     const std::array<double, DIM>& rSpacing,
-    SemLatticeType lattice)
+    SemLatticeType::Value lattice)
 {
     unsigned num_points = 1u;
     for (unsigned dim = 0; dim < DIM; ++dim)
@@ -101,7 +101,7 @@ std::vector<c_vector<double, DIM>> GenerateSemLatticePositions(
     const double layer_offset_y = 1.0 / 3.0;
     const double layer_spacing_z = std::sqrt(2.0 / 3.0);
 
-    const bool close_packed = (lattice == SEM_LATTICE_CLOSE_PACKED);
+    const bool close_packed = (lattice == SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
     std::vector<c_vector<double, DIM>> positions;
     positions.reserve(num_points);
@@ -232,7 +232,7 @@ double GetSemClosePackedSpacing(const c_vector<double, DIM>& rExtent, double cle
     unit_spacing.fill(1.0);
 
     const std::vector<c_vector<double, DIM>> lattice
-        = GenerateSemLatticePositions<DIM>(num_per_dim, unit_spacing, SEM_LATTICE_CLOSE_PACKED);
+        = GenerateSemLatticePositions<DIM>(num_per_dim, unit_spacing, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
     unsigned centre_index = 0u;
     unsigned stride = 1u;

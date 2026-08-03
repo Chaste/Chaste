@@ -403,7 +403,9 @@ modules:
         source_includes:
           - PybindUblasTypeCaster.hpp
 
-      - name: SemLatticeType # enum
+      # A struct wrapping a single enum, which is the only enum form cppwg can wrap
+      # (see Chaste/cppwg#113); RelativeTo above is wrapped the same way
+      - name: SemLatticeType
         source_file: SemEnumerations.hpp
 
       - name: SemSingleElementMeshGenerator

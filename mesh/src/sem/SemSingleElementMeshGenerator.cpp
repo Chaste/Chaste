@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned DIM> SemSingleElementMeshGenerator<DIM>::SemSingleElementMeshGenerator(
     const std::array<unsigned, DIM>& numNodes,
     double scaleFactor,
-    SemLatticeType nodeLattice)
+    SemLatticeType::Value nodeLattice)
     : mpMesh{std::make_shared<SemMesh<DIM>>()},
       mNumNodes{ numNodes },
       mScaleFactor{ scaleFactor },

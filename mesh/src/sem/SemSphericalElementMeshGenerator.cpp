@@ -121,7 +121,7 @@ std::vector<c_vector<double, DIM>> SemSphericalElementMeshGenerator<DIM>::Genera
     unit_spacing.fill(1.0);
 
     std::vector<c_vector<double, DIM>> sites
-        = GenerateSemLatticePositions<DIM>(num_per_dim, unit_spacing, SEM_LATTICE_CLOSE_PACKED);
+        = GenerateSemLatticePositions<DIM>(num_per_dim, unit_spacing, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
     // GenerateSemLatticePositions() places the block in the positive orthant with a corner at the
     // origin, so its extent is also the position of its far corner

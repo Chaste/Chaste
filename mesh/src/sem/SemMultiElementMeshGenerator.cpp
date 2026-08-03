@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned DIM> SemMultiElementMeshGenerator<DIM>::SemMultiElementMeshGenerator(
     const std::array<unsigned, DIM>& numNodesPerElem, const std::array<unsigned, DIM>& numElems, double scaleFactor,
-    SemLatticeType nodeLattice, SemLatticeType elementLattice)
+    SemLatticeType::Value nodeLattice, SemLatticeType::Value elementLattice)
     : mpMesh{std::make_shared<SemMesh<DIM>>()},
       mNumNodesPerElem{ numNodesPerElem },
       mNumElems{ numElems },
@@ -80,7 +80,7 @@ template <unsigned DIM> SemMultiElementMeshGenerator<DIM>::SemMultiElementMeshGe
     // spacing mNodeSpacing * mNumNodesPerElem[i]; a close-packed lattice staggers its rows, so it
     // needs a single spacing accounting for the directions in which elements interlock.
     const c_vector<double, DIM> element_extent = GetSemLatticeExtent<DIM>(positions);
-    if (mElementLattice == SEM_LATTICE_CLOSE_PACKED)
+    if (mElementLattice == SemLatticeType::SEM_LATTICE_CLOSE_PACKED)
     {
         mElemSpacing.fill(GetSemClosePackedSpacing<DIM>(element_extent, mNodeSpacing));
     }

@@ -92,7 +92,7 @@ public:
     {
         // In 1D a lattice is just evenly spaced points
         std::vector<c_vector<double, 1>> positions_1d
-            = GenerateSemLatticePositions<1>({4u}, {0.5}, SEM_LATTICE_CUBIC);
+            = GenerateSemLatticePositions<1>({4u}, {0.5}, SemLatticeType::SEM_LATTICE_CUBIC);
 
         TS_ASSERT_EQUALS(positions_1d.size(), 4u);
         for (unsigned i = 0; i < 4u; ++i)
@@ -102,7 +102,7 @@ public:
 
         // In 2D the first dimension varies fastest, so index = i + numPerDim[0]*j
         std::vector<c_vector<double, 2>> positions_2d
-            = GenerateSemLatticePositions<2>({3u, 2u}, {1.0, 1.0}, SEM_LATTICE_CUBIC);
+            = GenerateSemLatticePositions<2>({3u, 2u}, {1.0, 1.0}, SemLatticeType::SEM_LATTICE_CUBIC);
 
         TS_ASSERT_EQUALS(positions_2d.size(), 6u);
         for (unsigned j = 0; j < 2u; ++j)
@@ -116,7 +116,7 @@ public:
 
         // In 3D index = i + numPerDim[0]*(j + numPerDim[1]*k)
         std::vector<c_vector<double, 3>> positions_3d
-            = GenerateSemLatticePositions<3>({2u, 3u, 4u}, {1.0, 1.0, 1.0}, SEM_LATTICE_CUBIC);
+            = GenerateSemLatticePositions<3>({2u, 3u, 4u}, {1.0, 1.0, 1.0}, SemLatticeType::SEM_LATTICE_CUBIC);
 
         TS_ASSERT_EQUALS(positions_3d.size(), 24u);
         for (unsigned k = 0; k < 4u; ++k)
@@ -137,9 +137,9 @@ public:
     {
         // There is only one way to space points along a line
         std::vector<c_vector<double, 1>> cubic
-            = GenerateSemLatticePositions<1>({6u}, {0.25}, SEM_LATTICE_CUBIC);
+            = GenerateSemLatticePositions<1>({6u}, {0.25}, SemLatticeType::SEM_LATTICE_CUBIC);
         std::vector<c_vector<double, 1>> close_packed
-            = GenerateSemLatticePositions<1>({6u}, {0.25}, SEM_LATTICE_CLOSE_PACKED);
+            = GenerateSemLatticePositions<1>({6u}, {0.25}, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
         TS_ASSERT_EQUALS(close_packed.size(), cubic.size());
         for (unsigned i = 0; i < cubic.size(); ++i)
@@ -151,7 +151,7 @@ public:
     void TestClosePackedLatticePositionsIn2d()
     {
         std::vector<c_vector<double, 2>> positions
-            = GenerateSemLatticePositions<2>({3u, 3u}, {1.0, 1.0}, SEM_LATTICE_CLOSE_PACKED);
+            = GenerateSemLatticePositions<2>({3u, 3u}, {1.0, 1.0}, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
         TS_ASSERT_EQUALS(positions.size(), 9u);
 
@@ -180,7 +180,7 @@ public:
     void TestClosePackedLatticePositionsIn3d()
     {
         std::vector<c_vector<double, 3>> positions
-            = GenerateSemLatticePositions<3>({3u, 3u, 3u}, {1.0, 1.0, 1.0}, SEM_LATTICE_CLOSE_PACKED);
+            = GenerateSemLatticePositions<3>({3u, 3u, 3u}, {1.0, 1.0, 1.0}, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
         TS_ASSERT_EQUALS(positions.size(), 27u);
 
@@ -207,9 +207,9 @@ public:
         // The defining property of a close packing: with unit spacing, no two points are closer
         // than one spacing, and a point in the interior has six neighbours in 2D and twelve in 3D
         std::vector<c_vector<double, 2>> positions_2d
-            = GenerateSemLatticePositions<2>({5u, 5u}, {1.0, 1.0}, SEM_LATTICE_CLOSE_PACKED);
+            = GenerateSemLatticePositions<2>({5u, 5u}, {1.0, 1.0}, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
         std::vector<c_vector<double, 3>> positions_3d
-            = GenerateSemLatticePositions<3>({5u, 5u, 5u}, {1.0, 1.0, 1.0}, SEM_LATTICE_CLOSE_PACKED);
+            = GenerateSemLatticePositions<3>({5u, 5u, 5u}, {1.0, 1.0, 1.0}, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
         double min_separation_2d = DBL_MAX;
         unsigned num_neighbours_2d = 0u;
@@ -254,7 +254,7 @@ public:
     {
         // Spacings apply per axis, so an unequal spacing stretches rather than shears the lattice
         std::vector<c_vector<double, 2>> positions
-            = GenerateSemLatticePositions<2>({2u, 2u}, {2.0, 4.0}, SEM_LATTICE_CLOSE_PACKED);
+            = GenerateSemLatticePositions<2>({2u, 2u}, {2.0, 4.0}, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
         TS_ASSERT_DELTA(norm_2(positions[0] - Create_c_vector(0.0, 0.0)), 0.0, 1e-12);
         TS_ASSERT_DELTA(norm_2(positions[1] - Create_c_vector(2.0, 0.0)), 0.0, 1e-12);
@@ -266,9 +266,9 @@ public:
     {
         // A lattice of one point sits at the origin, whichever lattice is requested
         std::vector<c_vector<double, 3>> cubic
-            = GenerateSemLatticePositions<3>({1u, 1u, 1u}, {1.0, 1.0, 1.0}, SEM_LATTICE_CUBIC);
+            = GenerateSemLatticePositions<3>({1u, 1u, 1u}, {1.0, 1.0, 1.0}, SemLatticeType::SEM_LATTICE_CUBIC);
         std::vector<c_vector<double, 3>> close_packed
-            = GenerateSemLatticePositions<3>({1u, 1u, 1u}, {1.0, 1.0, 1.0}, SEM_LATTICE_CLOSE_PACKED);
+            = GenerateSemLatticePositions<3>({1u, 1u, 1u}, {1.0, 1.0, 1.0}, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
         TS_ASSERT_EQUALS(cubic.size(), 1u);
         TS_ASSERT_EQUALS(close_packed.size(), 1u);
@@ -295,14 +295,14 @@ public:
 
         // A cubic lattice spans one fewer spacing than it has points in each dimension
         const c_vector<double, 3> cubic_extent = GetSemLatticeExtent<3>(
-            GenerateSemLatticePositions<3>({4u, 3u, 2u}, {1.0, 2.0, 3.0}, SEM_LATTICE_CUBIC));
+            GenerateSemLatticePositions<3>({4u, 3u, 2u}, {1.0, 2.0, 3.0}, SemLatticeType::SEM_LATTICE_CUBIC));
         TS_ASSERT_DELTA(cubic_extent[0], 3.0, 1e-12);
         TS_ASSERT_DELTA(cubic_extent[1], 4.0, 1e-12);
         TS_ASSERT_DELTA(cubic_extent[2], 3.0, 1e-12);
 
         // Staggering widens a close-packed lattice in x by half a spacing, and shortens it in y
         const c_vector<double, 2> packed_extent = GetSemLatticeExtent<2>(
-            GenerateSemLatticePositions<2>({3u, 3u}, {1.0, 1.0}, SEM_LATTICE_CLOSE_PACKED));
+            GenerateSemLatticePositions<2>({3u, 3u}, {1.0, 1.0}, SemLatticeType::SEM_LATTICE_CLOSE_PACKED));
         TS_ASSERT_DELTA(packed_extent[0], 2.5, 1e-12);
         TS_ASSERT_DELTA(packed_extent[1], 2.0 * mRowSpacing, 1e-12);
     }
@@ -351,7 +351,7 @@ public:
             lattice_spacing.fill(spacing);
 
             const std::vector<c_vector<double, 3>> sites
-                = GenerateSemLatticePositions<3>({4u, 4u, 4u}, lattice_spacing, SEM_LATTICE_CLOSE_PACKED);
+                = GenerateSemLatticePositions<3>({4u, 4u, 4u}, lattice_spacing, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
             double min_separation = DBL_MAX;
             for (unsigned i = 0; i < sites.size(); ++i)
@@ -373,16 +373,16 @@ public:
 
         // A lattice must have at least one point in each dimension
         std::array<unsigned, 2> zero_num_per_dim = {2u, 0u};
-        TS_ASSERT_THROWS_THIS(GenerateSemLatticePositions<2>(zero_num_per_dim, valid_spacing, SEM_LATTICE_CUBIC),
+        TS_ASSERT_THROWS_THIS(GenerateSemLatticePositions<2>(zero_num_per_dim, valid_spacing, SemLatticeType::SEM_LATTICE_CUBIC),
             "GenerateSemLatticePositions: each entry of numPerDim must be >= 1");
 
         // Spacings must be positive
         std::array<double, 2> zero_spacing = {1.0, 0.0};
-        TS_ASSERT_THROWS_THIS(GenerateSemLatticePositions<2>(valid_num_per_dim, zero_spacing, SEM_LATTICE_CLOSE_PACKED),
+        TS_ASSERT_THROWS_THIS(GenerateSemLatticePositions<2>(valid_num_per_dim, zero_spacing, SemLatticeType::SEM_LATTICE_CLOSE_PACKED),
             "GenerateSemLatticePositions: each entry of spacing must be positive");
 
         std::array<double, 2> negative_spacing = {-1.0, 1.0};
-        TS_ASSERT_THROWS_THIS(GenerateSemLatticePositions<2>(valid_num_per_dim, negative_spacing, SEM_LATTICE_CUBIC),
+        TS_ASSERT_THROWS_THIS(GenerateSemLatticePositions<2>(valid_num_per_dim, negative_spacing, SemLatticeType::SEM_LATTICE_CUBIC),
             "GenerateSemLatticePositions: each entry of spacing must be positive");
 
         // There is no extent to measure without any positions

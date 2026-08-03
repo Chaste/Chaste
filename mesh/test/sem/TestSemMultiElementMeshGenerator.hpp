@@ -156,7 +156,7 @@ public:
     {
         // Node spacing = 2.0 / 2 = 1.0, so each element is a unit square of four nodes
         SemMultiElementMeshGenerator<2> generator({2, 2}, {2, 2}, 2.0,
-            SEM_LATTICE_CUBIC, SEM_LATTICE_CLOSE_PACKED);
+            SemLatticeType::SEM_LATTICE_CUBIC, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
         auto p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
@@ -184,8 +184,8 @@ public:
         // Node spacing = 3.0 / 3 = 1.0. Close packing the nodes brings the three rows of an
         // element from two node spacings apart to sqrt(3) apart, so the elements above and below
         // may move closer by the same amount.
-        SemMultiElementMeshGenerator<2> cubic_gen({3, 3}, {1, 2}, 3.0, SEM_LATTICE_CUBIC);
-        SemMultiElementMeshGenerator<2> packed_gen({3, 3}, {1, 2}, 3.0, SEM_LATTICE_CLOSE_PACKED);
+        SemMultiElementMeshGenerator<2> cubic_gen({3, 3}, {1, 2}, 3.0, SemLatticeType::SEM_LATTICE_CUBIC);
+        SemMultiElementMeshGenerator<2> packed_gen({3, 3}, {1, 2}, 3.0, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
         auto p_cubic_mesh = cubic_gen.GetMesh();
         auto p_packed_mesh = packed_gen.GetMesh();
@@ -200,11 +200,11 @@ public:
         // Node spacing = 3.0 / 3 = 1.0. However the nodes and the elements are laid out, nodes in
         // different elements must be no closer than nodes within an element, so that the mesh is
         // usable as an initial condition without the intercellular forces blowing up.
-        const SemLatticeType lattices[2] = {SEM_LATTICE_CUBIC, SEM_LATTICE_CLOSE_PACKED};
+        const SemLatticeType::Value lattices[2] = {SemLatticeType::SEM_LATTICE_CUBIC, SemLatticeType::SEM_LATTICE_CLOSE_PACKED};
 
-        for (const SemLatticeType node_lattice : lattices)
+        for (const SemLatticeType::Value node_lattice : lattices)
         {
-            for (const SemLatticeType element_lattice : lattices)
+            for (const SemLatticeType::Value element_lattice : lattices)
             {
                 SemMultiElementMeshGenerator<3> generator({3, 3, 3}, {2, 2, 2}, 3.0,
                     node_lattice, element_lattice);
@@ -222,7 +222,7 @@ public:
         // Omitting the lattice arguments must reproduce the original axis-aligned layout
         SemMultiElementMeshGenerator<3> default_gen({2, 3, 2}, {2, 1, 2}, 4.0);
         SemMultiElementMeshGenerator<3> cubic_gen({2, 3, 2}, {2, 1, 2}, 4.0,
-            SEM_LATTICE_CUBIC, SEM_LATTICE_CUBIC);
+            SemLatticeType::SEM_LATTICE_CUBIC, SemLatticeType::SEM_LATTICE_CUBIC);
 
         auto p_default_mesh = default_gen.GetMesh();
         auto p_cubic_mesh = cubic_gen.GetMesh();

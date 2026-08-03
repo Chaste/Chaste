@@ -73,10 +73,10 @@ private:
     std::array<double, DIM> mElemSpacing;
 
     /** The lattice on which the subcellular nodes within each element are placed */
-    SemLatticeType mNodeLattice;
+    SemLatticeType::Value mNodeLattice;
 
     /** The lattice on which the elements are placed */
-    SemLatticeType mElementLattice;
+    SemLatticeType::Value mElementLattice;
 
     /**
      * Generate uniformly spaced node positions.
@@ -116,13 +116,13 @@ public:
      * @param numNodesPerElem number of nodes per element in each direction (x, y, z)
      * @param numElems number of elements in each direction (x, y, z)
      * @param scaleFactor the target diameter of each element in the x-direction
-     * @param nodeLattice the lattice on which to place the nodes within each element (defaults to SEM_LATTICE_CUBIC)
-     * @param elementLattice the lattice on which to place the elements (defaults to SEM_LATTICE_CUBIC)
+     * @param nodeLattice the lattice on which to place the nodes within each element (defaults to SemLatticeType::SEM_LATTICE_CUBIC)
+     * @param elementLattice the lattice on which to place the elements (defaults to SemLatticeType::SEM_LATTICE_CUBIC)
      */
     SemMultiElementMeshGenerator(const std::array<unsigned, DIM>& numNodesPerElem,
         const std::array<unsigned, DIM>& numElems, double scaleFactor = 1.0,
-        SemLatticeType nodeLattice = SEM_LATTICE_CUBIC,
-        SemLatticeType elementLattice = SEM_LATTICE_CUBIC);
+        SemLatticeType::Value nodeLattice = SemLatticeType::SEM_LATTICE_CUBIC,
+        SemLatticeType::Value elementLattice = SemLatticeType::SEM_LATTICE_CUBIC);
 
     /**
      * Default constructor

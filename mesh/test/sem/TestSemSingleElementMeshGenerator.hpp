@@ -156,8 +156,8 @@ public:
     void TestClosePacked1DMatchesCubic()
     {
         // There is only one way to space points along a line, so the lattice type is immaterial in 1D
-        SemSingleElementMeshGenerator<1> cubic_gen({5}, 2.0, SEM_LATTICE_CUBIC);
-        SemSingleElementMeshGenerator<1> packed_gen({5}, 2.0, SEM_LATTICE_CLOSE_PACKED);
+        SemSingleElementMeshGenerator<1> cubic_gen({5}, 2.0, SemLatticeType::SEM_LATTICE_CUBIC);
+        SemSingleElementMeshGenerator<1> packed_gen({5}, 2.0, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
 
         auto p_cubic_mesh = cubic_gen.GetMesh();
         auto p_packed_mesh = packed_gen.GetMesh();
@@ -173,7 +173,7 @@ public:
     void TestClosePacked2D()
     {
         // Node spacing = scaleFactor / numNodes[0] = 4.0 / 4 = 1.0
-        SemSingleElementMeshGenerator<2> generator({4, 3}, 4.0, SEM_LATTICE_CLOSE_PACKED);
+        SemSingleElementMeshGenerator<2> generator({4, 3}, 4.0, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
         auto p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 12u);
@@ -206,7 +206,7 @@ public:
     void TestClosePacked2DIsTriangularLattice()
     {
         // Node spacing = 5.0 / 5 = 1.0
-        SemSingleElementMeshGenerator<2> generator({5, 5}, 5.0, SEM_LATTICE_CLOSE_PACKED);
+        SemSingleElementMeshGenerator<2> generator({5, 5}, 5.0, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
         auto p_mesh = generator.GetMesh();
 
         // No pair of nodes may be closer than one spacing, and an interior node of a triangular
@@ -218,7 +218,7 @@ public:
     void TestClosePacked3DIsHexagonalClosePacked()
     {
         // Node spacing = 5.0 / 5 = 1.0
-        SemSingleElementMeshGenerator<3> generator({5, 5, 5}, 5.0, SEM_LATTICE_CLOSE_PACKED);
+        SemSingleElementMeshGenerator<3> generator({5, 5, 5}, 5.0, SemLatticeType::SEM_LATTICE_CLOSE_PACKED);
         auto p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 125u);
@@ -237,7 +237,7 @@ public:
     {
         // Omitting the lattice argument must reproduce the original axis-aligned grid
         SemSingleElementMeshGenerator<3> default_gen({3, 3, 3}, 3.0);
-        SemSingleElementMeshGenerator<3> cubic_gen({3, 3, 3}, 3.0, SEM_LATTICE_CUBIC);
+        SemSingleElementMeshGenerator<3> cubic_gen({3, 3, 3}, 3.0, SemLatticeType::SEM_LATTICE_CUBIC);
 
         auto p_default_mesh = default_gen.GetMesh();
         auto p_cubic_mesh = cubic_gen.GetMesh();
