@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <cmath>
 
@@ -76,6 +77,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DefaultCellProliferativeType.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
 #include "SemBasedCellPopulation.hpp"
+#include "ChasteCuboid.hpp"
+#include "ConstBoundaryCondition.hpp"
+#include "EllipticBoxDomainPdeModifier.hpp"
+#include "UniformSourceEllipticPde.hpp"
 #include "SemForce.hpp"
 #include "SemGaussianRandomForce.hpp"
 #include "SemSpatiallyCorrelatedRandomForce.hpp"
@@ -183,6 +188,153 @@ public:
 
         // Run the simulation
         simulator.Solve();
+    }
+
+    /**
+     * A box domain PDE modifier generates its own finite element mesh over a supplied cuboid, so
+     * unlike the growing domain modifiers it never asks the population for one. Everything it needs
+     * from the population is the location of each cell centre, which a SEM population supplies as
+     * the centroid of its element, so it should work without any SEM-specific support.
+     *
+     * The concentration is checked against the analytic solution of the PDE actually being solved:
+     * with no source term, a constant boundary value must be reproduced exactly throughout.
+     */
+    void TestSemBasedSimulationWithEllipticBoxDomainPdeModifier()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+
+        SemMultiElementMeshGenerator<2> generator({3, 3}, {2, 2}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        c_vector<double, 4> box_collection_domain{};
+        box_collection_domain[0] = -1.0;
+        box_collection_domain[1] =  3.0;
+        box_collection_domain[2] = -1.0;
+        box_collection_domain[3] =  3.0;
+        p_mesh->SetUpBoxCollection(0.2, box_collection_domain);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetDampingConstantNormal(1.0);
+
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 4u);
+
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestSemBasedSimulationWithPde");
+        simulator.SetDt(0.01);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(0.02);
+        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2> >());
+        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
+
+        // No force is added: this test is about whether the PDE modifier can be driven by a SEM
+        // population at all, so the nodes are deliberately left stationary.
+
+        // A source-free PDE, so the solution is the boundary value everywhere
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        // The cuboid on which the modifier builds its own finite element mesh
+        ChastePoint<2> lower(-2.0, -2.0);
+        ChastePoint<2> upper(4.0, 4.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+        simulator.AddSimulationModifier(p_pde_modifier);
+
+        simulator.Solve();
+
+        // Every cell must have had the solution interpolated onto it at its centroid
+        for (typename AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+             cell_iter != simulator.rGetCellPopulation().End();
+             ++cell_iter)
+        {
+            TS_ASSERT(cell_iter->GetCellData()->HasItem("oxygen"));
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), 1.0, 1e-4);
+        }
+    }
+
+    /**
+     * The companion to the test above. A source-free PDE has a constant solution, so every set of
+     * interpolation weights gives the same answer and the exact check there cannot tell whether the
+     * solution was really sampled at each cell's own centroid. Adding a source makes the solution
+     * vary in space, so cells at different places must end up with different values.
+     */
+    void TestSemBasedSimulationPdeSolutionVariesBetweenCells()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+
+        SemMultiElementMeshGenerator<2> generator({3, 3}, {2, 2}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        c_vector<double, 4> box_collection_domain{};
+        box_collection_domain[0] = -1.0;
+        box_collection_domain[1] =  3.0;
+        box_collection_domain[2] = -1.0;
+        box_collection_domain[3] =  3.0;
+        p_mesh->SetUpBoxCollection(0.2, box_collection_domain);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetDampingConstantNormal(1.0);
+
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestSemBasedSimulationWithPdeVarying");
+        simulator.SetDt(0.01);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(0.02);
+        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2> >());
+        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
+
+        // A uniform source drives the solution away from the boundary value in the interior
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (1.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        // The cells sit near one corner of this cuboid, so they sample it at different depths
+        ChastePoint<2> lower(-2.0, -2.0);
+        ChastePoint<2> upper(4.0, 4.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+        simulator.AddSimulationModifier(p_pde_modifier);
+
+        simulator.Solve();
+
+        std::vector<double> values;
+        for (typename AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+             cell_iter != simulator.rGetCellPopulation().End();
+             ++cell_iter)
+        {
+            TS_ASSERT(cell_iter->GetCellData()->HasItem("oxygen"));
+            const double value = cell_iter->GetCellData()->GetItem("oxygen");
+            TS_ASSERT(!std::isnan(value));
+            values.push_back(value);
+        }
+        TS_ASSERT_EQUALS(values.size(), 4u);
+
+        // Sorted so the check does not depend on the order cells are visited in
+        std::sort(values.begin(), values.end());
+
+        /*
+         * Pinned against the solution actually computed. The source lifts the interior well above
+         * the boundary value of 1.0, and the four cells read four different depths into the field.
+         * The middle two are equal because those cells sit symmetrically about the diagonal of the
+         * cuboid, which is a property of the geometry rather than of the solver.
+         */
+        TS_ASSERT_DELTA(values[0], 3.245726, 1e-4);
+        TS_ASSERT_DELTA(values[1], 3.316239, 1e-4);
+        TS_ASSERT_DELTA(values[2], 3.316239, 1e-4);
+        TS_ASSERT_DELTA(values[3], 3.482906, 1e-4);
+
+        // The spread is the point: cells in different places must not all read the same value,
+        // which is what shows the solution is sampled per cell rather than broadcast
+        TS_ASSERT(values.back() - values.front() > 1e-6);
     }
 
     void TestSemBasedSimulationExample3D()
