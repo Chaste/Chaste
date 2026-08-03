@@ -765,6 +765,11 @@ modules:
       - name: ImmersedBoundaryMorseInteractionForce
       - name: ImmersedBoundaryMorseMembraneForce
 
+      # The aggregate returned by SemComputeNScaledParameters and the ApplyNScaled* methods, so it
+      # must be bound for those wrapped methods to be callable
+      - name: SemNScaledParameters
+        source_file: SemParameterScaling.hpp
+
       - name: SemForce
         source_includes:
           - PybindUblasTypeCaster.hpp
@@ -1073,6 +1078,20 @@ modules:
 
       - name: CellRemovalLocationsWriter
         source_includes: *population_writer_includes
+
+      ##=== cell_based: Chaste/cell_based/src/writers/node_point_data_writers
+      - name: AbstractNodePointDataWriter
+        source_includes: &node_point_data_writer_includes
+          - AbstractOffLatticeCellPopulation.hpp # forward decl
+
+      - name: BoundaryNodePointDataWriter
+        source_includes: *node_point_data_writer_includes
+
+      - name: ElementIdNodePointDataWriter
+        source_includes: *node_point_data_writer_includes
+
+      - name: NodeRegionPointDataWriter
+        source_includes: *node_point_data_writer_includes
 
       ##=== cell_based: Chaste/pychaste/src/cpp/cell_based
       - name: AttractingPlaneBoundaryCondition

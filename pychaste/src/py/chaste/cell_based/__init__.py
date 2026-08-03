@@ -47,6 +47,8 @@ from chaste._pychaste_all import (
     BernoulliTrialCellCycleModel,
     BetaCateninOneHitCellMutationState,
     BiasedBernoulliTrialCellCycleModel,
+    BoundaryNodePointDataWriter_2_2,
+    BoundaryNodePointDataWriter_3_3,
     BoundaryNodeWriter_2_2,
     BoundaryNodeWriter_3_3,
     BuskeAdhesiveForce_2,
@@ -172,6 +174,8 @@ from chaste._pychaste_all import (
     DiffusionForce_3,
     DivisionBiasTrackingModifier_2,
     DivisionBiasTrackingModifier_3,
+    ElementIdNodePointDataWriter_2_2,
+    ElementIdNodePointDataWriter_3_3,
     ExclusionCaBasedDivisionRule_2,
     ExclusionCaBasedDivisionRule_3,
     ExponentialG1GenerationalCellCycleModel,
@@ -237,6 +241,8 @@ from chaste._pychaste_all import (
     NodeBasedCellPopulationWithParticles_3,
     NodeLocationWriter_2_2,
     NodeLocationWriter_3_3,
+    NodeRegionPointDataWriter_2_2,
+    NodeRegionPointDataWriter_3_3,
     NodeVelocityWriter_2_2,
     NodeVelocityWriter_3_3,
     NormallyDistributedTargetAreaModifier_2,
@@ -276,6 +282,7 @@ from chaste._pychaste_all import (
     SemGaussianRandomForce_3,
     SemLinearForce_2,
     SemLinearForce_3,
+    SemNScaledParameters,
     SemRegionalForce_2,
     SemRegionalForce_3,
     SemSpatiallyCorrelatedRandomForce_2,
@@ -365,6 +372,15 @@ AttractingPlaneBoundaryCondition = TemplateClassDict(
         ("2", "2"): AttractingPlaneBoundaryCondition_2_2,
         ("3",): AttractingPlaneBoundaryCondition_3_3,
         ("3", "3"): AttractingPlaneBoundaryCondition_3_3,
+    }
+)
+
+BoundaryNodePointDataWriter = TemplateClassDict(
+    {
+        ("2",): BoundaryNodePointDataWriter_2_2,
+        ("2", "2"): BoundaryNodePointDataWriter_2_2,
+        ("3",): BoundaryNodePointDataWriter_3_3,
+        ("3", "3"): BoundaryNodePointDataWriter_3_3,
     }
 )
 
@@ -808,6 +824,15 @@ DivisionBiasTrackingModifier = TemplateClassDict(
     }
 )
 
+ElementIdNodePointDataWriter = TemplateClassDict(
+    {
+        ("2",): ElementIdNodePointDataWriter_2_2,
+        ("2", "2"): ElementIdNodePointDataWriter_2_2,
+        ("3",): ElementIdNodePointDataWriter_3_3,
+        ("3", "3"): ElementIdNodePointDataWriter_3_3,
+    }
+)
+
 ExclusionCaBasedDivisionRule = TemplateClassDict(
     {
         ("2",): ExclusionCaBasedDivisionRule_2,
@@ -1026,6 +1051,15 @@ NodeLocationWriter = TemplateClassDict(
         ("2", "2"): NodeLocationWriter_2_2,
         ("3",): NodeLocationWriter_3_3,
         ("3", "3"): NodeLocationWriter_3_3,
+    }
+)
+
+NodeRegionPointDataWriter = TemplateClassDict(
+    {
+        ("2",): NodeRegionPointDataWriter_2_2,
+        ("2", "2"): NodeRegionPointDataWriter_2_2,
+        ("3",): NodeRegionPointDataWriter_3_3,
+        ("3", "3"): NodeRegionPointDataWriter_3_3,
     }
 )
 

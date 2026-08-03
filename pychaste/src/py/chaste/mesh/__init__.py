@@ -89,6 +89,7 @@ from chaste._pychaste_all import (
     PottsMeshWriter_3,
     SemElement_2,
     SemElement_3,
+    SemLatticeType,
     SemMesh_2,
     SemMesh_3,
     SemMultiElementMeshGenerator_2,
