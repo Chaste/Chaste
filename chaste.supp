@@ -47,18 +47,36 @@
    ...
    fun:orte_init
 }
-# OpenMPI 5 replaced ORTE with PRRTE/PMIx. The PMIx client caches attribute strings on its
-# own progress thread; they are children of an allocation that is itself suppressed above,
-# so they are reported as an indirect loss with no parent. Note this requires 'indirect' to
-# be in --errors-for-leak-kinds (see cmake/Modules/ChasteMacros.cmake), as valgrind only
-# consults the suppression files for leak kinds that it treats as errors.
+# OpenMPI replaced ORTE with PRRTE/PMIx in version 5, but OpenMPI 4 also uses PMIx. The PMIx
+# client caches attribute strings on its own progress thread, which is still running when the
+# process exits, so what valgrind sees depends on how far that thread happens to have got.
+# When the parent allocation is still live the strings are an indirect loss; when it is not
+# they are judged alone and reported as possibly lost. Both kinds must be matched, or a small
+# fraction of runs fail on whichever test happens to lose the race. Note this requires
+# 'indirect' and 'possible' to be in --errors-for-leak-kinds (see
+# cmake/Modules/ChasteMacros.cmake), as valgrind only consults the suppression files for leak
+# kinds that it treats as errors.
 {
    PMIx progress thread attribute strings
    Memcheck:Leak
-   match-leak-kinds: indirect
+   match-leak-kinds: indirect,possible
    fun:malloc
    fun:strdup
    fun:pmix_bfrops_base_value_load
+}
+# The distribution libpmix carries no symbols, so the frame above cannot be matched by name
+# and the progress thread has to be identified by object and thread entry point instead.
+{
+   PMIx progress thread attribute strings (unsymbolised libpmix)
+   Memcheck:Leak
+   match-leak-kinds: indirect,possible
+   fun:malloc
+   fun:strdup
+   ...
+   obj:*/libpmix.so*
+   ...
+   fun:start_thread
+   fun:clone
 }
 # OpenMPI 5 selects its byte-transport layer through UCX, which probes every installed
 # transport including ROCm. The ROCm probe leaks whether or not any GPU is present.
