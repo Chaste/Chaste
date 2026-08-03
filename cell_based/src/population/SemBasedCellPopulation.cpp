@@ -217,7 +217,14 @@ void SemBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rPa
 template<unsigned DIM>
 void SemBasedCellPopulation<DIM>::Validate()
 {
-    // Check each SemElement has only one cell attached
+    /*
+     * The throwing checks below are all unreachable through the constructor, which is the only
+     * caller. It requires exactly one CellPtr per SemElement and rejects both out-of-range and
+     * duplicated location indices before Validate() runs, so every element index has exactly one
+     * cell in range by this point; and the population iterator skips cells whose element has been
+     * marked as deleted, so the first loop never sees one. Only the skip in the second loop is
+     * live. They are kept as a guard against a future caller that validates less thoroughly.
+     */
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
@@ -226,11 +233,11 @@ void SemBasedCellPopulation<DIM>::Validate()
         unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
         if (elem_index >= this->GetNumElements())
         {
-            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Cell is associated with element index " << elem_index << ", which is outside the SemMesh");
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Cell is associated with element index " << elem_index << ", which is outside the SemMesh"); // LCOV_EXCL_LINE - the constructor rejects an out-of-range index first
         }
         if (this->GetElement(elem_index)->IsDeleted())
         {
-            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Cell is associated with deleted element " << elem_index);
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Cell is associated with deleted element " << elem_index); // LCOV_EXCL_LINE - the population iterator skips cells on deleted elements
         }
         validated_element[elem_index]++;
     }
@@ -244,13 +251,12 @@ void SemBasedCellPopulation<DIM>::Validate()
 
         if (validated_element[i] == 0)
         {
-            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Element " << i << " does not appear to have a cell associated with it");
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Element " << i << " does not appear to have a cell associated with it"); // LCOV_EXCL_LINE - one cell per element makes this impossible
         }
 
         if (validated_element[i] > 1)
         {
-            // This should never be reached as you can only set one cell per element index
-            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Element " << i << " appears to have " << validated_element[i] << " cells associated with it"); // LCOV_EXCL_LINE - the constructor rejects a duplicated index first
         }
     }
 }

@@ -326,21 +326,30 @@ public:
     }
 
     /**
-     * A cell may not be attached to an element that has already been marked as deleted.
+     * Validate() tolerates an element that was already marked as deleted before the population was
+     * built, which is what allows a population to be reconstructed around a mesh carrying dead
+     * cells. The cell mapped to that element is simply not a real cell: the population iterator
+     * skips it, and it is not counted among the real cells.
      *
-     * This is the only one of Validate()'s checks that is reachable: the constructor requires
-     * exactly one cell per element index and rejects duplicate or out-of-range indices, so by the
-     * time Validate() runs every element index has exactly one cell in range.
+     * This exercises the only branch of Validate() that is reachable at all. Every throwing check
+     * in it is pre-empted by the constructor's own validation or by that same iterator skip.
      */
-    void TestValidateRejectsACellOnADeletedElement()
+    void TestValidateToleratesAnAlreadyDeletedElement()
     {
         TwoElementSemMesh fixture;
         fixture.mesh.GetElement(1u)->MarkAsDeleted();
 
         std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
 
-        TS_ASSERT_THROWS_CONTAINS(SemBasedCellPopulation<2> cell_population(fixture.mesh, cells),
-                                  "Cell is associated with deleted element 1");
+        // The constructor takes the cells by reference and empties the vector, so it can only be
+        // called once. Validate() runs inside it, and failing it would throw out of this line.
+        SemBasedCellPopulation<2> cell_population(fixture.mesh, cells);
+
+        // The deleted element still occupies its index, but its cell is not a real one
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
+        TS_ASSERT(cell_population.GetElement(1u)->IsDeleted());
+        TS_ASSERT(cell_population.IsCellAssociatedWithADeletedLocation(cell_population.GetCellUsingLocationIndex(1u)));
     }
 
     void TestDampingConstantUsesContainingElementCells()

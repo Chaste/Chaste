@@ -403,7 +403,7 @@ void SemMeshWriter<DIM>::PadVtkDataArrays(vtkDataSetAttributes* pAttributes, uns
         vtkDataArray* p_array = pAttributes->GetArray(array_index);
         if (p_array == nullptr)
         {
-            continue;
+            continue; // LCOV_EXCL_LINE - VTK never reports a null array below its own array count
         }
 
         const unsigned num_components = p_array->GetNumberOfComponents();

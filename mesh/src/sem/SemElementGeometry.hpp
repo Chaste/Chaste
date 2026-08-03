@@ -262,7 +262,7 @@ private:
     {
         if (rPoints.size() < 2u)
         {
-            EXCEPTION("A 1D SEM element surface requires at least two distinct nodes");
+            EXCEPTION("A 1D SEM element surface requires at least two distinct nodes"); // LCOV_EXCL_LINE - CalculateLocalSpacing rejects a <2 node element first
         }
 
         double min_x = rPoints[0][0];
@@ -277,7 +277,7 @@ private:
         max_x += expansionRadius;
         if (max_x <= min_x)
         {
-            EXCEPTION("A 1D SEM element surface requires a non-zero interval");
+            EXCEPTION("A 1D SEM element surface requires a non-zero interval"); // LCOV_EXCL_LINE - CalculateLocalSpacing rejects a zero-width element first
         }
 
         SemElementSurface<DIM> surface;
@@ -358,7 +358,7 @@ private:
     {
         if (pVtkPoints == nullptr || pVtkPoints->GetNumberOfPoints() == 0)
         {
-            EXCEPTION("SEM alpha-shape generation produced no surface points");
+            EXCEPTION("SEM alpha-shape generation produced no surface points"); // LCOV_EXCL_LINE - VTK would have to fail on valid input
         }
 
         rSurface.Points.reserve(pVtkPoints->GetNumberOfPoints());
@@ -420,7 +420,7 @@ private:
         {
             if (p_cell_point_ids->GetNumberOfIds() != 3)
             {
-                continue;
+                continue; // LCOV_EXCL_LINE - the Delaunay filter only emits triangles
             }
 
             const unsigned a = static_cast<unsigned>(p_cell_point_ids->GetId(0));
@@ -455,7 +455,7 @@ private:
 
         if (surface.Lines.empty() || surface.Measure <= 0.0)
         {
-            EXCEPTION("SEM alpha-shape generation failed to produce a 2D boundary");
+            EXCEPTION("SEM alpha-shape generation failed to produce a 2D boundary"); // LCOV_EXCL_LINE - VTK would have to fail on valid input
         }
 
         return surface;
@@ -521,7 +521,7 @@ private:
 
         if (surface.Triangles.empty())
         {
-            EXCEPTION("SEM alpha-shape generation failed to produce a 3D surface");
+            EXCEPTION("SEM alpha-shape generation failed to produce a 3D surface"); // LCOV_EXCL_LINE - VTK would have to fail on valid input
         }
 
         vtkSmartPointer<vtkMassProperties> p_mass_properties = vtkSmartPointer<vtkMassProperties>::New();
@@ -530,7 +530,7 @@ private:
 
         if (surface.Measure <= 0.0)
         {
-            EXCEPTION("SEM alpha-shape generation failed to produce a positive 3D volume");
+            EXCEPTION("SEM alpha-shape generation failed to produce a positive 3D volume"); // LCOV_EXCL_LINE - VTK would have to fail on valid input
         }
 
         return surface;

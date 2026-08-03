@@ -164,7 +164,7 @@ std::vector<c_vector<double, DIM>> SemSphericalElementMeshGenerator<DIM>::Genera
             }
         }
 
-        return false;
+        return false; // LCOV_EXCL_LINE - two lattice sites are never equal in every coordinate
     };
 
     const auto num_to_keep = static_cast<std::ptrdiff_t>(mNumNodes);

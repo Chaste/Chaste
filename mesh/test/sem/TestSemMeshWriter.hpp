@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 
 #include "SemMeshWriter.hpp"
+#include "SemMeshReader.hpp"
+#include "SemMultiElementMeshGenerator.hpp"
 #include "FileComparison.hpp"
 #include "OutputFileHandler.hpp"
 
@@ -126,6 +128,36 @@ public:
         TS_ASSERT_THROWS_CONTAINS(writer.AddCellData("test cell data", data), "requires Chaste to be compiled with VTK");
         TS_ASSERT_THROWS_CONTAINS(writer.WriteVtkUsingMesh(mesh), "requires Chaste to be compiled with VTK");
 #endif // CHASTE_VTK
+    }
+
+    /**
+     * The writer can also copy straight from a mesh reader rather than from a mesh, which is the
+     * path a file-format conversion takes. GetNextNode() and GetNextElement() then defer to the
+     * reader instead of walking a mesh, so the output must match the input byte for byte.
+     */
+    void TestWriteFilesUsingMeshReader()
+    {
+        EXIT_IF_PARALLEL;
+
+        // Write a mesh the usual way, from a mesh object
+        SemMultiElementMeshGenerator<2> generator({3, 3}, {2, 1}, 0.5);
+        auto p_mesh = generator.GetMesh();
+        SemMeshWriter<2> mesh_writer("TestSemMeshWriterFromReader", "from_mesh", true);
+        mesh_writer.WriteFilesUsingMesh(*p_mesh);
+
+        std::string from_mesh_base = OutputFileHandler::GetChasteTestOutputDirectory()
+                                     + "TestSemMeshWriterFromReader/from_mesh";
+
+        // Now read those files back and write them out again, this time from the reader
+        SemMeshReader<2> reader(from_mesh_base);
+        SemMeshWriter<2> reader_writer("TestSemMeshWriterFromReader", "from_reader", false);
+        reader_writer.WriteFilesUsingMeshReader(reader);
+
+        std::string from_reader_base = OutputFileHandler::GetChasteTestOutputDirectory()
+                                       + "TestSemMeshWriterFromReader/from_reader";
+
+        FileComparison(from_mesh_base + ".node", from_reader_base + ".node").CompareFiles();
+        FileComparison(from_mesh_base + ".cell", from_reader_base + ".cell").CompareFiles();
     }
 
     /**
