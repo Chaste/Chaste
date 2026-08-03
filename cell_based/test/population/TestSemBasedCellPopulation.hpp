@@ -46,6 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "NoCellCycleModel.hpp"
 #include "ApcOneHitCellMutationState.hpp"
+#include "CellDivisionLocationsWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellVolumesWriter.hpp"
 #include "OutputFileHandler.hpp"
 
@@ -212,6 +214,133 @@ public:
         std::set<unsigned> neighbouring_location_indices = cell_population.GetNeighbouringLocationIndices(cell_population.GetCellUsingLocationIndex(0u));
         TS_ASSERT_EQUALS(neighbouring_location_indices.size(), 1u);
         TS_ASSERT_EQUALS(neighbouring_location_indices.count(1u), 1u);
+    }
+
+    /**
+     * The neighbour searches examine each node pair from both ends, and which end a given node or
+     * element lands on depends only on the order the pair happens to be stored in. The queries in
+     * TestUpdatePopulatesNeighbouringNodeAndLocationIndices land on one end; these are the reverse
+     * queries over the same single pair, which land on the other.
+     */
+    void TestNeighbourQueriesFromBothEndsOfANodePair()
+    {
+        TwoElementSemMesh fixture;
+        std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
+        SemBasedCellPopulation<2> cell_population(fixture.mesh, cells);
+
+        c_vector<double, 4> domain;
+        domain[0] = -0.1;
+        domain[1] =  0.2;
+        domain[2] = -0.1;
+        domain[3] =  1.1;
+        fixture.mesh.SetUpBoxCollection(0.2, domain);
+
+        cell_population.Update(false);
+
+        std::set<unsigned> neighbours_of_node_2 = cell_population.GetNeighbouringNodeIndices(2u);
+        TS_ASSERT_EQUALS(neighbours_of_node_2.size(), 1u);
+        TS_ASSERT_EQUALS(neighbours_of_node_2.count(0u), 1u);
+
+        std::set<unsigned> neighbours_of_element_1
+            = cell_population.GetNeighbouringLocationIndices(cell_population.GetCellUsingLocationIndex(1u));
+        TS_ASSERT_EQUALS(neighbours_of_element_1.size(), 1u);
+        TS_ASSERT_EQUALS(neighbours_of_element_1.count(0u), 1u);
+    }
+
+    /**
+     * AddNode and GetElementCorrespondingToCell are thin pass-throughs to the mesh, but both are
+     * part of the population's public interface.
+     */
+    void TestAddNodeAndGetElementCorrespondingToCell()
+    {
+        TwoElementSemMesh fixture;
+        std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
+        SemBasedCellPopulation<2> cell_population(fixture.mesh, cells);
+
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 3u);
+
+        // The mesh takes ownership of the node, so it must not be deleted here
+        Node<2>* p_new_node = new Node<2>(3u, false, 0.5, 0.5);
+        TS_ASSERT_EQUALS(cell_population.AddNode(p_new_node), 3u);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(cell_population.GetNode(3u), p_new_node);
+
+        CellPtr p_cell_1 = cell_population.GetCellUsingLocationIndex(1u);
+        TS_ASSERT_EQUALS(cell_population.GetElementCorrespondingToCell(p_cell_1), fixture.mesh.GetElement(1u));
+    }
+
+    /**
+     * SEM populations do not support PDE modifiers. Both hooks exist only to satisfy the abstract
+     * interface and return sentinels; a modifier attached to a SEM population would silently see a
+     * null mesh and zero data rather than being rejected, so pin that behaviour.
+     */
+    void TestPdeModifierHooksReturnSentinels()
+    {
+        TwoElementSemMesh fixture;
+        std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
+        SemBasedCellPopulation<2> cell_population(fixture.mesh, cells);
+
+        TS_ASSERT(cell_population.GetTetrahedralMeshForPdeModifier() == nullptr);
+
+        std::string item = "unused";
+        TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0u, item, false, 0.0), 0.0, 1e-12);
+    }
+
+    /**
+     * The population accepts count and event writers, both of which are deliberate no-ops for SEM
+     * because element division and removal events are not tracked.
+     */
+    void TestAcceptsPopulationCountAndEventWriters()
+    {
+        TwoElementSemMesh fixture;
+        std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
+        SemBasedCellPopulation<2> cell_population(fixture.mesh, cells);
+
+        boost::shared_ptr<AbstractCellPopulationCountWriter<2, 2> > p_count_writer(
+            new CellMutationStatesCountWriter<2, 2>());
+        TS_ASSERT_THROWS_NOTHING(cell_population.AcceptPopulationCountWriter(p_count_writer));
+
+        boost::shared_ptr<AbstractCellPopulationEventWriter<2, 2> > p_event_writer(
+            new CellDivisionLocationsWriter<2, 2>());
+        TS_ASSERT_THROWS_NOTHING(cell_population.AcceptPopulationEventWriter(p_event_writer));
+    }
+
+    /**
+     * Once every element containing a node has been deleted there is no cell left to take a damping
+     * constant from, so the population refuses rather than returning a zero that would divide
+     * through into an infinite velocity.
+     */
+    void TestDampingConstantThrowsWhenNoLiveElementContainsTheNode()
+    {
+        TwoElementSemMesh fixture;
+        std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
+        SemBasedCellPopulation<2> cell_population(fixture.mesh, cells);
+
+        // Removing both cells deletes both elements and unregisters every node from them
+        cell_population.GetCellUsingLocationIndex(0u)->Kill();
+        cell_population.GetCellUsingLocationIndex(1u)->Kill();
+        TS_ASSERT_EQUALS(cell_population.RemoveDeadCells(), 2u);
+
+        TS_ASSERT_THROWS_CONTAINS(cell_population.GetDampingConstant(0u),
+            "Node 0 is not contained in any live SEM elements");
+    }
+
+    /**
+     * A cell may not be attached to an element that has already been marked as deleted.
+     *
+     * This is the only one of Validate()'s checks that is reachable: the constructor requires
+     * exactly one cell per element index and rejects duplicate or out-of-range indices, so by the
+     * time Validate() runs every element index has exactly one cell in range.
+     */
+    void TestValidateRejectsACellOnADeletedElement()
+    {
+        TwoElementSemMesh fixture;
+        fixture.mesh.GetElement(1u)->MarkAsDeleted();
+
+        std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
+
+        TS_ASSERT_THROWS_CONTAINS(SemBasedCellPopulation<2> cell_population(fixture.mesh, cells),
+                                  "Cell is associated with deleted element 1");
     }
 
     void TestDampingConstantUsesContainingElementCells()

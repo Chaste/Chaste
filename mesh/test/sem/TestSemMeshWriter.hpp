@@ -128,6 +128,101 @@ public:
 #endif // CHASTE_VTK
     }
 
+    /**
+     * VTK always stores three coordinates per point, so a 1D mesh has to pad y and z with zeros.
+     * Both the mesh nodes and the generated surface points go through that padding separately.
+     */
+    void TestSemMeshWriterIn1d()
+    {
+#ifdef CHASTE_VTK
+        std::vector<Node<1>*> nodes;
+        nodes.push_back(new Node<1>(0, false, 0.0));
+        nodes.push_back(new Node<1>(1, false, 1.0));
+        nodes.push_back(new Node<1>(2, false, 2.0));
+
+        std::vector<Node<1>*> element_nodes = nodes;
+        std::vector<SemElement<1>*> elements;
+        elements.push_back(new SemElement<1>(0, element_nodes));
+        SemMesh<1> mesh(nodes, elements);
+
+        // Surfaces are on by default, so the surface points are written as well as the nodes
+        TS_ASSERT(mesh.GetOutputElementSurfacesToVtk());
+
+        SemMeshWriter<1> writer("TestSemMeshWriter1d", "results_1d", false);
+        writer.WriteVtkUsingMesh(mesh);
+
+        std::string results_file = OutputFileHandler::GetChasteTestOutputDirectory()
+                                   + "TestSemMeshWriter1d/results_1d.vtu";
+        vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+        p_reader->SetFileName(results_file.c_str());
+        p_reader->Update();
+        vtkUnstructuredGrid* p_grid = p_reader->GetOutput();
+
+        // Three mesh nodes, plus the two endpoints of the generated 1D surface
+        TS_ASSERT_EQUALS(p_grid->GetNumberOfPoints(), 5u);
+
+        // Every point must lie on the x-axis, whether it came from a node or from the surface
+        for (vtkIdType point_index = 0; point_index < p_grid->GetNumberOfPoints(); ++point_index)
+        {
+            double point[3];
+            p_grid->GetPoint(point_index, point);
+            TS_ASSERT_DELTA(point[1], 0.0, 1e-12);
+            TS_ASSERT_DELTA(point[2], 0.0, 1e-12);
+        }
+
+        // The first three points are the mesh nodes, in index order
+        for (unsigned node_index = 0; node_index < 3u; ++node_index)
+        {
+            double point[3];
+            p_grid->GetPoint(static_cast<vtkIdType>(node_index), point);
+            TS_ASSERT_DELTA(point[0], static_cast<double>(node_index), 1e-12);
+        }
+#endif // CHASTE_VTK
+    }
+
+    /**
+     * AddCellData attaches an array directly to the VTK cells. SEM output normally uses
+     * AddElementData instead, because one SEM element becomes several VTK cells, but the writer
+     * offers both for parity with the other mesh writers.
+     */
+    void TestAddCellDataToVtk()
+    {
+#ifdef CHASTE_VTK
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+
+        std::vector<Node<2>*> element_nodes = nodes;
+        std::vector<SemElement<2>*> elements;
+        elements.push_back(new SemElement<2>(0, element_nodes));
+        SemMesh<2> mesh(nodes, elements);
+
+        SemMeshWriter<2> writer("TestSemMeshWriterCellData", "cell_data_results", false);
+
+        // One value for the element's point-cloud cell; the surface cells are padded out
+        std::vector<double> cell_data;
+        cell_data.push_back(7.5);
+        writer.AddCellData("test cell data", cell_data);
+        writer.WriteVtkUsingMesh(mesh);
+
+        std::string results_file = OutputFileHandler::GetChasteTestOutputDirectory()
+                                   + "TestSemMeshWriterCellData/cell_data_results.vtu";
+        vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+        p_reader->SetFileName(results_file.c_str());
+        p_reader->Update();
+        vtkUnstructuredGrid* p_grid = p_reader->GetOutput();
+
+        vtkDataArray* p_cell_data = p_grid->GetCellData()->GetArray("test cell data");
+        TS_ASSERT(p_cell_data != nullptr);
+
+        // The array is padded up to the number of VTK cells, so the value supplied comes first
+        TS_ASSERT_EQUALS(p_cell_data->GetNumberOfTuples(), p_grid->GetNumberOfCells());
+        TS_ASSERT_DELTA(p_cell_data->GetTuple1(0), 7.5, 1e-12);
+#endif // CHASTE_VTK
+    }
+
     void TestPerElementDataToVtk()
     {
 #ifdef CHASTE_VTK

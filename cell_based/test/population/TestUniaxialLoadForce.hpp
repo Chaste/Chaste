@@ -38,8 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include "CheckpointArchiveTypes.hpp"
+
+#include <fstream>
+#include <string>
 #include <vector>
 
+#include "OutputFileHandler.hpp"
 #include "UniaxialLoadForce.hpp"
 
 #include "CellsGenerator.hpp"
@@ -424,6 +429,72 @@ public:
         for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
+        }
+    }
+
+    /**
+     * The slabs are identified once and then held fixed, so a restart must recover not just the
+     * loading parameters but the slab membership itself: re-identifying it after the specimen has
+     * deformed would pick a different set of nodes.
+     */
+    void TestArchiving()
+    {
+        EXIT_IF_PARALLEL;
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "UniaxialLoadForce.arch";
+
+        unsigned upper_slab_count = 0u;
+        unsigned lower_slab_count = 0u;
+
+        {
+            SemSingleElementMeshGenerator<3> generator({ 3, 3, 3 }, 1.0);
+            auto p_mesh = generator.GetMesh();
+
+            std::vector<CellPtr> cells;
+            CellsGenerator<NoCellCycleModel, 3> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+            SemBasedCellPopulation<3> population(*p_mesh, cells);
+
+            UniaxialLoadForce<3> force;
+            force.SetLoad(2.5);
+            force.SetLoadingAxis(1u);
+            force.SetSlabThickness(0.2);
+            force.SetIsCompressive(false);
+
+            // Applying the force identifies the slabs, so they become part of the archived state
+            force.AddForceContribution(population);
+            upper_slab_count = force.GetUpperSlabNodeCount();
+            lower_slab_count = force.GetLowerSlabNodeCount();
+            TS_ASSERT_LESS_THAN(0u, upper_slab_count);
+            TS_ASSERT_LESS_THAN(0u, lower_slab_count);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<3>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<3>* p_force;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_force;
+
+            UniaxialLoadForce<3>* p_loaded = static_cast<UniaxialLoadForce<3>*>(p_force);
+            TS_ASSERT_DELTA(p_loaded->GetLoad(), 2.5, 1e-12);
+            TS_ASSERT_EQUALS(p_loaded->GetLoadingAxis(), 1u);
+            TS_ASSERT_DELTA(p_loaded->GetSlabThickness(), 0.2, 1e-12);
+            TS_ASSERT_EQUALS(p_loaded->GetIsCompressive(), false);
+
+            // The slab membership survives, so the restarted force loads the same nodes
+            TS_ASSERT_EQUALS(p_loaded->GetUpperSlabNodeCount(), upper_slab_count);
+            TS_ASSERT_EQUALS(p_loaded->GetLowerSlabNodeCount(), lower_slab_count);
+
+            delete p_force;
         }
     }
 

@@ -136,6 +136,56 @@ public:
     }
 
     /**
+     * Verify the 1D default packing density. A line of nodes fills its interval exactly, so the
+     * default is 1.0 and r_eq reduces to 2*R/N.
+     */
+    void TestComputeNScaledParameters1DDefaultPacking()
+    {
+        const unsigned N = 8u;
+        const double rho = 5.0;
+        const double r_cell = 1.0;
+        const double kappa0 = 8.0;
+
+        // packingDensity is omitted, so the dimension-specific default is used
+        SemNScaledParameters p = SemComputeNScaledParameters<1>(N, r_cell, kappa0, rho);
+
+        // Default packing of 1.0, and an exponent of 1/DIM = 1
+        const double r_eq_expected = 2.0 * r_cell * (1.0 / static_cast<double>(N));
+        TS_ASSERT_DELTA(p.EquilibriumDistance, r_eq_expected, 1e-12);
+
+        // n_factor = N^-1 = 0.125, lambda = 0, so kappa = kappa0/N
+        TS_ASSERT_DELTA(p.SpringConstant, kappa0 / static_cast<double>(N), 1e-12);
+        TS_ASSERT_DELTA(8.0 * rho * rho * p.WellDepth / (p.EquilibriumDistance * p.EquilibriumDistance),
+                        p.SpringConstant, 1e-12);
+        TS_ASSERT_DELTA(p.DampingConstant, static_cast<double>(N), 1e-12);
+    }
+
+    /**
+     * Verify the 3D default packing density (FCC, π/(3√2) ≈ 0.7405), which is the figure quoted by
+     * Sandersius & Newman (2008). Nothing else exercises it, because every other caller passes an
+     * explicit packing density.
+     */
+    void TestComputeNScaledParameters3DDefaultPacking()
+    {
+        const unsigned N = 27u;
+        const double rho = 5.0;
+        const double r_cell = 1.0;
+        const double kappa0 = 9.0;
+        const double packing_3d = 0.7405;  // FCC default
+
+        // packingDensity is omitted, so the dimension-specific default is used
+        SemNScaledParameters p = SemComputeNScaledParameters<3>(N, r_cell, kappa0, rho);
+
+        const double r_eq_expected = 2.0 * r_cell * std::pow(packing_3d / N, 1.0 / 3.0);
+        TS_ASSERT_DELTA(p.EquilibriumDistance, r_eq_expected, 1e-12);
+
+        // N^{1/3} = 3 exactly, so n_factor = 1/3 and, with lambda = 0, kappa = kappa0/3
+        TS_ASSERT_DELTA(p.SpringConstant, kappa0 / 3.0, 1e-12);
+        TS_ASSERT_DELTA(8.0 * rho * rho * p.WellDepth / (p.EquilibriumDistance * p.EquilibriumDistance),
+                        p.SpringConstant, 1e-12);
+    }
+
+    /**
      * Verify that packing=1.0 with R_cell=scaleFactor/2 gives r_eq equal to the
      * inter-node spacing scaleFactor/numNodes produced by the regular-grid generators.
      * This is the canonical parameter choice for SemSingleElementMeshGenerator /

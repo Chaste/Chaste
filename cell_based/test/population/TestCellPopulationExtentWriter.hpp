@@ -51,16 +51,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellPopulationExtentWriter.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
 #include "ChasteCuboid.hpp"
+#include "HoneycombMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "NoCellCycleModel.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "OutputFileHandler.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "PottsMeshGenerator.hpp"
 #include "SemBasedCellPopulation.hpp"
 #include "SemMesh.hpp"
 #include "SemSingleElementMeshGenerator.hpp"
 #include "SemSphericalElementMeshGenerator.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -292,6 +301,135 @@ public:
             TS_ASSERT_EQUALS(lines[line].size(), 4u);
             TS_ASSERT_DELTA(lines[line][1], lines[0][1], 1e-9);
         }
+    }
+
+    /**
+     * The writer offers a Visit() for every population type, and each defers to the same
+     * measurement, so each overload needs exercising to show the dispatch reaches it.
+     *
+     * A CA population sits on a 4x4 lattice of unit spacing, so the displacements from the centroid
+     * are +/-1.5 and +/-0.5, each four times over, on both axes. The mean square is therefore
+     * (2*1.5^2 + 2*0.5^2)/4 = 1.25 and the value written is sqrt(1.25) exactly.
+     */
+    void TestWorksWithACaBasedPopulation()
+    {
+        PottsMeshGenerator<2> generator(4, 0, 0, 4, 0, 0);
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells = CreateCells<2>(4u);
+        std::vector<unsigned> location_indices = { 7u, 11u, 12u, 13u };
+        CaBasedCellPopulation<2> population(*p_mesh, cells, location_indices);
+
+        const std::vector<std::vector<double> > lines
+            = WriteAndReadBack<2>("TestCellPopulationExtentWriterCaBased", &population);
+
+        TS_ASSERT_EQUALS(lines.size(), 1u);
+        TS_ASSERT_EQUALS(lines[0].size(), 3u);
+        TS_ASSERT_DELTA(lines[0][1], sqrt(1.25), 1e-5);
+        TS_ASSERT_DELTA(lines[0][2], sqrt(1.25), 1e-5);
+    }
+
+    /**
+     * A Potts population over the same 4x4 lattice gives the same value: the measurement depends
+     * only on where the nodes are, not on how they are grouped into elements.
+     */
+    void TestWorksWithAPottsBasedPopulation()
+    {
+        PottsMeshGenerator<2> generator(4, 1, 2, 4, 1, 2);
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells = CreateCells<2>(p_mesh->GetNumElements());
+        PottsBasedCellPopulation<2> population(*p_mesh, cells);
+
+        const std::vector<std::vector<double> > lines
+            = WriteAndReadBack<2>("TestCellPopulationExtentWriterPottsBased", &population);
+
+        TS_ASSERT_EQUALS(lines[0].size(), 3u);
+        TS_ASSERT_DELTA(lines[0][1], sqrt(1.25), 1e-5);
+        TS_ASSERT_DELTA(lines[0][2], sqrt(1.25), 1e-5);
+    }
+
+    /**
+     * Mesh-based populations are the one case where the writer's ELEMENT_DIM and SPACE_DIM can
+     * differ, so this also pins the <2,2> instantiation of the mesh-based overload.
+     */
+    void TestWorksWithAMeshBasedPopulation()
+    {
+        HoneycombMeshGenerator generator(5, 5, 0);
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells = CreateCells<2>(p_mesh->GetNumNodes());
+        MeshBasedCellPopulation<2> population(*p_mesh, cells);
+
+        const std::vector<std::vector<double> > lines
+            = WriteAndReadBack<2>("TestCellPopulationExtentWriterMeshBased", &population);
+
+        TS_ASSERT_EQUALS(lines[0].size(), 3u);
+
+        // A 5x5 honeycomb spans a few cell diameters, so both axes must report a positive extent
+        TS_ASSERT_LESS_THAN(0.0, lines[0][1]);
+        TS_ASSERT_LESS_THAN(0.0, lines[0][2]);
+
+        // The generated patch is wider than it is tall, and the measure must reflect that
+        TS_ASSERT_LESS_THAN(lines[0][2], lines[0][1]);
+    }
+
+    void TestWorksWithAVertexBasedPopulation()
+    {
+        HoneycombVertexMeshGenerator generator(4, 6);
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells = CreateCells<2>(p_mesh->GetNumElements());
+        VertexBasedCellPopulation<2> population(*p_mesh, cells);
+
+        const std::vector<std::vector<double> > lines
+            = WriteAndReadBack<2>("TestCellPopulationExtentWriterVertexBased", &population);
+
+        TS_ASSERT_EQUALS(lines[0].size(), 3u);
+        TS_ASSERT_LESS_THAN(0.0, lines[0][1]);
+        TS_ASSERT_LESS_THAN(0.0, lines[0][2]);
+    }
+
+    void TestWorksWithAnImmersedBoundaryPopulation()
+    {
+        ImmersedBoundaryPalisadeMeshGenerator generator(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells = CreateCells<2>(p_mesh->GetNumElements());
+        ImmersedBoundaryCellPopulation<2> population(*p_mesh, cells);
+
+        const std::vector<std::vector<double> > lines
+            = WriteAndReadBack<2>("TestCellPopulationExtentWriterImmersedBoundary", &population);
+
+        TS_ASSERT_EQUALS(lines[0].size(), 3u);
+        TS_ASSERT_LESS_THAN(0.0, lines[0][1]);
+        TS_ASSERT_LESS_THAN(0.0, lines[0][2]);
+
+        // An immersed boundary mesh lives in the unit square, so no axis can exceed it
+        TS_ASSERT_LESS_THAN(lines[0][1], 1.0);
+        TS_ASSERT_LESS_THAN(lines[0][2], 1.0);
+    }
+
+    /**
+     * A population with no nodes has no centroid to measure from, so the writer reports zero on
+     * every axis rather than dividing by a node count of zero.
+     */
+    void TestWritesZerosForAPopulationWithNoNodes()
+    {
+        // The single-argument constructor takes ownership of the mesh, so it must be heap allocated
+        SemMesh<3>* p_mesh = new SemMesh<3>();
+        SemBasedCellPopulation<3> population(*p_mesh);
+
+        TS_ASSERT_EQUALS(population.GetNumNodes(), 0u);
+
+        const std::vector<std::vector<double> > lines
+            = WriteAndReadBack<3>("TestCellPopulationExtentWriterEmpty", &population);
+
+        TS_ASSERT_EQUALS(lines.size(), 1u);
+        TS_ASSERT_EQUALS(lines[0].size(), 4u);
+        TS_ASSERT_DELTA(lines[0][1], 0.0, 1e-12);
+        TS_ASSERT_DELTA(lines[0][2], 0.0, 1e-12);
+        TS_ASSERT_DELTA(lines[0][3], 0.0, 1e-12);
     }
 
     void TestArchiving()

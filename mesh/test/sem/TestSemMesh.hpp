@@ -165,6 +165,73 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(2), p_new_element);
     }
 
+    /**
+     * The element iterator offers both dereference forms, and callers use whichever reads better.
+     * Every other test here goes through operator->, so this covers operator*.
+     */
+    void TestElementIteratorDereference()
+    {
+        SemMultiElementMeshGenerator<2> generator({3, 3}, {2, 1}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        unsigned expected_index = 0;
+        for (auto iter = p_mesh->GetElementIteratorBegin();
+             iter != p_mesh->GetElementIteratorEnd();
+             ++iter)
+        {
+            SemElement<2>& r_element = *iter;
+            TS_ASSERT_EQUALS(r_element.GetIndex(), expected_index);
+            TS_ASSERT_EQUALS(&r_element, p_mesh->GetElement(expected_index));
+
+            // The two dereference forms must agree
+            TS_ASSERT_EQUALS(&r_element, iter.operator->());
+            expected_index++;
+        }
+        TS_ASSERT_EQUALS(expected_index, 2u);
+    }
+
+    /**
+     * The two surface-generation multipliers are validated on the way in, since a non-positive
+     * alpha or a negative expansion would only surface later as a malformed alpha shape.
+     */
+    void TestSurfaceMultiplierSettersRejectInvalidValues()
+    {
+        SemMesh<2> mesh;
+
+        TS_ASSERT_THROWS_THIS(mesh.SetSemSurfaceAlphaMultiplier(0.0),
+                              "SEM surface alpha multiplier must be positive");
+        TS_ASSERT_THROWS_THIS(mesh.SetSemSurfaceAlphaMultiplier(-1.0),
+                              "SEM surface alpha multiplier must be positive");
+        TS_ASSERT_THROWS_NOTHING(mesh.SetSemSurfaceAlphaMultiplier(1.5));
+        TS_ASSERT_DELTA(mesh.GetSemSurfaceAlphaMultiplier(), 1.5, 1e-12);
+
+        TS_ASSERT_THROWS_THIS(mesh.SetSemSurfaceExpansionMultiplier(-1e-12),
+                              "SEM surface expansion multiplier must be non-negative");
+
+        // Zero expansion is legitimate: it means the surface is not expanded at all
+        TS_ASSERT_THROWS_NOTHING(mesh.SetSemSurfaceExpansionMultiplier(0.0));
+        TS_ASSERT_DELTA(mesh.GetSemSurfaceExpansionMultiplier(), 0.0, 1e-12);
+    }
+
+    /**
+     * A SemMesh never removes a node: element removal is managed through the population, which
+     * marks whole elements as deleted rather than editing the node list.
+     */
+    void TestDeleteNodePriorToReMeshIsUnsupported()
+    {
+        SemMultiElementMeshGenerator<2> generator({3, 3}, {2, 1}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        TS_ASSERT_THROWS_CONTAINS(p_mesh->DeleteNodePriorToReMesh(0u),
+                                  "DeleteNodePriorToReMesh is not supported for SemMesh");
+
+        // ReMesh is a no-op, and must leave the mesh untouched
+        NodeMap map(p_mesh->GetNumNodes());
+        TS_ASSERT_THROWS_NOTHING(p_mesh->ReMesh(map));
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 18u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
+    }
+
     void TestClear()
     {
         SemMultiElementMeshGenerator<2> generator({3, 3}, {2, 1}, 0.5);
@@ -399,6 +466,130 @@ public:
 
         TS_ASSERT_DELTA(SemElementGeometry<2>::CalculateLocalSpacing(mesh, 0), 1.0, 1e-6);
     }
+
+    /**
+     * Both surface multipliers are checked before any geometry is built, so an invalid one is
+     * rejected regardless of dimension or of whether VTK is available.
+     */
+    void TestGenerateSurfaceRejectsInvalidMultipliers()
+    {
+        std::vector<Node<1>*> nodes;
+        nodes.push_back(new Node<1>(0, false, 0.0));
+        nodes.push_back(new Node<1>(1, false, 1.0));
+        std::vector<Node<1>*> element_nodes = nodes;
+        std::vector<SemElement<1>*> elements;
+        elements.push_back(new SemElement<1>(0, element_nodes));
+        SemMesh<1> mesh(nodes, elements);
+
+        TS_ASSERT_THROWS_THIS(SemElementGeometry<1>::GenerateSurface(mesh, 0, 0.0, 0.0, false),
+                              "SEM surface alpha multiplier must be positive");
+        TS_ASSERT_THROWS_THIS(SemElementGeometry<1>::GenerateSurface(mesh, 0, -1.0, 0.0, false),
+                              "SEM surface alpha multiplier must be positive");
+        TS_ASSERT_THROWS_THIS(SemElementGeometry<1>::GenerateSurface(mesh, 0, 1.0, -1.0, false),
+                              "SEM surface expansion multiplier must be non-negative");
+
+        TS_ASSERT_THROWS_NOTHING(SemElementGeometry<1>::GenerateSurface(mesh, 0, 1.0, 0.0, false));
+    }
+
+    /**
+     * Local spacing is estimated by spreading the nodes over the element's bounding box, so it is
+     * undefined whenever that box collapses along any axis. Each dimension computes the estimate
+     * differently, so each rejects the degenerate case separately.
+     */
+    void TestCalculateLocalSpacingRejectsDegenerateElements()
+    {
+        const std::string expected = "A SEM element must contain at least two distinct nodes to calculate local spacing";
+
+        // A single node has no spacing to speak of, whatever the dimension
+        {
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+            std::vector<Node<2>*> element_nodes = nodes;
+            std::vector<SemElement<2>*> elements;
+            elements.push_back(new SemElement<2>(0, element_nodes));
+            SemMesh<2> mesh(nodes, elements);
+
+            TS_ASSERT_THROWS_THIS(SemElementGeometry<2>::CalculateLocalSpacing(mesh, 0), expected);
+        }
+
+        // 1D: two nodes, but coincident, so the interval has zero width
+        {
+            std::vector<Node<1>*> nodes;
+            nodes.push_back(new Node<1>(0, false, 0.5));
+            nodes.push_back(new Node<1>(1, false, 0.5));
+            std::vector<Node<1>*> element_nodes = nodes;
+            std::vector<SemElement<1>*> elements;
+            elements.push_back(new SemElement<1>(0, element_nodes));
+            SemMesh<1> mesh(nodes, elements);
+
+            TS_ASSERT_THROWS_THIS(SemElementGeometry<1>::CalculateLocalSpacing(mesh, 0), expected);
+        }
+
+        // 2D: four collinear nodes, so the bounding box has zero area
+        {
+            std::vector<Node<2>*> nodes;
+            for (unsigned i = 0; i < 4; ++i)
+            {
+                nodes.push_back(new Node<2>(i, false, static_cast<double>(i), 0.0));
+            }
+            std::vector<Node<2>*> element_nodes = nodes;
+            std::vector<SemElement<2>*> elements;
+            elements.push_back(new SemElement<2>(0, element_nodes));
+            SemMesh<2> mesh(nodes, elements);
+
+            TS_ASSERT_THROWS_THIS(SemElementGeometry<2>::CalculateLocalSpacing(mesh, 0), expected);
+        }
+
+        // 3D: four coplanar nodes, so the bounding box has zero volume
+        {
+            std::vector<Node<3>*> nodes;
+            nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+            nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
+            nodes.push_back(new Node<3>(2, false, 1.0, 1.0, 0.0));
+            nodes.push_back(new Node<3>(3, false, 0.0, 1.0, 0.0));
+            std::vector<Node<3>*> element_nodes = nodes;
+            std::vector<SemElement<3>*> elements;
+            elements.push_back(new SemElement<3>(0, element_nodes));
+            SemMesh<3> mesh(nodes, elements);
+
+            TS_ASSERT_THROWS_THIS(SemElementGeometry<3>::CalculateLocalSpacing(mesh, 0), expected);
+        }
+    }
+
+    /**
+     * An alpha shape needs enough points to enclose a volume at all: three in 2D and four in 3D.
+     * This is checked before any VTK filter runs, so it holds whether or not VTK is available.
+     */
+    void TestGenerateSurfaceRejectsTooFewPoints()
+    {
+        {
+            std::vector<Node<3>*> nodes;
+            nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+            nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
+            nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
+            std::vector<Node<3>*> element_nodes = nodes;
+            std::vector<SemElement<3>*> elements;
+            elements.push_back(new SemElement<3>(0, element_nodes));
+            SemMesh<3> mesh(nodes, elements);
+
+            TS_ASSERT_THROWS_THIS(SemElementGeometry<3>::GenerateSurface(mesh, 0, 1.0, 0.0, false),
+                                  "A 3D SEM alpha-shape surface requires at least four distinct nodes");
+        }
+
+        {
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+            std::vector<Node<2>*> element_nodes = nodes;
+            std::vector<SemElement<2>*> elements;
+            elements.push_back(new SemElement<2>(0, element_nodes));
+            SemMesh<2> mesh(nodes, elements);
+
+            TS_ASSERT_THROWS_THIS(SemElementGeometry<2>::GenerateSurface(mesh, 0, 1.0, 0.0, false),
+                                  "A 2D SEM alpha-shape surface requires at least three distinct nodes");
+        }
+    }
+
     void TestArchiveSemMesh()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);

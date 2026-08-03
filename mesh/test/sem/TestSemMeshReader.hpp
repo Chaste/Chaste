@@ -145,6 +145,40 @@ public:
         TS_ASSERT_THROWS_CONTAINS((SemMeshReader<2>(partial_base)), "Could not open data file");
     }
 
+    /**
+     * SemMeshWriter never emits element attributes, so nothing produced by Chaste exercises the
+     * reader's attribute column. The format supports one all the same, and a mesh file written by
+     * hand or by another tool may carry it, so read one back.
+     */
+    void TestElementAttributeIsRead()
+    {
+        EXIT_IF_PARALLEL;
+
+        // Borrow the node file from a valid mesh: 9 nodes in one element
+        std::string valid_base = WriteValidMesh("TestSemMeshReaderElementAttribute");
+        OutputFileHandler handler("TestSemMeshReaderElementAttribute", false);
+        std::string attributed_base = handler.GetOutputDirectoryFullPath() + "attributed_mesh";
+        CopyFileWithCorruption(valid_base + ".node", attributed_base + ".node", UINT_MAX, UINT_MAX);
+
+        // Hand-write the element file, declaring one element attribute in the header
+        {
+            std::ofstream element_file((attributed_base + ".cell").c_str());
+            TS_ASSERT(element_file.is_open());
+            element_file << "1 1\n";
+            element_file << "0 9 0 1 2 3 4 5 6 7 8 3\n";
+        }
+
+        SemMeshReader<2> reader(attributed_base);
+        TS_ASSERT_EQUALS(reader.GetNumElementAttributes(), 1u);
+        TS_ASSERT_EQUALS(reader.GetNumElements(), 1u);
+
+        ElementData element_data = reader.GetNextElementData();
+        TS_ASSERT_EQUALS(element_data.NodeIndices.size(), 9u);
+        TS_ASSERT_EQUALS(element_data.NodeIndices[0], 0u);
+        TS_ASSERT_EQUALS(element_data.NodeIndices[8], 8u);
+        TS_ASSERT_DELTA(element_data.AttributeValue, 3.0, 1e-12);
+    }
+
     void TestOutOfSequenceNodeDataThrows()
     {
         EXIT_IF_PARALLEL;

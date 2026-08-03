@@ -38,8 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include "CheckpointArchiveTypes.hpp"
+
+#include <fstream>
+#include <string>
 #include <vector>
 
+#include "OutputFileHandler.hpp"
 #include "SemRegionalForce.hpp"
 #include "SemBasedCellPopulation.hpp"
 #include "SemMesh.hpp"
@@ -217,6 +222,46 @@ public:
         TS_ASSERT_DELTA(force.GetSpringConstants()[2], 7.0, 1e-12);
         TS_ASSERT_DELTA(force.GetRestLengths()[1], 0.4, 1e-12);
         TS_ASSERT_DELTA(force.GetCutOffDistance(), 1.25, 1e-12);
+    }
+
+    void TestArchiving()
+    {
+        EXIT_IF_PARALLEL;
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SemRegionalForce.arch";
+
+        {
+            SemRegionalForce<2> force;
+            force.SetSpringConstants({5.0, 6.0, 7.0});
+            force.SetRestLengths({0.5, 0.4, 0.3});
+            force.SetCutOffDistance(1.25);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<2>* p_force;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_force;
+
+            SemRegionalForce<2>* p_loaded = static_cast<SemRegionalForce<2>*>(p_force);
+            TS_ASSERT_EQUALS(p_loaded->GetSpringConstants().size(), 3u);
+            TS_ASSERT_DELTA(p_loaded->GetSpringConstants()[0], 5.0, 1e-12);
+            TS_ASSERT_DELTA(p_loaded->GetSpringConstants()[2], 7.0, 1e-12);
+            TS_ASSERT_EQUALS(p_loaded->GetRestLengths().size(), 3u);
+            TS_ASSERT_DELTA(p_loaded->GetRestLengths()[1], 0.4, 1e-12);
+            TS_ASSERT_DELTA(p_loaded->GetCutOffDistance(), 1.25, 1e-12);
+
+            delete p_force;
+        }
     }
 
     void TestExceptions()
