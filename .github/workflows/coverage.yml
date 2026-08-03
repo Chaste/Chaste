@@ -9,125 +9,105 @@ on:
     branches:
       - develop
 
+env:
+  # Core count of the runner used below, for cmake, make and ctest.
+  CHASTE_NUM_CPUS: 4
+
 jobs:
   build-and-test:
+
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-latest
-
-    container:
-      image: chaste/runner:coverage-runner
-      env:
-        RUNNER_OFF: 1
-      options: --user 0 --cpus 4
+    runs-on: ubuntu-26.04
 
     env:
+      CHASTE_DIR: ${{ github.workspace }}/Chaste
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
       CC: gcc
       CXX: g++
 
-    defaults:
-      run:
-        shell: bash
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
+
+      - name: checkout Chaste
+        uses: actions/checkout@v7
         with:
+          path: Chaste
           fetch-depth: 0
 
-      - name: Compiler version
+      - name: install dependencies
         run: |
-          ${CXX} --version
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu resolute/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          sudo apt update
+          sudo apt install chaste-dependencies lcov
 
-      - name: Make build and test directories
+      - name: compiler version
+        run: ${CXX} --version
+
+      - name: make build and test directories
         run: |
-          mkdir -p chaste-build-dir
-          mkdir -p chaste-test-dir
-          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
+          mkdir -p ${CHASTE_BUILD_DIR}
+          mkdir -p ${CHASTE_TEST_OUTPUT}
 
-      - name: Create module loading script
+      - name: cmake configure
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=${CHASTE_NUM_CPUS} ..
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: build Continuous
+        run: cmake --build . --target Continuous --parallel ${CHASTE_NUM_CPUS}
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: build Parallel
+        run: cmake --build . --target Parallel --parallel ${CHASTE_NUM_CPUS}
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: run TestChasteBuildInfo
+        run: ctest -V -R TestChasteBuildInfo
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: run Continuous
+        run: ctest -j${CHASTE_NUM_CPUS} -L Continuous --output-on-failure
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: run Parallel
+        run: ctest -L Parallel --output-on-failure
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: capture coverage
+        # lcov 2.x makes fatal several conditions that 1.x only warned about; --ignore-errors
+        # demotes them back to warnings.
+        #
+        # "mismatch" is for incorrect information in the coverage data or source, such as
+        # overlapping exclusion directives. Chaste uses both LCOV_EXCL_* markers and the
+        # lcov_excl_line regex in cmake/Config/lcovrc, so these are expected.
+        #
+        # "unused" on remove fires when a pattern below matches no file, which several of
+        # these are likely to do.
         run: |
-          cat > load_modules.sh << 'EOF'
-          #!/bin/bash
-          source /etc/profile.d/modules.sh
-          module use /home/runner/modules/modulefiles
-          module avail
-          module load boost petsc_hdf5 sundials vtk xercesc xsd
-          module list
-          EOF
-        working-directory: chaste-build-dir
+          lcov --config-file ${CHASTE_DIR}/cmake/Config/lcovrc --directory . --capture --ignore-errors mismatch --output-file coverage.info
+          lcov --config-file ${CHASTE_DIR}/cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --ignore-errors unused --output-file coverage.info
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
-      - name: Authorize runner user
-        run: |
-          chown -R runner:runner .
-
-      - name: CMake Configure
-        run: |
-          su runner << 'EOF'
-          source load_modules.sh
-          cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=4 ..
-          EOF
-        working-directory: chaste-build-dir
-
-      - name: Build Continuous
-        run: |
-          su runner << 'EOF'
-          source load_modules.sh
-          cmake --build . --target Continuous --parallel 4
-          EOF
-        working-directory: chaste-build-dir
-
-      - name: Build Parallel
-        run: |
-          su runner << 'EOF'
-          source load_modules.sh
-          cmake --build . --target Parallel --parallel 4
-          EOF
-        working-directory: chaste-build-dir
-
-      - name: Run TestChasteBuildInfo
-        run: |
-          su runner << 'EOF'
-          source load_modules.sh
-          ctest -V -R TestChasteBuildInfo
-          EOF
-        working-directory: chaste-build-dir
-
-      - name: Run Continuous
-        run: |
-          su runner << 'EOF'
-          source load_modules.sh
-          ctest -j4 -L Continuous --output-on-failure
-          EOF
-        working-directory: chaste-build-dir
-
-      - name: Run Parallel
-        run: |
-          su runner << 'EOF'
-          source load_modules.sh
-          ctest -L Parallel --output-on-failure
-          EOF
-        working-directory: chaste-build-dir
-
-      - name: Run coverage
-        run: |
-          su runner << 'EOF'
-          lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info
-          lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info
-          EOF
-        working-directory: chaste-build-dir
-
-      - name: Upload to codecov
-        run: |
-          su runner << 'EOF'
-          curl -Os https://uploader.codecov.io/latest/linux/codecov
-          chmod +x codecov
-          ./codecov
-          EOF
-        working-directory: chaste-build-dir
-
-      - name: Upload as artifact
+      # Uploaded before the codecov step so the coverage data is retained even if the
+      # upload below fails.
+      - name: upload coverage as artifact
         uses: actions/upload-artifact@v7
         with:
           name: coverage-info
-          path: chaste-build-dir/coverage.info
+          path: ${{ env.CHASTE_BUILD_DIR }}/coverage.info
+
+      - name: upload coverage to codecov
+        uses: codecov/codecov-action@v7
+        # Skip on forks running this workflow against their own repository, where the upload
+        # has nowhere useful to go. Note this does not skip pull requests from forks, which
+        # run in the upstream repository's context and whose coverage we do want.
+        if: github.repository == 'Chaste/Chaste'
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ${{ env.CHASTE_BUILD_DIR }}/coverage.info
+          disable_search: true
+          # Pull requests from forks cannot read secrets, so they upload tokenlessly and are
+          # subject to codecov's global rate limit. Don't fail those runs for something the
+          # contributor cannot fix.
+          fail_ci_if_error: ${{ secrets.CODECOV_TOKEN != '' }}
