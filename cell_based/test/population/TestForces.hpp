@@ -2459,11 +2459,11 @@ public:
             = force.ApplyNScaledInterParameters(N, r_cell, kappa0, lambda, packing);
 
         const double r_eq_expected = 2.0 * r_cell * std::pow(packing / N, 1.0 / 3.0);
-        TS_ASSERT_DELTA(returned.EquilibriumDistance, r_eq_expected, 1e-12);
-        TS_ASSERT_DELTA(force.GetInterEquilibriumDistance(), returned.EquilibriumDistance, 1e-12);
-        TS_ASSERT_DELTA(force.GetInterWellDepth(), returned.WellDepth, 1e-12);
-        TS_ASSERT_DELTA(returned.SpringConstant, kappa0 / 3.0, 1e-12);
-        TS_ASSERT_DELTA(returned.DampingConstant, 27.0, 1e-12);
+        TS_ASSERT_DELTA(returned.GetEquilibriumDistance(), r_eq_expected, 1e-12);
+        TS_ASSERT_DELTA(force.GetInterEquilibriumDistance(), returned.GetEquilibriumDistance(), 1e-12);
+        TS_ASSERT_DELTA(force.GetInterWellDepth(), returned.GetWellDepth(), 1e-12);
+        TS_ASSERT_DELTA(returned.GetSpringConstant(), kappa0 / 3.0, 1e-12);
+        TS_ASSERT_DELTA(returned.GetDampingConstant(), 27.0, 1e-12);
 
         // The intra parameters must be untouched
         TS_ASSERT_DELTA(force.GetIntraEquilibriumDistance(), intra_r_eq_before, 1e-12);

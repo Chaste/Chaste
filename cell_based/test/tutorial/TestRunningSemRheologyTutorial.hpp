@@ -328,7 +328,7 @@ public:
             num_nodes, cell_radius, kappa0, 0.0, packing_density, eta0);
         p_sem_force->SetIntraEquilibriumDistance(r_eq);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
-        cell_population.SetDampingConstantNormal(nscaled.DampingConstant);
+        cell_population.SetDampingConstantNormal(nscaled.GetDampingConstant());
 
         /*
          * #### The simulator
@@ -371,7 +371,7 @@ public:
          */
         const double temperature_fraction = 1.0;
         const double diffusion_constant
-            = temperature_fraction * nscaled.WellDepth / nscaled.DampingConstant;
+            = temperature_fraction * nscaled.GetWellDepth() / nscaled.GetDampingConstant();
 
         /*
          * `SetCoolingWindow` cools the noise towards zero between the two given times, so the whole
@@ -416,7 +416,7 @@ public:
          * The two loads are equal and opposite, so the cell deforms without drifting and no
          * boundary condition is needed to hold it in place.
          */
-        const double applied_load = 1.2 * nscaled.SpringConstant * r_eq;
+        const double applied_load = 1.2 * nscaled.GetSpringConstant() * r_eq;
 
         MAKE_PTR(UniaxialLoadForce<3>, p_load);
         p_load->SetLoad(applied_load);

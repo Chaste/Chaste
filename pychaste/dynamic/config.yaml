@@ -765,8 +765,10 @@ modules:
       - name: ImmersedBoundaryMorseInteractionForce
       - name: ImmersedBoundaryMorseMembraneForce
 
-      # The aggregate returned by SemComputeNScaledParameters and the ApplyNScaled* methods, so it
-      # must be bound for those wrapped methods to be callable
+      # The parameter set returned by SemComputeNScaledParameters and the ApplyNScaled* methods, so
+      # it must be bound for those wrapped methods to be callable. It is declared as a class with
+      # Get* accessors rather than a struct of public members: cppwg drops non-enum structs without
+      # writing a wrapper (see Chaste/cppwg#116) and cannot bind public data members in any case
       - name: SemNScaledParameters
         source_file: SemParameterScaling.hpp
 

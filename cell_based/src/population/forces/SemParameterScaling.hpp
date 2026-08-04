@@ -42,27 +42,78 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Parameters computed by N-dependent scaling for SEM simulations.
  *
+ * Declared as a class with accessors rather than an aggregate of public members
+ * because cppwg cannot bind public data members, so a plain struct would reach
+ * Python with no readable fields.
+ *
  * @see SemComputeNScaledParameters
  */
-struct SemNScaledParameters
+class SemNScaledParameters
 {
+private:
+
     /** Equilibrium distance r_eq = 2 R_cell (p/N)^{1/DIM}. */
-    double EquilibriumDistance;
+    double mEquilibriumDistance;
 
     /** Morse well depth u₀ = κ r_eq² / (8 ρ²), derived from the spring constant and rho. */
-    double WellDepth;
+    double mWellDepth;
 
     /**
      * Harmonic spring constant κ = κ₀ N^{-1/DIM} (1 − λ N^{-1/DIM}).
      * Directly usable as the spring constant for SemLinearForce.
      */
-    double SpringConstant;
+    double mSpringConstant;
 
     /**
      * Damping constant η = η₀ N.
      * Pass to SemBasedCellPopulation::SetDampingConstantNormal().
      */
-    double DampingConstant;
+    double mDampingConstant;
+
+public:
+
+    /**
+     * Constructor.
+     *
+     * @param equilibriumDistance  equilibrium distance r_eq
+     * @param wellDepth  Morse well depth u₀
+     * @param springConstant  harmonic spring constant κ
+     * @param dampingConstant  damping constant η
+     */
+    SemNScaledParameters(double equilibriumDistance,
+                         double wellDepth,
+                         double springConstant,
+                         double dampingConstant)
+        : mEquilibriumDistance(equilibriumDistance),
+          mWellDepth(wellDepth),
+          mSpringConstant(springConstant),
+          mDampingConstant(dampingConstant)
+    {
+    }
+
+    /** @return the equilibrium distance r_eq. */
+    double GetEquilibriumDistance() const
+    {
+        return mEquilibriumDistance;
+    }
+
+    /** @return the Morse well depth u₀. */
+    double GetWellDepth() const
+    {
+        return mWellDepth;
+    }
+
+    /** @return the harmonic spring constant κ. */
+    double GetSpringConstant() const
+    {
+        return mSpringConstant;
+    }
+
+    /** @return the damping constant η. */
+    double GetDampingConstant() const
+    {
+        return mDampingConstant;
+    }
 };
 
 /**
@@ -139,7 +190,7 @@ SemNScaledParameters SemComputeNScaledParameters(
 
     const double eta = eta0 * n_d;
 
-    return { r_eq, u0, kappa, eta };
+    return SemNScaledParameters(r_eq, u0, kappa, eta);
 }
 
 #endif // SEMPARAMETERSCALING_HPP_

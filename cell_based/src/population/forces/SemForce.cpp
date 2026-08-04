@@ -207,8 +207,8 @@ SemNScaledParameters SemForce<DIM>::ApplyNScaledIntraParameters(
 {
     const SemNScaledParameters params = SemComputeNScaledParameters<DIM>(
         numNodes, cellRadius, kappa0, mIntraScalingFactor, lambda, eta0, packingDensity);
-    mIntraEquilibriumDistance = params.EquilibriumDistance;
-    mIntraWellDepth = params.WellDepth;
+    mIntraEquilibriumDistance = params.GetEquilibriumDistance();
+    mIntraWellDepth = params.GetWellDepth();
     return params;
 }
 
@@ -218,8 +218,8 @@ SemNScaledParameters SemForce<DIM>::ApplyNScaledInterParameters(
 {
     const SemNScaledParameters params = SemComputeNScaledParameters<DIM>(
         numNodes, cellRadius, kappa0, mInterScalingFactor, lambda, eta0, packingDensity);
-    mInterEquilibriumDistance = params.EquilibriumDistance;
-    mInterWellDepth = params.WellDepth;
+    mInterEquilibriumDistance = params.GetEquilibriumDistance();
+    mInterWellDepth = params.GetWellDepth();
     return params;
 }
 

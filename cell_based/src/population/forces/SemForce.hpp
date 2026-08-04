@@ -273,7 +273,7 @@ public:
      *
      * The full scaled parameter set is returned so the caller can apply the
      * consistent damping constant eta = eta0*N to the cell population, e.g.
-     * rPopulation.SetDampingConstantNormal(ApplyNScaledIntraParameters(...).DampingConstant).
+     * rPopulation.SetDampingConstantNormal(ApplyNScaledIntraParameters(...).GetDampingConstant()).
      * The damping constant is not applied automatically, but returning it here
      * avoids recomputing (and possibly mismatching) the scaling.
      *

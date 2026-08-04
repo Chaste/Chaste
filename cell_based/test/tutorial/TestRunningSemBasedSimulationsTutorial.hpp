@@ -231,7 +231,7 @@ public:
         /* `ApplyNScaledIntraParameters` also returns the consistent damping constant
          * η = η₀ N (with the default η₀ = 1), which we apply to the population so the
          * Langevin dynamics are scaled with N exactly as the force stiffness is. */
-        cell_population.SetDampingConstantNormal(intra_params.DampingConstant);
+        cell_population.SetDampingConstantNormal(intra_params.GetDampingConstant());
 
         /* We add `SemGaussianRandomForce`, which applies independent Gaussian noise
          * to each node. The diffusion constant D controls the magnitude: the force
@@ -326,7 +326,7 @@ public:
         /* The damping constant η = η₀ N is scaled per-cell (N is the nodes-per-cell count
          * used for the intra scaling), keeping the Langevin dynamics consistent with the
          * force stiffness as N is varied. */
-        cell_population.SetDampingConstantNormal(intra_params.DampingConstant);
+        cell_population.SetDampingConstantNormal(intra_params.GetDampingConstant());
 
         /* `SemSpatiallyCorrelatedRandomForce` requires the domain bounds and a correlation
          * length. Nodes closer together than `correlationLength` will receive similar noise
@@ -420,7 +420,7 @@ public:
         const SemNScaledParameters nscaled =
             p_sem_force->ApplyNScaledIntraParameters(num_nodes, cell_radius, kappa0, 0.0, packing, eta0);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
-        cell_population.SetDampingConstantNormal(nscaled.DampingConstant);
+        cell_population.SetDampingConstantNormal(nscaled.GetDampingConstant());
         simulator.AddForce(p_sem_force);
 
         /* For the 3D spatially correlated noise we must supply 3D corners. The
@@ -428,7 +428,7 @@ public:
          * fluctuations couple nearest-neighbour nodes. */
         MAKE_PTR(SemSpatiallyCorrelatedRandomForce<3>, p_noise);
         p_noise->SetDiffusionConstant(1e-5);
-        p_noise->SetCorrelationLength(nscaled.EquilibriumDistance);
+        p_noise->SetCorrelationLength(nscaled.GetEquilibriumDistance());
         p_noise->SetLowerCorner({{-1.0, -1.0, -1.0}});
         p_noise->SetUpperCorner({{ 2.0,  2.0,  2.0}});
         simulator.AddForce(p_noise);

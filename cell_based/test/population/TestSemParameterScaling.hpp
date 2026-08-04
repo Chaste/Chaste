@@ -74,18 +74,18 @@ public:
         SemNScaledParameters p = SemComputeNScaledParameters<3>(N, r_cell, kappa0, rho, lambda, eta0, packing);
 
         const double r_eq_expected = 2.0 * std::pow(packing / 27.0, 1.0/3.0);
-        TS_ASSERT_DELTA(p.EquilibriumDistance, r_eq_expected, 1e-9);
+        TS_ASSERT_DELTA(p.GetEquilibriumDistance(), r_eq_expected, 1e-9);
 
-        TS_ASSERT_DELTA(p.SpringConstant, 2.0, 1e-9);
+        TS_ASSERT_DELTA(p.GetSpringConstant(), 2.0, 1e-9);
 
         const double u0_expected = 2.0 * r_eq_expected * r_eq_expected / (8.0 * 25.0);
-        TS_ASSERT_DELTA(p.WellDepth, u0_expected, 1e-9);
+        TS_ASSERT_DELTA(p.GetWellDepth(), u0_expected, 1e-9);
 
         // Harmonic self-consistency: kappa = 8*rho^2*u0/r_eq^2
-        TS_ASSERT_DELTA(8.0 * rho * rho * p.WellDepth / (p.EquilibriumDistance * p.EquilibriumDistance),
-                        p.SpringConstant, 1e-9);
+        TS_ASSERT_DELTA(8.0 * rho * rho * p.GetWellDepth() / (p.GetEquilibriumDistance() * p.GetEquilibriumDistance()),
+                        p.GetSpringConstant(), 1e-9);
 
-        TS_ASSERT_DELTA(p.DampingConstant, eta0 * N, 1e-9);
+        TS_ASSERT_DELTA(p.GetDampingConstant(), eta0 * N, 1e-9);
     }
 
     /**
@@ -106,13 +106,13 @@ public:
         const double kappa_expected = kappa0 * std::pow(static_cast<double>(N), -1.0/3.0);
         const double u0_expected = kappa_expected * r_eq_expected * r_eq_expected / (8.0 * rho * rho);
 
-        TS_ASSERT_DELTA(p.EquilibriumDistance, r_eq_expected, 1e-9);
-        TS_ASSERT_DELTA(p.SpringConstant, kappa_expected, 1e-9);
-        TS_ASSERT_DELTA(p.WellDepth, u0_expected, 1e-9);
-        TS_ASSERT_DELTA(p.DampingConstant, static_cast<double>(N), 1e-9);
+        TS_ASSERT_DELTA(p.GetEquilibriumDistance(), r_eq_expected, 1e-9);
+        TS_ASSERT_DELTA(p.GetSpringConstant(), kappa_expected, 1e-9);
+        TS_ASSERT_DELTA(p.GetWellDepth(), u0_expected, 1e-9);
+        TS_ASSERT_DELTA(p.GetDampingConstant(), static_cast<double>(N), 1e-9);
 
-        TS_ASSERT_DELTA(8.0 * rho * rho * p.WellDepth / (p.EquilibriumDistance * p.EquilibriumDistance),
-                        p.SpringConstant, 1e-9);
+        TS_ASSERT_DELTA(8.0 * rho * rho * p.GetWellDepth() / (p.GetEquilibriumDistance() * p.GetEquilibriumDistance()),
+                        p.GetSpringConstant(), 1e-9);
     }
 
     /**
@@ -129,10 +129,10 @@ public:
         SemNScaledParameters p = SemComputeNScaledParameters<2>(N, r_cell, kappa0, rho);
 
         const double r_eq_expected = 2.0 * r_cell * std::pow(packing_2d / N, 0.5);
-        TS_ASSERT_DELTA(p.EquilibriumDistance, r_eq_expected, 1e-4);
+        TS_ASSERT_DELTA(p.GetEquilibriumDistance(), r_eq_expected, 1e-4);
 
-        TS_ASSERT_DELTA(8.0 * rho * rho * p.WellDepth / (p.EquilibriumDistance * p.EquilibriumDistance),
-                        p.SpringConstant, 1e-9);
+        TS_ASSERT_DELTA(8.0 * rho * rho * p.GetWellDepth() / (p.GetEquilibriumDistance() * p.GetEquilibriumDistance()),
+                        p.GetSpringConstant(), 1e-9);
     }
 
     /**
@@ -151,13 +151,13 @@ public:
 
         // Default packing of 1.0, and an exponent of 1/DIM = 1
         const double r_eq_expected = 2.0 * r_cell * (1.0 / static_cast<double>(N));
-        TS_ASSERT_DELTA(p.EquilibriumDistance, r_eq_expected, 1e-12);
+        TS_ASSERT_DELTA(p.GetEquilibriumDistance(), r_eq_expected, 1e-12);
 
         // n_factor = N^-1 = 0.125, lambda = 0, so kappa = kappa0/N
-        TS_ASSERT_DELTA(p.SpringConstant, kappa0 / static_cast<double>(N), 1e-12);
-        TS_ASSERT_DELTA(8.0 * rho * rho * p.WellDepth / (p.EquilibriumDistance * p.EquilibriumDistance),
-                        p.SpringConstant, 1e-12);
-        TS_ASSERT_DELTA(p.DampingConstant, static_cast<double>(N), 1e-12);
+        TS_ASSERT_DELTA(p.GetSpringConstant(), kappa0 / static_cast<double>(N), 1e-12);
+        TS_ASSERT_DELTA(8.0 * rho * rho * p.GetWellDepth() / (p.GetEquilibriumDistance() * p.GetEquilibriumDistance()),
+                        p.GetSpringConstant(), 1e-12);
+        TS_ASSERT_DELTA(p.GetDampingConstant(), static_cast<double>(N), 1e-12);
     }
 
     /**
@@ -177,12 +177,12 @@ public:
         SemNScaledParameters p = SemComputeNScaledParameters<3>(N, r_cell, kappa0, rho);
 
         const double r_eq_expected = 2.0 * r_cell * std::pow(packing_3d / N, 1.0 / 3.0);
-        TS_ASSERT_DELTA(p.EquilibriumDistance, r_eq_expected, 1e-12);
+        TS_ASSERT_DELTA(p.GetEquilibriumDistance(), r_eq_expected, 1e-12);
 
         // N^{1/3} = 3 exactly, so n_factor = 1/3 and, with lambda = 0, kappa = kappa0/3
-        TS_ASSERT_DELTA(p.SpringConstant, kappa0 / 3.0, 1e-12);
-        TS_ASSERT_DELTA(8.0 * rho * rho * p.WellDepth / (p.EquilibriumDistance * p.EquilibriumDistance),
-                        p.SpringConstant, 1e-12);
+        TS_ASSERT_DELTA(p.GetSpringConstant(), kappa0 / 3.0, 1e-12);
+        TS_ASSERT_DELTA(8.0 * rho * rho * p.GetWellDepth() / (p.GetEquilibriumDistance() * p.GetEquilibriumDistance()),
+                        p.GetSpringConstant(), 1e-12);
     }
 
     /**
@@ -202,7 +202,7 @@ public:
             const unsigned N = 9u;
             SemNScaledParameters p = SemComputeNScaledParameters<2>(N, r_cell, 1.0, 5.0, 0.0, 1.0, packing);
             const double expected_spacing = scale_factor / 3.0;
-            TS_ASSERT_DELTA(p.EquilibriumDistance, expected_spacing, 1e-9);
+            TS_ASSERT_DELTA(p.GetEquilibriumDistance(), expected_spacing, 1e-9);
         }
 
         // 3D: 3x3x3 = 27 nodes, spacing = scale_factor / 3 = 0.1667
@@ -210,7 +210,7 @@ public:
             const unsigned N = 27u;
             SemNScaledParameters p = SemComputeNScaledParameters<3>(N, r_cell, 1.0, 5.0, 0.0, 1.0, packing);
             const double expected_spacing = scale_factor / 3.0;
-            TS_ASSERT_DELTA(p.EquilibriumDistance, expected_spacing, 1e-9);
+            TS_ASSERT_DELTA(p.GetEquilibriumDistance(), expected_spacing, 1e-9);
         }
     }
 
@@ -236,10 +236,10 @@ public:
         TS_ASSERT_DELTA(force.GetIntraScalingFactor(), 5.0, 1e-9);  // rho unchanged
 
         // The returned parameter set should match the force state and carry the damping constant
-        TS_ASSERT_DELTA(returned.EquilibriumDistance, r_eq, 1e-9);
-        TS_ASSERT_DELTA(returned.WellDepth, u0, 1e-9);
-        TS_ASSERT_DELTA(returned.SpringConstant, 2.0, 1e-9);
-        TS_ASSERT_DELTA(returned.DampingConstant, 54.0, 1e-9);
+        TS_ASSERT_DELTA(returned.GetEquilibriumDistance(), r_eq, 1e-9);
+        TS_ASSERT_DELTA(returned.GetWellDepth(), u0, 1e-9);
+        TS_ASSERT_DELTA(returned.GetSpringConstant(), 2.0, 1e-9);
+        TS_ASSERT_DELTA(returned.GetDampingConstant(), 54.0, 1e-9);
     }
 
     /**
@@ -274,7 +274,7 @@ public:
         const double u0 = 2.0 * r_eq * r_eq / (8.0 * 25.0);
         TS_ASSERT_DELTA(force.GetIntraEquilibriumDistance(), r_eq, 1e-9);
         TS_ASSERT_DELTA(force.GetIntraWellDepth(), u0, 1e-9);
-        TS_ASSERT_DELTA(returned.DampingConstant, 27.0, 1e-9);
+        TS_ASSERT_DELTA(returned.GetDampingConstant(), 27.0, 1e-9);
     }
 };
 

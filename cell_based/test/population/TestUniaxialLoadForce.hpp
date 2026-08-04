@@ -354,7 +354,7 @@ public:
         const SemNScaledParameters nscaled
             = p_sem_force->ApplyNScaledIntraParameters(num_nodes, cell_radius, kappa0, 0.0, packing, eta0);
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
-        population.SetDampingConstantNormal(nscaled.DampingConstant);
+        population.SetDampingConstantNormal(nscaled.GetDampingConstant());
         simulator.AddForce(p_sem_force);
 
         MAKE_PTR(UniaxialLoadForce<3>, p_load);

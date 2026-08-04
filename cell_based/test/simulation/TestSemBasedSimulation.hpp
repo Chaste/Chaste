@@ -389,7 +389,7 @@ public:
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
         p_sem_force->ApplyNScaledInterParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
         p_sem_force->SetInterCutOffDistance(interaction_cutoff);
-        cell_population.SetDampingConstantNormal(intra_params.DampingConstant);
+        cell_population.SetDampingConstantNormal(intra_params.GetDampingConstant());
         simulator.AddForce(p_sem_force);
 
         MAKE_PTR(SemSpatiallyCorrelatedRandomForce<3>, p_random_force);
@@ -474,7 +474,7 @@ public:
         p_sem_force->SetIntraCutOffDistance(interaction_cutoff);
         p_sem_force->ApplyNScaledInterParameters(num_nodes, cell_radius, 20.0, 0.0, packing_density, 1.0);
         p_sem_force->SetInterCutOffDistance(interaction_cutoff);
-        cell_population.SetDampingConstantNormal(intra_params.DampingConstant);
+        cell_population.SetDampingConstantNormal(intra_params.GetDampingConstant());
         simulator.AddForce(p_sem_force);
 
         /*
@@ -537,7 +537,7 @@ public:
             MAKE_PTR(SemForce<2>, p_sem_force);
             const SemNScaledParameters params = p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
             p_sem_force->SetIntraCutOffDistance(0.5);
-            cell_population.SetDampingConstantNormal(params.DampingConstant);
+            cell_population.SetDampingConstantNormal(params.GetDampingConstant());
             simulator.AddForce(p_sem_force);
 
             simulator.Solve();
@@ -577,7 +577,7 @@ public:
             MAKE_PTR(SemForce<2>, p_sem_force);
             const SemNScaledParameters params = p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
             p_sem_force->SetIntraCutOffDistance(0.5);
-            cell_population.SetDampingConstantNormal(params.DampingConstant);
+            cell_population.SetDampingConstantNormal(params.GetDampingConstant());
             simulator.AddForce(p_sem_force);
 
             simulator.Solve();
