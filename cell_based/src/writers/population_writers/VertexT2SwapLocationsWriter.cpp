@@ -93,6 +93,11 @@ void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundary
 {
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+}
+
 // Explicit instantiation
 template class VertexT2SwapLocationsWriter<1,1>;
 template class VertexT2SwapLocationsWriter<1,2>;

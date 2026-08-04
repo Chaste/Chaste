@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
+#include "SemBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::RadialCellDataDistributionWriter()
@@ -191,6 +192,12 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBou
     VisitAnyPopulation(pCellPopulation);
 }
 
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    VisitAnyPopulation(pCellPopulation);
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetVariableName(std::string variableName)

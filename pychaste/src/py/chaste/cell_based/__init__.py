@@ -47,6 +47,8 @@ from chaste._pychaste_all import (
     BernoulliTrialCellCycleModel,
     BetaCateninOneHitCellMutationState,
     BiasedBernoulliTrialCellCycleModel,
+    BoundaryNodePointDataWriter_2_2,
+    BoundaryNodePointDataWriter_3_3,
     BoundaryNodeWriter_2_2,
     BoundaryNodeWriter_3_3,
     BuskeAdhesiveForce_2,
@@ -93,6 +95,8 @@ from chaste._pychaste_all import (
     CellPopulationAreaWriter_3_3,
     CellPopulationElementWriter_2_2,
     CellPopulationElementWriter_3_3,
+    CellPopulationExtentWriter_2_2,
+    CellPopulationExtentWriter_3_3,
     CellProliferativePhasesCountWriter_2_2,
     CellProliferativePhasesCountWriter_3_3,
     CellProliferativePhasesWriter_2_2,
@@ -170,6 +174,8 @@ from chaste._pychaste_all import (
     DiffusionForce_3,
     DivisionBiasTrackingModifier_2,
     DivisionBiasTrackingModifier_3,
+    ElementIdNodePointDataWriter_2_2,
+    ElementIdNodePointDataWriter_3_3,
     ExclusionCaBasedDivisionRule_2,
     ExclusionCaBasedDivisionRule_3,
     ExponentialG1GenerationalCellCycleModel,
@@ -235,6 +241,8 @@ from chaste._pychaste_all import (
     NodeBasedCellPopulationWithParticles_3,
     NodeLocationWriter_2_2,
     NodeLocationWriter_3_3,
+    NodeRegionPointDataWriter_2_2,
+    NodeRegionPointDataWriter_3_3,
     NodeVelocityWriter_2_2,
     NodeVelocityWriter_3_3,
     NormallyDistributedTargetAreaModifier_2,
@@ -266,6 +274,19 @@ from chaste._pychaste_all import (
     RandomDirectionVertexBasedDivisionRule_3,
     RepulsionForce_2,
     RepulsionForce_3,
+    SemBasedCellPopulation_2,
+    SemBasedCellPopulation_3,
+    SemForce_2,
+    SemForce_3,
+    SemGaussianRandomForce_2,
+    SemGaussianRandomForce_3,
+    SemLinearForce_2,
+    SemLinearForce_3,
+    SemNScaledParameters,
+    SemRegionalForce_2,
+    SemRegionalForce_3,
+    SemSpatiallyCorrelatedRandomForce_2,
+    SemSpatiallyCorrelatedRandomForce_3,
     ShortAxisImmersedBoundaryDivisionRule_2,
     ShortAxisImmersedBoundaryDivisionRule_3,
     ShortAxisVertexBasedDivisionRule_2,
@@ -292,6 +313,8 @@ from chaste._pychaste_all import (
     TargetedCellKiller_3,
     TransitCellProliferativeType,
     TysonNovakCellCycleModel,
+    UniaxialLoadForce_2,
+    UniaxialLoadForce_3,
     UniformCellCycleModel,
     UniformG1GenerationalCellCycleModel,
     VertexBasedCellPopulation_2,
@@ -349,6 +372,15 @@ AttractingPlaneBoundaryCondition = TemplateClassDict(
         ("2", "2"): AttractingPlaneBoundaryCondition_2_2,
         ("3",): AttractingPlaneBoundaryCondition_3_3,
         ("3", "3"): AttractingPlaneBoundaryCondition_3_3,
+    }
+)
+
+BoundaryNodePointDataWriter = TemplateClassDict(
+    {
+        ("2",): BoundaryNodePointDataWriter_2_2,
+        ("2", "2"): BoundaryNodePointDataWriter_2_2,
+        ("3",): BoundaryNodePointDataWriter_3_3,
+        ("3", "3"): BoundaryNodePointDataWriter_3_3,
     }
 )
 
@@ -521,6 +553,15 @@ CellPopulationElementWriter = TemplateClassDict(
         ("2", "2"): CellPopulationElementWriter_2_2,
         ("3",): CellPopulationElementWriter_3_3,
         ("3", "3"): CellPopulationElementWriter_3_3,
+    }
+)
+
+CellPopulationExtentWriter = TemplateClassDict(
+    {
+        ("2",): CellPopulationExtentWriter_2_2,
+        ("2", "2"): CellPopulationExtentWriter_2_2,
+        ("3",): CellPopulationExtentWriter_3_3,
+        ("3", "3"): CellPopulationExtentWriter_3_3,
     }
 )
 
@@ -783,6 +824,15 @@ DivisionBiasTrackingModifier = TemplateClassDict(
     }
 )
 
+ElementIdNodePointDataWriter = TemplateClassDict(
+    {
+        ("2",): ElementIdNodePointDataWriter_2_2,
+        ("2", "2"): ElementIdNodePointDataWriter_2_2,
+        ("3",): ElementIdNodePointDataWriter_3_3,
+        ("3", "3"): ElementIdNodePointDataWriter_3_3,
+    }
+)
+
 ExclusionCaBasedDivisionRule = TemplateClassDict(
     {
         ("2",): ExclusionCaBasedDivisionRule_2,
@@ -1004,6 +1054,15 @@ NodeLocationWriter = TemplateClassDict(
     }
 )
 
+NodeRegionPointDataWriter = TemplateClassDict(
+    {
+        ("2",): NodeRegionPointDataWriter_2_2,
+        ("2", "2"): NodeRegionPointDataWriter_2_2,
+        ("3",): NodeRegionPointDataWriter_3_3,
+        ("3", "3"): NodeRegionPointDataWriter_3_3,
+    }
+)
+
 NodeVelocityWriter = TemplateClassDict(
     {
         ("2",): NodeVelocityWriter_2_2,
@@ -1119,6 +1178,48 @@ RepulsionForce = TemplateClassDict(
     }
 )
 
+SemBasedCellPopulation = TemplateClassDict(
+    {
+        ("2",): SemBasedCellPopulation_2,
+        ("3",): SemBasedCellPopulation_3,
+    }
+)
+
+SemForce = TemplateClassDict(
+    {
+        ("2",): SemForce_2,
+        ("3",): SemForce_3,
+    }
+)
+
+SemGaussianRandomForce = TemplateClassDict(
+    {
+        ("2",): SemGaussianRandomForce_2,
+        ("3",): SemGaussianRandomForce_3,
+    }
+)
+
+SemLinearForce = TemplateClassDict(
+    {
+        ("2",): SemLinearForce_2,
+        ("3",): SemLinearForce_3,
+    }
+)
+
+SemRegionalForce = TemplateClassDict(
+    {
+        ("2",): SemRegionalForce_2,
+        ("3",): SemRegionalForce_3,
+    }
+)
+
+SemSpatiallyCorrelatedRandomForce = TemplateClassDict(
+    {
+        ("2",): SemSpatiallyCorrelatedRandomForce_2,
+        ("3",): SemSpatiallyCorrelatedRandomForce_3,
+    }
+)
+
 ShortAxisImmersedBoundaryDivisionRule = TemplateClassDict(
     {
         ("2",): ShortAxisImmersedBoundaryDivisionRule_2,
@@ -1186,6 +1287,13 @@ TargetedCellKiller = TemplateClassDict(
     {
         ("2",): TargetedCellKiller_2,
         ("3",): TargetedCellKiller_3,
+    }
+)
+
+UniaxialLoadForce = TemplateClassDict(
+    {
+        ("2",): UniaxialLoadForce_2,
+        ("3",): UniaxialLoadForce_3,
     }
 )
 

@@ -38,6 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <fstream>
+#include <sstream>
+#include <string>
+
 #include "CheckpointArchiveTypes.hpp"
 
 #include "GeneralisedLinearSpringForce.hpp"
@@ -56,6 +60,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FarhadifarForce.hpp"
 #include "PlanarPolarisedFarhadifarForce.hpp"
 #include "DiffusionForce.hpp"
+#include "SemForce.hpp"
+#include "SemLinearForce.hpp"
+#include "SemGaussianRandomForce.hpp"
+#include "SemSpatiallyCorrelatedRandomForce.hpp"
+#include "SemSingleElementMeshGenerator.hpp"
+#include "SemMultiElementMeshGenerator.hpp"
+#include "SemBasedCellPopulation.hpp"
+#include "NoCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
@@ -1915,7 +1927,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.InitialiseCells();
 
-        // Test that a subclass of AbstractTwoBodyInteractionForce emits the appropraite warning
+        // Test that a subclass of AbstractTwoBodyInteractionForce emits the appropriate warning
         GeneralisedLinearSpringForce<2> spring_force;
         Warnings::QuietDestroy(); // Clear any warnings before the expected one
         spring_force.AddForceContribution(cell_population);
@@ -2298,6 +2310,1223 @@ public:
 
             // Tidy up
             delete p_force;
+        }
+    }
+
+    /**
+     * Test getter and setter methods for SemForce.
+     */
+    void TestSemForceGettersSetters()
+    {
+        SemForce<2> force;
+
+        // Test default values
+        TS_ASSERT_DELTA(force.GetIntraWellDepth(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraScalingFactor(), 5.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraEquilibriumDistance(), 0.2, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraCutOffDistance(), 0.5, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterWellDepth(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterScalingFactor(), 5.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterEquilibriumDistance(), 0.3, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterCutOffDistance(), 0.5, 1e-6);
+
+        // Test setters
+        force.SetIntraWellDepth(2.0);
+        force.SetIntraScalingFactor(3.0);
+        force.SetIntraEquilibriumDistance(0.15);
+        force.SetIntraCutOffDistance(0.6);
+        force.SetInterWellDepth(1.5);
+        force.SetInterScalingFactor(4.0);
+        force.SetInterEquilibriumDistance(0.25);
+        force.SetInterCutOffDistance(0.7);
+
+        TS_ASSERT_DELTA(force.GetIntraWellDepth(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraScalingFactor(), 3.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraEquilibriumDistance(), 0.15, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraCutOffDistance(), 0.6, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterWellDepth(), 1.5, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterScalingFactor(), 4.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterEquilibriumDistance(), 0.25, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterCutOffDistance(), 0.7, 1e-6);
+    }
+
+    /**
+     * Test getter and setter methods for SemLinearForce.
+     *
+     * SemForce has an equivalent test above; SemLinearForce needs its own because the two classes
+     * hold their parameters independently rather than sharing a base.
+     */
+    void TestSemLinearForceGettersSetters()
+    {
+        SemLinearForce<2> force;
+
+        // Test default values
+        TS_ASSERT_DELTA(force.GetIntraWellDepth(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraScalingFactor(), 5.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraEquilibriumDistance(), 0.2, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraCutOffDistance(), 0.5, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterWellDepth(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterScalingFactor(), 5.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterEquilibriumDistance(), 0.3, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterCutOffDistance(), 0.5, 1e-6);
+
+        // Test setters
+        force.SetIntraWellDepth(2.0);
+        force.SetIntraScalingFactor(3.0);
+        force.SetIntraEquilibriumDistance(0.15);
+        force.SetIntraCutOffDistance(0.6);
+        force.SetInterWellDepth(1.5);
+        force.SetInterScalingFactor(4.0);
+        force.SetInterEquilibriumDistance(0.25);
+        force.SetInterCutOffDistance(0.7);
+
+        TS_ASSERT_DELTA(force.GetIntraWellDepth(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraScalingFactor(), 3.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraEquilibriumDistance(), 0.15, 1e-6);
+        TS_ASSERT_DELTA(force.GetIntraCutOffDistance(), 0.6, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterWellDepth(), 1.5, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterScalingFactor(), 4.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterEquilibriumDistance(), 0.25, 1e-6);
+        TS_ASSERT_DELTA(force.GetInterCutOffDistance(), 0.7, 1e-6);
+    }
+
+    /**
+     * SemLinearForce reports the harmonic spring constants it derives from the Morse parameters, so
+     * check both that every parameter is written and that the derived values are the ones the force
+     * actually uses, kappa = 8 * rho^2 * u0 / r_eq^2.
+     */
+    void TestSemLinearForceOutputParameters()
+    {
+        EXIT_IF_PARALLEL;
+        OutputFileHandler handler("TestSemLinearForceOutputParameters", false);
+
+        SemLinearForce<2> force;
+        force.SetIntraWellDepth(2.0);
+        force.SetIntraScalingFactor(3.0);
+        force.SetIntraEquilibriumDistance(0.25);
+        force.SetIntraCutOffDistance(0.6);
+        force.SetInterWellDepth(1.5);
+        force.SetInterScalingFactor(4.0);
+        force.SetInterEquilibriumDistance(0.5);
+        force.SetInterCutOffDistance(0.8);
+
+        out_stream parameter_file = handler.OpenOutputFile("sem_linear_results.parameters");
+        force.OutputForceParameters(parameter_file);
+        parameter_file->close();
+
+        std::ifstream file(handler.GetOutputDirectoryFullPath() + "sem_linear_results.parameters");
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        const std::string contents = buffer.str();
+
+        // kappa = 8 * rho^2 * u0 / r_eq^2, so 8*9*2/0.0625 = 2304 and 8*16*1.5/0.25 = 768
+        TS_ASSERT_DIFFERS(contents.find("<DerivedIntraSpringConstant>2304<"), std::string::npos);
+        TS_ASSERT_DIFFERS(contents.find("<DerivedInterSpringConstant>768<"), std::string::npos);
+
+        TS_ASSERT_DIFFERS(contents.find("<IntraWellDepth>2<"), std::string::npos);
+        TS_ASSERT_DIFFERS(contents.find("<IntraScalingFactor>3<"), std::string::npos);
+        TS_ASSERT_DIFFERS(contents.find("<IntraEquilibriumDistance>0.25<"), std::string::npos);
+        TS_ASSERT_DIFFERS(contents.find("<IntraCutOffDistance>0.6<"), std::string::npos);
+        TS_ASSERT_DIFFERS(contents.find("<InterWellDepth>1.5<"), std::string::npos);
+        TS_ASSERT_DIFFERS(contents.find("<InterScalingFactor>4<"), std::string::npos);
+        TS_ASSERT_DIFFERS(contents.find("<InterEquilibriumDistance>0.5<"), std::string::npos);
+        TS_ASSERT_DIFFERS(contents.find("<InterCutOffDistance>0.8<"), std::string::npos);
+
+        // The parent class contributes the cut-off length
+        TS_ASSERT_DIFFERS(contents.find("<UseCutOffLength>"), std::string::npos);
+    }
+
+    /**
+     * The inter-cellular counterpart of TestApplyNScaledParametersOnSemLinearForce in
+     * TestSemParameterScaling: applying the N-scaling must write through to the inter parameters
+     * and leave the intra ones alone.
+     */
+    void TestSemLinearForceApplyNScaledInterParameters()
+    {
+        SemLinearForce<3> force;
+        force.SetInterScalingFactor(5.0);
+
+        const double intra_r_eq_before = force.GetIntraEquilibriumDistance();
+        const double intra_u0_before = force.GetIntraWellDepth();
+
+        // N = 27 in 3D, so N^{1/3} = 3 exactly
+        const unsigned N = 27u;
+        const double r_cell = 1.0;
+        const double kappa0 = 9.0;
+        const double lambda = 0.0;
+        const double packing = 0.7405;
+        const SemNScaledParameters returned
+            = force.ApplyNScaledInterParameters(N, r_cell, kappa0, lambda, packing);
+
+        const double r_eq_expected = 2.0 * r_cell * std::pow(packing / N, 1.0 / 3.0);
+        TS_ASSERT_DELTA(returned.GetEquilibriumDistance(), r_eq_expected, 1e-12);
+        TS_ASSERT_DELTA(force.GetInterEquilibriumDistance(), returned.GetEquilibriumDistance(), 1e-12);
+        TS_ASSERT_DELTA(force.GetInterWellDepth(), returned.GetWellDepth(), 1e-12);
+        TS_ASSERT_DELTA(returned.GetSpringConstant(), kappa0 / 3.0, 1e-12);
+        TS_ASSERT_DELTA(returned.GetDampingConstant(), 27.0, 1e-12);
+
+        // The intra parameters must be untouched
+        TS_ASSERT_DELTA(force.GetIntraEquilibriumDistance(), intra_r_eq_before, 1e-12);
+        TS_ASSERT_DELTA(force.GetIntraWellDepth(), intra_u0_before, 1e-12);
+    }
+
+    /**
+     * Two coincident nodes have no separation direction, so the harmonic force must return zero
+     * rather than dividing by zero.
+     */
+    void TestSemLinearForceWithCoincidentNodes()
+    {
+        SemLinearForce<2> force;
+
+        c_vector<double, 2> vec_a_to_b = zero_vector<double>(2);
+        c_vector<double, 2> result = force.CalculateForceVector(vec_a_to_b, 0.0, 1.0, 5.0, 0.2);
+
+        TS_ASSERT_DELTA(result[0], 0.0, 1e-12);
+        TS_ASSERT_DELTA(result[1], 0.0, 1e-12);
+    }
+
+    /**
+     * Both SEM forces guard CalculateForceBetweenNodes as well as AddForceContribution, because a
+     * numerical method may reach the former directly. TestSemForceWithWrongPopulationType covers
+     * the AddForceContribution guards; this covers the pair inside CalculateForceBetweenNodes.
+     */
+    void TestSemForcesCalculateForceBetweenNodesWithWrongPopulationType()
+    {
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.0);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        SemForce<2> sem_force;
+        TS_ASSERT_THROWS_THIS(sem_force.CalculateForceBetweenNodes(0u, 1u, cell_population),
+                "SemForce is to be used with a SemBasedCellPopulation only");
+
+        SemLinearForce<2> sem_linear_force;
+        TS_ASSERT_THROWS_THIS(sem_linear_force.CalculateForceBetweenNodes(0u, 1u, cell_population),
+                "SemLinearForce is to be used with a SemBasedCellPopulation only");
+
+        for (unsigned i = 0; i < nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+    /**
+     * A correlation length far below the node spacing leaves the random field unresolved, which the
+     * force warns about once. The threshold is settable so that the warning can be provoked without
+     * needing a pathologically fine field.
+     */
+    void TestSemSpatiallyCorrelatedRandomForceWarnsAboutSmallCorrelationLength()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+
+        SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetDampingConstantNormal(1.0);
+
+        SemSpatiallyCorrelatedRandomForce<2> force;
+        force.SetDiffusionConstant(0.25);
+        force.SetCorrelationLength(0.5);
+        force.SetLowerCorner({{-1.0, -1.0}});
+        force.SetUpperCorner({{1.0, 1.0}});
+        force.SetPeriodicity({{false, false}});
+
+        // Declare any correlation length below 10 to be too small, so the one set above trips it
+        force.SetSmallCorrelationLengthWarningThreshold(10.0);
+
+        Warnings::QuietDestroy(); // Clear any warnings before the expected one
+        force.AddForceContribution(cell_population);
+
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
+            "SemSpatiallyCorrelatedRandomForce correlation length is very small;"
+            " the random field may be poorly resolved.");
+        Warnings::QuietDestroy();
+    }
+
+    /**
+     * The random seed is only written when one has been set, so both branches need exercising.
+     */
+    void TestSemSpatiallyCorrelatedRandomForceOutputParameters()
+    {
+        EXIT_IF_PARALLEL;
+        OutputFileHandler handler("TestSemSpatiallyCorrelatedRandomForceOutputParameters", false);
+
+        // Without a seed, no <RandomSeed> element is written
+        {
+            SemSpatiallyCorrelatedRandomForce<2> force;
+            force.SetCorrelationLength(0.5);
+
+            out_stream parameter_file = handler.OpenOutputFile("no_seed.parameters");
+            force.OutputForceParameters(parameter_file);
+            parameter_file->close();
+
+            std::ifstream file(handler.GetOutputDirectoryFullPath() + "no_seed.parameters");
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            const std::string contents = buffer.str();
+
+            TS_ASSERT_DIFFERS(contents.find("<CorrelationLength>0.5<"), std::string::npos);
+            TS_ASSERT_DIFFERS(contents.find("<HasRandomSeed>0<"), std::string::npos);
+            TS_ASSERT_EQUALS(contents.find("<RandomSeed>"), std::string::npos);
+        }
+
+        // With a seed, it is
+        {
+            SemSpatiallyCorrelatedRandomForce<2> force;
+            force.SetCorrelationLength(0.5);
+            force.SetRandomSeed(42u);
+
+            out_stream parameter_file = handler.OpenOutputFile("with_seed.parameters");
+            force.OutputForceParameters(parameter_file);
+            parameter_file->close();
+
+            std::ifstream file(handler.GetOutputDirectoryFullPath() + "with_seed.parameters");
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            const std::string contents = buffer.str();
+
+            TS_ASSERT_DIFFERS(contents.find("<HasRandomSeed>1<"), std::string::npos);
+            TS_ASSERT_DIFFERS(contents.find("<RandomSeed>42<"), std::string::npos);
+        }
+    }
+
+    /**
+     * Test the Morse force calculation directly via CalculateForceVector.
+     * Verifies equilibrium, repulsive/attractive sign convention, and exact values.
+     */
+    void TestSemMorseForceCalculation()
+    {
+        SemForce<2> morse_force;
+
+        double u0 = 1.0;
+        double rho = 5.0;
+        double r_eq = 0.2;
+
+        // Test 1: At equilibrium distance, force should be zero
+        {
+            c_vector<double, 2> vec_a_to_b;
+            vec_a_to_b[0] = r_eq;
+            vec_a_to_b[1] = 0.0;
+            double dist_sq = r_eq * r_eq;
+
+            c_vector<double, 2> force = morse_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+            TS_ASSERT_DELTA(force[0], 0.0, 1e-10);
+            TS_ASSERT_DELTA(force[1], 0.0, 1e-10);
+        }
+
+        // Test 2: At r < r_eq, force should be repulsive (pointing away from B, i.e. negative x)
+        {
+            double r = 0.15;
+            c_vector<double, 2> vec_a_to_b;
+            vec_a_to_b[0] = r;
+            vec_a_to_b[1] = 0.0;
+            double dist_sq = r * r;
+
+            c_vector<double, 2> force = morse_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+            TS_ASSERT_LESS_THAN(force[0], 0.0); // Repulsive: force on A away from B
+            TS_ASSERT_DELTA(force[1], 0.0, 1e-10);
+        }
+
+        // Test 3: At r > r_eq, force should be attractive (pointing toward B, i.e. positive x)
+        {
+            double r = 0.25;
+            c_vector<double, 2> vec_a_to_b;
+            vec_a_to_b[0] = r;
+            vec_a_to_b[1] = 0.0;
+            double dist_sq = r * r;
+
+            c_vector<double, 2> force = morse_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+            TS_ASSERT_LESS_THAN(0.0, force[0]); // Attractive: force on A toward B
+            TS_ASSERT_DELTA(force[1], 0.0, 1e-10);
+        }
+
+        // Test 4: Verify exact value against hand calculation
+        // At r = 0.15: s = 0.15^2/0.2^2 = 0.5625
+        // exp(rho*(1-s)) = exp(5*0.4375) = exp(2.1875)
+        // coeff = (4*5*1/0.04) * (exp(2.1875) - exp(2*2.1875))
+        //       = 500 * (exp(2.1875) - exp(4.375))
+        // force_x = coeff * 0.15
+        {
+            double r = 0.15;
+            c_vector<double, 2> vec_a_to_b;
+            vec_a_to_b[0] = r;
+            vec_a_to_b[1] = 0.0;
+            double dist_sq = r * r;
+
+            double s = dist_sq / (r_eq * r_eq);
+            double exp_rho_val = std::exp(rho * (1.0 - s));
+            double exp_2rho_val = exp_rho_val * exp_rho_val;
+            double expected_coeff = (4.0 * rho * u0 / (r_eq * r_eq)) * (exp_rho_val - exp_2rho_val);
+            double expected_force_x = expected_coeff * r;
+
+            c_vector<double, 2> force = morse_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+            TS_ASSERT_DELTA(force[0], expected_force_x, 1e-6);
+            TS_ASSERT_DELTA(force[1], 0.0, 1e-10);
+        }
+
+        // Test 5: Force should be along the vector A->B in a diagonal direction
+        {
+            double r = 0.25;
+            c_vector<double, 2> vec_a_to_b;
+            vec_a_to_b[0] = r / std::sqrt(2.0);
+            vec_a_to_b[1] = r / std::sqrt(2.0);
+            double dist_sq = r * r;
+
+            c_vector<double, 2> force = morse_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+            // Force should be symmetric in x and y
+            TS_ASSERT_DELTA(force[0], force[1], 1e-10);
+            // And attractive (positive, toward B)
+            TS_ASSERT_LESS_THAN(0.0, force[0]);
+        }
+    }
+
+    /**
+     * Test the linear (harmonic) force calculation and verify it agrees
+     * with the full Morse force for small deviations about equilibrium.
+     */
+    void TestSemLinearForceCalculation()
+    {
+        SemLinearForce<2> linear_force;
+
+        double u0 = 1.0;
+        double rho = 5.0;
+        double r_eq = 0.2;
+        double kappa = 8.0 * rho * rho * u0 / (r_eq * r_eq);
+
+        // Test 1: At equilibrium, force should be zero
+        {
+            c_vector<double, 2> vec_a_to_b;
+            vec_a_to_b[0] = r_eq;
+            vec_a_to_b[1] = 0.0;
+            double dist_sq = r_eq * r_eq;
+
+            c_vector<double, 2> force = linear_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+            TS_ASSERT_DELTA(force[0], 0.0, 1e-10);
+            TS_ASSERT_DELTA(force[1], 0.0, 1e-10);
+        }
+
+        // Test 2: Verify exact value at r = 0.25 (stretched by 0.05)
+        // F_A = kappa * (1 - r_eq/r) * vec_a_to_b
+        //     = kappa * (1 - 0.2/0.25) * 0.25 = kappa * 0.2 * 0.25 = kappa * 0.05
+        {
+            double r = 0.25;
+            c_vector<double, 2> vec_a_to_b;
+            vec_a_to_b[0] = r;
+            vec_a_to_b[1] = 0.0;
+            double dist_sq = r * r;
+
+            double expected_force_x = kappa * (1.0 - r_eq / r) * r;
+
+            c_vector<double, 2> force = linear_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+            TS_ASSERT_DELTA(force[0], expected_force_x, 1e-6);
+            TS_ASSERT_DELTA(force[1], 0.0, 1e-10);
+        }
+    }
+
+    /**
+     * Test that the Morse and linear forces agree for small deviations
+     * from equilibrium, and diverge for large deviations.
+     */
+    void TestSemMorseAndLinearForceAgreement()
+    {
+        SemForce<2> morse_force;
+        SemLinearForce<2> linear_force;
+
+        double u0 = 1.0;
+        double rho = 5.0;
+        double r_eq = 0.2;
+
+        // For very small deviations about equilibrium, the Morse force should
+        // agree with the tangent harmonic spring.
+        double kappa = 8.0 * rho * rho * u0 / (r_eq * r_eq);
+        for (double delta = -1e-4; delta <= 1e-4; delta += 5e-5)
+        {
+            double r = r_eq + delta;
+            if (r <= 0.0) continue;
+
+            c_vector<double, 2> vec_a_to_b;
+            vec_a_to_b[0] = r;
+            vec_a_to_b[1] = 0.0;
+            double dist_sq = r * r;
+
+            c_vector<double, 2> morse_f = morse_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+            c_vector<double, 2> linear_f = linear_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+            double expected_tangent_force = kappa * delta;
+
+            TS_ASSERT_DELTA(linear_f[0], expected_tangent_force, 1e-10);
+            TS_ASSERT_DELTA(morse_f[0], expected_tangent_force, 1e-2);
+            TS_ASSERT_DELTA(linear_f[1], 0.0, 1e-10);
+            TS_ASSERT_DELTA(morse_f[1], 0.0, 1e-10);
+        }
+
+        // At large compression (r = 0.1, 50% of r_eq), forces should diverge.
+        // The Morse exponential should give much stronger repulsion than the linear spring.
+        {
+            double r = 0.1;
+            c_vector<double, 2> vec_a_to_b;
+            vec_a_to_b[0] = r;
+            vec_a_to_b[1] = 0.0;
+            double dist_sq = r * r;
+
+            c_vector<double, 2> morse_f = morse_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+            c_vector<double, 2> linear_f = linear_force.CalculateForceVector(vec_a_to_b, dist_sq, u0, rho, r_eq);
+
+            // Both should be repulsive (negative x)
+            TS_ASSERT_LESS_THAN(morse_f[0], 0.0);
+            TS_ASSERT_LESS_THAN(linear_f[0], 0.0);
+
+            // Morse should be more strongly repulsive than linear at large compression
+            TS_ASSERT_LESS_THAN(morse_f[0], linear_f[0]);
+        }
+    }
+
+    c_vector<double, 3> CalculateExpectedSemMorseForce3d(const c_vector<double, 3>& rVectorAtoB,
+                                                         double u0,
+                                                         double rho,
+                                                         double rEq)
+    {
+        const double distance_sq = inner_prod(rVectorAtoB, rVectorAtoB);
+        const double r_eq_sq = rEq * rEq;
+        const double s = distance_sq / r_eq_sq;
+        const double exp_rho = std::exp(rho * (1.0 - s));
+        const double coefficient = (4.0 * rho * u0 / r_eq_sq) * (exp_rho - exp_rho * exp_rho);
+
+        return coefficient * rVectorAtoB;
+    }
+
+    /**
+     * Test that CalculateForceBetweenNodes uses the intra-cellular parameter set
+     * for two 3D SEM nodes in the same element.
+     */
+    void TestSemForceCalculateForceBetweenNodesUsesIntraParametersIn3d()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 0.18, 0.24, 0.0));
+        nodes[0]->AddElement(0u);
+        nodes[1]->AddElement(0u);
+
+        std::vector<Node<3>*> element_nodes;
+        element_nodes.push_back(nodes[0]);
+        element_nodes.push_back(nodes[1]);
+
+        std::vector<SemElement<3>*> elements;
+        elements.push_back(new SemElement<3>(0u, element_nodes));
+
+        SemMesh<3> mesh(nodes, elements);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements());
+        SemBasedCellPopulation<3> cell_population(mesh, cells);
+
+        SemForce<3> force;
+        force.SetIntraWellDepth(2.0);
+        force.SetIntraScalingFactor(3.0);
+        force.SetIntraEquilibriumDistance(0.2);
+        force.SetIntraCutOffDistance(1.0);
+        force.SetInterWellDepth(7.0);
+        force.SetInterScalingFactor(11.0);
+        force.SetInterEquilibriumDistance(0.8);
+        force.SetInterCutOffDistance(1.0);
+
+        const c_vector<double, 3> vec_a_to_b = nodes[1]->rGetLocation() - nodes[0]->rGetLocation();
+        const c_vector<double, 3> expected_force = CalculateExpectedSemMorseForce3d(vec_a_to_b, 2.0, 3.0, 0.2);
+        const c_vector<double, 3> force_between_nodes = force.CalculateForceBetweenNodes(0u, 1u, cell_population);
+
+        TS_ASSERT_DELTA(force_between_nodes[0], expected_force[0], 1e-10);
+        TS_ASSERT_DELTA(force_between_nodes[1], expected_force[1], 1e-10);
+        TS_ASSERT_DELTA(force_between_nodes[2], expected_force[2], 1e-10);
+    }
+
+    /**
+     * Test that CalculateForceBetweenNodes uses the inter-cellular parameter set
+     * for two 3D SEM nodes in different elements.
+     */
+    void TestSemForceCalculateForceBetweenNodesUsesInterParametersIn3d()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 0.18, 0.24, 0.0));
+        nodes[0]->AddElement(0u);
+        nodes[1]->AddElement(1u);
+
+        std::vector<Node<3>*> element_0_nodes;
+        element_0_nodes.push_back(nodes[0]);
+
+        std::vector<Node<3>*> element_1_nodes;
+        element_1_nodes.push_back(nodes[1]);
+
+        std::vector<SemElement<3>*> elements;
+        elements.push_back(new SemElement<3>(0u, element_0_nodes));
+        elements.push_back(new SemElement<3>(1u, element_1_nodes));
+
+        SemMesh<3> mesh(nodes, elements);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements());
+        SemBasedCellPopulation<3> cell_population(mesh, cells);
+
+        SemForce<3> force;
+        force.SetIntraWellDepth(2.0);
+        force.SetIntraScalingFactor(3.0);
+        force.SetIntraEquilibriumDistance(0.2);
+        force.SetIntraCutOffDistance(1.0);
+        force.SetInterWellDepth(1.5);
+        force.SetInterScalingFactor(4.0);
+        force.SetInterEquilibriumDistance(0.25);
+        force.SetInterCutOffDistance(1.0);
+
+        const c_vector<double, 3> vec_a_to_b = nodes[1]->rGetLocation() - nodes[0]->rGetLocation();
+        const c_vector<double, 3> expected_force = CalculateExpectedSemMorseForce3d(vec_a_to_b, 1.5, 4.0, 0.25);
+        const c_vector<double, 3> force_between_nodes = force.CalculateForceBetweenNodes(0u, 1u, cell_population);
+
+        TS_ASSERT_DELTA(force_between_nodes[0], expected_force[0], 1e-10);
+        TS_ASSERT_DELTA(force_between_nodes[1], expected_force[1], 1e-10);
+        TS_ASSERT_DELTA(force_between_nodes[2], expected_force[2], 1e-10);
+    }
+
+    /**
+     * Test cutoff behaviour in 3D, including below/at/above cutoff and separate
+     * intra- and inter-cellular cutoffs.
+     */
+    void TestSemForceCalculateForceBetweenNodesCutoffsIn3d()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 0.18, 0.24, 0.0));
+        nodes[0]->AddElement(0u);
+        nodes[1]->AddElement(1u);
+
+        std::vector<Node<3>*> element_0_nodes;
+        element_0_nodes.push_back(nodes[0]);
+
+        std::vector<Node<3>*> element_1_nodes;
+        element_1_nodes.push_back(nodes[1]);
+
+        std::vector<SemElement<3>*> elements;
+        elements.push_back(new SemElement<3>(0u, element_0_nodes));
+        elements.push_back(new SemElement<3>(1u, element_1_nodes));
+
+        SemMesh<3> mesh(nodes, elements);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements());
+        SemBasedCellPopulation<3> cell_population(mesh, cells);
+
+        SemForce<3> force;
+        force.SetInterWellDepth(1.0);
+        force.SetInterScalingFactor(5.0);
+        force.SetInterEquilibriumDistance(0.2);
+        force.SetInterCutOffDistance(0.31);
+
+        c_vector<double, 3> force_below_cutoff = force.CalculateForceBetweenNodes(0u, 1u, cell_population);
+        TS_ASSERT_LESS_THAN(0.0, norm_2(force_below_cutoff));
+
+        nodes[1]->rGetModifiableLocation()[0] = 0.3;
+        nodes[1]->rGetModifiableLocation()[1] = 0.0;
+        c_vector<double, 3> force_at_cutoff;
+        force.SetInterCutOffDistance(0.3);
+        force_at_cutoff = force.CalculateForceBetweenNodes(0u, 1u, cell_population);
+        TS_ASSERT_DELTA(norm_2(force_at_cutoff), 0.0, 1e-12);
+
+        nodes[1]->rGetModifiableLocation()[0] = 0.31;
+        c_vector<double, 3> force_above_cutoff = force.CalculateForceBetweenNodes(0u, 1u, cell_population);
+        TS_ASSERT_DELTA(norm_2(force_above_cutoff), 0.0, 1e-12);
+
+        nodes[1]->rGetModifiableLocation()[0] = 0.18;
+        nodes[1]->rGetModifiableLocation()[1] = 0.24;
+        force.SetInterCutOffDistance(0.31);
+        c_vector<double, 3> inter_force = force.CalculateForceBetweenNodes(0u, 1u, cell_population);
+        TS_ASSERT_LESS_THAN(0.0, norm_2(inter_force));
+
+        nodes[1]->rGetContainingElementIndices().clear();
+        nodes[1]->AddElement(0u);
+        force.SetIntraCutOffDistance(0.29);
+        c_vector<double, 3> intra_force = force.CalculateForceBetweenNodes(0u, 1u, cell_population);
+        TS_ASSERT_DELTA(norm_2(intra_force), 0.0, 1e-12);
+    }
+
+    /**
+     * Test SemForce and SemLinearForce with a real SemBasedCellPopulation.
+     * Uses a single-element mesh and verifies forces are finite.
+     */
+    void TestSemForceWithPopulation()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        // Create a single-element SEM mesh with nodes on a 5x5 grid, diameter 0.5
+        SemSingleElementMeshGenerator<2> generator({5, 5}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        c_vector<double, 4> domain;
+        domain[0] = -1.0;
+        domain[1] =  2.0;
+        domain[2] = -1.0;
+        domain[3] =  2.0;
+        p_mesh->SetUpBoxCollection(0.5, domain);
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 1);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 25);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetDampingConstantNormal(1.0);
+
+        // Populate node pairs via box collection
+        cell_population.Update(false);
+
+        // Clear forces
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); i++)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+
+        // Apply the Morse force
+        SemForce<2> morse_force;
+        morse_force.AddForceContribution(cell_population);
+
+        // Check that Morse forces are finite (no NaN or Inf)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); i++)
+        {
+            for (unsigned d = 0; d < 2; d++)
+            {
+                TS_ASSERT(!std::isnan(cell_population.GetNode(i)->rGetAppliedForce()[d]));
+                TS_ASSERT(!std::isinf(cell_population.GetNode(i)->rGetAppliedForce()[d]));
+            }
+        }
+
+        // Clear Morse forces before applying the linear force
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); i++)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+
+        // Apply the linear force with the same (default) parameters
+        SemLinearForce<2> linear_force;
+        linear_force.AddForceContribution(cell_population);
+
+        // Check that linear forces are also finite
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); i++)
+        {
+            for (unsigned d = 0; d < 2; d++)
+            {
+                TS_ASSERT(!std::isnan(cell_population.GetNode(i)->rGetAppliedForce()[d]));
+                TS_ASSERT(!std::isinf(cell_population.GetNode(i)->rGetAppliedForce()[d]));
+            }
+        }
+    }
+
+    /**
+     * Test SemForce with a multi-element population to verify inter-cellular
+     * forces are computed (using different parameters from intra-cellular).
+     */
+    void TestSemForceWithMultiElementPopulation()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        // Create a 2-element SEM mesh: two cells side by side
+        SemMultiElementMeshGenerator<2> generator({5, 5}, {2, 1}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        c_vector<double, 4> domain;
+        domain[0] = -1.0;
+        domain[1] =  3.0;
+        domain[2] = -1.0;
+        domain[3] =  2.0;
+        p_mesh->SetUpBoxCollection(0.5, domain);
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 50);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetDampingConstantNormal(1.0);
+
+        // Populate node pairs
+        cell_population.Update(false);
+
+        // Clear forces
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); i++)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+
+        // Apply force with distinct inter/intra parameters to ensure both code paths are exercised
+        SemForce<2> force;
+        force.SetIntraWellDepth(1.0);
+        force.SetIntraEquilibriumDistance(0.15);
+        force.SetInterWellDepth(0.5);
+        force.SetInterEquilibriumDistance(0.25);
+        force.AddForceContribution(cell_population);
+
+        // Check forces are finite
+        bool any_nonzero = false;
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); i++)
+        {
+            for (unsigned d = 0; d < 2; d++)
+            {
+                double f = cell_population.GetNode(i)->rGetAppliedForce()[d];
+                TS_ASSERT(!std::isnan(f));
+                TS_ASSERT(!std::isinf(f));
+                if (std::abs(f) > 1e-10)
+                {
+                    any_nonzero = true;
+                }
+            }
+        }
+        // At least some forces should be non-zero
+        TS_ASSERT(any_nonzero);
+    }
+
+    /**
+     * Test that the SEM Gaussian random force uses the SEM Langevin scaling.
+     */
+    void TestSemGaussianRandomForceWithPopulation()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+
+        SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        SemGaussianRandomForce<2> force;
+        force.SetDiffusionConstant(0.25);
+        TS_ASSERT_DELTA(force.GetDiffusionConstant(), 0.25, 1e-12);
+
+        RandomNumberGenerator::Instance()->Reseed(123u);
+        force.AddForceContribution(cell_population);
+
+        std::vector<c_vector<double, 2> > forces_with_lower_diffusion(cell_population.GetNumNodes());
+        for (unsigned node_index = 0; node_index < cell_population.GetNumNodes(); ++node_index)
+        {
+            forces_with_lower_diffusion[node_index] = cell_population.GetNode(node_index)->rGetAppliedForce();
+            cell_population.GetNode(node_index)->ClearAppliedForce();
+        }
+
+        force.SetDiffusionConstant(1.0);
+        RandomNumberGenerator::Instance()->Reseed(123u);
+        force.AddForceContribution(cell_population);
+
+        bool any_nonzero = false;
+        for (unsigned node_index = 0; node_index < cell_population.GetNumNodes(); ++node_index)
+        {
+            const c_vector<double, 2>& r_force_with_higher_diffusion = cell_population.GetNode(node_index)->rGetAppliedForce();
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                TS_ASSERT_DELTA(r_force_with_higher_diffusion[dim], 2.0 * forces_with_lower_diffusion[node_index][dim], 1e-12);
+                if (std::abs(r_force_with_higher_diffusion[dim]) > 1e-12)
+                {
+                    any_nonzero = true;
+                }
+            }
+        }
+        TS_ASSERT(any_nonzero);
+    }
+
+    /**
+     * The noise can be cooled towards zero over a window of simulation time, so that an anneal, a
+     * ramped quench and a subsequent noise-free relaxation all happen within one call to Solve().
+     */
+    void TestSemRandomForceCoolingWindow()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
+
+        SemGaussianRandomForce<2> force;
+        force.SetDiffusionConstant(0.8);
+
+        // With no cooling window set, the diffusion constant never changes
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.8, 1e-12);
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.8, 1e-12);
+
+        // Cool from t = 2 to t = 6: full strength before, linearly down across, nothing after
+        force.SetCoolingWindow(2.0, 6.0);
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.8, 1e-12);
+
+        SimulationTime::Instance()->IncrementTimeOneStep(); // t = 2
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.8, 1e-12);
+
+        SimulationTime::Instance()->IncrementTimeOneStep(); // t = 3, a quarter of the way through
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.6, 1e-12);
+
+        SimulationTime::Instance()->IncrementTimeOneStep(); // t = 4, halfway
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.4, 1e-12);
+
+        while (SimulationTime::Instance()->GetTime() < 6.0)
+        {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+        }
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.0, 1e-12);
+
+        SimulationTime::Instance()->IncrementTimeOneStep(); // t = 7, past the end of the window
+        TS_ASSERT_DELTA(force.GetCurrentDiffusionConstant(), 0.0, 1e-12);
+
+        // The value set by SetDiffusionConstant() is left alone throughout
+        TS_ASSERT_DELTA(force.GetDiffusionConstant(), 0.8, 1e-12);
+
+        TS_ASSERT_THROWS_THIS(force.SetCoolingWindow(6.0, 2.0),
+            "AbstractSemRandomForce: the cooling window must not end before it starts");
+    }
+
+    /**
+     * A cooled force must apply correspondingly smaller forces, and none at all once the window
+     * has passed.
+     */
+    void TestSemRandomForceCoolingWindowScalesTheAppliedForce()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(8.0, 8);
+
+        SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        SemGaussianRandomForce<2> force;
+        force.SetDiffusionConstant(1.0);
+        force.SetCoolingWindow(0.0, 4.0);
+
+        // At t = 1 the window is a quarter spent, so D is 0.75 of its full value and the force,
+        // which goes as the square root of D, is scaled by sqrt(0.75)
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        RandomNumberGenerator::Instance()->Reseed(123u);
+        force.AddForceContribution(cell_population);
+
+        std::vector<c_vector<double, 2> > cooled_forces(cell_population.GetNumNodes());
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
+        {
+            cooled_forces[i] = cell_population.GetNode(i)->rGetAppliedForce();
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+
+        SemGaussianRandomForce<2> uncooled_force;
+        uncooled_force.SetDiffusionConstant(1.0);
+        RandomNumberGenerator::Instance()->Reseed(123u);
+        uncooled_force.AddForceContribution(cell_population);
+
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
+        {
+            const c_vector<double, 2>& r_full = cell_population.GetNode(i)->rGetAppliedForce();
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                TS_ASSERT_DELTA(cooled_forces[i][dim], sqrt(0.75) * r_full[dim], 1e-12);
+            }
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+
+        // Once the window has passed there is no noise at all
+        while (SimulationTime::Instance()->GetTime() < 5.0)
+        {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+        }
+        force.AddForceContribution(cell_population);
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
+        {
+            TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), 0.0, 1e-12);
+        }
+    }
+
+    /**
+     * Test the SEM spatially correlated random force with a real SEM population.
+     */
+    void TestSemSpatiallyCorrelatedRandomForceWithPopulation()
+    {
+        EXIT_IF_PARALLEL; // SEM is not parallel-ready
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+
+        SemSingleElementMeshGenerator<2> generator({3, 3}, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetDampingConstantNormal(1.0);
+
+        SemSpatiallyCorrelatedRandomForce<2> force;
+        force.SetDiffusionConstant(0.25);
+        force.SetCorrelationLength(0.5);
+        force.SetLowerCorner({{-1.0, -1.0}});
+        force.SetUpperCorner({{1.0, 1.0}});
+        force.SetPeriodicity({{false, false}});
+        force.SetRandomSeed(123u);
+
+        TS_ASSERT_DELTA(force.GetDiffusionConstant(), 0.25, 1e-12);
+        TS_ASSERT_DELTA(force.GetCorrelationLength(), 0.5, 1e-12);
+        TS_ASSERT_EQUALS(force.GetLowerCorner()[0], -1.0);
+        TS_ASSERT_EQUALS(force.GetUpperCorner()[1], 1.0);
+        TS_ASSERT_EQUALS(force.GetPeriodicity()[0], false);
+
+        RandomNumberGenerator::Instance()->Reseed(123u);
+        force.AddForceContribution(cell_population);
+
+        bool any_nonzero = false;
+        for (unsigned node_index = 0; node_index < cell_population.GetNumNodes(); ++node_index)
+        {
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                const double force_component = cell_population.GetNode(node_index)->rGetAppliedForce()[dim];
+                TS_ASSERT(!std::isnan(force_component));
+                TS_ASSERT(!std::isinf(force_component));
+                if (std::abs(force_component) > 1e-12)
+                {
+                    any_nonzero = true;
+                }
+            }
+        }
+        TS_ASSERT(any_nonzero);
+    }
+
+    /**
+     * Test that SemForce throws an exception when used with a non-SEM population.
+     */
+    void TestSemForceWithWrongPopulationType()
+    {
+        // Create a simple NodeBasedCellPopulation
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.0);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        SemForce<2> sem_force;
+        TS_ASSERT_THROWS_THIS(sem_force.AddForceContribution(cell_population),
+                "SemForce is to be used with a SemBasedCellPopulation only");
+
+        SemLinearForce<2> sem_linear_force;
+        TS_ASSERT_THROWS_THIS(sem_linear_force.AddForceContribution(cell_population),
+                "SemLinearForce is to be used with a SemBasedCellPopulation only");
+
+        SemGaussianRandomForce<2> sem_gaussian_random_force;
+        TS_ASSERT_THROWS_THIS(sem_gaussian_random_force.AddForceContribution(cell_population),
+                "AbstractSemRandomForce is to be used with a SemBasedCellPopulation only");
+
+        SemSpatiallyCorrelatedRandomForce<2> sem_spatially_correlated_random_force;
+        TS_ASSERT_THROWS_THIS(sem_spatially_correlated_random_force.AddForceContribution(cell_population),
+                "AbstractSemRandomForce is to be used with a SemBasedCellPopulation only");
+
+        for (unsigned i = 0; i < nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+    /**
+     * Test archiving of SemForce.
+     */
+    void TestSemForceArchiving()
+    {
+        EXIT_IF_PARALLEL;
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SemForce.arch";
+
+        {
+            SemForce<2> force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            force.SetIntraWellDepth(2.5);
+            force.SetIntraScalingFactor(3.0);
+            force.SetIntraEquilibriumDistance(0.15);
+            force.SetIntraCutOffDistance(0.6);
+            force.SetInterWellDepth(1.5);
+            force.SetInterScalingFactor(4.0);
+            force.SetInterEquilibriumDistance(0.25);
+            force.SetInterCutOffDistance(0.7);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<2>* p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+
+            // Test member variables
+            TS_ASSERT_DELTA((static_cast<SemForce<2>*>(p_force))->GetIntraWellDepth(), 2.5, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SemForce<2>*>(p_force))->GetIntraScalingFactor(), 3.0, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SemForce<2>*>(p_force))->GetIntraEquilibriumDistance(), 0.15, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SemForce<2>*>(p_force))->GetIntraCutOffDistance(), 0.6, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SemForce<2>*>(p_force))->GetInterWellDepth(), 1.5, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SemForce<2>*>(p_force))->GetInterScalingFactor(), 4.0, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SemForce<2>*>(p_force))->GetInterEquilibriumDistance(), 0.25, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SemForce<2>*>(p_force))->GetInterCutOffDistance(), 0.7, 1e-6);
+
+            // Tidy up
+            delete p_force;
+        }
+    }
+
+    /**
+     * Test archiving of SemLinearForce.
+     */
+    void TestSemLinearForceArchiving()
+    {
+        EXIT_IF_PARALLEL;
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SemLinearForce.arch";
+
+        {
+            SemLinearForce<2> force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            force.SetIntraWellDepth(2.5);
+            force.SetIntraScalingFactor(3.0);
+            force.SetIntraEquilibriumDistance(0.15);
+            force.SetIntraCutOffDistance(0.6);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<2>* p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+
+            // Test member variables
+            TS_ASSERT_DELTA((static_cast<SemLinearForce<2>*>(p_force))->GetIntraWellDepth(), 2.5, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SemLinearForce<2>*>(p_force))->GetIntraScalingFactor(), 3.0, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SemLinearForce<2>*>(p_force))->GetIntraEquilibriumDistance(), 0.15, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SemLinearForce<2>*>(p_force))->GetIntraCutOffDistance(), 0.6, 1e-6);
+
+            // Tidy up
+            delete p_force;
+        }
+    }
+
+    /**
+     * Test archiving of SEM random forces.
+     */
+    void TestSemRandomForceArchiving()
+    {
+        EXIT_IF_PARALLEL;
+        OutputFileHandler handler("archive", false);
+
+        {
+            const std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SemGaussianRandomForce.arch";
+
+            {
+                SemGaussianRandomForce<2> force;
+                force.SetDiffusionConstant(0.25);
+
+                std::ofstream ofs(archive_filename.c_str());
+                boost::archive::text_oarchive output_arch(ofs);
+
+                AbstractForce<2>* const p_force = &force;
+                output_arch << p_force;
+            }
+
+            {
+                AbstractForce<2>* p_force;
+
+                std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+                boost::archive::text_iarchive input_arch(ifs);
+
+                input_arch >> p_force;
+
+                TS_ASSERT_DELTA((static_cast<SemGaussianRandomForce<2>*>(p_force))->GetDiffusionConstant(), 0.25, 1e-6);
+
+                delete p_force;
+            }
+        }
+
+        {
+            const std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SemSpatiallyCorrelatedRandomForce.arch";
+
+            {
+                SemSpatiallyCorrelatedRandomForce<2> force;
+                force.SetDiffusionConstant(0.5);
+                force.SetCorrelationLength(0.25);
+                force.SetLowerCorner({{-1.0, -2.0}});
+                force.SetUpperCorner({{3.0, 4.0}});
+                force.SetPeriodicity({{true, false}});
+                force.SetSmallCorrelationLengthWarningThreshold(1e-9);
+
+                std::ofstream ofs(archive_filename.c_str());
+                boost::archive::text_oarchive output_arch(ofs);
+
+                AbstractForce<2>* const p_force = &force;
+                output_arch << p_force;
+            }
+
+            {
+                AbstractForce<2>* p_force;
+
+                std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+                boost::archive::text_iarchive input_arch(ifs);
+
+                input_arch >> p_force;
+
+                auto p_random_force = static_cast<SemSpatiallyCorrelatedRandomForce<2>*>(p_force);
+                TS_ASSERT_DELTA(p_random_force->GetDiffusionConstant(), 0.5, 1e-6);
+                TS_ASSERT_DELTA(p_random_force->GetCorrelationLength(), 0.25, 1e-6);
+                TS_ASSERT_DELTA(p_random_force->GetLowerCorner()[0], -1.0, 1e-6);
+                TS_ASSERT_DELTA(p_random_force->GetLowerCorner()[1], -2.0, 1e-6);
+                TS_ASSERT_DELTA(p_random_force->GetUpperCorner()[0], 3.0, 1e-6);
+                TS_ASSERT_DELTA(p_random_force->GetUpperCorner()[1], 4.0, 1e-6);
+                TS_ASSERT_EQUALS(p_random_force->GetPeriodicity()[0], true);
+                TS_ASSERT_EQUALS(p_random_force->GetPeriodicity()[1], false);
+                TS_ASSERT_DELTA(p_random_force->GetSmallCorrelationLengthWarningThreshold(), 1e-9, 1e-12);
+
+                delete p_force;
+            }
         }
     }
 };

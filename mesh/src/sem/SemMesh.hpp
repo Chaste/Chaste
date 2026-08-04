@@ -1,0 +1,594 @@
+/*
+
+Copyright (c) 2005-2026, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+#ifndef SEMMESH_HPP_
+#define SEMMESH_HPP_
+
+// Forward declaration prevents circular include chain
+template<unsigned DIM>
+class SemMeshWriter;
+
+#include <algorithm>
+#include <map>
+#include <memory>
+
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/vector.hpp>
+#include "ChasteSerialization.hpp"
+
+#include "AbstractMesh.hpp"
+#include "ArchiveLocationInfo.hpp"
+#include "DistributedBoxCollection.hpp"
+#include "SemElement.hpp"
+#include "Element.hpp"
+#include "SemMeshReader.hpp"
+#include "SemMeshWriter.hpp"
+#include "NodeMap.hpp"
+
+/**
+ * A mesh of subcellular element (SEM) nodes, where each SemElement represents one biological cell.
+ *
+ * Each cell is made up of a collection of subcellular nodes. Nodes belonging to the same element
+ * interact via intra-cellular forces; nodes in different elements interact via inter-cellular forces.
+ * A DistributedBoxCollection partitions the domain so that only potentially-interacting node pairs
+ * (those within mMaximumInteractionDistance) are evaluated.
+ *
+ * Node regions are set by the generator using the SemNodeRegion enum (see SemEnumerations.hpp):
+ * SEM_INTERIOR_REGION (0) for interior nodes, SEM_BOUNDARY_REGION (1) for surface/cortex nodes.
+ *
+ * Mesh topology changes (DeleteNodePriorToReMesh, ReMesh with node deletion) are not supported.
+ * Cell removal is managed through SemBasedCellPopulation::RemoveDeadCells().
+ */
+template<unsigned DIM>
+class SemMesh : public AbstractMesh<DIM, DIM>
+{
+private:
+    /** Vector of pointers to SemElements. */
+    std::vector<SemElement<DIM>*> mElements;
+
+    /** Box collection to efficiently calculate node-node interactions. */
+    std::unique_ptr<DistributedBoxCollection<DIM>> mpBoxCollection;
+
+    /** Nodes separated by a distance less than mMaximumInteractionDistance are neighbours. */
+    double mMaximumInteractionDistance;
+
+    /** Whether generated SEM element surfaces are included in VTK output. */
+    bool mOutputElementSurfacesToVtk;
+
+    /** Multiplier applied to the local SEM element node spacing to set alpha-shape alpha. */
+    double mSemSurfaceAlphaMultiplier;
+
+    /** Multiplier applied to local SEM element node spacing for radial surface expansion. */
+    double mSemSurfaceExpansionMultiplier;
+
+    /** Whether GetVolumeOfElement() uses the expanded SEM surface. */
+    bool mUseExpandedSemSurfaceForVolume;
+
+    /**
+     * Set up a DistributedBoxCollection by calculating the correct domain size from the node locations.
+     *
+     * @param rNodes the nodes that will be contained in the box collection.
+     */
+    void SetUpBoxCollection(const std::vector<Node<DIM>*>& rNodes);
+
+    /**
+     * Map a global node index to a local one. This overridden method is required as it is pure
+     * virtual in AbstractMesh.
+     *
+     * A SemMesh holds every node on every process, so the mapping is the identity. It is
+     * exercised on every call to GetNode().
+     *
+     * @param index the global index of the node
+     *
+     * @return local index, which is equal to the global index
+     */
+    unsigned SolveNodeMapping(unsigned index) const override;
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+
+    /**
+     * Archive the SemMesh and its member variables. Note that this will write
+     * out a SemMeshWriter file to wherever ArchiveLocationInfo has specified.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template <class Archive>
+    void save(Archive& archive, const unsigned int version) const
+    {
+        archive& boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
+
+        // Node positions, regions and element membership are persisted via the mesh file
+        // below; the remaining SEM-specific scalar state is archived here. The box
+        // collection is not archived: it is rebuilt from the node locations on load.
+        archive& mMaximumInteractionDistance;
+        archive& mOutputElementSurfacesToVtk;
+        archive& mSemSurfaceAlphaMultiplier;
+        archive& mSemSurfaceExpansionMultiplier;
+        archive& mUseExpandedSemSurfaceForVolume;
+
+        // Create a mesh writer pointing to the correct file and directory
+        SemMeshWriter<DIM> writer(ArchiveLocationInfo::GetArchiveRelativePath(),
+                                  ArchiveLocationInfo::GetMeshFilename(),
+                                  false);
+        writer.WriteFilesUsingMesh(*(const_cast<SemMesh<DIM>*>(this)));
+    }
+
+    /**
+     * Load a mesh using SemMeshReader and the location in ArchiveLocationInfo.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template <class Archive>
+    void load(Archive& archive, const unsigned int version)
+    {
+        archive& boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
+
+        archive& mMaximumInteractionDistance;
+        archive& mOutputElementSurfacesToVtk;
+        archive& mSemSurfaceAlphaMultiplier;
+        archive& mSemSurfaceExpansionMultiplier;
+        archive& mUseExpandedSemSurfaceForVolume;
+
+        SemMeshReader<DIM> reader(ArchiveLocationInfo::GetArchiveDirectory()
+                                  + ArchiveLocationInfo::GetMeshFilename());
+        this->ConstructFromMeshReader(reader);
+
+        // The box collection is not archived, so rebuild it from the loaded node locations
+        // using the restored interaction distance.
+        SetUpBoxCollection(this->mNodes);
+    }
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+public:
+    /** Forward declaration of SemElement iterator. */
+    class SemElementIterator;
+
+    /**
+     * @return an iterator to the first SemElement in the SemMesh.
+     *
+     * @param skipDeletedElements whether to include deleted element
+     */
+    inline SemElementIterator GetElementIteratorBegin(bool skipDeletedElements = true);
+
+    /**
+     * @return an iterator to one past the last SemElement in the SemMesh.
+     */
+    inline SemElementIterator GetElementIteratorEnd();
+
+    /**
+     * Set up the box collection.
+     *
+     * @param cutOffLength the cut off length for node neighbours.
+     * @param domainSize the size of the domain containing the nodes.
+     * @param numLocalRows the number of rows that should be owned by this process.
+     * @param isDimPeriodic whether the DistributedBoxCollection should be periodic.
+     */
+    void SetUpBoxCollection(double cutOffLength, c_vector<double, 2 * DIM> domainSize, int numLocalRows = PETSC_DECIDE, c_vector<bool, DIM> isDimPeriodic = zero_vector<bool>(DIM));
+
+    /**
+     * Default constructor.
+     *
+     * @param nodes vector of pointers to nodes
+     * @param semElements vector of pointers to SemElements
+     */
+    SemMesh(std::vector<Node<DIM>*> nodes,
+            std::vector<SemElement<DIM>*> semElements);
+
+    /**
+     * Default constructor for use by serializer.
+     */
+    SemMesh();
+
+
+    /**
+     * Destructor.
+     */
+    virtual ~SemMesh();
+
+    /**
+     * @return the number of Nodes in the mesh.
+     */
+    unsigned GetNumNodes() const override;
+
+    /**
+     * Update the node locations in the box collection.
+     */
+    void UpdateBoxCollection();
+
+    /**
+     * Iterate through each node and add it to its appropriate box.
+     */
+    void AddNodesToBoxes();
+
+    /**
+     * Calculate pairs of nodes using the BoxCollection.
+     *
+     * @param rNodePairs reference to the vector of node pairs to populate.
+     */
+    void CalculateNodePairs(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
+
+    /**
+     * Adds a node to the mesh.
+     *
+     * @param pNewNode a pointer to the node to add
+     *
+     * @return the index of the new node within the mesh
+     */
+    virtual unsigned AddNode(Node<DIM>* pNewNode);
+
+    /**
+     * The number of SemElement slots in the mesh, counting those marked as deleted.
+     *
+     * SemMesh never removes an element or reuses an index: SemBasedCellPopulation uses the element
+     * index as its location index, so indices must stay stable for the lifetime of the mesh, and
+     * cell removal only sets the deleted flag (see SemElement::MarkAsDeleted). This method is
+     * therefore an upper bound on the element index, not a count of live cells — it does not change
+     * when a cell dies. To count or visit only live elements, test SemElement::IsDeleted() or use
+     * GetElementIteratorBegin(), which skips deleted elements by default.
+     *
+     * @return the number of SemElements in the mesh, including those marked as deleted
+     */
+    virtual unsigned GetNumElements() const;
+
+    /**
+     * Identical to GetNumElements(), and retained because AbstractCellPopulation-facing code uses
+     * both names. See GetNumElements() for why neither excludes deleted elements.
+     *
+     * @return the number of SemElements in the mesh, including those marked as deleted
+     */
+    unsigned GetNumAllElements() const;
+
+    /**
+     * @param index the global index of a specified SemElement
+     *
+     * @return a pointer to the SemElement.
+     */
+    virtual SemElement<DIM>* GetElement(unsigned index) const;
+
+    /**
+     * Add an element to the mesh.
+     *
+     * @param pNewElement a pointer to the SemElement to add to the mesh
+     *
+     * @return the index of the new element within the mesh
+     */
+    virtual unsigned AddElement(SemElement<DIM>* pNewElement);
+
+    /**
+     * Compute the centroid of an element.
+     *
+     * This must be overridden in daughter classes for non-Euclidean metrics.
+     *
+     * @param index the global index of a specified SemElement
+     *
+     * @return centroid of the element as a c_vector
+     */
+    virtual c_vector<double, DIM> GetCentroidOfElement(unsigned index);
+
+    /**
+     * Compute the bounding box of an element.
+     *
+     * @param index the global index of a specified SemElement
+     *
+     * @return bounding box of the element nodes
+     */
+    ChasteCuboid<DIM> CalculateBoundingBoxOfElement(unsigned index);
+
+    /**
+     * Construct the mesh using a MeshReader.
+     *
+     * @param rMeshReader the mesh reader
+     */
+    void ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader);
+
+    /**
+     * Delete mNodes and mElements.
+     */
+    virtual void Clear();
+
+    /**  Clear the BoxCollection  */
+    void ClearBoxCollection();
+
+    /**
+     * Get the volume (or area in 2D, or length in 1D) of an element.
+     *
+     * This needs to be overridden in daughter classes for non-Euclidean metrics.
+     *
+     * @param index  the global index of a specified SemElement
+     *
+     * @return the volume of the element
+     */
+    virtual double GetVolumeOfElement(unsigned index);
+
+    /**
+     * Return a pointer to the SemMesh.
+     *
+     * This method may be overridden in daughter classes for non-Euclidean metrics.
+     * This can then be used when writing to VTK.
+     *
+     * @return a pointer to the vertex mesh
+     */
+    virtual SemMesh<DIM>* GetMeshForVtk();
+
+    /**
+     * Set the maximum node interaction distance.
+     *
+     * @param maximumInteractionDistance the new maximum interaction distance
+     */
+    void SetMaximumInteractionDistance(double maximumInteractionDistance);
+
+    /**
+     * @return mMaximumInteractionDistance.
+     */
+    double GetMaximumInteractionDistance() const;
+
+    /**
+     * Set whether generated SEM element surfaces are included in VTK output.
+     *
+     * @param outputElementSurfacesToVtk whether to include element surfaces
+     */
+    void SetOutputElementSurfacesToVtk(bool outputElementSurfacesToVtk);
+
+    /**
+     * @return whether generated SEM element surfaces are included in VTK output.
+     */
+    bool GetOutputElementSurfacesToVtk() const;
+
+    /**
+     * Set the alpha multiplier used for SEM element alpha-shape generation.
+     *
+     * @param semSurfaceAlphaMultiplier multiplier applied to local node spacing
+     */
+    void SetSemSurfaceAlphaMultiplier(double semSurfaceAlphaMultiplier);
+
+    /**
+     * @return the alpha multiplier used for SEM element alpha-shape generation.
+     */
+    double GetSemSurfaceAlphaMultiplier() const;
+
+    /**
+     * Set the outward expansion multiplier used for SEM element surfaces.
+     *
+     * @param semSurfaceExpansionMultiplier multiplier applied to local node spacing
+     */
+    void SetSemSurfaceExpansionMultiplier(double semSurfaceExpansionMultiplier);
+
+    /**
+     * @return the outward expansion multiplier used for SEM element surfaces.
+     */
+    double GetSemSurfaceExpansionMultiplier() const;
+
+    /**
+     * Set whether GetVolumeOfElement() uses the expanded SEM surface.
+     *
+     * @param useExpandedSemSurfaceForVolume whether to use expanded surfaces
+     */
+    void SetUseExpandedSemSurfaceForVolume(bool useExpandedSemSurfaceForVolume);
+
+    /**
+     * @return whether GetVolumeOfElement() uses the expanded SEM surface.
+     */
+    bool GetUseExpandedSemSurfaceForVolume() const;
+
+    /**
+     * Not supported for SemMesh.
+     *
+     * Individual node deletion is not implemented; element removal is managed through
+     * SemBasedCellPopulation::RemoveDeadCells(), which marks the SemElement deleted and
+     * unregisters all of its nodes in one operation.
+     *
+     * @param node global index of the node to delete (unused)
+     */
+    void DeleteNodePriorToReMesh(unsigned int node);
+
+    /**
+     * No-op for SemMesh.
+     *
+     * SEM meshes have no triangulation; this method is required by the AbstractMesh
+     * interface and is called by generators after element construction, but it performs
+     * no work. The supplied NodeMap is ignored.
+     *
+     * @param map node index map (ignored)
+     */
+    void ReMesh(NodeMap map);
+
+    /**
+     * A smart iterator over the SemElements in the SemMesh.
+     */
+    class SemElementIterator
+    {
+    public:
+        /**
+         * Dereference the iterator giving you a *reference* to the current
+         * element. Make sure to use a reference for the result to avoid
+         * copying elements unnecessarily.
+         *
+         * @return reference to the current SemElement.
+         */
+        inline SemElement<DIM>& operator*();
+
+        /**
+         * Member access from a pointer.
+         *
+         * @return pointer to the current SemElement
+         */
+        inline SemElement<DIM>* operator->();
+
+        /**
+         * Comparison not-equal-to.
+         *
+         * @param rOther iterator with which comparison is made
+         *
+         * @return true if not equal.
+         */
+        inline bool operator!=(const typename SemMesh<DIM>::SemElementIterator& rOther);
+
+        /**
+         * Prefix increment operator.
+         *
+         * @return reference to incremented object.
+         */
+        inline SemElementIterator& operator++();
+
+        /**
+         * Constructor for a new iterator.
+         *
+         * This should not be called directly by user code; use the mesh methods
+         * SemMesh::GetElementIteratorBegin() and
+         * SemMesh::GetElementIteratorEnd() instead.
+         *
+         * @param rMesh the mesh to iterator over
+         * @param elementIter where to start iterating
+         * @param skipDeletedElements whether to include deleted elements
+         */
+        SemElementIterator(SemMesh<DIM>& rMesh,
+                              typename std::vector<SemElement<DIM>*>::iterator elementIter,
+                              bool skipDeletedElements = true);
+
+    private:
+        /** The mesh we're iterating over. */
+        SemMesh& mrMesh;
+
+        /** The actual element iterator. */
+        typename std::vector<SemElement<DIM>*>::iterator mElementIter;
+
+        /** Whether to skip deleted elements. */
+        bool mSkipDeletedElements;
+
+        /**
+         * Helper method to say when we're at the end.
+         *
+         * @return true if at end.
+         */
+        inline bool IsAtEnd();
+
+        /**
+         * Helper method to say if we're allowed to point at this element.
+         *
+         * @return true if allowed.
+         */
+        inline bool IsAllowedElement();
+    };
+};
+
+#include "SerializationExportWrapper.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(SemMesh)
+
+// SemElementIterator class implementation - most methods are inlined
+
+template<unsigned DIM>
+typename SemMesh<DIM>::SemElementIterator SemMesh<DIM>::GetElementIteratorBegin(
+    bool skipDeletedElements)
+{
+    return SemElementIterator(*this, mElements.begin(), skipDeletedElements);
+}
+
+template<unsigned DIM>
+typename SemMesh<DIM>::SemElementIterator SemMesh<DIM>::GetElementIteratorEnd()
+{
+    return SemElementIterator(*this, mElements.end());
+}
+
+template<unsigned DIM>
+SemElement<DIM>& SemMesh<DIM>::SemElementIterator::operator*()
+{
+    assert(!IsAtEnd());
+    return **mElementIter;
+}
+
+template<unsigned DIM>
+SemElement<DIM>* SemMesh<DIM>::SemElementIterator::operator->()
+{
+    assert(!IsAtEnd());
+    return *mElementIter;
+}
+
+template<unsigned DIM>
+bool SemMesh<DIM>::SemElementIterator::operator!=(const typename SemMesh<DIM>::SemElementIterator& rOther)
+{
+    return mElementIter != rOther.mElementIter;
+}
+
+template<unsigned DIM>
+typename SemMesh<DIM>::SemElementIterator& SemMesh<DIM>::SemElementIterator::operator++()
+{
+    do
+    {
+        ++mElementIter;
+    } while (!IsAtEnd() && !IsAllowedElement());
+
+    return (*this);
+}
+
+template<unsigned DIM>
+SemMesh<DIM>::SemElementIterator::SemElementIterator(
+    SemMesh<DIM>& rMesh,
+    typename std::vector<SemElement<DIM>*>::iterator elementIter,
+    bool skipDeletedElements)
+        : mrMesh(rMesh),
+          mElementIter(elementIter),
+          mSkipDeletedElements(skipDeletedElements)
+{
+    if (mrMesh.mElements.empty())
+    {
+        // Cope with empty meshes
+        mElementIter = mrMesh.mElements.end();
+    }
+    else
+    {
+        // Make sure we start at an allowed element
+        if (mElementIter == mrMesh.mElements.begin() && !IsAllowedElement())
+        {
+            ++(*this);
+        }
+    }
+}
+
+template<unsigned DIM>
+bool SemMesh<DIM>::SemElementIterator::IsAtEnd()
+{
+    return mElementIter == mrMesh.mElements.end();
+}
+
+template<unsigned DIM>
+bool SemMesh<DIM>::SemElementIterator::IsAllowedElement()
+{
+    return !(mSkipDeletedElements && (*this)->IsDeleted());
+}
+
+#endif /*SEMMESH_HPP_*/

@@ -393,6 +393,33 @@ modules:
       - name: PottsElementData
         excluded: True
 
+      #=== mesh: Chaste/mesh/src/sem
+      - name: SemElement
+
+      - name: SemMesh
+        excluded_methods:
+          - SetUpBoxCollection # boost::numeric::ublas::zero_vector default argument
+          - CalculateNodePairs # std::vector<std::pair<Node*, Node*>>
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      # A struct wrapping a single enum, which is the only enum form cppwg can wrap
+      # (see Chaste/cppwg#113); RelativeTo above is wrapped the same way
+      - name: SemLatticeType
+        source_file: SemEnumerations.hpp
+
+      - name: SemSingleElementMeshGenerator
+
+      - name: SemMultiElementMeshGenerator
+
+      - name: SemSphericalElementMeshGenerator
+
+      - name: SemMeshReader
+        excluded: True
+
+      - name: SemMeshWriter
+        excluded: True
+
       ##=== cell_based: Chaste/cell_based/src/cell
       - name: Cell
         excluded_methods:
@@ -547,6 +574,7 @@ modules:
           - CellPopulationAdjacencyMatrixWriter.hpp
           - CellPopulationAreaWriter.hpp
           - CellPopulationElementWriter.hpp
+          - CellPopulationExtentWriter.hpp
           - CellProliferativePhasesCountWriter.hpp
           - CellProliferativePhasesWriter.hpp
           - CellProliferativeTypesCountWriter.hpp
@@ -625,6 +653,15 @@ modules:
           - rGetMesh
           - GetElementTessellation
           - GetMutableMesh
+        custom_generator: *population_template
+        source_includes: *population_includes
+
+      - name: SemBasedCellPopulation
+        excluded_methods:
+          - GetElementCorrespondingToCell
+          - GetElement
+          - GetTetrahedralMeshForPdeModifier
+          - rGetMesh
         custom_generator: *population_template
         source_includes: *population_includes
 
@@ -727,6 +764,41 @@ modules:
       - name: ImmersedBoundaryLinearMembraneForce
       - name: ImmersedBoundaryMorseInteractionForce
       - name: ImmersedBoundaryMorseMembraneForce
+
+      # The parameter set returned by SemComputeNScaledParameters and the ApplyNScaled* methods, so
+      # it must be bound for those wrapped methods to be callable. It is declared as a class with
+      # Get* accessors rather than a struct of public members: cppwg drops non-enum structs without
+      # writing a wrapper (see Chaste/cppwg#116) and cannot bind public data members in any case
+      - name: SemNScaledParameters
+        source_file: SemParameterScaling.hpp
+
+      - name: SemForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: SemLinearForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: SemRegionalForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: AbstractSemRandomForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: SemGaussianRandomForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: SemSpatiallyCorrelatedRandomForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: UniaxialLoadForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
 
       - name: NagaiHondaForce
       - name: RepulsionForce
@@ -941,6 +1013,7 @@ modules:
           - CaBasedCellPopulation.hpp
           - ImmersedBoundaryCellPopulation.hpp
           - NodeBasedCellPopulation.hpp
+          - SemBasedCellPopulation.hpp
           - VertexBasedCellPopulation.hpp
 
       - name: BoundaryNodeWriter
@@ -953,6 +1026,9 @@ modules:
         source_includes: *population_writer_includes
 
       - name: CellPopulationElementWriter
+        source_includes: *population_writer_includes
+
+      - name: CellPopulationExtentWriter
         source_includes: *population_writer_includes
 
       - name: HeterotypicBoundaryLengthWriter
@@ -1004,6 +1080,20 @@ modules:
 
       - name: CellRemovalLocationsWriter
         source_includes: *population_writer_includes
+
+      ##=== cell_based: Chaste/cell_based/src/writers/node_point_data_writers
+      - name: AbstractNodePointDataWriter
+        source_includes: &node_point_data_writer_includes
+          - AbstractOffLatticeCellPopulation.hpp # forward decl
+
+      - name: BoundaryNodePointDataWriter
+        source_includes: *node_point_data_writer_includes
+
+      - name: ElementIdNodePointDataWriter
+        source_includes: *node_point_data_writer_includes
+
+      - name: NodeRegionPointDataWriter
+        source_includes: *node_point_data_writer_includes
 
       ##=== cell_based: Chaste/pychaste/src/cpp/cell_based
       - name: AttractingPlaneBoundaryCondition

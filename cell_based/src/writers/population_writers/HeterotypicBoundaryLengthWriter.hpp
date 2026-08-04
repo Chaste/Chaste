@@ -159,6 +159,21 @@ public:
      * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
      */
     virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the population and write the labelled boundary length data.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [fractional_length] [total_length] [fractional_neighbours] [total_neighbours]
+     *
+     * Here the indexing of nodes is as given by the NodeIterator.
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
+     *
+     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
+     */
+    virtual void Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -116,6 +116,12 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopula
     EXCEPTION("VoronoiDataWriter cannot be used with a ImmersedBoundaryCellPopulation");
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    EXCEPTION("VoronoiDataWriter cannot be used with a SemBasedCellPopulation");
+}
+
 // Explicit instantiation
 template class VoronoiDataWriter<1,1>;
 template class VoronoiDataWriter<1,2>;

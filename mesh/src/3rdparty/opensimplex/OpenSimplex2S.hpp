@@ -25,6 +25,8 @@
  * documentation above each, for more info.
  */
 
+#pragma once
+
 #include <memory>
 
 class OpenSimplex2S

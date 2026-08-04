@@ -412,7 +412,7 @@ public:
     void SetLoadBalanceMesh(bool loadBalanceMesh);
 
     /**
-     * Set the freqeuncy, in number of time steps, with which the underlying mesh should be load balanced.
+     * Set the frequency, in number of time steps, with which the underlying mesh should be load balanced.
      * @param loadBalanceFrequency the frequency for load balancing.
      */
     void SetLoadBalanceFrequency(unsigned loadBalanceFrequency);
