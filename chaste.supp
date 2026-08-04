@@ -47,31 +47,24 @@
    ...
    fun:orte_init
 }
-# OpenMPI replaced ORTE with PRRTE/PMIx in version 5, but OpenMPI 4 also uses PMIx. The PMIx
-# client caches attribute strings on its own progress thread, which is still running when the
-# process exits, so what valgrind sees depends on how far that thread happens to have got.
-# When the parent allocation is still live the strings are an indirect loss; when it is not
-# they are judged alone and reported as possibly lost. Both kinds must be matched, or a small
-# fraction of runs fail on whichever test happens to lose the race. Note this requires
-# 'indirect' and 'possible' to be in --errors-for-leak-kinds (see
+# OpenMPI replaced ORTE with PRRTE/PMIx in version 5, but OpenMPI 4 also uses PMIx. PMIx runs
+# its own progress thread, which is still going when the process exits, and it allocates from
+# several sites there: attribute-string caching (malloc/strdup/pmix_bfrops_base_value_load), a
+# key/value hash cache (pmix_hash_fetch), and others. Each site was previously suppressed by
+# name, but the set keeps growing and the distribution libpmix is unsymbolised, so the frames
+# rarely match anyway. Instead, identify the leak by the one thing common to all of them: it
+# originates in libpmix and terminates at the progress thread's entry point. What valgrind
+# reports depends on how far the thread has got when it is killed -- an indirect loss while
+# the parent allocation is still live, or a possible loss once it is judged alone -- so both
+# kinds are matched here, or a fraction of runs fail whichever way they lose the race. Scoped
+# to indirect/possible only, so a genuine 'definite' leak on that thread is still reported.
+# Note this requires 'indirect' and 'possible' to be in --errors-for-leak-kinds (see
 # cmake/Modules/ChasteMacros.cmake), as valgrind only consults the suppression files for leak
 # kinds that it treats as errors.
 {
-   PMIx progress thread attribute strings
+   PMIx progress thread (any allocation site)
    Memcheck:Leak
    match-leak-kinds: indirect,possible
-   fun:malloc
-   fun:strdup
-   fun:pmix_bfrops_base_value_load
-}
-# The distribution libpmix carries no symbols, so the frame above cannot be matched by name
-# and the progress thread has to be identified by object and thread entry point instead.
-{
-   PMIx progress thread attribute strings (unsymbolised libpmix)
-   Memcheck:Leak
-   match-leak-kinds: indirect,possible
-   fun:malloc
-   fun:strdup
    ...
    obj:*/libpmix.so*
    ...
