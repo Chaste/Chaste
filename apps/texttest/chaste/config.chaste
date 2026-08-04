@@ -2,6 +2,11 @@ binary:$TEXTTEST_CHECKOUT/apps/texttest/chaste/wrapper
 default_checkout:Chaste
 create_catalogues:true
 
+# Turn off automatically running the tests in parallel.
+# (Note that "default" is no longer the default behaviour and the docs say 
+# "Why this works is a little obscure to me.".)
+config_module:default
+
 # Note that texttest checks some binary results by 
 # 1. converting from binary to text using h5dump from HDF5
 #  * (we currently use version 1.8.11 of the h5dump binary for regular acceptance)
@@ -186,3 +191,4 @@ output:-- The C compiler identification is{LINES 22}
 
 # Why is CMake writing to stderr?
 errors:-- Found Chaste libraries in /
+
