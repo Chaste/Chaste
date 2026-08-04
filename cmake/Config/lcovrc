@@ -107,9 +107,11 @@ genhtml_branch_coverage = 1
 #                 compiler-generated exception edges (a local declaration whose
 #                 constructor may throw) reading as hit-but-no-branches-evaluated. Not a
 #                 coverage-data problem.
-# `unused` (a --remove pattern matching no file) is left on the coverage.yml command line,
-# next to the patterns it refers to.
-ignore_errors = mismatch,inconsistent
+#   unused:       a --remove / --exclude pattern that matched no file. Harmless (a stale or
+#                 belt-and-braces pattern); not worth failing CI over.
+# NB: a command-line --ignore-errors REPLACES this list rather than merging with it, so
+# every category must live here and coverage.yml must pass no --ignore-errors of its own.
+ignore_errors = mismatch,inconsistent,unused
 
 # Directory containing gcov kernel files
 # lcov_gcov_dir = /proc/gcov
