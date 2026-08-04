@@ -185,6 +185,10 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
         set(test_command ${VALGRIND_COMMAND})
         set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.txt")
         set(test_args "${test_args} --track-fds=yes --leak-check=yes --num-callers=50 ${Chaste_MEMORY_TESTING_SUPPS}")
+        # By default valgrind neither shows indirect losses nor treats them as errors, which
+        # means they can never be matched against the suppression files but are still counted
+        # in the leak summary. Including them here makes them both visible and suppressible.
+        set(test_args "${test_args} --show-leak-kinds=definite,indirect,possible --errors-for-leak-kinds=definite,indirect,possible")
         set(test_args "${test_args} --gen-suppressions=all $<TARGET_FILE:${exeTargetName}> -malloc_debug -malloc_dump -memory_info")
         set(num_cpus 1)
     elseif (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
@@ -468,9 +472,6 @@ macro(Chaste_DO_APPS_COMMON component)
         else()
             target_link_libraries(${appName} LINK_PUBLIC ${component_library} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
         endif()
-        if(MSVC)
-            set_target_properties(${appName} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /IGNORE:4217 /IGNORE:4049")
-        endif()
     endforeach(app)
     if (Chaste_ENABLE_TESTING AND TEXTTEST_FOUND AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/texttest)
         configure_file(texttest/chaste/wrapper.cmake.in texttest/chaste/wrapper)
@@ -567,31 +568,9 @@ macro(Chaste_DO_TEST_COMMON component)
     #set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} ${Chaste_DEPENDS_${component}})
     # Generate test suites
 
-    if(MSVC)
-        if(NOT HAS_OWN_LINKER_FLAGS)
-            set(LINKER_FLAGS "/NODEFAULTLIB:LIBCMT")
-        endif(NOT HAS_OWN_LINKER_FLAGS)
-
-        #disable linker warnings 4217, 4049: locally-defined symbol imported in function ...
-        set(LINKER_FLAGS "${LINKER_FLAGS} /IGNORE:4217 /IGNORE:4049")
-        #message("Linker flags for project ${PROJECT_NAME} = ${LINKER_FLAGS}")
-    endif(MSVC)
-
-
     foreach(type ${TestPackTypes})
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
             file(STRINGS "${type}TestPack.txt" testpack)
-
-            # remove python tests from windows builds
-            if (WIN32 OR CYGWIN)
-                set(testpack_new "")
-                foreach(filename ${testpack})
-                    if (NOT filename MATCHES ".py$")
-                        list(APPEND testpack_new ${filename})
-                    endif()
-                endforeach()
-                set(testpack ${testpack_new})
-            endif(WIN32 OR CYGWIN)
 
             foreach(filename ${testpack})
                 string(STRIP ${filename} filename)
@@ -608,6 +587,10 @@ macro(Chaste_DO_TEST_COMMON component)
                     # if the test has already been defined, add it to this test pack
                     get_property(test_labels TEST ${testTargetName} PROPERTY LABELS)
                     list(APPEND test_labels ${type}_${component})
+                    list(FIND Chaste_DEPENDS_core ${component} _core_component_index)
+                    if (NOT _core_component_index EQUAL -1)
+                        list(APPEND test_labels ${type}_core)
+                    endif ()
                     set_property(TEST ${testTargetName} PROPERTY LABELS "${test_labels}")
 
                 else()
@@ -620,11 +603,19 @@ macro(Chaste_DO_TEST_COMMON component)
                         else()
                             target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
                         endif()
-                        set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
                     endif()
 
 
-                    set_property(TEST ${testTargetName} PROPERTY LABELS ${type}_${component})
+                    # Every test is labelled <testpack>_<component>. Tests belonging to a
+                    # "core" component (see Chaste_DEPENDS_core) additionally get a
+                    # <testpack>_core label, so that e.g. `ctest -L Continuous_core` selects
+                    # all core-component tests in one go.
+                    set (_test_labels ${type}_${component})
+                    list (FIND Chaste_DEPENDS_core ${component} _core_component_index)
+                    if (NOT _core_component_index EQUAL -1)
+                        list (APPEND _test_labels ${type}_core)
+                    endif ()
+                    set_property(TEST ${testTargetName} PROPERTY LABELS ${_test_labels})
 
                     if (Chaste_INSTALL_TESTS AND NOT(${component} MATCHES "^project"))
                         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${old_testTargetName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
@@ -670,6 +661,11 @@ macro(Chaste_DO_TEST_COMMON component)
                 if ((NOT ${component} STREQUAL python) AND (NOT (${filename} MATCHES ".py$")))
                     add_dependencies(${component} ${exeTargetName})
                     add_dependencies(${type} ${exeTargetName})
+                    # ...and to the combined target for this test pack of this component,
+                    # so that e.g. Continuous_cell_based builds only what it will run.
+                    if (TARGET ${type}_${component})
+                        add_dependencies(${type}_${component} ${exeTargetName})
+                    endif()
                 endif()
             endforeach(filename ${testpack})
         endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
