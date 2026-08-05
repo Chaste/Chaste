@@ -1,5 +1,27 @@
 message(STATUS "Adding compiler flags...")
 
+# Detect whether the standard library actually implements floating-point std::to_chars.
+# This was added to libstdc++ in GCC 11; some officially-supported compilers (e.g. GCC 10)
+# compile as C++17 but only implement the integer overloads of <charconv>, so checking
+# __cplusplus/CMAKE_CXX_STANDARD alone is not sufficient here.
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles("
+    #include <charconv>
+    int main()
+    {
+        char buffer[32];
+        double value = 3.14;
+        std::to_chars_result result = std::to_chars(buffer, buffer + sizeof(buffer), value, std::chars_format::general, 6);
+        return result.ec != std::errc();
+    }
+" Chaste_HAS_FLOAT_TO_CHARS)
+if (Chaste_HAS_FLOAT_TO_CHARS)
+    message(STATUS "Standard library supports floating-point std::to_chars")
+    add_definitions(-DCHASTE_HAS_FLOAT_TO_CHARS)
+else()
+    message(STATUS "Standard library does not support floating-point std::to_chars; falling back to iostream formatting")
+endif()
+
 # default flags added to all compilers
 set(default_flags "-Wall")
 if (Chaste_ERROR_ON_WARNING)

@@ -79,7 +79,8 @@ void VertexT3SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
     {
         for (unsigned i=0; i<SPACE_DIM; i++)
         {
-            *this->mpOutStream << t3_swap_info[index].mLocation[i] << "\t";
+            this->WriteDouble(t3_swap_info[index].mLocation[i]);
+            *this->mpOutStream << "\t";
         }
     }
 
