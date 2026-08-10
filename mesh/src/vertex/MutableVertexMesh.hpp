@@ -167,9 +167,29 @@ protected:
      * Check if any elements have become intersected and correct this by implementing the appropriate
      * local remeshing operation (a T3 swap or node merge).
      *
+     * @param pBoundaryElementCentroids optional cache of boundary-element centroids, keyed by element
+     *        index, maintained by the caller across successive calls within a single ReMesh(). When
+     *        supplied, boundary-element centroids are looked up here rather than recomputed from
+     *        scratch after every T3 swap; entries for elements whose geometry changes in a swap are
+     *        invalidated automatically. Pass nullptr (the default) to compute all centroids afresh,
+     *        which is the correct behaviour for standalone calls (e.g. from tests).
+     *
      * @return whether to recheck the mesh again
      */
-    bool CheckForIntersections();
+    bool CheckForIntersections(std::map<unsigned, c_vector<double, SPACE_DIM> >* pBoundaryElementCentroids = nullptr);
+
+    /**
+     * Whether this mesh is periodic in one or more directions, so that GetVectorFromAtoB() wraps
+     * around the domain. This base implementation returns false; periodic subclasses (for example
+     * Cylindrical2dVertexMesh and Toroidal2dVertexMesh) override it to return true.
+     *
+     * Used by CheckForIntersections() to decide whether the uniform spatial grid that accelerates
+     * T3-swap checking may be used: that grid buckets elements by raw coordinate and so is invalid
+     * when distances wrap around the domain.
+     *
+     * @return whether the mesh is periodic
+     */
+    virtual bool IsMeshPeriodic() const;
 
     /**
      * Helper method for ReMesh(), called by CheckForSwapsFromShortEdges() when

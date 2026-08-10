@@ -55,11 +55,11 @@ double NagaiHondaDifferentialAdhesionForce<DIM>::GetAdhesionParameter(Node<DIM>*
                                                                       Node<DIM>* pNodeB,
                                                                       VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
 {
-    // Find the indices of the elements owned by each node
-    std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
-    std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
+    // Find the indices of the elements owned by each node (taken by reference to avoid copying the sets)
+    const std::set<unsigned>& elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
+    const std::set<unsigned>& elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
 
-    // Find common elements
+    // Find common elements (the shared element indices themselves are needed below, so we keep them)
     std::set<unsigned> shared_elements;
     std::set_intersection(elements_containing_nodeA.begin(),
                           elements_containing_nodeA.end(),

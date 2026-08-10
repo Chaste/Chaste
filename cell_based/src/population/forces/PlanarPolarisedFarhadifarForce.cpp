@@ -62,30 +62,41 @@ void PlanarPolarisedFarhadifarForce<DIM>::SetPlanarPolarisedLineTensionMultiplie
 template<unsigned DIM>
 double PlanarPolarisedFarhadifarForce<DIM>::GetLineTensionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
 {
-    // Find the indices of the elements owned by each node
-    std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
-    std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
+    // Find the indices of the elements owned by each node (taken by reference to avoid copying the sets)
+    const std::set<unsigned>& elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
+    const std::set<unsigned>& elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
 
-    // Find common elements
-    std::set<unsigned> shared_elements;
-    std::set_intersection(elements_containing_nodeA.begin(),
-                          elements_containing_nodeA.end(),
-                          elements_containing_nodeB.begin(),
-                          elements_containing_nodeB.end(),
-                          std::inserter(shared_elements, shared_elements.begin()));
+    /*
+     * Count how many elements the two nodes share, which determines whether the edge is on the
+     * boundary (1 shared element) or internal (2). We only need to distinguish these cases, so we
+     * iterate over the smaller set counting membership in the larger and stop as soon as we reach
+     * two, avoiding the allocation of an intersection set.
+     */
+    const std::set<unsigned>& smaller_set = (elements_containing_nodeA.size() <= elements_containing_nodeB.size())
+                                                ? elements_containing_nodeA : elements_containing_nodeB;
+    const std::set<unsigned>& larger_set = (elements_containing_nodeA.size() <= elements_containing_nodeB.size())
+                                               ? elements_containing_nodeB : elements_containing_nodeA;
+
+    unsigned num_shared_elements = 0;
+    for (std::set<unsigned>::const_iterator iter = smaller_set.begin(); iter != smaller_set.end(); ++iter)
+    {
+        if (larger_set.count(*iter) != 0)
+        {
+            if (++num_shared_elements == 2u)
+            {
+                break;
+            }
+        }
+    }
 
     // Check that the nodes have a common edge
-    assert(!shared_elements.empty());
+    assert(num_shared_elements > 0);
 
-    // Since each internal edge is visited twice in the loop above, we have to use half the line tension parameter
-    // for each visit.
-    double line_tension_parameter_in_calculation = this->mLineTensionParameter/2.0;
-
-    // If the edge corresponds to a single element, then the cell is on the boundary
-    if (shared_elements.size() == 1)
-    {
-        line_tension_parameter_in_calculation = this->mBoundaryLineTensionParameter;
-    }
+    // If the edge corresponds to a single element, then the cell is on the boundary. Otherwise, since
+    // each internal edge is visited twice in the loop above, we use half the line tension parameter.
+    double line_tension_parameter_in_calculation = (num_shared_elements == 1)
+                                                       ? this->mBoundaryLineTensionParameter
+                                                       : this->mLineTensionParameter/2.0;
 
     // Get the vector between the two vertices
     c_vector<double, 2> vector = pNodeB->rGetLocation() - pNodeA->rGetLocation();

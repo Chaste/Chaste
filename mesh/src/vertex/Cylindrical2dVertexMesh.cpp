@@ -363,6 +363,11 @@ c_vector<double, 2> Cylindrical2dVertexMesh::GetVectorFromAtoB(const c_vector<do
     return vector;
 }
 
+bool Cylindrical2dVertexMesh::IsMeshPeriodic() const
+{
+    return true;
+}
+
 void Cylindrical2dVertexMesh::SetNode(unsigned nodeIndex, ChastePoint<2> point)
 {
     double x_coord = point.rGetLocation()[0];

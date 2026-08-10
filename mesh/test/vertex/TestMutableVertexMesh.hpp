@@ -221,6 +221,9 @@ public:
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumNodes(), 7u);
 
+        // A plain MutableVertexMesh is not periodic (the T3-swap grid in CheckForIntersections is used)
+        TS_ASSERT_EQUALS(basic_vertex_mesh.IsMeshPeriodic(), false);
+
         TS_ASSERT_DELTA(basic_vertex_mesh.GetNode(2)->rGetLocation()[0], 1.5, 1e-3);
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(1)->GetNodeGlobalIndex(2), 6u);
 

@@ -115,7 +115,8 @@ double VertexBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
     // Take the average of the cells containing this vertex
     double average_damping_constant = 0.0;
 
-    std::set<unsigned> containing_elements = GetNode(nodeIndex)->rGetContainingElementIndices();
+    // Taken by reference to avoid copying the set (this method is called once per node per timestep)
+    const std::set<unsigned>& containing_elements = GetNode(nodeIndex)->rGetContainingElementIndices();
 
     unsigned num_containing_elements = containing_elements.size();
     if (num_containing_elements == 0)
@@ -124,6 +125,11 @@ double VertexBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
     }
 
     double temp = 1.0/((double) num_containing_elements);
+
+    // Cache the damping constants, which are the same for every containing element
+    const double damping_constant_normal = this->GetDampingConstantNormal();
+    const double damping_constant_mutant = this->GetDampingConstantMutant();
+
     for (std::set<unsigned>::iterator iter = containing_elements.begin();
          iter != containing_elements.end();
          ++iter)
@@ -133,11 +139,11 @@ double VertexBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
 
         if (cell_is_wild_type)
         {
-            average_damping_constant += this->GetDampingConstantNormal()*temp;
+            average_damping_constant += damping_constant_normal*temp;
         }
         else
         {
-            average_damping_constant += this->GetDampingConstantMutant()*temp;
+            average_damping_constant += damping_constant_mutant*temp;
         }
     }
 

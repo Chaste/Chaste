@@ -133,6 +133,13 @@ public:
     c_vector<double, 2> GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2);
 
     /**
+     * Overridden IsMeshPeriodic() method.
+     *
+     * @return true, since this mesh is periodic in the x-direction.
+     */
+    bool IsMeshPeriodic() const;
+
+    /**
      * Overridden SetNode() method.
      *
      * If the location should be set outside a cylindrical boundary

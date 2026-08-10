@@ -321,6 +321,11 @@ c_vector<double, 2> Toroidal2dVertexMesh::GetVectorFromAtoB(const c_vector<doubl
     return vector;
 }
 
+bool Toroidal2dVertexMesh::IsMeshPeriodic() const
+{
+    return true;
+}
+
 void Toroidal2dVertexMesh::SetNode(unsigned nodeIndex, ChastePoint<2> point)
 {
     double x_coord = point.rGetLocation()[0];
