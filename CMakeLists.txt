@@ -119,6 +119,24 @@ set (Chaste_NUM_CPUS_TEST 1 CACHE STRING "Number of cpus to use when running tes
 option (Chaste_USE_VTK "Compile Chaste with VTK support" ON)
 option (Chaste_USE_CVODE "Compile Chaste with CVODE support" ON)
 
+# Uses a pooled memory allocator (via boost::pool) for Node objects instead of the default
+# new/delete, trading higher peak memory (the pool never returns memory to the OS until program
+# exit) for much cheaper allocation/deallocation when many nodes are repeatedly constructed and
+# destroyed (e.g. mesh generation/teardown, VTK outline-mesh writing). Off by default until
+# validated more broadly.
+option (Chaste_USE_POOLED_NODE_ALLOCATOR "Use a pooled memory allocator for Node objects" OFF)
+if (Chaste_USE_POOLED_NODE_ALLOCATOR)
+    add_definitions(-DCHASTE_USE_POOLED_NODE_ALLOCATOR)
+endif ()
+
+# As Chaste_USE_POOLED_NODE_ALLOCATOR above, but for Element objects (used by TetrahedralMesh
+# and its subclasses, e.g. rebuilt from scratch on every remesh). Kept as a separate flag so
+# the two can be enabled/tested independently.
+option (Chaste_USE_POOLED_ELEMENT_ALLOCATOR "Use a pooled memory allocator for Element objects" OFF)
+if (Chaste_USE_POOLED_ELEMENT_ALLOCATOR)
+    add_definitions(-DCHASTE_USE_POOLED_ELEMENT_ALLOCATOR)
+endif ()
+
 option (Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
 
 option (Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
