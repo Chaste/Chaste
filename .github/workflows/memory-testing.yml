@@ -9,18 +9,95 @@ on:
     branches:
       - develop
 
+env:
+  # Read by cmake/process_valgrind_output.py to label the generated report. head_ref and
+  # pull_request.head.sha are only set for pull_request events, so they fall back to the
+  # push/workflow_dispatch equivalents.
+  Chaste_GH_WORKFLOW_BRANCH: ${{ github.head_ref || github.ref_name }}
+  Chaste_GH_WORKFLOW_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  # Core count of the runners used below, for cmake, make and ctest.
+  CHASTE_NUM_CPUS: 4
+
 jobs:
 
   build-and-test:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
+
+    # Split the Continuous test pack across parallel runners. Each leg builds and
+    # runs exactly one component's Continuous tests, selected by the Continuous_<component>
+    # build target and the matching ctest label.
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [cell_based, heart, crypt, lung, core]
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
+
+    steps:
+
+      - name: checkout Chaste
+        uses: actions/checkout@v7
+        with:
+          path: Chaste
+
+      - name: install dependencies
+        run: |
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu resolute/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          sudo apt update
+          sudo apt install chaste-dependencies
+
+      - name: make build and test directories
+        run: |
+          mkdir -p ${CHASTE_BUILD_DIR}
+          mkdir -p ${CHASTE_TEST_OUTPUT}
+
+      - name: cmake configure
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=${CHASTE_NUM_CPUS} ..
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: build component test pack
+        run: cmake --build . --target Continuous_${{ matrix.component }} --parallel ${CHASTE_NUM_CPUS}
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: run TestChasteBuildInfo
+        run: ctest -V -R TestChasteBuildInfo
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+        if: matrix.component == 'core'
+
+      - name: run memtest for component
+        # Run this component's tests under valgrind. This fails the leg only if a test
+        # itself fails or crashes; memory problems are found by the aggregate job below,
+        # which processes the raw logs uploaded here.
+        run: ctest -j${CHASTE_NUM_CPUS} -L Continuous_${{ matrix.component }} --output-on-failure
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: upload component valgrind logs
+        uses: actions/upload-artifact@v7
+        with:
+          name: memtest-logs-${{ matrix.component }}
+          path: ${{ env.CHASTE_BUILD_DIR }}/memtest/*_valgrind.txt
+        if: always()
+
+
+  aggregate:
+
+    name: Aggregate memtest results
+    needs: build-and-test
+    runs-on: ubuntu-26.04
+    # Run even if one or more components failed (e.g. found a leak), so the combined
+    # report is always produced. Skip only if the whole run was cancelled or CI
+    # is disabled for this PR.
+    if: ${{ !cancelled() && !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    env:
+      MEMTEST_DIR: ${{ github.workspace }}/memtest
 
     outputs:
       index: ${{ steps.index-exists.outputs.index }}
@@ -32,23 +109,12 @@ jobs:
         id: get-datetime
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
-      - name: set environment for pull request
-        run: |
-          echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
-          echo "Chaste_GH_WORKFLOW_SHA=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
-        if: github.event_name == 'pull_request'
-
-      - name: set environment for push or workflow dispatch
-        run: |
-          echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
-          echo "Chaste_GH_WORKFLOW_SHA=${{ github.sha }}" >> $GITHUB_ENV
-        if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
-
-      - name: checkout Chaste
-        uses: actions/checkout@v6
+      - name: checkout valgrind output processor
+        uses: actions/checkout@v7
         with:
-          repository: Chaste/Chaste
           path: Chaste
+          sparse-checkout: cmake/process_valgrind_output.py
+          sparse-checkout-cone-mode: false
 
       - name: install dependencies
         run: |
@@ -57,80 +123,60 @@ jobs:
           sudo apt update
           sudo apt install chaste-dependencies lld
 
-      - name: Downgrade libexpat1 (native ubuntu-22.04 only)
-        # if: ${{ matrix.os == 'ubuntu-22.04' }}
-        run: |
-          if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
-            sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
-          fi
+      - name: download all component logs
+        uses: actions/download-artifact@v8
+        with:
+          pattern: memtest-logs-*
+          path: ${{ env.MEMTEST_DIR }}
+          merge-multiple: true
 
-      - name: make build and test directories
-        run: |
-          mkdir -p ${CHASTE_BUILD_DIR}
-          mkdir -p ${CHASTE_TEST_OUTPUT}
-
-      - name: cmake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=4 ..
-        working-directory: ${{ env.CHASTE_BUILD_DIR }}
-
-      - name: build continuous test pack
-        run: cmake --build . --target Continuous --parallel 4
-        working-directory: ${{ env.CHASTE_BUILD_DIR }}
-
-      - name: run TestChasteBuildInfo
-        run: |
-          ctest -V -R TestChasteBuildInfo
-        working-directory: ${{ env.CHASTE_BUILD_DIR }}
-
-      - name: run memtest
-        run: cmake --build . --target memtest --parallel 4
-        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+      - name: process combined valgrind output
+        # Generate the index/summaries over the merged logs from every component. This is
+        # the authoritative pass/fail: a non-zero exit here (a memory problem in any
+        # component) fails the workflow.
+        run: python3 "${{ github.workspace }}/Chaste/cmake/process_valgrind_output.py" "${MEMTEST_DIR}"
 
       - name: check if index file successfully created
         id: index-exists
         run: |
-          if [ -e ${CHASTE_BUILD_DIR}/memtest/index.html ]; then
-            echo "Index file exists"
+          if [ -e ${MEMTEST_DIR}/index.html ]; then
             echo "index=True"  >> $GITHUB_OUTPUT
           else
-            echo "Index file does not exist"
             echo "index=False"  >> $GITHUB_OUTPUT
           fi
-          if [ -e ${CHASTE_BUILD_DIR}/memtest/github_summary.md ]; then
+          if [ -e ${MEMTEST_DIR}/github_summary.md ]; then
             echo "github_summary=True"  >> $GITHUB_OUTPUT
           fi
-          if [ -e ${CHASTE_BUILD_DIR}/memtest/txt_summary.txt ]; then
+          if [ -e ${MEMTEST_DIR}/txt_summary.txt ]; then
             echo "txt_summary=True"  >> $GITHUB_OUTPUT
           fi
         if: always()
 
       - name: display memtest summary in terminal
-        working-directory: ${{ env.CHASTE_BUILD_DIR }}
-        run: |
-          cat memtest/txt_summary.txt
+        run: cat ${MEMTEST_DIR}/txt_summary.txt
         if: always() && steps.index-exists.outputs.txt_summary == 'True'
 
       - name: display memtest summary in job summary
-        working-directory: ${{ env.CHASTE_BUILD_DIR }}
-        run: |
-          cat memtest/github_summary.md >> $GITHUB_STEP_SUMMARY
+        run: cat ${MEMTEST_DIR}/github_summary.md >> $GITHUB_STEP_SUMMARY
         if: always() && steps.index-exists.outputs.github_summary == 'True'
 
       - name: upload memtest artifact
         uses: actions/upload-artifact@v7
         with:
           name: memtest-files
-          path: ${{ env.CHASTE_BUILD_DIR }}/memtest
+          path: ${{ env.MEMTEST_DIR }}
         if: always() && steps.index-exists.outputs.index == 'True'
 
 
   publish-results:
 
     name: Publish results (non-fork PRs only)
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    # only when index exists AND it's being run from the primary repo (Chaste/Chaste)
-    if: ${{ needs.build-and-test.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
+    needs: aggregate
+    runs-on: ubuntu-26.04
+    # Publish whenever a report was produced, including when the aggregate job failed
+    # because a memory problem was found - those are the results most worth publishing.
+    # Only from the primary repo (Chaste/Chaste), which holds the push token.
+    if: ${{ !cancelled() && needs.aggregate.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
 
     env:
       MEMTEST_DIR: ${{ github.workspace }}/memory-testing
@@ -144,7 +190,7 @@ jobs:
           path: ./memtest
 
       - name: checkout memory-testing
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Chaste/memory-testing
           path: memory-testing
@@ -153,11 +199,11 @@ jobs:
 
       - name: copy results
         run: |
-          mkdir ${MEMTEST_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}
-          cp ./memtest/* ${MEMTEST_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
+          mkdir ${MEMTEST_DIR}/log-files/${{ needs.aggregate.outputs.datetime }}
+          cp ./memtest/* ${MEMTEST_DIR}/log-files/${{ needs.aggregate.outputs.datetime }}/
 
       - name: setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.x'
 
@@ -179,4 +225,4 @@ jobs:
 
       - name: results URL on chaste.github.io
         run: |
-          echo https://chaste.github.io/memory-testing/${{ steps.get-datetime.outputs.datetime }}/index.html
+          echo https://chaste.github.io/memory-testing/${{ needs.aggregate.outputs.datetime }}/index.html
