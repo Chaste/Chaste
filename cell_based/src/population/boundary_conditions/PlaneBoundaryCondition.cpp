@@ -104,10 +104,9 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
             for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
                 cell_iter != this->mpCellPopulation->End();
                 ++cell_iter) {
-                
                 node_indices.push_back(this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter));
             }
-                
+
             #ifdef _OPENMP
             #pragma omp parallel for
             #endif
