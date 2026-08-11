@@ -145,10 +145,10 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellP
         bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
 
         // Get this node's von Neumann neighbours (not Moore neighbours, since they must share an edge)
-        std::set<unsigned> neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(index);
+        const std::vector<unsigned>& neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(index);
 
         // Iterate over these neighbours
-        for (std::set<unsigned>::iterator neighbour_iter = neighbour_node_indices.begin();
+        for (std::vector<unsigned>::const_iterator neighbour_iter = neighbour_node_indices.begin();
              neighbour_iter != neighbour_node_indices.end();
              ++neighbour_iter)
         {
@@ -299,15 +299,15 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCe
         {
             // Get this node's von Neumann neighbours (not Moore neighbours, since they must share an edge)
             unsigned global_index = pCellPopulation->rGetMesh().GetElement(elem_index)->GetNodeGlobalIndex(local_index);
-            std::set<unsigned> neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(global_index);
+            const std::vector<unsigned>& neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(global_index);
 
             // Iterate over these neighbours
-            for (std::set<unsigned>::iterator neighbour_iter = neighbour_node_indices.begin();
+            for (std::vector<unsigned>::const_iterator neighbour_iter = neighbour_node_indices.begin();
                  neighbour_iter != neighbour_node_indices.end();
                  ++neighbour_iter)
             {
                 // Get the elements containing this neighbour
-                std::set<unsigned> neighbour_elem_indices = pCellPopulation->GetNode(*neighbour_iter)->rGetContainingElementIndices();
+                const std::set<unsigned>& neighbour_elem_indices = pCellPopulation->GetNode(*neighbour_iter)->rGetContainingElementIndices();
 
                 if (neighbour_elem_indices.size() == 1)
                 {

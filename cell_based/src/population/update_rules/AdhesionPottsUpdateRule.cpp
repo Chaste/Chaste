@@ -53,8 +53,8 @@ double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned cu
                                                                 unsigned targetNodeIndex,
                                                                 PottsBasedCellPopulation<DIM>& rCellPopulation)
 {
-    std::set<unsigned> containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
-    std::set<unsigned> new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();
+    const std::set<unsigned>& containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
+    const std::set<unsigned>& new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();
 
     bool current_node_contained = !containing_elements.empty();
     bool target_node_contained = !new_location_containing_elements.empty();
@@ -77,12 +77,12 @@ double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned cu
 
     // Iterate over nodes neighbouring the target node to work out the contact energy contribution
     double delta_H = 0.0;
-    std::set<unsigned> target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
-    for (std::set<unsigned>::iterator iter = target_neighbouring_node_indices.begin();
+    const std::vector<unsigned>& target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
+    for (std::vector<unsigned>::const_iterator iter = target_neighbouring_node_indices.begin();
          iter != target_neighbouring_node_indices.end();
          ++iter)
     {
-        std::set<unsigned> neighbouring_node_containing_elements = rCellPopulation.rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
+        const std::set<unsigned>& neighbouring_node_containing_elements = rCellPopulation.rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
 
         // Every node must each be in at most one element
         assert(neighbouring_node_containing_elements.size() < 2);
