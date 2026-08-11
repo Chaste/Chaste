@@ -83,16 +83,27 @@ void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>
         static_cast<MeshBasedCellPopulation<DIM>*>(&(rCellPopulation))->CreateVoronoiTessellation();
     }
 
-    // Iterate over cell population
+    // Collect cell pointers so the loop below can be parallelised
+    // (AbstractCellPopulation::Iterator wraps a std::list iterator, which OpenMP can't split)
+    std::vector<CellPtr> cells;
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
+        cells.push_back(*cell_iter);
+    }
+
+    // Iterate over cell population
+    #ifdef _OPENMP
+    #pragma omp parallel for
+    #endif
+    for (const auto& p_cell : cells)
+    {
         // Get the volume of this cell
-        double cell_volume = rCellPopulation.GetVolumeOfCell(*cell_iter);
+        double cell_volume = rCellPopulation.GetVolumeOfCell(p_cell);
 
         // Store the cell's volume in CellData
-        cell_iter->GetCellData()->SetItem("volume", cell_volume);
+        p_cell->GetCellData()->SetItem("volume", cell_volume);
     }
 }
 

@@ -118,6 +118,7 @@ set (Chaste_NUM_CPUS_TEST 1 CACHE STRING "Number of cpus to use when running tes
 
 option (Chaste_USE_VTK "Compile Chaste with VTK support" ON)
 option (Chaste_USE_CVODE "Compile Chaste with CVODE support" ON)
+option (Chaste_USE_OPENMP "Compile Chaste with OpenMP support" OFF)
 
 option (Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
 
@@ -395,6 +396,13 @@ if (Chaste_USE_VTK)
     add_definitions (-DCHASTE_VTK)
 endif ()
 
+################################
+####  Find OpenMP
+################################
+if (Chaste_USE_OPENMP)
+    find_package(OpenMP REQUIRED COMPONENTS CXX)
+    target_link_libraries(Chaste_COMMON_DEPS INTERFACE OpenMP::OpenMP_CXX)
+endif ()
 
 ################################
 ####  Find Boost

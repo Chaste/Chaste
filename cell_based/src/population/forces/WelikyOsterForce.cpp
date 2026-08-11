@@ -62,45 +62,66 @@ void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPo
 
         // Helper variable that is a static cast of the cell population
         VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
+        unsigned num_nodes = p_cell_population->GetNumNodes();
+        unsigned num_elements = p_cell_population->GetNumElements();
 
         /*
             * The force on each node is given by the interaction between the area and
             * the perimeter of the element containing the node.
             */
 
-        // Iterate over elements in the cell population
+        // Precompute the area and perimeter of each element, to avoid recomputing them once per node below
+        std::vector<double> element_areas(num_elements);
+        std::vector<double> element_perimeters(num_elements);
         for (typename VertexMesh<DIM,DIM>::VertexElementIterator element_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
                     element_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
                     ++element_iter)
         {
             unsigned element_index = element_iter->GetIndex();
+            element_areas[element_index] = p_cell_population->rGetMesh().GetVolumeOfElement(element_index);
+            element_perimeters[element_index] = p_cell_population->rGetMesh().GetSurfaceAreaOfElement(element_index);
+        }
 
-            /******** Start of deformation force calculation ********/
+        // Iterate over nodes in the cell population, so that each node's total force is accumulated
+        // and written exactly once (a node can belong to several elements, so looping over elements
+        // instead would mean multiple iterations writing to the same node)
+        #ifdef _OPENMP
+        #pragma omp parallel for
+        #endif
+        for (unsigned node_global_index = 0; node_global_index < num_nodes; node_global_index++)
+        {
+            Node<DIM>* p_node = p_cell_population->GetNode(node_global_index);
+            c_vector<double, DIM> current_node = p_node->rGetLocation();
 
-            // Compute the area of this element
-            double element_area = p_cell_population->rGetMesh().GetVolumeOfElement(element_index);
+            c_vector<double, DIM> force_on_node = zero_vector<double>(DIM);
 
-            double deformation_coefficient = GetWelikyOsterAreaParameter()/element_area;
+            // Find the indices of the elements owned by this node
+            std::set<unsigned> containing_elem_indices = p_node->rGetContainingElementIndices();
 
-            /******** End of deformation force calculation *************/
-
-            /******** Start of membrane force calculation ***********/
-
-            // Compute the perimeter of the element
-            double element_perimeter = p_cell_population->rGetMesh().GetSurfaceAreaOfElement(element_index);
-
-            double membrane_surface_tension_coefficient = GetWelikyOsterPerimeterParameter()*element_perimeter;
-
-            /******** End of membrane force calculation **********/
-
-            unsigned num_nodes = element_iter->GetNumNodes();
-            for (unsigned node_local_index = 0; node_local_index < num_nodes; node_local_index++)
+            // Iterate over these elements
+            for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
+                 iter != containing_elem_indices.end();
+                 ++iter)
             {
-                unsigned node_global_index = element_iter->GetNodeGlobalIndex(node_local_index);
+                VertexElement<DIM,DIM>* p_element = p_cell_population->GetElement(*iter);
+                unsigned element_index = p_element->GetIndex();
+                unsigned num_nodes_elem = p_element->GetNumNodes();
+                unsigned node_local_index = p_element->GetNodeLocalIndex(node_global_index);
 
-                c_vector<double, DIM> current_node = element_iter->GetNodeLocation(node_local_index);
-                c_vector<double, DIM> next_node = element_iter->GetNodeLocation((node_local_index + 1)%(element_iter->GetNumNodes()));
-                c_vector<double, DIM> previous_node = element_iter->GetNodeLocation((node_local_index + element_iter->GetNumNodes() - 1)%(element_iter->GetNumNodes()));
+                /******** Start of deformation force calculation ********/
+
+                double deformation_coefficient = GetWelikyOsterAreaParameter()/element_areas[element_index];
+
+                /******** End of deformation force calculation *************/
+
+                /******** Start of membrane force calculation ***********/
+
+                double membrane_surface_tension_coefficient = GetWelikyOsterPerimeterParameter()*element_perimeters[element_index];
+
+                /******** End of membrane force calculation **********/
+
+                c_vector<double, DIM> next_node = p_element->GetNodeLocation((node_local_index + 1)%num_nodes_elem);
+                c_vector<double, DIM> previous_node = p_element->GetNodeLocation((node_local_index + num_nodes_elem - 1)%num_nodes_elem);
 
                 c_vector<double, DIM> clockwise_unit_vector = p_cell_population->rGetMesh().GetVectorFromAtoB(current_node, previous_node);
                 clockwise_unit_vector /= norm_2(clockwise_unit_vector);
@@ -116,10 +137,10 @@ void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPo
 
                 c_vector<double, DIM> membrane_surface_tension_contribution = membrane_surface_tension_coefficient * (clockwise_unit_vector + anti_clockwise_unit_vector);
 
-                c_vector<double, DIM> force_on_node = deformation_contribution + membrane_surface_tension_contribution;
-
-                p_cell_population->GetNode(node_global_index)->AddAppliedForceContribution(force_on_node);
+                force_on_node += deformation_contribution + membrane_surface_tension_contribution;
             }
+
+            p_node->AddAppliedForceContribution(force_on_node);
         }
     }
     else
