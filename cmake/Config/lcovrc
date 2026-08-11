@@ -80,9 +80,17 @@ genhtml_sort = 1
 # --no-func-coverage option of genhtml)
 genhtml_function_coverage = 1
 
-# Include branch coverage data display (can be disabled by the
-# --no-branch-coverage option of genhtml)
-genhtml_branch_coverage = 1
+# Report line coverage only, not branch coverage.
+#
+# This must be spelled `branch_coverage`, not the old `genhtml_branch_coverage`. Under
+# lcov 1.x the latter affected genhtml alone, so `lcov --capture` emitted no BRDA records.
+# lcov 2.x consolidated the per-tool settings and aliases the old name onto this global
+# one (see %deprecated_rc in lcov's lib/lcovutil.pm), so setting it to 1 also switched on
+# branch capture: BRDA records then appear in coverage.info and codecov reports lines
+# whose branches are not all taken as "partial".
+#
+# Turning this off also reduces lcov's memory and CPU use and the size of coverage.info.
+branch_coverage = 0
 
 # Location of the gcov tool (same as --gcov-info option of geninfo)
 #geninfo_gcov_tool = gcov
@@ -97,6 +105,21 @@ genhtml_branch_coverage = 1
 # Enable libtool compatibility mode if non-zero (same as --compat-libtool option
 # of geninfo if non-zero, same as --no-compat-libtool if zero)
 #geninfo_compat_libtool = 0
+
+# Demote lcov 2.x's stricter fatal conditions back to warnings. Loaded by both the
+# --capture and --remove lcov calls in .github/workflows/coverage.yml.
+#   mismatch:     exception-tag / block metadata disagreements when merging heavily
+#                 inlined templates across many object files. Cosmetic: line hit counts
+#                 still merge correctly.
+#   inconsistent: branch-consistency false positive, e.g. a line whose only branches are
+#                 compiler-generated exception edges (a local declaration whose
+#                 constructor may throw) reading as hit-but-no-branches-evaluated. Not a
+#                 coverage-data problem.
+#   unused:       a --remove / --exclude pattern that matched no file. Harmless (a stale or
+#                 belt-and-braces pattern); not worth failing CI over.
+# NB: a command-line --ignore-errors REPLACES this list rather than merging with it, so
+# every category must live here and coverage.yml must pass no --ignore-errors of its own.
+ignore_errors = mismatch,inconsistent,unused
 
 # Directory containing gcov kernel files
 # lcov_gcov_dir = /proc/gcov
