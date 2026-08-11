@@ -622,6 +622,12 @@ endforeach ()
 foreach (component ${Chaste_COMPONENTS})
     # ${component} target will build library and tests
     add_custom_target (${component})
+    # ${type}_${component} targets build only one test pack of one component, e.g.
+    # Continuous_cell_based. This lets CI build exactly the tests it is about to run,
+    # rather than every test pack of that component via the ${component} target.
+    foreach (type ${TestPackTypes})
+        add_custom_target (${type}_${component})
+    endforeach ()
     # chaste_${component} is the actual library target
     list (APPEND Chaste_ALL_LIBRARIES chaste_${component})
 endforeach ()
@@ -671,6 +677,16 @@ set (Chaste_DEPENDS_all_components ${Chaste_COMPONENTS})
 # Set dependencies for custom targets
 add_dependencies (core ${Chaste_DEPENDS_core})
 add_dependencies (all_components ${Chaste_DEPENDS_all_components})
+
+# Per-test-pack equivalents of the core target, e.g. Continuous_core builds the Continuous
+# tests of every core component. These match the ${type}_core test labels, so CI can use the
+# same name for the build target and the ctest label.
+foreach (type ${TestPackTypes})
+    add_custom_target (${type}_core)
+    foreach (component ${Chaste_DEPENDS_core})
+        add_dependencies (${type}_core ${type}_${component})
+    endforeach ()
+endforeach ()
 
 foreach (component ${Chaste_COMPONENTS})
     set (Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src")
