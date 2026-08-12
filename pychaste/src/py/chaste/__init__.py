@@ -37,12 +37,11 @@ import sys
 
 import petsc4py
 
-import chaste.cell_based
-import chaste.core
-import chaste.mesh
-import chaste.ode
-import chaste.pde
-import chaste.visualization
+# Expose every wrapped class at the top level as chaste.ClassName in addition to
+# chaste.subpackage.ClassName (PyChaste issue #73). _generated.py is written by
+# cppwg genpackage and its subpackage imports also pull in the subpackages,
+# so chaste.core, chaste.mesh, ... remain available.
+from chaste._generated import *  # noqa: F401,F403
 
 
 def init(test_output=None, comm=None):
@@ -66,7 +65,8 @@ def init(test_output=None, comm=None):
     else:
         petsc4py.init(comm=comm)
 
-    return chaste.core.OutputFileHandler("", False)
+    # OutputFileHandler is exposed at the top level by the flatten import above.
+    return OutputFileHandler("", False)
 
 
 init()

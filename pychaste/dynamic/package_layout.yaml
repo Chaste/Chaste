@@ -1,0 +1,247 @@
+# Python-package layout for cppwg genpackage (pychaste).
+#
+# pychaste compiles a SINGLE extension (_pychaste_all) that is split into six
+# subpackages purely in the Python layer. cppwg's config has one `all` module,
+# so the split lives here: each subpackage lists the wrapped base names it owns.
+# The generator emits an explicit `from chaste._pychaste_all import (...)` plus
+# the TemplateClass stubs into each subpackage's _generated.py; the hand-written
+# __init__.py does `from ._generated import *` and keeps the bespoke pieces
+# (top-level petsc init(), cell_based's writer-subscript loop + _fortests,
+# visualization's IPython gating + _jupyter + JupyterSceneModifier stub).
+#
+# package_root is resolved relative to this layout file's directory.
+package: chaste
+package_root: ../src/py/chaste
+compiled_module: _pychaste_all
+# pychaste offers a single-arg diagonal shorthand for its <ELEMENT_DIM,
+# SPACE_DIM> classes: Element[2] is an alias for Element[2, 2].
+diagonal_shorthand: true
+# Also expose every wrapped class at the top level as chaste.ClassName,
+# in addition to chaste.subpackage.ClassName.
+flatten_to_root: true
+subpackages:
+  core:
+    - ChasteBuildInfo
+    - FileFinder
+    - Identifiable
+    - OutputFileHandler
+    - PetscSetupUtils
+    - PetscTools
+    - ProgressReporter
+    - RandomNumberGenerator
+    - RelativeTo
+    - ReplicatableVector
+    - TimeStepper
+    - Timer
+  mesh:
+    - ChasteCuboid
+    - ChasteEllipsoid
+    - ChastePoint
+    - Cylindrical2dMesh
+    - Cylindrical2dNodesOnlyMesh
+    - Cylindrical2dVertexMesh
+    - CylindricalHoneycombMeshGenerator
+    - CylindricalHoneycombVertexMeshGenerator
+    - Edge
+    - EdgeHelper
+    - EdgeOperation
+    - Element
+    - FluidSource
+    - HoneycombMeshGenerator
+    - HoneycombVertexMeshGenerator
+    - ImmersedBoundaryElement
+    - ImmersedBoundaryHoneycombMeshGenerator
+    - ImmersedBoundaryMesh
+    - ImmersedBoundaryPalisadeMeshGenerator
+    - MutableElement
+    - MutableMesh
+    - MutableVertexMesh
+    - Node
+    - NodeAttributes
+    - NodesOnlyMesh
+    - PeriodicNodesOnlyMesh
+    - PottsElement
+    - PottsMesh
+    - PottsMeshGenerator
+    - PottsMeshWriter
+    - TetrahedralMesh
+    - Toroidal2dMesh
+    - Toroidal2dVertexMesh
+    - ToroidalHoneycombMeshGenerator
+    - ToroidalHoneycombVertexMeshGenerator
+    - VertexMesh
+    - VoronoiVertexMeshGenerator
+  ode:
+    - Alarcon2004OxygenBasedCellCycleOdeSystem
+    - DeltaNotchEdgeOdeSystem
+    - DeltaNotchInteriorOdeSystem
+    - DeltaNotchOdeSystem
+    - Goldbeter1991OdeSystem
+    - TysonNovak2001OdeSystem
+  pde:
+    - AveragedSourceEllipticPde
+    - AveragedSourceParabolicPde
+    - CellBasedEllipticPdeSolver
+    - CellBasedParabolicPdeSolver
+    - CellwiseSourceEllipticPde
+    - CellwiseSourceParabolicPde
+    - ConstBoundaryCondition
+    - EllipticBoxDomainPdeModifier
+    - EllipticGrowingDomainPdeModifier
+    - ParabolicBoxDomainPdeModifier
+    - ParabolicGrowingDomainPdeModifier
+    - PdeSimulationTime
+    - UniformSourceEllipticPde
+    - UniformSourceParabolicPde
+  cell_based:
+    - AdhesionPottsUpdateRule
+    - Alarcon2004OxygenBasedCellCycleModel
+    - AlwaysDivideCellCycleModel
+    - ApcOneHitCellMutationState
+    - ApcTwoHitCellMutationState
+    - ApoptoticCellKiller
+    - ApoptoticCellProperty
+    - AttractingPlaneBoundaryCondition
+    - BernoulliTrialCellCycleModel
+    - BetaCateninOneHitCellMutationState
+    - BiasedBernoulliTrialCellCycleModel
+    - BoundaryNodeWriter
+    - BuskeAdhesiveForce
+    - BuskeCompressionForce
+    - BuskeElasticForce
+    - CaBasedCellPopulation
+    - Cell
+    - CellAgesWriter
+    - CellAncestor
+    - CellAncestorWriter
+    - CellAppliedForceWriter
+    - CellCycleModelProteinConcentrationsWriter
+    - CellData
+    - CellDataItemWriter
+    - CellDeltaNotchWriter
+    - CellDivisionLocationsWriter
+    - CellEdgeData
+    - CellId
+    - CellIdWriter
+    - CellLabel
+    - CellLabelWriter
+    - CellLocationIndexWriter
+    - CellMutationStatesCountWriter
+    - CellMutationStatesWriter
+    - CellPopulationAdjacencyMatrixWriter
+    - CellPopulationAreaWriter
+    - CellPopulationElementWriter
+    - CellProliferativePhasesCountWriter
+    - CellProliferativePhasesWriter
+    - CellProliferativeTypesCountWriter
+    - CellProliferativeTypesWriter
+    - CellPropertyCollection
+    - CellPropertyRegistry
+    - CellRadiusWriter
+    - CellRemovalLocationsWriter
+    - CellRosetteRankWriter
+    - CellSrnModel
+    - CellVolumesWriter
+    - CellsGenerator
+    - ChemotacticForce
+    - ChemotaxisPottsUpdateRule
+    - ContactInhibitionCellCycleModel
+    - DefaultCellProliferativeType
+    - DeltaNotchEdgeInteriorTrackingModifier
+    - DeltaNotchEdgeSrnModel
+    - DeltaNotchEdgeTrackingModifier
+    - DeltaNotchInteriorSrnModel
+    - DeltaNotchSrnModel
+    - DeltaNotchTrackingModifier
+    - DifferentialAdhesionGeneralisedLinearSpringForce
+    - DifferentialAdhesionPottsUpdateRule
+    - DifferentiatedCellProliferativeType
+    - DiffusionCaUpdateRule
+    - DiffusionForce
+    - DivisionBiasTrackingModifier
+    - ExclusionCaBasedDivisionRule
+    - ExponentialG1GenerationalCellCycleModel
+    - ExtrinsicPullModifier
+    - FarhadifarForce
+    - FixedCentreBasedDivisionRule
+    - FixedG1GenerationalCellCycleModel
+    - FixedSequenceCellCycleModel
+    - FixedVertexBasedDivisionRule
+    - ForwardEulerNumericalMethod
+    - GammaG1CellCycleModel
+    - GeneralisedLinearSpringForce
+    - Goldbeter1991SrnModel
+    - HeterotypicBoundaryLengthWriter
+    - ImmersedBoundaryBoundaryCellWriter
+    - ImmersedBoundaryCellPopulation
+    - ImmersedBoundaryKinematicFeedbackForce
+    - ImmersedBoundaryLinearDifferentialAdhesionForce
+    - ImmersedBoundaryLinearInteractionForce
+    - ImmersedBoundaryLinearMembraneForce
+    - ImmersedBoundaryMorseInteractionForce
+    - ImmersedBoundaryMorseMembraneForce
+    - ImmersedBoundaryNeighbourNumberWriter
+    - ImmersedBoundarySimulationModifier
+    - ImmersedBoundarySvgWriter
+    - IsolatedLabelledCellKiller
+    - LabelDependentBernoulliTrialCellCycleModel
+    - LegacyCellProliferativeTypesWriter
+    - MeshBasedCellPopulation
+    - MeshBasedCellPopulationWithGhostNodes
+    - NagaiHondaDifferentialAdhesionForce
+    - NagaiHondaForce
+    - NoCellCycleModel
+    - NodeBasedCellPopulation
+    - NodeBasedCellPopulationWithBuskeUpdate
+    - NodeBasedCellPopulationWithParticles
+    - NodeLocationWriter
+    - NodeVelocityWriter
+    - NormallyDistributedTargetAreaModifier
+    - NullSrnModel
+    - OffLatticeSimulation
+    - OnLatticeSimulation
+    - PlanarPolarisedFarhadifarForce
+    - PlaneBasedCellKiller
+    - PlaneBoundaryCondition
+    - PottsBasedCellPopulation
+    - PythonSimulationModifier
+    - RadialCellDataDistributionWriter
+    - RandomCaSwitchingUpdateRule
+    - RandomCellKiller
+    - RandomDirectionCentreBasedDivisionRule
+    - RandomDirectionVertexBasedDivisionRule
+    - RepulsionForce
+    - ShortAxisImmersedBoundaryDivisionRule
+    - ShortAxisVertexBasedDivisionRule
+    - ShovingCaBasedDivisionRule
+    - SimpleOxygenBasedCellCycleModel
+    - SimpleTargetAreaModifier
+    - SimulationTime
+    - SlidingBoundaryCondition
+    - SphereGeometryBoundaryCondition
+    - StemCellProliferativeType
+    - StochasticOxygenBasedCellCycleModel
+    - SurfaceAreaConstraintPottsUpdateRule
+    - T2SwapCellKiller
+    - TargetAreaLinearGrowthModifier
+    - TargetedCellKiller
+    - TransitCellProliferativeType
+    - TysonNovakCellCycleModel
+    - UniformCellCycleModel
+    - UniformG1GenerationalCellCycleModel
+    - VertexBasedCellPopulation
+    - VertexBasedPopulationSrn
+    - VertexIntersectionSwapLocationsWriter
+    - VertexT1SwapLocationsWriter
+    - VertexT2SwapLocationsWriter
+    - VertexT3SwapLocationsWriter
+    - VolumeConstraintPottsUpdateRule
+    - VolumeTrackingModifier
+    - VonMisesVertexBasedDivisionRule
+    - VoronoiDataWriter
+    - VtkSceneModifier
+    - WelikyOsterForce
+    - WildTypeCellMutationState
+  visualization:
+    - CellPopulationPyChasteActorGenerator
+    - VtkScene
