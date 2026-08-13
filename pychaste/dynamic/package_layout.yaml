@@ -1,24 +1,79 @@
-# Python-package layout for cppwg genpackage (pychaste).
+# PyChaste Python package layout for the `cppwg genpackage` tool.
 #
-# pychaste compiles a SINGLE extension (_pychaste_all) that is split into six
-# subpackages purely in the Python layer. cppwg's config has one `all` module,
-# so the split lives here: each subpackage lists the wrapped base names it owns.
-# The generator emits an explicit `from chaste._pychaste_all import (...)` plus
-# the TemplateClass stubs into each subpackage's _generated.py; the hand-written
-# __init__.py does `from ._generated import *` and keeps the bespoke pieces
-# (top-level petsc init(), cell_based's writer-subscript loop + _fortests,
-# visualization's IPython gating + _jupyter + JupyterSceneModifier stub).
-#
-# package_root is resolved relative to this layout file's directory.
+# PyChaste compiles a single _pychaste_all extension that contains all wrapped
+# classes, using the settings in config.yaml. The wrappers are manually split
+# into subpackages purely in Python. Each subpackage lists the wrappers it owns
+# in the layout below. The `cppwg genpackage` tool uses this layout to create a
+# _generated.py in each subpackage, each containing an explicit
+# `from chaste._pychaste_all import (<list_of_classes>)` plus the TemplateClass
+# stubs that enable syntax such as Element[2,2] instead of Element_2_2.
+# The hand-written __init__.py in each subpackage imports all of these via
+# `from ._generated import *` and may add additional manually maintained code.
 package: chaste
-package_root: ../src/py/chaste
 compiled_module: _pychaste_all
-# pychaste offers a single-arg diagonal shorthand for its <ELEMENT_DIM,
-# SPACE_DIM> classes: Element[2] is an alias for Element[2, 2].
+# package_root is resolved relative to this layout file's directory.
+package_root: ../src/py/chaste
+# This makes sure that Element[2] is added as an alias for Element[2, 2].
 diagonal_shorthand: true
-# Also expose every wrapped class at the top level as chaste.ClassName,
-# in addition to chaste.subpackage.ClassName.
+# This makes sure chaste.ClassName works as well as chaste.subpackage.ClassName.
 flatten_to_root: true
+# Abstract base classes must be wrapped, but are deliberately not exposed here
+# as they are not meant to be named, instantiated or subclassed from Python.
+exclude:
+  - AbstractBoundaryCondition
+  - AbstractBoxDomainPdeModifier
+  - AbstractCaBasedDivisionRule
+  - AbstractCaSwitchingUpdateRule
+  - AbstractCaUpdateRule
+  - AbstractCellBasedSimulation
+  - AbstractCellBasedSimulationModifier
+  - AbstractCellBasedWriter
+  - AbstractCellCycleModel
+  - AbstractCellCycleModelOdeSolver
+  - AbstractCellKiller
+  - AbstractCellMutationState
+  - AbstractCellPopulation
+  - AbstractCellPopulationBoundaryCondition
+  - AbstractCellPopulationCountWriter
+  - AbstractCellPopulationEventWriter
+  - AbstractCellPopulationWriter
+  - AbstractCellProliferativeType
+  - AbstractCellProperty
+  - AbstractCellWriter
+  - AbstractCentreBasedCellPopulation
+  - AbstractCentreBasedDivisionRule
+  - AbstractChasteRegion
+  - AbstractElement
+  - AbstractForce
+  - AbstractGrowingDomainPdeModifier
+  - AbstractImmersedBoundaryDivisionRule
+  - AbstractImmersedBoundaryForce
+  - AbstractLinearEllipticPde
+  - AbstractLinearParabolicPde
+  - AbstractLinearParabolicPdeSystemForCoupledOdeSystem
+  - AbstractLinearPde
+  - AbstractMesh
+  - AbstractNumericalMethod
+  - AbstractOdeBasedCellCycleModel
+  - AbstractOdeBasedPhaseBasedCellCycleModel
+  - AbstractOdeSrnModel
+  - AbstractOdeSystem
+  - AbstractOdeSystemInformation
+  - AbstractOffLatticeCellPopulation
+  - AbstractOnLatticeCellPopulation
+  - AbstractPdeModifier
+  - AbstractPhaseBasedCellCycleModel
+  - AbstractPottsUpdateRule
+  - AbstractPyChasteActorGenerator
+  - AbstractSimpleCellCycleModel
+  - AbstractSimpleGenerationalCellCycleModel
+  - AbstractSimplePhaseBasedCellCycleModel
+  - AbstractSrnModel
+  - AbstractTargetAreaModifier
+  - AbstractTetrahedralMesh
+  - AbstractTwoBodyInteractionForce
+  - AbstractUpdateRule
+  - AbstractVertexBasedDivisionRule
 subpackages:
   core:
     - ChasteBuildInfo
