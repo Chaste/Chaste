@@ -53,10 +53,13 @@ from chaste.cell_based._fortests import (
 # AbstractCellPopulation is kept as a fallback, so that
 # population.AddCellWriter(writer) still works.
 #
-# The loop below essentially does, for each concrete population class:
+# The loop below essentially does:
 #     PottsBasedCellPopulation_2.AddCellWriter = TemplateMethod(
-#         "AddCellWriter", PottsBasedCellPopulation_2.AddCellWriter)
-# and likewise for _1, _3, ... and the other writer methods.
+#         "AddCellWriter",
+#         PottsBasedCellPopulation_2.AddCellWriter
+#     )
+# and likewise for PottsBasedCellPopulation_3, ... , and also for the other
+# writer methods, repeated for all the other cell population classes.
 
 # The list of cell population writer methods to add subscript syntax for.
 _WRITER_METHOD_BASES = (
