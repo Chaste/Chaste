@@ -14,3 +14,12 @@ from chaste._pychaste_all import (
     Goldbeter1991OdeSystem,
     TysonNovak2001OdeSystem,
 )
+
+__all__ = [
+    "Alarcon2004OxygenBasedCellCycleOdeSystem",
+    "DeltaNotchEdgeOdeSystem",
+    "DeltaNotchInteriorOdeSystem",
+    "DeltaNotchOdeSystem",
+    "Goldbeter1991OdeSystem",
+    "TysonNovak2001OdeSystem",
+]

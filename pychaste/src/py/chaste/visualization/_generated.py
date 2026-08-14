@@ -14,6 +14,15 @@ from chaste._pychaste_all import (
 )
 from chaste._syntax import TemplateClass
 
+__all__ = [
+    "CellPopulationPyChasteActorGenerator",
+    "CellPopulationPyChasteActorGenerator_2",
+    "CellPopulationPyChasteActorGenerator_3",
+    "VtkScene",
+    "VtkScene_2",
+    "VtkScene_3",
+]
+
 
 class CellPopulationPyChasteActorGenerator(TemplateClass):
     _instantiations = {
