@@ -42,3 +42,11 @@ fi
 "$_cppwg" genpackage \
     --model "$_build_dir/pychaste/wrappers/cppwg_package_model.json" \
     --layout "$_script_dir/package_layout.yaml"
+
+# 3. Stamp the generated Python files with the Chaste copyright notice.
+#    CheckForCopyrights.py -new inserts the notice below each file's module
+#    docstring. Files that already carry it (the hand-written __init__.py etc.)
+#    are left unchanged.
+_chaste_root="$(cd "$_script_dir/../.." && pwd)"
+_package_dir="$(cd "$_chaste_root/pychaste/src/py/chaste" && pwd)"
+python3 "$_chaste_root/python/infra/CheckForCopyrights.py" -new -dir "$_package_dir"
