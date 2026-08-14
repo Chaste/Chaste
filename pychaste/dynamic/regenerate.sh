@@ -14,15 +14,31 @@
 # --package-only regenerates just the _generated.py files.
 set -euo pipefail
 
-_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-_build_dir="${1:-${CHASTE_BUILD_DIR:-}}"
-if [ -z "$_build_dir" ]; then
+usage() {
     echo "usage: regenerate.sh <build-dir> [--package-only]" >&2
     exit 2
+}
+
+_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Parse options.
+_build_dir=""
+_package_only=0
+for _arg in "$@"; do
+    case "$_arg" in
+        --package-only) _package_only=1 ;;
+        -*) usage ;;
+        *) _build_dir="$_arg" ;;
+    esac
+done
+
+_build_dir="${_build_dir:-${CHASTE_BUILD_DIR:-}}"
+if [ -z "$_build_dir" ]; then
+    usage
 fi
 
 # 1. Regenerate the C++ wrappers and cppwg_package_model.json (skip for --package-only).
-if [ "${2:-}" != "--package-only" ]; then
+if [ "$_package_only" -eq 0 ]; then
     cmake --build "$_build_dir" --target pychaste_wrappers
 fi
 
