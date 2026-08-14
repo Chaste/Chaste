@@ -32,16 +32,23 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import importlib.util
 import os
 import sys
 
 import petsc4py
 
 # Expose every wrapped class at the top level as chaste.ClassName in addition to
-# chaste.subpackage.ClassName (PyChaste issue #73). _generated.py is written by
-# cppwg genpackage and its subpackage imports also pull in the subpackages,
-# so chaste.core, chaste.mesh, ... remain available.
+# chaste.subpackage.ClassName.
 from chaste._generated import *  # noqa: F401,F403
+
+# JupyterNotebookManager and JupyterSceneModifier are hand-written, so the
+# flatten above does not include them. Expose them at the top level too.
+if importlib.util.find_spec("IPython") is not None:
+    from chaste.visualization import (  # noqa: F401
+        JupyterNotebookManager,
+        JupyterSceneModifier,
+    )
 
 
 def init(test_output=None, comm=None):

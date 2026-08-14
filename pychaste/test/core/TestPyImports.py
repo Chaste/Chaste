@@ -115,6 +115,46 @@ class TestPyImports(unittest.TestCase):
                     + REGEN_HINT,
                 )
 
+    def test_subpackage_classes_available_at_top_level(self):
+        """Every class exposed as chaste.<subpackage>.Foo must also be exposed as
+        chaste.Foo, including hand-written additions such as the IPython-only
+        visualization classes. Concrete template instantiations (e.g. Node_2)
+        are reached as chaste.Node[2], so are not expected at the top."""
+        import importlib
+
+        subpackages = ["core", "mesh", "cell_based", "ode", "pde", "visualization"]
+        missing = []
+        for subpackage in subpackages:
+            module = importlib.import_module(f"chaste.{subpackage}")
+            named = [
+                (name, getattr(module, name))
+                for name in dir(module)
+                if not name.startswith("_") and isinstance(getattr(module, name), type)
+            ]
+
+            # Concrete instantiations of a templated class (Node_2, ...) are the
+            # values of each TemplateClass stub; they are reached via chaste.Node[2]
+            # rather than chaste.Node_2, so are not flattened to the top level.
+            concrete = set()
+            for _, obj in named:
+                if issubclass(obj, TemplateClass) and obj is not TemplateClass:
+                    concrete.update(obj._instantiations.values())
+
+            for name, obj in named:
+                # Skip the _syntax helpers (TemplateClass/TemplateMethod) and the
+                # concrete instantiations gathered above.
+                if obj.__module__ == "chaste._syntax" or obj in concrete:
+                    continue
+                if getattr(chaste, name, None) is not obj:
+                    missing.append(f"chaste.{subpackage}.{name}")
+
+        self.assertEqual(
+            missing,
+            [],
+            "\nAvailable as chaste.<subpackage>.Foo but not as chaste.Foo"
+            f" (issue #73): {missing}",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
