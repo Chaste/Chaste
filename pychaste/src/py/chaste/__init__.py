@@ -42,8 +42,15 @@ import petsc4py
 # chaste.subpackage.ClassName.
 from chaste._generated import *  # noqa: F401,F403
 
-# JupyterNotebookManager and JupyterSceneModifier are hand-written, so the
-# flatten above does not include them. Expose them at the top level too.
+# The flatten above only re-exports wrapped classes. Hand-written additions must
+# be exposed at the top level explicitly.
+from chaste.cell_based import (  # noqa: F401
+    AbstractCellBasedTestSuite,
+    AbstractCellBasedWithTimingsTestSuite,
+)
+
+# The Jupyter visualization classes require IPython, so only expose them when it
+# is installed.
 if importlib.util.find_spec("IPython") is not None:
     from chaste.visualization import (  # noqa: F401
         JupyterNotebookManager,
