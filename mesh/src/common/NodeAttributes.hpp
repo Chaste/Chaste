@@ -39,10 +39,141 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasVectorInclude.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/vector.hpp>
+#include <boost/serialization/set.hpp>
+#include <bitset>
+#include <iterator>
 
 /**
  * A container for attributes associated with the Node class.
  */
+#define numNodes 4096
+
+template <std::size_t N>
+class MyBitset
+{
+public:
+  using value_type      = unsigned; 
+  using size_type       = std::size_t;
+  using difference_type = std::ptrdiff_t;
+  using reference       = unsigned; 
+  using const_reference = unsigned; 
+
+  class iterator
+  {
+  public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type        = unsigned; 
+    using difference_type   = std::ptrdiff_t;
+    using reference         = unsigned; 
+    using pointer           = void;
+
+    iterator(MyBitset* c, size_type pos): container_(c), pos_(pos)   {    }
+
+    reference operator*() const      	{ return pos_; }
+    iterator& operator++()      	{  nextBit();      return *this;      }
+    iterator operator++(int)    	{  iterator tmp = *this;   nextBit();      return tmp;      }
+    friend bool operator==(const iterator& a, const iterator& b)      {    return a.pos_ == b.pos_;      }
+    friend bool operator!=(const iterator& a, const iterator& b)      {    return !(a == b);      }
+  private:
+    void nextBit( )
+    {
+      while( ++pos_ < N && !container_->bits_.test( pos_ ) );
+    }
+    MyBitset* container_;
+    size_type pos_;
+  };
+  class const_iterator
+  {
+  public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type        = unsigned; 
+    using difference_type   = std::ptrdiff_t;
+    using reference         = unsigned; 
+    using pointer           = void;
+
+    const_iterator(const MyBitset* c, size_type pos): container_(c), pos_(pos)      {      }
+    reference operator*() const      { return pos_;        }
+    const_iterator& operator++()     { nextBit(); return *this;  }
+    const_iterator operator++(int)   { auto tmp = *this; nextBit(); return tmp;      }
+    friend bool operator==(const const_iterator& a,
+			   const const_iterator& b)     { return a.pos_ == b.pos_;   }
+    friend bool operator!=(const const_iterator& a,
+			   const const_iterator& b)     { return !(a == b);      }
+  private:
+    void nextBit( )
+    {
+      while( ++pos_ < N && !container_->bits_.test( pos_ ) );
+    }
+    const MyBitset* container_;
+    size_type pos_;
+  };
+  private:
+  iterator nextBit( size_type pos = 0 )
+  {
+    if( bits_.none() ) return iterator( this, N );
+    for( size_type i = pos; i < numNodes; ++i )
+      if ( bits_.test( i ))
+	return iterator( this, i );
+    return iterator( this, N );
+  }
+private:
+  std::bitset<N> bits_;
+  friend class boost::serialization::access;
+
+  /**
+   * not sure where this is use of if it is needed, but without it compile fails
+   */
+  template< class Archive >
+  void serialize( Archive& ar, const unsigned int version )
+  {
+    std::vector<unsigned> temp;
+    for( int x = 0; x < 1024; ++x )
+      {
+      if ( bits_.test(x) )
+	temp.push_back( x );
+      }
+    ar & temp;
+  }
+public:
+  bool test( size_t x ) const { return bits_.test( x ); }
+  iterator begin()
+  {
+    return nextBit();
+  }
+  size_t 		count() { return bits_.count(); }
+  iterator           	end()           { return iterator(this, N);      }
+  const_iterator     	begin() const   { return const_iterator(this, 0);    }
+  const_iterator     	end() const     { return const_iterator(this, N);    }
+
+  const_iterator     	cbegin() const  { return begin();    }
+  const_iterator     	cend() const    { return end();    }
+  void               	insert( unsigned idx )  {    bits_.set( idx );  }
+  void 			clear()		{ bits_.reset(); }
+  bool 			empty() const 	{ return bits_.none(); }
+  unsigned erase( unsigned idx )
+  {
+    unsigned ret = bits_.test( idx );
+    bits_.reset( idx );
+    return ret;
+  }
+  auto count() const  {    return bits_.count();  }
+  unsigned count(unsigned idx) const   {    return bits_.test( idx ) ? 1 : 0;  }
+  iterator find( unsigned idx )
+  {
+    if ( bits_.test( idx ) )
+      return iterator( this, idx );
+    else
+      return iterator( this, N );
+  }
+  const_iterator find( const unsigned idx ) const
+  {
+    if ( bits_.test( idx ) )
+      return const_iterator( this, idx );
+    else
+      return const_iterator( this, N );
+  }
+};
+  
 template<unsigned SPACE_DIM>
 class NodeAttributes
 {
@@ -52,22 +183,22 @@ private:
     std::vector<double> mAttributes;
 
     /** The ID of the region of mesh in which the Node lies */
-    unsigned mRegion;
+  unsigned mRegion{ 0u };
 
     /** For mutable nodes in OffLatticeSimulations, a container for the force accumulated on this node. */
-    c_vector<double, SPACE_DIM> mAppliedForce;
+  c_vector<double, SPACE_DIM> mAppliedForce{ zero_vector<double>(SPACE_DIM) };
 
     /** The radius associated with the Node */
-    double mRadius;
+  double mRadius{ 0.0 };
 
     /** Vector of indices corresponding to neighbouring nodes. */
-    std::vector<unsigned> mNeighbourIndices;
-
-    /** A bool indicating whether the neighbours of this node have been calculated yet. */
-    bool mNeighboursSetUp;
+  MyBitset<numNodes>  mNeighbourIndices;
+  
+  /** A bool indicating whether the neighbours of this node have been calculated yet. */
+  bool mNeighboursSetUp{ false };
 
     /** Whether the node represents a particle or not: Used for NodeBasedCellPopulationWithParticles */
-    bool mIsParticle;
+  bool mIsParticle{ false };
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -99,7 +230,7 @@ public:
     /**
      * Defaults all variables.
      */
-    NodeAttributes();
+  NodeAttributes() = default;
 
     /**
      * @return mAttributes
@@ -161,7 +292,7 @@ public:
     /**
      * Remove duplicates from the vector of node neighbour indices.
      */
-    void RemoveDuplicateNeighbours();
+  void RemoveDuplicateNeighbours(){}
 
     /**
      * Check whether the node neighbours collection is empty.
@@ -185,8 +316,22 @@ public:
     /**
      * @return this node's vector of neighbour indices.
      */
-    std::vector<unsigned>& rGetNeighbours();
+  std::vector<unsigned> rGetNeighbours() const;
+  /**
+   *  @return begin iterator to neighbours
+   */
+  MyBitset<numNodes>::iterator getNeighboursBegin() { return mNeighbourIndices.begin(); }
 
+  /**
+   * @return end iterator to neighbours
+   */
+  MyBitset<numNodes>::iterator getNeighboursEnd() { return mNeighbourIndices.end(); }
+
+  /**
+   * @return number of neighbours
+   */
+  size_t getNeighboursCount() { return mNeighbourIndices.count(); }
+  
     /**
      * Get whether this node is a particle, or not.
      *

@@ -39,18 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned SPACE_DIM>
-NodeAttributes<SPACE_DIM>::NodeAttributes()
-    :   mAttributes(std::vector<double>()),
-        mRegion(0u),
-        mAppliedForce(zero_vector<double>(SPACE_DIM)),
-        mRadius(0.0),
-        mNeighbourIndices(std::vector<unsigned>()),
-        mNeighboursSetUp(false),
-        mIsParticle(false)
-{
-}
-
-template<unsigned SPACE_DIM>
 std::vector<double>& NodeAttributes<SPACE_DIM>::rGetAttributes()
 {
     return mAttributes;
@@ -98,20 +86,13 @@ void NodeAttributes<SPACE_DIM>::ClearAppliedForce()
 template<unsigned SPACE_DIM>
 void NodeAttributes<SPACE_DIM>::AddNeighbour(unsigned index)
 {
-    mNeighbourIndices.push_back(index);
+  mNeighbourIndices.insert(index);
 }
 
 template<unsigned SPACE_DIM>
 void NodeAttributes<SPACE_DIM>::ClearNeighbours()
 {
-    mNeighbourIndices.clear();
-}
-
-template<unsigned SPACE_DIM>
-void NodeAttributes<SPACE_DIM>::RemoveDuplicateNeighbours()
-{
-    sort( mNeighbourIndices.begin(), mNeighbourIndices.end() );
-    mNeighbourIndices.erase( unique( mNeighbourIndices.begin(), mNeighbourIndices.end() ), mNeighbourIndices.end() );
+  mNeighbourIndices.clear();
 }
 
 template<unsigned SPACE_DIM>
@@ -133,9 +114,15 @@ bool NodeAttributes<SPACE_DIM>::GetNeighboursSetUp()
 };
 
 template<unsigned SPACE_DIM>
-std::vector<unsigned>& NodeAttributes<SPACE_DIM>::rGetNeighbours()
+std::vector<unsigned> NodeAttributes<SPACE_DIM>::rGetNeighbours() const
 {
-    return mNeighbourIndices;
+  std::vector<unsigned> ret;
+  for( int x = 0; x < 1024; ++x )
+    {
+      if ( mNeighbourIndices.test(x) )
+	ret.push_back( x );
+    }
+  return ret;
 };
 
 

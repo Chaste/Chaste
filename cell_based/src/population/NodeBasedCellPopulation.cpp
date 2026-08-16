@@ -391,11 +391,9 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
     }
 
     // Get set of 'candidate' neighbours.
-    std::vector<unsigned>& near_nodes = p_node_i->rGetNeighbours();
-
     // Find which ones are actually close
-    for (std::vector<unsigned>::iterator iter = near_nodes.begin();
-         iter != near_nodes.end();
+    for ( auto iter = p_node_i->getNeighboursBegin(); 
+	  iter != p_node_i->getNeighboursEnd(); 
          ++iter)
     {
         // Be sure not to return the index itself.
@@ -448,11 +446,9 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     }
 
     // Get set of 'candidate' neighbours
-    std::vector<unsigned>& near_nodes = p_node_i->rGetNeighbours();
-
     // Find which ones are actually close
-    for (std::vector<unsigned>::iterator iter = near_nodes.begin();
-         iter != near_nodes.end();
+    for (auto iter = p_node_i->getNeighboursBegin();
+         iter != p_node_i->getNeighboursEnd();
          ++iter)
     {
         // Be sure not to return the index itself

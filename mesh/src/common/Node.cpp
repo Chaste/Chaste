@@ -373,7 +373,7 @@ bool Node<SPACE_DIM>::GetNeighboursSetUp()
 };
 
 template<unsigned SPACE_DIM>
-std::vector<unsigned>& Node<SPACE_DIM>::rGetNeighbours()
+std::vector<unsigned> Node<SPACE_DIM>::rGetNeighbours() const
 {
     CheckForNodeAttributes();
 
