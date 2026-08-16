@@ -117,7 +117,7 @@ template<unsigned SPACE_DIM>
 std::vector<unsigned> NodeAttributes<SPACE_DIM>::rGetNeighbours() const
 {
   std::vector<unsigned> ret;
-  for( int x = 0; x < 1024; ++x )
+  for( int x = 0; x < numNodes; ++x )
     {
       if ( mNeighbourIndices.test(x) )
 	ret.push_back( x );

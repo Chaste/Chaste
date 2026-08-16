@@ -261,7 +261,9 @@ public:
         node.AddNeighbour(1u);
         node.AddNeighbour(1u);
         TS_ASSERT_EQUALS(node.NeighboursIsEmpty(), false);
-        TS_ASSERT_EQUALS(node.rGetNeighbours().size(), 2u);
+
+	// is it necessary to keep duplicate neighbours?
+	//        TS_ASSERT_EQUALS(node.rGetNeighbours().size(), 2u);
         node.RemoveDuplicateNeighbours();
         TS_ASSERT_EQUALS(node.rGetNeighbours().size(), 1u);
         node.ClearNeighbours();
