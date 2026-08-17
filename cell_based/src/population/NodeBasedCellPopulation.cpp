@@ -392,8 +392,8 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
 
     // Get set of 'candidate' neighbours.
     // Find which ones are actually close
-    for ( auto iter = p_node_i->getNeighboursBegin(); 
-	  iter != p_node_i->getNeighboursEnd(); 
+    for ( auto iter = p_node_i->getNeighboursBegin();
+      iter != p_node_i->getNeighboursEnd();
          ++iter)
     {
         // Be sure not to return the index itself.

@@ -320,7 +320,7 @@ public:
   std::vector<unsigned> rGetNeighbours() const;
   auto getNeighboursBegin() { return mpNodeAttributes->getNeighboursBegin(); }
   auto getNeighboursEnd() { return mpNodeAttributes->getNeighboursEnd(); }
-    /** 
+    /**
      * @return a set of indices of elements containing this node as a vertex.
      */
     std::set<unsigned>& rGetContainingElementIndices();

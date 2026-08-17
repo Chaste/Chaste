@@ -52,26 +52,26 @@ template <std::size_t N>
 class MyBitset
 {
 public:
-  using value_type      = unsigned; 
+  using value_type      = unsigned;
   using size_type       = std::size_t;
   using difference_type = std::ptrdiff_t;
-  using reference       = unsigned; 
-  using const_reference = unsigned; 
+  using reference       = unsigned;
+  using const_reference = unsigned;
 
   class iterator
   {
   public:
     using iterator_category = std::forward_iterator_tag;
-    using value_type        = unsigned; 
+    using value_type        = unsigned;
     using difference_type   = std::ptrdiff_t;
-    using reference         = unsigned; 
+    using reference         = unsigned;
     using pointer           = void;
 
     iterator(MyBitset* c, size_type pos): container_(c), pos_(pos)   {    }
 
-    reference operator*() const      	{ return pos_; }
-    iterator& operator++()      	{  nextBit();      return *this;      }
-    iterator operator++(int)    	{  iterator tmp = *this;   nextBit();      return tmp;      }
+    reference operator*() const          { return pos_; }
+    iterator& operator++()          {  nextBit();      return *this;      }
+    iterator operator++(int)        {  iterator tmp = *this;   nextBit();      return tmp;      }
     friend bool operator==(const iterator& a, const iterator& b)      {    return a.pos_ == b.pos_;      }
     friend bool operator!=(const iterator& a, const iterator& b)      {    return !(a == b);      }
   private:
@@ -86,9 +86,9 @@ public:
   {
   public:
     using iterator_category = std::forward_iterator_tag;
-    using value_type        = unsigned; 
+    using value_type        = unsigned;
     using difference_type   = std::ptrdiff_t;
-    using reference         = unsigned; 
+    using reference         = unsigned;
     using pointer           = void;
 
     const_iterator(const MyBitset* c, size_type pos): container_(c), pos_(pos)      {      }
@@ -96,9 +96,9 @@ public:
     const_iterator& operator++()     { nextBit(); return *this;  }
     const_iterator operator++(int)   { auto tmp = *this; nextBit(); return tmp;      }
     friend bool operator==(const const_iterator& a,
-			   const const_iterator& b)     { return a.pos_ == b.pos_;   }
+               const const_iterator& b)     { return a.pos_ == b.pos_;   }
     friend bool operator!=(const const_iterator& a,
-			   const const_iterator& b)     { return !(a == b);      }
+               const const_iterator& b)     { return !(a == b);      }
   private:
     void nextBit( )
     {
@@ -113,7 +113,7 @@ public:
     if( bits_.none() ) return iterator( this, N );
     for( size_type i = pos; i < numNodes; ++i )
       if ( bits_.test( i ))
-	return iterator( this, i );
+    return iterator( this, i );
     return iterator( this, N );
   }
 private:
@@ -130,7 +130,7 @@ private:
     for( int x = 0; x < 1024; ++x )
       {
       if ( bits_.test(x) )
-	temp.push_back( x );
+    temp.push_back( x );
       }
     ar & temp;
   }
@@ -140,16 +140,16 @@ public:
   {
     return nextBit();
   }
-  size_t 		count() { return bits_.count(); }
-  iterator           	end()           { return iterator(this, N);      }
-  const_iterator     	begin() const   { return const_iterator(this, 0);    }
-  const_iterator     	end() const     { return const_iterator(this, N);    }
+  size_t         count() { return bits_.count(); }
+  iterator               end()           { return iterator(this, N);      }
+  const_iterator         begin() const   { return const_iterator(this, 0);    }
+  const_iterator         end() const     { return const_iterator(this, N);    }
 
-  const_iterator     	cbegin() const  { return begin();    }
-  const_iterator     	cend() const    { return end();    }
-  void               	insert( unsigned idx )  {    bits_.set( idx );  }
-  void 			clear()		{ bits_.reset(); }
-  bool 			empty() const 	{ return bits_.none(); }
+  const_iterator         cbegin() const  { return begin();    }
+  const_iterator         cend() const    { return end();    }
+  void                   insert( unsigned idx )  {    bits_.set( idx );  }
+  void             clear()        { bits_.reset(); }
+  bool             empty() const     { return bits_.none(); }
   unsigned erase( unsigned idx )
   {
     unsigned ret = bits_.test( idx );
@@ -173,7 +173,7 @@ public:
       return const_iterator( this, N );
   }
 };
-  
+
 template<unsigned SPACE_DIM>
 class NodeAttributes
 {
@@ -193,7 +193,7 @@ private:
 
     /** Vector of indices corresponding to neighbouring nodes. */
   MyBitset<numNodes>  mNeighbourIndices;
-  
+
   /** A bool indicating whether the neighbours of this node have been calculated yet. */
   bool mNeighboursSetUp{ false };
 
@@ -331,7 +331,7 @@ public:
    * @return number of neighbours
    */
   size_t getNeighboursCount() { return mNeighbourIndices.count(); }
-  
+
     /**
      * Get whether this node is a particle, or not.
      *

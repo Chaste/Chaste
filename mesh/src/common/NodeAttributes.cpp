@@ -120,7 +120,7 @@ std::vector<unsigned> NodeAttributes<SPACE_DIM>::rGetNeighbours() const
   for( int x = 0; x < numNodes; ++x )
     {
       if ( mNeighbourIndices.test(x) )
-	ret.push_back( x );
+    ret.push_back( x );
     }
   return ret;
 };
