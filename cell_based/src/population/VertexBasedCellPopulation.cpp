@@ -475,12 +475,12 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
     if (num_cells>0)
     {
         /*
-         * If edge SRNs are specified, then write VTK results into a mesh where 
-         * quantities associated with each edge are taken into account. Assume 
-         * that the first cell is representative of all cells. Edge VTK results 
+         * If edge SRNs are specified, then write VTK results into a mesh where
+         * quantities associated with each edge are taken into account. Assume
+         * that the first cell is representative of all cells. Edge VTK results
          * are also written if cells contain CellEdgeData.
          */
-        
+
         auto p_cell_edge_data = this->Begin()->GetCellEdgeData();
 
         //If cells contain edge data
@@ -518,11 +518,11 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
             if (p_cell_writer->GetOutputScalarData())
             {
                 /*
-                * Create a vector to store scalar data per cell for VTK output from 
-                * this writer. Note: the term "CellData" in 
-                * "GetCellDataForVtkOutput()" should not be confused with the 
-                * CellData class; an example of what might be stored here is each 
-                * cell's age. Any CellData item(s) per cell are output to VTK in 
+                * Create a vector to store scalar data per cell for VTK output from
+                * this writer. Note: the term "CellData" in
+                * "GetCellDataForVtkOutput()" should not be confused with the
+                * CellData class; an example of what might be stored here is each
+                * cell's age. Any CellData item(s) per cell are output to VTK in
                 * the code block further down.
                 */
                 std::vector<double> vtk_cell_data(num_cells);
@@ -547,11 +547,11 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
             if (p_cell_writer->GetOutputVectorData())
             {
                 /*
-                * Create a vector to store vector data per cell for VTK output from 
-                * this writer. Note: the term "CellData" in 
-                * "GetCellDataForVtkOutput()" should not be confused with the 
-                * CellData class; an example of what might be stored here is each 
-                * cell's age. Any CellData item(s) per cell are output to VTK in 
+                * Create a vector to store vector data per cell for VTK output from
+                * this writer. Note: the term "CellData" in
+                * "GetCellDataForVtkOutput()" should not be confused with the
+                * CellData class; an example of what might be stored here is each
+                * cell's age. Any CellData item(s) per cell are output to VTK in
                 * the code block further down.
                 */
                 //std::vector<c_vector<double, DIM>> vtk_cell_vec_data(num_cells);
@@ -575,8 +575,8 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
         }
 
         /*
-        * Prepare a vector of vectors of the correct size to store each cell's 
-        * CellData item(s). Note: when outputting any CellData, we assume that the 
+        * Prepare a vector of vectors of the correct size to store each cell's
+        * CellData item(s). Note: when outputting any CellData, we assume that the
         * first cell is representative of all cells.
         */
         unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
@@ -602,15 +602,15 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
             }
         }
 
-        // Add cell_data to the VertexMeshWriter to be output to VTK 
+        // Add cell_data to the VertexMeshWriter to be output to VTK
         for (unsigned var = 0; var < num_cell_data_items; ++var)
         {
             mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
         }
 
         /*
-        * Prepare a vector of vectors of the correct size to store each cell's 
-        * CellVecData item(s). Note: when outputting any CellVecData, we assume 
+        * Prepare a vector of vectors of the correct size to store each cell's
+        * CellVecData item(s). Note: when outputting any CellVecData, we assume
         * that the first cell is representative of all cells.
         */
 
