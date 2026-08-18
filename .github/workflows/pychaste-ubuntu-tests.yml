@@ -18,42 +18,65 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-22.04", "ubuntu-24.04"]
+        image: ["ubuntu:22.04", "ubuntu:24.04", "ubuntu:26.04"]
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    container:
+      image: ${{ matrix.image }}
 
     env:
+      DEBIAN_FRONTEND: noninteractive
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/testoutput
+      # Force mesa software rendering (llvmpipe) so VTK off-screen rendering
+      # does not pick up an unstable GPU/DRI path on the runner.
+      LIBGL_ALWAYS_SOFTWARE: "1"
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Make build and test directories
         run: |
           mkdir -p build
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
+      - name: Install basic system dependencies
+        run: |
+          apt-get update &&
+          apt-get install -y \
+            apt-transport-https \
+            apt-utils \
+            ca-certificates \
+            build-essential \
+            git \
+            wget
+
       - name: Install Chaste dependencies
         run: |
           codename=$(cat /etc/os-release | grep VERSION_CODENAME | cut -d= -f2)
-          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
           echo "deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${codename}/" \
-            | sudo tee -a /etc/apt/sources.list.d/chaste.list
-          sudo apt-get update
-          sudo apt-get install -y chaste-dependencies
+            | tee -a /etc/apt/sources.list.d/chaste.list
+          apt-get update &&
+          apt-get install -y chaste-dependencies
 
-      - name: Install extra PyChaste dependencies
+      - name: Get system VTK version
         run: |
-          for vtk_ver in $(seq 7 9); do
-            installed=1
-            dpkg -s "libvtk${vtk_ver}-dev" || installed=0
-            if [ "${installed}" -eq 1 ]; then
+          vtk_ver=
+          for candidate in $(seq 7 99); do
+            vtk_pkg="$(apt-cache search --names-only ^libvtk${candidate}-dev$)"
+            if [ -n "${vtk_pkg}" ]; then
+              vtk_ver="${candidate}"
               break
             fi
           done
+          echo "VTK version: ${vtk_ver}"
+          echo "VTK_VERSION=${vtk_ver}" >> $GITHUB_ENV
 
-          sudo apt-get install -y \
+      - name: Install extra PyChaste dependencies
+        run: |
+          apt-get install -y \
             castxml \
             clang \
             python3-matplotlib \
@@ -62,9 +85,18 @@ jobs:
             python3-numpy \
             python3-petsc4py-real \
             python3-pip \
-            python3-vtk${vtk_ver} \
+            python3-vtk${{ env.VTK_VERSION }} \
             python3-xvfbwrapper \
             xvfb
+
+      - name: Install CastXML superbuild on Ubuntu 24.04
+        if: ${{ matrix.image == 'ubuntu:24.04' }}
+        run: |
+          # The apt castxml (0.6.3) cannot parse Ubuntu 24.04's gcc-13
+          # system headers, so install a newer castxml binary instead.
+          wget -qO- https://github.com/CastXML/CastXMLSuperbuild/releases/download/v2026.01.30/castxml-ubuntu-24.04-x86_64.tar.gz \
+            | tar -xz -C /opt
+          echo "/opt/castxml/bin" >> "${GITHUB_PATH}"
 
       - name: Configure PyChaste
         run: |
@@ -87,3 +119,32 @@ jobs:
           xvfb-run --server-args="-screen 0 1024x768x24" \
             ctest -j $(nproc) -L pychaste --output-on-failure
         working-directory: build
+
+      # Diagnostic: if a test crashed, re-run each failed test under gdb to print
+      # a native backtrace. PETSc installs its own signal handler that turns a
+      # SIGSEGV into an MPI_ABORT with no stack, so disable it here.
+      - name: Capture backtrace on failure
+        if: failure()
+        working-directory: build
+        env:
+          PETSC_OPTIONS: -no_signal_handler
+        run: |
+          apt-get install -y --no-install-recommends gdb
+          ctest --rerun-failed --show-only=json-v1 > failed.json 2>/dev/null || true
+          python3 - <<'PY'
+          import json, subprocess
+          try:
+              tests = json.load(open("failed.json")).get("tests", [])
+          except Exception:
+              tests = []
+          for t in tests:
+              cmd = t.get("command")
+              if not cmd:
+                  continue
+              print(f"::group::backtrace {t.get('name')}", flush=True)
+              subprocess.run(
+                  ["xvfb-run", "--server-args=-screen 0 1024x768x24",
+                   "gdb", "-batch", "-ex", "run", "-ex", "bt", "-ex", "quit",
+                   "--args", *cmd])
+              print("::endgroup::", flush=True)
+          PY

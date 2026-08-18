@@ -1,4 +1,6 @@
-"""Helper classes for visualization in Jupyter notebooks."""
+"""Helper classes for visualising Chaste cell populations in Jupyter notebooks."""
+
+from __future__ import annotations
 
 __copyright__ = """Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
@@ -42,30 +44,41 @@ import warnings
 
 from importlib import resources
 from io import StringIO
+from typing import Any
 
 import vtk
 import xvfbwrapper
 
-from chaste.cell_based import VtkSceneModifier_2, VtkSceneModifier_3
+from chaste.cell_based import SimulationTime, VtkSceneModifier_2, VtkSceneModifier_3
 
 
 class JupyterNotebookManager:
     """
-    Singleton class for managing plotting in a Jupyter notebook
+    Singleton that manages cell-population rendering in a Jupyter notebook.
+
+    On construction it starts a headless virtual display (Xvfb) so VTK can
+    render off-screen. Use vtk_show() to display a VtkScene, as a static image
+    or an interactive three.js plot. It is a singleton so the virtual display
+    is started only once per kernel.
     """
 
-    def __new__(cls, *args, **kwds):
-        """Singleton pattern"""
-        # https://www.python.org/download/releases/2.2/descrintro/#__new__
-        it = cls.__dict__.get("__it__", None)
-        if it is not None:
-            return it
-        it = object.__new__(cls)
-        cls.__it__ = it
-        it._init(*args, **kwds)
-        return it
+    _instance = None
 
-    def _init(self, *args, **kwds):
+    def __new__(cls) -> JupyterNotebookManager:
+        """Return the singleton instance, creating it on the first call."""
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self) -> None:
+        """Start the virtual display and locate the JavaScript assets (once)."""
+        # __init__ fires on every construction (singleton), so guard the
+        # one-time setup below.
+        if getattr(self, "_initialized", False):
+            return
+        self._initialized = True
+
+        # Xvfb gives VTK a headless X display for its off-screen GL rendering.
         try:
             self.vdisplay = xvfbwrapper.Xvfb()
             self.vdisplay.start()
@@ -73,133 +86,156 @@ class JupyterNotebookManager:
             self.vdisplay = None
             warnings.warn("Could not start Xvfb.")
 
-        self.renderWindow = vtk.vtkRenderWindow()
+        self.js_resource_dir = resources.files("chaste").joinpath("external")
 
-        self.interactive_plotting_loaded = False
-        self.three_js_dir = resources.files("chaste").joinpath("external")
+        # Counter for the unique DOM id given to each interactive plot's container.
         self.container_id = 0
 
-    def _interactive_plot_init(self):
-        if not self.interactive_plotting_loaded:
+    def _display_image(self, scene: Any, width: int, height: int) -> None:
+        """Render the scene to a width x height PNG and display it."""
+        # The render and PNG capture are done in C++ (GetSceneAsCharBuffer)
+        # Size the render window first so the image honours the requested width/height.
+        scene.GetRenderWindow().SetSize(width, height)
 
-            library_javascript = StringIO()
-            library_javascript.write(
-                """
-            <script type="text/javascript">
-            var pychaste_javascript_injected = true;
-            """
-            )
+        # memoryview exposes the wrapped vtkUnsignedCharArray as a bytes buffer.
+        data = memoryview(scene.GetSceneAsCharBuffer())
+        IPython.display.display(IPython.display.Image(data))
 
-            three_js_libraries = (
-                "three.min.js",
-                "OrbitControls.js",
-                "VRMLLoader.js",
-                "Detector.js",
-            )
+    def _display_interactive(self, scene: Any, width: int, height: int, increment: bool = True) -> None:
+        """
+        Export the scene to VRML and display it as an interactive three.js plot.
+        """
+        # Build the scene before rendering and exporting it (0 = time step, used
+        # only for naming saved output, which this path does not write).
+        scene.RenderFrame(0)
 
-            # Include three.js
-            for library in three_js_libraries:
-                with self.three_js_dir.joinpath(library).open() as infile:
-                    library_javascript.write(infile.read())
+        render_window = scene.GetRenderWindow()
+        render_window.SetOffScreenRendering(1)
+        render_window.SetSize(width, height)
+        render_window.Render()
 
-            # Include internal plotting functions
-            with self.three_js_dir.joinpath("plotting_script.js").open() as infile:
-                library_javascript.write(infile.read())
+        # Written to the working directory so the notebook can serve it back to
+        # the interactive plot via its "files/" URL.
+        wrl_filename = "temp_scene.wrl"
+        exporter = vtk.vtkVRMLExporter()
+        exporter.SetInput(render_window)
+        exporter.SetFileName(os.path.join(os.getcwd(), wrl_filename))
+        exporter.Write()
 
-            self.interactive_plotting_loaded = True
-            IPython.display.display(IPython.display.HTML(library_javascript.getvalue()))
-
-    def _interactive_plot_show(
-        self, width, height, file_name="temp_scene.wrl", increment=True
-    ):
-
-        self._interactive_plot_init()
         if increment:
             self.container_id += 1
 
-        html_source = f"""
-        <div id="pychaste_plotting_container_{self.container_id}" style="width:{width}px; height:{height}px">
-            &nbsp;
-        </div>
-        <script type="text/javascript">
-            (function(){{
-            var three_container = document.getElementById("pychaste_plotting_container_{self.container_id}");
-            pychaste_plot(three_container, files/{file_name}, {width}, {height});
-            }})();
-        </script>
-        """
+        # A unique container id per plot, so each output's script
+        # targets its own <div> rather than another plot's.
+        container = f"pychaste_plotting_container_{self.container_id}"
+
+        # Each plot's output is self-contained. It loads the plotting libraries
+        # itself if they are not already on the page, then renders.
+        head = (
+            f'<div id="{container}" style="width:{width}px; height:{height}px"></div>\n'
+            '<script type="text/javascript">\n'
+            "(function () {\n"
+            "    function plot() {\n"
+            f'        var container = document.getElementById("{container}");\n'
+            f'        pychaste_plot(container, "files/{wrl_filename}", {width}, {height});\n'
+            "    }\n"
+            '    if (typeof pychaste_plot === "function") {\n'
+            "        plot();\n"
+            "    } else {\n"
+        )
+        tail = "\n        plot();\n    }\n})();\n</script>\n"
+        # head ends at "} else {", so the libraries form the else-branch bootstrap
+        # that runs only when pychaste_plot is not already defined on the page.
+        html_source = head + self._read_plotting_libraries() + tail
 
         IPython.display.display(IPython.display.HTML(html_source))
 
+    def _read_plotting_libraries(self) -> str:
+        """
+        Return the bundled three.js libraries and plotting script concatenated
+        into a single block of JavaScript, ready to inject into a notebook cell.
+        """
+        js = StringIO()
+        # Hide RequireJS's define so the three.js UMD builds set the global THREE
+        # instead of registering as anonymous AMD modules; restore it afterwards.
+        js.write("var __pychaste_define = window.define;\n" "window.define = undefined;\n")
+        for library in ("three.min.js", "OrbitControls.js", "VRMLLoader.js"):
+            with self.js_resource_dir.joinpath(library).open() as infile:
+                js.write(infile.read())
+
+        js.write("window.define = __pychaste_define;\n")
+
+        with self.js_resource_dir.joinpath("plotting_script.js").open() as infile:
+            js.write(infile.read())
+        return js.getvalue()
+
     def vtk_show(
-        self, scene, width=400, height=300, output_format="png", increment=True
-    ):
+        self,
+        scene: Any,
+        width: int = 400,
+        height: int = 300,
+        output_format: str = "png",
+        increment: bool = True,
+    ) -> None:
         """
-        Takes vtkRenderer instance and returns an IPython Image with the rendering.
+        Display a VtkScene in the current Jupyter notebook cell, sized to
+        width x height pixels.
+
+        For output_format "png" (the default) the scene is rendered to a static
+        image; for "wrl" it is exported to VRML and shown as an interactive
+        three.js plot (drag to rotate, scroll to zoom). Pass increment=False to
+        overwrite the previous interactive plot in place instead of adding one.
         """
-
-        scene.ResetRenderer(0)
-        renderer = scene.GetRenderer()
-
-        self.renderWindow.SetOffScreenRendering(1)
-        self.renderWindow.AddRenderer(renderer)
-        self.renderWindow.SetSize(width, height)
-        self.renderWindow.Render()
-
         if output_format == "wrl":
-            exporter = vtk.vtkVRMLExporter()
-            exporter.SetInput(self.renderWindow)
-            exporter.SetFileName(os.getcwd() + "/temp_scene.wrl")
-            exporter.Write()
-            self._interactive_plot_show(width, height, "temp_scene.wrl", increment)
-            self.renderWindow.RemoveRenderer(renderer)
-
+            self._display_interactive(scene, width, height, increment)
         else:
-            windowToImageFilter = vtk.vtkWindowToImageFilter()
-            windowToImageFilter.SetInput(self.renderWindow)
-            windowToImageFilter.Update()
-
-            writer = vtk.vtkPNGWriter()
-            writer.SetWriteToMemory(1)
-            writer.SetInputConnection(windowToImageFilter.GetOutputPort())
-            writer.Write()
-            data = memoryview(writer.GetResult())
-            self.renderWindow.RemoveRenderer(renderer)
-
-            return IPython.display.Image(data)
+            self._display_image(scene, width, height)
 
 
-def JupyterSceneModifierFactory(VtkSceneModifier):
+def JupyterSceneModifierFactory(VtkSceneModifier: type) -> type:
+    """
+    Build a JupyterSceneModifier subclass of the given dimension-specific
+    VtkSceneModifier (used to create the 2D and 3D variants below).
+    """
 
     class JupyterSceneModifier(VtkSceneModifier):
         """
-        Class for real time plotting of output
+        Simulation modifier that renders the scene into the active Jupyter
+        notebook cell at the end of each time step, for real-time plotting.
         """
 
-        def __init__(self, plotting_manager):
-            self.output_format = "png"
-            self.plotting_manager = plotting_manager
+        def __init__(self, plotting_manager: JupyterNotebookManager, output_format: str = "png") -> None:
+            """
+            Create the modifier with the manager that displays each frame and
+            the output format ("png" for a static image, "wrl" for interactive).
+            """
             super().__init__()
+            self.plotting_manager = plotting_manager
+            self.output_format = output_format
 
-        def UpdateAtEndOfTimeStep(self, cell_population):
+        def UpdateAtEndOfTimeStep(self, cell_population: Any) -> None:
             """
-            Update the Jupyter notebook plot with the new scene
+            Re-render the cell population into the notebook cell at the end of a
+            time step (only on steps that are a multiple of the update frequency).
             """
 
-            super().UpdateAtEndOfTimeStep(cell_population)
+            # Update the population directly rather than via the base class: its
+            # render-if-due path only writes file output (unused here) and would
+            # rebuild the scene redundantly before vtk_show renders it below.
+            self.UpdateCellData(cell_population)
 
+            # Only refresh the plot every GetUpdateFrequency() time steps.
+            time_step = SimulationTime.Instance().GetTimeStepsElapsed()
+            if time_step % self.GetUpdateFrequency() != 0:
+                return
+
+            # Clear the previous frame so this one replaces it in the same cell.
             IPython.display.clear_output(wait=True)
+            self.plotting_manager.vtk_show(self.GetVtkScene(), output_format=self.output_format)
 
-            if self.output_format == "png":
-                IPython.display.display(
-                    self.plotting_manager.vtk_show(
-                        self.GetVtkScene(), output_format=self.output_format
-                    )
-                )
-            else:
-                self.plotting_manager.vtk_show(
-                    self.GetVtkScene(), output_format=self.output_format
-                )
+    # Give each dimension's class a distinct, informative name.
+    JupyterSceneModifier.__name__ = VtkSceneModifier.__name__.replace("VtkSceneModifier", "JupyterSceneModifier")
+    JupyterSceneModifier.__qualname__ = JupyterSceneModifier.__name__
 
     return JupyterSceneModifier
 

@@ -806,7 +806,7 @@ public:
     {
         // Set end time
         double archive_time = 0.1;
-        
+
         {
             // Create a simple 2D MutableVertexMesh
             HoneycombVertexMeshGenerator generator(6, 6);
@@ -853,7 +853,7 @@ public:
         }
 
         SimulationTime::Instance()->SetStartTime(0.0);
-        
+
         {
             // Load simulation
             OffLatticeSimulation<2>* p_simulator

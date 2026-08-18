@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # CLEANING UP
 # Look at  testoutput/$HOSTNAME.BUILD_TYPE/Semaphores...
-# 
+#
 # There are 16 semaphores open, owned by 1 users:
 # chaste (16)
 # etc.
@@ -65,7 +65,7 @@ names = []
 for entry in semaphore_data:
   total_open += int(entry.split()[0])
   names.append( getpwuid(int(entry.split()[1]))[0] + ' (' + entry.split()[0] +')' )
-  
+
 # Let the test summary script know
 print("There are %s semaphores open, owned by %s users:" % (total_open, len(semaphore_data)))
 for name in names:

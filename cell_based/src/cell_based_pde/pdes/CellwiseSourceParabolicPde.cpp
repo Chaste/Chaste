@@ -110,19 +110,19 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>&
     {
         if (mrCellPopulation.IsPdeNodeAssociatedWithNonApoptoticCell(rNode.GetIndex()))
         {
-        
+
             double cell_volume = 1.0;
 
             // Scale by volume if wanted
             if (mScaleByCellVolume)
-            {   
+            {
                 CellPtr p_cell = mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex());
                 cell_volume = mrCellPopulation.GetVolumeOfCell(p_cell);
-                  
+
                 if (cell_volume <1e-6)
                 {
-                    EXCEPTION("The volume of one of the cells is " << cell_volume << 
-                              " and you are scaling by cell volume. Either turn scaling off or use"  
+                    EXCEPTION("The volume of one of the cells is " << cell_volume <<
+                              " and you are scaling by cell volume. Either turn scaling off or use"
                               " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
                 }
             }

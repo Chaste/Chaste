@@ -8,14 +8,21 @@ Module contents
     :members:
     :undoc-members:
     :show-inheritance:
-    
-.. autoclass:: chaste.ode.AbstractOdeSystem
+
+.. autoclass:: chaste.ode.Alarcon2004OxygenBasedCellCycleOdeSystem
     :members:
 
-.. autoclass:: chaste.ode.AbstractOdeSystemInformation
+.. autoclass:: chaste.ode.DeltaNotchOdeSystem
     :members:
 
-.. autoclass:: chaste.ode.AbstractPythonOdeSystemInformation
+.. autoclass:: chaste.ode.DeltaNotchEdgeOdeSystem
     :members:
 
+.. autoclass:: chaste.ode.DeltaNotchInteriorOdeSystem
+    :members:
 
+.. autoclass:: chaste.ode.Goldbeter1991OdeSystem
+    :members:
+
+.. autoclass:: chaste.ode.TysonNovak2001OdeSystem
+    :members:

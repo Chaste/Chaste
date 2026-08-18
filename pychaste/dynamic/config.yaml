@@ -18,8 +18,6 @@ template_substitutions:
     replacement: [[2], [3]]
   - signature: <unsigned SPACE_DIM>
     replacement: [[2], [3]]
-  - signature: <unsigned DIM, unsigned DIM>
-    replacement: [[2, 2], [3, 3]]
   - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
     replacement: [[2, 2], [3, 3]]
   - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
@@ -58,6 +56,11 @@ template_substitutions:
       - [UniformCellCycleModel, 3]
       - [UniformG1GenerationalCellCycleModel, 2]
       - [UniformG1GenerationalCellCycleModel, 3]
+
+# Translate C++ exception into Python exceptions.
+exceptions:
+  - name: Exception
+    message_method: GetMessage
 
 modules:
   - name: all
@@ -725,7 +728,7 @@ modules:
       - name: ImmersedBoundaryLinearMembraneForce
       - name: ImmersedBoundaryMorseInteractionForce
       - name: ImmersedBoundaryMorseMembraneForce
-      
+
       - name: NagaiHondaForce
       - name: RepulsionForce
 

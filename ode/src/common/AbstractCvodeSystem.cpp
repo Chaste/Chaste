@@ -176,6 +176,9 @@ AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
           mHasAnalyticJacobian(false),
           mUseAnalyticJacobian(false),
           mpCvodeMem(nullptr),
+#if CHASTE_SUNDIALS_VERSION >= 60000
+          mpSundialsContextManager(CvodeContextManager::Instance()),
+#endif
           mMaxSteps(0),
           mLastInternalStepSize(0)
 {
@@ -434,7 +437,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
 
         // Set error handler
 #if CHASTE_SUNDIALS_VERSION >= 70000
-	SUNContext_PushErrHandler(CvodeContextManager::Instance()->GetSundialsContext(),  CvodeErrorHandler, nullptr);
+    SUNContext_PushErrHandler(CvodeContextManager::Instance()->GetSundialsContext(),  CvodeErrorHandler, nullptr);
 #else
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
 #endif

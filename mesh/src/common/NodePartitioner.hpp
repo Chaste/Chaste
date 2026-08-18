@@ -50,7 +50,7 @@ class NodePartitioner
 public:
 
     /**
-      * Method to compute a parallel partitioning of a given mesh based on 
+      * Method to compute a parallel partitioning of a given mesh based on
       * a DistributedVectorFactory in the mesh (if it exists) or else on rMesh.GetNumNodes().
       *
       * @param rMesh is the original mesh (so that we can set the DistributedVectorFactory up

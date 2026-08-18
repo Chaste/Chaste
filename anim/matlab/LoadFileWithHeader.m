@@ -1,13 +1,13 @@
 function [vals, headers]=LoadFileWithHeader(filename)
 %
-% LOADFILEWITHHEADER    Load a CHASTE-type output file with one header line 
+% LOADFILEWITHHEADER    Load a CHASTE-type output file with one header line
 %   followed by n columns of data
-% 
-%   [DATA, HEADERS] = LOADFILEWITHHEADER(FILENAME) read a file and loads the 
-%   data into the first return parameter and optionally the header into the 
+%
+%   [DATA, HEADERS] = LOADFILEWITHHEADER(FILENAME) read a file and loads the
+%   data into the first return parameter and optionally the header into the
 %   second return param, as a vector of strings
 %
-%   Usage: 
+%   Usage:
 %     [data, headers] = LoadFileWithHeader('data.txt')
 %     PlotCols(1,3,data,headers)    % plots col 3 against col 1 & labels axes
 %
@@ -18,7 +18,7 @@ function [vals, headers]=LoadFileWithHeader(filename)
 % filename for a new, temporary file
 tempfile_name = [filename, '.matlabtemp'];
 
-% call system command copying the file to a new file 
+% call system command copying the file to a new file
 % without the first line
 command = ['sed "1d" ', filename, ' > ' , tempfile_name];
 system(command);

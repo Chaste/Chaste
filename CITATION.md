@@ -26,44 +26,44 @@ To cite Chaste in publications, please use one of these:
 BibTeX entries for LaTeX users are:
 
 ```
-@article{ChasteFRC2020,  
-  doi = {10.21105/joss.01848},  
-  url = {https://doi.org/10.21105/joss.01848},  
-  year = {2020},  
-  publisher = {The Open Journal},  
-  volume = {5},  
-  number = {47},  
-  pages = {1848},  
-  author = {Fergus R. Cooper and Ruth E. Baker and Miguel O. Bernabeu and Rafel Bordas and Louise Bowler and Alfonso Bueno-Orovio and Helen M. Byrne and Valentina Carapella and Louie Cardone-Noott and Jonathan Cooper and Sara Dutta and Benjamin D. Evans and Alexander G. Fletcher and James A. Grogan and Wenxian Guo and Daniel G. Harvey and Maurice Hendrix and David Kay and Jochen Kursawe and Philip K. Maini and Beth McMillan and Gary R. Mirams and James M. Osborne and Pras Pathmanathan and Joe M. Pitt-Francis and Martin Robinson and Blanca Rodriguez and Raymond J. Spiteri and David J. Gavaghan},  
-  title = {Chaste: Cancer, Heart and Soft Tissue Environment},  
-  journal = {Journal of Open Source Software}  
+@article{ChasteFRC2020,
+  doi = {10.21105/joss.01848},
+  url = {https://doi.org/10.21105/joss.01848},
+  year = {2020},
+  publisher = {The Open Journal},
+  volume = {5},
+  number = {47},
+  pages = {1848},
+  author = {Fergus R. Cooper and Ruth E. Baker and Miguel O. Bernabeu and Rafel Bordas and Louise Bowler and Alfonso Bueno-Orovio and Helen M. Byrne and Valentina Carapella and Louie Cardone-Noott and Jonathan Cooper and Sara Dutta and Benjamin D. Evans and Alexander G. Fletcher and James A. Grogan and Wenxian Guo and Daniel G. Harvey and Maurice Hendrix and David Kay and Jochen Kursawe and Philip K. Maini and Beth McMillan and Gary R. Mirams and James M. Osborne and Pras Pathmanathan and Joe M. Pitt-Francis and Martin Robinson and Blanca Rodriguez and Raymond J. Spiteri and David J. Gavaghan},
+  title = {Chaste: Cancer, Heart and Soft Tissue Environment},
+  journal = {Journal of Open Source Software}
 }
 ```
 
 ```
-@article{ChasteGRM2013,  
-  title = "Chaste: an open source C++ library for computational physiology and biology",  
-  author = "G.R. Mirams and C.J. Arthurs and M.O. Bernabeu and R. Bordas and J. Cooper and A. Corrias and Y. Davit and S-J. Dunn and A.G. Fletcher and D.G. Harvey and M.E. Marsh and J. M. Osborne and P. Pathmanathan and J. Pitt-Francis and J. Southern and N. Zemzemi and D.J. Gavaghan",  
-  year = "2013",  
-  journal = "PLoS Computational Biology",  
-  number = "3",  
-  pages = "e1002970",  
-  url = "http://dx.plos.org/10.1371/journal.pcbi.1002970",  
-  volume = "9",  
-  doi = "10.1371/journal.pcbi.1002970",  
+@article{ChasteGRM2013,
+  title = "Chaste: an open source C++ library for computational physiology and biology",
+  author = "G.R. Mirams and C.J. Arthurs and M.O. Bernabeu and R. Bordas and J. Cooper and A. Corrias and Y. Davit and S-J. Dunn and A.G. Fletcher and D.G. Harvey and M.E. Marsh and J. M. Osborne and P. Pathmanathan and J. Pitt-Francis and J. Southern and N. Zemzemi and D.J. Gavaghan",
+  year = "2013",
+  journal = "PLoS Computational Biology",
+  number = "3",
+  pages = "e1002970",
+  url = "http://dx.plos.org/10.1371/journal.pcbi.1002970",
+  volume = "9",
+  doi = "10.1371/journal.pcbi.1002970",
 }
 ```
 
 ```
-@article{ChasteJPF2009,  
-  title = "Chaste: a test-driven approach to software development for biological modelling",  
-  author = "J. Pitt-Francis, P. Pathmanathan, M.O. Bernabeu, R. Bordas, J. Cooper, A.G. Fletcher, G.R. Mirams, P. Murray, J.M. Osborne, A. Walter, S.J. Chapman, A. Garny, I.M.M. van Leeuwen, P.K. Maini, B. Rodriguez, S.L. Waters, J.P. Whiteley, H.M. Byrne, D.J. Gavaghan",  
-  year = "2009",  
-  journal = "Computer Physics Communications",  
-  number = "12",  
-  pages = "2452--2471",  
-  publisher = "North-Holland",  
-  volume = "180",  
-  doi = "10.1016/j.cpc.2009.07.019",  
+@article{ChasteJPF2009,
+  title = "Chaste: a test-driven approach to software development for biological modelling",
+  author = "J. Pitt-Francis, P. Pathmanathan, M.O. Bernabeu, R. Bordas, J. Cooper, A.G. Fletcher, G.R. Mirams, P. Murray, J.M. Osborne, A. Walter, S.J. Chapman, A. Garny, I.M.M. van Leeuwen, P.K. Maini, B. Rodriguez, S.L. Waters, J.P. Whiteley, H.M. Byrne, D.J. Gavaghan",
+  year = "2009",
+  journal = "Computer Physics Communications",
+  number = "12",
+  pages = "2452--2471",
+  publisher = "North-Holland",
+  volume = "180",
+  doi = "10.1016/j.cpc.2009.07.019",
 }
 ```

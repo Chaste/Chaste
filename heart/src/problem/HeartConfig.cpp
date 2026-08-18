@@ -40,7 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractChasteRegion.hpp"
 #include "ArchiveLocationInfo.hpp"
 #include "ChastePoint.hpp"
+#include "ChasteXsdVersion.hpp"
 #include "Exception.hpp"
+#include "FilesystemPermissions.hpp"
 #include "HeartConfig.hpp"
 #include "HeartFileFinder.hpp"
 #include "OutputFileHandler.hpp"
@@ -63,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace xsd::cxx::tree;
 
 // Coping with changes to XSD interface
-#if (XSD_INT_VERSION >= 3000000L)
+#if CHASTE_XSD_VERSION_AT_LEAST(3, 0, 0)
 #define XSD_SEQUENCE_TYPE(base) base##_sequence
 #define XSD_ITERATOR_TYPE(base) base##_iterator
 #define XSD_NESTED_TYPE(t) t##_type
@@ -84,7 +86,7 @@ using namespace xsd::cxx::tree;
     XSD_ITERATOR_TYPE(XSD_ANON_TYPE(t1, t2)::t3)
 
 // Newer versions don't allow you to set fixed attributes
-#if (XSD_INT_VERSION >= 3020000L)
+#if CHASTE_XSD_VERSION_AT_LEAST(3, 2, 0)
 #define XSD_CREATE_WITH_FIXED_ATTR(type, name, attr) \
     type name
 #define XSD_CREATE_WITH_FIXED_ATTR1(type, name, arg1, attr) \
@@ -279,6 +281,7 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
     {
         EXCEPTION("Could not open XML file in HeartConfig");
     }
+    FilesystemPermissions::SetFilePermissions(output_dirname + "ChasteParameters.xml");
 
     //Schema map
     //Note - this location is relative to where we are storing the xml

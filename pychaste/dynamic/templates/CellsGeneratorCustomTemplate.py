@@ -77,13 +77,13 @@ class {class_name}_Overrides : {class_name}{{
 
         code = f"""
         .def("GenerateBasic",
-            (std::vector<CellPtr>({class_name}::*)(unsigned int, const std::vector<unsigned>, boost::shared_ptr<AbstractCellProperty>)) 
+            (std::vector<CellPtr>({class_name}::*)(unsigned int, const std::vector<unsigned>, boost::shared_ptr<AbstractCellProperty>))
             &{class_name}_Overrides::GenerateBasic, " " , py::arg("numCells"),  py::arg("locationIndices") = std::vector<unsigned int>(), py::arg("pCellProliferativeType") = boost::shared_ptr<AbstractCellProperty>())
         .def("GenerateBasicRandom",
-            (std::vector<CellPtr>({class_name}::*)(unsigned int, boost::shared_ptr<AbstractCellProperty>)) 
+            (std::vector<CellPtr>({class_name}::*)(unsigned int, boost::shared_ptr<AbstractCellProperty>))
             &{class_name}_Overrides::GenerateBasicRandom, " " , py::arg("numCells"), py::arg("pCellProliferativeType") = boost::shared_ptr<AbstractCellProperty>())
         .def("GenerateGivenLocationIndices",
-            (std::vector<CellPtr>({class_name}::*)(const std::vector<unsigned> locationIndices, boost::shared_ptr<AbstractCellProperty>)) 
+            (std::vector<CellPtr>({class_name}::*)(const std::vector<unsigned> locationIndices, boost::shared_ptr<AbstractCellProperty>))
             &{class_name}_Overrides::GenerateGivenLocationIndices, " " , py::arg("locationIndices"), py::arg("pCellProliferativeType") = boost::shared_ptr<AbstractCellProperty>())
 """
         return code

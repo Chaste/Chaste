@@ -1354,12 +1354,12 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     }
 
 #ifdef CHASTE_HOMEMADE_MESH_TO_DUAL
-    // element_node_matrix is an encoding of the .ele file.  Each row is an element with the 
+    // element_node_matrix is an encoding of the .ele file.  Each row is an element with the
     // 3 or 4 adjacent nodes indicated by a 1 in the approciate column
     Mat element_node_matrix;
     PetscTools::SetupMat(element_node_matrix, num_elements, num_nodes, ELEMENT_DIM+1, num_local_elements);
 #endif
-    
+
     unsigned counter = 0;
     for (idx_t element_index = 0; element_index < num_local_elements; element_index++)
     {
@@ -1375,7 +1375,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 #else
             eind[counter++] = element_data.NodeIndices[i];
 #endif
-	    }
+        }
     }
     eptr[num_local_elements] = counter;
 
@@ -1386,7 +1386,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
     idx_t* xadj;
     idx_t* adjncy;
- 
+
     Timer::Reset();
 #ifdef CHASTE_HOMEMADE_MESH_TO_DUAL
     PetscMatTools::Finalise(element_node_matrix);
@@ -1400,7 +1400,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
      * ELEMENT_DIM+1 if they are the same row and ELEMENT_DIM if they are neighbours.
      * These dot-products are achieved (slowly) with
      * element_element_matrix = element_node_matrix * transpose(element_node_matrix)
-     * 
+     *
      * Each entry of element_element_matrix shows how many nodes a pair of elements share.
      */
 
@@ -1415,7 +1415,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     for (PetscInt el_index=first_local_element; el_index<last_plus_one_element; el_index++)
     {
          MatGetRow(element_element_matrix, el_index, &ncols, &cols, &vals);
-	     for (PetscInt i=0;i<ncols;i++)
+         for (PetscInt i=0;i<ncols;i++)
          {
             if (std::lround(vals[i])==ELEMENT_DIM)
             {
@@ -1430,8 +1430,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     MatDestroy(&element_node_matrix);
     MatDestroy(&node_element_matrix);
     MatDestroy(&element_element_matrix);
-    xadj = &my_xadj[0];
-    adjncy = &my_adjncy[0];
+    xadj = my_xadj.data();
+    adjncy = my_adjncy.data();
 
 #else
     // The default behaviour is to use a ParMETIS (or possible Scotch) function to get the dual
