@@ -193,7 +193,7 @@ protected:
      * Check consistency of our internal data structures. Each node must
      * have a cell associated with it.
      */
-    virtual void Validate();
+    virtual void Validate() override;
 
 public:
     /**
@@ -250,7 +250,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /** @return mUseAreaBasedDampingConstant. */
     bool UseAreaBasedDampingConstant();
@@ -263,7 +263,7 @@ public:
      * @param pNewNode pointer to the new node
      * @return global index of new node in cell population
      */
-    unsigned AddNode(Node<SPACE_DIM>* pNewNode);
+    unsigned AddNode(Node<SPACE_DIM>* pNewNode) override;
 
     /**
      * Overridden SetNode() method.
@@ -273,7 +273,7 @@ public:
      * @param nodeIndex the index of the node to be moved
      * @param rNewLocation the new target location of the node
      */
-    void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation);
+    void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation) override;
 
     /**
      * Overridden GetDampingConstant() method that includes the
@@ -282,7 +282,7 @@ public:
      * @param nodeIndex the global index of this node
      * @return the damping constant for the given Cell.
      */
-    double GetDampingConstant(unsigned nodeIndex);
+    double GetDampingConstant(unsigned nodeIndex) override;
 
     /**
      * Set method for mUseAreaBasedDampingConstant.
@@ -298,7 +298,7 @@ public:
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
      * Remove all cells that are labelled as dead.
@@ -312,7 +312,7 @@ public:
      *
      * @return number of cells removed.
      */
-    virtual unsigned RemoveDeadCells();
+    virtual unsigned RemoveDeadCells() override;
 
     /**
      * Overridden AddCell() method.
@@ -325,14 +325,14 @@ public:
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
+    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell) override;
 
     /**
      * Overridden WriteResultsToFiles() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteResultsToFiles(const std::string& rDirectory);
+    virtual void WriteResultsToFiles(const std::string& rDirectory) override;
 
     /**
      * A virtual method to accept a cell population writer so it can
@@ -340,7 +340,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter) override;
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -348,7 +348,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter) override;
 
     /**
      * A virtual method to accept a cell population event writer so it can
@@ -356,7 +356,7 @@ public:
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter);
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter) override;
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -365,7 +365,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell) override;
 
     /**
      * Overridden Update(bool hasHadBirthsOrDeaths) method.
@@ -374,7 +374,7 @@ public:
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
      * not needed in this cell population class
      */
-    virtual void Update(bool hasHadBirthsOrDeaths=true);
+    virtual void Update(bool hasHadBirthsOrDeaths=true) override;
 
     /**
      *  Tessellates when required: if areas or volumes are needed for
@@ -398,21 +398,21 @@ public:
      *
      * @return pointer to the Node with given index.
      */
-    Node<SPACE_DIM>* GetNode(unsigned index);
+    Node<SPACE_DIM>* GetNode(unsigned index) override;
 
     /**
      * Overridden GetNumNodes() method.
      *
      * @return the number of nodes in the cell population.
      */
-    unsigned GetNumNodes();
+    unsigned GetNumNodes() override;
 
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -420,7 +420,7 @@ public:
      * @param pCell boost shared pointer to a cell
      * @return volume via associated mesh element
      */
-    double GetVolumeOfCell(CellPtr pCell);
+    double GetVolumeOfCell(CellPtr pCell) override;
 
     /**
      * Create a Voronoi tessellation of the mesh.
@@ -480,7 +480,7 @@ public:
      * @param rDimension a dimension (0,1 or 2)
      * @return The maximum distance between any nodes in this dimension.
      */
-    double GetWidth(const unsigned& rDimension);
+    double GetWidth(const unsigned& rDimension) override;
 
     /**
      * Overridden WriteDataToVisualizerSetupFile() method.
@@ -489,7 +489,7 @@ public:
      *
      * @param pVizSetupFile a visualization setup file
      */
-    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile) override;
 
     /**
      * Iterator over edges in the mesh, which correspond to springs between cells.
@@ -586,7 +586,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 
     /**
      * Set mWriteVtkAsPoints.
@@ -654,7 +654,7 @@ public:
      * @param index the node index
      * @return the set of neighbouring node indices.
      */
-    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index) override;
 
     /**
      * Populate mSpringRestLengths by looping over all springs and calculating the current length
