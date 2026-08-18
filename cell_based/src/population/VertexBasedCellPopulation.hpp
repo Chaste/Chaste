@@ -438,6 +438,15 @@ public:
     double GetVolumeOfCell(CellPtr pCell);
 
     /**
+     * Helper method to convert a PETSc vector, as used to store CellVecData
+     * items, into a std::vector for VTK output.
+     *
+     * @param petscVec the PETSc vector to be converted
+     * @return a std::vector containing the same entries as petscVec
+     */
+    std::vector<double> ConvertPetscVecToVector(Vec petscVec);
+
+    /**
      * Return all locations of T2 swaps since the last sampling time step.
      *
      * @return mLocationsOfT2Swaps
@@ -679,4 +688,3 @@ inline void load_construct_data(
 } // namespace ...
 
 #endif /*VERTEXBASEDCELLPOPULATION_HPP_*/
-

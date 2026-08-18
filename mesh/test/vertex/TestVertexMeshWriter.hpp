@@ -56,6 +56,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkVersion.h>
+#include <vtkXMLUnstructuredGridReader.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkCellData.h>
+#include <vtkDoubleArray.h>
 #endif
 
 class TestVertexMeshWriter : public CxxTest::TestSuite
@@ -406,6 +410,58 @@ public:
         // We should have one less element and three less nodes
         TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 27u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 8u);
+    }
+
+    /**
+     * Test writing and reading CellVecData
+     */
+    void TestVertexMeshWriterAddCellDataVector()
+    {
+#ifdef CHASTE_VTK
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        MutableVertexMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 9u);
+
+        VertexMeshWriter<2,2> mesh_writer("TestVertexMeshWriterAddCellDataVector", "vertex_mesh_vector_data");
+
+        // One c_vector per cell, with distinct components; num cells (9) > SPACE_DIM (2)
+        std::vector<c_vector<double,2> > cell_vectors;
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            c_vector<double,2> vec;
+            vec[0] = double(i);
+            vec[1] = -double(i) - 0.5;
+            cell_vectors.push_back(vec);
+        }
+        mesh_writer.AddCellData("Test vector data", cell_vectors);
+
+        mesh_writer.WriteVtkUsingMesh(mesh);
+
+        OutputFileHandler handler("TestVertexMeshWriterAddCellDataVector", false);
+        FileFinder vtk_file(handler.GetOutputDirectoryFullPath() + "vertex_mesh_vector_data.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file.Exists());
+
+        vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+        p_reader->SetFileName(vtk_file.GetAbsolutePath().c_str());
+        p_reader->Update();
+
+        vtkSmartPointer<vtkUnstructuredGrid> p_grid = p_reader->GetOutput();
+        vtkDataArray* p_array = p_grid->GetCellData()->GetArray("Test vector data");
+        TS_ASSERT(p_array != nullptr);
+        TS_ASSERT_EQUALS(p_array->GetNumberOfComponents(), 3);
+        TS_ASSERT_EQUALS((unsigned) p_array->GetNumberOfTuples(), mesh.GetNumElements());
+
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            double tuple[3];
+            p_array->GetTuple(i, tuple);
+            TS_ASSERT_DELTA(tuple[0], double(i), 1e-10);
+            TS_ASSERT_DELTA(tuple[1], -double(i) - 0.5, 1e-10);
+            TS_ASSERT_DELTA(tuple[2], 0.0, 1e-10); // Padded, since SPACE_DIM<3
+        }
+#endif //CHASTE_VTK
     }
 
     void TestReadingAndWritingElementAttributes()
