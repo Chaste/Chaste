@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexT3SwapLocationsWriter.hpp"
 #include "VertexIntersectionSwapLocationsWriter.hpp"
 #include "AbstractCellBasedSimulation.hpp"
+#include "ReplicatableVector.hpp"
 
 template<unsigned DIM>
 VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
@@ -455,19 +456,13 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 
 template<unsigned DIM>
 std::vector<double> VertexBasedCellPopulation<DIM>::ConvertPetscVecToVector(Vec petscVec) {
-    PetscInt size;
-    VecGetSize(petscVec, &size);
+    // ReplicatableVector gathers the (possibly distributed) PETSc vector onto every process
+    ReplicatableVector replicated_vec(petscVec);
 
-    std::vector<double> converted_vector(size);
-
-    PetscScalar *array;
-    VecGetArray(petscVec, &array);
-
-    for (PetscInt i = 0; i < size; ++i) {
-        converted_vector[i] = PetscRealPart(array[i]);
+    std::vector<double> converted_vector(replicated_vec.GetSize());
+    for (unsigned i = 0; i < replicated_vec.GetSize(); ++i) {
+        converted_vector[i] = replicated_vec[i];
     }
-
-    VecRestoreArray(petscVec, &array);
 
     return converted_vector;
 }
@@ -566,16 +561,12 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
                 for (auto cell_iter = this->Begin();
                     cell_iter != this->End();
                     ++cell_iter)
-                {   
-                    if(cell_iter->HasCellVecData()){
-
+                {
                     // Get index of this element in the vertex mesh
                     unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
 
                     // Populate the vector of VTK cell data
-                    vtk_cell_vec_data[elem_index] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);    
-
-                    }
+                    vtk_cell_vec_data[elem_index] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
                 }
 
                 // Add data to the VertexMeshWriter to be output to VTK
@@ -650,8 +641,8 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
             }
         }
 
-        // Add vector cell_data to the VertexMeshWriter to be output to VTK 
-        for (unsigned var = 0; var < num_cell_data_items; ++var)
+        // Add vector cell_data to the VertexMeshWriter to be output to VTK
+        for (unsigned var = 0; var < num_cell_vec_data_items; ++var)
         {
             //mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
             mesh_writer.AddCellData(cell_vec_data_names[var], cell_vec_data[var]);

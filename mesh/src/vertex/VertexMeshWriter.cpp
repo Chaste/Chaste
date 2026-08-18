@@ -354,21 +354,25 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload)
 {
 #ifdef CHASTE_VTK
-    vtkDoubleArray* p_scalars = vtkDoubleArray::New();
-    p_scalars->SetName(dataName.c_str());
+    vtkDoubleArray* p_vectors = vtkDoubleArray::New();
+    p_vectors->SetName(dataName.c_str());
+    p_vectors->SetNumberOfComponents(3);
     for (unsigned i=0; i<dataPayload.size(); i++)
     {
-        for (unsigned j=0; j<dataPayload.size(); j++){
-        p_scalars->InsertNextValue(dataPayload[i][j]);
+        for (unsigned j=0; j<SPACE_DIM; j++)
+        {
+            p_vectors->InsertNextValue(dataPayload[i][j]);
         }
-        for (unsigned j= SPACE_DIM; j<3; j++){
-        p_scalars->InsertNextValue(0.0);
+        // When SPACE_DIM<3, then pad
+        for (unsigned j=SPACE_DIM; j<3; j++)
+        {
+            p_vectors->InsertNextValue(0.0);
         }
     }
 
     vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
-    p_cell_data->AddArray(p_scalars);
-    p_scalars->Delete(); // Reference counted
+    p_cell_data->AddArray(p_vectors);
+    p_vectors->Delete(); // Reference counted
 #endif //CHASTE_VTK
 }
 
@@ -376,21 +380,26 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<std::vector<double> > dataPayload)
 {
 #ifdef CHASTE_VTK
-    vtkDoubleArray* p_scalars = vtkDoubleArray::New();
-    p_scalars->SetName(dataName.c_str());
+    vtkDoubleArray* p_vectors = vtkDoubleArray::New();
+    p_vectors->SetName(dataName.c_str());
+    p_vectors->SetNumberOfComponents(3);
     for (unsigned i=0; i<dataPayload.size(); i++)
     {
-        for (unsigned j=0; j<dataPayload.size(); j++){
-        p_scalars->InsertNextValue(dataPayload[i][j]);
+        assert(dataPayload[i].size() == SPACE_DIM);
+        for (unsigned j=0; j<SPACE_DIM; j++)
+        {
+            p_vectors->InsertNextValue(dataPayload[i][j]);
         }
-        for (unsigned j= SPACE_DIM; j<3; j++){
-        p_scalars->InsertNextValue(0.0);
+        // When SPACE_DIM<3, then pad
+        for (unsigned j=SPACE_DIM; j<3; j++)
+        {
+            p_vectors->InsertNextValue(0.0);
         }
     }
 
     vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
-    p_cell_data->AddArray(p_scalars);
-    p_scalars->Delete(); // Reference counted
+    p_cell_data->AddArray(p_vectors);
+    p_vectors->Delete(); // Reference counted
 #endif //CHASTE_VTK
 }
 
