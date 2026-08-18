@@ -438,10 +438,11 @@ public:
     double GetVolumeOfCell(CellPtr pCell);
 
     /**
-     * Converter which takes in Petscs vectors and converts them to a c_vector
+     * Helper method to convert a PETSc vector, as used to store CellVecData
+     * items, into a std::vector for VTK output.
      *
-     * @param petscVec the PetSc vector to be converted
-     * @return c_vector variation of the PetSc vector
+     * @param petscVec the PETSc vector to be converted
+     * @return a std::vector containing the same entries as petscVec
      */
     std::vector<double> ConvertPetscVecToVector(Vec petscVec);
 

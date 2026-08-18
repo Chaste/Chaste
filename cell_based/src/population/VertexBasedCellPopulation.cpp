@@ -455,12 +455,14 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 }
 
 template<unsigned DIM>
-std::vector<double> VertexBasedCellPopulation<DIM>::ConvertPetscVecToVector(Vec petscVec) {
+std::vector<double> VertexBasedCellPopulation<DIM>::ConvertPetscVecToVector(Vec petscVec)
+{
     // ReplicatableVector gathers the (possibly distributed) PETSc vector onto every process
     ReplicatableVector replicated_vec(petscVec);
 
     std::vector<double> converted_vector(replicated_vec.GetSize());
-    for (unsigned i = 0; i < replicated_vec.GetSize(); ++i) {
+    for (unsigned i = 0; i < replicated_vec.GetSize(); ++i)
+    {
         converted_vector[i] = replicated_vec[i];
     }
 
@@ -548,13 +550,9 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
             {
                 /*
                 * Create a vector to store vector data per cell for VTK output from
-                * this writer. Note: the term "CellData" in
-                * "GetCellDataForVtkOutput()" should not be confused with the
-                * CellData class; an example of what might be stored here is each
-                * cell's age. Any CellData item(s) per cell are output to VTK in
-                * the code block further down.
+                * this writer, e.g. a cell's applied force or polarity. This is
+                * independent of whether the cell has any CellVecData set on it.
                 */
-                //std::vector<c_vector<double, DIM>> vtk_cell_vec_data(num_cells);
                 std::vector<c_vector<double, DIM>> vtk_cell_vec_data(num_cells);
 
                 // Iterate over cells and populate this vector
@@ -613,41 +611,38 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
         * CellVecData item(s). Note: when outputting any CellVecData, we assume
         * that the first cell is representative of all cells.
         */
-
-      if(this->Begin()->HasCellVecData()){
-        unsigned num_cell_vec_data_items = this->Begin()->GetCellVecData()->GetNumItems();
-        std::vector<std::string> cell_vec_data_names = this->Begin()->GetCellVecData()->GetKeys();
-        std::vector<std::vector<std::vector<double>>> cell_vec_data;
-        for (unsigned var = 0; var < num_cell_vec_data_items; ++var)
+        if (this->Begin()->HasCellVecData())
         {
-            std::vector<std::vector<double>> cell_vec_data_var(num_cells);
-            cell_vec_data.push_back(cell_vec_data_var);
-        }
-
-        // Iterate over cells and populate cell_data
-        for (auto cell_iter = this->Begin();
-            cell_iter != this->End();
-            ++cell_iter)
-        {
-            // Get index of this element in the vertex mesh
-            unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
-
+            unsigned num_cell_vec_data_items = this->Begin()->GetCellVecData()->GetNumItems();
+            std::vector<std::string> cell_vec_data_names = this->Begin()->GetCellVecData()->GetKeys();
+            std::vector<std::vector<std::vector<double>>> cell_vec_data;
             for (unsigned var = 0; var < num_cell_vec_data_items; ++var)
             {
-                // As our CellVecData is originally stored in a Petsc Vector we need to convert it to a standard vector
+                std::vector<std::vector<double>> cell_vec_data_var(num_cells);
+                cell_vec_data.push_back(cell_vec_data_var);
+            }
 
-                std::vector<double> converted = ConvertPetscVecToVector(cell_iter->GetCellVecData()->GetItem(cell_vec_data_names[var]));
-                cell_vec_data[var][elem_index] = converted;
+            // Iterate over cells and populate cell_vec_data
+            for (auto cell_iter = this->Begin();
+                cell_iter != this->End();
+                ++cell_iter)
+            {
+                // Get index of this element in the vertex mesh
+                unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+                for (unsigned var = 0; var < num_cell_vec_data_items; ++var)
+                {
+                    // CellVecData is stored as a PETSc Vec, so convert it to a std::vector
+                    cell_vec_data[var][elem_index] = ConvertPetscVecToVector(cell_iter->GetCellVecData()->GetItem(cell_vec_data_names[var]));
+                }
+            }
+
+            // Add cell_vec_data to the VertexMeshWriter to be output to VTK
+            for (unsigned var = 0; var < num_cell_vec_data_items; ++var)
+            {
+                mesh_writer.AddCellData(cell_vec_data_names[var], cell_vec_data[var]);
             }
         }
-
-        // Add vector cell_data to the VertexMeshWriter to be output to VTK
-        for (unsigned var = 0; var < num_cell_vec_data_items; ++var)
-        {
-            //mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
-            mesh_writer.AddCellData(cell_vec_data_names[var], cell_vec_data[var]);
-        }
-      }
     }
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
