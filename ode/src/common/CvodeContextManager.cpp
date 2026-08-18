@@ -56,11 +56,18 @@ CvodeContextManager::~CvodeContextManager()
     SUNContext_Free(&mSundialsContext);
 }
 
-CvodeContextManager* CvodeContextManager::Instance()
+std::shared_ptr<CvodeContextManager> CvodeContextManager::Instance()
 {
-    // Single instance per thread
-    static thread_local std::unique_ptr<CvodeContextManager> instance = std::unique_ptr<CvodeContextManager>(new CvodeContextManager());
-    return instance.get();
+    // Single instance per thread. Ownership is shared rather than exclusive because the
+    // context has to outlive everything created against it: thread-local destructors run at
+    // the start of exit(), before the destructors of static objects in shared libraries, and
+    // some of those statics (e.g. CellCycleModelOdeSolver's mpInstance) still hold a
+    // CvodeAdaptor whose destructor calls CVodeFree(). Freeing the context when the thread
+    // goes away would therefore be a use-after-free at exit, which Sundials 7 detects via
+    // SUNContext_PeekLastError. Note that make_shared cannot be used here as the constructor
+    // is private.
+    static thread_local std::shared_ptr<CvodeContextManager> p_instance(new CvodeContextManager());
+    return p_instance;
 }
 
 SUNContext& CvodeContextManager::GetSundialsContext()

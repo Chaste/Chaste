@@ -575,6 +575,9 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
 CvodeAdaptor::CvodeAdaptor(double relTol, double absTol)
         : AbstractIvpOdeSolver(),
           mpCvodeMem(nullptr),
+#if CHASTE_SUNDIALS_VERSION >= 60000
+          mpSundialsContextManager(CvodeContextManager::Instance()),
+#endif
           mRelTol(relTol),
           mAbsTol(absTol),
           mLastInternalStepSize(-0.0),

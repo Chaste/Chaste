@@ -431,7 +431,6 @@ public:
      */
     void TestHdf5ToXdmfConverter()
     {
-#ifndef _MSC_VER
         std::string working_directory = "TestHdf5Converters_TestHdf5ToXdmfConverter";
 
         CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
@@ -459,7 +458,6 @@ public:
             FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
-#endif // _MSC_VER
     }
 };
 

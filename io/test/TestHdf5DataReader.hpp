@@ -592,6 +592,47 @@ public:
                                   "GetVariableOverTimeOverMultipleNodes() cannot be called using incomplete data sets");
     }
 
+    /* Backward compatibility check - read a file that was written by a new(er) version of HDF5. Cut down version of test above. */
+    void TestIncompleteDataHdf5Version2()
+    {
+        /*
+         * //This isn't as helpful as you might think...
+        FileFinder file("io/test/data/hdf5_test_full_format_incomplete_v2", RelativeTo::ChasteSourceRoot);
+        hid_t file_id = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+        hid_t plist_id = H5Fget_access_plist(file_id);
+        H5F_libver_t low_bound;
+        H5F_libver_t high_bound;
+        H5Pget_libver_bounds(plist_id, &low_bound, &high_bound); // libver_low should show "the lower version bound (e.g., compatibility with older libraries)."
+        H5Pclose(plist_id);
+        H5Fclose(file_id);
+        */
+        DistributedVectorFactory factory(NUMBER_NODES);
+
+        Hdf5DataReader reader("io/test/data","hdf5_test_full_format_incomplete_v2.1.1", false);
+
+        std::vector<std::string> variable_names = reader.GetVariableNames();
+        TS_ASSERT_EQUALS(variable_names.size(), 3u);
+        TS_ASSERT_EQUALS(reader.GetUnit("I_Na"), "milliamperes");
+
+
+        std::vector<unsigned> nodes=reader.GetIncompleteNodeMap();
+        TS_ASSERT_EQUALS(nodes.size(), 3U);
+        TS_ASSERT_EQUALS(nodes[2], 60U);
+
+        // Can read one of the nodes that was written
+        std::vector<double> twenty_one = reader.GetVariableOverTime("Node", 21);
+        TS_ASSERT_EQUALS(twenty_one.size(), 10u);
+        TS_ASSERT_EQUALS(twenty_one[7], 21u);
+
+        // Data not included
+        TS_ASSERT_THROWS_THIS(reader.GetVariableOverTime("Node", 22),
+                              "The incomplete dataset 'Data' does not contain info of node 22");
+
+        // another exception
+        TS_ASSERT_THROWS_CONTAINS(reader.GetVariableOverTimeOverMultipleNodes("I_Na", 0, 1),
+                                  "GetVariableOverTimeOverMultipleNodes() cannot be called using incomplete data sets");
+    }
+
     void TestReadingExtraData()
     {
         // In this test we read data from a file in the source
@@ -628,6 +669,33 @@ public:
 
             PetscTools::Destroy(data);
         }
+    }
+
+    /* Backward compatibility check - read a file that was written by a new(er) version of HDF5. Cut down version of test above. */
+    void TestReadingExtraDataHdf5Version2()
+    {
+        Hdf5DataReader reader("io/test/data","hdf5_test_adding_variables_v2.1.1", false, "Extra stuff");
+        std::vector<std::string> variable_names = reader.GetVariableNames();
+        TS_ASSERT_EQUALS(variable_names[0], "Phase");
+        TS_ASSERT_EQUALS(variable_names[1], "Plasma");
+
+        TS_ASSERT_EQUALS(reader.GetUnlimitedDimensionName(), "Distance");
+        TS_ASSERT_EQUALS(reader.GetUnlimitedDimensionUnit(), "LightYears");
+
+        DistributedVectorFactory factory(reader.GetNumberOfRows());
+        Vec data = factory.CreateVec();
+        reader.GetVariableOverNodes(data, "Plasma", 1/*timestep*/);
+        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(data);
+
+        for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                                index!= distributed_vector_1.End();
+                                ++index)
+        {
+            // These magic numbers come from TestHdf5DataWriter - where they are written into the HDF5 file.
+            TS_ASSERT_DELTA(distributed_vector_1[index], 1*1000 + 100 + index.Global, 1e-9);
+        }
+
+        PetscTools::Destroy(data);
     }
 
     void TestListingDatasetsInAnHdf5File()

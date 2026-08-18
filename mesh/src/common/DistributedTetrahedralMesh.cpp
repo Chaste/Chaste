@@ -1430,8 +1430,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     MatDestroy(&element_node_matrix);
     MatDestroy(&node_element_matrix);
     MatDestroy(&element_element_matrix);
-    xadj = &my_xadj[0];
-    adjncy = &my_adjncy[0];
+    xadj = my_xadj.data();
+    adjncy = my_adjncy.data();
 
 #else
     // The default behaviour is to use a ParMETIS (or possible Scotch) function to get the dual
