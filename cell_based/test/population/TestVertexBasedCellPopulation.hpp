@@ -42,6 +42,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#ifdef CHASTE_VTK
+#define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
+#include <vtkXMLUnstructuredGridReader.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkCellData.h>
+#include <vtkDoubleArray.h>
+#endif //CHASTE_VTK
+
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
@@ -65,6 +73,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedVertexBasedDivisionRule.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "CellSrnModel.hpp"
+#include "CellVecData.hpp"
+#include "PetscTools.hpp"
 // Cell writers
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
@@ -1753,6 +1763,80 @@ public:
         FileFinder vtk_file3(output_directory + "/results.pvd", RelativeTo::ChasteTestOutput);
         TS_ASSERT(vtk_file3.Exists());
 #endif //CHASTE_VTK
+    }
+
+    /**
+     * Tests that CellVecData items are output to VTK for a vertex-based cell
+     * population.
+     */
+    void TestOutputVtkCellWithCellVecData()
+    {
+#ifdef CHASTE_VTK
+        // Set up SimulationTime (needed if VTK is used)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
+        // Create a simple vertex-based cell population
+        HoneycombVertexMeshGenerator generator(4, 6); // 24 elements, well over SPACE_DIM (2)
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Give each cell a scalar CellData item and a 2-component CellVecData item
+        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        {
+            cells[elem_index]->GetCellData()->SetItem("Cell data", 1.0);
+
+            // Each cell needs its own CellVecData instance (unlike registry-shared
+            // marker properties, it holds per-cell mutable data)
+            MAKE_PTR(CellVecData, p_vec_data);
+            cells[elem_index]->AddCellProperty(p_vec_data);
+
+            std::vector<double> polarity;
+            polarity.push_back(double(elem_index));
+            polarity.push_back(-double(elem_index) - 0.5);
+            Vec p_polarity_vec = PetscTools::CreateVec(polarity);
+            cells[elem_index]->GetCellVecData()->SetItem("Polarity", p_polarity_vec);
+        }
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        std::string output_directory = "TestVertexBasedCellPopulationWriteOutputVtkWithCellVecData";
+        cell_population.SetWriteCellVtkResults(true);
+        cell_population.SetWriteEdgeVtkResults(false);
+
+        OutputFileHandler output_file_handler(output_directory, false);
+        cell_population.OpenWritersFiles(output_file_handler);
+        cell_population.WriteVtkResultsToFile(output_directory);
+        cell_population.CloseWritersFiles();
+
+        FileFinder vtk_file(output_directory + "/results_0.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
+
+        // Read the VTK file back in and check the CellVecData item was written out correctly
+        vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+        p_reader->SetFileName(vtk_file.GetAbsolutePath().c_str());
+        p_reader->Update();
+
+        vtkSmartPointer<vtkUnstructuredGrid> p_grid = p_reader->GetOutput();
+        vtkDataArray* p_array = p_grid->GetCellData()->GetArray("Polarity");
+        TS_ASSERT(p_array != nullptr);
+        TS_ASSERT_EQUALS(p_array->GetNumberOfComponents(), 3);
+        TS_ASSERT_EQUALS((unsigned) p_array->GetNumberOfTuples(), p_mesh->GetNumElements());
+
+        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            unsigned elem_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+            double tuple[3];
+            p_array->GetTuple(elem_index, tuple);
+            TS_ASSERT_DELTA(tuple[0], double(elem_index), 1e-6);
+            TS_ASSERT_DELTA(tuple[1], -double(elem_index) - 0.5, 1e-6);
+            TS_ASSERT_DELTA(tuple[2], 0.0, 1e-6); // Padded, since SPACE_DIM<3
+        }
     }
 };
 
