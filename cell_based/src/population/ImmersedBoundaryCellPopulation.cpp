@@ -568,15 +568,20 @@ void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(
 {
     double length = boost::numeric::ublas::norm_2(rDisplacement);
 
-    /* There are two reasons ot adjust movement in a imersed boundary model
-     * - either the movement is large enough to cause a rearangement.
-     * or the movement is too large (i.e larger than AbsoluteMovementThreshold),
+    /* There are two reasons to adjust movement in an immersed boundary model:
+     * - either the movement is large enough to cause a rearrangement,
+     * - or the movement is too large (i.e. larger than AbsoluteMovementThreshold).
      *
-     * In the first case we want to restrict movement but not throw an exception just a warning.
-     * in the second case we want to throw an exception which can be used by the adaptivie timestepper,
-     * This is handled in the parent class AbstractCentreBasedCellPopulation, which checks for movement above the AbsoluteMovementThreshold and throws an exception. In this class we check for movement above half the CellRearrangementThreshold and restrict movement if this is the case, but only throw an exception if movement is above the AbsoluteMovementThreshold.
+     * In the first case we want to restrict movement but not throw an exception, just a warning.
+     * In the second case we want to throw an exception which can be used by the adaptive timestepper.
+     * This is handled in the parent class, which checks for movement above the AbsoluteMovementThreshold
+     * and throws an exception. In this class we check for movement above half the CellRearrangementThreshold
+     * and restrict movement if this is the case, but only throw an exception if movement is above the
+     * AbsoluteMovementThreshold.
      */
 
+    // Check for movement above the AbsoluteMovementThreshold first, and throw an exception if exceeded
+    AbstractOffLatticeCellPopulation<DIM, DIM>::CheckForStepSizeException(nodeIndex, rDisplacement, dt);
 
     if (length > 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold())
     {
@@ -584,10 +589,6 @@ void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(
 
         WARN_ONCE_ONLY("Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
     }
-
-    // Check for movement above the AbsoluteMovementThreshold and throw an exception if this is the case
-    // Call method on parent class
-    AbstractOffLatticeCellPopulation<DIM, DIM>::CheckForStepSizeException(nodeIndex, rDisplacement, dt);
 
 }
 
