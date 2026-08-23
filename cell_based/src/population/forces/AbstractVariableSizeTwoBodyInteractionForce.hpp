@@ -49,7 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * and apoptosis. Concrete subclasses define the final force law via
  * CalculateLinkInteraction().
  */
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+#endif
 class AbstractVariableSizeTwoBodyInteractionForce : public AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
 {
 private:
