@@ -188,7 +188,6 @@ public:
     virtual void OutputForceParameters(out_stream& rParamsFile);
 };
 
-#include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(AbstractVariableSizeTwoBodyInteractionForce)
+TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractVariableSizeTwoBodyInteractionForce)
 
 #endif /*ABSTRACTVARIABLESIZETWOBODYINTERACTIONFORCE_HPP_*/

@@ -268,7 +268,3 @@ template class AbstractVariableSizeTwoBodyInteractionForce<2,2>;
 template class AbstractVariableSizeTwoBodyInteractionForce<1,3>;
 template class AbstractVariableSizeTwoBodyInteractionForce<2,3>;
 template class AbstractVariableSizeTwoBodyInteractionForce<3,3>;
-
-// Serialization for Boost >= 1.36
-#include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(AbstractVariableSizeTwoBodyInteractionForce)
