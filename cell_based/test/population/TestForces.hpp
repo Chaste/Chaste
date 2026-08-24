@@ -2472,6 +2472,31 @@ void TestDifferentialAdhesionPathmanathanInteractionForceMethods()
         }
     }
 
+    void TestIncorrectForcesWithMeshBasedCellPopulation()
+    {
+        // Create a Mesh Based Cell Population
+        unsigned cells_across = 3;
+        unsigned cells_up = 3;
+        unsigned thickness_of_ghost_layer = 0;
+
+        HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, location_indices.size(), location_indices);
+
+        // Create cell population
+        MeshBasedCellPopulation<2> mesh_cell_population(*p_mesh, cells, location_indices);
+
+        // Test that SimpleLogarithmicRepulsionForce throws the correct exception
+        SimpleLogarithmicRepulsionForce<2> simple_logarithmic_repulsion_force;
+        TS_ASSERT_THROWS_THIS(simple_logarithmic_repulsion_force.AddForceContribution(mesh_cell_population),
+                "SimpleLogarithmicRepulsionForce is to be used with a NodeBasedCellPopulation only");
+    }
+
     void TestDiffusionForceIn1D()
     {
         // Set up time parameters
