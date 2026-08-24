@@ -124,7 +124,7 @@ void ExponentialG1GenerationalCellCycleModel::SetTransitCellG1Duration(double tr
 void ExponentialG1GenerationalCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     const unsigned level = 3;
-     CHASTE_PARAM(rParamsFile, level, mRate);
+    CHASTE_PARAM(rParamsFile, level, mRate);
 
     // Call method on direct parent class
     AbstractSimpleGenerationalCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

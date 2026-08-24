@@ -861,6 +861,7 @@ void VertexBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& 
     CHASTE_PARAM(rParamsFile, level, mOutputCellRearrangementLocations);
     CHASTE_PARAM(rParamsFile, level, mRestrictVertexMovement);
     CHASTE_PARAM(rParamsFile, level, mWriteCellVtkResults);
+    CHASTE_PARAM(rParamsFile, level, mWriteEdgeVtkResults);
 
     // Add the division rule parameters
     *rParamsFile << "\t\t<VertexBasedDivisionRule>\n";

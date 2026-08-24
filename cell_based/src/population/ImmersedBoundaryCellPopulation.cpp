@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 
 #include "ApoptoticCellProperty.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "ImmersedBoundaryMeshWriter.hpp"
 #include "ImmersedBoundaryBoundaryCellWriter.hpp"
@@ -811,11 +812,14 @@ template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::OutputCellPopulationParameters(
     out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<ReMeshFrequency>" << mReMeshFrequency << "</ReMeshFrequency>\n";
-    *rParamsFile << "\t\t<ThrowStepSizeException>" << mThrowStepSizeException << "</ThrowStepSizeException>\n";
-    *rParamsFile << "\t\t<CellRearrangementThreshold>" << mCellRearrangementThreshold << "</CellRearrangementThreshold>\n";
-    *rParamsFile << "\t\t<PopulationHasActiveSources>" << mPopulationHasActiveSources << "</PopulationHasActiveSources>\n";
-    *rParamsFile << "\t\t<OutputNodeRegionToVtk>" << mOutputNodeRegionToVtk << "</OutputNodeRegionToVtk>\n";
+    const unsigned level = 2;
+    CHASTE_PARAM(rParamsFile, level, mReMeshFrequency);
+    CHASTE_PARAM(rParamsFile, level, mThrowStepSizeException);
+    CHASTE_PARAM(rParamsFile, level, mCellRearrangementThreshold);
+    CHASTE_PARAM(rParamsFile, level, mPopulationHasActiveSources);
+    CHASTE_PARAM(rParamsFile, level, mOutputNodeRegionToVtk);
+    CHASTE_PARAM(rParamsFile, level, mInteractionDistance);
+    CHASTE_PARAM(rParamsFile, level, mIntrinsicSpacing);
 
     // Add the division rule parameters
     *rParamsFile << "\t\t<ImmersedBoundaryDivisionRule>\n";

@@ -3,6 +3,8 @@
 		<CellRearrangementThreshold>0.5</CellRearrangementThreshold>
 		<PopulationHasActiveSources>0</PopulationHasActiveSources>
 		<OutputNodeRegionToVtk>1</OutputNodeRegionToVtk>
+		<InteractionDistance>0.0139783</InteractionDistance>
+		<IntrinsicSpacing>0.01</IntrinsicSpacing>
 		<ImmersedBoundaryDivisionRule>
 			<ShortAxisImmersedBoundaryDivisionRule-2>
 			</ShortAxisImmersedBoundaryDivisionRule-2>
