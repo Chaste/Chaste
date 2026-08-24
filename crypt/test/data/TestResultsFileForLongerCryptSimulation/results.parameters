@@ -71,7 +71,7 @@
 			<MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength>
 			<MeinekeSpringGrowthDuration>0.72</MeinekeSpringGrowthDuration>
 			<UseCutOffLength>0</UseCutOffLength>
-			<CutOffLength>1.79769e+308</CutOffLength>
+			<MechanicsCutOffLength>1.79769e+308</MechanicsCutOffLength>
 		</GeneralisedLinearSpringForce-2-2>
 	</Forces>
 
