@@ -952,7 +952,7 @@ void TestDifferentialAdhesionPathmanathanInteractionForceMethods()
         std::string output_directory = "TestForcesOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        // Test with LinearSpringForce
+// Test with LinearSpringForce
         LinearSpringForce<2> linear_spring_force;
         linear_spring_force.SetCutOffLength(1.5);
         TS_ASSERT_EQUALS(linear_spring_force.GetIdentifier(), "LinearSpringForce-2-2");
@@ -981,6 +981,40 @@ void TestDifferentialAdhesionPathmanathanInteractionForceMethods()
         {
             FileFinder generated_file = output_file_handler.FindFile("differential_adhesion_linear_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestForces/differential_adhesion_linear_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with PathmanathanInteractionForce
+        PathmanathanInteractionForce<2> pathmanathan_interaction_force;
+        pathmanathan_interaction_force.SetCutOffLength(1.5);
+        TS_ASSERT_EQUALS(pathmanathan_interaction_force.GetIdentifier(), "PathmanathanInteractionForce-2-2");
+
+        out_stream pathmanathan_interaction_force_parameter_file = output_file_handler.OpenOutputFile("pathmanathan_results.parameters");
+        pathmanathan_interaction_force.OutputForceParameters(pathmanathan_interaction_force_parameter_file);
+        pathmanathan_interaction_force_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("pathmanathan_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/pathmanathan_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with DifferentialAdhesionPathmanathanInteractionForce
+        DifferentialAdhesionPathmanathanInteractionForce<2> differential_pathmanathan_force;
+        differential_pathmanathan_force.SetCutOffLength(1.5);
+        TS_ASSERT_EQUALS(differential_pathmanathan_force.GetIdentifier(), "DifferentialAdhesionPathmanathanInteractionForce-2-2");
+
+        out_stream differential_pathmanathan_force_parameter_file = output_file_handler.OpenOutputFile("differential_adhesion_pathmanathan_results.parameters");
+        differential_pathmanathan_force.OutputForceParameters(differential_pathmanathan_force_parameter_file);
+        differential_pathmanathan_force_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("differential_adhesion_pathmanathan_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/differential_adhesion_pathmanathan_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file,reference_file);
             TS_ASSERT(comparer.CompareFiles());
