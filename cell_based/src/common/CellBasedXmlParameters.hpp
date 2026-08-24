@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *     CHASTE_PARAM(rParamsFile, level, mMyParam)
  *
- * emits  <MyParam>value</MyParam>  at the requested tab-indentation level.
+ * emits  \<MyParam\>value\</MyParam\>  at the requested tab-indentation level.
  *
  * The indentation level is the number of tab characters to prepend:
  *  - level 2  simulation / population parameters
@@ -69,7 +69,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Strips the leading 'm' from the variable name to form the XML tag, e.g.
  * CHASTE_PARAM(rParamsFile, 3, mMyParam) emits
+ * @verbatim
  *     \t\t\t<MyParam>value</MyParam>
+ * @endverbatim
  *
  * @param stream   the out_stream to write to (e.g. rParamsFile)
  * @param level    number of leading tabs (unsigned integer expression)
@@ -84,7 +86,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Strips the leading 'm' from the variable name to form the XML tag, e.g.
  * CHASTE_PARAM_CVECTOR(rParamsFile, 3, mMyVec) emits
+ * @verbatim
  *     \t\t\t<MyVec>v0,v1,...,vN</MyVec>
+ * @endverbatim
  *
  * @param stream   the out_stream to write to
  * @param level    number of leading tabs (unsigned integer expression)
@@ -107,7 +111,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * e.g. values obtained from a helper object or singleton.
  *
  * CHASTE_PARAM_EXPR(rParamsFile, 3, MyTag, SomeObject::Instance()->GetValue())
+ * @verbatim
  * emits   \t\t\t<MyTag>value</MyTag>
+ * @endverbatim
  *
  * @param stream   the out_stream to write to
  * @param level    number of leading tabs (unsigned integer expression)
