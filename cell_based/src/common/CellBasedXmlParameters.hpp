@@ -77,7 +77,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #define CHASTE_PARAM(stream, level, mVar) \
     *(stream) << std::string((level), '\t') \
-              << "<" << (#mVar + 1) << ">" << (mVar) << "</" << (#mVar + 1) << ">\n"
+              << "<" << (&(#mVar)[1]) << ">" << (mVar) << "</" << (&(#mVar)[1]) << ">\n"
 
 /**
  * Write a c_vector member variable as a comma-separated XML element.
@@ -92,12 +92,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #define CHASTE_PARAM_CVECTOR(stream, level, mVar) \
     do { \
-        *(stream) << std::string((level), '\t') << "<" << (#mVar + 1) << ">"; \
+        *(stream) << std::string((level), '\t') << "<" << (&(#mVar)[1]) << ">"; \
         for (unsigned chaste_cvec_i_ = 0; chaste_cvec_i_ + 1u < (unsigned)(mVar).size(); ++chaste_cvec_i_) \
         { \
             *(stream) << (mVar)[chaste_cvec_i_] << ","; \
         } \
-        *(stream) << (mVar)[(mVar).size() - 1u] << "</" << (#mVar + 1) << ">\n"; \
+        *(stream) << (mVar)[(mVar).size() - 1u] << "</" << (&(#mVar)[1]) << ">\n"; \
     } while (false)
 
 /**
