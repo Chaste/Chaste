@@ -176,6 +176,9 @@ AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
           mHasAnalyticJacobian(false),
           mUseAnalyticJacobian(false),
           mpCvodeMem(nullptr),
+#if CHASTE_SUNDIALS_VERSION >= 60000
+          mpSundialsContextManager(CvodeContextManager::Instance()),
+#endif
           mMaxSteps(0),
           mLastInternalStepSize(0)
 {

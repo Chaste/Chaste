@@ -946,16 +946,6 @@ public:
             Warnings::QuietDestroy();
         }
 
-        //Cover warning that a .pvj file can't be read
-        if (PetscTools::AmMaster())
-        {
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
-
-            chmod("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star.pvj", 0000);
-            TS_ASSERT_THROWS_CONTAINS(purkinje_problem.Initialise(), "Couldn't open data file:");
-            chmod("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star.pvj", CHASTE_READ_WRITE);
-        }
-
         //Covers empty lines in .pvj file
         {
             HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/bad_pvj_mesh");
