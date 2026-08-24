@@ -534,7 +534,7 @@ public:
         // Create a force law and pass it to the simulation
         MAKE_PTR(LinearSpringForce<1>, p_linear_force);
 
-        // Set the SpringGrowthDuration to be the shorter than the default MPhase Duration as Tyson Novak sells divide every 1.25 hours.
+        // Set the SpringGrowthDuration to be shorter than the default M-phase duration, as Tyson-Novak cells divide every 1.25 hours.
         p_linear_force->SetSpringGrowthDuration(0.1);
 
         simulator.AddForce(p_linear_force);
