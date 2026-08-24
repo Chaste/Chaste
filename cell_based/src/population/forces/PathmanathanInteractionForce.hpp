@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * (doi:10.1242/dev.126359).
  *
  * For two cells whose separation is less than the sum of their radii
- * (i.e. overlap > 0, cells are compressed), a logarithmic repulsion force is used:
+ * (i.e. overlap < 0, cells are compressed), a logarithmic repulsion force is used:
  * \f[
  * \mathbf{F} = \mu \hat{\mathbf{r}} s \ln\!\left(1 + \frac{d - s}{s}\right)
  * \f]
