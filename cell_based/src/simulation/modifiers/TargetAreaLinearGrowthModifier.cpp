@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "TargetAreaLinearGrowthModifier.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "AbstractPhaseBasedCellCycleModel.hpp"
@@ -159,8 +160,9 @@ void TargetAreaLinearGrowthModifier<DIM>::SetGrowthRate(double growthRate)
 template<unsigned DIM>
 void TargetAreaLinearGrowthModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<AgeToStartGrowing>" << mAgeToStartGrowing << "</AgeToStartGrowing>\n";
-    *rParamsFile << "\t\t\t<GrowthRate>" << mGrowthRate << "</GrowthRate>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mAgeToStartGrowing);
+    CHASTE_PARAM(rParamsFile, level, mGrowthRate);
 
     // Next, call method on direct parent class
     AbstractTargetAreaModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);

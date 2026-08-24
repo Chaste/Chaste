@@ -34,13 +34,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryKinematicFeedbackForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "ImmersedBoundaryEnumerations.hpp"
 #include "UblasCustomFunctions.hpp"
 
 template <unsigned DIM>
 ImmersedBoundaryKinematicFeedbackForce<DIM>::ImmersedBoundaryKinematicFeedbackForce()
     : AbstractImmersedBoundaryForce<DIM>(),
-      mSpringConst(1e3),
+      mSpringConstant(1e3),
       mPreviousLocations()
 {
 }
@@ -103,7 +104,7 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContri
 
             double elem_spacing = 0.5 * (node_a_elem_spacing + node_b_elem_spacing);
 
-            double eff_spring_const = mSpringConst * elem_spacing / rCellPopulation.GetIntrinsicSpacing();
+            double eff_spring_const = mSpringConstant * elem_spacing / rCellPopulation.GetIntrinsicSpacing();
 
             /*
              * We must scale each applied force by a factor of elem_spacing / local spacing, so that forces
@@ -168,7 +169,8 @@ template<unsigned DIM>
 void ImmersedBoundaryKinematicFeedbackForce<DIM>::OutputImmersedBoundaryForceParameters(
     out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConst << "</SpringConstant>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mSpringConstant);
 
     // Call method on direct parent class
     AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);
@@ -177,14 +179,14 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::OutputImmersedBoundaryForcePar
 template<unsigned DIM>
 double ImmersedBoundaryKinematicFeedbackForce<DIM>::GetSpringConst() const
 {
-    return mSpringConst;
+    return mSpringConstant;
 }
 
 template<unsigned DIM>
 void ImmersedBoundaryKinematicFeedbackForce<DIM>::SetSpringConst(
     double springConst)
 {
-    mSpringConst = springConst;
+    mSpringConstant = springConst;
 }
 
 // Explicit instantiation

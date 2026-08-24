@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 #include "CellLabel.hpp"
 
@@ -120,9 +121,10 @@ void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellBoundaryAdhesionEn
 template<unsigned DIM>
 void DifferentialAdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<LabelledCellLabelledCellAdhesionEnergyParameter>" << mLabelledCellLabelledCellAdhesionEnergyParameter << "</LabelledCellLabelledCellAdhesionEnergyParameter>\n";
-    *rParamsFile << "\t\t\t<LabelledCellCellAdhesionEnergyParameter>" << mLabelledCellCellAdhesionEnergyParameter << "</LabelledCellCellAdhesionEnergyParameter>\n";
-    *rParamsFile << "\t\t\t<LabelledCellBoundaryAdhesionEnergyParameter>" << mLabelledCellBoundaryAdhesionEnergyParameter << "</LabelledCellBoundaryAdhesionEnergyParameter>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mLabelledCellLabelledCellAdhesionEnergyParameter);
+    CHASTE_PARAM(rParamsFile, level, mLabelledCellCellAdhesionEnergyParameter);
+    CHASTE_PARAM(rParamsFile, level, mLabelledCellBoundaryAdhesionEnergyParameter);
 
     // Call method on direct parent class
     AdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);

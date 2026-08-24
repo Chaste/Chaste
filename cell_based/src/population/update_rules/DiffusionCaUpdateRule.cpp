@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DiffusionCaUpdateRule.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 DiffusionCaUpdateRule<DIM>::DiffusionCaUpdateRule()
@@ -76,7 +77,8 @@ void DiffusionCaUpdateRule<DIM>::SetDiffusionParameter(double diffusionParameter
 template<unsigned DIM>
 void DiffusionCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<DiffusionParameter>" << mDiffusionParameter << "</DiffusionParameter>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mDiffusionParameter);
 
     // Call method on direct parent class
     AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);

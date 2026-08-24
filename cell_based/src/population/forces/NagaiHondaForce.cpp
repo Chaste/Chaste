@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NagaiHondaForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 NagaiHondaForce<DIM>::NagaiHondaForce()
@@ -260,11 +261,12 @@ void NagaiHondaForce<DIM>::SetNagaiHondaTargetAreaParameter(double nagaiHondaTar
 template<unsigned DIM>
 void NagaiHondaForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<NagaiHondaDeformationEnergyParameter>" << mNagaiHondaDeformationEnergyParameter << "</NagaiHondaDeformationEnergyParameter>\n";
-    *rParamsFile << "\t\t\t<NagaiHondaMembraneSurfaceEnergyParameter>" << mNagaiHondaMembraneSurfaceEnergyParameter << "</NagaiHondaMembraneSurfaceEnergyParameter>\n";
-    *rParamsFile << "\t\t\t<NagaiHondaCellCellAdhesionEnergyParameter>" << mNagaiHondaCellCellAdhesionEnergyParameter << "</NagaiHondaCellCellAdhesionEnergyParameter>\n";
-    *rParamsFile << "\t\t\t<NagaiHondaCellBoundaryAdhesionEnergyParameter>" << mNagaiHondaCellBoundaryAdhesionEnergyParameter << "</NagaiHondaCellBoundaryAdhesionEnergyParameter>\n";
-    *rParamsFile << "\t\t\t<NagaiHondaTargetAreaParameter>" << mNagaiHondaTargetAreaParameter << "</NagaiHondaTargetAreaParameter>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mNagaiHondaDeformationEnergyParameter);
+    CHASTE_PARAM(rParamsFile, level, mNagaiHondaMembraneSurfaceEnergyParameter);
+    CHASTE_PARAM(rParamsFile, level, mNagaiHondaCellCellAdhesionEnergyParameter);
+    CHASTE_PARAM(rParamsFile, level, mNagaiHondaCellBoundaryAdhesionEnergyParameter);
+    CHASTE_PARAM(rParamsFile, level, mNagaiHondaTargetAreaParameter);
 
     // Call method on direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);

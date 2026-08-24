@@ -34,12 +34,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryLinearInteractionForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "ImmersedBoundaryEnumerations.hpp"
 
 template <unsigned DIM>
 ImmersedBoundaryLinearInteractionForce<DIM>::ImmersedBoundaryLinearInteractionForce()
     : AbstractImmersedBoundaryForce<DIM>(),
-       mSpringConst(1e3),
+       mSpringConstant(1e3),
        mRestLength(0.25),
        mLaminaSpringConstMult(1.0),
        mLaminaRestLengthMult(1.0)
@@ -89,7 +90,7 @@ void ImmersedBoundaryLinearInteractionForce<DIM>::AddImmersedBoundaryForceContri
 
                 double elem_spacing = 0.5 * (node_a_elem_spacing + node_b_elem_spacing);
 
-                double eff_spring_const = mSpringConst * elem_spacing / rCellPopulation.GetIntrinsicSpacing();
+                double eff_spring_const = mSpringConstant * elem_spacing / rCellPopulation.GetIntrinsicSpacing();
                 double eff_rest_length = mRestLength * rCellPopulation.GetInteractionDistance();
 
                 if (a_lamina || b_lamina)
@@ -126,10 +127,11 @@ template<unsigned DIM>
 void ImmersedBoundaryLinearInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(
     out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConst << "</SpringConstant>\n";
-    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
-    *rParamsFile << "\t\t\t<LaminaSpringConstMult>" << mLaminaSpringConstMult << "</LaminaSpringConstMult>\n";
-    *rParamsFile << "\t\t\t<LaminaRestLengthMult>" << mLaminaRestLengthMult << "</LaminaRestLengthMult>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mSpringConstant);
+    CHASTE_PARAM(rParamsFile, level, mRestLength);
+    CHASTE_PARAM(rParamsFile, level, mLaminaSpringConstMult);
+    CHASTE_PARAM(rParamsFile, level, mLaminaRestLengthMult);
 
     // Call method on direct parent class
     AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);
@@ -138,14 +140,14 @@ void ImmersedBoundaryLinearInteractionForce<DIM>::OutputImmersedBoundaryForcePar
 template<unsigned DIM>
 double ImmersedBoundaryLinearInteractionForce<DIM>::GetSpringConst() const
 {
-    return mSpringConst;
+    return mSpringConstant;
 }
 
 template<unsigned DIM>
 void ImmersedBoundaryLinearInteractionForce<DIM>::SetSpringConst(
     double springConst)
 {
-    mSpringConst = springConst;
+    mSpringConstant = springConst;
 }
 
 template<unsigned DIM>

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VolumeConstraintPottsUpdateRule.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 VolumeConstraintPottsUpdateRule<DIM>::VolumeConstraintPottsUpdateRule()
@@ -126,8 +127,9 @@ void VolumeConstraintPottsUpdateRule<DIM>::SetMatureCellTargetVolume(double matu
 template<unsigned DIM>
 void VolumeConstraintPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<DeformationEnergyParameter>" << mDeformationEnergyParameter << "</DeformationEnergyParameter>\n";
-    *rParamsFile << "\t\t\t<MatureCellTargetVolume>" << mMatureCellTargetVolume << "</MatureCellTargetVolume>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mDeformationEnergyParameter);
+    CHASTE_PARAM(rParamsFile, level, mMatureCellTargetVolume);
 
     // Call method on direct parent class
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
