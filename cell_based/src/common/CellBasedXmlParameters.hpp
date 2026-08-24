@@ -110,9 +110,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Use this for parameters that are not stored as a direct member variable,
  * e.g. values obtained from a helper object or singleton.
  *
- * CHASTE_PARAM_EXPR(rParamsFile, 3, MyTag, SomeObject::Instance()->GetValue())
+ * CHASTE_PARAM_EXPR(rParamsFile, 3, MyTag, SomeObject::Instance()->GetValue()) emits
  * @verbatim
- * emits   \t\t\t<MyTag>value</MyTag>
+ *     \t\t\t<MyTag>value</MyTag>
  * @endverbatim
  *
  * @param stream   the out_stream to write to
