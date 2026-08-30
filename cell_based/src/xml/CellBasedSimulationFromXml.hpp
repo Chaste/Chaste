@@ -90,6 +90,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <iostream>
 #include <vector>
 
 #include "Exception.hpp"
@@ -264,7 +265,7 @@ inline void FindOpenTag(const std::string& rXml,
             return;
         }
         outTagEnd = close + 1;
-        outSelfClose = (rXml[close - 1] == '/');
+        outSelfClose = (close > 0 && rXml[close - 1] == '/');
         return;
     }
 }
@@ -437,30 +438,72 @@ inline std::vector<std::string> AllChildren(const std::string& rXml,
                                             const std::string& rTag)
 {
     std::vector<std::string> result;
-    std::size_t pos = 0;
-    while (pos < rXml.size())
+    std::size_t searchFrom = 0;
+    while (searchFrom < rXml.size())
     {
+        // Find the opening tag for this element starting from searchFrom
         std::size_t tagStart, tagEnd;
         bool selfClose;
-        FindOpenTag(rXml, rTag, tagStart, tagEnd, selfClose, pos);
+        FindOpenTag(rXml, rTag, tagStart, tagEnd, selfClose, searchFrom);
         if (tagStart == std::string::npos)
         {
             break;
         }
+
         if (selfClose)
         {
             result.push_back("");
-            pos = tagEnd;
+            searchFrom = tagEnd;
             continue;
         }
-        std::string closeTagStr = "</" + rTag + ">";
-        std::size_t closePos = rXml.find(closeTagStr, tagEnd);
-        if (closePos == std::string::npos)
+
+        // Use nesting-aware search for the matching close tag
+        const std::string openTagStr  = "<"  + rTag;
+        const std::string closeTagStr = "</" + rTag + ">";
+        int depth = 1;
+        std::size_t scanPos = tagEnd;
+        std::size_t contentEnd = std::string::npos;
+        while (depth > 0 && scanPos < rXml.size())
         {
-            break;
+            std::size_t nextOpen  = rXml.find(openTagStr,  scanPos);
+            std::size_t nextClose = rXml.find(closeTagStr, scanPos);
+            if (nextClose == std::string::npos)
+            {
+                break;
+            }
+            if (nextOpen != std::string::npos && nextOpen < nextClose)
+            {
+                std::size_t charAfter = nextOpen + openTagStr.size();
+                char ch = (charAfter < rXml.size()) ? rXml[charAfter] : 0;
+                bool isRealOpen = (ch == ' ' || ch == '\t' || ch == '\n'
+                                   || ch == '\r' || ch == '>' || ch == '/');
+                bool isClose = (nextOpen + 1 < rXml.size()
+                                && rXml[nextOpen + 1] == '/');
+                if (isRealOpen && !isClose)
+                {
+                    ++depth;
+                    scanPos = nextOpen + openTagStr.size();
+                    continue;
+                }
+            }
+            --depth;
+            if (depth == 0)
+            {
+                contentEnd = nextClose;
+                scanPos = nextClose + closeTagStr.size();
+            }
+            else
+            {
+                scanPos = nextClose + closeTagStr.size();
+            }
         }
-        result.push_back(rXml.substr(tagEnd, closePos - tagEnd));
-        pos = closePos + closeTagStr.size();
+
+        if (contentEnd == std::string::npos)
+        {
+            break; // malformed XML
+        }
+        result.push_back(rXml.substr(tagEnd, contentEnd - tagEnd));
+        searchFrom = contentEnd + closeTagStr.size();
     }
     return result;
 }
@@ -728,8 +771,10 @@ public:
                 }
                 else if (!forceType.empty())
                 {
-                    // Unknown force type — warn but continue
-                    // (WARN_IF_PARALLEL is not available here; use std::cerr)
+                    // Unknown force type — emit warning and continue
+                    std::cerr << "CellBasedSimulationFromXml: WARNING: "
+                              << "unrecognised Force type '" << forceType
+                              << "' — skipping.\n";
                 }
             }
         }
