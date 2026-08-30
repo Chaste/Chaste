@@ -62,9 +62,9 @@ private:
     void serialize(Archive& archive, const unsigned int version)
     {
         archive& boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
-        archive& mElementSpringConst;
+        archive& mElementSpringConstant;
         archive& mElementRestLength;
-        archive& mLaminaSpringConst;
+        archive& mLaminaSpringConstant;
         archive& mLaminaRestLength;
     }
 
@@ -72,7 +72,7 @@ private:
      * The spring constant associated with each element. Initialised to 1e6 in
      * constructor.
      */
-    double mElementSpringConst;
+    double mElementSpringConstant;
 
     /**
      * The rest length associated with each element as a fraction of the average
@@ -84,7 +84,7 @@ private:
      * The spring constant associated with each lamina. Initialised to 1e6 in
      * constructor.
      */
-    double mLaminaSpringConst;
+    double mLaminaSpringConstant;
 
     /**
      * The rest length associated with each lamina as a fraction of the average
@@ -134,13 +134,13 @@ public:
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
 
-    /** @return mElementSpringConst */
+    /** @return mElementSpringConstant */
     double GetElementSpringConst() const;
 
     /**
-     * Set mElementSpringConst.
+     * Set mElementSpringConstant.
      *
-     * @param elementSpringConst the new value of mElementSpringConst
+     * @param elementSpringConst the new value of mElementSpringConstant
      */
     void SetElementSpringConst(double elementSpringConst);
 
@@ -154,13 +154,13 @@ public:
      */
     void SetElementRestLength(double elementRestLength);
 
-    /** @return mLaminaSpringConst */
+    /** @return mLaminaSpringConstant */
     double GetLaminaSpringConst() const;
 
     /**
-     * Set mLaminaSpringConst.
+     * Set mLaminaSpringConstant.
      *
-     * @param laminaSpringConst the new value of mLaminaSpringConst
+     * @param laminaSpringConst the new value of mLaminaSpringConstant
      */
     void SetLaminaSpringConst(double laminaSpringConst);
 

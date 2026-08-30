@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MeshBasedCellPopulation.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "VtkMeshWriter.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "Cylindrical2dMesh.hpp"
@@ -1195,11 +1196,15 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<UseAreaBasedDampingConstant>" << mUseAreaBasedDampingConstant << "</UseAreaBasedDampingConstant>\n";
-    *rParamsFile << "\t\t<AreaBasedDampingConstantParameter>" <<  mAreaBasedDampingConstantParameter << "</AreaBasedDampingConstantParameter>\n";
-    *rParamsFile << "\t\t<WriteVtkAsPoints>" << mWriteVtkAsPoints << "</WriteVtkAsPoints>\n";
-    *rParamsFile << "\t\t<BoundVoronoiTessellation>" << mBoundVoronoiTessellation << "</BoundVoronoiTessellation>\n";
-    *rParamsFile << "\t\t<HasVariableRestLength>" << mHasVariableRestLength << "</HasVariableRestLength>\n";
+    const unsigned level = 2;
+    CHASTE_PARAM(rParamsFile, level, mUseAreaBasedDampingConstant);
+    CHASTE_PARAM(rParamsFile, level, mAreaBasedDampingConstantParameter);
+    CHASTE_PARAM(rParamsFile, level, mWriteVtkAsPoints);
+    CHASTE_PARAM(rParamsFile, level, mBoundVoronoiTessellation);
+    CHASTE_PARAM(rParamsFile, level, mScaleBoundByEdgeLength);
+    CHASTE_PARAM_EXPR(rParamsFile, level, BoundedVoronoiTessellationLengthCutoff, mBoundedVoroniTesselationLengthCutoff);
+    CHASTE_PARAM(rParamsFile, level, mOffsetNewBoundaryNodes);
+    CHASTE_PARAM(rParamsFile, level, mHasVariableRestLength);
 
     // Call method on direct parent class
     AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParameters(rParamsFile);

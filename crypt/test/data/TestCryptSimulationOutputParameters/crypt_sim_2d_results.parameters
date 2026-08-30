@@ -2,6 +2,7 @@
 		<UseJiggledBottomCells>0</UseJiggledBottomCells>
 		<Dt>0.00833333</Dt>
 		<EndTime>1.5</EndTime>
+		<NoBirth>0</NoBirth>
 		<UpdateCellPopulation>1</UpdateCellPopulation>
 		<SamplingTimestepMultiple>1</SamplingTimestepMultiple>
 		<UpdatingTimestepMultiple>1</UpdatingTimestepMultiple>

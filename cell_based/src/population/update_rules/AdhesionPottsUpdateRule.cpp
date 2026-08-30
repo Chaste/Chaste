@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AdhesionPottsUpdateRule.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 AdhesionPottsUpdateRule<DIM>::AdhesionPottsUpdateRule()
@@ -190,8 +191,9 @@ void AdhesionPottsUpdateRule<DIM>::SetCellBoundaryAdhesionEnergyParameter(double
 template<unsigned DIM>
 void AdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<CellCellAdhesionEnergyParameter>" << mCellCellAdhesionEnergyParameter << "</CellCellAdhesionEnergyParameter>\n";
-    *rParamsFile << "\t\t\t<CellBoundaryAdhesionEnergyParameter>" << mCellBoundaryAdhesionEnergyParameter << "</CellBoundaryAdhesionEnergyParameter>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mCellCellAdhesionEnergyParameter);
+    CHASTE_PARAM(rParamsFile, level, mCellBoundaryAdhesionEnergyParameter);
 
     // Call method on direct parent class
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);

@@ -949,6 +949,7 @@ public:
         files_to_compare.push_back("cellmutationstates.dat");
         files_to_compare.push_back("cellcyclephases.dat");
         files_to_compare.push_back("celltypes.dat");
+        files_to_compare.push_back("results.parameters");
 
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();

@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 GammaG1CellCycleModel::GammaG1CellCycleModel()
     : AbstractSimplePhaseBasedCellCycleModel(),
@@ -111,8 +112,9 @@ double GammaG1CellCycleModel::GetScale() const
 
 void GammaG1CellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<Shape>" << mShape << "</Shape>\n";
-    *rParamsFile << "\t\t\t<Scale>" << mScale << "</Scale>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mShape);
+    CHASTE_PARAM(rParamsFile, level, mScale);
 
     AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }

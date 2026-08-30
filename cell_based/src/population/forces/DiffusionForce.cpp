@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DiffusionForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
 //Static constant is instantiated here.
@@ -142,8 +143,9 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
 template<unsigned DIM>
 void DiffusionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<AbsoluteTemperature>" << mAbsoluteTemperature << "</AbsoluteTemperature> \n";
-    *rParamsFile << "\t\t\t<Viscosity>" << mViscosity << "</Viscosity> \n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mAbsoluteTemperature);
+    CHASTE_PARAM(rParamsFile, level, mViscosity);
 
     // Call direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);

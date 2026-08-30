@@ -1,5 +1,7 @@
 		<MechanicsCutOffLength>1.2</MechanicsCutOffLength>
 		<UseVariableRadii>0</UseVariableRadii>
+		<LoadBalanceMesh>0</LoadBalanceMesh>
+		<LoadBalanceFrequency>100</LoadBalanceFrequency>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<CentreBasedDivisionRule>
 			<RandomDirectionCentreBasedDivisionRule-2-2>
@@ -7,4 +9,5 @@
 		</CentreBasedDivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
+		<AbsoluteMovementThreshold>2</AbsoluteMovementThreshold>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>

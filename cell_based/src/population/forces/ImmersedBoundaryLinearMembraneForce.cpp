@@ -34,13 +34,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template <unsigned DIM>
 ImmersedBoundaryLinearMembraneForce<DIM>::ImmersedBoundaryLinearMembraneForce()
     : AbstractImmersedBoundaryForce<DIM>(),
-      mElementSpringConst(1e6),
+      mElementSpringConstant(1e6),
       mElementRestLength(0.5),
-      mLaminaSpringConst(1e6),
+      mLaminaSpringConstant(1e6),
       mLaminaRestLength(0.5)
 {
 }
@@ -116,14 +117,14 @@ void ImmersedBoundaryLinearMembraneForce<DIM>::CalculateForcesOnElement(
     {
         node_spacing = rCellPopulation.rGetMesh().GetAverageNodeSpacingOfLamina(elem_idx, false);
 
-        spring_constant = mLaminaSpringConst * intrinsicSpacingSquared / (node_spacing * node_spacing);
+        spring_constant = mLaminaSpringConstant * intrinsicSpacingSquared / (node_spacing * node_spacing);
         rest_length = mLaminaRestLength * node_spacing;
     }
     else // regular element
     {
         node_spacing = rCellPopulation.rGetMesh().GetAverageNodeSpacingOfElement(elem_idx, false);
 
-        spring_constant = mElementSpringConst * intrinsicSpacingSquared / (node_spacing * node_spacing);
+        spring_constant = mElementSpringConstant * intrinsicSpacingSquared / (node_spacing * node_spacing);
         rest_length = mElementRestLength * node_spacing;
     }
 
@@ -159,10 +160,11 @@ template <unsigned DIM>
 void ImmersedBoundaryLinearMembraneForce<DIM>::OutputImmersedBoundaryForceParameters(
     out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<ElementSpringConstant>" << mElementSpringConst << "</ElementSpringConstant>\n";
-    *rParamsFile << "\t\t\t<ElementRestLength>" << mElementRestLength << "</ElementRestLength>\n";
-    *rParamsFile << "\t\t\t<LaminaSpringConstant>" << mLaminaSpringConst << "</LaminaSpringConstant>\n";
-    *rParamsFile << "\t\t\t<LaminaRestLength>" << mLaminaRestLength << "</LaminaRestLength>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mElementSpringConstant);
+    CHASTE_PARAM(rParamsFile, level, mElementRestLength);
+    CHASTE_PARAM(rParamsFile, level, mLaminaSpringConstant);
+    CHASTE_PARAM(rParamsFile, level, mLaminaRestLength);
 
     // Call method on direct parent class
     AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);
@@ -171,14 +173,14 @@ void ImmersedBoundaryLinearMembraneForce<DIM>::OutputImmersedBoundaryForceParame
 template <unsigned DIM>
 double ImmersedBoundaryLinearMembraneForce<DIM>::GetElementSpringConst() const
 {
-    return mElementSpringConst;
+    return mElementSpringConstant;
 }
 
 template <unsigned DIM>
 void ImmersedBoundaryLinearMembraneForce<DIM>::SetElementSpringConst(
     double elementSpringConst)
 {
-    mElementSpringConst = elementSpringConst;
+    mElementSpringConstant = elementSpringConst;
 }
 
 template <unsigned DIM>
@@ -197,14 +199,14 @@ void ImmersedBoundaryLinearMembraneForce<DIM>::SetElementRestLength(
 template <unsigned DIM>
 double ImmersedBoundaryLinearMembraneForce<DIM>::GetLaminaSpringConst() const
 {
-    return mLaminaSpringConst;
+    return mLaminaSpringConstant;
 }
 
 template <unsigned DIM>
 void ImmersedBoundaryLinearMembraneForce<DIM>::SetLaminaSpringConst(
     double laminaSpringConst)
 {
-    mLaminaSpringConst = laminaSpringConst;
+    mLaminaSpringConstant = laminaSpringConst;
 }
 
 template <unsigned DIM>

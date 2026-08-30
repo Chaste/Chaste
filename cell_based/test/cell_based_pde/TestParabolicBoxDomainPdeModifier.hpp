@@ -48,7 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CaBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
 #include "CheckpointArchiveTypes.hpp"
+#include "ConstBoundaryCondition.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "FileComparison.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -836,6 +838,35 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
 
         // Exactly the same as all On Lattice models as same cell cetres
         TS_ASSERT_DELTA(p_cell_55->GetCellData()->GetItem("variable"), 0.0848, 1e-4);
+    }
+
+    void TestParabolicBoxDomainPdeModifierOutputParameters()
+    {
+        EXIT_IF_PARALLEL;
+        std::string output_directory = "TestParabolicBoxDomainPdeModifierOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (0.0, -0.1, 1.0, 0.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        ChastePoint<2> lower(-1.0, -1.0);
+        ChastePoint<2> upper(1.0, 1.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_modifier, (p_pde, p_bc, false, p_cuboid, 2.0));
+        p_modifier->SetDependentVariableName("u");
+
+        out_stream modifier_parameter_file = output_file_handler.OpenOutputFile("ParabolicBoxDomainPdeModifier.parameters");
+        p_modifier->OutputSimulationModifierParameters(modifier_parameter_file);
+        modifier_parameter_file->close();
+
+        FileFinder generated = output_file_handler.FindFile("ParabolicBoxDomainPdeModifier.parameters");
+        FileFinder reference("cell_based/test/data/TestParabolicBoxDomainPdeModifierOutputParameters/ParabolicBoxDomainPdeModifier.parameters",
+                             RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated, reference);
+        TS_ASSERT(comparer.CompareFiles());
     }
 };
 

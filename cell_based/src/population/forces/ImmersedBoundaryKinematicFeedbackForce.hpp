@@ -69,14 +69,14 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
-        archive & mSpringConst;
+        archive & mSpringConstant;
     }
 
     /**
      * The basic spring constant associated with interactions.
      * Initialised to 1e3 in constructor.
      */
-    double mSpringConst;
+    double mSpringConstant;
 
     /**
      * Vector to contain the location of each node at the previous time step.
@@ -143,13 +143,13 @@ public:
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
 
-    /** @return mSpringConst */
+    /** @return mSpringConstant */
     double GetSpringConst() const;
 
     /**
-     * Set mSpringConst.
+     * Set mSpringConstant.
      *
-     * @param springConst the new value of mSpringConst
+     * @param springConst the new value of mSpringConstant
      */
     void SetSpringConst(double springConst);
 };

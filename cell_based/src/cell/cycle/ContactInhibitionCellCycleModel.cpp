@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ContactInhibitionCellCycleModel.hpp"
 #include "CellLabel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel()
     : AbstractSimplePhaseBasedCellCycleModel(),
@@ -175,8 +176,9 @@ double ContactInhibitionCellCycleModel::GetCurrentQuiescentOnsetTime() const
 
 void ContactInhibitionCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<QuiescentVolumeFraction>" << mQuiescentVolumeFraction << "</QuiescentVolumeFraction>\n";
-    *rParamsFile << "\t\t\t<EquilibriumVolume>" << mEquilibriumVolume << "</EquilibriumVolume>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mQuiescentVolumeFraction);
+    CHASTE_PARAM(rParamsFile, level, mEquilibriumVolume);
 
     // Call method on direct parent class
     AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

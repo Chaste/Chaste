@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SimpleTargetAreaModifier.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "AbstractPhaseBasedCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
 
@@ -137,7 +138,8 @@ void SimpleTargetAreaModifier<DIM>::SetGrowthDuration(double growthDuration)
 template<unsigned DIM>
 void SimpleTargetAreaModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<GrowthDuration>" << mGrowthDuration << "</GrowthDuration>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mGrowthDuration);
 
     // Next, call method on direct parent class
     AbstractTargetAreaModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);

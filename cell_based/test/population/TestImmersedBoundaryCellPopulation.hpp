@@ -566,7 +566,8 @@ public:
         cell_population.OutputCellPopulationParameters(parameter_file);
         parameter_file->close();
 
-        FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.parameters").CompareFiles();
+        FileComparison(results_dir + "results.parameters",
+                       "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.parameters").CompareFiles();
 
 #ifdef CHASTE_VTK
         // Test that VTK writer has produced some files

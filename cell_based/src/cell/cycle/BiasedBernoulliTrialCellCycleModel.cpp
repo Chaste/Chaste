@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BiasedBernoulliTrialCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 BiasedBernoulliTrialCellCycleModel::BiasedBernoulliTrialCellCycleModel()
     : AbstractCellCycleModel(),
@@ -119,8 +120,9 @@ double BiasedBernoulliTrialCellCycleModel::GetAverageStemCellCycleTime()
 
 void BiasedBernoulliTrialCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<MaxDivisionProbability>" << mMaxDivisionProbability << "</MaxDivisionProbability>\n";
-    *rParamsFile << "\t\t\t<MinimumDivisionAge>" << mMinimumDivisionAge << "</MinimumDivisionAge>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mMaxDivisionProbability);
+    CHASTE_PARAM(rParamsFile, level, mMinimumDivisionAge);
 
     // Call method on direct parent class
     AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

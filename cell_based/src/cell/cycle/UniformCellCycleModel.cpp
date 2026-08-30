@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UniformCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 UniformCellCycleModel::UniformCellCycleModel()
     : AbstractSimpleCellCycleModel(),
@@ -113,8 +114,9 @@ double UniformCellCycleModel::GetAverageStemCellCycleTime()
 
 void UniformCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<MinCellCycleDuration>" << mMinCellCycleDuration << "</MinCellCycleDuration>\n";
-    *rParamsFile << "\t\t\t<MaxCellCycleDuration>" << mMaxCellCycleDuration << "</MaxCellCycleDuration>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mMinCellCycleDuration);
+    CHASTE_PARAM(rParamsFile, level, mMaxCellCycleDuration);
 
     // Call method on direct parent class
     AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
