@@ -800,6 +800,63 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputInitialCellGeometryAndState(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t<InitialCellGeometryAndState>\n";
+
+    unsigned cell_index = 0;
+    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter, ++cell_index)
+    {
+        *rParamsFile << "\t\t<Cell index=\"" << cell_index << "\">\n";
+
+        // Output cell centre location
+        c_vector<double, SPACE_DIM> location = GetLocationOfCellCentre(*cell_iter);
+        *rParamsFile << "\t\t\t<Location>";
+        for (unsigned d = 0; d < SPACE_DIM; d++)
+        {
+            *rParamsFile << location[d];
+            if (d + 1 < SPACE_DIM)
+            {
+                *rParamsFile << " ";
+            }
+        }
+        *rParamsFile << "</Location>\n";
+
+        // Output mutation state
+        *rParamsFile << "\t\t\t<MutationState>" << (*cell_iter)->GetMutationState()->GetIdentifier() << "</MutationState>\n";
+
+        // Output cell data
+        boost::shared_ptr<CellData> p_cell_data = (*cell_iter)->GetCellData();
+        if (p_cell_data && p_cell_data->GetNumItems() > 0)
+        {
+            *rParamsFile << "\t\t\t<CellData>\n";
+            std::vector<std::string> keys = p_cell_data->GetKeys();
+            for (unsigned i = 0; i < keys.size(); i++)
+            {
+                *rParamsFile << "\t\t\t\t<Variable name=\"" << keys[i] << "\">" << p_cell_data->GetItem(keys[i]) << "</Variable>\n";
+            }
+            *rParamsFile << "\t\t\t</CellData>\n";
+        }
+
+        // Output cell-cycle model info
+        *rParamsFile << "\t\t\t<CellCycleModel>\n";
+        (*cell_iter)->GetCellCycleModel()->OutputCellCycleModelInfo(rParamsFile);
+        *rParamsFile << "\t\t\t</CellCycleModel>\n";
+
+        // Output SRN model info
+        *rParamsFile << "\t\t\t<SrnModel>\n";
+        (*cell_iter)->GetSrnModel()->OutputSrnModelInfo(rParamsFile);
+        *rParamsFile << "\t\t\t</SrnModel>\n";
+
+        *rParamsFile << "\t\t</Cell>\n";
+    }
+
+    *rParamsFile << "\t</InitialCellGeometryAndState>\n";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<OutputResultsForChasteVisualizer>" << mOutputResultsForChasteVisualizer << "</OutputResultsForChasteVisualizer>\n";

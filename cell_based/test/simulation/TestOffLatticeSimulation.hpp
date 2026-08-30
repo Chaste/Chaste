@@ -1087,6 +1087,26 @@ public:
         info_file.open(command.c_str());
         TS_ASSERT(info_file.is_open());
         info_file.close();
+
+        // Check that the initial cell geometry file was created and contains expected content
+        std::string initial_geom_path = results_dir + "initial_cell_geometry.dat";
+        std::ifstream initial_geom_file(initial_geom_path.c_str());
+        TS_ASSERT(initial_geom_file.is_open());
+        if (initial_geom_file.is_open())
+        {
+            std::string file_contents((std::istreambuf_iterator<char>(initial_geom_file)),
+                                       std::istreambuf_iterator<char>());
+            initial_geom_file.close();
+            // Check for expected XML structure
+            TS_ASSERT(file_contents.find("<Chaste>") != std::string::npos);
+            TS_ASSERT(file_contents.find("<InitialCellGeometryAndState>") != std::string::npos);
+            TS_ASSERT(file_contents.find("</InitialCellGeometryAndState>") != std::string::npos);
+            TS_ASSERT(file_contents.find("<Cell index=") != std::string::npos);
+            TS_ASSERT(file_contents.find("<Location>") != std::string::npos);
+            TS_ASSERT(file_contents.find("<MutationState>") != std::string::npos);
+            TS_ASSERT(file_contents.find("<CellCycleModel>") != std::string::npos);
+            TS_ASSERT(file_contents.find("<SrnModel>") != std::string::npos);
+        }
     }
 
     /**

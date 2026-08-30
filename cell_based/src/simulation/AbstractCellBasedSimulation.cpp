@@ -705,7 +705,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 
         // Output cell population details (includes cell-cycle model details)
         mrCellPopulation.OutputCellPopulationInfo(parameter_file);
-
         // Loop over cell killers
         *parameter_file << "\n\t<CellKillers>\n";
         for (typename std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > >::iterator iter = mCellKillers.begin();
@@ -733,6 +732,13 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 
         *parameter_file << "\n</Chaste>\n";
         parameter_file->close();
+
+        // Output initial cell geometry and per-cell biological state
+        out_stream initial_state_file = output_file_handler.OpenOutputFile("initial_cell_geometry.dat");
+        *initial_state_file << "<Chaste>\n";
+        mrCellPopulation.OutputInitialCellGeometryAndState(initial_state_file);
+        *initial_state_file << "</Chaste>\n";
+        initial_state_file->close();
     }
 }
 
