@@ -106,6 +106,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
+#include "PlaneBasedCellKiller.hpp"
+#include "PlaneBoundaryCondition.hpp"
 
 /**
  * Minimal, dependency-free XML helper.
@@ -508,6 +510,34 @@ inline std::vector<std::string> AllChildren(const std::string& rXml,
     return result;
 }
 
+/**
+ * Parse a 2-D c_vector from a "x,y" text string (as written by
+ * CHASTE_PARAM_CVECTOR and used in PlaneBasedCellKiller XML output).
+ *
+ * @param rText  string of the form "1.5,0" or "1.5, 0"
+ * @param defaultVec  value returned if rText is empty or unparsable
+ * @return parsed vector
+ */
+inline c_vector<double, 2> ParseCVector2(const std::string& rText,
+                                          const c_vector<double, 2>& rDefault)
+{
+    c_vector<double, 2> result = rDefault;
+    std::size_t comma = rText.find(',');
+    if (comma != std::string::npos)
+    {
+        try
+        {
+            result[0] = std::stod(rText.substr(0, comma));
+            result[1] = std::stod(rText.substr(comma + 1));
+        }
+        catch (const std::exception&)
+        {
+            result = rDefault;
+        }
+    }
+    return result;
+}
+
 } // namespace CellBasedXmlDetail
 
 // ============================================================================
@@ -774,6 +804,130 @@ public:
                     // Unknown force type — emit warning and continue
                     std::cerr << "CellBasedSimulationFromXml: WARNING: "
                               << "unrecognised Force type '" << forceType
+                              << "' — skipping.\n";
+                }
+            }
+        }
+
+        // ── 8. Cell killers ───────────────────────────────────────────────
+        bool foundKillers;
+        std::string killersInner = GetInner(rootInner, "CellKillers", foundKillers);
+        if (foundKillers)
+        {
+            std::size_t pos = 0;
+            while (pos < killersInner.size())
+            {
+                std::size_t tagStart, tagEnd;
+                bool selfClose;
+                FindOpenTag(killersInner, "CellKiller",
+                            tagStart, tagEnd, selfClose, pos);
+                if (tagStart == std::string::npos)
+                {
+                    break;
+                }
+                std::string killerOpenTag = killersInner.substr(tagStart,
+                                                                tagEnd - tagStart);
+                std::string killerType = GetAttr(killerOpenTag, "type", "");
+                std::string killerInner;
+                if (!selfClose)
+                {
+                    const std::string closeTag = "</CellKiller>";
+                    std::size_t closePos = killersInner.find(closeTag, tagEnd);
+                    if (closePos != std::string::npos)
+                    {
+                        killerInner = killersInner.substr(tagEnd,
+                                                          closePos - tagEnd);
+                        pos = closePos + closeTag.size();
+                    }
+                    else
+                    {
+                        pos = tagEnd;
+                    }
+                }
+                else
+                {
+                    pos = tagEnd;
+                }
+
+                if (killerType == "PlaneBasedCellKiller")
+                {
+                    c_vector<double, 2> zero2 = zero_vector<double>(2);
+                    c_vector<double, 2> point =
+                        ParseCVector2(ChildText(killerInner, "PointOnPlane", ""),
+                                      zero2);
+                    c_vector<double, 2> normal =
+                        ParseCVector2(ChildText(killerInner, "NormalToPlane", ""),
+                                      zero2);
+                    MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer,
+                                  (p_population.get(), point, normal));
+                    p_simulator->AddCellKiller(p_killer);
+                }
+                else if (!killerType.empty())
+                {
+                    std::cerr << "CellBasedSimulationFromXml: WARNING: "
+                              << "unrecognised CellKiller type '" << killerType
+                              << "' — skipping.\n";
+                }
+            }
+        }
+
+        // ── 9. Boundary conditions ────────────────────────────────────────
+        bool foundBCs;
+        std::string bcsInner = GetInner(rootInner, "BoundaryConditions", foundBCs);
+        if (foundBCs)
+        {
+            std::size_t pos = 0;
+            while (pos < bcsInner.size())
+            {
+                std::size_t tagStart, tagEnd;
+                bool selfClose;
+                FindOpenTag(bcsInner, "BoundaryCondition",
+                            tagStart, tagEnd, selfClose, pos);
+                if (tagStart == std::string::npos)
+                {
+                    break;
+                }
+                std::string bcOpenTag = bcsInner.substr(tagStart,
+                                                        tagEnd - tagStart);
+                std::string bcType = GetAttr(bcOpenTag, "type", "");
+                std::string bcInner;
+                if (!selfClose)
+                {
+                    const std::string closeTag = "</BoundaryCondition>";
+                    std::size_t closePos = bcsInner.find(closeTag, tagEnd);
+                    if (closePos != std::string::npos)
+                    {
+                        bcInner = bcsInner.substr(tagEnd,
+                                                  closePos - tagEnd);
+                        pos = closePos + closeTag.size();
+                    }
+                    else
+                    {
+                        pos = tagEnd;
+                    }
+                }
+                else
+                {
+                    pos = tagEnd;
+                }
+
+                if (bcType == "PlaneBoundaryCondition")
+                {
+                    c_vector<double, 2> zero2 = zero_vector<double>(2);
+                    c_vector<double, 2> point =
+                        ParseCVector2(ChildText(bcInner, "PointOnPlane", ""),
+                                      zero2);
+                    c_vector<double, 2> normal =
+                        ParseCVector2(ChildText(bcInner, "NormalToPlane", ""),
+                                      zero2);
+                    MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc,
+                                  (p_population.get(), point, normal));
+                    p_simulator->AddCellPopulationBoundaryCondition(p_bc);
+                }
+                else if (!bcType.empty())
+                {
+                    std::cerr << "CellBasedSimulationFromXml: WARNING: "
+                              << "unrecognised BoundaryCondition type '" << bcType
                               << "' — skipping.\n";
                 }
             }

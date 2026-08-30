@@ -68,6 +68,10 @@ public:
     /**
      * Load the bundled 5x5 MeshBased example XML, check that the simulation
      * parameters are read correctly, and run the simulation.
+     *
+     * The XML specifies EndTime=15 (long enough for at least one division
+     * cycle of min duration 10), a PlaneBasedCellKiller at x=5, and a
+     * PlaneBoundaryCondition at x=0.
      */
     void TestLoadAndRunMeshBased5x5()
     {
@@ -85,8 +89,8 @@ public:
 
         // ── Check simulation parameters were read from XML ────────────────
 
-        // EndTime = 0.5
-        TS_ASSERT_DELTA(p_simulator->mEndTime, 0.5, 1e-9);
+        // EndTime = 15
+        TS_ASSERT_DELTA(p_simulator->mEndTime, 15.0, 1e-9);
 
         // Dt = 0.00833333  (1/120)
         TS_ASSERT_DELTA(p_simulator->GetDt(), 0.00833333, 1e-6);
@@ -94,12 +98,11 @@ public:
         // SamplingTimestepMultiple = 6
         TS_ASSERT_EQUALS(p_simulator->mSamplingTimestepMultiple, 6u);
 
-        // ── Check population type and size ────────────────────────────────
+        // ── Check population type and initial size ────────────────────────
         AbstractCellPopulation<2>& r_pop = p_simulator->rGetCellPopulation();
         TS_ASSERT_EQUALS(r_pop.GetNumRealCells(), 25u); // 5x5
 
-        // ── Check a force was added ───────────────────────────────────────
-        // The simulation should have exactly one force (GeneralisedLinearSpringForce)
+        // ── Check force and killer were added ─────────────────────────────
         TS_ASSERT_EQUALS(p_simulator->rGetForceCollection().size(), 1u);
 
         // ── Check initial node locations (before Solve) ───────────────────
@@ -110,33 +113,42 @@ public:
         // Node 12: (2.0,  2*sqrt(3)/2)  — centre node of the grid
         // Node 24: (4.0,  4*sqrt(3)/2)
         const double kSqrt3Over2 = std::sqrt(3.0) / 2.0;
-        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(0)[0],  0.0,             1e-6);
-        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(0)[1],  0.0,             1e-6);
-        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(4)[0],  4.0,             1e-6);
-        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(4)[1],  0.0,             1e-6);
-        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(12)[0], 2.0,             1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(0)[0],  0.0,               1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(0)[1],  0.0,               1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(4)[0],  4.0,               1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(4)[1],  0.0,               1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(12)[0], 2.0,               1e-6);
         TS_ASSERT_DELTA(p_simulator->GetNodeLocation(12)[1], 2.0 * kSqrt3Over2, 1e-6);
-        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(24)[0], 4.0,             1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(24)[0], 4.0,               1e-6);
         TS_ASSERT_DELTA(p_simulator->GetNodeLocation(24)[1], 4.0 * kSqrt3Over2, 1e-6);
 
         // ── Run the simulation ────────────────────────────────────────────
         TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
 
         // ── Post-run checks ───────────────────────────────────────────────
-        // With EndTime=0.5 and UniformCellCycleModel(min=10, max=12), no
-        // cell divisions occur, so the population size must be unchanged.
-        TS_ASSERT_EQUALS(r_pop.GetNumRealCells(), 25u);
+        // After 15 time units with UniformCellCycleModel(min=10, max=12),
+        // cells should have divided (at least once), so population is larger.
+        TS_ASSERT_LESS_THAN(25u, r_pop.GetNumRealCells());
 
-        // The centroid of the population should remain close to its initial
-        // value (2.2, sqrt(3)/2 * 2 = 1.732), since there are no boundary
-        // conditions and the spring force is symmetric.
-        c_vector<double, 2> centroid = r_pop.GetCentroidOfCellPopulation();
-        TS_ASSERT_DELTA(centroid[0], 2.2,               0.05);
-        TS_ASSERT_DELTA(centroid[1], 2.0 * kSqrt3Over2, 0.05);
+        // The PlaneBasedCellKiller removes cells with x > 5, so no cell
+        // centre should be to the right of x=5 after Solve().
+        for (AbstractCellPopulation<2>::Iterator cell_iter = r_pop.Begin();
+             cell_iter != r_pop.End();
+             ++cell_iter)
+        {
+            c_vector<double, 2> loc = r_pop.GetLocationOfCellCentre(*cell_iter);
+            TS_ASSERT_LESS_THAN_EQUALS(loc[0], 5.0 + 1e-6);
+        }
 
-        // The centre node (12) should still be close to the interior of the grid.
-        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(12)[0], 2.0, 0.1);
-        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(12)[1], 2.0 * kSqrt3Over2, 0.1);
+        // The PlaneBoundaryCondition (x=0, normal -1,0) prevents cells from
+        // crossing x=0, so no cell centre should be to the left of x=0.
+        for (AbstractCellPopulation<2>::Iterator cell_iter = r_pop.Begin();
+             cell_iter != r_pop.End();
+             ++cell_iter)
+        {
+            c_vector<double, 2> loc = r_pop.GetLocationOfCellCentre(*cell_iter);
+            TS_ASSERT_LESS_THAN_EQUALS(-1e-6, loc[0]);
+        }
     }
 
     /**

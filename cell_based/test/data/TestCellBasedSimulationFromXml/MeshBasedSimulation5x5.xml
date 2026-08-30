@@ -74,9 +74,16 @@
   </Forces>
 
   <!--
-    CELL KILLERS: zero or more cell killers (empty = none).
+    CELL KILLERS: kill cells whose centre crosses the plane x=5.
+    PointOnPlane and NormalToPlane are comma-separated x,y values.
+    The outward normal (1,0) means cells with x > 5 are killed.
   -->
-  <CellKillers/>
+  <CellKillers>
+    <CellKiller type="PlaneBasedCellKiller">
+      <PointOnPlane>5,0</PointOnPlane>
+      <NormalToPlane>1,0</NormalToPlane>
+    </CellKiller>
+  </CellKillers>
 
   <!--
     SIMULATION MODIFIERS (empty = none).
@@ -84,9 +91,16 @@
   <SimulationModifiers/>
 
   <!--
-    BOUNDARY CONDITIONS (empty = none).
+    BOUNDARY CONDITIONS: reflect cells back if they cross the plane x=0.
+    PointOnPlane and NormalToPlane are comma-separated x,y values.
+    The inward normal (-1,0) means cells with x < 0 are pushed back.
   -->
-  <BoundaryConditions/>
+  <BoundaryConditions>
+    <BoundaryCondition type="PlaneBoundaryCondition">
+      <PointOnPlane>0,0</PointOnPlane>
+      <NormalToPlane>-1,0</NormalToPlane>
+    </BoundaryCondition>
+  </BoundaryConditions>
 
   <!--
     NUMERICAL METHOD (off-lattice only).
@@ -104,7 +118,7 @@
   -->
   <Simulation>
     <Dt>0.00833333</Dt>
-    <EndTime>0.5</EndTime>
+    <EndTime>15</EndTime>
     <UpdateCellPopulation>1</UpdateCellPopulation>
     <SamplingTimestepMultiple>6</SamplingTimestepMultiple>
     <UpdatingTimestepMultiple>1</UpdatingTimestepMultiple>
