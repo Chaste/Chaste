@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Example cell-based simulation specification for a 5x5 MeshBasedCellPopulation
+  driven by a GeneralisedLinearSpringForce with a UniformCellCycleModel.
+
+  Parameters are at default values unless otherwise noted.
+  The elementDim / spaceDim attributes are used to dispatch to the correct
+  C++ template instantiation in CellBasedSimulationFromXml.
+-->
+<CellBasedSimulation version="1" elementDim="2" spaceDim="2">
+
+  <!--
+    GEOMETRY: which mesh generator to use and how large the grid should be.
+    Currently supported generators:
+      HoneycombMeshGenerator         -> MeshBasedCellPopulation / NodeBasedCellPopulation
+      HoneycombVertexMeshGenerator   -> VertexBasedCellPopulation
+      PottsMeshGenerator             -> PottsBasedCellPopulation / CaBasedCellPopulation
+  -->
+  <Geometry>
+    <HoneycombMeshGenerator numCellsAcross="5" numCellsUp="5" numGhostLayers="0"/>
+  </Geometry>
+
+  <!--
+    INITIAL CELLS: cell-cycle model, SRN model, proliferative type and mutation
+    state assigned to every cell at t=0.  Birth times are drawn uniformly from
+    [-MaxCellCycleDuration, 0] to randomise the initial cell phases.
+  -->
+  <InitialCells>
+    <DefaultCellCycleModel type="UniformCellCycleModel">
+      <MinCellCycleDuration>10</MinCellCycleDuration>
+      <MaxCellCycleDuration>12</MaxCellCycleDuration>
+    </DefaultCellCycleModel>
+    <DefaultSrnModel type="NullSrnModel"/>
+    <DefaultProliferativeType>TransitCellProliferativeType</DefaultProliferativeType>
+    <DefaultMutationState>WildTypeCellMutationState</DefaultMutationState>
+  </InitialCells>
+
+  <!--
+    POPULATION: concrete type plus all parameters emitted by
+    OutputCellPopulationParameters().  Parameter element names exactly match
+    the XML tags written by those methods (member name minus leading 'm').
+  -->
+  <Population type="MeshBasedCellPopulation">
+    <!-- MeshBasedCellPopulation own params -->
+    <UseAreaBasedDampingConstant>0</UseAreaBasedDampingConstant>
+    <AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
+    <WriteVtkAsPoints>0</WriteVtkAsPoints>
+    <BoundVoronoiTessellation>0</BoundVoronoiTessellation>
+    <HasVariableRestLength>0</HasVariableRestLength>
+    <!-- AbstractCentreBasedCellPopulation params -->
+    <MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
+    <CentreBasedDivisionRule type="RandomDirectionCentreBasedDivisionRule"/>
+    <!-- AbstractOffLatticeCellPopulation params -->
+    <DampingConstantNormal>1</DampingConstantNormal>
+    <DampingConstantMutant>1</DampingConstantMutant>
+    <!-- AbstractCellPopulation params -->
+    <OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
+  </Population>
+
+  <!--
+    FORCES: zero or more forces to add to the simulation.
+    Parameter element names match those written by OutputForceParameters().
+  -->
+  <Forces>
+    <Force type="GeneralisedLinearSpringForce">
+      <!-- GeneralisedLinearSpringForce own params -->
+      <MeinekeSpringStiffness>15</MeinekeSpringStiffness>
+      <MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength>
+      <MeinekeSpringGrowthDuration>1</MeinekeSpringGrowthDuration>
+      <!-- AbstractTwoBodyInteractionForce params -->
+      <UseCutOffLength>0</UseCutOffLength>
+      <CutOffLength>1e10</CutOffLength>
+    </Force>
+  </Forces>
+
+  <!--
+    CELL KILLERS: zero or more cell killers (empty = none).
+  -->
+  <CellKillers/>
+
+  <!--
+    SIMULATION MODIFIERS (empty = none).
+  -->
+  <SimulationModifiers/>
+
+  <!--
+    BOUNDARY CONDITIONS (empty = none).
+  -->
+  <BoundaryConditions/>
+
+  <!--
+    NUMERICAL METHOD (off-lattice only).
+    Parameter element names match those written by OutputNumericalMethodParameters().
+  -->
+  <NumericalMethod type="ForwardEulerNumericalMethod">
+    <UseAdaptiveTimestep>0</UseAdaptiveTimestep>
+    <UseUpdateNodeLocation>0</UseUpdateNodeLocation>
+    <GhostNodeForcesEnabled>0</GhostNodeForcesEnabled>
+  </NumericalMethod>
+
+  <!--
+    SIMULATION: AbstractCellBasedSimulation parameters + output directory.
+    Parameter element names match those written by OutputSimulationParameters().
+  -->
+  <Simulation>
+    <Dt>0.00833333</Dt>
+    <EndTime>0.5</EndTime>
+    <UpdateCellPopulation>1</UpdateCellPopulation>
+    <SamplingTimestepMultiple>6</SamplingTimestepMultiple>
+    <UpdatingTimestepMultiple>1</UpdatingTimestepMultiple>
+    <OutputDivisionLocations>0</OutputDivisionLocations>
+    <OutputCellVelocities>0</OutputCellVelocities>
+    <OutputDirectory>TestCellBasedSimulationFromXml_MeshBased5x5</OutputDirectory>
+  </Simulation>
+
+</CellBasedSimulation>
