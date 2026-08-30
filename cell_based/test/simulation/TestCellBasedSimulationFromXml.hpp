@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <cxxtest/TestSuite.h>
+#include <cmath>
 
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "CellBasedSimulationFromXml.hpp"
@@ -101,9 +102,41 @@ public:
         // The simulation should have exactly one force (GeneralisedLinearSpringForce)
         TS_ASSERT_EQUALS(p_simulator->rGetForceCollection().size(), 1u);
 
+        // ── Check initial node locations (before Solve) ───────────────────
+        // HoneycombMeshGenerator(5,5,0) produces a regular lattice.
+        // Row k has y = k * sqrt(3)/2; odd rows are offset by 0.5 in x.
+        // Node 0:  (0.0,      0.0)
+        // Node 4:  (4.0,      0.0)
+        // Node 12: (2.0,  2*sqrt(3)/2)  — centre node of the grid
+        // Node 24: (4.0,  4*sqrt(3)/2)
+        const double kSqrt3Over2 = std::sqrt(3.0) / 2.0;
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(0)[0],  0.0,             1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(0)[1],  0.0,             1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(4)[0],  4.0,             1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(4)[1],  0.0,             1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(12)[0], 2.0,             1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(12)[1], 2.0 * kSqrt3Over2, 1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(24)[0], 4.0,             1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(24)[1], 4.0 * kSqrt3Over2, 1e-6);
+
         // ── Run the simulation ────────────────────────────────────────────
-        // This is a smoke test: Solve() should complete without throwing
         TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
+
+        // ── Post-run checks ───────────────────────────────────────────────
+        // With EndTime=0.5 and UniformCellCycleModel(min=10, max=12), no
+        // cell divisions occur, so the population size must be unchanged.
+        TS_ASSERT_EQUALS(r_pop.GetNumRealCells(), 25u);
+
+        // The centroid of the population should remain close to its initial
+        // value (2.2, sqrt(3)/2 * 2 = 1.732), since there are no boundary
+        // conditions and the spring force is symmetric.
+        c_vector<double, 2> centroid = r_pop.GetCentroidOfCellPopulation();
+        TS_ASSERT_DELTA(centroid[0], 2.2,               0.05);
+        TS_ASSERT_DELTA(centroid[1], 2.0 * kSqrt3Over2, 0.05);
+
+        // The centre node (12) should still be close to the interior of the grid.
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(12)[0], 2.0, 0.1);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(12)[1], 2.0 * kSqrt3Over2, 0.1);
     }
 
     /**
@@ -175,8 +208,23 @@ public:
         // One force added
         TS_ASSERT_EQUALS(p_simulator->rGetForceCollection().size(), 1u);
 
+        // ── Check initial node positions for the 3×3 grid (before Solve) ──
+        // HoneycombMeshGenerator(3, 3, 0):
+        // Node 0: (0.0, 0.0), Node 2: (2.0, 0.0), Node 4: (1.5, sqrt(3)/2)
+        const double kSqrt3Over2 = std::sqrt(3.0) / 2.0;
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(0)[0], 0.0,           1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(0)[1], 0.0,           1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(2)[0], 2.0,           1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(2)[1], 0.0,           1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(4)[0], 1.5,           1e-6);
+        TS_ASSERT_DELTA(p_simulator->GetNodeLocation(4)[1], kSqrt3Over2,   1e-6);
+
         // Run without throwing
         TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
+
+        // ── Post-run checks ───────────────────────────────────────────────
+        // No divisions occur in 0.1 time units; population must stay at 9.
+        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), 9u);
     }
 };
 
