@@ -87,6 +87,19 @@ VtkScene<DIM>::VtkScene()
 }
 
 template <unsigned DIM>
+VtkScene<DIM>::~VtkScene()
+{
+    try
+    {
+        End();
+    }
+    catch (...)
+    {
+        // Suppress exceptions in the destructor to avoid std::terminate
+    }
+}
+
+template <unsigned DIM>
 void VtkScene<DIM>::End()
 {
     if (mSaveAsAnimation && mHasStarted)

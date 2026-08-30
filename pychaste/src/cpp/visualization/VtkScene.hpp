@@ -131,9 +131,9 @@ public:
     VtkScene();
 
     /**
-     * Destructor
+     * Destructor. Finalises the animation writer if one was started.
      */
-    virtual ~VtkScene() = default;
+    virtual ~VtkScene();
 
     /**
      * Finalise and close the animation file, if one is being written.
