@@ -1094,18 +1094,35 @@ public:
         TS_ASSERT(initial_geom_file.is_open());
         if (initial_geom_file.is_open())
         {
-            std::string file_contents((std::istreambuf_iterator<char>(initial_geom_file)),
-                                       std::istreambuf_iterator<char>());
+            bool found_chaste = false;
+            bool found_initial_state_open = false;
+            bool found_initial_state_close = false;
+            bool found_cell_index = false;
+            bool found_location = false;
+            bool found_mutation_state = false;
+            bool found_ccm = false;
+            bool found_srn = false;
+            std::string line;
+            while (std::getline(initial_geom_file, line))
+            {
+                if (line.find("<Chaste>") != std::string::npos) { found_chaste = true; }
+                if (line.find("<InitialCellGeometryAndState>") != std::string::npos) { found_initial_state_open = true; }
+                if (line.find("</InitialCellGeometryAndState>") != std::string::npos) { found_initial_state_close = true; }
+                if (line.find("<Cell index=") != std::string::npos) { found_cell_index = true; }
+                if (line.find("<Location>") != std::string::npos) { found_location = true; }
+                if (line.find("<MutationState>") != std::string::npos) { found_mutation_state = true; }
+                if (line.find("<CellCycleModel>") != std::string::npos) { found_ccm = true; }
+                if (line.find("<SrnModel>") != std::string::npos) { found_srn = true; }
+            }
             initial_geom_file.close();
-            // Check for expected XML structure
-            TS_ASSERT(file_contents.find("<Chaste>") != std::string::npos);
-            TS_ASSERT(file_contents.find("<InitialCellGeometryAndState>") != std::string::npos);
-            TS_ASSERT(file_contents.find("</InitialCellGeometryAndState>") != std::string::npos);
-            TS_ASSERT(file_contents.find("<Cell index=") != std::string::npos);
-            TS_ASSERT(file_contents.find("<Location>") != std::string::npos);
-            TS_ASSERT(file_contents.find("<MutationState>") != std::string::npos);
-            TS_ASSERT(file_contents.find("<CellCycleModel>") != std::string::npos);
-            TS_ASSERT(file_contents.find("<SrnModel>") != std::string::npos);
+            TS_ASSERT(found_chaste);
+            TS_ASSERT(found_initial_state_open);
+            TS_ASSERT(found_initial_state_close);
+            TS_ASSERT(found_cell_index);
+            TS_ASSERT(found_location);
+            TS_ASSERT(found_mutation_state);
+            TS_ASSERT(found_ccm);
+            TS_ASSERT(found_srn);
         }
     }
 

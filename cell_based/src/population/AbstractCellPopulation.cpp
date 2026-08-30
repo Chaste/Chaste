@@ -804,12 +804,12 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputInitialCellGeometryAn
 {
     *rParamsFile << "\t<InitialCellGeometryAndState>\n";
 
-    unsigned cell_index = 0;
     for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
-         ++cell_iter, ++cell_index)
+         ++cell_iter)
     {
-        *rParamsFile << "\t\t<Cell index=\"" << cell_index << "\">\n";
+        unsigned location_index = GetLocationIndexUsingCell(*cell_iter);
+        *rParamsFile << "\t\t<Cell index=\"" << location_index << "\">\n";
 
         // Output cell centre location
         c_vector<double, SPACE_DIM> location = GetLocationOfCellCentre(*cell_iter);
@@ -833,9 +833,9 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputInitialCellGeometryAn
         {
             *rParamsFile << "\t\t\t<CellData>\n";
             std::vector<std::string> keys = p_cell_data->GetKeys();
-            for (unsigned i = 0; i < keys.size(); i++)
+            for (const std::string& key : keys)
             {
-                *rParamsFile << "\t\t\t\t<Variable name=\"" << keys[i] << "\">" << p_cell_data->GetItem(keys[i]) << "</Variable>\n";
+                *rParamsFile << "\t\t\t\t<Variable name=\"" << key << "\">" << p_cell_data->GetItem(key) << "</Variable>\n";
             }
             *rParamsFile << "\t\t\t</CellData>\n";
         }
