@@ -9,81 +9,68 @@ Module contents
     :undoc-members:
     :show-inheritance:
 
-.. autoclass:: chaste.mesh.ChastePoint3
+.. autoclass:: chaste.mesh.ChastePoint_2
     :members:
 
-.. autoclass:: chaste.mesh.Node3
+.. autoclass:: chaste.mesh.ChastePoint_3
     :members:
 
-.. autoclass:: chaste.mesh.NodeAttributes3
+.. autoclass:: chaste.mesh.Node_2
     :members:
 
-.. autoclass:: chaste.mesh.PottsMesh3
+.. autoclass:: chaste.mesh.Node_3
     :members:
 
-.. autoclass:: chaste.mesh.SharedPottsMeshGenerator3
+.. autoclass:: chaste.mesh.NodeAttributes_2
     :members:
 
-.. autoclass:: chaste.mesh.ChastePoint2
+.. autoclass:: chaste.mesh.NodeAttributes_3
     :members:
 
-.. autoclass:: chaste.mesh.Node2
+.. autoclass:: chaste.mesh.NodesOnlyMesh_2
     :members:
 
-.. autoclass:: chaste.mesh.NodeAttributes2
+.. autoclass:: chaste.mesh.NodesOnlyMesh_3
     :members:
 
-.. autoclass:: chaste.mesh.PottsMesh2
+.. autoclass:: chaste.mesh.MutableMesh_2_2
     :members:
 
-.. autoclass:: chaste.mesh.SharedPottsMeshGenerator2
+.. autoclass:: chaste.mesh.MutableMesh_3_3
     :members:
 
-.. autoclass:: chaste.mesh.NodesOnlyMesh2
+.. autoclass:: chaste.mesh.TetrahedralMesh_2_2
     :members:
 
-.. autoclass:: chaste.mesh.NodesOnlyMesh3
+.. autoclass:: chaste.mesh.TetrahedralMesh_3_3
     :members:
 
-.. autoclass:: chaste.mesh.MutableMesh2_2
+.. autoclass:: chaste.mesh.VertexMesh_2_2
     :members:
 
-.. autoclass:: chaste.mesh.MutableMesh3_3
+.. autoclass:: chaste.mesh.VertexMesh_3_3
     :members:
 
-.. autoclass:: chaste.mesh.TetrahedralMesh2_2
+.. autoclass:: chaste.mesh.MutableVertexMesh_2_2
     :members:
 
-.. autoclass:: chaste.mesh.TetrahedralMesh3_3
+.. autoclass:: chaste.mesh.MutableVertexMesh_3_3
     :members:
 
-.. autoclass:: chaste.mesh.AbstractTetrahedralMesh2_2
+.. autoclass:: chaste.mesh.PottsMesh_2
     :members:
 
-.. autoclass:: chaste.mesh.AbstractTetrahedralMesh3_3
+.. autoclass:: chaste.mesh.PottsMesh_3
     :members:
 
-.. autoclass:: chaste.mesh.AbstractMesh2_2
+.. autoclass:: chaste.mesh.PottsMeshGenerator_2
     :members:
 
-.. autoclass:: chaste.mesh.AbstractMesh3_3
-    :members:
-
-.. autoclass:: chaste.mesh.VertexMesh2_2
-    :members:
-
-.. autoclass:: chaste.mesh.VertexMesh3_3
-    :members:
-
-.. autoclass:: chaste.mesh.MutableVertexMesh2_2
-    :members:
-
-.. autoclass:: chaste.mesh.MutableVertexMesh3_3
+.. autoclass:: chaste.mesh.PottsMeshGenerator_3
     :members:
 
 .. autoclass:: chaste.mesh.Cylindrical2dVertexMesh
     :members:
 
-.. autoclass:: chaste.mesh.SharedCylindricalHoneycombVertexMeshGenerator
+.. autoclass:: chaste.mesh.CylindricalHoneycombVertexMeshGenerator
     :members:
-

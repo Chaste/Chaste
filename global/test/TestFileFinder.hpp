@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "FileFinder.hpp"
 #include "ChasteBuildRoot.hpp"
+#include "FilesystemPermissions.hpp"
 #include "OutputFileHandler.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "Warnings.hpp"
@@ -47,6 +48,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestFileFinder : public CxxTest::TestSuite
 {
+private:
+    void AssertPermissions(const fs::path& rPath, fs::perms expectedPermissions)
+    {
+#ifndef _MSC_VER
+        TS_ASSERT_EQUALS(static_cast<unsigned>(fs::status(rPath).permissions() & fs::perms::all),
+                         static_cast<unsigned>(expectedPermissions));
+#endif
+    }
+
 public:
 
     void TestFileFinderOpening()
@@ -163,10 +173,7 @@ public:
     void TestIsAbsolutePath()
     {
         TS_ASSERT(!FileFinder::IsAbsolutePath("global/src/FileFinder.hpp"));
-#ifndef _MSC_VER
-        //This would always fail on Windows: it's not a single-root OS
         TS_ASSERT(FileFinder::IsAbsolutePath("/root"));
-#endif
     }
 
     void TestDirFinder()
@@ -371,6 +378,7 @@ public:
         FileFinder dest = source.CopyTo(dest_dir);
         TS_ASSERT(dest.IsFile());
         TS_ASSERT(fs::equivalent(fs::path(dest.GetAbsolutePath()),fs::path(expected_dest.GetAbsolutePath())));
+        AssertPermissions(dest.GetAbsolutePath(), FilesystemPermissions::GetFilePermissions());
 
         // Copy to existing file
         dest = source.CopyTo(dest_dir);
@@ -383,6 +391,7 @@ public:
         dest = source.CopyTo(expected_dest);
         TS_ASSERT(dest.IsFile());
         TS_ASSERT_EQUALS(dest.GetAbsolutePath(), expected_dest.GetAbsolutePath());
+        AssertPermissions(dest.GetAbsolutePath(), FilesystemPermissions::GetFilePermissions());
 
         // Recursive copy of a folder
         // Firstly we create some sub-folders to copy
@@ -401,6 +410,10 @@ public:
         TS_ASSERT(copy_handler.FindFile(dest_dir_name + "/sub1/sub2").IsDir());
         TS_ASSERT(copy_handler.FindFile(dest_dir_name + "/sub1/sub2/test.txt").IsFile());
         TS_ASSERT(copy_handler.FindFile(dest_dir_name + "/TestFileFinder.hpp").IsFile());
+        AssertPermissions(copy_handler.FindFile(dest_dir_name).GetAbsolutePath(),
+                          FilesystemPermissions::GetDirectoryPermissions());
+        AssertPermissions(copy_handler.FindFile(dest_dir_name + "/sub1/sub2/test.txt").GetAbsolutePath(),
+                          FilesystemPermissions::GetFilePermissions());
 
         // Copy the tree to a name that doesn't exist
         dest_dir = copy_handler.FindFile("second_copy");
@@ -410,6 +423,9 @@ public:
         TS_ASSERT_EQUALS(dest.GetLeafName(), "second_copy");
         TS_ASSERT(FileFinder("TestFileFinder.hpp", dest).IsFile());
         TS_ASSERT(FileFinder("sub1", dest).IsDir());
+        AssertPermissions(dest.GetAbsolutePath(), FilesystemPermissions::GetDirectoryPermissions());
+        AssertPermissions(FileFinder("TestFileFinder.hpp", dest).GetAbsolutePath(),
+                          FilesystemPermissions::GetFilePermissions());
 
         // Error cases
         TS_ASSERT_THROWS_CONTAINS(FileFinder("global/no_file", RelativeTo::ChasteSourceRoot).CopyTo(dest),
