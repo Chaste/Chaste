@@ -102,9 +102,10 @@ VtkScene<DIM>::~VtkScene()
 template <unsigned DIM>
 void VtkScene<DIM>::End()
 {
-    if (mSaveAsAnimation && mHasStarted)
+    if (mAnimationWriterStarted)
     {
         mAnimationWriter->End();
+        mAnimationWriterStarted = false;
     }
 }
 
@@ -181,6 +182,17 @@ void VtkScene<DIM>::RenderFrame(unsigned timeStep)
 
         if (mSaveAsAnimation)
         {
+            if (!mAnimationWriterStarted)
+            {
+                // Delay writer startup until the first real animation frame, so
+                // GetSceneAsCharBuffer() can capture notebook PNGs without
+                // creating an empty Ogg stream that needs finalising in End().
+                mAnimationWriter->SetInputConnection(mWindowToImageFilter->GetOutputPort());
+                mAnimationWriter->SetFileName((mOutputFilePath + ".ogg").c_str());
+                mAnimationWriter->SetRate(ANIMATION_FRAME_RATE);
+                mAnimationWriter->Start();
+                mAnimationWriterStarted = true;
+            }
             mAnimationWriter->Write();
         }
     }
@@ -252,13 +264,6 @@ void VtkScene<DIM>::Start()
         mpRenderWindow->Render();
         mWindowToImageFilter->Update();
 
-        if (mSaveAsAnimation)
-        {
-            mAnimationWriter->SetInputConnection(mWindowToImageFilter->GetOutputPort());
-            mAnimationWriter->SetFileName((mOutputFilePath + ".ogg").c_str());
-            mAnimationWriter->SetRate(ANIMATION_FRAME_RATE);
-            mAnimationWriter->Start();
-        }
     }
 
     mHasStarted = true;

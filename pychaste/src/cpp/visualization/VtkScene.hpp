@@ -118,6 +118,11 @@ class VtkScene
     bool mHasStarted = false;
 
     /**
+     * Has the animation writer started
+     */
+    bool mAnimationWriterStarted = false;
+
+    /**
      * The cell population
      */
     boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > mpCellPopulationGenerator;
