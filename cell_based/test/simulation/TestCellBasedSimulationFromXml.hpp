@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include <cmath>
+#include <sstream>
 
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "CellBasedSimulationFromXml.hpp"
@@ -57,6 +58,48 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "FileComparison.hpp"
 #include "PetscSetupAndFinalize.hpp"
+
+namespace
+{
+
+std::string BuildUniformInitialCellGeometryAndState(unsigned numCellsAcross,
+                                                    unsigned numCellsUp,
+                                                    double minCellCycleDuration,
+                                                    double maxCellCycleDuration)
+{
+    std::ostringstream xml;
+    const double sqrt3_over_2 = std::sqrt(3.0) / 2.0;
+    unsigned index = 0;
+
+    xml << "  <InitialCellGeometryAndState>\n";
+    for (unsigned row = 0; row < numCellsUp; ++row)
+    {
+        for (unsigned col = 0; col < numCellsAcross; ++col, ++index)
+        {
+            double x = static_cast<double>(col) + (row % 2u == 0u ? 0.0 : 0.5);
+            double y = static_cast<double>(row) * sqrt3_over_2;
+
+            xml << "    <Cell index=\"" << index << "\">\n"
+                << "      <Location>" << x << " " << y << "</Location>\n"
+                << "      <MutationState>WildTypeCellMutationState</MutationState>\n"
+                << "      <CellCycleModel>\n"
+                << "        <UniformCellCycleModel>\n"
+                << "          <MinCellCycleDuration>" << minCellCycleDuration << "</MinCellCycleDuration>\n"
+                << "          <MaxCellCycleDuration>" << maxCellCycleDuration << "</MaxCellCycleDuration>\n"
+                << "        </UniformCellCycleModel>\n"
+                << "      </CellCycleModel>\n"
+                << "      <SrnModel>\n"
+                << "        <NullSrnModel/>\n"
+                << "      </SrnModel>\n"
+                << "    </Cell>\n";
+        }
+    }
+    xml << "  </InitialCellGeometryAndState>\n";
+
+    return xml.str();
+}
+
+}
 
 /**
  * Test suite for CellBasedSimulationFromXml.
@@ -106,7 +149,7 @@ public:
         TS_ASSERT_EQUALS(p_simulator->rGetForceCollection().size(), 1u);
 
         // ── Check initial node locations (before Solve) ───────────────────
-        // HoneycombMeshGenerator(5,5,0) produces a regular lattice.
+        // The explicit InitialCellGeometryAndState section encodes a honeycomb lattice.
         // Row k has y = k * sqrt(3)/2; odd rows are offset by 0.5 in x.
         // Node 0:  (0.0,      0.0)
         // Node 4:  (4.0,      0.0)
@@ -168,17 +211,10 @@ public:
         *p_file <<
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             "<CellBasedSimulation version=\"1\" elementDim=\"2\" spaceDim=\"2\">\n"
-            "  <Geometry>\n"
-            "    <HoneycombMeshGenerator numCellsAcross=\"3\" numCellsUp=\"3\" numGhostLayers=\"0\"/>\n"
-            "  </Geometry>\n"
             "  <InitialCells>\n"
-            "    <DefaultCellCycleModel type=\"UniformCellCycleModel\">\n"
-            "      <MinCellCycleDuration>10</MinCellCycleDuration>\n"
-            "      <MaxCellCycleDuration>12</MaxCellCycleDuration>\n"
-            "    </DefaultCellCycleModel>\n"
             "    <DefaultProliferativeType>TransitCellProliferativeType</DefaultProliferativeType>\n"
-            "    <DefaultMutationState>WildTypeCellMutationState</DefaultMutationState>\n"
             "  </InitialCells>\n"
+            << BuildUniformInitialCellGeometryAndState(3u, 3u, 10.0, 12.0) <<
             "  <Population type=\"MeshBasedCellPopulation\"/>\n"
             "  <Forces>\n"
             "    <Force type=\"GeneralisedLinearSpringForce\">\n"

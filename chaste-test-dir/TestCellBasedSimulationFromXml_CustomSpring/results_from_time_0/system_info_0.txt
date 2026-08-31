@@ -1,0 +1,21 @@
+Process 0 of 1.
+uname sysname  = Linux
+uname nodename = runnervmgx7h7
+uname release  = 6.17.0-1022-azure
+uname version  = #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026
+uname machine  = x86_64
+
+Information on number and type of processors:
+model name	: INTEL(R) XEON(R) PLATINUM 8573C
+model name	: INTEL(R) XEON(R) PLATINUM 8573C
+model name	: INTEL(R) XEON(R) PLATINUM 8573C
+model name	: INTEL(R) XEON(R) PLATINUM 8573C
+
+Information on processor caches, in the same order as above:
+cache size	: 266240 KB
+cache size	: 266240 KB
+cache size	: 266240 KB
+cache size	: 266240 KB
+
+Information on system memory:
+MemTotal:       16372440 kB

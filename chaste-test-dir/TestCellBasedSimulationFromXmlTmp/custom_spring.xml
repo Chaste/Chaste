@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CellBasedSimulation version="1" elementDim="2" spaceDim="2">
+  <InitialCells>
+    <DefaultProliferativeType>TransitCellProliferativeType</DefaultProliferativeType>
+  </InitialCells>
+  <InitialCellGeometryAndState>
+    <Cell index="0">
+      <Location>0 0</Location>
+      <MutationState>WildTypeCellMutationState</MutationState>
+      <CellCycleModel>
+        <UniformCellCycleModel>
+          <MinCellCycleDuration>10</MinCellCycleDuration>
+          <MaxCellCycleDuration>12</MaxCellCycleDuration>
+        </UniformCellCycleModel>
+      </CellCycleModel>
+      <SrnModel>
+        <NullSrnModel/>
+      </SrnModel>
+    </Cell>
+    <Cell index="1">
+      <Location>1 0</Location>
+      <MutationState>WildTypeCellMutationState</MutationState>
+      <CellCycleModel>
+        <UniformCellCycleModel>
+          <MinCellCycleDuration>10</MinCellCycleDuration>
+          <MaxCellCycleDuration>12</MaxCellCycleDuration>
+        </UniformCellCycleModel>
+      </CellCycleModel>
+      <SrnModel>
+        <NullSrnModel/>
+      </SrnModel>
+    </Cell>
+    <Cell index="2">
+      <Location>2 0</Location>
+      <MutationState>WildTypeCellMutationState</MutationState>
+      <CellCycleModel>
+        <UniformCellCycleModel>
+          <MinCellCycleDuration>10</MinCellCycleDuration>
+          <MaxCellCycleDuration>12</MaxCellCycleDuration>
+        </UniformCellCycleModel>
+      </CellCycleModel>
+      <SrnModel>
+        <NullSrnModel/>
+      </SrnModel>
+    </Cell>
+    <Cell index="3">
+      <Location>0.5 0.866025</Location>
+      <MutationState>WildTypeCellMutationState</MutationState>
+      <CellCycleModel>
+        <UniformCellCycleModel>
+          <MinCellCycleDuration>10</MinCellCycleDuration>
+          <MaxCellCycleDuration>12</MaxCellCycleDuration>
+        </UniformCellCycleModel>
+      </CellCycleModel>
+      <SrnModel>
+        <NullSrnModel/>
+      </SrnModel>
+    </Cell>
+    <Cell index="4">
+      <Location>1.5 0.866025</Location>
+      <MutationState>WildTypeCellMutationState</MutationState>
+      <CellCycleModel>
+        <UniformCellCycleModel>
+          <MinCellCycleDuration>10</MinCellCycleDuration>
+          <MaxCellCycleDuration>12</MaxCellCycleDuration>
+        </UniformCellCycleModel>
+      </CellCycleModel>
+      <SrnModel>
+        <NullSrnModel/>
+      </SrnModel>
+    </Cell>
+    <Cell index="5">
+      <Location>2.5 0.866025</Location>
+      <MutationState>WildTypeCellMutationState</MutationState>
+      <CellCycleModel>
+        <UniformCellCycleModel>
+          <MinCellCycleDuration>10</MinCellCycleDuration>
+          <MaxCellCycleDuration>12</MaxCellCycleDuration>
+        </UniformCellCycleModel>
+      </CellCycleModel>
+      <SrnModel>
+        <NullSrnModel/>
+      </SrnModel>
+    </Cell>
+    <Cell index="6">
+      <Location>0 1.73205</Location>
+      <MutationState>WildTypeCellMutationState</MutationState>
+      <CellCycleModel>
+        <UniformCellCycleModel>
+          <MinCellCycleDuration>10</MinCellCycleDuration>
+          <MaxCellCycleDuration>12</MaxCellCycleDuration>
+        </UniformCellCycleModel>
+      </CellCycleModel>
+      <SrnModel>
+        <NullSrnModel/>
+      </SrnModel>
+    </Cell>
+    <Cell index="7">
+      <Location>1 1.73205</Location>
+      <MutationState>WildTypeCellMutationState</MutationState>
+      <CellCycleModel>
+        <UniformCellCycleModel>
+          <MinCellCycleDuration>10</MinCellCycleDuration>
+          <MaxCellCycleDuration>12</MaxCellCycleDuration>
+        </UniformCellCycleModel>
+      </CellCycleModel>
+      <SrnModel>
+        <NullSrnModel/>
+      </SrnModel>
+    </Cell>
+    <Cell index="8">
+      <Location>2 1.73205</Location>
+      <MutationState>WildTypeCellMutationState</MutationState>
+      <CellCycleModel>
+        <UniformCellCycleModel>
+          <MinCellCycleDuration>10</MinCellCycleDuration>
+          <MaxCellCycleDuration>12</MaxCellCycleDuration>
+        </UniformCellCycleModel>
+      </CellCycleModel>
+      <SrnModel>
+        <NullSrnModel/>
+      </SrnModel>
+    </Cell>
+  </InitialCellGeometryAndState>
+  <Population type="MeshBasedCellPopulation"/>
+  <Forces>
+    <Force type="GeneralisedLinearSpringForce">
+      <MeinekeSpringStiffness>16</MeinekeSpringStiffness>
+      <MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength>
+      <MeinekeSpringGrowthDuration>1</MeinekeSpringGrowthDuration>
+      <UseCutOffLength>0</UseCutOffLength>
+      <CutOffLength>1e10</CutOffLength>
+    </Force>
+  </Forces>
+  <CellKillers/>
+  <SimulationModifiers/>
+  <BoundaryConditions/>
+  <NumericalMethod type="ForwardEulerNumericalMethod">
+    <UseAdaptiveTimestep>0</UseAdaptiveTimestep>
+    <UseUpdateNodeLocation>0</UseUpdateNodeLocation>
+    <GhostNodeForcesEnabled>0</GhostNodeForcesEnabled>
+  </NumericalMethod>
+  <Simulation>
+    <Dt>0.00833333</Dt>
+    <EndTime>0.1</EndTime>
+    <SamplingTimestepMultiple>2</SamplingTimestepMultiple>
+    <OutputDirectory>TestCellBasedSimulationFromXml_CustomSpring</OutputDirectory>
+  </Simulation>
+</CellBasedSimulation>

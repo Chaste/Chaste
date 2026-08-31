@@ -46,16 +46,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ```xml
  * <CellBasedSimulation version="1" elementDim="2" spaceDim="2">
- *   <Geometry>
- *     <HoneycombMeshGenerator numCellsAcross="5" numCellsUp="5" numGhostLayers="0"/>
- *   </Geometry>
+ *   <InitialCellGeometryAndState>
+ *     <Cell index="0">
+ *       <Location>0 0</Location>
+ *       <MutationState>WildTypeCellMutationState</MutationState>
+ *       <CellCycleModel>
+ *         <UniformCellCycleModel>
+ *           <MinCellCycleDuration>10</MinCellCycleDuration>
+ *           <MaxCellCycleDuration>12</MaxCellCycleDuration>
+ *         </UniformCellCycleModel>
+ *       </CellCycleModel>
+ *       <SrnModel>
+ *         <NullSrnModel/>
+ *       </SrnModel>
+ *     </Cell>
+ *   </InitialCellGeometryAndState>
  *   <InitialCells>
- *     <DefaultCellCycleModel type="UniformCellCycleModel">
- *       <MinCellCycleDuration>10</MinCellCycleDuration>
- *       <MaxCellCycleDuration>12</MaxCellCycleDuration>
- *     </DefaultCellCycleModel>
  *     <DefaultProliferativeType>TransitCellProliferativeType</DefaultProliferativeType>
- *     <DefaultMutationState>WildTypeCellMutationState</DefaultMutationState>
  *   </InitialCells>
  *   <Population type="MeshBasedCellPopulation">
  *     ...
@@ -78,8 +85,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * - Parameter element names are identical to those written by
  *   `Output*Parameters()` methods (member variable name minus leading `m`),
  *   so the round-trip is exact once the output path is implemented.
- * - Birth times are drawn uniformly from `[-MaxCellCycleDuration, 0]` to
- *   randomise the initial cell phases (the "RandomCellGenerator" behaviour).
+ * - If `<InitialCellGeometryAndState>` is provided, node locations and per-cell
+ *   biological state are read directly from that section.
+ * - Otherwise the legacy `<Geometry>` + `<InitialCells>` path is used, with
+ *   birth times drawn uniformly from `[-MaxCellCycleDuration, 0]` to randomise
+ *   the initial cell phases (the "RandomCellGenerator" behaviour).
  * - Currently supports 2-D `MeshBasedCellPopulation` with
  *   `UniformCellCycleModel`, optionally with a `GeneralisedLinearSpringForce`.
  *   Support for additional population types and component families will be
@@ -87,6 +97,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <fstream>
+#include <map>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -98,8 +109,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "UniformCellCycleModel.hpp"
 #include "NullSrnModel.hpp"
+#include "StemCellProliferativeType.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
@@ -511,10 +524,12 @@ inline std::vector<std::string> AllChildren(const std::string& rXml,
 }
 
 /**
- * Parse a 2-D c_vector from a "x,y" text string (as written by
- * CHASTE_PARAM_CVECTOR and used in PlaneBasedCellKiller XML output).
+ * Parse a 2-D c_vector from a short text string.
  *
- * @param rText  string of the form "1.5,0" or "1.5, 0"
+ * Accepts either comma- or whitespace-separated values, e.g. "1.5,0",
+ * "1.5, 0" or "1.5 0".
+ *
+ * @param rText  vector text
  * @param defaultVec  value returned if rText is empty or unparsable
  * @return parsed vector
  */
@@ -522,18 +537,19 @@ inline c_vector<double, 2> ParseCVector2(const std::string& rText,
                                           const c_vector<double, 2>& rDefault)
 {
     c_vector<double, 2> result = rDefault;
-    std::size_t comma = rText.find(',');
-    if (comma != std::string::npos)
+    std::string normalised = rText;
+    for (unsigned i = 0; i < normalised.size(); ++i)
     {
-        try
+        if (normalised[i] == ',')
         {
-            result[0] = std::stod(rText.substr(0, comma));
-            result[1] = std::stod(rText.substr(comma + 1));
+            normalised[i] = ' ';
         }
-        catch (const std::exception&)
-        {
-            result = rDefault;
-        }
+    }
+
+    std::istringstream parser(normalised);
+    if (!(parser >> result[0] >> result[1]))
+    {
+        result = rDefault;
     }
     return result;
 }
@@ -590,81 +606,338 @@ public:
                       "spaceDim=2 is currently supported.");
         }
 
-        // ── 2. Geometry ───────────────────────────────────────────────────
-        bool foundGeom;
-        std::string geomOpenTag;
-        std::string geomInner = GetInner(rootInner, "Geometry",
-                                         foundGeom, geomOpenTag);
-        if (!foundGeom)
-        {
-            EXCEPTION("CellBasedSimulationFromXml: <Geometry> element "
-                      "is required.");
-        }
-
-        // Currently: HoneycombMeshGenerator only
-        bool foundGen;
-        std::string genOpenTag;
-        GetInner(geomInner, "HoneycombMeshGenerator", foundGen, genOpenTag);
-        if (!foundGen)
-        {
-            EXCEPTION("CellBasedSimulationFromXml: only "
-                      "<HoneycombMeshGenerator> is currently supported inside "
-                      "<Geometry>.");
-        }
-        unsigned numX      = static_cast<unsigned>(
-            std::stoul(GetAttr(genOpenTag, "numCellsAcross", "5")));
-        unsigned numY      = static_cast<unsigned>(
-            std::stoul(GetAttr(genOpenTag, "numCellsUp",     "5")));
-        unsigned numGhosts = static_cast<unsigned>(
-            std::stoul(GetAttr(genOpenTag, "numGhostLayers", "0")));
-
-        HoneycombMeshGenerator generator(numX, numY, numGhosts);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
-
-        // ── 3. Initial cells ──────────────────────────────────────────────
+        // ── 2. Initial-cell defaults ──────────────────────────────────────
         bool foundIC;
         std::string icInner = GetInner(rootInner, "InitialCells", foundIC);
 
-        // Default parameters for the cell-cycle model
-        double minCCDuration = 10.0;
-        double maxCCDuration = 12.0;
-
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        boost::shared_ptr<AbstractCellProperty> p_default_proliferative_type = p_stem_type;
         if (foundIC)
         {
-            bool foundCCM;
-            std::string ccmInner = GetInner(icInner,
-                                            "DefaultCellCycleModel", foundCCM);
-            if (foundCCM)
+            std::string default_prolif_type = ChildText(icInner,
+                                                        "DefaultProliferativeType",
+                                                        "");
+            if (default_prolif_type == "TransitCellProliferativeType")
             {
-                minCCDuration = ChildDouble(ccmInner, "MinCellCycleDuration",
-                                           minCCDuration);
-                maxCCDuration = ChildDouble(ccmInner, "MaxCellCycleDuration",
-                                           maxCCDuration);
+                p_default_proliferative_type = p_transit_type;
+            }
+            else if (!default_prolif_type.empty()
+                     && default_prolif_type != "StemCellProliferativeType")
+            {
+                std::cerr << "CellBasedSimulationFromXml: WARNING: "
+                          << "unrecognised DefaultProliferativeType '"
+                          << default_prolif_type
+                          << "' — using StemCellProliferativeType.\n";
             }
         }
 
-        // Build the cell vector with randomised birth times
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh;
         std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_state);
-        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(WildTypeCellMutationState, p_wild_type_state);
 
-        RandomNumberGenerator* const p_rng = RandomNumberGenerator::Instance();
-        unsigned num_cells = p_mesh->GetNumNodes();
-        cells.reserve(num_cells);
-        for (unsigned i = 0; i < num_cells; ++i)
+        // ── 3. Initial geometry and cells ─────────────────────────────────
+        bool foundInitialState;
+        std::string initialStateInner = GetInner(rootInner,
+                                                 "InitialCellGeometryAndState",
+                                                 foundInitialState);
+        if (foundInitialState)
         {
-            UniformCellCycleModel* p_model = new UniformCellCycleModel();
-            p_model->SetMinCellCycleDuration(minCCDuration);
-            p_model->SetMaxCellCycleDuration(maxCCDuration);
+            std::map<unsigned, Node<2>*> nodes_by_index;
+            std::map<unsigned, CellPtr> cells_by_index;
+            std::size_t pos = 0;
+            while (pos < initialStateInner.size())
+            {
+                std::size_t tagStart, tagEnd;
+                bool selfClose;
+                FindOpenTag(initialStateInner, "Cell",
+                            tagStart, tagEnd, selfClose, pos);
+                if (tagStart == std::string::npos)
+                {
+                    break;
+                }
 
-            CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(p_transit_type);
+                std::string cellOpenTag = initialStateInner.substr(tagStart,
+                                                                   tagEnd - tagStart);
+                std::string cellInner;
+                if (!selfClose)
+                {
+                    const std::string closeTag = "</Cell>";
+                    std::size_t closePos = initialStateInner.find(closeTag, tagEnd);
+                    if (closePos == std::string::npos)
+                    {
+                        EXCEPTION("CellBasedSimulationFromXml: malformed "
+                                  "<InitialCellGeometryAndState> entry.");
+                    }
+                    cellInner = initialStateInner.substr(tagEnd, closePos - tagEnd);
+                    pos = closePos + closeTag.size();
+                }
+                else
+                {
+                    pos = tagEnd;
+                }
 
-            // Random birth time in [-maxCCDuration, 0]
-            double birth_time = -maxCCDuration * p_rng->ranf();
-            p_cell->SetBirthTime(birth_time);
+                unsigned location_index = static_cast<unsigned>(
+                    std::stoul(GetAttr(cellOpenTag,
+                                       "index",
+                                       std::to_string(nodes_by_index.size()))));
+                if (nodes_by_index.count(location_index) != 0u)
+                {
+                    EXCEPTION("CellBasedSimulationFromXml: duplicate Cell index "
+                              + std::to_string(location_index) + ".");
+                }
 
-            cells.push_back(p_cell);
+                c_vector<double, 2> zero2 = zero_vector<double>(2);
+                c_vector<double, 2> location =
+                    ParseCVector2(ChildText(cellInner, "Location", ""), zero2);
+                nodes_by_index[location_index] = new Node<2>(location_index, location);
+
+                std::string mutation_state = ChildText(cellInner,
+                                                       "MutationState",
+                                                       "WildTypeCellMutationState");
+                if (mutation_state != "WildTypeCellMutationState")
+                {
+                    EXCEPTION("CellBasedSimulationFromXml: only "
+                              "WildTypeCellMutationState is currently "
+                              "supported in <InitialCellGeometryAndState>.");
+                }
+
+                bool foundCellCycleModel;
+                std::string cellCycleWrapper = GetInner(cellInner,
+                                                        "CellCycleModel",
+                                                        foundCellCycleModel);
+                if (!foundCellCycleModel)
+                {
+                    EXCEPTION("CellBasedSimulationFromXml: each Cell in "
+                              "<InitialCellGeometryAndState> must define a "
+                              "<CellCycleModel>.");
+                }
+
+                AbstractCellCycleModel* p_model = nullptr;
+
+                bool foundUniformCcm;
+                std::string uniformCcmInner = GetInner(cellCycleWrapper,
+                                                       "UniformCellCycleModel",
+                                                       foundUniformCcm);
+                if (foundUniformCcm)
+                {
+                    UniformCellCycleModel* p_uniform_model = new UniformCellCycleModel();
+                    p_uniform_model->SetDimension(2);
+                    p_uniform_model->SetMinCellCycleDuration(
+                        ChildDouble(uniformCcmInner, "MinCellCycleDuration", 10.0));
+                    p_uniform_model->SetMaxCellCycleDuration(
+                        ChildDouble(uniformCcmInner, "MaxCellCycleDuration", 12.0));
+                    p_model = p_uniform_model;
+                }
+                else
+                {
+                    bool foundFixedG1Ccm;
+                    std::string fixedG1CcmInner = GetInner(cellCycleWrapper,
+                                                           "FixedG1GenerationalCellCycleModel",
+                                                           foundFixedG1Ccm);
+                    if (!foundFixedG1Ccm)
+                    {
+                        EXCEPTION("CellBasedSimulationFromXml: unsupported "
+                                  "cell-cycle model in "
+                                  "<InitialCellGeometryAndState>.");
+                    }
+
+                    FixedG1GenerationalCellCycleModel* p_fixed_g1_model =
+                        new FixedG1GenerationalCellCycleModel();
+                    p_fixed_g1_model->SetDimension(2);
+                    p_fixed_g1_model->SetMaxTransitGenerations(
+                        ChildUnsigned(fixedG1CcmInner,
+                                      "MaxTransitGenerations",
+                                      p_fixed_g1_model->GetMaxTransitGenerations()));
+                    p_fixed_g1_model->SetMinimumGapDuration(
+                        ChildDouble(fixedG1CcmInner,
+                                    "MinimumGapDuration",
+                                    p_fixed_g1_model->GetMinimumGapDuration()));
+                    p_fixed_g1_model->SetStemCellG1Duration(
+                        ChildDouble(fixedG1CcmInner,
+                                    "StemCellG1Duration",
+                                    p_fixed_g1_model->GetStemCellG1Duration()));
+                    p_fixed_g1_model->SetTransitCellG1Duration(
+                        ChildDouble(fixedG1CcmInner,
+                                    "TransitCellG1Duration",
+                                    p_fixed_g1_model->GetTransitCellG1Duration()));
+                    p_fixed_g1_model->SetSDuration(
+                        ChildDouble(fixedG1CcmInner,
+                                    "SDuration",
+                                    p_fixed_g1_model->GetSDuration()));
+                    p_fixed_g1_model->SetG2Duration(
+                        ChildDouble(fixedG1CcmInner,
+                                    "G2Duration",
+                                    p_fixed_g1_model->GetG2Duration()));
+                    p_fixed_g1_model->SetMDuration(
+                        ChildDouble(fixedG1CcmInner,
+                                    "MDuration",
+                                    p_fixed_g1_model->GetMDuration()));
+                    p_model = p_fixed_g1_model;
+                }
+
+                bool foundSrnModel;
+                std::string srnModelWrapper = GetInner(cellInner,
+                                                       "SrnModel",
+                                                       foundSrnModel);
+                if (!foundSrnModel)
+                {
+                    EXCEPTION("CellBasedSimulationFromXml: each Cell in "
+                              "<InitialCellGeometryAndState> must define an "
+                              "<SrnModel>.");
+                }
+
+                bool foundNullSrn;
+                std::string nullSrnInner = GetInner(srnModelWrapper,
+                                                    "NullSrnModel",
+                                                    foundNullSrn);
+                if (!foundNullSrn)
+                {
+                    EXCEPTION("CellBasedSimulationFromXml: only NullSrnModel "
+                              "is currently supported in "
+                              "<InitialCellGeometryAndState>.");
+                }
+
+                CellPtr p_cell(new Cell(p_wild_type_state, p_model, new NullSrnModel()));
+                p_cell->SetCellProliferativeType(p_default_proliferative_type);
+                p_cell->SetBirthTime(ChildDouble(cellInner, "BirthTime", 0.0));
+
+                bool foundCellData;
+                std::string cellDataInner = GetInner(cellInner, "CellData", foundCellData);
+                if (foundCellData)
+                {
+                    std::size_t variable_pos = 0;
+                    while (variable_pos < cellDataInner.size())
+                    {
+                        std::size_t variableTagStart, variableTagEnd;
+                        bool variableSelfClose;
+                        FindOpenTag(cellDataInner, "Variable",
+                                    variableTagStart, variableTagEnd,
+                                    variableSelfClose, variable_pos);
+                        if (variableTagStart == std::string::npos)
+                        {
+                            break;
+                        }
+
+                        std::string variableOpenTag = cellDataInner.substr(variableTagStart,
+                                                                           variableTagEnd - variableTagStart);
+                        std::string variableInner;
+                        if (!variableSelfClose)
+                        {
+                            const std::string closeTag = "</Variable>";
+                            std::size_t closePos = cellDataInner.find(closeTag,
+                                                                      variableTagEnd);
+                            if (closePos == std::string::npos)
+                            {
+                                EXCEPTION("CellBasedSimulationFromXml: malformed "
+                                          "<CellData> entry.");
+                            }
+                            variableInner = cellDataInner.substr(variableTagEnd,
+                                                                 closePos - variableTagEnd);
+                            variable_pos = closePos + closeTag.size();
+                        }
+                        else
+                        {
+                            variable_pos = variableTagEnd;
+                        }
+
+                        std::string variable_name = GetAttr(variableOpenTag, "name", "");
+                        if (!variable_name.empty())
+                        {
+                            p_cell->GetCellData()->SetItem(variable_name,
+                                std::stod(Trim(variableInner)));
+                        }
+                    }
+                }
+
+                cells_by_index[location_index] = p_cell;
+            }
+
+            if (nodes_by_index.empty())
+            {
+                EXCEPTION("CellBasedSimulationFromXml: "
+                          "<InitialCellGeometryAndState> contained no cells.");
+            }
+
+            std::vector<Node<2>*> nodes;
+            nodes.reserve(nodes_by_index.size());
+            cells.reserve(cells_by_index.size());
+            for (std::map<unsigned, Node<2>*>::const_iterator iter = nodes_by_index.begin();
+                 iter != nodes_by_index.end();
+                 ++iter)
+            {
+                nodes.push_back(iter->second);
+                cells.push_back(cells_by_index[iter->first]);
+            }
+
+            p_mesh.reset(new MutableMesh<2,2>(nodes));
+        }
+        else
+        {
+            bool foundGeom;
+            std::string geomOpenTag;
+            std::string geomInner = GetInner(rootInner, "Geometry",
+                                             foundGeom, geomOpenTag);
+            if (!foundGeom)
+            {
+                EXCEPTION("CellBasedSimulationFromXml: either <Geometry> or "
+                          "<InitialCellGeometryAndState> is required.");
+            }
+
+            bool foundGen;
+            std::string genOpenTag;
+            GetInner(geomInner, "HoneycombMeshGenerator", foundGen, genOpenTag);
+            if (!foundGen)
+            {
+                EXCEPTION("CellBasedSimulationFromXml: only "
+                          "<HoneycombMeshGenerator> is currently supported inside "
+                          "<Geometry>.");
+            }
+            unsigned numX      = static_cast<unsigned>(
+                std::stoul(GetAttr(genOpenTag, "numCellsAcross", "5")));
+            unsigned numY      = static_cast<unsigned>(
+                std::stoul(GetAttr(genOpenTag, "numCellsUp",     "5")));
+            unsigned numGhosts = static_cast<unsigned>(
+                std::stoul(GetAttr(genOpenTag, "numGhostLayers", "0")));
+
+            HoneycombMeshGenerator generator(numX, numY, numGhosts);
+            p_mesh = generator.GetMesh();
+
+            double minCCDuration = 10.0;
+            double maxCCDuration = 12.0;
+            if (foundIC)
+            {
+                bool foundCCM;
+                std::string ccmInner = GetInner(icInner,
+                                                "DefaultCellCycleModel",
+                                                foundCCM);
+                if (foundCCM)
+                {
+                    minCCDuration = ChildDouble(ccmInner, "MinCellCycleDuration",
+                                                minCCDuration);
+                    maxCCDuration = ChildDouble(ccmInner, "MaxCellCycleDuration",
+                                                maxCCDuration);
+                }
+            }
+
+            RandomNumberGenerator* const p_rng = RandomNumberGenerator::Instance();
+            unsigned num_cells = p_mesh->GetNumNodes();
+            cells.reserve(num_cells);
+            for (unsigned i = 0; i < num_cells; ++i)
+            {
+                UniformCellCycleModel* p_model = new UniformCellCycleModel();
+                p_model->SetDimension(2);
+                p_model->SetMinCellCycleDuration(minCCDuration);
+                p_model->SetMaxCellCycleDuration(maxCCDuration);
+
+                CellPtr p_cell(new Cell(p_wild_type_state, p_model));
+                p_cell->SetCellProliferativeType(p_default_proliferative_type);
+
+                double birth_time = -maxCCDuration * p_rng->ranf();
+                p_cell->SetBirthTime(birth_time);
+
+                cells.push_back(p_cell);
+            }
         }
 
         // ── 4. Cell population ────────────────────────────────────────────
