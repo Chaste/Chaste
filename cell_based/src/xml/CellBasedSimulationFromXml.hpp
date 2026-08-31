@@ -706,7 +706,11 @@ public:
             : "CellBasedSimulationFromXml";
 
         boost::shared_ptr<OffLatticeSimulation<2> > p_simulator(
-            new OffLatticeSimulation<2>(*p_population));
+            new OffLatticeSimulation<2>(*p_population, false),
+            [p_population, p_mesh](OffLatticeSimulation<2>* pSimulation)
+            {
+                delete pSimulation;
+            });
         p_simulator->SetOutputDirectory(output_dir);
         p_simulator->SetDt(dt);
         p_simulator->SetEndTime(end_time);
