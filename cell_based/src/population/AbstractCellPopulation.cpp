@@ -805,6 +805,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputInitialCellGeometryAn
 {
     *rParamsFile << "\t<InitialCellGeometryAndState>\n";
 
+    const unsigned cell_level = 3u;
     for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
@@ -824,7 +825,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputInitialCellGeometryAn
         }
         *rParamsFile << "</Location>\n";
 
-        CHASTE_PARAM_EXPR(rParamsFile, 3u, MutationState, (*cell_iter)->GetMutationState()->GetIdentifier());
+        CHASTE_PARAM_EXPR(rParamsFile, cell_level, MutationState, (*cell_iter)->GetMutationState()->GetIdentifier());
 
         boost::shared_ptr<CellData> p_cell_data = (*cell_iter)->GetCellData();
         if (p_cell_data && p_cell_data->GetNumItems() > 0)
