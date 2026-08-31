@@ -707,6 +707,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 
         // Output cell population details (includes cell-cycle model details)
         mrCellPopulation.OutputCellPopulationInfo(parameter_file);
+
         // Loop over cell killers
         *parameter_file << "\n\t<CellKillers>\n";
         for (typename std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > >::iterator iter = mCellKillers.begin();

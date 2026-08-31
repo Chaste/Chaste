@@ -812,7 +812,6 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputInitialCellGeometryAn
         unsigned location_index = GetLocationIndexUsingCell(*cell_iter);
         *rParamsFile << "\t\t<Cell index=\"" << location_index << "\">\n";
 
-        // Output cell centre location
         c_vector<double, SPACE_DIM> location = GetLocationOfCellCentre(*cell_iter);
         *rParamsFile << "\t\t\t<Location>";
         for (unsigned d = 0; d < SPACE_DIM; d++)
@@ -825,10 +824,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputInitialCellGeometryAn
         }
         *rParamsFile << "</Location>\n";
 
-        // Output mutation state identifier
         CHASTE_PARAM_EXPR(rParamsFile, 3u, MutationState, (*cell_iter)->GetMutationState()->GetIdentifier());
 
-        // Output cell data key/value pairs (omitted when empty)
         boost::shared_ptr<CellData> p_cell_data = (*cell_iter)->GetCellData();
         if (p_cell_data && p_cell_data->GetNumItems() > 0)
         {
@@ -841,12 +838,10 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputInitialCellGeometryAn
             *rParamsFile << "\t\t\t</CellData>\n";
         }
 
-        // Output cell-cycle model info (delegates to OutputCellCycleModelInfo)
         *rParamsFile << "\t\t\t<CellCycleModel>\n";
         (*cell_iter)->GetCellCycleModel()->OutputCellCycleModelInfo(rParamsFile);
         *rParamsFile << "\t\t\t</CellCycleModel>\n";
 
-        // Output SRN model info (delegates to OutputSrnModelInfo)
         *rParamsFile << "\t\t\t<SrnModel>\n";
         (*cell_iter)->GetSrnModel()->OutputSrnModelInfo(rParamsFile);
         *rParamsFile << "\t\t\t</SrnModel>\n";
