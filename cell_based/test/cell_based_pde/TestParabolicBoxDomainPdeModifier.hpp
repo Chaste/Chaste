@@ -268,6 +268,89 @@ public:
         delete p_mesh;
     }
 
+    void TestInterpolateSolutionFromCellMovementReproducesFieldWhenCellsHaveNotMoved()
+    {
+        // InterpolateSolutionFromCellMovement() builds a mesh from cell centres, deforms a copy of
+        // the FE mesh according to how those centres have moved since mOldCellLocations was last
+        // recorded, then interpolates the previous solution from the deformed mesh back onto the
+        // (fixed) original FE mesh nodes.
+        //
+        // We check a mathematically exact special case here, rather than trusting a value obtained
+        // by simply running the code once: if every cell's centre is unchanged since the last
+        // timestep, every interpolated displacement is exactly zero (a weighted average of zero
+        // vectors), so the "deformed" mesh is geometrically identical to the original FE mesh, and
+        // the method must return the input solution field completely unchanged.
+        //
+        // A non-zero *uniform* cell displacement was considered instead of this (it is also exactly
+        // hand-computable, since piecewise-linear FE interpolation reproduces an affine function
+        // exactly) but is unsafe to use: the method's second interpolation stage restricts its
+        // containing-element search to each node's own originally-incident elements, and a corner
+        // of a rectangular FE mesh is incident to only one or two elements spanning at most its
+        // local 90-degree angle. The four corners of the box need that restricted search to succeed
+        // in four different (mutually exclusive, one per quadrant) directions, so *any* non-zero
+        // uniform translation of the whole mesh is guaranteed to fail this search at one corner or
+        // more - hitting the method's assert(0) on a Debug build. The zero-displacement case has no
+        // such failure mode: every node's own position is trivially "contained" (as a vertex, with
+        // weight 1) by its own unmoved incident elements.
+        MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (0.0, 0.0, 1.0, 0.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (0.0));
+
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(4.0, 2.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 1.0));
+        p_pde_modifier->SetDependentVariableName("variable");
+        p_pde_modifier->SetMoveSolutionWithCells(true);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Four cells forming a box that comfortably contains the FE mesh box [0,4]x[0,2] in its
+        // convex hull, so every FE mesh node has a containing element in the cell mesh.
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, -2.0, -2.0));
+        nodes.push_back(new Node<2>(1, false,  6.0, -2.0));
+        nodes.push_back(new Node<2>(2, false,  6.0,  4.0));
+        nodes.push_back(new Node<2>(3, false, -2.0,  4.0));
+        NodesOnlyMesh<2> cell_mesh;
+        cell_mesh.ConstructNodesWithoutMesh(nodes, 20.0);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, cell_mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(cell_mesh, cells);
+
+        // Cells have not moved: their recorded "old" locations equal their current locations.
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            p_pde_modifier->mOldCellLocations[*cell_iter] = cell_population.GetLocationOfCellCentre(*cell_iter);
+        }
+
+        // A real, non-constant "previous" solution field: each FE node's own x-coordinate.
+        unsigned num_fe_nodes = p_pde_modifier->mpFeMesh->GetNumNodes();
+        std::vector<double> solution_values(num_fe_nodes);
+        for (unsigned node_index=0; node_index<num_fe_nodes; node_index++)
+        {
+            solution_values[node_index] = p_pde_modifier->mpFeMesh->GetNode(node_index)->rGetLocation()[0];
+        }
+        Vec solution = PetscTools::CreateVec(solution_values);
+        p_pde_modifier->mSolution = solution;
+
+        Vec interpolated_solution = p_pde_modifier->InterpolateSolutionFromCellMovement(cell_population);
+        ReplicatableVector interpolated_solution_repl(interpolated_solution);
+
+        for (unsigned node_index=0; node_index<num_fe_nodes; node_index++)
+        {
+            TS_ASSERT_DELTA(interpolated_solution_repl[node_index], solution_values[node_index], 1e-9);
+        }
+
+        PetscTools::Destroy(interpolated_solution);
+    }
+
     void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
