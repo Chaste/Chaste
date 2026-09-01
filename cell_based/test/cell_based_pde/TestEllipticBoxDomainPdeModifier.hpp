@@ -277,7 +277,7 @@ public:
         p_pde_modifier->mSolution = solution;
 
         TS_ASSERT_THROWS_THIS(p_pde_modifier->UpdateCellData(cell_population),
-                "One or more of the cells doesnt contain any pde nodes so cant use Voronoi CellData calculation in the ");
+                "One or more of the cells doesn't contain any pde nodes so can't use Voronoi CellData calculation");
     }
 
     void TestArchiveEllipticBoxDomainPdeModifier()

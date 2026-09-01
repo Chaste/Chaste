@@ -474,7 +474,7 @@ public:
         MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
-        // Change where BCS are appied here we want the bcs applied on the boundary of the cells.
+        // Change where BCS are applied here we want the bcs applied on the boundary of the cells.
         // Good for compact tissues
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
         p_pde_modifier->SetBcsOnBoxBoundary(false);
@@ -558,7 +558,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
-        // Change where BCS are appied here we want the bcs applied on the boundary of the cells.
+        // Change where BCS are applied here we want the bcs applied on the boundary of the cells.
         // Good for compact tissues
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
         p_pde_modifier->SetBcsOnBoxBoundary(false);
