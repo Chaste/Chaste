@@ -119,6 +119,45 @@ public:
         TS_ASSERT_EQUALS(p_pde_modifier->GetOutputGradient(),true);
     }
 
+    void TestSetupSolveWithUniformSourceEllipticPde()
+    {
+        // Coverage: SetUpSourceTermsForAveragedSourcePde() is only called elsewhere in this test suite
+        // with an AveragedSourceEllipticPde or AveragedSourceParabolicPde; here we run it with a
+        // UniformSourceEllipticPde, whose source terms need no setup as they are already constant.
+        HoneycombMeshGenerator generator(3, 3, 0);
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create PDE and boundary condition objects
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        ChastePoint<2> lower(-5.0, -5.0);
+        ChastePoint<2> upper(15.0, 15.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("variable");
+
+        TS_ASSERT_THROWS_NOTHING(p_pde_modifier->SetupSolve(cell_population, "TestUniformSourceBoxEllipticPde"));
+
+        // Clear memory
+        delete p_mesh;
+    }
+
     void TestArchiveEllipticBoxDomainPdeModifier()
     {
         // Create a file for archiving

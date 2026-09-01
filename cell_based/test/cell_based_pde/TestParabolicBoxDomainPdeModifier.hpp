@@ -212,6 +212,62 @@ public:
         }
     }
 
+    void TestSetupSolveStoresOldCellLocationsWhenMovingSolutionWithCells()
+    {
+        // Coverage: SetupSolve() only stores mOldCellLocations when mMoveSolutionWithCells is set;
+        // elsewhere in this suite the flag is only used via the getter/setter or an archiving
+        // round-trip, never through a real call to SetupSolve().
+        HoneycombMeshGenerator generator(3, 3, 0);
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            cells[i]->GetCellData()->SetItem("variable", 1.0);
+        }
+
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        double constant_coefficient = -0.1;
+        double linear_coefficient = -0.2;
+        double diffusion_coefficient = 0.1;
+        double rate_coefficient = 0.1;
+        MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        ChastePoint<2> lower(-5.0, -5.0);
+        ChastePoint<2> upper(15.0, 15.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("variable");
+        p_pde_modifier->SetMoveSolutionWithCells(true);
+
+        TS_ASSERT_EQUALS(p_pde_modifier->mOldCellLocations.size(), 0u);
+        p_pde_modifier->SetupSolve(cell_population, "TestParabolicBoxDomainPdeModifierStoresOldCellLocations");
+        TS_ASSERT_EQUALS(p_pde_modifier->mOldCellLocations.size(), cell_population.GetNumRealCells());
+
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            c_vector<double, 2> stored_location = p_pde_modifier->mOldCellLocations[*cell_iter];
+            c_vector<double, 2> actual_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+            TS_ASSERT_DELTA(stored_location[0], actual_location[0], 1e-6);
+            TS_ASSERT_DELTA(stored_location[1], actual_location[1], 1e-6);
+        }
+
+        // Clear memory
+        delete p_mesh;
+    }
+
     void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
