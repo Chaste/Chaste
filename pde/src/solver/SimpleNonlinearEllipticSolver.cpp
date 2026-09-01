@@ -90,8 +90,7 @@ c_vector<double,1*(ELEMENT_DIM+1)> SimpleNonlinearEllipticSolver<ELEMENT_DIM,SPA
     // Note rGradU is a 1 by SPACE_DIM matrix, the 1 representing the dimension of
     // u (ie in this problem the unknown is a scalar). rGradU0 is rGradU as a vector.
     matrix_row< c_matrix<double, 1, SPACE_DIM> > rGradU0(rGradU, 0);
-    c_vector<double, ELEMENT_DIM+1> integrand_values1 =
-        prod(c_vector<double, ELEMENT_DIM>(prod(rGradU0, FOfU)), rGradPhi);
+    c_vector<double, ELEMENT_DIM+1> integrand_values1 = prod(c_vector<double, ELEMENT_DIM>(prod(rGradU0, FOfU)), rGradPhi);
 
     ret = integrand_values1 - (forcing_term * rPhi);
     return ret;
