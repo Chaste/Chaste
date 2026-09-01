@@ -6,7 +6,7 @@ if( NOT post_cmd )
    message( FATAL_ERROR "Variable post_cmd not defined" )
 endif( NOT post_cmd )
 
-# output_file contains the name of the output file the post_cmd will produce 
+# output_file contains the name of the output file the post_cmd will produce
 if( NOT output_file )
     message( FATAL_ERROR "Variable output_file not defined" )
 endif( NOT output_file )
@@ -44,5 +44,20 @@ else()
         )
     if (post_not_successful)
         message( SEND_ERROR "post_processing ${post_cmd} failed")
+    endif()
+
+    # optional second post-processing command, e.g. gperftools emits both a text report and an svg call graph
+    if( post_cmd2 )
+        separate_arguments( post_args2 )
+        message("executing second post-processing command:")
+        message("\t${post_cmd2} ${post_args2}")
+        execute_process(
+            COMMAND ${post_cmd2} ${post_args2}
+            OUTPUT_FILE ${output_file2}
+            RESULT_VARIABLE post2_not_successful
+            )
+        if (post2_not_successful)
+            message( SEND_ERROR "second post_processing ${post_cmd2} failed")
+        endif()
     endif()
 endif()

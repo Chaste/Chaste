@@ -38,15 +38,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulationBoundaryCondition.hpp"
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
+#include "ChasteSerialization.hpp"
 
 /**
- * A plane cell population boundary condition class, which pulls nodes toward a specified plane.
- * The plane can move over the course of the simulation, allowing simulated tensile tests.
- * Although the name of this class suggests it is specific to 3D, it is actually also implemented in 2D, for which it is
- * really a 'line' boundary condition. It's not currently implemented in 1D
+ * A boundary condition defined by an (infinite) plane that attracts nearby cells onto it.
+ *
+ * Unlike PlaneBoundaryCondition, which only pushes back nodes that have crossed
+ * to the outward side, this condition also pulls in nodes that lie within
+ * mAttractionThreshold of the plane on the inward side, snapping them onto it.
+ * This is useful for, e.g., holding cells against a moving grip in a simulated
+ * tensile test; the plane can be repositioned during a simulation via
+ * SetPointOnPlane().
+ *
+ * Despite the name, the condition is not specific to 3D: in 2D the 'plane' is a
+ * line. It is not implemented in 1D.
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
 class AttractingPlaneBoundaryCondition : public AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM>
@@ -58,18 +65,20 @@ private:
     c_vector<double, SPACE_DIM> mPointOnPlane;
 
     /**
-     * The outward-facing unit normal vector to the boundary plane.
+     * The outward-facing unit normal to the boundary plane. Cells on the side
+     * this points towards are considered to have crossed the plane.
      */
     c_vector<double, SPACE_DIM> mNormalToPlane;
 
     /**
-     * Whether to jiggle the cells on the bottom surface, initialised to false
-     * in the constructor.
+     * Whether to add a small random perturbation to each node as it is snapped
+     * onto the plane, to stop nodes from piling up exactly on it.
      */
     bool mUseJiggledNodesOnPlane;
 
     /**
-     * Nodes inside this distance to the plane are snapped to the plane
+     * Attraction band width: inward-side nodes within this distance of the
+     * plane are pulled onto it (in addition to any node that has crossed it).
      */
     double mAttractionThreshold;
 
@@ -85,7 +94,8 @@ private:
     void serialize(Archive& archive, const unsigned int version)
     {
         archive& boost::serialization::base_object<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> >(*this);
-        // archive & mUseJiggledNodesOnPlane;
+        archive & mUseJiggledNodesOnPlane;
+        archive & mAttractionThreshold;
     }
 
 public:
@@ -94,48 +104,29 @@ public:
      *
      * @param pCellPopulation pointer to the cell population
      * @param point a point on the boundary plane
-     * @param normal the outward-facing unit normal vector to the boundary plane
+     * @param normal a vector normal to the plane, facing outward (i.e. towards
+     *               the side cells are kept off); it need not be a unit vector,
+     *               as it is normalised internally
      */
     AttractingPlaneBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation,
                                      c_vector<double, SPACE_DIM> point, c_vector<double, SPACE_DIM> normal);
 
-    /**
-     * @return #mPointOnPlane.
-     */
-    const c_vector<double, SPACE_DIM>& rGetPointOnPlane() const;
+    /** @return the attraction band width (#mAttractionThreshold). */
+    double GetAttractionThreshold() const;
 
-    /**
-     * @return #mNormalToPlane.
-     */
-    const c_vector<double, SPACE_DIM>& rGetNormalToPlane() const;
-
-    /**
-     * Set method for mUseJiggledNodesOnPlane
-     *
-     * @param useJiggledNodesOnPlane whether to jiggle the nodes on the surface of the plane, can help stop overcrowding on plane.
-     */
-    void SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane);
-
-    /** @return #mUseJiggledNodesOnPlane. */
-    bool GetUseJiggledNodesOnPlane();
+    /** @return whether nodes are jiggled as they are snapped onto the plane (#mUseJiggledNodesOnPlane). */
+    bool GetUseJiggledNodesOnPlane() const;
 
     /**
      * Overridden ImposeBoundaryCondition() method.
      *
-     * Apply the cell population boundary conditions.
+     * Snap onto the plane every node that has crossed to its outward side or
+     * that lies within the attraction threshold on the inward side, optionally
+     * jiggling each snapped node (see #mUseJiggledNodesOnPlane).
      *
-     * @param rOldLocations the node locations before any boundary conditions are applied
+     * @param rOldLocations the node locations before any boundary conditions are applied (unused)
      */
-    void ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations);
-
-    /**
-     * Overridden VerifyBoundaryCondition() method.
-     * Verify the boundary conditions have been applied.
-     * This is called after ImposeBoundaryCondition() to ensure the condition is still satisfied.
-     *
-     * @return whether the boundary conditions are satisfied.
-     */
-    bool VerifyBoundaryCondition();
+    void ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations) override;
 
     /**
      * Overridden OutputCellPopulationBoundaryConditionParameters() method.
@@ -143,21 +134,45 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile);
+    void OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile) override;
+
+    /** @return the unit normal to the boundary plane (#mNormalToPlane). */
+    const c_vector<double, SPACE_DIM>& rGetNormalToPlane() const;
+
+    /** @return the stored point on the boundary plane (#mPointOnPlane). */
+    const c_vector<double, SPACE_DIM>& rGetPointOnPlane() const;
 
     /**
-     * Give a new value to the point describing the plane, can be used for time varying boundary conditions
+     * Set the width of the inward-side band within which cells are attracted onto
+     * the plane (see #mAttractionThreshold).
      *
-     * @param point a point on the boundary plane
+     * @param attractionThreshold the attraction band width
+     */
+    void SetAttractionThreshold(double attractionThreshold);
+
+    /**
+     * Move the plane to pass through a new point, keeping the same normal. Allows
+     * the boundary to be repositioned over the course of a simulation.
+     *
+     * @param rPoint a point on the boundary plane
      */
     void SetPointOnPlane(const c_vector<double, SPACE_DIM>& rPoint);
 
     /**
-     * Specify the distance to the plane for cell attraction
+     * Set whether to jiggle nodes as they are snapped onto the plane, which can
+     * help stop them overcrowding on it (see #mUseJiggledNodesOnPlane).
      *
-     * @param attractionThreshold the distance to the plane for cell attraction
+     * @param useJiggledNodesOnPlane whether to jiggle the snapped nodes
      */
-    void SetAttractionThreshold(double attractionThreshold);
+    void SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane);
+
+    /**
+     * Overridden VerifyBoundaryCondition() method, called after
+     * ImposeBoundaryCondition() to confirm the condition still holds.
+     *
+     * @return whether every cell centre is on the inward side of the plane
+     */
+    bool VerifyBoundaryCondition() override;
 };
 
 #include "SerializationExportWrapper.hpp"

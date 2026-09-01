@@ -102,7 +102,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
     assert(!(this->IsNeumannBoundaryCondition()));
 
     this->ConstructBoundaryConditionsContainerHelper(rCellPopulation,p_bcc);
-    
+
     return p_bcc;
 }
 

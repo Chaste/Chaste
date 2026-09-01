@@ -61,7 +61,7 @@ class TestDiskSpace(unittest.TestCase):
             # psutil 0.3.0 or newer is needed for this test to work
             return
         gb = 1024*1024*1024
-        
+
         source_free_gb = du(__file__).free / gb
         print("Free space on Chaste source partition: %sGB" % source_free_gb)
         self.assertFalse(source_free_gb < 5,

@@ -208,7 +208,7 @@ public:
         TS_ASSERT_DELTA(scaled_pde.GetConstantCoefficient(), 0.01, 1e-6);
         TS_ASSERT_DELTA(scaled_pde.GetLinearCoefficient(), 0.05, 1e-6);
         TS_ASSERT_DELTA(scaled_pde.GetDiffusionCoefficient(), 2.0, 1e-6);
-        TS_ASSERT(scaled_pde.GetScaleByCellVolume()); 
+        TS_ASSERT(scaled_pde.GetScaleByCellVolume());
 
         // Test ComputeConstantInUSourceTermAtNode() and ComputeLinearInUCoeffInSourceTermAtNode() methods
         // Node<2>* p_node_0 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(0));
@@ -220,7 +220,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(12)), 0.5*sqrt(3), 1e-6);
         TS_ASSERT_DELTA(scaled_pde.ComputeConstantInUSourceTermAtNode(*p_node_12), 0.01/0.5/sqrt(3), 1e-6);
         TS_ASSERT_DELTA(scaled_pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_12), 0.05/0.5/sqrt(3), 1e-6);
-        
+
         // Test Exceptions
         Node<2>* p_node_24 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(24));
         TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(24)), 0.0, 1e-6);
@@ -365,7 +365,7 @@ public:
         TS_ASSERT_DELTA(pde.GetUptakeRateForElement(0), 0.5, 1e-6);
         TS_ASSERT_DELTA(pde.GetUptakeRateForElement(1), 0.0, 1e-6);
 
-        // Bound the voronoi tesselation so no zero cell areas and 
+        // Bound the voronoi tesselation so no zero cell areas and
         // create a scaled PDE object
         cell_population.SetBoundVoronoiTessellation(true);
         constant_coefficient = 0.01;
@@ -396,7 +396,7 @@ public:
         }
         TS_ASSERT_DELTA(tissue_area, 21.4620, 1e-4);
 
-        // The first element has area 0.5*10*10 = 50 and there are 5*5 = 25 cells with a total area of 21.4620, 
+        // The first element has area 0.5*10*10 = 50 and there are 5*5 = 25 cells with a total area of 21.4620,
         // so the cell density is 21.4620 /50 = 0.5.
         TS_ASSERT_DELTA(scaled_pde.mCellDensityOnCoarseElements[0], tissue_area/50.0, 1e-4);
 

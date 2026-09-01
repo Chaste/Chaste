@@ -88,8 +88,8 @@ public:
 
 /**
 * The tests below build the VTK writer object
-* then tests whether it actually writes valid VTK files 
-* with the expected data 
+* then tests whether it actually writes valid VTK files
+* with the expected data
 */
 class TestCardiacElectroMechanicsVtkHandler : public CxxTest::TestSuite
 {
@@ -146,11 +146,11 @@ public:
         p_mesh_pair->SetUpBoxesOnFineMesh();
         p_mesh_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(mechanics_solver.GetQuadratureRule()), false);
         p_mesh_pair->DeleteFineBoxCollection();
-        
+
         mechanics_solver.SetFineCoarseMeshPair(p_mesh_pair);
         mechanics_solver.SetComputeAverageStressPerElementDuringSolve(true);
         mechanics_solver.Initialise();
-        
+
         Vec ics = mono_problem.CreateInitialCondition();
         ReplicatableVector ic(ics);
         CardiacElectroMechanicsVtkHandler<2> handler(mechanics_solver,
@@ -182,7 +182,7 @@ public:
             {
                 TS_ASSERT_DELTA(ic[i] , voltage[i], 1e-9);
             }
-            
+
             // No displacement expected at the start
             std::vector< c_vector<double, 2> > displ;
             vtk_reader.GetPointData("displacements", displ);
@@ -218,7 +218,7 @@ public:
 
             //check that the deformed position is reflected in the solver
             TS_ASSERT_DELTA(mechanics_solver.rGetDeformedPosition()[i](0), x_coord + x_coord*scaling_factor,1e-9);
-        }        
+        }
         //write this fake solution
         handler.WriteSolution(1u, fake_repl);
         {
@@ -236,7 +236,7 @@ public:
                 TS_ASSERT_DELTA(next_node[0],mechanics_mesh.GetNode(i)->rGetLocation()[0]*(1+scaling_factor),1e-9);
                 //...and that the internal mesh moved...
                 TS_ASSERT_DELTA(next_node[0],handler.mpVtkOutputMesh->GetNode(i)->rGetLocation()(0),1e-9);
-                
+
                 //unchanged for y direction
                 TS_ASSERT_DELTA(next_node[1],mechanics_mesh.GetNode(i)->rGetLocation()[1],1e-9);
                 TS_ASSERT_DELTA(next_node[1],handler.mpVtkOutputMesh->GetNode(i)->rGetLocation()(1),1e-9);
@@ -255,7 +255,7 @@ public:
             {
                 TS_ASSERT_DELTA(expected_interpolated_voltages[i] , voltage[i], 1e-9);
             }
-            
+
             // Check displacements
             std::vector< c_vector<double, 2> > displ;
             vtk_reader.GetPointData("displacements", displ);
@@ -267,7 +267,7 @@ public:
                 TS_ASSERT_DELTA(displ[i](1) , 0.0, 1e-9);//no displacement in y direction
             }
         }
-        
+
         delete p_mesh_pair;
         PetscTools::Destroy(fake_solution);
         PetscTools::Destroy(ics);
@@ -283,7 +283,7 @@ public:
 // Requires  "sudo aptitude install libvtk5-dev" or similar
         MechanicsEventHandler::Reset();//prevent some warnings
         HeartEventHandler::Reset();//prevent some warnings
-        
+
         EntirelyStimulatedTissueCellFactory3D cell_factory;
 
         TetrahedralMesh<3,3> electrics_mesh;
@@ -331,11 +331,11 @@ public:
         p_mesh_pair->SetUpBoxesOnFineMesh();
         p_mesh_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(mechanics_solver.GetQuadratureRule()), false);
         p_mesh_pair->DeleteFineBoxCollection();
-        
+
         mechanics_solver.SetFineCoarseMeshPair(p_mesh_pair);
         mechanics_solver.SetComputeAverageStressPerElementDuringSolve(true);
         mechanics_solver.Initialise();
-        
+
         Vec ics = mono_problem.CreateInitialCondition();
         ReplicatableVector ic(ics);
         CardiacElectroMechanicsVtkHandler<3> handler(mechanics_solver,
@@ -343,7 +343,7 @@ public:
                                       electrics_mesh,
                                       ic,
                                       output_dir);
-        
+
         // fake a solution
         Vec fake_solution = mono_problem.CreateInitialCondition();
         ReplicatableVector fake_repl(fake_solution);
@@ -374,7 +374,7 @@ public:
             {
                 TS_ASSERT_DELTA(fake_repl[i] , voltage[i], 1e-9);
             }
-            
+
             // No displacement expected
             std::vector< c_vector<double, 3> > displ;
             vtk_reader.GetPointData("displacements", displ);
@@ -394,7 +394,7 @@ public:
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
-  
+
 
 };
 #endif /*TESTCARDIACELECTROMECHANICSVTKHANDLER_HPP_*/

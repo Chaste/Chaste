@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Citations.hpp"
+#include "FilesystemPermissions.hpp"
 #include "PetscTools.hpp"
 #include <algorithm>
 #include <iterator>
@@ -86,6 +87,7 @@ void Citations::Print()
                 std::string out_file_path = CommandLineArguments::Instance()->GetStringCorrespondingToOption("-citations");
                 p_output = new std::ofstream(out_file_path.c_str(), std::ios::out);
                 EXCEPT_IF_NOT(p_output->good());
+                FilesystemPermissions::SetFilePermissions(out_file_path);
             }
 
             /* Write header */
