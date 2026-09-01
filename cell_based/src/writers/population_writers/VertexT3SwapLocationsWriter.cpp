@@ -71,8 +71,7 @@ void VertexT3SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPo
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexT3SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    std::vector<T3SwapInfo<SPACE_DIM> > t3_swap_info
-            = pCellPopulation->rGetMesh().GetOperationRecorder()->GetT3SwapsInfo();
+    std::vector<T3SwapInfo<SPACE_DIM> > t3_swap_info = pCellPopulation->rGetMesh().GetOperationRecorder()->GetT3SwapsInfo();
 
     *this->mpOutStream << t3_swap_info.size() << "\t";
     for (unsigned index = 0;  index < t3_swap_info.size(); index++)
