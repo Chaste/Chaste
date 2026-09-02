@@ -135,43 +135,41 @@ public:
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
-        // Set up cell-based simulation
-        OnLatticeSimulation<2> simulator(cell_population);
-        std::string output_directory = "TestCaSingleCellRandomMovement";
-        simulator.SetOutputDirectory(output_directory);
-        simulator.SetDt(delta_t);
-        simulator.SetEndTime(delta_t);
-
-        // Add update rule
+        // Add update rule. Note that we call `CaBasedCellPopulation::UpdateCellLocations()` directly
+        // in the loop below, rather than driving this through an `OnLatticeSimulation`. Calling
+        // `OnLatticeSimulation::Solve()` in a loop num_runs times would re-run its per-call setup
+        // (creating and cleaning a new output directory and reopening writer files) num_runs times,
+        // which dominates runtime without adding anything this test checks; `UpdateCellLocations()`
+        // is the same method `Solve()` would call each timestep, and has no dependency on
+        // `SimulationTime` or the simulator. This does mean we skip `Solve()`'s per-timestep cell
+        // birth/death/population-update bookkeeping, but that is a no-op here (there are no cell
+        // killers and the cell is `DifferentiatedCellProliferativeType`, which never divides), and is
+        // covered thoroughly by the other tests in this file.
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(diffusion_parameter);
-        simulator.AddUpdateRule(p_diffusion_update_rule);
+        cell_population.AddUpdateRule(p_diffusion_update_rule);
+
+        CellPtr p_cell = *(cell_population.Begin());
 
         for (unsigned i=1; i<=num_runs; i++)
         {
-            simulator.SetEndTime(delta_t*i);
+            cell_population.UpdateCellLocations(delta_t);
 
-            // Run simulation
-            simulator.Solve();
+            TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
 
-            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1u);
-            AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
-
-            unsigned cell_location = simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter);
+            unsigned cell_location = cell_population.GetLocationIndexUsingCell(p_cell);
             TS_ASSERT_LESS_THAN(cell_location, 9u);
 
             location_of_cell[cell_location]++;
 
             // Reset the position of the cell
-            simulator.rGetCellPopulation().MoveCellInLocationMap(*cell_iter, cell_location, 4u);
+            cell_population.MoveCellInLocationMap(p_cell, cell_location, 4u);
 
-            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), 4u);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_cell), 4u);
         }
 
         // Check that we still have only one cell
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1u);
-        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
 
         ///\todo Check that the cell is moving correctly
         double probability_of_occupation[9];
@@ -192,7 +190,7 @@ public:
         TS_ASSERT_DELTA(probability_of_occupation[8], diffusion_parameter*delta_t/4.0, 1e-2);
 
         // For coverage
-        simulator.RemoveAllUpdateRules();
+        cell_population.RemoveAllUpdateRules();
     }
 
     void TestCaMonolayerWithBirth()
