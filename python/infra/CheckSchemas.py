@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -102,7 +102,7 @@ for (path, file) in files_to_check:
     else:
         if file in exception_tests:
           num_good+=1
-        else:  
+        else:
           print('%s is an orphan.  There is no reference schema with that name.' % file_name)
           num_bad+=1
 

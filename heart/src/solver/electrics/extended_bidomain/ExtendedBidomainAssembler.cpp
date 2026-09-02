@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,19 +63,15 @@ c_matrix<double,3*(ELEMENT_DIM+1),3*(ELEMENT_DIM+1)>
     double delta_t = PdeSimulationTime::GetPdeTimeStep();
 
     c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> temp_1 = prod(sigma_i_first_cell, rGradPhi);
-    c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> grad_phi_sigma_i_first_cell_grad_phi =
-        prod(trans(rGradPhi), temp_1);
+    c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> grad_phi_sigma_i_first_cell_grad_phi = prod(trans(rGradPhi), temp_1);
 
     c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> temp_2 = prod(sigma_i_second_cell, rGradPhi);
-    c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> grad_phi_sigma_i_second_cell_grad_phi =
-        prod(trans(rGradPhi), temp_2);
+    c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> grad_phi_sigma_i_second_cell_grad_phi = prod(trans(rGradPhi), temp_2);
 
-    c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> basis_outer_prod =
-        outer_prod(rPhi, rPhi);
+    c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> basis_outer_prod = outer_prod(rPhi, rPhi);
 
     c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> temp_ext = prod(sigma_e, rGradPhi);
-    c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> grad_phi_sigma_e_grad_phi =
-        prod(trans(rGradPhi), temp_ext);
+    c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> grad_phi_sigma_e_grad_phi = prod(trans(rGradPhi), temp_ext);
 
 
     c_matrix<double,3*(ELEMENT_DIM+1),3*(ELEMENT_DIM+1)> ret;

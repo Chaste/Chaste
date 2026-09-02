@@ -1,6 +1,6 @@
 """PyChaste Module"""
 
-__copyright__ = """Copyright (c) 2005-2025, University of Oxford.
+__copyright__ = """Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,17 +32,30 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import importlib.util
 import os
 import sys
 
 import petsc4py
 
-import chaste.cell_based
-import chaste.core
-import chaste.mesh
-import chaste.ode
-import chaste.pde
-import chaste.visualization
+# Expose every wrapped class at the top level as chaste.ClassName in addition to
+# chaste.subpackage.ClassName.
+from chaste._generated import *  # noqa: F401,F403
+
+# The flatten above only re-exports wrapped classes. Hand-written additions must
+# be exposed at the top level explicitly.
+from chaste.cell_based import (  # noqa: F401
+    AbstractCellBasedTestSuite,
+    AbstractCellBasedWithTimingsTestSuite,
+)
+
+# The Jupyter visualization classes require IPython, so only expose them when it
+# is installed.
+if importlib.util.find_spec("IPython") is not None:
+    from chaste.visualization import (  # noqa: F401
+        JupyterNotebookManager,
+        JupyterSceneModifier,
+    )
 
 
 def init(test_output=None, comm=None):
@@ -66,7 +79,8 @@ def init(test_output=None, comm=None):
     else:
         petsc4py.init(comm=comm)
 
-    return chaste.core.OutputFileHandler("", False)
+    # OutputFileHandler is exposed at the top level by the flatten import above.
+    return OutputFileHandler("", False)
 
 
 init()

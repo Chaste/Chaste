@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -262,8 +262,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     static c_matrix<double, NUM_NODES_PER_ELEMENT, DIM> trans_grad_quad_phi;
 
     // Get the material law
-    AbstractIncompressibleMaterialLaw<DIM>* p_material_law
-        = this->mrProblemDefinition.GetIncompressibleMaterialLaw(rElement.GetIndex());
+    AbstractIncompressibleMaterialLaw<DIM>* p_material_law = this->mrProblemDefinition.GetIncompressibleMaterialLaw(rElement.GetIndex());
 
     static c_matrix<double,DIM,DIM> grad_u; // grad_u = (du_i/dX_M)
 
@@ -595,8 +594,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::FormInitialGuess()
          ++iter)
     {
         ///\todo #2223 This is unlikely to work using DistributedQuadraticMesh with Non-homogeneous material laws
-        double zero_strain_pressure
-           = this->mrProblemDefinition.GetIncompressibleMaterialLaw(iter->GetIndex())->GetZeroStrainPressure();
+        double zero_strain_pressure = this->mrProblemDefinition.GetIncompressibleMaterialLaw(iter->GetIndex())->GetZeroStrainPressure();
 
 
         // Loop over vertices and set pressure solution to be zero-strain-pressure

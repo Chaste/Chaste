@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -85,7 +85,7 @@ public:
 
     void TestParabolicConstructor()
     {
-        // Create PDE and boundary condition objects 
+        // Create PDE and boundary condition objects
         double constant_coefficient = -0.1;
         double linear_coefficient = -0.2;
         double diffusion_coefficient = 0.1;

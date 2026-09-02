@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,8 +101,7 @@ void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
              * a new CellPropertyRegistry. In this case the CellLabel's cell count would be incorrect.
              * We must therefore access the CellLabel via the cell's CellPropertyCollection.
              */
-            std::shared_ptr<AbstractCellProperty> p_label =
-                mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<CellLabel>();
+            auto p_label = mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<CellLabel>();
             mpCell->AddCellProperty(p_label);
         }
         else

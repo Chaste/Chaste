@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Element.hpp"
-
+#include <algorithm>
 #include <cfloat>
 #include <cassert>
 
@@ -207,14 +207,8 @@ c_vector <double, 2> Element<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths
         for (unsigned j=i+1; j<=ELEMENT_DIM; j++)
         {
             double length = norm_2(this->GetNodeLocation(j) - loc_i);
-            if (length < min_max[0])
-            {
-                min_max[0] = length;
-            }
-            if (length > min_max[1])
-            {
-                min_max[1] = length;
-            }
+            min_max[0] = std::min(min_max[0], length);
+            min_max[1] = std::max(min_max[1], length);
         }
     }
     return min_max;

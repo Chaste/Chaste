@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -122,8 +122,12 @@ public:
 
             PetscSetupUtils::CommonFinalize(); // This prints the citations to disk
 
-// Check PETSc version - this is just because they reformatted their BibTex between versions, no change to function!
-#if PETSC_VERSION_GE(3, 23, 0) //PETSc 3.23.0 onwards
+            // Check PETSc version - this is just because they reformatted their BibTex between versions, no change to function!
+#if PETSC_VERSION_GE(3, 25, 0) //PETSc 3.25.0 onwards
+            FileFinder reference_citations("global/test/data/citations-2026_1.txt", RelativeTo::ChasteSourceRoot);
+#elif PETSC_VERSION_GE(3, 24, 0) //PETSc 3.24.0 onwards
+            FileFinder reference_citations("global/test/data/citations-2026_0.txt", RelativeTo::ChasteSourceRoot);
+#elif PETSC_VERSION_GE(3, 23, 0) //PETSc 3.23.0 onwards
             FileFinder reference_citations("global/test/data/citations-2025_0.txt", RelativeTo::ChasteSourceRoot);
 #elif PETSC_VERSION_GE(3, 22, 0) //PETSc 3.22.0 onwards
             FileFinder reference_citations("global/test/data/citations-2024_1.txt", RelativeTo::ChasteSourceRoot);

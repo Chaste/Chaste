@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,8 +68,7 @@ void BackwardEulerIvpOdeSolver::ComputeJacobian(AbstractOdeSystem* pAbstractOdeS
     if (pAbstractOdeSystem->GetUseAnalyticJacobian() && !mForceUseOfNumericalJacobian)
     {
         // The ODE system has an analytic jacobian, so use that
-        AbstractOdeSystemWithAnalyticJacobian* p_ode_system
-            = static_cast<AbstractOdeSystemWithAnalyticJacobian*>(pAbstractOdeSystem);
+        auto* p_ode_system = static_cast<AbstractOdeSystemWithAnalyticJacobian*>(pAbstractOdeSystem);
         p_ode_system->AnalyticJacobian(rCurrentGuess, mJacobian, time, timeStep);
     }
     else

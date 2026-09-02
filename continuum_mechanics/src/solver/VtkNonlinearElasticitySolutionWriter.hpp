@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,10 +83,10 @@ public:
 
     /**
      * Stores the displacements in rDisplacements.
-     * Memory for rDisplacements must be alloctaed before calling this method, 
+     * Memory for rDisplacements must be alloctaed before calling this method,
      * which will check if rDisplacements is of the same size as the number of
      * nodes in the quadratic mesh
-     * 
+     *
      * @param rDisplacements the vector that wil be filled in with displacement values
      */
     void CalculateDisplacements(std::vector<c_vector<double,DIM> >& rDisplacements);
@@ -97,7 +97,7 @@ public:
      * Memory for rStrains must be allocated before calling this method,
      * which will check if rStresses is of the same size as the number of
      * elements in the quadratic mesh
-     * 
+     *
      * @param name the name of the displacements, based on the most recent call to SetWriteElementWiseStrains
      * @param rStrains the vector that will be filled with corresponding strain values
      */

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,8 +83,7 @@ double AbstractCvodeCellWithDataClamp::GetExperimentalVoltageAtTimeT(const doubl
         EXCEPTION("The requested time " << rTime << " is outside the times stored in the data clamp.");
     }
 
-    std::vector<double>::iterator upper_vec =
-            std::upper_bound(mExperimentalTimes.begin(), mExperimentalTimes.end(), rTime);
+    auto upper_vec = std::upper_bound(mExperimentalTimes.begin(), mExperimentalTimes.end(), rTime);
     // upper_vec points to first element that is (strictly) > rTime (so it can't be first one if rTime is in range)
 
     // Special case - here the lower bound is equal to upper bound and both are pointing to end!

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -138,8 +138,7 @@ void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
              * count would be incorrect. We must therefore access the ApoptoticCellProperty via the
              * cell's CellPropertyCollection.
              */
-            std::shared_ptr<AbstractCellProperty> p_apoptotic_property =
-                mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+            auto p_apoptotic_property = mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
             mpCell->AddCellProperty(p_apoptotic_property);
         }
     }

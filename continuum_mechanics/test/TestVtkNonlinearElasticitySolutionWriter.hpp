@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -87,7 +87,7 @@ public:
             problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
             problem_defn.SetZeroDisplacementNodes(fixed_nodes);
             IncompressibleNonlinearElasticitySolver<3> solver(bar_mesh,problem_defn,dir.str());
-            
+
             solver.Solve();
 
             // solution is currently no deformation. Hack into the solution and set it to be something known.
@@ -128,7 +128,7 @@ public:
             // .vtu files have been visualised, everything looks good.
             FileFinder vtk_file(dir.str() + "/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
             TS_ASSERT(vtk_file.Exists());
-            
+
             {
                 // Check that the reader can see it
                 VtkMeshReader<3,3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + dir.str() + "/vtk/solution.vtu");
@@ -153,7 +153,7 @@ public:
                 }
             }
 
-            // It is difficult to test the content of tensor data as the VTK reader doesn't have a method (yet) 
+            // It is difficult to test the content of tensor data as the VTK reader doesn't have a method (yet)
             // However, the strain data is stored in a member variable so we can
             // test it was computed correctly.
             for (unsigned i=0; i<bar_mesh.GetNumElements(); i++)
@@ -189,7 +189,7 @@ public:
                         }
                     }
                 }
-                
+
             }
         }
 #endif //CHASTE_VTK

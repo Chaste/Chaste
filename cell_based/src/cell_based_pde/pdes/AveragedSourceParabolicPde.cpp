@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,8 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AveragedSourceParabolicPde<DIM>::AveragedSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
-                                                            double constantSourceCoefficient, 
-                                                            double linearSourceCoefficient, 
+                                                            double constantSourceCoefficient,
+                                                            double linearSourceCoefficient,
                                                             double diffusionCoefficient,
                                                             double duDtCoefficient,
                                                             bool scaleByCellVolume)
@@ -123,14 +123,14 @@ void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>&
             double cell_weight = 1.0;
 
             if (mScaleByCellVolume)
-            {   
-                // If scaling by cell volume then use volume her instead of cell count 
+            {
+                // If scaling by cell volume then use volume her instead of cell count
                 cell_weight = mrCellPopulation.GetVolumeOfCell(*cell_iter);
 
                 if (cell_weight <1e-6)
                 {
-                    EXCEPTION("The volume of one of the cells is " << cell_weight << 
-                              " and you are scaling by cell volume. Either turn scaling off or use"  
+                    EXCEPTION("The volume of one of the cells is " << cell_weight <<
+                              " and you are scaling by cell volume. Either turn scaling off or use"
                               " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
                 }
             }
@@ -162,7 +162,7 @@ double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>
 
     // The source term is (a*u + b)*density
     double source_term = (mLinearSourceCoefficient * u + mConstantSourceCoefficient) * mCellDensityOnCoarseElements[pElement->GetIndex()];
-   
+
     return source_term;
 }
 

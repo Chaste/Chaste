@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -114,7 +114,7 @@ void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopul
         {
             mOldCellLocations[*cell_iter] = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
         }
-    } 
+    }
 }
 
 template<unsigned DIM>
@@ -154,7 +154,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicBoxDomainPdeMo
     std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     this->ConstructBoundaryConditionsContainerHelper(rCellPopulation,p_bcc);
-   
+
     return p_bcc;
 }
 
@@ -197,11 +197,11 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
         const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
         double radius = norm_2(r_position_of_cell.rGetLocation());
-        
+
         if (max_radius < radius)
         {
             max_radius = radius;
-        }                
+        }
     }
 
     // Create mesh from cell centres so can interpolate tissue velocity onto mpFeMesh
@@ -220,33 +220,33 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
         {
             //PRINT_VARIABLE(mOldCellLocations[*cell_iter]);
             c_vector<double,DIM> displacement = position_of_cell - mOldCellLocations[*cell_iter];
-       
+
             cell_displacements.push_back(displacement);
             temp_nodes.push_back(new Node<DIM>(cell_index, position_of_cell));
         }
     }
     MutableMesh<DIM,DIM> cell_mesh(temp_nodes);
 
-    // Make the deformed mesh. Based on the displacement of cells. 
+    // Make the deformed mesh. Based on the displacement of cells.
     auto* p_deformed_mesh = new TetrahedralMesh<DIM,DIM>();
     this->GenerateAndReturnFeMesh(this->mpMeshCuboid,this->mStepSize,p_deformed_mesh);
-    
+
     for (typename TetrahedralMesh<DIM, DIM>::NodeIterator node_iter = p_deformed_mesh->GetNodeIteratorBegin();
          node_iter != p_deformed_mesh->GetNodeIteratorEnd();
          ++node_iter)
     {
         c_vector<double, DIM> node_location = node_iter->rGetLocation();
 
-        
+
         c_vector<double, DIM> new_node_location = node_location;
-        
+
         if (norm_2(node_location) <= max_radius)
         {
             // Find the element in the cell mesh that contains this node.
             try
             {
                 unsigned elem_index = cell_mesh.GetContainingElementIndex(node_location, false);
-        
+
                 // Now do the interpolation
                 Element<DIM,DIM>* p_element = cell_mesh.GetElement(elem_index);
                 c_vector<double,DIM+1> weights = p_element->CalculateInterpolationWeights(node_location);
@@ -264,7 +264,7 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
             {
                 // Don't do anything as these FE nodes are outside the Cell mesh, and it's fine to do nothing.
             }
-        }   
+        }
     }
 
     // Loop over nodes of the mpFeMesh and get solution values from the deformed mesh
@@ -279,15 +279,15 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
         // Find the element in the deformed mesh that contains this FE node.
         std::set<unsigned> elements_to_check = node_iter->rGetContainingElementIndices();
         try
-        { 
+        {
             unsigned elem_index = p_deformed_mesh->GetContainingElementIndex(node_location, false, elements_to_check);
-       
+
             // Now do the interpolation
             Element<DIM,DIM>* p_element = p_deformed_mesh->GetElement(elem_index);
             c_vector<double,DIM+1> weights;
 
             weights = p_element->CalculateInterpolationWeights(node_location);
-        
+
             double solution_at_node = 0.0;
             for (unsigned i=0; i<DIM+1; i++)
             {
@@ -307,7 +307,7 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
             // VtkMeshWriter<DIM, DIM>* p_vtk_mesh_writer1 = new VtkMeshWriter<DIM, DIM>(this->mOutputDirectory, results_file1, false);
             // p_vtk_mesh_writer1->AddPointData(this->mDependentVariableName, cell_displacements);
             // p_vtk_mesh_writer1->WriteFilesUsingMesh(cell_mesh);
-            // delete p_vtk_mesh_writer1; 
+            // delete p_vtk_mesh_writer1;
 
             // // output the deformed mesh
             // std::ostringstream time_string;
@@ -315,11 +315,11 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
             // std::string results_file = "deformed_mesh_" + this->mDependentVariableName + "_" + time_string.str();
             // VtkMeshWriter<DIM, DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM, DIM>(this->mOutputDirectory, results_file, false);
             // p_vtk_mesh_writer->WriteFilesUsingMesh(*p_deformed_mesh);
-            // delete p_vtk_mesh_writer;  
+            // delete p_vtk_mesh_writer;
 
             assert(0);
         }
-    }   
+    }
 
     // Tidy Up
     delete p_deformed_mesh;

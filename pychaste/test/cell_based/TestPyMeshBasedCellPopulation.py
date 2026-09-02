@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -57,7 +57,7 @@ class TestPyMeshBasedCellPopulation(chaste.cell_based.AbstractCellBasedTestSuite
 
         # Make the cell population
         cell_population = chaste.cell_based.MeshBasedCellPopulation[2, 2](mesh, cells)
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 
         # Set up the visualizer
         scene = chaste.visualization.VtkScene[2]()

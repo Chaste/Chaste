@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,8 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define XDMFMESHWRITER_HPP_
 
 #include "AbstractTetrahedralMeshWriter.hpp"
-// Xerces is currently not supported in the Windows port
-#ifndef _MSC_VER
 
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/dom/DOM.hpp>
@@ -52,8 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #define X(str) xsd::cxx::xml::string(str).c_str()
 #endif //X
-
-#endif // _MSC_VER
 /**
  * A class for writing from a Chaste mesh to the geometry/topology components of
  * an XDMF file.
@@ -72,7 +68,6 @@ private:
      */
     void WriteXdmfMasterFile(unsigned numberOfChunks=1u);
 
-#ifndef _MSC_VER
     /**
      * Generate Attribute tags and append to the element.  Here this is a dummy class, but can be
      * overloaded with real variables elsewhere (see pde/src/postprocesssing/Hdf5toXdmfConverter).
@@ -86,7 +81,6 @@ private:
     {
         //Empty body - implemented in derived classes
     }
-#endif // _MSC_VER
 
 public:
     /**

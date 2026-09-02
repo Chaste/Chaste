@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -192,7 +192,7 @@ class TestPyPottsBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
 
         ## In order to visualize labelled cells we need to use the following command.
 
-        cell_population.AddCellWriterCellLabelWriter()
+        cell_population.AddCellWriter["CellLabelWriter"]()
 
         ## We then pass in the cell population into an `OffLatticeSimulation`, and set the output directory and end time
 
@@ -270,7 +270,7 @@ class TestPyPottsBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
 
         ## In order to visualize labelled cells we need to use the following command.
 
-        cell_population.AddCellWriterCellLabelWriter()
+        cell_population.AddCellWriter["CellLabelWriter"]()
 
         ## We then pass in the cell population into an `OffLatticeSimulation`, and set the output directory and end time
 

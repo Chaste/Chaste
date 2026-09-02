@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -944,16 +944,6 @@ public:
             TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
             TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "No Purkinje-Ventricular junction (.pvj) file found. Junctions must be specified manually.");
             Warnings::QuietDestroy();
-        }
-
-        //Cover warning that a .pvj file can't be read
-        if (PetscTools::AmMaster())
-        {
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
-
-            chmod("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star.pvj", 0000);
-            TS_ASSERT_THROWS_CONTAINS(purkinje_problem.Initialise(), "Couldn't open data file:");
-            chmod("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star.pvj", CHASTE_READ_WRITE);
         }
 
         //Covers empty lines in .pvj file

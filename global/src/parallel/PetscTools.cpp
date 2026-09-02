@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -377,7 +377,7 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
         // Create an empty matrix with non-default parallel layout
         PetscInt num_rows, num_local_rows;
         VecGetSize(rParallelLayout, &num_rows);
-        VecGetLocalSize(rParallelLayout, &num_local_rows);       
+        VecGetLocalSize(rParallelLayout, &num_local_rows);
         /// \todo: #1082 work out appropriate nz allocation.
         PetscTools::SetupMat(rMat, num_rows, num_rows, 100, num_local_rows, num_local_rows, false);
 
@@ -386,7 +386,7 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
     {
         // Create an empty matrix with default parallel layout
         MatCreate(PETSC_COMM_WORLD, &rMat);
-        MatSetType(rMat, MATMPIAIJ);   
+        MatSetType(rMat, MATMPIAIJ);
     }
 
     // Read into parallel matrix
@@ -492,7 +492,7 @@ bool PetscTools::HasParMetis()
 
     // We are expecting an error from PETSC on systems that don't have the interface, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
+    PetscPushErrorHandler(PetscReturnErrorHandler, nullptr);
 
 #if (PETSC_VERSION_MAJOR == 2 || (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2))
     PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part, MAT_PARTITIONING_PARMETIS);
@@ -506,16 +506,6 @@ bool PetscTools::HasParMetis()
     // Note that this method probably leaks memory inside PETSc because if MatPartitioningCreate fails
     // then there isn't a proper handle to destroy.
     MatPartitioningDestroy(PETSC_DESTROY_PARAM(part));
-
-    // Get out of jail free card for Windows where the latest configuration of the integration machine shows that our implementation doesn't work as expected.
-#ifdef _MSC_VER
-    //\todo #2016 (or similar ticket).  The method NodePartitioner::PetscMatrixPartitioning is not working in parallel
-    if (parmetis_installed_error == 0)
-    {
-        WARN_ONCE_ONLY("The PETSc/parMETIS interface is correctly installed but does not yet work in Windows so matrix-based partitioning will be turned off.");
-    }
-    return false;
-#endif
 
     return (parmetis_installed_error == 0);
 }

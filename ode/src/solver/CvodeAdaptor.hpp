@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,12 +37,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _CVODEADAPTOR_HPP_
 #define _CVODEADAPTOR_HPP_
 
+#include <memory>
 #include <vector>
 
 #include <boost/serialization/base_object.hpp>
 #include "ChasteSerialization.hpp"
 
 #include "AbstractIvpOdeSolver.hpp"
+#include "CvodeContextManager.hpp"
 #include "OdeSolution.hpp"
 
 // CVODE headers
@@ -137,6 +139,14 @@ private:
 
     /** Pointer to the CVODE memory block. */
     void* mpCvodeMem;
+
+#if CHASTE_SUNDIALS_VERSION >= 60000
+    /**
+     * Shared ownership of the SUNContext this solver's Sundials objects were created
+     * against, to guarantee the context outlives them. See CvodeContextManager.
+     */
+    std::shared_ptr<CvodeContextManager> mpSundialsContextManager;
+#endif
 
     /** The CVODE data structure. */
     CvodeData mData;

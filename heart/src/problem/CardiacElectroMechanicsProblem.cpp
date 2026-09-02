@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -339,7 +339,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProbl
     delete mpCardiacMechSolver;
     delete mpMeshPair;
     delete mpCardiacVtkWriter;
-    
+
     LogFile::Close();
 }
 
@@ -436,7 +436,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     unsigned num_quad_points = mpCardiacMechSolver->GetTotalNumQuadPoints();
     mInterpolatedCalciumConcs.assign(num_quad_points, 0.0);
     mInterpolatedVoltages.assign(num_quad_points, 0.0);
-    
+
     if (mpProblemDefinition->ReadFibreSheetDirectionsFromFile())
     {
        mpCardiacMechSolver->SetVariableFibreSheetDirections(mpProblemDefinition->GetFibreSheetDirectionsFile(),
@@ -483,7 +483,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     {
         TrianglesMeshWriter<DIM,DIM> mesh_writer(mOutputDirectory,"electrics_mesh",false);
         mesh_writer.WriteFilesUsingMesh(*mpElectricsMesh);
-    }   
+    }
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
@@ -508,8 +508,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     // get an electrics solver from the problem. Note that we don't call
     // Solve() on the CardiacProblem class, we do the looping here.
-    AbstractDynamicLinearPdeSolver<DIM,DIM,ELEC_PROB_DIM>* p_electrics_solver
-       = mpElectricsProblem->CreateSolver();
+    AbstractDynamicLinearPdeSolver<DIM,DIM,ELEC_PROB_DIM>* p_electrics_solver = mpElectricsProblem->CreateSolver();
 
     // set up initial voltage etc
     Vec electrics_solution=NULL; //This will be set and used later
@@ -529,7 +528,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     {
 #ifdef CHASTE_VTK
         if (HeartConfig::Instance()->GetVisualizeWithVtk())
-        {   
+        {
             ReplicatableVector ic(initial_voltage);
             mpCardiacVtkWriter = new CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>(*mpMechanicsSolver,
                 *mpMechanicsMesh,*mpElectricsMesh, ic, mDeformationOutputDirectory);

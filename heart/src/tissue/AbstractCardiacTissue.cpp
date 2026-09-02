@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -89,8 +89,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     mCellsDistributed.resize(num_local_nodes);
 
     // Figure out if we're dealing with Purkinje
-    AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>* p_purkinje_cell_factory
-       = dynamic_cast<AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>*>(pCellFactory);
+    auto* p_purkinje_cell_factory = dynamic_cast<AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>*>(pCellFactory);
     if (p_purkinje_cell_factory)
     {
         mHasPurkinje = true;
@@ -111,8 +110,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
 
             if (mHasPurkinje)
             {
-                mPurkinjeCellsDistributed[local_index]
-                    = p_purkinje_cell_factory->CreatePurkinjeCellForNode(p_node, mCellsDistributed[local_index]);
+                mPurkinjeCellsDistributed[local_index] = p_purkinje_cell_factory->CreatePurkinjeCellForNode(p_node, mCellsDistributed[local_index]);
                 mPurkinjeCellsDistributed[local_index]->SetUsedInTissueSimulation();
             }
         }

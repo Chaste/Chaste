@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -86,8 +86,14 @@ class ProcessValgrind:
         uninit = re.compile(
             r'==\d+== (Conditional jump or move depends on uninitialised value\(s\)|Use of uninitialised value)')
         open_files = re.compile(
-            r'==(\d+)== Open (?:file descriptor|AF_UNIX socket) (?![012])(\d+): (?!(?:/home/bob/eclipse/lockfile|/dev/urandom))(.*)')
-        orte_init = re.compile(r'==(\d+)==    (?:by|at) .*(: orte_init)?.*')
+            r'==(\d+)== Open (?:file descriptor|AF_UNIX socket) (\d+):\s*(.*)')
+        ignored_files = ('/home/bob/eclipse/lockfile', '/dev/urandom')
+        # Frames indicating that an open file descriptor belongs to MPI/PETSc start-up rather
+        # than to Chaste. OpenMPI 4 and earlier went through orte_init; OpenMPI 5 replaced
+        # ORTE with PRRTE/PMIx, so match the surrounding init frames as well.
+        mpi_init = re.compile(
+            r'==\d+==\s+(?:by|at) .*(?:orte_init|opal_init|ompi_mpi_init|ompi_mpi_instance_init'
+            r'|ompi_rte_init|PMPI_Init_thread|PetscInitialize)')
         test_killed = 'Test killed due to exceeding time limit'
 
         if output_lines is None:
@@ -138,13 +144,13 @@ class ProcessValgrind:
                 break
 
             m = open_files.match(output_lines[lineno])
-            if m:
+            if m and int(m.group(2)) > 2 and m.group(3).strip() not in ignored_files:
                 # There's a file open that shouldn't be.
                 # Descriptors 0, 1 and 2 are ok, as are names /dev/urandom
                 # and /home/bob/eclipse/lockfile, and the log files.
                 # All these OK files are inherited from the parent process.
                 if (not output_lines[lineno + 1].strip().endswith("<inherited from parent>")
-                        and not self._check_openmpi_file(output_lines, lineno + 1, orte_init)):
+                        and not self._check_openmpi_file(output_lines, lineno + 1, mpi_init)):
                     _status = 'Openfile'
                     break
         if _status == 'Unknown':
@@ -153,18 +159,20 @@ class ProcessValgrind:
 
     @staticmethod
     def _check_openmpi_file(output_lines, lineno, regexp):
-        """Check whether a purported open file is actually something from OpenMPI."""
-        result = False
-        m = regexp.match(output_lines[lineno])
-        while m:
-            if m and m.group(1):
-                result = True
-                break
-            if not m:
-                break
+        """
+        Check whether a purported open file is actually something from OpenMPI.
+
+        Walks the stack trace starting at lineno, looking for a frame matching regexp. Note
+        that the previous implementation tested the pid group of its match rather than the
+        frame name, so it returned True for any stack at all and no open file was ever
+        reported.
+        """
+        frame = re.compile(r'==\d+==\s+(?:by|at) ')
+        while lineno < len(output_lines) and frame.match(output_lines[lineno]):
+            if regexp.match(output_lines[lineno]):
+                return True
             lineno += 1
-            m = regexp.match(output_lines[lineno])
-        return result
+        return False
 
     @staticmethod
     def get_html_head():

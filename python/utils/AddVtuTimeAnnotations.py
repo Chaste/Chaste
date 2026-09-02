@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Copyright (C) Victor Chang Cardiac Research Institute, 2012. (Original author A.Sadrieh)."""
 
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,7 +32,7 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
- 
+
 """Convert a .vtu file from a heart simulation to have time annotations.
    This changes lines like
    <DataArray type="Float64" Name="V_000019" ...
@@ -40,9 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    to
    <DataArray type="Float64" Name="V" TimeStep="19" ...
    <DataArray type="Float64" Name="Phi_e" TimeStep="20" ...
-   
+
    It also needs to add a TimeValues annotation to the <UnstructuredGrid> component:
-   <UnstructuredGrid TimeValues="0 1 ..." > 
+   <UnstructuredGrid TimeValues="0 1 ..." >
 """
 import fileinput
 import sys
@@ -51,9 +51,9 @@ import os
 
 """
     Check that the time steps start at zero and are monotonically increasing by 1 each time
-    Note that there are likely to be multiple copies of each time step.  
+    Note that there are likely to be multiple copies of each time step.
     We could count the number of copies and check that they're all the same...
-    
+
     Returns the value of the final time step
 """
 def QueryVtuFile(inputFileName, nameTimePair):
@@ -71,8 +71,8 @@ def QueryVtuFile(inputFileName, nameTimePair):
              assert(time_step == 0)
          last_times[var_name] = time_step
     max_time=max( last_times.values() )
-    assert(max_time == time_step) 
-    
+    assert(max_time == time_step)
+
     #Reverse the dictionary so that we can return all the variables which have a given number of time steps
     last_times_reverse = {}
     for var in last_times.keys():
@@ -81,7 +81,7 @@ def QueryVtuFile(inputFileName, nameTimePair):
             last_times_reverse[time].append(var)
         else:
             last_times_reverse[time] = [var]
-        
+
     return last_times_reverse
 
 """
@@ -98,7 +98,7 @@ def AnnotateVtuFile(inputFileName, nameTimePair, outputFileName, lastTimeStep, e
         if (header_mode):
            # <UnstructuredGrid> ... or <PUnstructuredGrid>
            if (line.find('<UnstructuredGrid')>0 or line.find('<PUnstructuredGrid')>0):
-              time_annotation = 'UnstructuredGrid TimeValues="' 
+              time_annotation = 'UnstructuredGrid TimeValues="'
               for time in timevalues:
                   time_annotation += str(time)+ ' '
               time_annotation += '"'
@@ -138,11 +138,11 @@ if __name__ == "__main__":
     #Reading in command line arguments
     input_name = sys.argv[1]
     output_name = sys.argv[2]
-    
+
     if input_name == output_name:
         print("Error: input and output files should be different.", file=sys.stderr)
         sys.exit(1)
-    
+
     pvtu_mode = False
     if (input_name[-5:] == '.pvtu'):
         pvtu_mode = True
@@ -155,12 +155,12 @@ if __name__ == "__main__":
         #If output_name doesn't end in .vtu then add it
         if (output_name[-4:] != '.vtu'):
             output_name=output_name+'.vtu'
-        
-    
+
+
     #Regular expression for  ... Name="some_var_name_000020" ... as Chaste writes it.
     name_time_pair = re.compile('Name=\"(.*)_([0-9]{6})\"')
-    
-    # Check the time steps in the vtu file and query for the final time step 
+
+    # Check the time steps in the vtu file and query for the final time step
     last_time_steps = QueryVtuFile(input_name, name_time_pair)
     #Write a copy of the file but with annotations
     for last_time_step in last_time_steps.keys():
@@ -168,7 +168,7 @@ if __name__ == "__main__":
         if (last_time_step != max(last_time_steps.keys()) ):
             my_output_name = output_name[:-4]+"_"+"".join(last_time_steps[last_time_step])+".vtu"
         AnnotateVtuFile(input_name, name_time_pair, my_output_name, last_time_step, last_time_steps[last_time_step])
-    
+
     if (pvtu_mode):
         #Remove path and suffix to get the expected base name for chunks
         in_base_path = input_name[:-5]
@@ -182,6 +182,6 @@ if __name__ == "__main__":
             assert(len(last_time_steps.keys()) == 1 ) #Todo this is getting a bit too complicated
             for last_time_step in last_time_steps.keys():
                 AnnotateVtuFile(in_base_path+suffix, name_time_pair, out_base_path+suffix, last_time_step, last_time_steps[last_time_step])
-        
-        
+
+
 

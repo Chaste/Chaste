@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _ABSTRACTCVODESYSTEM_HPP_
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -46,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Chaste includes
 #include "AbstractParameterisedSystem.hpp"
+#include "CvodeContextManager.hpp"
 #include "Exception.hpp"
 #include "OdeSolution.hpp"
 #include "VectorHelperFunctions.hpp"
@@ -299,6 +301,14 @@ protected:
 
     /** CVODE's internal data. */
     void* mpCvodeMem;
+
+#if CHASTE_SUNDIALS_VERSION >= 60000
+    /**
+     * Shared ownership of the SUNContext this system's Sundials objects were created
+     * against, to guarantee the context outlives them. See CvodeContextManager.
+     */
+    std::shared_ptr<CvodeContextManager> mpSundialsContextManager;
+#endif
 
     /**
      * The maximum number of steps to be taken by the solver

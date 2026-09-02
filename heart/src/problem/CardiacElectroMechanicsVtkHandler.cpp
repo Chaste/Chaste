@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,7 +54,7 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
     assert(mpVtkOutputMesh->GetNumNodes() == rQuadMesh.GetNumNodes());
 
     //cretae the writer, using the output mesh voltage and other quantities
-    mpVtkWriter =  new VtkDeformedMeshWriter<DIM>(mpVtkOutputMesh, rOutputDir + "/vtk","deformed_mechanics_mesh_",true);         
+    mpVtkWriter =  new VtkDeformedMeshWriter<DIM>(mpVtkOutputMesh, rOutputDir + "/vtk","deformed_mechanics_mesh_",true);
     //set up voltage interpolating object
     mpInterpolater = new VoltageInterpolaterOntoMechanicsMesh<DIM>(rElectricsMesh,*mpVtkOutputMesh);
     mpVtkElastictyWriter = new VtkNonlinearElasticitySolutionWriter<DIM>(rMechanicsSolver);
@@ -70,7 +70,7 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
         for (unsigned j=0u; j < DIM; ++j)
         {
             zero_strains(i,j) = 0.0;
-        } 
+        }
     }
     mDisplacements.assign(mpVtkOutputMesh->GetNumNodes(),no_displ);
     mStrains.assign(mpVtkOutputMesh->GetNumElements(),zero_strains);
@@ -113,11 +113,11 @@ void CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::WriteSolution(unsigne
     mpVtkWriter->ApplyDeformation(mrMechanicsSolver.rGetDeformedPosition());
     mpVtkWriter->SetOutputBaseFileName("deformed_mechanics_mesh_" + std::to_string(counter));
     mpVtkWriter->SetWriteMeshCells(false);
-    
+
     //voltage
-    mpInterpolater->InterpolateOnCoarseMesh(mInterpolatedVoltagesNodeWise,rElectricsSolution);//VTK output. Determine voltage on coarse nodes 
+    mpInterpolater->InterpolateOnCoarseMesh(mInterpolatedVoltagesNodeWise,rElectricsSolution);//VTK output. Determine voltage on coarse nodes
     mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
-    
+
     //displacement
     mpVtkElastictyWriter->CalculateDisplacements(mDisplacements);
     mpVtkWriter->AddPointData("displacements", mDisplacements);

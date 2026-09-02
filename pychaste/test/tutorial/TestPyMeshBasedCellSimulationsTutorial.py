@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -91,7 +91,7 @@ class TestPyMeshBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
         ## To view the results of this and the next test in Paraview it is necessary to explicitly
         ## generate the required .vtu files.
 
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 
         ## We can set up a `VtkScene` to do a quick visualization of the population before running the analysis.
 
@@ -176,7 +176,7 @@ class TestPyMeshBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
 
         ## Again Paraview output is explicitly requested.
 
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 
         ## We can set up a `VtkScene` to do a quick visualization of the population before running the analysis.
 

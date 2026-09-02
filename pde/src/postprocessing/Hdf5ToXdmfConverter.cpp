@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,8 +55,6 @@ Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToXdmfConverter(const FileFinde
     // Write
     this->WriteFilesUsingMesh(*pMesh);
 }
-
-#ifndef _MSC_VER
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* pGridElement,
@@ -138,8 +136,6 @@ void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAME
         p_hdf_element->appendChild(p_hdf_text);
     }
 }
-
-#endif
 
 // Explicit instantiation
 template class Hdf5ToXdmfConverter<1,1>;

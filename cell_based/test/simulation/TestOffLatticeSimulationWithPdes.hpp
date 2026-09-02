@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -629,12 +629,12 @@ public:
         double linear_coefficient = -0.1;
         double diffusion_coefficient = 1.0;
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
-        
+
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         linear_coefficient = -0.5;
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde2, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
-        
+
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -849,7 +849,7 @@ public:
             OffLatticeSimulation<2> simulator(cell_population);
             simulator.SetOutputDirectory("OffLatticeSimulationWithPdesSaveAndLoad");
             simulator.SetEndTime(0.2);
-            
+
             // Create PDE and boundary condition objects
             double constant_coefficient = 0.0;
             double linear_coefficient = -0.1;
@@ -914,7 +914,7 @@ public:
 
         std::string output_directory = "TestArchivingWithCellwisePde";
         double end_time = 0.1;
-        
+
         {
             // Set up mesh
             HoneycombMeshGenerator generator(5, 5, 0);
@@ -955,7 +955,7 @@ public:
             double diffusion_coefficient = 1.0;
             MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
             MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-            
+
             // Create a PDE modifier and set the name of the dependent variable in the PDE
             MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
             p_pde_modifier->SetDependentVariableName("oxygen");
@@ -1289,7 +1289,7 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects (zero uptake to check analytic solution)
-        
+
         double constant_coefficient = 0.0;
         double linear_coefficient = 0.0;
         double diffusion_coefficient = 1.0;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define idx_t SCOTCH_Num
 #define real_t float
 #define CHASTE_SCOTCH_PARMETIS
-// Conditionally turn off the interface to ParMETIS_V3_Mesh2Dual which should be added into PTScotch at 7.0.9 
+// Conditionally turn off the interface to ParMETIS_V3_Mesh2Dual which should be added into PTScotch at 7.0.9
 #if ((SCOTCH_VERSION < 7) || (SCOTCH_RELEASE < 0) || (SCOTCH_PATCHLEVEL < 9))
 #define CHASTE_HOMEMADE_MESH_TO_DUAL
 #endif

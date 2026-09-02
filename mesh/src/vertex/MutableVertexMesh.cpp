@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -2234,10 +2234,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(
                     mOperationRecorder.RecordNewEdgeOperation(this->mElements[element_1_index], node_A_local_index_in_1);
             }
             this->mElements[element_3_index]->AddNode(this->mNodes[node_A_index], node_B_local_index_in_3);
-            c_vector<double, SPACE_DIM> vector_B_to_node
-                = this->GetVectorFromAtoB(this->GetElement(elementIndex)->GetNode(intersected_edge)->rGetLocation(), this->mNodes[node_B_index]->rGetLocation());
-            c_vector<double, SPACE_DIM> vector_A_to_B
-                = this->GetVectorFromAtoB(this->mNodes[node_B_index]->rGetLocation(), this->mNodes[node_A_index]->rGetLocation());
+            c_vector<double, SPACE_DIM> vector_B_to_node = this->GetVectorFromAtoB(this->GetElement(elementIndex)->GetNode(intersected_edge)->rGetLocation(), this->mNodes[node_B_index]->rGetLocation());
+            c_vector<double, SPACE_DIM> vector_A_to_B = this->GetVectorFromAtoB(this->mNodes[node_B_index]->rGetLocation(), this->mNodes[node_A_index]->rGetLocation());
             // Insertion of node A splits the intersected edge
             if (mTrackMeshOperations)
                 mOperationRecorder.RecordEdgeSplitOperation(this->GetElement(elementIndex), intersected_edge,
@@ -2276,10 +2274,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(
 
             unsigned node_before_B_in_3 = (node_B_local_index_in_3 + this->GetElement(element_3_index)->GetNumNodes() - 1) % this->GetElement(element_3_index)->GetNumNodes();
             this->mElements[element_3_index]->AddNode(this->mNodes[node_A_index], node_before_B_in_3);
-            c_vector<double, SPACE_DIM> vector_B_to_node
-                = this->GetVectorFromAtoB(this->GetElement(elementIndex)->GetNode(intersected_edge)->rGetLocation(), this->mNodes[node_B_index]->rGetLocation());
-            c_vector<double, SPACE_DIM> vector_A_to_B
-                = this->GetVectorFromAtoB(this->mNodes[node_B_index]->rGetLocation(), this->mNodes[node_A_index]->rGetLocation());
+            c_vector<double, SPACE_DIM> vector_B_to_node = this->GetVectorFromAtoB(this->GetElement(elementIndex)->GetNode(intersected_edge)->rGetLocation(), this->mNodes[node_B_index]->rGetLocation());
+            c_vector<double, SPACE_DIM> vector_A_to_B = this->GetVectorFromAtoB(this->mNodes[node_B_index]->rGetLocation(), this->mNodes[node_A_index]->rGetLocation());
             // Insertion of node A splits the intersected edge
             if (mTrackMeshOperations)
                 mOperationRecorder.RecordEdgeSplitOperation(this->GetElement(elementIndex), intersected_edge,
@@ -3386,14 +3382,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(
 
                     // Add the moved and new nodes to the element (this also updates the node)
                     const double a_to_b_length = norm_2(vector_a_to_b);
-                    const c_vector<double, SPACE_DIM> a_to_node2_vector
-                        = this->GetVectorFromAtoB(new_node_2_location, vertexA);
+                    const c_vector<double, SPACE_DIM> a_to_node2_vector = this->GetVectorFromAtoB(new_node_2_location, vertexA);
                     const double a_to_node2_length = norm_2(a_to_node2_vector);
-                    const c_vector<double, SPACE_DIM> a_to_nodeP_vector
-                        = this->GetVectorFromAtoB(intersection, vertexA);
+                    const c_vector<double, SPACE_DIM> a_to_nodeP_vector = this->GetVectorFromAtoB(intersection, vertexA);
                     const double a_to_nodeP_length = norm_2(a_to_nodeP_vector);
-                    const c_vector<double, SPACE_DIM> a_to_node1_vector
-                        = this->GetVectorFromAtoB(new_node_1_location, vertexA);
+                    const c_vector<double, SPACE_DIM> a_to_node1_vector = this->GetVectorFromAtoB(new_node_1_location, vertexA);
                     const double a_to_node1_length = norm_2(a_to_node1_vector);
 
                     this->GetElement(elementIndex)->AddNode(this->mNodes[new_node_2_global_index], node_A_local_index);

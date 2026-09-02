@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -449,7 +449,7 @@ inline void CopyToStdVector(const N_Vector& rSrc, std::vector<double>& rDest)
 {
     // Check for no-op
     realtype* p_src = NV_DATA_S(rSrc);
-    if (!rDest.empty() && p_src == &(rDest[0]))
+    if (p_src == rDest.data())
         return;
     // Set dest size
     long size = NV_LENGTH_S(rSrc);
@@ -472,7 +472,7 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, N_Vector& rDest)
 {
     // Check for no-op
     realtype* p_dest = NV_DATA_S(rDest);
-    if (p_dest == &(rSrc[0])) return;
+    if (p_dest == rSrc.data()) return;
 
     // Check dest size
     long size = NV_LENGTH_S(rDest);

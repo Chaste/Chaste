@@ -1,6 +1,6 @@
 message(STATUS "Adding compiler flags...")
 
-# default flags added to all compilers except MSVC
+# default flags added to all compilers
 set(default_flags "-Wall")
 if (Chaste_ERROR_ON_WARNING)
     set(default_flags "${default_flags} -Werror")
@@ -92,10 +92,10 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     set(Intel_flags
         # Not available on 10.0
         -Wnon-virtual-dtor -Woverloaded-virtual -Wno-unused-parameter
-        
+
         -wr2304 #2304: non-explicit constructor with single argument
-        
-        # Switch these ones on for compatibility 
+
+        # Switch these ones on for compatibility
         -wr271 #271: trailing comma is nonstandard
 
         #Following doesn't seem to play
@@ -141,35 +141,9 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
          #2305: declaration of 'explicit' constructor without a single argument is redundant
         )
     string (REPLACE ";" " " Intel_flags_str "${Intel_flags}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} ${Intel_flags_str}") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} ${Intel_flags_str}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags} ${Intel_flags_str}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${default_exe_linker_flags}")
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-    message(STATUS "\t... for MSVC compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
-    #For GUI configs. Change C, and CXX compiler flags dynamically to static, debug build.
-    #The overrides.cmake include takes care of non GUI builds.
-    foreach(flag_var
-        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-        if(${flag_var} MATCHES "/MD")
-            string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-       endif(${flag_var} MATCHES "/MD")
-    endforeach(flag_var)
-
-    # A bunch of compiler flags. Since we now propagate the compiler and linker flags to all external projects
-    # this is one place to set all the flags.
-    add_definitions(
-        -Z7     # => embed debugging info in library as opposed to using an external .pdb database
-        -wd4996 # => disable insecure api warnings
-        -wd4267 # => disable "possible loss of data due to 'narrowing' conversion, e.g. size_t to int"
-        -wd4290 # => disable warning "C++ exception specification ignored except to indicate a function is not __declspec(nothrow)"
-        -wd4005 # => 'identifier' : macro redefinition
-        -wd4018 # => 'expression' : signed/unsigned mismatch
-        -wd4244 # => 'argument' : conversion from 'type1' to 'type2', possible loss of data
-        -wd4101 # => 'identifier' : unreferenced local variable
-        -wd4661 # => 'identifier' : no suitable definition provided for explicit template instantiation request
-    )
-
 else()
     message(WARNING "Unknown CXX compiler type ${CMAKE_CXX_COMPILER_ID}")
 endif()

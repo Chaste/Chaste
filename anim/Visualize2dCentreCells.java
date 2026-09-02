@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,7 +81,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
     public static boolean stressFilePresent = false;
     public static boolean elementFilePresent = true;
     public static boolean locationFilePresent = true;
-    
+
     public static boolean isSparseMesh = false;
     public static boolean drawOrientations = false;
     // by default the last timestep isn't read or visualised; this
@@ -651,7 +651,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
         }
         if (!pde_solution_file.isFile())
         {
-        	pde_solution.setVisible(false);
+            pde_solution.setVisible(false);
             pde_solution.setState(false);
             drawPdeSolution = false;
         }
@@ -818,7 +818,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
             numCells = new int[num_lines];
             image_cells = new int[num_lines][];
 
-            
+
             if (locationFilePresent)
             {
                 // One location per cell
@@ -1008,13 +1008,13 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 if (locationFilePresent)
                 {
                     double location_time = Double.valueOf(st_location.nextToken()).doubleValue();
-                    
+
                     if (Math.abs(time.doubleValue() - location_time) > 1e-6)
                     {
                         throw new Exception("Error: The time corresponding to each line of the location file must match that of the node file");
                     }
                 }
-                
+
                 if (elementFilePresent)
                 {
                     double element_time = Double.valueOf(st_element.nextToken()).doubleValue();
@@ -1025,7 +1025,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                     }
                 }
 
-                
+
                 times[row] = time.doubleValue();
 
                 // Count the number of entries in the node file and check correct
@@ -1039,20 +1039,20 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 numCells[row] = entries/2;
 
                 int entries_from_cell_type_file = st_cell_type.countTokens();
-                
-                
+
+
                 if ( (( numCells[row] != entries_from_cell_type_file) && !locationFilePresent) ||
                     (locationFilePresent && (numCells[row] < entries_from_cell_type_file)) )
                 {
                     System.out.println("Warning: At time "+time.doubleValue()+", node file gives "+numCells[row]+" cells, but cell type file gives "+entries_from_cell_type_file+" cells");
                     break;
                 }
-    
+
                 if (locationFilePresent)
                 {
                     locations[row] = new int[memory_factor*numCells[row]];
                 }
-                
+
                 if (elementFilePresent)
                 {
 
@@ -1080,7 +1080,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                         element_nodes[row] = new int[memory_factor*3*numElements[row]];
                     }
                 }
-                
+
                 positions[row] = new RealPoint[memory_factor*numCells[row]];
 
                 if (orientationFilePresent)
@@ -1103,44 +1103,44 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 {
                     stress_values[row] = new double[memory_factor*numCells[row]][2];
                 }
-                
+
                 cell_type[row] = new int[memory_factor*numCells[row]];
-                
-                
+
+
                 if (locationFilePresent)
                 {
                     // Adjust the cell types vector to account for ghost nodes
-                    
+
                     // Count the number of entries in the location file and check correct
                     int num_location_entries = st_location.countTokens();
                     int num_cell_type_entries = st_cell_type.countTokens();
                     // Assert(num_location_entries == num_cell_type_entries);
-                    
+
                     // Populate a vector of ghosts then ad in normal cells at the relvent places
                     for (int i=0; i<numCells[row]; i++)
                     {
                         cell_type[row][i] = canvas.INVISIBLE_COLOUR;
-                        
+
                         if (ancestorsFilePresent)
                         {
                             ancestor_values[row][i] = canvas.INVISIBLE_COLOUR;
                         }
                     }
-                    
+
                     for (int i=0; i<num_location_entries; i++)
                     {
                         locations[row][i] = Integer.parseInt(st_location.nextToken());
                         cell_type[row][locations[row][i]] = Integer.parseInt(st_cell_type.nextToken());
-                        
+
                         if (ancestorsFilePresent)
                         {
                             ancestor_values[row][locations[row][i]] = Integer.parseInt(st_ancestors.nextToken());
-        
+
                         }
                     }
                 }
-                
-                
+
+
                 for (int i=0; i<numCells[row]; i++)
                 {
                     double d1 = Double.valueOf(st_node.nextToken()).doubleValue();
@@ -1153,12 +1153,12 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                         orientations[row][i] = new RealPoint(o1,o2);
                     }
 
-                    
+
                     if (!locationFilePresent)
                     {
                         cell_type[row][i] = Integer.parseInt(st_cell_type.nextToken());
                     }
-                    
+
                     if ( cell_type[row][i] < 0 )
                     {
                         System.out.println("Error: Cell type must be a non-negative integer");
@@ -1364,7 +1364,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 // Fill image_nodes with an identity map (at each time step each node maps to itself)
                 for (int i=0; i<numCells[time_index]; i++)
                 {
-                    image_cells[time_index][i] = i;		// Fill with as many image nodes as are cells in that time frame
+                    image_cells[time_index][i] = i;        // Fill with as many image nodes as are cells in that time frame
                 }
 
                 if ( (elementFilePresent) && (!isSparseMesh) )
@@ -1373,8 +1373,8 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                     for (int i=0; i<numElements[time_index]; i++)
                     {
                         // What nodes are we joining up? Go into the element file and get
-                    	// the nodes that correspond to each element
-                    	// element node1 node2 node3
+                        // the nodes that correspond to each element
+                        // element node1 node2 node3
                         int indexA = element_nodes[time_index][3*i];
                         int indexB = element_nodes[time_index][3*i+1];
                         int indexC = element_nodes[time_index][3*i+2];
@@ -1468,21 +1468,21 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 RealPoint old_point = positions[time_index][node_index];
                 RealPoint new_point = new RealPoint(0.0,0.0);
                 new_point.y = old_point.y;
-               
+
                 // if your original node is on the left, your new image node is that plus crypt width
-                if (old_point.x < half_width)	
+                if (old_point.x < half_width)
                 {
                     new_point.x = old_point.x + crypt_width;
                 }
                 // if your original node is on the right, your new image node is that minus crypt width
-                if (old_point.x > half_width)	
+                if (old_point.x > half_width)
                 {
                     new_point.x = old_point.x - crypt_width;
                 }
 
                 // For the visualiser, we make a new ghost node at that image location
-                positions[time_index][numCells[time_index]] = new_point;	// Adds one to the vector of positions
-                cell_type[time_index][numCells[time_index]] = canvas.INVISIBLE_COLOUR;	// Same for cell type
+                positions[time_index][numCells[time_index]] = new_point;    // Adds one to the vector of positions
+                cell_type[time_index][numCells[time_index]] = canvas.INVISIBLE_COLOUR;    // Same for cell type
 
                 // Update the image record
                 image_cells[time_index][node_index] = numCells[time_index];
@@ -1619,8 +1619,8 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
 
         if (vis.drawCircles)
         {
-        	double scaling = 0.4;
-        	
+            double scaling = 0.4;
+
             // Draw cell circle interiors
             for (int i=0; i<vis.numCells[vis.timeStep]; i++ )
             {
@@ -1649,23 +1649,23 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                 }
             }
         }
-        
+
         if (vis.drawSquares)
         {
             double scaling = 0.4;
-            
+
             for (int i=0; i<vis.numCells[vis.timeStep]; i++ )
             {
                 // Plot Cell Centres
-                
+
                 RealPoint real_point = vis.positions[vis.timeStep][i];
                 PlotPoint square_vertices[] = new PlotPoint[4];
-                
+
                 square_vertices[0] = scale(real_point.x - 0.5, real_point.y - 0.5);
                 square_vertices[1] = scale(real_point.x + 0.5, real_point.y - 0.5);
                 square_vertices[2] = scale(real_point.x + 0.5, real_point.y + 0.5);
                 square_vertices[3] = scale(real_point.x - 0.5, real_point.y + 0.5);
-                
+
                 int xpoints[] = new int[4];
                 int ypoints[] = new int[4];
                 for (int node=0; node<4; node++)
@@ -1674,15 +1674,15 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                     ypoints[node] = square_vertices[node].y;
                 }
                 SetCellColour(i);
-                
+
                 if (vis.cell_type[vis.timeStep][i] != INVISIBLE_COLOUR) // if not ghost
                 {
                     g2.fillPolygon(xpoints, ypoints, 4);
                 }
-                
+
                 // Plot cell boundary lines
                 g2.setColor(Color.black);
-                
+
                 if (vis.cell_type[vis.timeStep][i] != INVISIBLE_COLOUR) // if not ghost
                 {
                     for (int node=0; node<4; node++)

@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -171,8 +171,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         EXCEPTION("Something went wrong when tagging corner locations"); //LCOV_EXCL_LINE
     }
 
-    if ( corner_indices[LEFT_APICAL_CORNER] - corner_indices[RIGHT_APICAL_CORNER] !=
-         corner_indices[RIGHT_BASAL_CORNER] - corner_indices[LEFT_BASAL_CORNER] )
+    if ( corner_indices[LEFT_APICAL_CORNER] - corner_indices[RIGHT_APICAL_CORNER] != corner_indices[RIGHT_BASAL_CORNER] - corner_indices[LEFT_BASAL_CORNER] )
     {
         EXCEPTION("Apical and basal surfaces are different sizes"); //LCOV_EXCL_LINE
     }

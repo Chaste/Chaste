@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -100,8 +100,7 @@ protected:
      * @param alreadyDeletedConditions  This is a set of BCs that have already been deleted that we should avoid trying
      *  to delete inside this method. (defaults to empty = delete everything)
      */
-    void DeleteDirichletBoundaryConditions(std::set<const AbstractBoundaryCondition<SPACE_DIM>*> alreadyDeletedConditions
-                                            = std::set<const AbstractBoundaryCondition<SPACE_DIM>*>());
+    void DeleteDirichletBoundaryConditions(std::set<const AbstractBoundaryCondition<SPACE_DIM>*> alreadyDeletedConditions = {});
 
 public:
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -575,6 +575,9 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
 CvodeAdaptor::CvodeAdaptor(double relTol, double absTol)
         : AbstractIvpOdeSolver(),
           mpCvodeMem(nullptr),
+#if CHASTE_SUNDIALS_VERSION >= 60000
+          mpSundialsContextManager(CvodeContextManager::Instance()),
+#endif
           mRelTol(relTol),
           mAbsTol(absTol),
           mLastInternalStepSize(-0.0),

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveLocationInfo.hpp"
 #include "ArchiveOpener.hpp"
 #include "Exception.hpp"
+#include "FilesystemPermissions.hpp"
 #include "OutputFileHandler.hpp"
 #include "ProcessSpecificArchive.hpp"
 
@@ -207,15 +208,12 @@ public:
                 delete mpCommonStream;
                 EXCEPTION("Failed to open main archive file for writing: " + common_path.str());
             }
+            FilesystemPermissions::SetFilePermissions(common_path.str());
         }
         else
         {
             // Non-master processes need to go through the serialization methods, but not write any data
-#ifdef _MSC_VER
-            mpCommonStream = new std::ofstream("NUL", std::ios::binary | std::ios::trunc);
-#else
             mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
-#endif
             // LCOV_EXCL_START
             if (!mpCommonStream->is_open())
             {
@@ -235,6 +233,7 @@ public:
             delete mpCommonStream;
             EXCEPTION("Failed to open secondary archive file for writing: " + private_path);
         }
+        FilesystemPermissions::SetFilePermissions(private_path);
         mpPrivateArchive = new OutputArchive(*mpPrivateStream);
         ProcessSpecificArchive<OutputArchive>::Set(mpPrivateArchive);
     }

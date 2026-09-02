@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1747,6 +1747,7 @@ public:
          * test but I can't think of a better way.
          * (These numbers might be machine-dependent!)
          */
+#if H5_VERS_MAJOR == 1
         H5O_info_t data_info;
         H5Oget_info(dset, &data_info);
         TS_ASSERT_EQUALS(data_info.addr, 0x8000u); // 32 KB
@@ -1760,6 +1761,22 @@ public:
         dset = H5Dopen(h5_file, "UpstrokeTimeMap_0", H5P_DEFAULT);
         H5Oget_info(dset, &data_info);
         TS_ASSERT_EQUALS(data_info.addr, 18809856u); // About 17.9 MB
+#else // H5_VERS_MAJOR == 2
+        H5O_info_t data_info;
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 0x4000u); // 16 KB
+        H5Dclose(dset);
+
+        dset = H5Dopen(h5_file, "Data_Unlimited", H5P_DEFAULT);
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 18710528u); // About 17.8 MB
+        H5Dclose(dset);
+
+        dset = H5Dopen(h5_file, "UpstrokeTimeMap_0", H5P_DEFAULT);
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 18785280u); // About 17.9 MB
+#endif
+
         // And chunk dims for this one
         hsize_t expected_dims_upstroke[3] = { 1, 746, 1 };
         dcpl = H5Dget_create_plist(dset); // get dataset creation property list
@@ -1807,9 +1824,15 @@ public:
             TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
         }
         // Check location
+#if H5_VERS_MAJOR == 1
         H5O_info_t data_info;
         H5Oget_info(dset, &data_info);
         TS_ASSERT_DELTA(data_info.addr, 20567968u, 41u); // About 19.6 MB with a little leeway
+#else // H5_VERS_MAJOR == 2
+        H5O_info_t data_info;
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_DELTA(data_info.addr, 20543288u, 41u); // About 19.6 MB with a little leeway
+#endif
         H5Dclose(dset);
         H5Fclose(h5_file);
     }

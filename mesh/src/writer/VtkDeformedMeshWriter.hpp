@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,18 +38,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_VTK
 
-#include <cstring> 
+#include <cstring>
 #include "VtkMeshWriter.hpp"
 #include "AbstractTetrahedralMesh.hpp"
 
 /**
- * A class to write meshes in VTK format, allowing for specification of 
+ * A class to write meshes in VTK format, allowing for specification of
  * a new set of node positions ("deformed mesh") and a new file name.
- * 
+ *
  * This class was designed with time-dependent simulations in mind, where,
  * at every time step, one may want to write out a mesh that is being
  * deformed in the time loop.
- * 
+ *
  * Typical usage:
  *
  *  VtkDeformedMeshWriter<DIM> writer(...);
@@ -63,10 +63,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  writer.SetWriteMeshCells(false); //cells have been alreday written
  *  writer.SetOutputBaseFileName(new_name);//do not overwrite the previous file
  *  writer.WriteDeformedFiles();
- * 
+ *
  *  Note that the ApplyDeformation method actually changes
  *  the mesh node coordinates. Use with caution as no other
- *  quantities of the mesh (e.g., Jacobian) are actually modified!      
+ *  quantities of the mesh (e.g., Jacobian) are actually modified!
  */
 template<unsigned DIM>
 class VtkDeformedMeshWriter : public VtkMeshWriter<DIM,DIM>
@@ -74,8 +74,8 @@ class VtkDeformedMeshWriter : public VtkMeshWriter<DIM,DIM>
 
 private:
 
-    /** 
-     * Pointer to the deformed mesh, used only for output here. 
+    /**
+     * Pointer to the deformed mesh, used only for output here.
      * Initialized to a new mesh object and constructed upon construction of this writer object
      */
     AbstractTetrahedralMesh<DIM,DIM>* mpDeformedMesh;
@@ -84,7 +84,7 @@ public:
 
     /**
      * Constructor
-     * 
+     *
      * @param pDeformedOutputMesh a pointer to the mesh objectto be used.
      * @param rDirectory  the directory in which to write the mesh to file
      * @param rBaseName  the base name of the files in which to write the mesh data
@@ -100,7 +100,7 @@ public:
     /**
      * Set the new file name to be used the next time WriteDeformedFiles() is called.
      * The output file will then be rOutputBaseFileName.vtu
-     * 
+     *
      * @param rOutputBaseFileName the base name of the next output file (".vtu" will be added)
      */
     void SetOutputBaseFileName(const std::string& rOutputBaseFileName);
@@ -116,9 +116,9 @@ public:
 
     /**
      * Modify the node locations of the mesh by assigning the coordinates
-     * according to rPositions. Note that only node coordinates are changed 
+     * according to rPositions. Note that only node coordinates are changed
      * (no Jacobians or other related quantities are modified). Use with caution!
-     * 
+     *
      * @param rPositions the node positions to be applied to the mesh
      */
     void ApplyDeformation(const std::vector<c_vector<double,DIM> >& rPositions);

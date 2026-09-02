@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,8 +58,7 @@ void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(Abstract
 
         *this->mpOutStream << "Time\t ";
 
-        const std::vector<std::shared_ptr<AbstractCellProperty> >& r_cell_properties =
-            pCellPopulation->GetCellPropertyRegistry()->rGetAllCellProperties();
+        const std::vector<std::shared_ptr<AbstractCellProperty> >& r_cell_properties = pCellPopulation->GetCellPropertyRegistry()->rGetAllCellProperties();
 
         for (unsigned i=0; i<r_cell_properties.size(); i++)
         {

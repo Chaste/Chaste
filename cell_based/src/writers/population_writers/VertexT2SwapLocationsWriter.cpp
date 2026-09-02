@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -71,8 +71,7 @@ void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPo
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    std::vector<T2SwapInfo<SPACE_DIM> > t2_swap_info
-        = pCellPopulation->rGetMesh().GetOperationRecorder()->GetT2SwapsInfo();
+    std::vector<T2SwapInfo<SPACE_DIM> > t2_swap_info = pCellPopulation->rGetMesh().GetOperationRecorder()->GetT2SwapsInfo();
 
     *this->mpOutStream << t2_swap_info.size() << "\t";
 

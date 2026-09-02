@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,25 +35,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PythonSimulationModifier.hpp"
 
-template<unsigned DIM>
+template <unsigned DIM>
 PythonSimulationModifier<DIM>::PythonSimulationModifier()
-    : AbstractCellBasedSimulationModifier<DIM>()
+        : AbstractCellBasedSimulationModifier<DIM>()
 {
 }
 
-template<unsigned DIM>
-PythonSimulationModifier<DIM>::~PythonSimulationModifier()
+template <unsigned DIM>
+void PythonSimulationModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
+    // No parameters to output, so just call method on direct parent class
+    AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-template<unsigned DIM>
-void PythonSimulationModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
-{
-    UpdateCellData(rCellPopulation);
-}
-
-template<unsigned DIM>
-void PythonSimulationModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+template <unsigned DIM>
+void PythonSimulationModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
@@ -62,18 +58,17 @@ void PythonSimulationModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& 
     UpdateCellData(rCellPopulation);
 }
 
-template<unsigned DIM>
-void PythonSimulationModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM>
+void PythonSimulationModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
-    // Make sure the cell population is updated
-    rCellPopulation.Update();
+    UpdateCellData(rCellPopulation);
 }
 
-template<unsigned DIM>
-void PythonSimulationModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+template <unsigned DIM>
+void PythonSimulationModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
-    // No parameters to output, so just call method on direct parent class
-    AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    // Bring the population's internal state up to date.
+    rCellPopulation.Update();
 }
 
 // Explicit instantiation

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -237,11 +237,7 @@ public:
 
         std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
-#ifndef _MSC_VER
         TS_ASSERT(FilesMatch(output_dir + "testenddefine.dat", "io/test/data/testenddefine_good.dat"));
-#else
-        TS_ASSERT(FilesMatch(output_dir + "testenddefine.dat", "io/test/data/testenddefine_Windows_good.dat"));
-#endif
 
         TS_ASSERT(FilesMatch(output_dir + "testenddefine.info", "io/test/data/testenddefine_good.info"));
     }
@@ -321,9 +317,6 @@ public:
 
     void TestPutNegativeVariable()
     {
-#ifdef  _MSC_VER
-        _set_output_format(_TWO_DIGIT_EXPONENT);
-#endif
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testunlimitednegative", false));
         int time_var_id = 0;
         int ina_var_id = 0;
@@ -369,9 +362,6 @@ public:
 
     void TestPutVariableInFixedFileAndPrecision()
     {
-#ifdef  _MSC_VER
-        _set_output_format(_TWO_DIGIT_EXPONENT);
-#endif
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testfixed", false, 3)); // precision = 3
 
         int node_var_id = 0;
@@ -529,10 +519,6 @@ public:
 
     void TestPutVariableInFixedandUnlimitedFile()
     {
-#ifdef _MSC_VER
-        _set_output_format(_TWO_DIGIT_EXPONENT);
-#endif
-
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testfixedandunlimited", false));
 
         int time_var_id = 0;

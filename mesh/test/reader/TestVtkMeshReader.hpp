@@ -6,7 +6,7 @@ Copyright (C) Fujitsu Laboratories of Europe, 2009
 
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -365,16 +365,16 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 173u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 610u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 312u);
-        
-        // Check that the boundary is properly marked 
+
+        // Check that the boundary is properly marked
         /* Change to indexing in vtkGeometryFilter happened in VTK 9.1
          * This means that when the boundary faces are extracted by vtkGeometryFilter
          * the mesh of faces has the subset of boundary nodes reindexed, so the
-         * following checks we are using the original numbering */ 
+         * following checks we are using the original numbering */
         TS_ASSERT_EQUALS(mesh.GetNode(27)->IsBoundaryNode(), false);
         TS_ASSERT_EQUALS(mesh.GetNode(49)->IsBoundaryNode(), false);
         TS_ASSERT_EQUALS(mesh.GetNode(170)->IsBoundaryNode(), false);
-        
+
         TS_ASSERT_EQUALS(mesh.GetNode(0)->IsBoundaryNode(), true);
         TS_ASSERT_EQUALS(mesh.GetNode(171)->IsBoundaryNode(), true);
         TS_ASSERT_EQUALS(mesh.GetNode(172)->IsBoundaryNode(), true);
@@ -474,11 +474,11 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 610u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 312u);
 
-        // Check that the boundary is properly marked 
+        // Check that the boundary is properly marked
         /* Change to indexing in vtkGeometryFilter happened in VTK 9.1
          * This means that when the boundary faces are extracted by vtkGeometryFilter
          * the mesh of faces has the subset of boundary nodes reindexed, so the
-         * following checks we are using the original numbering */ 
+         * following checks we are using the original numbering */
         try
         {
             Node<3> *node = mesh.GetNode(27);
@@ -497,7 +497,7 @@ public:
         {
             // Don't own this node
         }
-        
+
         // Check some node co-ordinates
         try
         {

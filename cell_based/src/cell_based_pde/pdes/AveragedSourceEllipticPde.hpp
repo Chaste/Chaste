@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -122,9 +122,9 @@ public:
      * @param scaleByCellVolume whether to scale by cell volume (defaults to)
      */
     AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,
-                              double constantSourceCoefficient=0.0, 
+                              double constantSourceCoefficient=0.0,
                               double linearSourceCoefficient=0.0,
-                              double diffusionCoefficient=1.0, 
+                              double diffusionCoefficient=1.0,
                               bool scaleByCellVolume=false);
 
     /**
@@ -141,7 +141,7 @@ public:
      * @return mLinearSourceCoefficient
      */
     double GetLinearCoefficient() const;
-        
+
     /**
      * @return mDiffusionCoefficient
      */

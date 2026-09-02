@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,9 +63,6 @@ public:
     {
         int time_var_id=-1, var1_id=-1, var2_id=-1;
 
-#ifdef _MSC_VER
-        _set_output_format(_TWO_DIGIT_EXPONENT);
-#endif
 
         // Make a parallel data writer
         mpParallelWriter = new ParallelColumnDataWriter("TestParallelColumnDataWriter", "ParallelColumnWriter");
@@ -214,9 +211,6 @@ public:
         }
 
         // Write to file with parallel data writer
-#ifdef _MSC_VER
-        _set_output_format(_TWO_DIGIT_EXPONENT);
-#endif
 
         ParallelColumnDataWriter* p_parallel_writer = new ParallelColumnDataWriter("TestParallelColumnDataWriterStripe","Stripe");
         unsigned time_var_id = p_parallel_writer->DefineUnlimitedDimension("Time","msecs");

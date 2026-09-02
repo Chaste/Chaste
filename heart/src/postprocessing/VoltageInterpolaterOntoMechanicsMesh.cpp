@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
             : mrElectricsMesh(rElectricsMesh),
               mrMechanicsMesh(rMechanicsMesh),
               mpMeshPair(new FineCoarseMeshPair<DIM>(rElectricsMesh, rMechanicsMesh))
-              
+
 {
     assert(mpMeshPair);
     mpMeshPair->SetUpBoxesOnFineMesh();
@@ -83,7 +83,7 @@ void VoltageInterpolaterOntoMechanicsMesh<DIM>::InterpolateOnCoarseMesh(std::vec
 template<unsigned DIM>
 void VoltageInterpolaterOntoMechanicsMesh<DIM>::OutputToCmgui(std::vector<std::string>& rVariableNames,
                                      std::string directory,
-                                     std::string inputFileNamePrefix)          
+                                     std::string inputFileNamePrefix)
 {
     assert(mpMeshPair);
     mpMeshPair->SetUpBoxesOnFineMesh();

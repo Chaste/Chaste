@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -90,8 +90,7 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
     *rParamsFile << "\n\t<UpdateRules>\n";
 
     // This static_cast is fine, since otherwise an exception would have been thrown in the constructor
-    std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > > collection =
-            static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->GetUpdateRuleCollection();
+    auto collection = static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->GetUpdateRuleCollection();
 
     for (typename std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter = collection.begin();
          iter != collection.end();

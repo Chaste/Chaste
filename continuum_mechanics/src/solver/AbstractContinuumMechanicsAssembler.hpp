@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -491,8 +491,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
 
         if (this->mAssembleVector)
         {
-            c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> b_spatial
-                = ComputeSpatialVectorTerm(quad_phi, grad_quad_phi, X, &rElement);
+            c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> b_spatial = ComputeSpatialVectorTerm(quad_phi, grad_quad_phi, X, &rElement);
             c_vector<double,PRESSURE_BLOCK_SIZE_ELEMENTAL> b_pressure = ComputePressureVectorTerm(linear_phi, grad_linear_phi, X, &rElement);
 
             for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
@@ -508,11 +507,9 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
 
         if (this->mAssembleMatrix)
         {
-            c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> a_spatial_spatial
-                = ComputeSpatialSpatialMatrixTerm(quad_phi, grad_quad_phi, X, &rElement);
+            c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> a_spatial_spatial = ComputeSpatialSpatialMatrixTerm(quad_phi, grad_quad_phi, X, &rElement);
 
-            c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> a_spatial_pressure
-                = ComputeSpatialPressureMatrixTerm(quad_phi, grad_quad_phi, linear_phi, grad_linear_phi, X, &rElement);
+            c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> a_spatial_pressure = ComputeSpatialPressureMatrixTerm(quad_phi, grad_quad_phi, linear_phi, grad_linear_phi, X, &rElement);
 
             c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> a_pressure_spatial;
             if (!BLOCK_SYMMETRIC_MATRIX)
@@ -521,8 +518,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
                 //a_pressure_spatial = ComputeSpatialPressureMatrixTerm(quad_phi, grad_quad_phi, lin_phi, grad_lin_phi, x, &rElement);
             }
 
-            c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> a_pressure_pressure
-                = ComputePressurePressureMatrixTerm(linear_phi, grad_linear_phi, X, &rElement);
+            c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> a_pressure_pressure = ComputePressurePressureMatrixTerm(linear_phi, grad_linear_phi, X, &rElement);
 
             for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
             {

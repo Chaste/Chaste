@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1944,16 +1944,28 @@ public:
         }
         H5Pclose(dcpl);
 
+        /*  Check that the file is bigger than expected.
+         * Because every 8 K chunk will be aligned to 16 K boundaries the file
+         * will be about twice the size it needs to be on disk.
+         */
+
+        hsize_t data_storage_size = H5Dget_storage_size(dset);
+        //TS_ASSERT_EQUALS(data_storage_size, 4896000u); //  HDF 1.10.7 size of data whatever the chunking and alignment are
+        unsigned storage_size = std::filesystem::file_size(file.GetAbsolutePath().c_str());
+        //TS_ASSERT_EQUALS( storage_size,  4906824u); // HDF 1.10.7 size of file when chunking/alignment are *not* set
+        //TS_ASSERT_EQUALS( storage_size, 10159104u);  // HDF 1.10.7 size of file when chunking/alignment are set
+        TS_ASSERT_LESS_THAN(2*data_storage_size, storage_size);
         /*
          * Check the "location" of the datasets (the offset from the start of
          * file, a bit like a pointer to the start of the dataset) to confirm
          * alignment was switched on.
          * With alignment switched off, Data is usually located at 800 B. With
-         * alignment = 16 K it is at 64 K. For the Data_Unlimited dataset the
+         * alignment = 16 K it is at 64 K (v1) or 32K (v2). For the Data_Unlimited dataset the
          * numbers are 4935472 B (about 4.7 MB) and 10125312 B (about 9.7 MB),
          * respectively.
          * (These numbers might be machine-dependent!)
          */
+#if H5_VERS_MAJOR == 1
         H5O_info_t data_info;
         H5Oget_info(dset, &data_info);
         TS_ASSERT_EQUALS(data_info.addr, 0x10000u); // 64 KB
@@ -1962,7 +1974,16 @@ public:
         dset = H5Dopen(h5_file, "Data_Unlimited", H5P_DEFAULT);
         H5Oget_info(dset, &data_info);
         TS_ASSERT_EQUALS(data_info.addr, 0x9A8000u); // About 9.7 MB
+#else // H5_VERS_MAJOR == 2
+        H5O_info_t data_info;
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 0x8000u); // 32 KB in HDF 2.x
+        H5Dclose(dset);
 
+        dset = H5Dopen(h5_file, "Data_Unlimited", H5P_DEFAULT);
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 0x99C000u); // About 9.6 MB in HDF 2.x
+#endif // H5_VERS_MAJOR
         // Tidy up
         H5Dclose(dset);
         H5Fclose(h5_file);

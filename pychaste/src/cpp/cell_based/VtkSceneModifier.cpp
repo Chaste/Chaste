@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,95 +35,105 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VtkSceneModifier.hpp"
 
-template<unsigned DIM>
+template <unsigned DIM>
 VtkSceneModifier<DIM>::VtkSceneModifier()
-    : AbstractCellBasedSimulationModifier<DIM>(),
-      mpScene(),
-      mUpdateFrequency(1)
+        : AbstractCellBasedSimulationModifier<DIM>(),
+          mpScene(),
+          mUpdateFrequency(1)
 {
 }
 
-template<unsigned DIM>
-VtkSceneModifier<DIM>::~VtkSceneModifier()
+template <unsigned DIM>
+unsigned VtkSceneModifier<DIM>::GetUpdateFrequency() const
 {
+    return mUpdateFrequency;
 }
 
-// 1-D is not supported
-template<>
-void VtkSceneModifier<1>::UpdateAtEndOfTimeStep(AbstractCellPopulation<1,1>& rCellPopulation)
-{
-    UpdateCellData(rCellPopulation);
-}
-
-template<unsigned DIM>
-void VtkSceneModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
-{
-    UpdateCellData(rCellPopulation);
-
-    if(DIM>1)
-    {
-        if(mpScene and SimulationTime::Instance()->GetTimeStepsElapsed()%mUpdateFrequency==0)
-        {
-            mpScene->ResetRenderer(SimulationTime::Instance()->GetTimeStepsElapsed());
-        }
-    }
-}
-
-template<unsigned DIM>
+template <unsigned DIM>
 std::shared_ptr<VtkScene<DIM> > VtkSceneModifier<DIM>::GetVtkScene()
 {
     return mpScene;
 }
 
-template<unsigned DIM>
-void VtkSceneModifier<DIM>::SetVtkScene(std::shared_ptr<VtkScene<DIM> > pScene)
-{
-    mpScene = pScene;
-}
-
-// 1-D is not supported
-template<>
-void VtkSceneModifier<1>::SetupSolve(AbstractCellPopulation<1,1>& rCellPopulation, std::string outputDirectory)
-{
-    /*
-     * We must update CellData in SetupSolve(), otherwise it will not have been
-     * fully initialised by the time we enter the main time loop.
-     */
-    UpdateCellData(rCellPopulation);
-}
-
-template<unsigned DIM>
-void VtkSceneModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
-{
-    /*
-     * We must update CellData in SetupSolve(), otherwise it will not have been
-     * fully initialised by the time we enter the main time loop.
-     */
-    UpdateCellData(rCellPopulation);
-    if(mpScene and SimulationTime::Instance()->GetTimeStepsElapsed()%mUpdateFrequency==0)
-    {
-        mpScene->ResetRenderer(SimulationTime::Instance()->GetTimeStepsElapsed());
-    }
-}
-
-template<unsigned DIM>
-void VtkSceneModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
-{
-    // Make sure the cell population is updated
-    rCellPopulation.Update();
-}
-
-template<unsigned DIM>
+template <unsigned DIM>
 void VtkSceneModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 void VtkSceneModifier<DIM>::SetUpdateFrequency(unsigned frequency)
 {
     mUpdateFrequency = frequency;
+}
+
+template <unsigned DIM>
+void VtkSceneModifier<DIM>::SetVtkScene(std::shared_ptr<VtkScene<DIM> > pScene)
+{
+    mpScene = pScene;
+}
+
+// As above, the 1D overload only updates the cell data and does not render.
+template <>
+void VtkSceneModifier<1>::SetupSolve(AbstractCellPopulation<1, 1>& rCellPopulation, std::string outputDirectory)
+{
+    /*
+     * We must update CellData in SetupSolve(), otherwise it will not have been
+     * fully initialised by the time we enter the main time loop.
+     */
+    UpdateCellData(rCellPopulation);
+}
+
+template <unsigned DIM>
+void VtkSceneModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory)
+{
+    /*
+     * We must update CellData in SetupSolve(), otherwise it will not have been
+     * fully initialised by the time we enter the main time loop.
+     */
+    UpdateCellData(rCellPopulation);
+    RenderSceneIfDue();
+}
+
+// VtkScene renders only 2D/3D populations, so this 1D overload updates the
+// cell data but skips rendering.
+template <>
+void VtkSceneModifier<1>::UpdateAtEndOfTimeStep(AbstractCellPopulation<1, 1>& rCellPopulation)
+{
+    UpdateCellData(rCellPopulation);
+}
+
+template <unsigned DIM>
+void VtkSceneModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
+{
+    UpdateCellData(rCellPopulation);
+    RenderSceneIfDue();
+}
+
+template <unsigned DIM>
+void VtkSceneModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
+{
+    // Bring the population's internal state up to date so the scene renders the
+    // current configuration.
+    rCellPopulation.Update();
+}
+
+template <unsigned DIM>
+void VtkSceneModifier<DIM>::RenderSceneIfDue()
+{
+    // Nothing to render until a scene has been attached.
+    if (!mpScene)
+    {
+        return;
+    }
+
+    // Render only on time steps that are a multiple of the update frequency.
+    const unsigned timeStep = SimulationTime::Instance()->GetTimeStepsElapsed();
+    if (timeStep % mUpdateFrequency == 0)
+    {
+        mpScene->RenderFrame(timeStep);
+    }
 }
 
 // Explicit instantiation

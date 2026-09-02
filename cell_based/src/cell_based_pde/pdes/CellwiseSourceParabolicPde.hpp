@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * c*du/dt = Grad.(D*Grad(u)) + a*u*rho(x) + b*rho(x),
  *
  * where the scalars c, D, a and b are specified by the members mDuDtCoefficient,
- * mDiffusionCoefficient, mLinearSourceCoefficient and mConstantSourceCoefficient, 
+ * mDiffusionCoefficient, mLinearSourceCoefficient and mConstantSourceCoefficient,
  * respectively. Their values must be set in the constructor.
  *
  * For a node of the finite element mesh with location x, the function rho(x)
@@ -101,7 +101,7 @@ protected:
 
     /** Coefficient of rate of change term.  */
     double mDuDtCoefficient;
-    
+
     /** Whether to scale terms by cell volume. */
     bool mScaleByCellVolume;
 
@@ -119,7 +119,7 @@ public:
      * @param scaleByCellVolume whether to scale by cell volume (defaults to false)
      */
     CellwiseSourceParabolicPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
-                               double constantSourceCoefficient=0.0, 
+                               double constantSourceCoefficient=0.0,
                                double linearSourceCoefficient=0.0,
                                double diffusionCoefficient=1.0,
                                double duDtCoefficient=1.0,
@@ -139,7 +139,7 @@ public:
      * @return mLinearSourceCoefficient
      */
     double GetLinearCoefficient() const;
-        
+
     /**
      * @return mDiffusionCoefficient
      */

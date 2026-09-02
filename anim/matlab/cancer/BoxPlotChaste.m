@@ -66,7 +66,7 @@ function hout=BoxPlotChaste(x,varargin)
 
 %   Older syntax still supported:
 %       BOXPLOT(X,NOTCH,SYM,VERT,WHIS)
-% 
+%
 %   BOXPLOT calls BOXUTIL to do the actual plotting.
 
 %   References
@@ -165,7 +165,7 @@ if isempty(vert)
 elseif ischar(vert)
    vert = strmatch(vert,{'horizontal' 'vertical'}) - 1;
 end
-if isempty(vert) || ~isscalar(vert) || ~ismember(vert,0:1)   
+if isempty(vert) || ~isscalar(vert) || ~ismember(vert,0:1)
    error('stats:boxplot:InvalidOrientation',...
          'Invalid value for ''orientation'' parameter');
 end
@@ -346,7 +346,7 @@ if ~isempty(labels)
       setappdata(ax,'NLines',size(gname,2));
       xlabel(ax,'');
       ylim = get(ax, 'YLim');
-      
+
       % Place multi-line text approximately where tick labels belong
       ypos = repmat(ylim(1),size(posns));
       text(posns,ypos,labels,'HorizontalAlignment','center', ...
@@ -421,7 +421,7 @@ else
 end
 yy3 = [med med];
 
-    
+
 % Determine if the boxes are vertical or horizontal.
 % The difference is the choice of x and y in the plot command.
 if vert
@@ -473,7 +473,7 @@ allax = findall(f,'Type','Axes');
 for j=1:length(allax)
     ax = allax(j);
     nlines = getappdata(ax, 'NLines');
-    
+
     if ~isempty(nlines)
         % Try to retain the original normalized outer position
         nop = getappdata(ax,'NormalizedOuterPosition');
@@ -482,7 +482,7 @@ for j=1:length(allax)
             nop = get(ax,'OuterPosition');
         end
         set(ax,'OuterPosition',nop);
-        
+
         % Adjust position so the fake X tick labels have room to display
         temp = hgconvertunits(f,[0 0 1 1],'character','normalized',f);
         charheight = temp(4);
@@ -492,7 +492,7 @@ for j=1:length(allax)
              nop(3)*(1-li(1)-li(3)), nop(4)*(1-li(4))-tickheight];
         p = max(p,0.0001);
         set(ax, 'Position', p);
-        
+
         % The following lines do not change the position, but they leave
         % the axes in a state such that MATLAB will try to preserve the
         % outerposition rather than the ordinary position

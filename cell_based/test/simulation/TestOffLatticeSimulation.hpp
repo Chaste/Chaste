@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1375,6 +1375,7 @@ public:
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithAdaptivity");
         simulator.SetEndTime(5.0);
         simulator.SetDt(0.1);
+        simulator.SetMaxAdaptiveTimeStep(3u);
 
         // Pass an adaptive numerical method to the simulation
         std::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
@@ -1393,6 +1394,7 @@ public:
         simulator.Solve();
 
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 14u);
+        TS_ASSERT_EQUALS(simulator.GetMaxAdaptiveTimeStep(), 3u);
 
         // Check cells have moved to the correct location
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3169,1e-4);

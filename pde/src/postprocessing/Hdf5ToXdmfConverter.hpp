@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,7 +61,6 @@ public:
     Hdf5ToXdmfConverter(const FileFinder& rInputDirectory,
             const std::string& rFileBaseName,
             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
-#ifndef _MSC_VER
     /**
      * Generate Attribute tags and append to the element.  Here this is a dummy class, but can be
      * overloaded with real variables elsewhere (see pde/src/postprocesssing/Hdf5toXdmfConverter).
@@ -72,7 +71,6 @@ public:
     void AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* pGridElement,
                         XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* pDomDocument,
                         unsigned timeStep);
-#endif // _MSC_VER
 };
 
 #endif // HDF5TOXDMFCONVERTER_HPP_

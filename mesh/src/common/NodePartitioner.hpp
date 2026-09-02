@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,7 @@ class NodePartitioner
 public:
 
     /**
-      * Method to compute a parallel partitioning of a given mesh based on 
+      * Method to compute a parallel partitioning of a given mesh based on
       * a DistributedVectorFactory in the mesh (if it exists) or else on rMesh.GetNumNodes().
       *
       * @param rMesh is the original mesh (so that we can set the DistributedVectorFactory up

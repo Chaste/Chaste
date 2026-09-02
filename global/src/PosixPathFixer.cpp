@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,9 +37,5 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 std::string ChastePosixPathFixer::ToPosix(const fs::path path)
 {
-#ifdef _MSC_VER
-    return path.generic_string();
-#else
     return path.string(); //Doesn't matter on systems that already use POSIX path format
-#endif
 }

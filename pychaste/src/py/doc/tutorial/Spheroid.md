@@ -17,7 +17,7 @@ It covers:
  * Setting up a cell cycle model with oxygen dependence
  * Setting up and solving an oxygen transport PDE
  * Setting up a cell killer
- 
+
 ## The Test
 
 ```python
@@ -89,7 +89,7 @@ Now we have a mesh and a set of cells to go with it, we can create a `CellPopula
 To view the results of this and the next test in Paraview it is necessary to explicitly generate the required .vtu files.
 
 ```python
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 ```
 We then pass in the cell population into an `OffLatticeSimulation`, and set the output directory and end time.
 
@@ -207,7 +207,7 @@ class TestPySpheroidTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
 
         cell_population = chaste.cell_based.MeshBasedCellPopulation[2, 2](mesh, cells)
 
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 
         simulator = chaste.cell_based.OffLatticeSimulation[2, 2](cell_population)
         simulator.SetOutputDirectory("Python/TestSpheroidTutorial")

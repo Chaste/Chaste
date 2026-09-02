@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,7 +61,7 @@ class TestDiskSpace(unittest.TestCase):
             # psutil 0.3.0 or newer is needed for this test to work
             return
         gb = 1024*1024*1024
-        
+
         source_free_gb = du(__file__).free / gb
         print("Free space on Chaste source partition: %sGB" % source_free_gb)
         self.assertFalse(source_free_gb < 5,

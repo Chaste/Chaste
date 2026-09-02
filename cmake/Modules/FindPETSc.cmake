@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2025, University of Oxford.
+# Copyright (c) 2005-2026, University of Oxford.
 # All rights reserved.
 #
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -9,14 +9,14 @@
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-#  * Redistributions of source code must retain the above copyright notice,
-#    this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above copyright notice,
-#    this list of conditions and the following disclaimer in the documentation
-#    and/or other materials provided with the distribution.
-#  * Neither the name of the University of Oxford nor the names of its
-#    contributors may be used to endorse or promote products derived from this
-#    software without specific prior written permission.
+# * Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+# * Neither the name of the University of Oxford nor the names of its
+# contributors may be used to endorse or promote products derived from this
+# software without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -42,29 +42,29 @@
 #
 # This module defines the following IMPORTED target:
 #
-#  PETSc::PETSc        - the PETSc library
+# PETSc::PETSc        - the PETSc library
 #
 # Result Variables
 # ^^^^^^^^^^^^^^^^
 #
 # This module will set the following variables in your project:
 #
-#  PETSc_FOUND          - if false, do not try to link to PETSc
-#  PETSc_LIBRARIES      - a list of the full paths to all libraries
-#  PETSc_INCLUDE_DIRS   - a list of all include directories
-#  PETSc_VERSION        - the full version of PETSc MAJOR.MINOR.PATCH
-#  PETSc_VERSION_MAJOR  - the MAJOR part of PETSc_VERSION
-#  PETSc_VERSION_MINOR  - the MINOR part of PETSc_VERSION
-#  PETSc_VERSION_PATCH  - the PATCH part of PETSc_VERSION
+# PETSc_FOUND          - if false, do not try to link to PETSc
+# PETSc_LIBRARIES      - a list of the full paths to all libraries
+# PETSc_INCLUDE_DIRS   - a list of all include directories
+# PETSc_VERSION        - the full version of PETSc MAJOR.MINOR.PATCH
+# PETSc_VERSION_MAJOR  - the MAJOR part of PETSc_VERSION
+# PETSc_VERSION_MINOR  - the MINOR part of PETSc_VERSION
+# PETSc_VERSION_PATCH  - the PATCH part of PETSc_VERSION
 
 cmake_policy(VERSION 3.10)
 
 # Generate a argument for cmake pkg-config call
-if (PETSc_FIND_QUIETLY)
+if(PETSc_FIND_QUIETLY)
     find_package(PkgConfig QUIET REQUIRED)
-else ()
+else()
     find_package(PkgConfig REQUIRED)
-endif ()
+endif()
 
 # Collect candidate PKG_CONFIG_PATH entries in preference order
 set(_custom_pkg_paths "")
@@ -72,9 +72,11 @@ set(_custom_pkg_paths "")
 # ... from PETSC_DIR and PETSC_ARCH (user-defined)
 if(DEFINED ENV{PETSC_DIR} AND DEFINED ENV{PETSC_ARCH})
     set(_petsc_env_path "$ENV{PETSC_DIR}/$ENV{PETSC_ARCH}/lib/pkgconfig")
+
     if(EXISTS "${_petsc_env_path}")
         list(APPEND _custom_pkg_paths "${_petsc_env_path}")
     endif()
+
     unset(_petsc_env_path)
 endif()
 
@@ -86,13 +88,14 @@ endif()
 
 # Build the pkg-config version spec
 set(_pkg_version_spec "")
-if (DEFINED PETSc_FIND_VERSION)
-    if (PETSc_FIND_VERSION_EXACT)
+
+if(DEFINED PETSc_FIND_VERSION)
+    if(PETSc_FIND_VERSION_EXACT)
         set(_pkg_version_spec "=${PETSc_FIND_VERSION}")
-    else ()
+    else()
         set(_pkg_version_spec ">=${PETSc_FIND_VERSION}")
-    endif ()
-endif ()
+    endif()
+endif()
 
 # Allow system flags
 set(ENV{PKG_CONFIG_ALLOW_SYSTEM_CFLAGS} 1)
@@ -101,16 +104,16 @@ set(ENV{PKG_CONFIG_ALLOW_SYSTEM_LIBS} 1)
 # Use pkg-config to find PETSc
 set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH "YES")
 
-if (PETSc_FIND_QUIETLY)
+if(PETSc_FIND_QUIETLY)
     pkg_check_modules(PETSc QUIET IMPORTED_TARGET GLOBAL "PETSc${_pkg_version_spec}")
-else ()
+else()
     pkg_check_modules(PETSc IMPORTED_TARGET GLOBAL "PETSc${_pkg_version_spec}")
-endif ()
+endif()
 
 unset(_pkg_version_spec)
 
 # Extract version parts from the version information
-if (PC_PETSc_VERSION)
+if(PC_PETSc_VERSION)
     set(_petsc_versions "")
     string(REGEX MATCHALL "[0-9]+" _petsc_versions ${PETSc_VERSION})
     list(GET _petsc_versions 0 _petsc_version_major)
@@ -126,16 +129,16 @@ if (PC_PETSc_VERSION)
     unset(_petsc_version_major)
     unset(_petsc_version_minor)
     unset(_petsc_version_patch)
-endif ()
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PETSc
-        REQUIRED_VARS PETSc_FOUND PETSc_INCLUDE_DIRS PETSc_LIBRARIES
-        VERSION_VAR PETSc_VERSION
+    REQUIRED_VARS PETSc_FOUND PETSc_INCLUDE_DIRS PETSc_LIBRARIES
+    VERSION_VAR PETSc_VERSION
 )
 
-if (NOT TARGET PETSc::PETSc)
+if(NOT TARGET PETSc::PETSc)
     add_library(PETSc::PETSc ALIAS PkgConfig::PETSc)
-endif ()
+endif()
 
 mark_as_advanced(PETSc_INCLUDE_DIRS PETSc_LIBRARIES PETSc_VERSION_MAJOR PETSc_VERSION_MINOR PETSc_VERSION_PATCH VERSION_VAR PETSc_VERSION)

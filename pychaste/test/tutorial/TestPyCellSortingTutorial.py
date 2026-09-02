@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,7 +88,7 @@ class TestPyCellSortingTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
 
         ## In order to visualize labelled cells we need to use the following command.
 
-        cell_population.AddCellWriterCellLabelWriter()
+        cell_population.AddCellWriter["CellLabelWriter"]()
 
         ## PyChaste can do simple 3D rendering with VTK. We set up a VtkScene so that we can
         ## see the population evovle in real time.

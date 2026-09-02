@@ -1,6 +1,6 @@
 """Helper classes for running cell-based tests."""
 
-__copyright__ = """Copyright (c) 2005-2025, University of Oxford.
+__copyright__ = """Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,43 +34,63 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import unittest
 
-import chaste.cell_based
-import chaste.core
+from chaste.cell_based import CellId, SimulationTime
+from chaste.core import RandomNumberGenerator, Timer
 
 
 def SetupNotebookTest():
-    simulation_time = chaste.cell_based.SimulationTime.Instance()
+    """Reset the global simulation state at the start of a tutorial notebook.
+
+    A notebook cannot inherit the setUp of the test-suite classes below, so it
+    calls this explicitly to keep notebooks that run in sequence independent.
+    """
+    simulation_time = SimulationTime.Instance()
     simulation_time.SetStartTime(0.0)
-    chaste.core.RandomNumberGenerator.Instance().Reseed(0)
-    chaste.cell_based.CellId.ResetMaxCellId()
+    RandomNumberGenerator.Instance().Reseed(0)
+    CellId.ResetMaxCellId()
 
 
 def TearDownNotebookTest():
-    simulation_time = chaste.cell_based.SimulationTime.Instance()
+    """Destroy the global simulation state at the end of a tutorial notebook.
+
+    The teardown counterpart of :func:`SetupNotebookTest`.
+    """
+    simulation_time = SimulationTime.Instance()
     simulation_time.Destroy()
-    chaste.core.RandomNumberGenerator.Instance().Destroy()
+    RandomNumberGenerator.Instance().Destroy()
 
 
 class AbstractCellBasedTestSuite(unittest.TestCase):
+    """Base test suite that resets the global simulation state around each test.
+
+    The Python equivalent of the C++ base class of the same name (see
+    cell_based/src/fortests/AbstractCellBasedTestSuite.hpp). It is not wrapped
+    from C++; it is re-implemented directly in Python as a unittest.TestCase
+    subclass so Python test suites get the same per-test setUp/tearDown behaviour.
+    """
 
     def setUp(self):
-        simulation_time = chaste.cell_based.SimulationTime.Instance()
-        simulation_time.SetStartTime(0.0)
-        chaste.core.RandomNumberGenerator.Instance().Reseed(0)
-        chaste.cell_based.CellId.ResetMaxCellId()
+        """Reset the global simulation state before each test."""
+        SetupNotebookTest()
 
     def tearDown(self):
-        simulation_time = chaste.cell_based.SimulationTime.Instance()
-        simulation_time.Destroy()
-        chaste.core.RandomNumberGenerator.Instance().Destroy()
+        """Destroy the global simulation state after each test."""
+        TearDownNotebookTest()
 
 
 class AbstractCellBasedWithTimingsTestSuite(AbstractCellBasedTestSuite):
+    """AbstractCellBasedTestSuite that also times each test.
+
+    The Python equivalent of the C++ base class of the same name (see
+    cell_based/src/fortests/AbstractCellBasedWithTimingsTestSuite.hpp).
+    """
 
     def setUp(self):
-        chaste.core.Timer().Reset()
-        super(AbstractCellBasedWithTimingsTestSuite, self).setUp()
+        """Reset the timer, then the global simulation state, before each test."""
+        Timer().Reset()
+        super().setUp()
 
     def tearDown(self):
-        super(AbstractCellBasedWithTimingsTestSuite, self).tearDown()
-        chaste.core.Timer().Print("Test elapsed")
+        """Destroy the global simulation state, then report the elapsed time."""
+        super().tearDown()
+        Timer().Print("Test elapsed")

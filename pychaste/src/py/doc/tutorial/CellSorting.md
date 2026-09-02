@@ -15,7 +15,7 @@ This test is a demonstration of cell sorting using a Cellular Potts based framew
 It shows:
  * How to set up a Potts simulation
  * Working with labels
- 
+
 ## The Test
 
 ```python
@@ -71,7 +71,7 @@ Now we have a mesh and a set of cells to go with it, we can create a `CellPopula
 In order to visualize labelled cells we need to use the following command.
 
 ```python
-        cell_population.AddCellWriterCellLabelWriter()
+        cell_population.AddCellWriter["CellLabelWriter"]()
 ```
 PyChaste can do simple 3D rendering with VTK. We set up a VtkScene so that we can
 see the population evovle in real time.
@@ -165,7 +165,7 @@ class TestPyCellSortingTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
 
         cell_population = chaste.cell_based.PottsBasedCellPopulation[2](mesh, cells)
 
-        cell_population.AddCellWriterCellLabelWriter()
+        cell_population.AddCellWriter["CellLabelWriter"]()
 
         scene = chaste.visualization.VtkScene[2]()
         scene.SetCellPopulation(cell_population)

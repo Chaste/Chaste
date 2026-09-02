@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,8 +47,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * by Sundials 6.0 and above.
  *
  * This class is a singleton and an instance should be retrieved with:
- * CvodeContextManager* ctx = CvodeContextManager::Instance();
+ * std::shared_ptr<CvodeContextManager> ctx = CvodeContextManager::Instance();
  *
+ * There is one instance per thread, since a SUNContext may not be shared between threads.
+ * Ownership is shared: Sundials requires that every object created against a context is
+ * freed before the context itself, but the context is created lazily on first use and so
+ * would otherwise be torn down before the longer-lived objects that refer to it. Any class
+ * holding Sundials resources should therefore keep a copy of the pointer returned here for
+ * as long as it holds those resources, which keeps the context alive until the last user
+ * has gone.
  */
 class CvodeContextManager
 {
@@ -73,13 +80,16 @@ public:
     SUNContext& GetSundialsContext();
 
     /**
-     * @return a pointer to the context manager object.
-     * The object is created the first time this method is called.
+     * @return a shared pointer to the context manager object for the calling thread.
+     * The object is created the first time this method is called on that thread, and is
+     * destroyed once the thread has exited and every holder of the returned pointer has
+     * released it.
      */
-    static CvodeContextManager* Instance();
+    static std::shared_ptr<CvodeContextManager> Instance();
 
     /**
-     * Public destructor is only called when singleton goes out of scope (e.g. end of test-suite)
+     * Public destructor is only called when the last holder of the shared pointer returned
+     * by Instance() releases it.
      */
     ~CvodeContextManager();
 };

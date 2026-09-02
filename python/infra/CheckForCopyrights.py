@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,6 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import ast
 import os
 import re
 import sys
@@ -70,7 +71,7 @@ deprecated_notice = re.compile(r"""(# ){0,1}Copyright \(c\) 2005-\d{4}, Universi
 """, re.MULTILINE)
 
 
-current_notice = """Copyright (c) 2005-2025, University of Oxford.
+current_notice = """Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -108,7 +109,7 @@ cpp_current_notice = '/*\n\n'+current_notice+'\n*/'
 
 
 def AddHashesToBeginningOfLines(message):
-    message = '# ' + message.replace("\n", "\n# ")
+    message = ('# ' + message.replace("\n", "\n# ")).replace("\n# \n", "\n#\n")
     return message[:-2]
 
 
@@ -225,6 +226,68 @@ def HeadAppendStringInFile(appendString, filePath):
     print('Notice: applied copyright notice in %s' % filePath)
 
 
+def InsertPyNoticeInFile(notice, filePath):
+    """Insert notice just after a Python module's header, after shebangs,
+    encoding declarations, docstrings and __future__ imports. The notice
+    never displaces something that must stay at the top of the file."""
+    with open(filePath) as input:
+        source = input.read()
+
+    # Keep the original line endings so the file can be reassembled.
+    lines = source.splitlines(keepends=True)
+
+    # Count the leading statements the notice must go after: the module
+    # docstring if any, then any __future__ imports.
+    try:
+        body = ast.parse(source).body
+    except SyntaxError:
+        # A file that does not parse has no detectable docstring.
+        body = []
+    header_stmts = 0  # number of leading statements to keep above the notice
+    # A module's first statement is a docstring if it's a bare string literal:
+    #   1. body[0] is an ast.Expr           - just an expression (not an import, def, ...)
+    #   2. body[0].value is an ast.Constant - the expression is a literal (not a call, name, ...)
+    #   3. body[0].value.value is a str     - the literal is a string (not a number)
+    if (body and isinstance(body[0], ast.Expr)
+            and isinstance(body[0].value, ast.Constant)
+            and isinstance(body[0].value.value, str)):
+        header_stmts = 1
+
+    # __future__ imports must stay at the very top (after a docstring), so the
+    # notice must go after those too, otherwise it's a SyntaxError.
+    while (header_stmts < len(body) and isinstance(body[header_stmts], ast.ImportFrom)
+            and body[header_stmts].module == '__future__'):
+        header_stmts += 1
+
+    # end_lineno of the last leading statement is 1-based, which is the same as
+    # the 0-based index of the line after it, i.e. where to insert.
+    insert_at = body[header_stmts - 1].end_lineno if header_stmts else 0
+
+    # A shebang and a PEP 263 encoding declaration are comments, so ast never
+    # sees them; when there is no docstring or __future__ import to anchor to,
+    # skip them by line.
+    if not header_stmts:
+        if lines and lines[0].startswith('#!'):
+            insert_at = 1  # shebang: only recognised on line 1
+        if (insert_at < min(2, len(lines))
+                and re.match(r'[ \t\f]*#.*coding[:=]', lines[insert_at])):
+            insert_at += 1  # encoding: only recognised on line 1 or 2
+
+    # Separate the notice from any preceding lines with a blank line.
+    block = ('\n' if insert_at else '') + notice
+
+    # Write to a temp file, then swap it in, so a failure part-way through
+    # cannot leave a half-written source file behind.
+    tempName = filePath+'~'
+    with open(tempName, 'w') as output:
+        # lines[:insert_at] is the module header kept above the notice (if any).
+        output.write(''.join(lines[:insert_at]))
+        output.write(block)
+        output.write(''.join(lines[insert_at:]))
+    UpdateFile(filePath, tempName)
+    print('Notice: applied copyright notice in %s' % filePath)
+
+
 def InspectFile(fileName):
     file_in = open(fileName)
     if fileName[-21:] == 'CheckForCopyrights.py':
@@ -248,9 +311,9 @@ def InspectFile(fileName):
         CheckForCopyrightNotice(triangle_notice, file_in) or
         CheckForCopyrightNotice(tetgen_predicates_notice, file_in) or
         CheckForCopyrightNotice(tetgen_notice, file_in) or
-        CheckForCopyrightNotice(py_lgpl_notice, file_in) or 
-        CheckForCopyrightNotice(opensimplex_notice, file_in) or 
-        CheckForCopyrightNotice(smtk_notice, file_in) or 
+        CheckForCopyrightNotice(py_lgpl_notice, file_in) or
+        CheckForCopyrightNotice(opensimplex_notice, file_in) or
+        CheckForCopyrightNotice(smtk_notice, file_in) or
         CheckForCopyrightNotice(dolfinx_notice, file_in)):
         # print('Found 3rd party notice in %s' % file_name)
         if valid_notice:
@@ -279,8 +342,8 @@ def InspectFile(fileName):
     print('Found no copyright notice for %s' % fileName)
     if apply_new:
         if fileName[-3:] == '.py':
-            print('Not implemented for .py files')
-            return False
+            # Keep the module docstring in place and add the notice below it as __copyright__.
+            InsertPyNoticeInFile('__copyright__ = ' + py_current_notice, fileName)
         elif fileName[-14:] == 'CMakeLists.txt':
             HeadAppendStringInFile(cmake_current_notice + "\n\n", fileName)
         elif fileName[-7:] == 'LICENSE':

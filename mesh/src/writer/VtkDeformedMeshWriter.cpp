@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,13 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 
 template<unsigned DIM>
-VtkDeformedMeshWriter<DIM>::VtkDeformedMeshWriter(AbstractTetrahedralMesh<DIM,DIM>* pDeformedOutputMesh, 
-    const std::string& rDirectory, 
-    const std::string& rBaseName, 
+VtkDeformedMeshWriter<DIM>::VtkDeformedMeshWriter(AbstractTetrahedralMesh<DIM,DIM>* pDeformedOutputMesh,
+    const std::string& rDirectory,
+    const std::string& rBaseName,
     const bool& rCleanDirectory)
     : VtkMeshWriter<DIM,DIM>(rDirectory,rBaseName,rCleanDirectory),
       mpDeformedMesh(pDeformedOutputMesh)
-{    
+{
 }
 
 template<unsigned DIM>
@@ -79,7 +79,7 @@ void VtkDeformedMeshWriter<DIM>::ApplyDeformation(const std::vector<c_vector<dou
     for (unsigned node_index = 0u; node_index<rPositions.size(); ++node_index)
     {
         ChastePoint<DIM> new_position(rPositions[node_index]);
-        //The next line will change node coordinates. 
+        //The next line will change node coordinates.
         //Note that we do not update element Jacobians (and related quantities)
         //as this mesh is used only in this class for visualization purposes.
         mpDeformedMesh->GetNode(node_index)->SetPoint(new_position);

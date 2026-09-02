@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,8 +88,7 @@ Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
 
     // loop over boundary elements and add a non-zero phi_e boundary condition (ie extracellular
     // stimulus) if (assuming axis_index=0, etc) x=lowerValue (where x is the x-value of the centroid)
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-            = mpMesh->GetBoundaryElementIteratorBegin();
+    for (auto iter = mpMesh->GetBoundaryElementIteratorBegin();
        iter != mpMesh->GetBoundaryElementIteratorEnd();
        iter++)
     {
@@ -179,8 +178,7 @@ void Electrodes<DIM>::ComputeElectrodesAreasAndCheckEquality(unsigned dimensionI
     c_vector<double,DIM> weighted_direction;
     double jacobian_determinant;
 
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-             = mpMesh->GetBoundaryElementIteratorBegin();
+    for (auto iter = mpMesh->GetBoundaryElementIteratorBegin();
          iter != mpMesh->GetBoundaryElementIteratorEnd();
          iter++)
     {

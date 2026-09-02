@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,8 +82,7 @@ void DeltaNotchEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<
         std::vector<double> delta_vec;
         for (unsigned i = 0 ; i  < p_cell_edge_model->GetNumEdgeSrn(); i++)
         {
-            std::shared_ptr<DeltaNotchEdgeSrnModel> p_model
-            = std::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_model->GetEdgeSrn(i));
+            auto p_model = std::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_model->GetEdgeSrn(i));
             double this_delta = p_model->GetDelta();
             double this_notch = p_model->GetNotch();
             delta_vec.push_back(this_delta);

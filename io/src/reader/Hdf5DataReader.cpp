@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -209,7 +209,7 @@ void Hdf5DataReader::CommonConstructor()
     // Read data from hyperslab in the file into the hyperslab in memory
     mIncompleteNodeIndices.clear();
     mIncompleteNodeIndices.resize(num_node_indices);
-    H5Aread(attribute_id, H5T_NATIVE_UINT, &mIncompleteNodeIndices[0]);
+    H5Aread(attribute_id, H5T_NATIVE_UINT, mIncompleteNodeIndices.data());
 
     H5Tclose(attribute_type);
     H5Sclose(attribute_space);

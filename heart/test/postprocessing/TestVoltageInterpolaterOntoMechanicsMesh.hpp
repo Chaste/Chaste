@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,7 +82,7 @@ public:
 
         VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh, mech_mesh);
         interpolater.OutputToCmgui(variable_names,"TestVoltageInterpolater1d","MonodomainLR91_1d");
-        
+
         Hdf5DataReader fine_reader("TestVoltageInterpolater1d","MonodomainLR91_1d");
         DistributedVectorFactory factory1(mesh.GetNumNodes());
         Vec voltage_fine = factory1.CreateVec();
