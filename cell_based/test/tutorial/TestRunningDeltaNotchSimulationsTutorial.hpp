@@ -162,11 +162,14 @@ public:
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         /* We are now in a position to create and configure the cell-based simulation object, pass a force law to it,
-         * and run the simulation. We can make the simulation run for longer to see more patterning by increasing the end time. */
+         * and run the simulation. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexBasedMonolayerWithDeltaNotch");
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(1.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see more Delta-Notch
+         * patterning develop, change this to `1.0`.** */
+        double end_time = 0.1;
+        simulator.SetEndTime(end_time);
 
         /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within the cells in `CellData` and passes it to the simulation.*/
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
@@ -179,7 +182,12 @@ public:
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
-        simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING`
+         * checks that the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it
+         * actually reached the requested end time.*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -242,7 +250,10 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestNodeBasedMonolayerWithDeltaNotch");
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(5.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see more Delta-Notch
+         * patterning develop, change this to `5.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /* Again we define the modifier class, which automatically updates the values of Delta and Notch within the cells in `CellData` and passes it to the simulation.*/
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
@@ -253,7 +264,11 @@ public:
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
-        simulator.Solve();
+        /* The next two lines are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING`
+         * checks that the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it
+         * actually reached the requested end time.*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*

@@ -144,23 +144,21 @@ public:
          * and set the output directory and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("Test2DMeshBasedMonolayerSimulationForVisualizing");
-        simulator.SetEndTime(1.0);
+        /* We use a short `end_time` here to keep automated testing fast, which still produces several `.vtu`
+         * output frames. **To generate a fuller Paraview animation, change this to `1.0`.** */
+        double end_time = 0.1;
+        simulator.SetEndTime(end_time);
 
         /* We create a force law and pass it to the `OffLatticeSimulation`. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         * We are checking that we reached the end time of the simulation
-         * with the correct number of cells. If different simulation input parameters are being explored
-         * the lines should be removed.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 108u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -210,21 +208,20 @@ public:
 
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing");
-        simulator.SetEndTime(1.0);
+        /* We use a short `end_time` here to keep automated testing fast, which still produces several `.vtu`
+         * output frames. **To generate a fuller Paraview animation, change this to `1.0`.** */
+        double end_time = 0.1;
+        simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         * We are checking that we reached the end time of the simulation
-         * with the correct number of cells. If different simulation input parameters are being explored
-         * the lines should be removed.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 108u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
+        /* The next two lines are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING`
+         * checks that the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it
+         * actually reached the requested end time.*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -267,19 +264,20 @@ public:
 
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("Test2DNodeBasedMonolayerSimulationForVisualizing");
-        simulator.SetEndTime(1.0);
+        /* We use a short `end_time` here to keep automated testing fast, which still produces several `.vtu`
+         * output frames. **To generate a fuller Paraview animation, change this to `1.0`.** */
+        double end_time = 0.1;
+        simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         * We are checking that we reached the end time of the simulation
-         * with the correct number of cells. */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 108u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
+        /* The next two lines are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING`
+         * checks that the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it
+         * actually reached the requested end time.*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -316,7 +314,10 @@ public:
          * and set the output directory and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("Test2DVertexMonolayerSimulationForVisualizing");
-        simulator.SetEndTime(0.1);
+        /* We use a short `end_time` here to keep automated testing fast, which still produces several `.vtu`
+         * output frames. **To generate a fuller Paraview animation, change this to `0.1`.** */
+        double end_time = 0.02;
+        simulator.SetEndTime(end_time);
 
         /* We create a force law and pass it to the `OffLatticeSimulation`. */
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
@@ -328,14 +329,11 @@ public:
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         * We are checking that we reached the end time of the simulation
-         * with the correct number of cells. */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 84u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*

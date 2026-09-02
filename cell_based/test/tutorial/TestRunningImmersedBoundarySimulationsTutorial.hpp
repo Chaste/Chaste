@@ -134,7 +134,10 @@ public:
         simulator.SetOutputDirectory("TestImmersedBoundaryDemoTutorial");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(100.0 * dt);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the palisade relax into
+         * a more realistic equilibrium shape, change this to `100.0 * dt`.** */
+        double end_time = 30.0 * dt;
+        simulator.SetEndTime(end_time);
 
         /* All of the machinery for the immersed boundary method is handled in the following `SimulationModifier`.
          * Here, we create a 'shared pointer' to an `ImmersedBoundarySimulationModifier` object and pass it to the
@@ -154,8 +157,12 @@ public:
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
         p_cell_cell_force->SetSpringConst(1.0 * 1e6);
 
-        /* Finally we call the `Solve` method on the simulation to run the simulation.*/
-        simulator.Solve();
+        /* Finally we call the `Solve` method on the simulation to run the simulation. (The next two lines are for
+         * test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the
+         * simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it actually reached the
+         * requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 
