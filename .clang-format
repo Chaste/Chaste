@@ -44,7 +44,7 @@ Cpp11BracedListStyle: false
 DerivePointerAlignment: false
 DisableFormat:   false
 ExperimentalAutoDetectBinPacking: false
-ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
+ForEachMacros:   [ foreach, Q_FOREACH ]
 IncludeCategories:
   - Regex:           '"FakePetscSetup.hpp"'
     Priority:        99
