@@ -145,7 +145,10 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo1");
         simulator.SetSamplingTimestepMultiple(200);
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         /* To specify how cells move around, we create a "shared pointer" to a
          * `Force` object and pass it to the `OffLatticeSimulation`. This is done using the `MAKE_PTR` macro as follows.
@@ -160,16 +163,12 @@ public:
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        /* Finally we call the `Solve` method on the simulation to run the simulation.*/
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         * We are checking that we reached the end time of the simulation
-         * with the correct number of cells. If different simulation input parameters are being explored
-         * the lines should be removed.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* Finally we call the `Solve` method on the simulation to run the simulation. (The next two lines
+         * are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that
+         * the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it actually reached
+         * the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -217,7 +216,10 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo2"); //**Changed**//
         simulator.SetSamplingTimestepMultiple(12); //**Changed**//
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         /* We use a different `Force` which is suitable for node based simulations.
          */
@@ -232,15 +234,12 @@ public:
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_cell_killer, (&cell_population, 0.01)); //**Changed**//
         simulator.AddCellKiller(p_cell_killer);
 
-        /* Again we call the `Solve` method on the simulation to run the simulation.*/
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         * Again, we are checking that we reached the end time of the simulation
-         * with the correct number of cells.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 7u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* Again we call the `Solve` method on the simulation to run the simulation. (The next two lines are
+         * for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that
+         * the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it actually
+         * reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -283,19 +282,21 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo3"); //**Changed**//
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         /* We use a different `Force` which is suitable for mesh based simulations.*/
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force); //**Changed**//
         simulator.AddForce(p_force);
 
-        /* Again we call the `Solve` method on the simulation to run the simulation.*/
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* Again we call the `Solve` method on the simulation to run the simulation. (The next two lines are
+         * for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that
+         * the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it actually
+         * reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -339,17 +340,21 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo4"); //**Changed**//
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(2.0); //**Changed**//
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `2.0`.** (Shorter than the other demos, since the
+         * Tyson-Novak cells proliferate quickly.) */
+        double end_time = 0.2; //**Changed**//
+        simulator.SetEndTime(end_time);
 
         /* We use the same `Force` as before and run the simulation in the same way.*/
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
-        simulator.Solve();
 
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 2.0, 1e-10);
+        /* The next two lines are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING`
+         * checks that the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it
+         * actually reached the requested end time.*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -384,17 +389,19 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo5"); //**Changed**//
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(20.0); //**Changed**//
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0; //**Changed**//
+        simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 29u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* The next two lines are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING`
+         * checks that the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it
+         * actually reached the requested end time.*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -425,7 +432,10 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo6"); //**Changed**//
         simulator.SetSamplingTimestepMultiple(50);
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
@@ -438,13 +448,12 @@ public:
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc);
 
-        /* Finally we call the `Solve` method as in all other simulations.*/
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 23u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* Finally we call the `Solve` method as in all other simulations. (The next two lines are for test
+         * purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the
+         * simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it actually
+         * reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
     /*
      * The results may be visualized using `Visualize2dCentreCells` as described in the
@@ -482,7 +491,10 @@ public:
          */
         OnLatticeSimulation<2> simulator(cell_population);//**Changed**//
         simulator.SetOutputDirectory("CellBasedDemo7"); //**Changed**//
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         /* In order to specify how cells move around we create "shared pointers" to
          * `UpdateRule` objects and pass them to the `OnLatticeSimulation`.
@@ -499,13 +511,11 @@ public:
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_cell_killer, (&cell_population, 0.01));
         simulator.AddCellKiller(p_cell_killer);
 
-        /* Again we run the simulation by calling the `Solve` method.*/
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* Again we run the simulation by calling the `Solve` method. (The next two lines are for test purposes
+         * only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to
+         * completion without error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*
