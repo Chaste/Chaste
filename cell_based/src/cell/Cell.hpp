@@ -87,7 +87,7 @@ struct null_deleter
  *
  * This class should not store any spatial information - cells are linked to space by the AbstractCellPopulation subclasses.
  */
-class Cell : private boost::noncopyable, public std::enable_shared_from_this<Cell>
+class Cell : private boost::noncopyable
 {
 private:
 
