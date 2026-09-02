@@ -257,7 +257,7 @@ public:
          * argument of the constructor takes a vector of the indices of the real nodes and should be the
          * same length as the vector of cell pointers.
          */
-        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices); //**Changed**//
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         /* Again Paraview output is explicitly requested.*/
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
