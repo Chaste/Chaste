@@ -116,9 +116,13 @@ public:
         simulator.SetOutputDirectory("TestShortSingleCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(4u);
-        simulator.SetEndTime(100 * dt);
+        // We use a short end_time here to keep automated testing fast; increase this (e.g. to 100.0 * dt) to run
+        // the simulation for longer.
+        double end_time = 16.0 * dt;
+        simulator.SetEndTime(end_time);
 
-        simulator.Solve();
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     void TestShortTwoCellSim()
@@ -167,9 +171,13 @@ public:
         simulator.SetOutputDirectory("TestShortTwoCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(4u);
-        simulator.SetEndTime(100.0 * dt);
+        // We use a short end_time here to keep automated testing fast; increase this (e.g. to 100.0 * dt) to run
+        // the simulation for longer.
+        double end_time = 16.0 * dt;
+        simulator.SetEndTime(end_time);
 
-        simulator.Solve();
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
 
@@ -219,9 +227,13 @@ public:
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(4u);
-        simulator.SetEndTime(100.0 * dt);
+        // We use a short end_time here to keep automated testing fast; increase this (e.g. to 100.0 * dt) to run
+        // the simulation for longer.
+        double end_time = 16.0 * dt;
+        simulator.SetEndTime(end_time);
 
-        simulator.Solve();
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 
