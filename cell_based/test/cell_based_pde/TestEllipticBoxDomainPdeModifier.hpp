@@ -238,6 +238,10 @@ public:
                          expected_sum[0]/expected_count[0], 1e-10);
         TS_ASSERT_DELTA(cell_population.GetCellUsingLocationIndex(1)->GetCellData()->GetItem("variable"),
                          expected_sum[1]/expected_count[1], 1e-10);
+
+        // Tidy up (ConstructNodesWithoutMesh() copies the nodes rather than taking ownership)
+        delete nodes[0];
+        delete nodes[1];
     }
 
     void TestUpdateCellDataWithVoronoiCellsForInterpolationThrowsIfACellHasNoNodes()
@@ -278,6 +282,10 @@ public:
 
         TS_ASSERT_THROWS_THIS(p_pde_modifier->UpdateCellData(cell_population),
                 "One or more of the cells doesn't contain any pde nodes so can't use Voronoi CellData calculation");
+
+        // Tidy up (ConstructNodesWithoutMesh() copies the nodes rather than taking ownership)
+        delete nodes[0];
+        delete nodes[1];
     }
 
     void TestArchiveEllipticBoxDomainPdeModifier()

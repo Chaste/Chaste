@@ -349,6 +349,12 @@ public:
         }
 
         PetscTools::Destroy(interpolated_solution);
+
+        // Tidy up (ConstructNodesWithoutMesh() copies the nodes rather than taking ownership)
+        delete nodes[0];
+        delete nodes[1];
+        delete nodes[2];
+        delete nodes[3];
     }
 
     void TestMeshBasedSquareMonolayer()
