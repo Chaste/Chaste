@@ -350,15 +350,18 @@ public:
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 4.0);
 
-        ChastePoint<1> lower_corner(0.0);
-        ChastePoint<1> upper_corner(4.0);
-        std::vector<ChasteCuboid<1> > heterogeneity_area;
-        heterogeneity_area.push_back(ChasteCuboid<1>(lower_corner, upper_corner)); // covers the whole mesh
+        // HeartConfig::SetConductivityHeterogeneities() always takes 3D cuboids and conductivity
+        // vectors, regardless of the tissue's actual SPACE_DIM (only the first SPACE_DIM
+        // components are read back by GetConductivityHeterogeneities()).
+        ChastePoint<3> lower_corner(0.0, 0.0, 0.0);
+        ChastePoint<3> upper_corner(4.0, 0.0, 0.0);
+        std::vector<ChasteCuboid<3> > heterogeneity_area;
+        heterogeneity_area.push_back(ChasteCuboid<3>(lower_corner, upper_corner)); // covers the whole mesh
 
-        std::vector<c_vector<double,1> > intra_conductivities;
-        intra_conductivities.push_back(Create_c_vector(1.0));
-        std::vector<c_vector<double,1> > extra_conductivities;
-        extra_conductivities.push_back(Create_c_vector(2.0));
+        std::vector<c_vector<double,3> > intra_conductivities;
+        intra_conductivities.push_back(Create_c_vector(1.0, 0.0, 0.0));
+        std::vector<c_vector<double,3> > extra_conductivities;
+        extra_conductivities.push_back(Create_c_vector(2.0, 0.0, 0.0));
 
         HeartConfig::Instance()->SetConductivityHeterogeneities(heterogeneity_area, intra_conductivities, extra_conductivities);
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(15.0));
