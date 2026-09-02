@@ -243,7 +243,10 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithCellHeightTrackingModifier");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         MAKE_PTR(RepulsionForce<2>, p_force);
         simulator.AddForce(p_force);
@@ -254,8 +257,11 @@ public:
         MAKE_PTR(CellHeightTrackingModifier, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are
+         * not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion
+         * without error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*

@@ -271,14 +271,21 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithMotileCellPropertyAndWriters");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(10.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `10.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
-        /* Next we create a force law and pass it to the `OffLatticeSimulation`, and call `Solve()` to run the simulation. */
+        /* Next we create a force law and pass it to the `OffLatticeSimulation`, and call `Solve()` to run the simulation.
+         * (The next two lines are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING`
+         * checks that the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it actually
+         * reached the requested end time.)*/
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
-        simulator.Solve();
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*
