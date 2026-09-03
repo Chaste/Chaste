@@ -1130,9 +1130,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
         // finding no heterogeneities defined is allowed
         return;
     }
-    XSD_SEQUENCE_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity)
-    cell_heterogeneity
-        = mpParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
+    auto cell_heterogeneity = mpParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
 
     bool user_supplied_negative_value = false;
     mUserAskedForCellularTransmuralHeterogeneities = false; // overwritten with true below if necessary
@@ -1443,8 +1441,7 @@ HeartFileFinder HeartConfig::GetArchivedSimulationDir() const
 void HeartConfig::GetIntracellularConductivities(c_vector<double, 3>& rIntraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().IntracellularConductivities().present(), "Physiological/IntracellularConductivities");
-    cp::conductivities_type intra_conductivities
-        = mpParameters->Physiological().IntracellularConductivities().get();
+    cp::conductivities_type intra_conductivities = mpParameters->Physiological().IntracellularConductivities().get();
     double intra_x_cond = intra_conductivities.longi();
     double intra_y_cond = intra_conductivities.trans();
     double intra_z_cond = intra_conductivities.normal();
@@ -1461,8 +1458,7 @@ void HeartConfig::GetIntracellularConductivities(c_vector<double, 3>& rIntraCond
 void HeartConfig::GetIntracellularConductivities(c_vector<double, 2>& rIntraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().IntracellularConductivities().present(), "Physiological/IntracellularConductivities");
-    cp::conductivities_type intra_conductivities
-        = mpParameters->Physiological().IntracellularConductivities().get();
+    cp::conductivities_type intra_conductivities = mpParameters->Physiological().IntracellularConductivities().get();
     double intra_x_cond = intra_conductivities.longi();
     double intra_y_cond = intra_conductivities.trans();
 
@@ -1475,8 +1471,7 @@ void HeartConfig::GetIntracellularConductivities(c_vector<double, 2>& rIntraCond
 void HeartConfig::GetIntracellularConductivities(c_vector<double, 1>& rIntraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().IntracellularConductivities().present(), "Physiological/IntracellularConductivities");
-    cp::conductivities_type intra_conductivities
-        = mpParameters->Physiological().IntracellularConductivities().get();
+    cp::conductivities_type intra_conductivities = mpParameters->Physiological().IntracellularConductivities().get();
     double intra_x_cond = intra_conductivities.longi();
 
     rIntraConductivities[0] = intra_x_cond;
@@ -1485,8 +1480,7 @@ void HeartConfig::GetIntracellularConductivities(c_vector<double, 1>& rIntraCond
 void HeartConfig::GetExtracellularConductivities(c_vector<double, 3>& rExtraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().ExtracellularConductivities().present(), "Physiological/ExtracellularConductivities");
-    cp::conductivities_type extra_conductivities
-        = mpParameters->Physiological().ExtracellularConductivities().get();
+    cp::conductivities_type extra_conductivities = mpParameters->Physiological().ExtracellularConductivities().get();
     double extra_x_cond = extra_conductivities.longi();
     double extra_y_cond = extra_conductivities.trans();
     double extra_z_cond = extra_conductivities.normal();
@@ -1503,8 +1497,7 @@ void HeartConfig::GetExtracellularConductivities(c_vector<double, 3>& rExtraCond
 void HeartConfig::GetExtracellularConductivities(c_vector<double, 2>& rExtraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().ExtracellularConductivities().present(), "Physiological/ExtracellularConductivities");
-    cp::conductivities_type extra_conductivities
-        = mpParameters->Physiological().ExtracellularConductivities().get();
+    cp::conductivities_type extra_conductivities = mpParameters->Physiological().ExtracellularConductivities().get();
     double extra_x_cond = extra_conductivities.longi();
     double extra_y_cond = extra_conductivities.trans();
 
@@ -1517,8 +1510,7 @@ void HeartConfig::GetExtracellularConductivities(c_vector<double, 2>& rExtraCond
 void HeartConfig::GetExtracellularConductivities(c_vector<double, 1>& rExtraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().ExtracellularConductivities().present(), "Physiological/ExtracellularConductivities");
-    cp::conductivities_type extra_conductivities
-        = mpParameters->Physiological().ExtracellularConductivities().get();
+    cp::conductivities_type extra_conductivities = mpParameters->Physiological().ExtracellularConductivities().get();
     double extra_x_cond = extra_conductivities.longi();
 
     rExtraConductivities[0] = extra_x_cond;
@@ -1738,7 +1730,7 @@ bool HeartConfig::IsApdMapsRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)& apd_maps = mpParameters->PostProcessing()->ActionPotentialDurationMap();
+        auto& apd_maps = mpParameters->PostProcessing()->ActionPotentialDurationMap();
         result = (apd_maps.begin() != apd_maps.end());
     }
     return result;
@@ -1749,7 +1741,7 @@ void HeartConfig::GetApdMaps(std::vector<std::pair<double, double> >& apd_maps) 
     CHECK_EXISTS(IsApdMapsRequested(), "PostProcessing/ActionPotentialDurationMap");
     apd_maps.clear();
 
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)& apd_maps_sequence = mpParameters->PostProcessing()->ActionPotentialDurationMap();
+    auto& apd_maps_sequence = mpParameters->PostProcessing()->ActionPotentialDurationMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::ActionPotentialDurationMap) i = apd_maps_sequence.begin();
          i != apd_maps_sequence.end();
@@ -1766,7 +1758,7 @@ bool HeartConfig::IsUpstrokeTimeMapsRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)& upstroke_map = mpParameters->PostProcessing()->UpstrokeTimeMap();
+        auto& upstroke_map = mpParameters->PostProcessing()->UpstrokeTimeMap();
         result = (upstroke_map.begin() != upstroke_map.end());
     }
     return result;
@@ -1776,7 +1768,7 @@ void HeartConfig::GetUpstrokeTimeMaps(std::vector<double>& upstroke_time_maps) c
     CHECK_EXISTS(IsUpstrokeTimeMapsRequested(), "PostProcessing/UpstrokeTimeMap");
     assert(upstroke_time_maps.size() == 0);
 
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)& upstroke_maps_sequence = mpParameters->PostProcessing()->UpstrokeTimeMap();
+    auto& upstroke_maps_sequence = mpParameters->PostProcessing()->UpstrokeTimeMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::UpstrokeTimeMap) i = upstroke_maps_sequence.begin();
          i != upstroke_maps_sequence.end();
@@ -1791,7 +1783,7 @@ bool HeartConfig::IsMaxUpstrokeVelocityMapRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)& max_upstroke_velocity_map = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
+        auto& max_upstroke_velocity_map = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
         result = (max_upstroke_velocity_map.begin() != max_upstroke_velocity_map.end());
     }
     return result;
@@ -1802,7 +1794,7 @@ void HeartConfig::GetMaxUpstrokeVelocityMaps(std::vector<double>& upstroke_veloc
     CHECK_EXISTS(IsMaxUpstrokeVelocityMapRequested(), "PostProcessing/MaxUpstrokeVelocityMap");
     assert(upstroke_velocity_maps.size() == 0);
 
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)& max_upstroke_velocity_maps_sequence = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
+    auto& max_upstroke_velocity_maps_sequence = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap) i = max_upstroke_velocity_maps_sequence.begin();
          i != max_upstroke_velocity_maps_sequence.end();
@@ -1817,7 +1809,7 @@ bool HeartConfig::IsConductionVelocityMapsRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)& cond_vel_maps = mpParameters->PostProcessing()->ConductionVelocityMap();
+        auto& cond_vel_maps = mpParameters->PostProcessing()->ConductionVelocityMap();
         result = (cond_vel_maps.begin() != cond_vel_maps.end());
     }
     return result;
@@ -1828,7 +1820,7 @@ void HeartConfig::GetConductionVelocityMaps(std::vector<unsigned>& conduction_ve
     CHECK_EXISTS(IsConductionVelocityMapsRequested(), "PostProcessing/ConductionVelocityMap");
     assert(conduction_velocity_maps.size() == 0);
 
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)& cond_vel_maps_sequence = mpParameters->PostProcessing()->ConductionVelocityMap();
+    auto& cond_vel_maps_sequence = mpParameters->PostProcessing()->ConductionVelocityMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::ConductionVelocityMap) i = cond_vel_maps_sequence.begin();
          i != cond_vel_maps_sequence.end();
@@ -1843,7 +1835,7 @@ bool HeartConfig::IsAnyNodalTimeTraceRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)& requested_nodes = mpParameters->PostProcessing()->TimeTraceAtNode();
+        auto& requested_nodes = mpParameters->PostProcessing()->TimeTraceAtNode();
         result = (requested_nodes.begin() != requested_nodes.end());
     }
     return result;
@@ -1854,7 +1846,7 @@ void HeartConfig::GetNodalTimeTraceRequested(std::vector<unsigned>& rRequestedNo
     CHECK_EXISTS(IsAnyNodalTimeTraceRequested(), "PostProcessing/TimeTraceAtNode");
     assert(rRequestedNodes.size() == 0);
 
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)& req_nodes = mpParameters->PostProcessing()->TimeTraceAtNode();
+    auto& req_nodes = mpParameters->PostProcessing()->TimeTraceAtNode();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::TimeTraceAtNode) i = req_nodes.begin();
          i != req_nodes.end();
@@ -1869,7 +1861,7 @@ bool HeartConfig::IsPseudoEcgCalculationRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)& electrodes = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
+        auto& electrodes = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
         result = (electrodes.begin() != electrodes.end());
     }
     return result;
@@ -1879,7 +1871,7 @@ template <unsigned SPACE_DIM>
 void HeartConfig::GetPseudoEcgElectrodePositions(std::vector<ChastePoint<SPACE_DIM> >& rPseudoEcgElectrodePositions) const
 {
     rPseudoEcgElectrodePositions.clear();
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)& electrodes = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
+    auto& electrodes = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition) i = electrodes.begin();
          i != electrodes.end();
          ++i)
@@ -2536,8 +2528,7 @@ void HeartConfig::SetMeshPartitioning(const char* meshPartioningMethod)
 void HeartConfig::SetApdMaps(const std::vector<std::pair<double, double> >& apdMaps)
 {
     EnsurePostProcessingSectionPresent();
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)& apd_maps_sequence
-        = mpParameters->PostProcessing()->ActionPotentialDurationMap();
+    auto& apd_maps_sequence = mpParameters->PostProcessing()->ActionPotentialDurationMap();
     //Erase or create a sequence
     apd_maps_sequence.clear();
 
@@ -2553,8 +2544,7 @@ void HeartConfig::SetApdMaps(const std::vector<std::pair<double, double> >& apdM
 void HeartConfig::SetUpstrokeTimeMaps(std::vector<double>& upstrokeTimeMaps)
 {
     EnsurePostProcessingSectionPresent();
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)& var_type_sequence
-        = mpParameters->PostProcessing()->UpstrokeTimeMap();
+    auto& var_type_sequence = mpParameters->PostProcessing()->UpstrokeTimeMap();
 
     //Erase or create a sequence
     var_type_sequence.clear();
@@ -2571,8 +2561,7 @@ void HeartConfig::SetUpstrokeTimeMaps(std::vector<double>& upstrokeTimeMaps)
 void HeartConfig::SetMaxUpstrokeVelocityMaps(std::vector<double>& maxUpstrokeVelocityMaps)
 {
     EnsurePostProcessingSectionPresent();
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)& max_upstroke_velocity_maps_sequence
-        = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
+    auto& max_upstroke_velocity_maps_sequence = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
 
     //Erase or create a sequence
     max_upstroke_velocity_maps_sequence.clear();
@@ -2590,8 +2579,7 @@ void HeartConfig::SetMaxUpstrokeVelocityMaps(std::vector<double>& maxUpstrokeVel
 void HeartConfig::SetConductionVelocityMaps(std::vector<unsigned>& conductionVelocityMaps)
 {
     EnsurePostProcessingSectionPresent();
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)& conduction_velocity_maps_sequence
-        = mpParameters->PostProcessing()->ConductionVelocityMap();
+    auto& conduction_velocity_maps_sequence = mpParameters->PostProcessing()->ConductionVelocityMap();
 
     //Erase or create a sequence
     conduction_velocity_maps_sequence.clear();
@@ -2606,8 +2594,7 @@ void HeartConfig::SetConductionVelocityMaps(std::vector<unsigned>& conductionVel
 void HeartConfig::SetRequestedNodalTimeTraces(std::vector<unsigned>& requestedNodes)
 {
     EnsurePostProcessingSectionPresent();
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)& requested_nodes_sequence
-        = mpParameters->PostProcessing()->TimeTraceAtNode();
+    auto& requested_nodes_sequence = mpParameters->PostProcessing()->TimeTraceAtNode();
 
     //Erase or create a sequence
     requested_nodes_sequence.clear();
@@ -2623,8 +2610,7 @@ template <unsigned SPACE_DIM>
 void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<ChastePoint<SPACE_DIM> >& rPseudoEcgElectrodePositions)
 {
     EnsurePostProcessingSectionPresent();
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)& electrodes_sequence
-        = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
+    auto& electrodes_sequence = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
 
     //Erase or create a sequence
     electrodes_sequence.clear();
