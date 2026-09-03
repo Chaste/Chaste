@@ -581,9 +581,7 @@ modules:
       - name: ImmersedBoundaryLinearMembraneForce
       - name: ImmersedBoundaryMorseInteractionForce
       - name: ImmersedBoundaryMorseMembraneForce
-      - name: NagaiHondaDifferentialAdhesionForce
       - name: NagaiHondaForce
-      - name: PlanarPolarisedFarhadifarForce
       - name: RepulsionForce
       - name: WelikyOsterForce
         excluded_methods:
