@@ -1,0 +1,34 @@
+<ChasteBuildInfo>
+	<ProvenanceInfo>
+		<VersionString>2026.1.2e434ce</VersionString> <!-- build specific -->
+		<IsWorkingCopyModified>1</IsWorkingCopyModified>
+		<BuildInformation>Release</BuildInformation>
+		<BuildTime>Mon, 31 Aug 2026 09:53:29 +0000</BuildTime>
+		<CurrentTime>Mon, 31 Aug 2026 10:03:05 +0000</CurrentTime>
+		<BuilderUnameInfo>Linux</BuilderUnameInfo>
+		<ChasteTestOutputDirectory>/home/runner/work/Chaste/Chaste/chaste-test-dir/</ChasteTestOutputDirectory>
+		<Projects>
+		</Projects>
+	</ProvenanceInfo>
+	<Compiler>
+		<NameAndVersion>/usr/bin/c++, version 13.3.0</NameAndVersion>
+		<Flags>-Wall -Werror -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-attributes -Wno-unused-parameter -Wvla -Wimplicit-fallthrough=2 -Wno-maybe-uninitialized -Wno-array-bounds -Wno-stringop-overflow -Wno-stringop-overread -O3 -DNDEBUG</Flags>
+	</Compiler>
+	<Libraries>
+		<CompiledIn>
+			<PETSc>3.19.6</PETSc>
+			<Boost>1.83.0</Boost>
+			<HDF5>1.10.10</HDF5>
+			<Parmetis>4.0.3</Parmetis>
+		</CompiledIn>
+		<Binaries>
+			<XSD>4.0.0</XSD>
+		</Binaries>
+		<Optional>
+			<SUNDIALS>6.4.1</SUNDIALS>
+			<VTK>9.1</VTK>
+			<Xerces>3.2.4</Xerces>
+		</Optional>
+	</Libraries>
+	<ChasteCodegenVersion>chaste_codegen 0.10.6</ChasteCodegenVersion>
+</ChasteBuildInfo>

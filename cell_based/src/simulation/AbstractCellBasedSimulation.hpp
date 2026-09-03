@@ -71,6 +71,7 @@ class AbstractCellBasedSimulation : public Identifiable
     friend class TestCryptSimulation2d;
     friend class TestOffLatticeSimulation3d;
     friend class TestOffLatticeSimulation;
+    friend class TestCellBasedSimulationFromXml;
 
 private:
 

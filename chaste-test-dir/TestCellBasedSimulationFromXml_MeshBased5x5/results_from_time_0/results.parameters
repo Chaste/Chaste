@@ -1,0 +1,77 @@
+<Chaste>
+
+	<OffLatticeSimulation-2-2>
+		<Dt>0.00833333</Dt>
+		<EndTime>15</EndTime>
+		<UpdateCellPopulation>1</UpdateCellPopulation>
+		<SamplingTimestepMultiple>6</SamplingTimestepMultiple>
+		<UpdatingTimestepMultiple>1</UpdatingTimestepMultiple>
+		<OutputDivisionLocations>0</OutputDivisionLocations>
+		<OutputCellVelocities>0</OutputCellVelocities>
+	</OffLatticeSimulation-2-2>
+
+	<MeshBasedCellPopulation-2-2>
+		<UseAreaBasedDampingConstant>0</UseAreaBasedDampingConstant>
+		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
+		<WriteVtkAsPoints>0</WriteVtkAsPoints>
+		<BoundVoronoiTessellation>0</BoundVoronoiTessellation>
+		<HasVariableRestLength>0</HasVariableRestLength>
+		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
+		<CentreBasedDivisionRule>
+			<RandomDirectionCentreBasedDivisionRule-2-2>
+			</RandomDirectionCentreBasedDivisionRule-2-2>
+		</CentreBasedDivisionRule>
+		<DampingConstantNormal>1</DampingConstantNormal>
+		<DampingConstantMutant>1</DampingConstantMutant>
+		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
+	</MeshBasedCellPopulation-2-2>
+
+	<CellCycleModels>
+		<UniformCellCycleModel>
+			<MinCellCycleDuration>10</MinCellCycleDuration>
+			<MaxCellCycleDuration>12</MaxCellCycleDuration>
+		</UniformCellCycleModel>
+	</CellCycleModels>
+
+	<SrnModels>
+		<NullSrnModel>
+		</NullSrnModel>
+	</SrnModels>
+
+	<CellKillers>
+		<PlaneBasedCellKiller-2>
+			<PointOnPlane>5,0</PointOnPlane>
+			<NormalToPlane>1,0</NormalToPlane>
+		</PlaneBasedCellKiller-2>
+	</CellKillers>
+
+	<SimulationModifiers>
+	</SimulationModifiers>
+
+	<Forces>
+		<GeneralisedLinearSpringForce-2-2>
+			<MeinekeSpringStiffness>15</MeinekeSpringStiffness>
+			<MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength>
+			<MeinekeSpringGrowthDuration>1</MeinekeSpringGrowthDuration>
+			<UseCutOffLength>0</UseCutOffLength>
+			<CutOffLength>1.79769e+308</CutOffLength>
+		</GeneralisedLinearSpringForce-2-2>
+	</Forces>
+
+	<CellPopulationBoundaryConditions>
+		<PlaneBoundaryCondition-2-2>
+			<PointOnPlane>0,0</PointOnPlane>
+			<NormalToPlane>-1,0</NormalToPlane>
+			<UseJiggledNodesOnPlane>0</UseJiggledNodesOnPlane>
+		</PlaneBoundaryCondition-2-2>
+	</CellPopulationBoundaryConditions>
+
+	<NumericalMethod>
+		<ForwardEulerNumericalMethod-2-2>
+			<UseAdaptiveTimestep>0</UseAdaptiveTimestep> 
+			<UseUpdateNodeLocation>0</UseUpdateNodeLocation> 
+			<GhostNodeForcesEnabled>0</GhostNodeForcesEnabled> 
+		</ForwardEulerNumericalMethod-2-2>
+	</NumericalMethod>
+
+</Chaste>
