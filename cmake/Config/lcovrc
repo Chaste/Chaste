@@ -2,6 +2,20 @@
 # dedicated Chaste defaults for LCOV
 #
 
+# Paths excluded from coverage, in one place so both pipelines (CI codecov
+# .github/workflows/coverage.yml, local `make coverage` in root CMakeLists.txt) select the
+# same files. Applied at geninfo capture time, so `lcov --capture` needs no --exclude args
+# and no `lcov --remove` pass; also keeps system/module headers out of the merge, which is
+# what otherwise triggers the lcov 2.x `inconsistent`/`mismatch` errors (see below).
+# NB: a command-line --exclude REPLACES this list, so neither pipeline passes one.
+exclude = /usr/*
+exclude = */modules/*
+exclude = */fortests/*
+exclude = */test/*
+exclude = */3rdparty/*
+exclude = */global/src/random/*
+exclude = */cxxtest/*
+
 # Specify an external style sheet file (same as --css-file option of genhtml)
 #genhtml_css_file = gcov.css
 
@@ -106,19 +120,12 @@ branch_coverage = 0
 # of geninfo if non-zero, same as --no-compat-libtool if zero)
 #geninfo_compat_libtool = 0
 
-# Demote lcov 2.x's stricter fatal conditions back to warnings. Loaded by both the
-# --capture and --remove lcov calls in .github/workflows/coverage.yml.
-#   mismatch:     exception-tag / block metadata disagreements when merging heavily
-#                 inlined templates across many object files. Cosmetic: line hit counts
-#                 still merge correctly.
-#   inconsistent: branch-consistency false positive, e.g. a line whose only branches are
-#                 compiler-generated exception edges (a local declaration whose
-#                 constructor may throw) reading as hit-but-no-branches-evaluated. Not a
-#                 coverage-data problem.
-#   unused:       a --remove / --exclude pattern that matched no file. Harmless (a stale or
-#                 belt-and-braces pattern); not worth failing CI over.
-# NB: a command-line --ignore-errors REPLACES this list rather than merging with it, so
-# every category must live here and coverage.yml must pass no --ignore-errors of its own.
+# Demote lcov 2.x's stricter fatal conditions back to warnings (all verified benign for
+# Chaste): mismatch = exception-tag/block metadata disagreements when merging heavily
+# inlined templates (line hit counts still correct); inconsistent = a line whose only
+# branches are compiler-generated exception edges reading as hit-but-no-branches; unused =
+# an exclude pattern above that matched nothing.
+# NB: a command-line --ignore-errors REPLACES this list, so the lcov calls pass none.
 ignore_errors = mismatch,inconsistent,unused
 
 # Directory containing gcov kernel files
