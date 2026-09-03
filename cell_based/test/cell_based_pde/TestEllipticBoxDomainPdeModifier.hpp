@@ -121,6 +121,175 @@ public:
         TS_ASSERT_EQUALS(p_pde_modifier->GetOutputGradient(),true);
     }
 
+    void TestSetupSolveWithUniformSourceEllipticPde()
+    {
+        // Coverage: SetUpSourceTermsForAveragedSourcePde() is only called elsewhere in this test suite
+        // with an AveragedSourceEllipticPde or AveragedSourceParabolicPde; here we run it with a
+        // UniformSourceEllipticPde, whose source terms need no setup as they are already constant.
+        HoneycombMeshGenerator generator(3, 3, 0);
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create PDE and boundary condition objects
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        ChastePoint<2> lower(-5.0, -5.0);
+        ChastePoint<2> upper(15.0, 15.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("variable");
+
+        TS_ASSERT_THROWS_NOTHING(p_pde_modifier->SetupSolve(cell_population, "TestUniformSourceBoxEllipticPde"));
+
+        // Clear memory
+        delete p_mesh;
+    }
+
+    void TestUpdateCellDataWithVoronoiCellsForInterpolationAveragesCorrectly()
+    {
+        // UpdateCellData()'s Voronoi-interpolation branch (mUseVoronoiCellsForInterpolation) assigns
+        // each FE mesh node's solution value to its nearest cell (by Euclidean distance to the cell
+        // centre) and averages over each cell's assigned nodes. Rather than pinning down a value
+        // obtained by simply running the code once, we compute the expected nearest-neighbour
+        // average independently here, from the FE mesh's actual node locations, and check the real
+        // method against it.
+        //
+        // We call UpdateCellData() directly, without SetupSolve()/Solve(), so the PDE and boundary
+        // condition below are never used - only the modifier's constructor (which builds mpFeMesh)
+        // and UpdateCellData() itself are under test.
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, 0.0, 1.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (0.0));
+
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(4.0, 2.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 1.0));
+        p_pde_modifier->SetDependentVariableName("variable");
+        p_pde_modifier->SetUseVoronoiCellsForInterpolation(true);
+
+        // Two cells, positioned so that no FE mesh node (which all lie within the box [0,4]x[0,2])
+        // is ever equidistant between them, so nearest-cell assignment is unambiguous.
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.5, 1.0));
+        nodes.push_back(new Node<2>(1, false, 3.0, 1.0));
+        NodesOnlyMesh<2> cell_mesh;
+        cell_mesh.ConstructNodesWithoutMesh(nodes, 10.0);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, cell_mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(cell_mesh, cells);
+
+        c_vector<double,2> cell_location_0 = cell_population.GetLocationOfCellCentre(cell_population.GetCellUsingLocationIndex(0));
+        c_vector<double,2> cell_location_1 = cell_population.GetLocationOfCellCentre(cell_population.GetCellUsingLocationIndex(1));
+
+        // Build a solution field equal to each FE node's x-coordinate (a real, non-constant field,
+        // so that a bug that mixed up nodes or cells would change the result), and independently
+        // work out - using only the FE mesh's actual node locations and the two cells' actual
+        // locations, not the method under test - which cell each node should be assigned to.
+        unsigned num_fe_nodes = p_pde_modifier->mpFeMesh->GetNumNodes();
+        std::vector<double> solution_values(num_fe_nodes);
+        double expected_sum[2] = {0.0, 0.0};
+        unsigned expected_count[2] = {0u, 0u};
+
+        for (unsigned node_index=0; node_index<num_fe_nodes; node_index++)
+        {
+            c_vector<double,2> node_location = p_pde_modifier->mpFeMesh->GetNode(node_index)->rGetLocation();
+            solution_values[node_index] = node_location[0];
+
+            double dx0 = node_location[0]-cell_location_0[0];
+            double dy0 = node_location[1]-cell_location_0[1];
+            double dx1 = node_location[0]-cell_location_1[0];
+            double dy1 = node_location[1]-cell_location_1[1];
+            double dist_to_cell_0 = sqrt(dx0*dx0 + dy0*dy0);
+            double dist_to_cell_1 = sqrt(dx1*dx1 + dy1*dy1);
+
+            unsigned nearest_cell = (dist_to_cell_0 < dist_to_cell_1) ? 0u : 1u;
+            expected_sum[nearest_cell] += node_location[0];
+            expected_count[nearest_cell]++;
+        }
+
+        // Sanity check that both cells actually get at least one node, or the test below would be
+        // checking a division that never happens.
+        TS_ASSERT_LESS_THAN(0u, expected_count[0]);
+        TS_ASSERT_LESS_THAN(0u, expected_count[1]);
+
+        Vec solution = PetscTools::CreateVec(solution_values);
+        p_pde_modifier->mSolution = solution;
+
+        p_pde_modifier->UpdateCellData(cell_population);
+
+        TS_ASSERT_DELTA(cell_population.GetCellUsingLocationIndex(0)->GetCellData()->GetItem("variable"),
+                         expected_sum[0]/expected_count[0], 1e-10);
+        TS_ASSERT_DELTA(cell_population.GetCellUsingLocationIndex(1)->GetCellData()->GetItem("variable"),
+                         expected_sum[1]/expected_count[1], 1e-10);
+
+        // Tidy up (ConstructNodesWithoutMesh() copies the nodes rather than taking ownership)
+        delete nodes[0];
+        delete nodes[1];
+    }
+
+    void TestUpdateCellDataWithVoronoiCellsForInterpolationThrowsIfACellHasNoNodes()
+    {
+        // If no FE mesh node has a given cell as its nearest cell, UpdateCellData() cannot compute
+        // an average for it and must throw. We engineer this deterministically: for any FE mesh
+        // node with x >= 0, and cells at x=-10 and x=-9 (same y), the distance to the x=-9 cell is
+        // (x+9), which is strictly less than the distance to the x=-10 cell, (x+10), for every
+        // x >= 0 - so the x=-10 cell can never be nearest to any node of a mesh confined to x >= 0,
+        // regardless of the nodes' y-coordinates.
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, 0.0, 1.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (0.0));
+
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(4.0, 2.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 1.0));
+        p_pde_modifier->SetDependentVariableName("variable");
+        p_pde_modifier->SetUseVoronoiCellsForInterpolation(true);
+
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, -10.0, 1.0)); // never nearest to any FE mesh node
+        nodes.push_back(new Node<2>(1, false,  -9.0, 1.0)); // always at least 1.0 closer
+        NodesOnlyMesh<2> cell_mesh;
+        cell_mesh.ConstructNodesWithoutMesh(nodes, 10.0);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, cell_mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(cell_mesh, cells);
+
+        unsigned num_fe_nodes = p_pde_modifier->mpFeMesh->GetNumNodes();
+        std::vector<double> solution_values(num_fe_nodes, 0.0);
+        Vec solution = PetscTools::CreateVec(solution_values);
+        p_pde_modifier->mSolution = solution;
+
+        TS_ASSERT_THROWS_THIS(p_pde_modifier->UpdateCellData(cell_population),
+                "One or more of the cells doesn't contain any pde nodes so can't use Voronoi CellData calculation");
+
+        // Tidy up (ConstructNodesWithoutMesh() copies the nodes rather than taking ownership)
+        delete nodes[0];
+        delete nodes[1];
+    }
+
     void TestArchiveEllipticBoxDomainPdeModifier()
     {
         // Create a file for archiving
