@@ -40,6 +40,10 @@ SimpleLogarithmicRepulsionForce<ELEMENT_DIM, SPACE_DIM>::SimpleLogarithmicRepuls
     : AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>(),
       mRepulsionParameter(15.0)
 {
+    if constexpr (SPACE_DIM == 1)
+    {
+        mRepulsionParameter = 30.0;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

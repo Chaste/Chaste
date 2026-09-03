@@ -46,7 +46,7 @@ AbstractVariableSizeTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AbstractVari
       mDivisionRestingSpringLength(0.5),
       mSpringGrowthDuration(1.0)
 {
-    if (SPACE_DIM == 1)
+    if constexpr (SPACE_DIM == 1)
     {
         mSpringStiffness = 30.0;
     }
