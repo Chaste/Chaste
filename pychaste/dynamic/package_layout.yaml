@@ -223,6 +223,7 @@ subpackages:
     - FixedSequenceCellCycleModel
     - FixedVertexBasedDivisionRule
     - ForwardEulerNumericalMethod
+    - RK4NumericalMethod
     - GammaG1CellCycleModel
     - GeneralisedLinearSpringForce
     - Goldbeter1991SrnModel
