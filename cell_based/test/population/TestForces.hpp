@@ -2480,6 +2480,8 @@ void TestDifferentialAdhesionPathmanathanInteractionForceMethods()
 
     void TestIncorrectForcesWithMeshBasedCellPopulation()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create a Mesh Based Cell Population
         unsigned cells_across = 3;
         unsigned cells_up = 3;
