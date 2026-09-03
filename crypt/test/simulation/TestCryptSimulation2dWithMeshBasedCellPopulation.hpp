@@ -200,7 +200,7 @@ public:
         CryptSimulation2d simulator(crypt);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Destroy the simulation time class because of failed solve
@@ -266,7 +266,7 @@ public:
        simulator.SetOutputDirectory("CryptWithMultipleCellKillers");
 
        // Create a force law and pass it to the simulation
-       MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+       MAKE_PTR(LinearSpringForce<2>, p_linear_force);
        simulator.AddForce(p_linear_force);
 
        // Create cell killer and pass in to crypt simulation.
@@ -434,7 +434,7 @@ public:
         simulator.SetOutputDirectory("Crypt2DCylindrical");
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
@@ -507,7 +507,7 @@ public:
         simulator.SetEndTime(0.6);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -617,7 +617,7 @@ public:
         simulator.SetEndTime(0.3);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -675,7 +675,7 @@ public:
         simulator.SetEndTime(0.1);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Memory leak (unconditional jump) without the following line.
@@ -802,7 +802,7 @@ public:
         simulator.SetEndTime(0.275);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -878,7 +878,7 @@ public:
         simulator.SetEndTime(0.1);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -1116,7 +1116,7 @@ public:
         simulator.SetEndTime(0.1);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -1166,7 +1166,7 @@ public:
         simulator.SetDt(0.001);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -1224,7 +1224,7 @@ public:
         CryptSimulation2d simulator(crypt);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -1266,8 +1266,8 @@ public:
         CryptSimulation2d simulator(conf_crypt);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetMeinekeDivisionRestingSpringLength(0.9); // coverage
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetDivisionRestingSpringLength(0.9); // coverage
         simulator.AddForce(p_linear_force);
 
         MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
@@ -1437,7 +1437,7 @@ public:
         simulator.SetNoBirth(true);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -1487,7 +1487,7 @@ public:
         simulator.SetEndTime(0.35);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -1528,7 +1528,7 @@ public:
         simulator.UseJiggledBottomCells();
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Move the first cell (which should be on y=0) down a bit
@@ -1627,7 +1627,7 @@ public:
         simulator.UseJiggledBottomCells();
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Run simulation
@@ -1795,7 +1795,7 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Run simulation
@@ -1846,7 +1846,7 @@ public:
         simulator.SetEndTime(1.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         ///\todo #1453 add an killer and test the output is correct
@@ -1909,8 +1909,8 @@ public:
         simulator.SetEndTime(time_of_each_run);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetMeinekeSpringStiffness(30.0); //normally 15.0;
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetSpringStiffness(30.0); //normally 15.0;
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation

@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 LinearSpringWithVariableSpringConstantsForce<DIM>::LinearSpringWithVariableSpringConstantsForce()
-    : GeneralisedLinearSpringForce<DIM>(),
+    : LinearSpringForce<DIM>(),
       mUseEdgeBasedSpringConstant(false),
       mUseMutantSprings(false),
       mMutantMutantMultiplier(DOUBLE_UNSET),
@@ -96,7 +96,7 @@ double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstant
     bool isCloserThanRestLength)
 {
 
-    double multiplication_factor = GeneralisedLinearSpringForce<DIM>::VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex,
+    double multiplication_factor = LinearSpringForce<DIM>::VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex,
                                                                                                             nodeBGlobalIndex,
                                                                                                             rCellPopulation,
                                                                                                             isCloserThanRestLength);
@@ -186,8 +186,8 @@ double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstant
 
         if (cell_A_is_apoptotic || cell_B_is_apoptotic)
         {
-            double spring_a_stiffness = 2.0 * this->GetMeinekeSpringStiffness();
-            double spring_b_stiffness = 2.0 * this->GetMeinekeSpringStiffness();
+            double spring_a_stiffness = 2.0 * this->GetSpringStiffness();
+            double spring_b_stiffness = 2.0 * this->GetSpringStiffness();
 
             if (cell_A_is_apoptotic)
             {
@@ -212,7 +212,7 @@ double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstant
                 }
             }
 
-            multiplication_factor /= (1.0/spring_a_stiffness + 1.0/spring_b_stiffness)*this->GetMeinekeSpringStiffness();
+            multiplication_factor /= (1.0/spring_a_stiffness + 1.0/spring_b_stiffness)*this->GetSpringStiffness();
         }
     }
 
@@ -298,7 +298,7 @@ void LinearSpringWithVariableSpringConstantsForce<DIM>::OutputForceParameters(ou
     *rParamsFile << "\t\t\t<ApoptoticSpringCompressionStiffness>" << mApoptoticSpringCompressionStiffness << "</ApoptoticSpringCompressionStiffness>\n";
 
     // Call method on direct parent class
-    GeneralisedLinearSpringForce<DIM>::OutputForceParameters(rParamsFile);
+    LinearSpringForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
 // Explicit instantiation

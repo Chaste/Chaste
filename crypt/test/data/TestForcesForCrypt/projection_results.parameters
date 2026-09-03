@@ -2,8 +2,8 @@
 			<B>2</B>
 			<IncludeWntChemotaxis>0</IncludeWntChemotaxis>
 			<WntChemotaxisStrength>100</WntChemotaxisStrength>
-			<MeinekeSpringStiffness>15</MeinekeSpringStiffness>
-			<MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength>
-			<MeinekeSpringGrowthDuration>1</MeinekeSpringGrowthDuration>
+			<SpringStiffness>15</SpringStiffness>
+			<DivisionRestingSpringLength>0.5</DivisionRestingSpringLength>
+			<SpringGrowthDuration>1</SpringGrowthDuration>
 			<UseCutOffLength>1</UseCutOffLength>
 			<CutOffLength>1.5</CutOffLength>

@@ -33,22 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef REPULSIONFORCE_HPP_
-#define REPULSIONFORCE_HPP_
+#ifndef SIMPLELOGARITHMICREPULSIONFORCE_HPP_
+#define SIMPLELOGARITHMICREPULSIONFORCE_HPP_
 
-#include "GeneralisedLinearSpringForce.hpp"
+#include "AbstractTwoBodyInteractionForce.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
 /**
  * A class for a simple two-body repulsion force law. Designed
- * for use in node-based simulations
+ * for use in node-based simulations.
  *
- * The force just creates a linear repulsive force between cells
- * with a nonlinear separation less than 2. This force does not
- * take a cell's age or cell cycle phase into account.
+ * A linear repulsive force is applied between cells that overlap
+ * (i.e. whose separation is less than the sum of their radii).
+ * No attractive force is applied, and no cell-age or cell-cycle
+ * effects are included.
  */
-template<unsigned DIM>
-class RepulsionForce : public GeneralisedLinearSpringForce<DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class SimpleLogarithmicRepulsionForce : public AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
 {
 private :
 
@@ -63,28 +64,50 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<GeneralisedLinearSpringForce<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & mRepulsionParameter;
     }
+
+protected:
+
+    /** Repulsion parameter. Defaults to 15.0. */
+    double mRepulsionParameter;
 
 public :
 
     /**
      * Constructor.
      */
-    RepulsionForce();
+    SimpleLogarithmicRepulsionForce();
 
     /**
-     * Overridden AddForceContribution() method.
-     *
-     * @param rCellPopulation reference to the CellPopulation
+     * @return mRepulsionParameter
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    double GetRepulsionParameter();
 
     /**
-     * Outputs force Parameters to file
+     * Set mRepulsionParameter.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * @param repulsionParameter the new value of mRepulsionParameter
+     */
+    void SetRepulsionParameter(double repulsionParameter);
+
+    /**
+     * Overridden CalculateForceBetweenNodes() method.
+     *
+     * Returns a linear repulsive force when nodes overlap, and zero otherwise.
+     *
+     * @param nodeAGlobalIndex index of one neighbouring node
+     * @param nodeBGlobalIndex index of the other neighbouring node
+     * @param rCellPopulation the cell population
+     * @return The force exerted on Node A by Node B.
+     */
+    c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
+                                                           unsigned nodeBGlobalIndex,
+                                                           AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
+
+    /**
+     * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -92,6 +115,6 @@ public :
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(RepulsionForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(SimpleLogarithmicRepulsionForce)
 
-#endif /*REPULSIONFORCE_HPP_*/
+#endif /*SIMPLELOGARITHMICREPULSIONFORCE_HPP_*/
