@@ -584,8 +584,6 @@ modules:
       - name: NagaiHondaForce
       - name: RepulsionForce
       - name: WelikyOsterForce
-        excluded_methods:
-          - GetLineTensionParameter
 
       - name: DifferentialAdhesionLinearSpringForce
         template_substitutions: *full_force_template_substitutions
@@ -600,9 +598,6 @@ modules:
       - name: PlanarPolarisedFarhadifarForce
         excluded_methods:
           - GetLineTensionParameter
-
-      - name: DiscreteSystemForceCalculator
-        excluded: True
 
       ##=== cell_based: Chaste/cell_based/src/population/killers
       - name: AbstractCellKiller
