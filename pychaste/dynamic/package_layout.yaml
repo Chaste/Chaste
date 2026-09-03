@@ -73,6 +73,7 @@ exclude:
   - AbstractTetrahedralMesh
   - AbstractTwoBodyInteractionForce
   - AbstractUpdateRule
+  - AbstractVariableSizeTwoBodyInteractionForce
   - AbstractVertexBasedDivisionRule
 subpackages:
   core:
@@ -208,7 +209,8 @@ subpackages:
     - DeltaNotchInteriorSrnModel
     - DeltaNotchSrnModel
     - DeltaNotchTrackingModifier
-    - DifferentialAdhesionGeneralisedLinearSpringForce
+    - DifferentialAdhesionLinearSpringForce
+    - DifferentialAdhesionPathmanathanInteractionForce
     - DifferentialAdhesionPottsUpdateRule
     - DifferentiatedCellProliferativeType
     - DiffusionCaUpdateRule
@@ -224,7 +226,6 @@ subpackages:
     - FixedVertexBasedDivisionRule
     - ForwardEulerNumericalMethod
     - GammaG1CellCycleModel
-    - GeneralisedLinearSpringForce
     - Goldbeter1991SrnModel
     - HeterotypicBoundaryLengthWriter
     - ImmersedBoundaryBoundaryCellWriter
@@ -241,6 +242,7 @@ subpackages:
     - IsolatedLabelledCellKiller
     - LabelDependentBernoulliTrialCellCycleModel
     - LegacyCellProliferativeTypesWriter
+    - LinearSpringForce
     - MeshBasedCellPopulation
     - MeshBasedCellPopulationWithGhostNodes
     - NagaiHondaDifferentialAdhesionForce
@@ -256,6 +258,7 @@ subpackages:
     - NullSrnModel
     - OffLatticeSimulation
     - OnLatticeSimulation
+    - PathmanathanInteractionForce
     - PlanarPolarisedFarhadifarForce
     - PlaneBasedCellKiller
     - PlaneBoundaryCondition
@@ -267,10 +270,10 @@ subpackages:
     - RandomCellKiller
     - RandomDirectionCentreBasedDivisionRule
     - RandomDirectionVertexBasedDivisionRule
-    - RepulsionForce
     - ShortAxisImmersedBoundaryDivisionRule
     - ShortAxisVertexBasedDivisionRule
     - ShovingCaBasedDivisionRule
+    - SimpleLogarithmicRepulsionForce
     - SimpleOxygenBasedCellCycleModel
     - SimpleTargetAreaModifier
     - SimulationTime

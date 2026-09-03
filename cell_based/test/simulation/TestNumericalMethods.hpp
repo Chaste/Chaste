@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "AbstractCellBasedTestSuite.hpp"

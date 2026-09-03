@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -125,9 +125,9 @@ static std::vector<c_vector<double,2> > RunMonolayer(
     sim.SetSamplingTimestepMultiple(1); // ensure results.viznodes is written at endTime
 
     // Force
-    MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+    MAKE_PTR(PathmanathanInteractionForce<2>, p_force);
     p_force->SetCutOffLength(1.5);
-    p_force->SetMeinekeSpringStiffness(1.0);
+    p_force->SetSpringStiffness(1.0);
     sim.AddForce(p_force);
 
     // Numerical method

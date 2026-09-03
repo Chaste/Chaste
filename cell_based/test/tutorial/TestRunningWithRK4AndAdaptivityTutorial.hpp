@@ -114,7 +114,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "UniformCellCycleModel.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
 #include "NodesOnlyMesh.hpp"
@@ -176,7 +176,7 @@ public:
         simulator.SetNumericalMethod(p_numerical_method);
 
         /* Add a spring force between neighbouring cells. */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(PathmanathanInteractionForce<2>, p_force);
         simulator.AddForce(p_force);
 
         /* Run the simulation. */
@@ -276,7 +276,7 @@ public:
         simulator.SetMaxAdaptiveTimeStep(10);
 
         /* Add a spring force. */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(PathmanathanInteractionForce<2>, p_force);
         simulator.AddForce(p_force);
 
         /* Run the simulation.  The adaptive loop will silently reduce the sub-step
