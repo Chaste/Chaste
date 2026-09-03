@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 
 CellLabel::CellLabel(unsigned colour)
-    : AbstractCellProperty(),
+    : CellProperty<CellLabel>(),
       mColour(colour)
 {
 }

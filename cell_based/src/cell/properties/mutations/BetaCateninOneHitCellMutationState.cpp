@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 
 BetaCateninOneHitCellMutationState::BetaCateninOneHitCellMutationState()
-    : AbstractCellMutationState(4)
+    : CellProperty<BetaCateninOneHitCellMutationState, AbstractCellMutationState>(4)
 {}
 
 #include "SerializationExportWrapperForCpp.hpp"

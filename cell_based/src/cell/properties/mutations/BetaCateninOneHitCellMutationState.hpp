@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Subclass of AbstractCellMutationState defining a Beta-catenin with
  * a change at residue 45 mutation state.
  */
-class BetaCateninOneHitCellMutationState : public AbstractCellMutationState
+class BetaCateninOneHitCellMutationState : public CellProperty<BetaCateninOneHitCellMutationState, AbstractCellMutationState>
 {
 private:
     /** Needed for serialization. */

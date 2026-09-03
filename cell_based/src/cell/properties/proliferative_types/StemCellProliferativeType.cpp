@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 
 StemCellProliferativeType::StemCellProliferativeType()
-    : AbstractCellProliferativeType(0)
+    : CellProperty<StemCellProliferativeType, AbstractCellProliferativeType>(0)
 {}
 
 #include "SerializationExportWrapperForCpp.hpp"

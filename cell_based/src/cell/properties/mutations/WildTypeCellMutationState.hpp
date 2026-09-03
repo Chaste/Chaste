@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Subclass of AbstractCellMutationState defining a 'wild type' mutation state.
  */
-class WildTypeCellMutationState : public AbstractCellMutationState
+class WildTypeCellMutationState : public CellProperty<WildTypeCellMutationState, AbstractCellMutationState>
 {
 private:
     /** Needed for serialization. */

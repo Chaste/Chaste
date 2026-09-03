@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DefaultCellProliferativeType.hpp"
 
 DefaultCellProliferativeType::DefaultCellProliferativeType()
-    : AbstractCellProliferativeType(0)
+    : CellProperty<DefaultCellProliferativeType, AbstractCellProliferativeType>(0)
 {}
 
 #include "SerializationExportWrapperForCpp.hpp"

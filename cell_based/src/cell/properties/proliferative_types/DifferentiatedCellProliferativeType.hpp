@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Subclass of AbstractCellProliferativeType defining a differentiated cell.
  */
-class DifferentiatedCellProliferativeType : public AbstractCellProliferativeType
+class DifferentiatedCellProliferativeType : public CellProperty<DifferentiatedCellProliferativeType, AbstractCellProliferativeType>
 {
 private:
     /** Needed for serialization. */

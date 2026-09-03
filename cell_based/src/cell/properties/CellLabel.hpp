@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The CellLabel object keeps track of the number of cells that have the label, as well
  * as what colour should be used by the visualizer to display cells with the label.
  */
-class CellLabel : public AbstractCellProperty
+class CellLabel : public CellProperty<CellLabel>
 {
 protected:
 
