@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
 #include "SmartPointers.hpp"
-#include "TransitCellProliferativeType.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FakePetscSetup.hpp"
 

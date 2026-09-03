@@ -406,9 +406,9 @@ class MutableVertexMesh(TemplateClass):
 
 class Node(TemplateClass):
     _instantiations = {
+        ("1",): Node_1,
         ("2",): Node_2,
         ("3",): Node_3,
-        ("1",): Node_1,
     }
 
 
@@ -446,9 +446,9 @@ class PottsElement(TemplateClass):
 
 class PottsMesh(TemplateClass):
     _instantiations = {
+        ("1",): PottsMesh_1,
         ("2",): PottsMesh_2,
         ("3",): PottsMesh_3,
-        ("1",): PottsMesh_1,
     }
 
 

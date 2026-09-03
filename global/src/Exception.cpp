@@ -39,12 +39,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <petsc.h>
 
-#include "Exception.hpp"
 #include "FileFinder.hpp"
 #include "PosixPathFixer.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "ChasteBuildRoot.hpp"
-#include "PosixPathFixer.hpp"
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2 || PETSC_VERSION_MAJOR<3 ) // Before PETSc 3.2
 using PetscBool = PetscTruth;

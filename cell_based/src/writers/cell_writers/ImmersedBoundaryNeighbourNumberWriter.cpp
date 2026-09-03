@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundaryNeighbourNumberWriter.hpp"
 #include "AbstractCellPopulation.hpp"
-#include "ImmersedBoundaryCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryNeighbourNumberWriter<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryNeighbourNumberWriter()

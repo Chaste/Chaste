@@ -56,7 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshGenerator.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
-#include "OnLatticeSimulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "DiffusionCaUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"

@@ -23,7 +23,7 @@ jobs:
         include:
           - project_org: "Chaste"
             project_repo: "CellBasedComparison2017"
-            ref: ""
+            ref: "8bb7287d0dfb55316892707faab2945cca3d48ea"
             build_target: "project_CellBasedComparison2017"
             test_target: "project_CellBasedComparison2017"
 

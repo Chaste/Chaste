@@ -120,7 +120,7 @@ class TestPySpheroidTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
 
         ## We define how the springs between cells behave using a force law.
 
-        force = chaste.cell_based.GeneralisedLinearSpringForce[2, 2]()
+        force = chaste.cell_based.LinearSpringForce[2, 2]()
         simulator.AddForce(force)
 
         ## We set up a PDE for oxygen diffusion and consumption by cells, setting the rate of consumption to 0.1
