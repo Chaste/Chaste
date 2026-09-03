@@ -92,7 +92,7 @@ public:
 
         // simple Mesh to pass element to tests below
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Test ComputeConstantInUSourceTerm() method
         TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.01, 1e-6);
@@ -147,7 +147,7 @@ public:
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -235,7 +235,7 @@ public:
 
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -289,7 +289,7 @@ public:
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -439,7 +439,7 @@ public:
 
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());

@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "AbstractTetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
@@ -120,7 +120,7 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
     // Write the exlem file
     //////////////////////////
 
-    std::vector<boost::shared_ptr<std::ofstream> > elem_files = OpenElementFiles();
+    std::vector<std::shared_ptr<std::ofstream> > elem_files = OpenElementFiles();
     WriteElementsFileHeader(elem_files);
 
     // Write each elements's data
@@ -168,10 +168,10 @@ out_stream CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::OpenNodeFile(bool append)
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<boost::shared_ptr<std::ofstream> > CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::OpenElementFiles(bool append)
+std::vector<std::shared_ptr<std::ofstream> > CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::OpenElementFiles(bool append)
 {
 
-    std::vector<boost::shared_ptr<std::ofstream> > elem_files;
+    std::vector<std::shared_ptr<std::ofstream> > elem_files;
     // If nobody defined region names we default to the same name as the file name.
     if (mRegionNames.size() == 0)
     {
@@ -186,7 +186,7 @@ std::vector<boost::shared_ptr<std::ofstream> > CmguiMeshWriter<ELEMENT_DIM, SPAC
         fs::path elem_file_path(directory);
         elem_file_path /= elem_file_name;
 
-        boost::shared_ptr<std::ofstream> p_output_file(new std::ofstream(elem_file_path, GetOpenMode(append)));
+        std::shared_ptr<std::ofstream> p_output_file(new std::ofstream(elem_file_path, GetOpenMode(append)));
 // LCOV_EXCL_START
         if (!p_output_file->is_open())
         {
@@ -199,7 +199,7 @@ std::vector<boost::shared_ptr<std::ofstream> > CmguiMeshWriter<ELEMENT_DIM, SPAC
         //
         // elem_files[region_index]  = this->mpOutputFileHandler->OpenOutputFile(elem_file_name, GetOpenMode(append));
         //
-        // but that implies automatic conversion between std::shared_ptr to boost::shared_ptr.
+        // but that implies automatic conversion between std::shared_ptr to std::shared_ptr.
         // That is OK with most compilers, but the combination of gcc 4.1 and boost 1.33 complains about that
         elem_files[region_index]  = p_output_file;
     }
@@ -240,7 +240,7 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteNodeFileHeader(out_stream& rpN
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteElementsFileHeader(std::vector<boost::shared_ptr<std::ofstream> >& rElemFiles)
+void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteElementsFileHeader(std::vector<std::shared_ptr<std::ofstream> >& rElemFiles)
 {
 
        for (unsigned region_index=0; region_index<mRegionNames.size(); region_index++)
@@ -293,7 +293,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::CreateFilesWithHeaders()
      *  Element files
      */
      // Array with file descriptors for each of regions
-     std::vector<boost::shared_ptr<std::ofstream> > elem_files = OpenElementFiles();
+     std::vector<std::shared_ptr<std::ofstream> > elem_files = OpenElementFiles();
      WriteElementsFileHeader(elem_files);
      for (unsigned i = 0; i < elem_files.size(); i++)
      {
@@ -327,7 +327,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
 
     //Now Element files
 
-    std::vector<boost::shared_ptr<std::ofstream> > elem_files = OpenElementFiles(true);
+    std::vector<std::shared_ptr<std::ofstream> > elem_files = OpenElementFiles(true);
     typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElemIterType;
 
     for (ElemIterType iter = this->mpDistributedMesh->GetElementIteratorBegin();

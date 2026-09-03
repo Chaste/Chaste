@@ -109,10 +109,10 @@ public:
         cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
 
         c_vector<double, 2> division_vector;
-        division_vector = boost::static_pointer_cast<FixedVertexBasedDivisionRule<2> >(p_division_rule)->rGetDivisionVector();
+        division_vector = std::static_pointer_cast<FixedVertexBasedDivisionRule<2> >(p_division_rule)->rGetDivisionVector();
         TS_ASSERT_DELTA(division_vector(0), 0.8, 1e-6);
         TS_ASSERT_DELTA(division_vector(1), 0.6, 1e-6);
 
@@ -164,11 +164,11 @@ public:
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Set the division rule for our population to be the random direction division rule
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new RandomDirectionVertexBasedDivisionRule<2>());
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new RandomDirectionVertexBasedDivisionRule<2>());
         cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
 
         // Get 10000 division vectors, check each length, their mean and their variance.
         c_vector<double, 2> average_axis = zero_vector<double>(2);
@@ -241,7 +241,7 @@ public:
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
         c_vector<double, 2> short_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
         TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-9);
@@ -287,7 +287,7 @@ public:
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Create a division rule and set the mean and concentration parameters
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new VonMisesVertexBasedDivisionRule<2>());
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new VonMisesVertexBasedDivisionRule<2>());
         double mu = 1.23;
         double kappa = 10.0;
         (dynamic_cast<VonMisesVertexBasedDivisionRule<2>*>(p_division_rule_to_set.get()))->SetMeanParameter(mu);
@@ -295,7 +295,7 @@ public:
         cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
 
         // Get 10000 division vectors, check each length, their mean and their variance
         c_vector<double, 2> average_axis = zero_vector<double>(2);
@@ -321,7 +321,7 @@ public:
             c_vector<double, 2> vector;
             vector(0) = 5.0/13.0;
             vector(1) = 12.0/13.0;
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new FixedVertexBasedDivisionRule<2>(vector));
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new FixedVertexBasedDivisionRule<2>(vector));
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -332,7 +332,7 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
 
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
@@ -356,7 +356,7 @@ public:
 
         // Create data structures to store variables to test for equality here
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new RandomDirectionVertexBasedDivisionRule<2>());
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new RandomDirectionVertexBasedDivisionRule<2>());
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -367,7 +367,7 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -387,7 +387,7 @@ public:
 
         // Create data structures to store variables to test for equality here
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new ShortAxisVertexBasedDivisionRule<2>());
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new ShortAxisVertexBasedDivisionRule<2>());
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -398,7 +398,7 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -420,7 +420,7 @@ public:
         {
             double mean_parameter = 1.1;
             double concentration_parameter = 72.3;
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new VonMisesVertexBasedDivisionRule<2>());
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new VonMisesVertexBasedDivisionRule<2>());
             (dynamic_cast<VonMisesVertexBasedDivisionRule<2>*>(p_division_rule.get()))->SetMeanParameter(mean_parameter);
             (dynamic_cast<VonMisesVertexBasedDivisionRule<2>*>(p_division_rule.get()))->SetConcentrationParameter(concentration_parameter);
 
@@ -433,7 +433,7 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
 
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();

@@ -68,7 +68,7 @@ template <unsigned PROBLEM_DIM=1>
 class MyCardiacCellFactory : public AbstractCardiacCellFactory<PROBLEM_DIM>
 {
 private:
-    boost::shared_ptr<AbstractStimulusFunction> mpStimulus;
+    std::shared_ptr<AbstractStimulusFunction> mpStimulus;
 public:
 
     MyCardiacCellFactory()

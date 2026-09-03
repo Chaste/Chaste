@@ -68,7 +68,7 @@ public:
                                                232, 250, 251, 252, 253, 271, 272, 273, 274, 292, 293, 294, 295, 313,
                                                314, 315, 316, 334, 335, 336, 337, 355, 356, 357, 358, 376, 377, 378,
                                                379, 397, 398, 399, 400, 418, 419, 420, 421, 439, 440};
-        boost::shared_ptr<std::vector<PetscInt> > p_bath(new std::vector<PetscInt>(bath_nodes, &bath_nodes[num_bath_nodes]));
+        std::shared_ptr<std::vector<PetscInt> > p_bath(new std::vector<PetscInt>(bath_nodes, &bath_nodes[num_bath_nodes]));
         assert(p_bath->size() == num_bath_nodes);
 
         Mat system_matrix;
@@ -182,7 +182,7 @@ public:
                                                232, 250, 251, 252, 253, 271, 272, 273, 274, 292, 293, 294, 295, 313,
                                                314, 315, 316, 334, 335, 336, 337, 355, 356, 357, 358, 376, 377, 378,
                                                379, 397, 398, 399, 400, 418, 419, 420, 421, 439, 440};
-        boost::shared_ptr<std::vector<PetscInt> > p_bath(new std::vector<PetscInt>(bath_nodes, &bath_nodes[num_bath_nodes]));
+        std::shared_ptr<std::vector<PetscInt> > p_bath(new std::vector<PetscInt>(bath_nodes, &bath_nodes[num_bath_nodes]));
         assert(p_bath->size() == num_bath_nodes);
 
         unsigned point_jacobi_its;

@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 
-TysonNovakCellCycleModel::TysonNovakCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+TysonNovakCellCycleModel::TysonNovakCellCycleModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
 {
     if (!mpOdeSolver)

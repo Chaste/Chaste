@@ -113,7 +113,7 @@ public:
         * cells) wide, and 2 elements high.
         */
         HoneycombVertexMeshGenerator generator(2, 2);    // Parameters are: cells across, cells up
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* Having created a mesh, we now create a `std::vector` of `CellPtr`s.
         * To do this, we use the `CellsGenerator` helper class, which is templated over the type
@@ -201,7 +201,7 @@ public:
          * is 4 elements (i.e. cells) wide, and 4 elements high.
          */
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);    // Parameters are: cells across, cells up
-        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         /* Having created a mesh, we now create a `std::vector` of `CellPtr`s.
         * This is exactly the same as the above test. */

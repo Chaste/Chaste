@@ -80,22 +80,22 @@ public:
         OutputFileHandler file_handler1 = OutputFileHandler("TestVtkSceneWithMeshBasedPopulation/2d/");
 
         HoneycombMeshGenerator generator(2, 2, 2);    // Parameters are: cells across, cells up
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
-        auto p_cell_population = boost::make_shared<MeshBasedCellPopulationWithGhostNodes<2> >(*p_mesh, cells, location_indices);
+        auto p_cell_population = std::make_shared<MeshBasedCellPopulationWithGhostNodes<2> >(*p_mesh, cells, location_indices);
         p_cell_population->AddPopulationWriter<VoronoiDataWriter>();
 
-        auto p_scene = boost::make_shared<VtkScene<2> >();
+        auto p_scene = std::make_shared<VtkScene<2> >();
         p_scene->SetCellPopulation(p_cell_population);
         p_scene->SetSaveAsImages(true);
         p_scene->SetOutputFilePath(file_handler1.GetOutputDirectoryFullPath()+"/cell_population");
 
-        auto p_scene_modifier = boost::make_shared<VtkSceneModifier<2> >();
+        auto p_scene_modifier = std::make_shared<VtkSceneModifier<2> >();
         p_scene_modifier->SetVtkScene(p_scene);
         p_scene->Start();
 
@@ -127,16 +127,16 @@ public:
         CellsGenerator<UniformCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
-        auto p_cell_population = boost::make_shared<MeshBasedCellPopulation<3> >(mesh, cells);
+        auto p_cell_population = std::make_shared<MeshBasedCellPopulation<3> >(mesh, cells);
         p_cell_population->SetAbsoluteMovementThreshold(DBL_MAX);
         p_cell_population->AddPopulationWriter<VoronoiDataWriter>();
 
-        auto p_scene = boost::make_shared<VtkScene<3> >();
+        auto p_scene = std::make_shared<VtkScene<3> >();
         p_scene->SetCellPopulation(p_cell_population);
         p_scene->SetSaveAsImages(true);
         p_scene->SetOutputFilePath(file_handler1.GetOutputDirectoryFullPath()+"/cell_population");
 
-        auto p_scene_modifier = boost::make_shared<VtkSceneModifier<3> >();
+        auto p_scene_modifier = std::make_shared<VtkSceneModifier<3> >();
         p_scene_modifier->SetVtkScene(p_scene);
         p_scene->Start();
 

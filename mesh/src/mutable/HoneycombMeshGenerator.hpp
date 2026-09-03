@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "MutableMesh.hpp"
 
 /**
@@ -53,7 +53,7 @@ class HoneycombMeshGenerator
 protected:
 
     /** A pointer to the mesh this class creates */
-    boost::shared_ptr<MutableMesh<2,2> > mpMesh;
+    std::shared_ptr<MutableMesh<2,2> > mpMesh;
 
     /** The indices of the nodes in this mesh which are 'ghost nodes'  */
     std::set<unsigned> mGhostNodeIndices;
@@ -106,7 +106,7 @@ public:
     /**
      * @return a 2D honeycomb mesh based on a 2D plane
      */
-    virtual boost::shared_ptr<MutableMesh<2,2> > GetMesh();
+    virtual std::shared_ptr<MutableMesh<2,2> > GetMesh();
 
     /**
      * Returns the indices of the nodes in the mesh which correspond to
@@ -121,7 +121,7 @@ public:
      * @param radius the radius of the circular mesh
      * @return a honeycomb mesh constructed to be roughly circular.
      */
-    boost::shared_ptr<MutableMesh<2,2> > GetCircularMesh(double radius);
+    std::shared_ptr<MutableMesh<2,2> > GetCircularMesh(double radius);
 
     /**
      * @return #mDomainDepth

@@ -74,7 +74,7 @@ VtkScene<DIM>::VtkScene()
           mpRenderWindowInteractor(vtkSmartPointer<vtkRenderWindowInteractor>::New()),
           mAnimationWriter(vtkSmartPointer<vtkOggTheoraWriter>::New()),
           mWindowToImageFilter(vtkSmartPointer<vtkWindowToImageFilter>::New()),
-          mpCellPopulationGenerator(boost::make_shared<CellPopulationPyChasteActorGenerator<DIM> >())
+          mpCellPopulationGenerator(std::make_shared<CellPopulationPyChasteActorGenerator<DIM> >())
 {
     mpRenderer->SetBackground(1.0, 1.0, 1.0); // white
     mpRenderWindow->AddRenderer(mpRenderer);
@@ -96,7 +96,7 @@ void VtkScene<DIM>::End()
 }
 
 template <unsigned DIM>
-boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > VtkScene<DIM>::GetCellPopulationActorGenerator() const
+std::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > VtkScene<DIM>::GetCellPopulationActorGenerator() const
 {
     return mpCellPopulationGenerator;
 }
@@ -181,7 +181,7 @@ void VtkScene<DIM>::RenderFrame(unsigned timeStep)
 }
 
 template <unsigned DIM>
-void VtkScene<DIM>::SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation)
+void VtkScene<DIM>::SetCellPopulation(std::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation)
 {
     mpCellPopulationGenerator->SetCellPopulation(pCellPopulation);
 }

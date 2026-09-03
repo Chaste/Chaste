@@ -314,7 +314,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -322,7 +322,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
 
     /**
      * A virtual method to accept a cell population event writer so it can
@@ -330,7 +330,7 @@ public:
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    virtual void AcceptPopulationEventWriter(std::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -339,7 +339,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -419,7 +419,7 @@ public:
      *
      * @param pUpdateRule pointer to an update rule
      */
-    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
+    virtual void AddUpdateRule(std::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.

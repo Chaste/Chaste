@@ -201,7 +201,7 @@ public:
         EXIT_IF_PARALLEL;
         // Create mesh
         HoneycombVertexMeshGenerator mesh_generator(2, 2);
-        boost::shared_ptr<VertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<VertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

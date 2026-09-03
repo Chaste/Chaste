@@ -38,8 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
-ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
-                                                                          boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(std::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                          std::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                           bool isNeumannBoundaryCondition,
                                                                           Vec solution)
     : AbstractGrowingDomainPdeModifier<DIM>(pPde,
@@ -67,7 +67,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 
     // Use CellBasedParabolicPdeSolver as cell wise PDE
     CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh,
-                                            boost::static_pointer_cast<AbstractLinearParabolicPde<DIM,DIM> >(this->mpPde).get(),
+                                            std::static_pointer_cast<AbstractLinearParabolicPde<DIM,DIM> >(this->mpPde).get(),
                                             p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step
@@ -93,7 +93,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<D
 {
     AbstractGrowingDomainPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
 
-    if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(this->mpPde))
+    if (std::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(this->mpPde))
     {
         EXCEPTION("ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
     }

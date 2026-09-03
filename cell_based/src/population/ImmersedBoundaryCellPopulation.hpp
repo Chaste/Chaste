@@ -80,7 +80,7 @@ private:
      * dividing cells. This is a specialisation for immersed boundary
      * simulations.
      */
-    boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > mpImmersedBoundaryDivisionRule;
+    std::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > mpImmersedBoundaryDivisionRule;
 
     /**
      * The intrinsic node spacing, relative to which various parameters must be
@@ -437,7 +437,7 @@ public:
      * @param pPopulationWriter the population writer.
      */
     virtual void AcceptPopulationWriter(
-        boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+        std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
      * Overridden AcceptPopulationWriter() method.
@@ -445,7 +445,7 @@ public:
      * @param pPopulationEventWriter the population event writer.
      */
     virtual void AcceptPopulationEventWriter(
-        boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+        std::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
 
     /**
      * Overridden AcceptPopulationCountWriter() method.
@@ -453,7 +453,7 @@ public:
      * @param pPopulationCountWriter the population count writer.
      */
     virtual void AcceptPopulationCountWriter(
-        boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+        std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
 
     /**
      * Overridden AcceptCellWriter() method.
@@ -462,7 +462,7 @@ public:
      * @param pCell the cell whose data are being written.
      */
     virtual void AcceptCellWriter(
-        boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter,
+        std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter,
         CellPtr pCell);
 
     /**
@@ -550,7 +550,7 @@ public:
     /**
      * @return The division rule that is currently being used.
      */
-    boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > GetImmersedBoundaryDivisionRule();
+    std::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > GetImmersedBoundaryDivisionRule();
 
     /**
      * Set the division rule for this population.
@@ -558,7 +558,7 @@ public:
      * @param pImmersedBoundaryDivisionRule  pointer to the new division rule
      */
     void SetImmersedBoundaryDivisionRule(
-        boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > pImmersedBoundaryDivisionRule);
+        std::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > pImmersedBoundaryDivisionRule);
 
     /**
      * @return mPopulationHasActiveSources whether the population has active

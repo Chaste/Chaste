@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCARDIACCELLFACTORY_HPP_
 #define ABSTRACTCARDIACCELLFACTORY_HPP_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "AbstractCardiacCellInterface.hpp"
 #include "AbstractTetrahedralMesh.hpp"
@@ -83,9 +83,9 @@ private:
 
 protected:
     /** For use at un-stimulated cells. */
-    boost::shared_ptr<ZeroStimulus> mpZeroStimulus;
+    std::shared_ptr<ZeroStimulus> mpZeroStimulus;
     /** The solver to give each of the cells */
-    boost::shared_ptr<AbstractIvpOdeSolver> mpSolver;
+    std::shared_ptr<AbstractIvpOdeSolver> mpSolver;
 
 public:
     /**
@@ -134,7 +134,7 @@ public:
      *
      * @param pSolver  the ODE solver to use to simulate this cell.
      */
-    AbstractCardiacCellFactory(boost::shared_ptr<AbstractIvpOdeSolver> pSolver = boost::shared_ptr<AbstractIvpOdeSolver>(new EulerIvpOdeSolver));
+    AbstractCardiacCellFactory(std::shared_ptr<AbstractIvpOdeSolver> pSolver = std::shared_ptr<AbstractIvpOdeSolver>(new EulerIvpOdeSolver));
     /**
      * Destructor: free solver, zero stimulus and fake bath cell.
      */

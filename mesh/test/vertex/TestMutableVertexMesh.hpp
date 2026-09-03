@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "VertexMeshReader.hpp"
 #include "VertexMeshWriter.hpp"
@@ -1862,7 +1862,7 @@ public:
     void TestSetAndGetDistanceForT3SwapChecking()
     {
         HoneycombVertexMeshGenerator mesh_generator(10,10); // is_flat_bottom, T1swaptthreshold, T2swapthreshold, elementArea
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
         double standard_distance = p_mesh->GetDistanceForT3SwapChecking();
         TS_ASSERT_EQUALS(standard_distance, 5.0);
 

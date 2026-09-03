@@ -54,7 +54,7 @@ private:
     MeshBasedCellPopulation<2>& mrCellPopulation;
 
     /** The mechanics used to determine the new location of the cells. */
-    std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > mForceCollection;
+    std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > > mForceCollection;
 
     /**
      * Small parameter, used in GetSamplingAngles().
@@ -119,7 +119,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param forceCollection vector of force laws present
      */
-    DiscreteSystemForceCalculator(MeshBasedCellPopulation<2>& rCellPopulation, std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > forceCollection);
+    DiscreteSystemForceCalculator(MeshBasedCellPopulation<2>& rCellPopulation, std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > > forceCollection);
 
     /**
      * @return the extremal normal forces on each node in the cell population.

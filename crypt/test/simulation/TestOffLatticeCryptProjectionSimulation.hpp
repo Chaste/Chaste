@@ -83,7 +83,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         double crypt_length = (double)num_cells_depth * sqrt(3.0) / 2.0;
 
@@ -163,7 +163,7 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         double crypt_length = (double)num_cells_depth * sqrt(3.0) / 2.0;
 

@@ -43,7 +43,7 @@ the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "DummyModifier.hpp"
 #include "TimeModifier.hpp"
@@ -74,8 +74,8 @@ private:
     void setUp()
     {
            if(!p_shannon){
-                      boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
-                   boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+                      std::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
+                   std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
                       OutputFileHandler handler("TestModifiers", true);
 
                    FileFinder cellml_file("_deps/cellml_repo-src/cellml/shannon_wang_puglisi_weber_bers_2004.cellml", RelativeTo::ChasteBuildRoot);
@@ -119,7 +119,7 @@ public:
         TS_ASSERT_DELTA(p_shannon->GetModifier("membrane_rapid_delayed_rectifier_potassium_current_conductance")->Calc(123,0),123,1e-9);
 
         // Make a new modifier
-        boost::shared_ptr<AbstractModifier> p_new_modifier(new FixedModifier(-90.0));
+        std::shared_ptr<AbstractModifier> p_new_modifier(new FixedModifier(-90.0));
 
         TS_ASSERT_THROWS_THIS(p_shannon->SetModifier("Alan",p_new_modifier), "There is no modifier called Alan in this model.");
 

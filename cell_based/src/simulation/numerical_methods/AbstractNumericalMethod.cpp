@@ -80,13 +80,13 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractO
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces)
+void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetForceCollection(std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces)
 {
     mpForceCollection = pForces;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetBoundaryConditions(std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* pBoundaryConditions)
+void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetBoundaryConditions(std::vector<std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* pBoundaryConditions)
 {
     mpBoundaryConditions = pBoundaryConditions;
 }
@@ -122,7 +122,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryConditions(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLocations)
 {
     // Apply any boundary conditions
-    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mpBoundaryConditions->begin();
+    for (typename std::vector<std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mpBoundaryConditions->begin();
          bcs_iter != mpBoundaryConditions->end();
          ++bcs_iter)
     {
@@ -141,7 +141,7 @@ std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SP
         node_iter->ClearAppliedForce();
     }
 
-    for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mpForceCollection->begin();
+    for (typename std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mpForceCollection->begin();
         iter != mpForceCollection->end(); ++iter)
     {
         (*iter)->AddForceContribution(*mpCellPopulation);

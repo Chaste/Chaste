@@ -120,7 +120,7 @@ class VtkScene
     /**
      * The cell population
      */
-    boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > mpCellPopulationGenerator;
+    std::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > mpCellPopulationGenerator;
 
 public:
 
@@ -144,7 +144,7 @@ public:
      * Get the cell population actor generator
      * @return the cell population actor generator
      */
-    boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > GetCellPopulationActorGenerator() const;
+    std::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > GetCellPopulationActorGenerator() const;
 
     /**
      * Return the render window (e.g. to set its size before capturing a frame)
@@ -176,7 +176,7 @@ public:
      * Set the cell population
      * @param pCellPopulation the cell population for rendering
      */
-    void SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation);
+    void SetCellPopulation(std::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation);
 
     /**
      * Set whether to render to an interactive on-screen window (rather than

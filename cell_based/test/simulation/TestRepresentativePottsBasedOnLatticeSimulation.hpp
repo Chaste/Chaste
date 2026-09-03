@@ -77,7 +77,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(60, 10, 4, 60, 10, 4);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

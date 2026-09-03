@@ -42,11 +42,11 @@ S1S2Stimulus::S1S2Stimulus(double magnitude, double stimulusDuration, double s1D
     mNumS2FrequencyValues = s2Periods.size();
     for (unsigned i=0; i<mNumS2FrequencyValues; i++)
     {
-        boost::shared_ptr<MultiStimulus> p_experiment_stimulus(new MultiStimulus());
+        std::shared_ptr<MultiStimulus> p_experiment_stimulus(new MultiStimulus());
 
         // The 0.5*(s1Period-stimulusDuration) taken off the stop time is to avoid getting a double stimulus at the instant s1Duration+startTime (#2442).
-        boost::shared_ptr<RegularStimulus> p_s1(new RegularStimulus(magnitude, stimulusDuration, s1Period, startTime, s1Duration+startTime-0.5*(s1Period-stimulusDuration)));
-        boost::shared_ptr<RegularStimulus> p_s2(new RegularStimulus(magnitude, stimulusDuration, s2Periods[i], s1Duration+startTime, s1Duration + 2*s2Periods[i]+startTime));
+        std::shared_ptr<RegularStimulus> p_s1(new RegularStimulus(magnitude, stimulusDuration, s1Period, startTime, s1Duration+startTime-0.5*(s1Period-stimulusDuration)));
+        std::shared_ptr<RegularStimulus> p_s2(new RegularStimulus(magnitude, stimulusDuration, s2Periods[i], s1Duration+startTime, s1Duration + 2*s2Periods[i]+startTime));
 
         p_experiment_stimulus->AddStimulus(p_s1);
         p_experiment_stimulus->AddStimulus(p_s2);

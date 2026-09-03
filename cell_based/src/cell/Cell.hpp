@@ -37,8 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELL_HPP_
 
 #include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
+#include <memory>
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/shared_ptr.hpp>
@@ -59,7 +58,7 @@ class AbstractSrnModel; // Circular definition (cells need to know about subcell
 class Cell;
 
 /** Cells shouldn't be copied - it doesn't make sense.  So all access is via this pointer type. */
-typedef boost::shared_ptr<Cell> CellPtr;
+typedef std::shared_ptr<Cell> CellPtr;
 
 /**
  * null_deleter means "doesn't delete" rather than "deletes nulls".
@@ -88,7 +87,7 @@ struct null_deleter
  *
  * This class should not store any spatial information - cells are linked to space by the AbstractCellPopulation subclasses.
  */
-class Cell : private boost::noncopyable, public boost::enable_shared_from_this<Cell>
+class Cell : private boost::noncopyable
 {
 private:
 
@@ -168,7 +167,7 @@ public:
      * @param archiving  whether this constructor is being called by the archiver - do things slightly differently! (defaults to false)
      * @param cellPropertyCollection the cell property collection (defaults to NULL)
      */
-    Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
+    Cell(std::shared_ptr<AbstractCellProperty> pMutationState,
          AbstractCellCycleModel* pCellCycleModel,
          AbstractSrnModel* pSrnModel=nullptr,
          bool archiving=false,
@@ -182,14 +181,14 @@ public:
     /**
      * @return the cell's proliferative type.
      */
-    boost::shared_ptr<AbstractCellProliferativeType> GetCellProliferativeType() const;
+    std::shared_ptr<AbstractCellProliferativeType> GetCellProliferativeType() const;
 
     /**
      * Set the cell's proliferative type.
      *
      * @param pProliferativeType the cell's new proliferative type
      */
-    void SetCellProliferativeType(boost::shared_ptr<AbstractCellProperty> pProliferativeType);
+    void SetCellProliferativeType(std::shared_ptr<AbstractCellProperty> pProliferativeType);
 
     /**
      * Set the birth time of the cell - can be negative so that your cells have an age when a simulation begins
@@ -262,21 +261,21 @@ public:
     /**
      * @return the cell's current mutation state.
      */
-    boost::shared_ptr<AbstractCellMutationState> GetMutationState() const;
+    std::shared_ptr<AbstractCellMutationState> GetMutationState() const;
 
     /**
      * Get the CellData associated with the cell.
      *
      * @return a pointer to the cell data
      */
-    boost::shared_ptr<CellData> GetCellData() const;
+    std::shared_ptr<CellData> GetCellData() const;
 
     /**
      * Get the CellEdgeData associated with the cell.
      *
      * @return a pointer to the cell edge data
      */
-    boost::shared_ptr<CellEdgeData> GetCellEdgeData() const;
+    std::shared_ptr<CellEdgeData> GetCellEdgeData() const;
 
     /**
      * Checks whether there is CellVecData associated with this cell
@@ -290,14 +289,14 @@ public:
      *
      * @return a pointer to the cell Vec data
      */
-    boost::shared_ptr<CellVecData> GetCellVecData() const;
+    std::shared_ptr<CellVecData> GetCellVecData() const;
 
     /**
      * Set the cell's mutation state.
      *
      * @param pMutationState the cell's new mutation state
      */
-    void SetMutationState(boost::shared_ptr<AbstractCellProperty> pMutationState);
+    void SetMutationState(std::shared_ptr<AbstractCellProperty> pMutationState);
 
     /**
      * @return reference to #mCellPropertyCollection.
@@ -317,7 +316,7 @@ public:
      *
      * @param rProperty the property to add
      */
-    void AddCellProperty(const boost::shared_ptr<AbstractCellProperty>& rProperty);
+    void AddCellProperty(const std::shared_ptr<AbstractCellProperty>& rProperty);
 
     /**
      * Remove a cell property of the given type. Use this method instead of
@@ -331,7 +330,7 @@ public:
     {
         bool cell_has_property = false;
 
-        for (std::set<boost::shared_ptr<AbstractCellProperty> >::iterator property_iter = mCellPropertyCollection.Begin();
+        for (std::set<std::shared_ptr<AbstractCellProperty> >::iterator property_iter = mCellPropertyCollection.Begin();
              property_iter != mCellPropertyCollection.End();
              ++property_iter)
         {
@@ -417,7 +416,7 @@ public:
      *
      * @param pCellAncestor the cell's ancestor
      */
-    void SetAncestor(boost::shared_ptr<AbstractCellProperty> pCellAncestor);
+    void SetAncestor(std::shared_ptr<AbstractCellProperty> pCellAncestor);
 
     /**
      * @return The ancestor object, inherited from parents or set using the method above,
@@ -452,7 +451,7 @@ inline void save_construct_data(
     Archive & ar, const Cell * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const boost::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();
+    const std::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();
     ar & p_mutation_state;
     const AbstractCellCycleModel* const p_cell_cycle_model = t->GetCellCycleModel();
     ar & p_cell_cycle_model;
@@ -470,7 +469,7 @@ inline void load_construct_data(
     Archive & ar, Cell * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    boost::shared_ptr<AbstractCellMutationState> p_mutation_state;
+    std::shared_ptr<AbstractCellMutationState> p_mutation_state;
     ar & p_mutation_state;
 
     AbstractCellCycleModel* p_cell_cycle_model;

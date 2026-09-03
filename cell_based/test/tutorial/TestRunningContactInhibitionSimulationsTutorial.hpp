@@ -131,7 +131,7 @@ public:
         /* We use the honeycomb mesh generator to create a honeycomb mesh and
          * the associated mutable mesh. */
         HoneycombMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We now create a vector of cell pointers. */
         std::vector<CellPtr> cells;
@@ -233,7 +233,7 @@ public:
     {
         /* Just as before we create a simple mesh. */
         HoneycombMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We again create the cells. The difference here is that one of the cells is not contact-inhibited, but rather
          * is defined by a `UniformCellCycleModel`. */
@@ -337,7 +337,7 @@ public:
     {
         /* First we create a simple 2D MutableVertexMesh.*/
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         /*
          * We then create cells as before, only this time we need one per element. We also create the cell population (a `VertexBasedCellPopulation`).

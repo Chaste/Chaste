@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellCycleModelOdeHandler.hpp"
 #include "SimulationTime.hpp"
 
-typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
+typedef std::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 
 /**
  * SRN model at the cell level, has representation for edges internally. Also
@@ -75,7 +75,7 @@ private:
     }
 
     /** Vector of pointers to edge SRN models. */
-    std::vector<boost::shared_ptr<AbstractSrnModel>> mEdgeSrnModels;
+    std::vector<std::shared_ptr<AbstractSrnModel>> mEdgeSrnModels;
 
     /**
      * @typedef abstractsrnmodel_t
@@ -84,7 +84,7 @@ private:
     using abstractsrnmodel_t = std::vector<AbstractSrnModelPtr>;
 
     /** Pointer to interior SRN model. */
-    boost::shared_ptr<AbstractSrnModel> mpInteriorSrnModel;
+    std::shared_ptr<AbstractSrnModel> mpInteriorSrnModel;
 
 protected:
 

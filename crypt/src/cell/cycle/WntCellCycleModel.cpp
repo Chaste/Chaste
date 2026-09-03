@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-WntCellCycleModel::WntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+WntCellCycleModel::WntCellCycleModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractWntOdeBasedCellCycleModel(pOdeSolver)
 {
     if (!mpOdeSolver)

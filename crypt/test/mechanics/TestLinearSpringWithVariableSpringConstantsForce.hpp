@@ -74,7 +74,7 @@ public:
       //This one is going to throw because the ghost layers haven't been set up properly
         CylindricalHoneycombMeshGenerator generator(6, 12, 0, 1.1);
 
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -115,7 +115,7 @@ public:
         //Do it again, but with ghost layers set up properly
         CylindricalHoneycombMeshGenerator generator(6, 12, 2, 1.1);
         //                                                 ^-- That was a zero before
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -158,7 +158,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         CylindricalHoneycombMeshGenerator generator(6, 12, 0, 1.1);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -206,7 +206,7 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         HoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         CellPropertyRegistry::Instance()->Clear();
@@ -251,10 +251,10 @@ public:
             }
             p_cell_cycle_model->SetGeneration(generation);
 
-            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            std::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+            std::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+            std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
 
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
 
@@ -377,7 +377,7 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         CellPropertyRegistry::Instance()->Clear();
@@ -408,10 +408,10 @@ public:
             double birth_time = 0.0;
             birth_time = -p_random_num_gen->ranf();
 
-            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            std::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+            std::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+            std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
 
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
 
@@ -519,10 +519,10 @@ public:
         LinearSpringWithVariableSpringConstantsForce<2> linear_force;
 
         // Set cells' mutation states
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
-        boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
-        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+        std::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
 
         cell_population.GetCellUsingLocationIndex(0)->SetMutationState(p_state);
         cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
@@ -555,7 +555,7 @@ public:
 
         // Set up stretched cell population
         HoneycombMeshGenerator generator(4, 4, 0, 2.0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
@@ -568,7 +568,7 @@ public:
         stretched_cell_population.InitialiseCells();
 
         // Set one of the non-boundary cells to be necrotic
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(new ApoptoticCellProperty);
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_state(new ApoptoticCellProperty);
         stretched_cell_population.GetCellUsingLocationIndex(6)->AddCellProperty(p_apoptotic_state);
 
         LinearSpringWithVariableSpringConstantsForce<2> linear_force;
@@ -585,7 +585,7 @@ public:
 
         // Now do similar tests for a squashed cell population
         HoneycombMeshGenerator generator2(4, 4, 0, 0.5);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh2 = generator2.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh2 = generator2.GetMesh();
         std::vector<unsigned> location_indices2 = generator2.GetCellLocationIndices();
 
         std::vector<CellPtr> cells2;
@@ -648,8 +648,8 @@ public:
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
             std::vector<CellPtr> cells;
-            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {

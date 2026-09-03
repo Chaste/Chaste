@@ -104,7 +104,7 @@ public:
     {
         /* First we create a regular vertex mesh. Here we choose to set the value of the cell rearrangement threshold. */
         HoneycombVertexMeshGenerator generator(5, 5);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         /* We then create some cells using the helper class `CellsGenerator`. Note that in this simulation
@@ -131,7 +131,7 @@ public:
          * each cell independently with probability 0.5. Note that since the cells have been passed to the
          * `VertexBasedCellPopulation` object, the vector `cells` above is now empty, so we must use the
          * `Iterator` to loop over cells. */
-         boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+         std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)

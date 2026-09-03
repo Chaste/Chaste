@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _ODESYSTEMINFORMATION_HPP_
 #define _ODESYSTEMINFORMATION_HPP_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "AbstractOdeSystemInformation.hpp"
 
 /**
@@ -62,7 +62,7 @@ private:
      * \todo see if using weak_ptr would work and give funkier semantics
      *   (automatically destroy the singleton when no ODE systems were using it)
      */
-    static boost::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > mpInstance;
+    static std::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > mpInstance;
 
 protected:
 
@@ -107,11 +107,11 @@ public:
     /**
      * @return a pointer to the singleton instance, creating it if necessary.
      */
-    static boost::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > Instance();
+    static std::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > Instance();
 };
 
 template<class ODE_SYSTEM>
-boost::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > OdeSystemInformation<ODE_SYSTEM>::Instance()
+std::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > OdeSystemInformation<ODE_SYSTEM>::Instance()
 {
     if (!mpInstance)
     {
@@ -138,7 +138,7 @@ void OdeSystemInformation<ODE_SYSTEM>::Initialise()
  * Definition of the instance static member.
  */
 template<class ODE_SYSTEM>
-boost::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > OdeSystemInformation<ODE_SYSTEM>::mpInstance;
+std::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > OdeSystemInformation<ODE_SYSTEM>::mpInstance;
 
 
 #endif /*_ODESYSTEMINFORMATION_HPP_*/

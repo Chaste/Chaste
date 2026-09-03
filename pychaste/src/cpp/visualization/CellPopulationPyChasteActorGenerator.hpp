@@ -68,7 +68,7 @@ class CellPopulationPyChasteActorGenerator : public AbstractPyChasteActorGenerat
     /**
      * The CellPopulation
      */
-    boost::shared_ptr<AbstractCellPopulation<DIM> > mpCellPopulation;
+    std::shared_ptr<AbstractCellPopulation<DIM> > mpCellPopulation;
 
     /**
      * Show mutable mesh edges for Mesh Based populations
@@ -185,7 +185,7 @@ public:
      * Set the cell population to render.
      * @param pCellPopulation the cell population to render
      */
-    void SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation);
+    void SetCellPopulation(std::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation);
 
     /**
      * Set whether to colour cells by a named CellData entry (see the data label
@@ -286,7 +286,7 @@ private:
      * @return the coloured unstructured grid
      */
     template <typename PopulationType>
-    vtkSmartPointer<vtkUnstructuredGrid> BuildMeshElementGrid(boost::shared_ptr<PopulationType> pPopulation);
+    vtkSmartPointer<vtkUnstructuredGrid> BuildMeshElementGrid(std::shared_ptr<PopulationType> pPopulation);
 
     /**
      * Build a colour transfer function scaled to the range of a data array, using

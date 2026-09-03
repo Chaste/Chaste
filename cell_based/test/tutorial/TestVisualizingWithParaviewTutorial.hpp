@@ -111,7 +111,7 @@ public:
          * with no differentiation.
          */
         HoneycombMeshGenerator generator(10, 10);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -194,7 +194,7 @@ public:
          * in the x direction.
          */
         CylindricalHoneycombMeshGenerator generator(10, 10, 2);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
@@ -253,7 +253,7 @@ public:
          * [Running Node Based Simulations](../runningnodebasedsimulations/).
          */
         HoneycombMeshGenerator generator(10, 10, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
@@ -304,7 +304,7 @@ public:
          * cell-cycle model (with differentiation after a default number of generations).
          */
         HoneycombVertexMeshGenerator generator(6, 9);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;

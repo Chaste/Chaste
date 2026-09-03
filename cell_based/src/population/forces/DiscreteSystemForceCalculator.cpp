@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DiscreteSystemForceCalculator.hpp"
 
 DiscreteSystemForceCalculator::DiscreteSystemForceCalculator(MeshBasedCellPopulation<2>& rCellPopulation,
-                                                             std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > forceCollection)
+                                                             std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > > forceCollection)
     : mrCellPopulation(rCellPopulation),
       mForceCollection(forceCollection),
       mEpsilon(0.01)
@@ -152,7 +152,7 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(unsigned ind
             c_vector<double,2> force_between_nodes = zero_vector<double>(2);
 
             // Iterate over vector of forces present and add up forces between nodes
-            for (std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > >::iterator force_iter = mForceCollection.begin();
+            for (std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > >::iterator force_iter = mForceCollection.begin();
                  force_iter != mForceCollection.end();
                  ++force_iter)
             {

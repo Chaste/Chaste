@@ -152,7 +152,7 @@ public:
     void TestConstructorRejectsOnLatticePopulation()
     {
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);

@@ -98,7 +98,7 @@ public:
      *
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    DeltaNotchEdgeSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+    DeltaNotchEdgeSrnModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = std::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Overridden builder method to create new copies of this SRN model.
@@ -222,7 +222,7 @@ public:
     virtual void SplitEdgeSrn(const double relativePosition);
 };
 
-typedef boost::shared_ptr<DeltaNotchEdgeSrnModel> DeltaNotchEdgeSrnModelPtr;
+typedef std::shared_ptr<DeltaNotchEdgeSrnModel> DeltaNotchEdgeSrnModelPtr;
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"

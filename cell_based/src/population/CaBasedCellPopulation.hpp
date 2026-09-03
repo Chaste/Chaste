@@ -74,14 +74,14 @@ private:
      * The update rules used to determine the new location of the cells.
      * These rules specify is cells switch locations.
      */
-    std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > mSwitchingUpdateRuleCollection;
+    std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > > mSwitchingUpdateRuleCollection;
 
     /** Records for each node the node the number of spaces available. */
     std::vector<unsigned> mAvailableSpaces;
 
     /** A pointer to a division rule that is used to specify how cells divide. I.e do they move other cells out of the way.
      * This is a specialisation for CA models. */
-    boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > mpCaBasedDivisionRule;
+    std::shared_ptr<AbstractCaBasedDivisionRule<DIM> > mpCaBasedDivisionRule;
 
     /**
      * Set the empty sites by taking in a set of which nodes indices are empty sites.
@@ -341,7 +341,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -349,7 +349,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
 
     /**
      * A virtual method to accept a cell population event writer so it can
@@ -357,7 +357,7 @@ public:
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    virtual void AcceptPopulationEventWriter(std::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -366,7 +366,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -420,21 +420,21 @@ public:
     /**
      * @return The Ca division rule that is currently being used.
      */
-    boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > GetCaBasedDivisionRule();
+    std::shared_ptr<AbstractCaBasedDivisionRule<DIM> > GetCaBasedDivisionRule();
 
     /**
      * Set the division rule for this population.
      *
      * @param pCaBasedDivisionRule  pointer to the new division rule
      */
-    void SetCaBasedDivisionRule(boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule);
+    void SetCaBasedDivisionRule(std::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule);
 
     /**
      * Overridden AddUpdateRule() method.
      *
      * @param pUpdateRule pointer to an update rule
      */
-    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
+    virtual void AddUpdateRule(std::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Overridden AddUpdateRule() method.
@@ -445,7 +445,7 @@ public:
      *
      * @return the update rule collection
      */
-    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
+    virtual const std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.

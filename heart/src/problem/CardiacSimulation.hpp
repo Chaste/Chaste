@@ -94,7 +94,7 @@ private:
     template<class Problem, unsigned SPACE_DIM>
     void CreateAndRun()
     {
-        boost::shared_ptr<Problem> p_problem;
+        std::shared_ptr<Problem> p_problem;
 
         if (HeartConfig::Instance()->IsSimulationDefined())
         {
@@ -218,13 +218,13 @@ public:
      * @return the saved problem instance, if any.  Will return an empty pointer if the
      * instance was not saved.
      */
-    boost::shared_ptr<AbstractUntemplatedCardiacProblem> GetSavedProblem();
+    std::shared_ptr<AbstractUntemplatedCardiacProblem> GetSavedProblem();
 private:
     /** Whether to save a copy of the problem instance for examination by tests. */
     bool mSaveProblemInstance;
 
     /** The saved problem instance, if any. */
-    boost::shared_ptr<AbstractUntemplatedCardiacProblem> mSavedProblem;
+    std::shared_ptr<AbstractUntemplatedCardiacProblem> mSavedProblem;
 };
 
 #endif /*CARDIACSIMULATION_HPP_*/

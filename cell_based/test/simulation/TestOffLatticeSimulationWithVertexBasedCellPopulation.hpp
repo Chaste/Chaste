@@ -241,7 +241,7 @@ public:
     {
         // Create a simple 2D MutableVertexMesh with only one cell
         HoneycombVertexMeshGenerator generator(1, 1);
-        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cell.
         std::vector<CellPtr> cells;
@@ -294,7 +294,7 @@ public:
     {
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(5, 5);
-        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -360,7 +360,7 @@ public:
     {
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create a horseshoe-shaped mesh
         p_mesh->DeleteElementPriorToReMesh(0);
@@ -426,7 +426,7 @@ public:
 
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(4, 4);
-        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         /*
@@ -557,7 +557,7 @@ public:
     {
         // Create a simple 2D MutableVertexMesh with four cells
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -570,7 +570,7 @@ public:
             cells[i]->SetBirthTime(-2.0);
         }
 
-        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         cells[0]->AddCellProperty(p_label);
         cells[2]->AddCellProperty(p_label);
 
@@ -614,7 +614,7 @@ public:
     {
         // Create a simple 2D MutableVertexMesh with four cells
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         // Create cells
@@ -628,7 +628,7 @@ public:
             cells[i]->SetBirthTime(-2.0);
         }
 
-        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         cells[0]->AddCellProperty(p_label);
         cells[2]->AddCellProperty(p_label);
 
@@ -751,7 +751,7 @@ public:
 
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -810,7 +810,7 @@ public:
         {
             // Create a simple 2D MutableVertexMesh
             HoneycombVertexMeshGenerator generator(6, 6);
-            boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+            std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
             // Create cells
             std::vector<CellPtr> cells;
@@ -873,7 +873,7 @@ public:
             TS_ASSERT_EQUALS(p_simulator->rGetForceCollection().size(), 1u);
 
             // Get a pointer to the Nagai Honda Force, and verify we can access its methods
-            boost::shared_ptr<NagaiHondaForce<2> > p_force = boost::static_pointer_cast<NagaiHondaForce<2> >(p_simulator->rGetForceCollection()[0]);
+            std::shared_ptr<NagaiHondaForce<2> > p_force = std::static_pointer_cast<NagaiHondaForce<2> >(p_simulator->rGetForceCollection()[0]);
 
             double param_value = p_force->GetNagaiHondaDeformationEnergyParameter(); // Get the current value
             p_force->SetNagaiHondaDeformationEnergyParameter(1.23);

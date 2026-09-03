@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include <fstream>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "Alarcon2004OxygenBasedCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
@@ -101,7 +101,7 @@ public:
          * is the same type as the solver used by the cell-cycle model if no solver is provided
          * (unless CVODE is used), so our results should be identical.
          */
-        boost::shared_ptr<CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver> >
+        std::shared_ptr<CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver> >
             p_solver(CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver>::Instance());
         p_solver->SetSizeOfOdeSystem(6);
         p_solver->Initialise();
@@ -109,7 +109,7 @@ public:
         TysonNovakCellCycleModel* p_other_cell_model = new TysonNovakCellCycleModel(p_solver);
 
         // Coverage of GetOdeSolver()
-        boost::shared_ptr<AbstractCellCycleModelOdeSolver> p_solver_from_model = p_other_cell_model->GetOdeSolver();
+        std::shared_ptr<AbstractCellCycleModelOdeSolver> p_solver_from_model = p_other_cell_model->GetOdeSolver();
         TS_ASSERT_EQUALS(p_solver_from_model->GetSizeOfOdeSystem(), 6u);
 
         p_other_cell_model->SetBirthTime(p_simulation_time->GetTime());
@@ -328,7 +328,7 @@ public:
         p_cell_3d->InitialiseCellCycleModel();
 
         // For coverage, we create another cell-cycle model that is identical to p_model_2d except for the ODE solver
-        boost::shared_ptr<CellCycleModelOdeSolver<Alarcon2004OxygenBasedCellCycleModel, RungeKutta4IvpOdeSolver> >
+        std::shared_ptr<CellCycleModelOdeSolver<Alarcon2004OxygenBasedCellCycleModel, RungeKutta4IvpOdeSolver> >
             p_solver(CellCycleModelOdeSolver<Alarcon2004OxygenBasedCellCycleModel, RungeKutta4IvpOdeSolver>::Instance());
         p_solver->Initialise();
 

@@ -72,7 +72,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
 private:
-    void RandomlyLabelCells(std::vector<CellPtr>& rCells, boost::shared_ptr<AbstractCellProperty> pLabel, double labelledRatio)
+    void RandomlyLabelCells(std::vector<CellPtr>& rCells, std::shared_ptr<AbstractCellProperty> pLabel, double labelledRatio)
     {
         for (unsigned i = 0; i<rCells.size(); i++)
         {
@@ -91,7 +91,7 @@ public:
 
         // Create a simple tetrahedral mesh
         HoneycombMeshGenerator generator(3, 3, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -113,7 +113,7 @@ public:
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -135,7 +135,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells (we use a NoCellCycleModel here for simplicity, since there is no proliferation)
         std::vector<CellPtr> cells;
@@ -185,7 +185,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -218,7 +218,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(16, 4, 4, 24, 8, 2);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -266,7 +266,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(8, 1, 4, 10, 1, 4);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -314,7 +314,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(30, 4, 4, 30, 4, 4);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -323,7 +323,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Randomly label some cells
-        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
@@ -384,7 +384,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(20, 5, 4, 20, 5, 4, 1, 1, 1, false, true, true); // Periodic in x and y
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -393,7 +393,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Randomly label some cells
-        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
@@ -453,7 +453,7 @@ public:
 
         // Create a simple 3D PottsMesh
         PottsMeshGenerator<3> generator(10, 2, 2, 10, 2, 2, 10, 2, 2);
-        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -493,7 +493,7 @@ public:
 
         // Create a simple 3D PottsMesh
         PottsMeshGenerator<3> generator(12, 1, 2, 6, 1, 2, 6, 1, 2, false, true, true, true);
-        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -536,7 +536,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(8, 1, 4, 10, 1, 4);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -582,7 +582,7 @@ public:
         unsigned element_size = 2;
 
         PottsMeshGenerator<3> generator(domain_size, element_number, element_size, domain_size, element_number, element_size, domain_size, element_number, element_size);
-        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -591,7 +591,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Randomly label some cells
-        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
@@ -667,7 +667,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 1, 4, 10, 1, 4);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -720,7 +720,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 1, 4, 10, 1, 4);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "TetrahedralMesh.hpp"
@@ -84,12 +84,12 @@ protected:
     /**
      * Shared pointer to a linear PDE object.
      */
-    boost::shared_ptr<AbstractLinearPde<DIM,DIM> > mpPde;
+    std::shared_ptr<AbstractLinearPde<DIM,DIM> > mpPde;
 
     /**
      * Shared pointer to a boundary condition object.
      */
-    boost::shared_ptr<AbstractBoundaryCondition<DIM> > mpBoundaryCondition;
+    std::shared_ptr<AbstractBoundaryCondition<DIM> > mpBoundaryCondition;
 
     /**
      * Whether the boundary condition is Neumann (false corresponds to a Dirichlet boundary condition).
@@ -146,8 +146,8 @@ public:
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=NULL,
-                        boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+    AbstractPdeModifier(std::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=NULL,
+                        std::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=std::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                         bool isNeumannBoundaryCondition=true,
                         Vec solution=nullptr);
 
@@ -159,12 +159,12 @@ public:
     /**
      * @return mpPde
      */
-    boost::shared_ptr<AbstractLinearPde<DIM,DIM> > GetPde();
+    std::shared_ptr<AbstractLinearPde<DIM,DIM> > GetPde();
 
     /**
      * @return mpBoundaryCondition
      */
-    boost::shared_ptr<AbstractBoundaryCondition<DIM> > GetBoundaryCondition();
+    std::shared_ptr<AbstractBoundaryCondition<DIM> > GetBoundaryCondition();
 
     /**
      * @return mIsNeumannBoundaryCondition

@@ -71,7 +71,7 @@ class VtkSceneModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
     /**
      * The scene that renders the cell population
      */
-    boost::shared_ptr<VtkScene<DIM> > mpScene;
+    std::shared_ptr<VtkScene<DIM> > mpScene;
 
     /**
      * The scene is rendered every mUpdateFrequency time steps
@@ -97,7 +97,7 @@ public:
     /**
      * @return the scene used to render the cell population
      */
-    boost::shared_ptr<VtkScene<DIM> > GetVtkScene();
+    std::shared_ptr<VtkScene<DIM> > GetVtkScene();
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -117,7 +117,7 @@ public:
      * Set the scene used to render the cell population.
      * @param pScene the scene
      */
-    void SetVtkScene(boost::shared_ptr<VtkScene<DIM> > pScene);
+    void SetVtkScene(std::shared_ptr<VtkScene<DIM> > pScene);
 
     /**
      * Overridden SetupSolve() method.

@@ -168,7 +168,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
             // Edge SRN remains the same
             case 0:
             {
-                new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
+                new_edge_srn[i] = std::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
                 break;
             }
             case 1:
@@ -178,7 +178,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
                  * because currently we assume that edge concentrations are
                  * uniform on the edge.
                  */
-                new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
+                new_edge_srn[i] = std::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
                 assert(split_proportions[i] >= 0);
                 new_edge_srn[i]->SplitEdgeSrn(split_proportions[i]);
                 break;
@@ -186,7 +186,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
             case 2:
             {
                 // The edge is new
-                new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[0]->CreateSrnModel());
+                new_edge_srn[i] = std::shared_ptr<AbstractSrnModel>(parentSrnEdges[0]->CreateSrnModel());
                 new_edge_srn[i]->SetCell(pCellSrn->GetCell());
                 new_edge_srn[i]->InitialiseDaughterCell();
                 break;
@@ -194,7 +194,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
             case 3:
             {
                 // If the edge above or below this edge was deleted
-                new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
+                new_edge_srn[i] = std::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
 
                 const bool is_prev_edge = rEdgeChange.GetEdgesStatus()[(i+1)%num_edges]==3;
 
@@ -217,7 +217,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
             case 4:
             {
                 // Add SRNs from the edge above to this edge
-                new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
+                new_edge_srn[i] = std::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
                 const unsigned next_edge_index = (remap_index+1)%(num_edges+1);
                 new_edge_srn[i]->AddMergedEdgeSrn(parentSrnEdges[next_edge_index].get());
                 break;
@@ -229,7 +229,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
     }
 
     // For the case when edge quantities are returned into interior when edge shrinks due to node merging
-    auto p_interior_srn = boost::shared_ptr<AbstractSrnModel>(pCellSrn->GetInteriorSrn());
+    auto p_interior_srn = std::shared_ptr<AbstractSrnModel>(pCellSrn->GetInteriorSrn());
     if (p_interior_srn != nullptr)
     {
         for (unsigned shrunk_edge_index : shrunk_edges)

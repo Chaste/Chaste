@@ -73,7 +73,7 @@ public:
     {
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 9 cells in the central nodes
         std::vector<unsigned> location_indices;
@@ -112,11 +112,11 @@ public:
         p_new_cell->SetBirthTime(-1);
 
         // Set the division rule for our population to be the shoving division rule
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new ShovingCaBasedDivisionRule<2>());
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new ShovingCaBasedDivisionRule<2>());
         cell_population.SetCaBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population and try to add new cell by dividing cell at site 0
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
 
         // Select central cell
         CellPtr p_cell_12 = cell_population.GetCellUsingLocationIndex(12);
@@ -153,7 +153,7 @@ public:
     {
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 25 cells, one for each node
         std::vector<unsigned> location_indices;
@@ -179,11 +179,11 @@ public:
         p_new_cell->SetBirthTime(-1);
 
         // Set the division rule for our population to be the shoving division rule
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new ShovingCaBasedDivisionRule<2>());
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new ShovingCaBasedDivisionRule<2>());
         cell_population.SetCaBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population and try to add new cell by dividing cell at site 0;
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
 
         // Select central cell
         CellPtr p_cell_12 = cell_population.GetCellUsingLocationIndex(12);
@@ -238,7 +238,7 @@ public:
     {
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 4, 0, 0,1,0,0,false, true); // Periodic in x
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 6 cells in the bottom 2 rows
         std::vector<unsigned> location_indices;
@@ -275,11 +275,11 @@ public:
         p_new_cell->SetBirthTime(-1);
 
         // Set the division rule for our population to be the cryot shoving division rule
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new CryptShovingCaBasedDivisionRule());
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new CryptShovingCaBasedDivisionRule());
         cell_population.SetCaBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population and try to add new cell by dividing cell at site 0;
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
 
         // Select left cell in bottom row
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
@@ -345,7 +345,7 @@ public:
     {
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0, 1, 0, 0, false, true); // x periodic
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 9 cells, one for each node
         std::vector<unsigned> location_indices;
@@ -371,11 +371,11 @@ public:
         p_new_cell->SetBirthTime(-1);
 
         // Set the division rule for our population to be the crypt shoving division rule
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new CryptShovingCaBasedDivisionRule());
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new CryptShovingCaBasedDivisionRule());
         cell_population.SetCaBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population and try to add new cell by dividing cell at site 0
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
 
         // Select bottom left cell
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);

@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTNUMERICALMETHOD_HPP_
 #define ABSTRACTNUMERICALMETHOD_HPP_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "Identifiable.hpp"
@@ -82,10 +82,10 @@ protected:
     AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* mpCellPopulation;
 
     /** Pointer to the force collection to apply*/
-    std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* mpForceCollection;
+    std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* mpForceCollection;
 
     /** Pointer to the boundary conditions to apply*/
-    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* mpBoundaryConditions;
+    std::vector<std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* mpBoundaryConditions;
 
     /**
      * Whether the numerical method uses an adaptive time step.
@@ -180,14 +180,14 @@ public:
      *
      * @param pForces Pointer to the simulation's force collection
      */
-    void SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces);
+    void SetForceCollection(std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces);
 
     /**
      * Sets the pointer to the boundary conditions applied by this method
      *
      * @param pBoundaryConditions Pointer to the simulation's boundary condition collection
      */
-    void SetBoundaryConditions(std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* pBoundaryConditions);
+    void SetBoundaryConditions(std::vector<std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* pBoundaryConditions);
 
     /**
      * Set mUseAdaptiveTimestep.

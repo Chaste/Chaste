@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef RANDOMNUMBERGENERATORS_HPP_
 #define RANDOMNUMBERGENERATORS_HPP_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/version.hpp>
 #include <sstream>
 
@@ -211,7 +211,7 @@ public:
      * @param rValues  the initial values and the output permutation of shuffled values.  Must be non-empty
      */
     template <class T>
-    void Shuffle(std::vector<boost::shared_ptr<T> >& rValues)
+    void Shuffle(std::vector<std::shared_ptr<T> >& rValues)
     {
         unsigned num = rValues.size();
         if (num == 0)
@@ -222,7 +222,7 @@ public:
         {
             // Pick a random integer from {0,..,end}
             unsigned k = RandomNumberGenerator::Instance()->randMod(end + 1);
-            boost::shared_ptr<T> temp = rValues[end];
+            std::shared_ptr<T> temp = rValues[end];
             rValues[end] = rValues[k];
             rValues[k] = temp;
         }

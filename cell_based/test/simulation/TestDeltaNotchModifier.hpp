@@ -81,7 +81,7 @@ public:
 
         // Create a small 2D NodeBasedCellPopulation
         HoneycombMeshGenerator generator(2, 2, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -375,7 +375,7 @@ public:
 
         // Create a regular vertex mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
 
         // Initial condition for delta, notch
@@ -420,8 +420,8 @@ public:
 
         // Testing addition of topology update simulation modifier
         simulator.AddTopologyUpdateSimulationModifier(p_modifier);
-        std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetTopologyUpdateSimulationModifiers()->begin();
-        TS_ASSERT(boost::static_pointer_cast<DeltaNotchTrackingModifier<2> >(*iter));
+        std::vector<std::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetTopologyUpdateSimulationModifiers()->begin();
+        TS_ASSERT(std::static_pointer_cast<DeltaNotchTrackingModifier<2> >(*iter));
         TS_ASSERT_EQUALS(simulator.GetTopologyUpdateSimulationModifiers()->size(), 1u);
 
         // Create force law and add to simulation
@@ -447,7 +447,7 @@ public:
 
         // Create a 2D honeycomb mesh
         HoneycombMeshGenerator generator(2, 2, 2);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();//**Changed**//
 
         // Initial condition for delta, notch
@@ -510,7 +510,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Initial condition for delta, notch
         std::vector<double> initial_conditions;
@@ -568,7 +568,7 @@ public:
 
         // Create cell population
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<unsigned> location_indices;
         location_indices.push_back(0);
@@ -642,7 +642,7 @@ public:
         {
             // Create a regular 2D VertexBasedCellPopulation
             HoneycombVertexMeshGenerator generator(2, 2);
-            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+            std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
             // Initial condition for delta, notch
             std::vector<double> initial_conditions;
@@ -766,7 +766,7 @@ public:
         {
             // Create a regular 2D VertexBasedCellPopulation
             HoneycombVertexMeshGenerator generator(2, 2);
-            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+            std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
             // Initial condition for delta, notch
             std::vector<double> initial_conditions;
@@ -918,7 +918,7 @@ public:
         {
             // Create a regular 2D VertexBasedCellPopulation
             HoneycombVertexMeshGenerator generator(2, 2);
-            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+            std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
             // Initial condition for delta, notch
             std::vector<double> initial_conditions;

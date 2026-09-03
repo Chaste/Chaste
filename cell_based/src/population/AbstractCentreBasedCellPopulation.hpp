@@ -95,7 +95,7 @@ protected:
     /** A pointer to a division rule that is used to generate the locations of daughter cells when a cell divides.
      * This is a specialisation for centre-based models.
      */
-    boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > mpCentreBasedDivisionRule;
+    std::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > mpCentreBasedDivisionRule;
 
     /**
      * Constructor that just takes in a mesh.
@@ -298,14 +298,14 @@ public:
     /**
      * @return The division rule that is currently being used.
      */
-    boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > GetCentreBasedDivisionRule();
+    std::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > GetCentreBasedDivisionRule();
 
     /**
      * Set the division rule for this population.
      *
      * @param pCentreBasedDivisionRule  pointer to the new division rule
      */
-    void SetCentreBasedDivisionRule(boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > pCentreBasedDivisionRule);
+    void SetCentreBasedDivisionRule(std::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > pCentreBasedDivisionRule);
 
     /**
      * Overridden OutputCellPopulationParameters() method.

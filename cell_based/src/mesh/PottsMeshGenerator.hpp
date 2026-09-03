@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "PottsMesh.hpp"
 
 /**
@@ -55,7 +55,7 @@ class PottsMeshGenerator
 protected:
 
     /** A pointer to the mesh this class creates */
-    boost::shared_ptr<PottsMesh<DIM> > mpMesh;
+    std::shared_ptr<PottsMesh<DIM> > mpMesh;
 
 public:
 
@@ -106,7 +106,7 @@ public:
     /**
      * @return a Cuboid or rectangular Potts mesh.
      */
-    virtual boost::shared_ptr<PottsMesh<DIM> > GetMesh();
+    virtual std::shared_ptr<PottsMesh<DIM> > GetMesh();
 };
 
 #endif /*POTTSMESHGENERATOR_HPP_*/

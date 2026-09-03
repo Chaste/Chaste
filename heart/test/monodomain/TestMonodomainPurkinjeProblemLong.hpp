@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class NonPurkinjeCellFactory3d : public AbstractCardiacCellFactory<3>
 {
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     NonPurkinjeCellFactory3d()
@@ -86,7 +86,7 @@ public:
 class PurkinjeCellFactory3d : public AbstractPurkinjeCellFactory<3> //inherits from different base
 {
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     PurkinjeCellFactory3d()

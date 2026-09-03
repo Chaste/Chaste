@@ -36,10 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DeltaNotchInteriorSrnModel.hpp"
 #include "DeltaNotchEdgeSrnModel.hpp"
 
-DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
         : AbstractOdeSrnModel(2, pOdeSolver)
 {
-    if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
+    if (mpOdeSolver == std::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
 #ifdef CHASTE_CVODE
         mpOdeSolver = CellCycleModelOdeSolver<DeltaNotchInteriorSrnModel, CvodeAdaptor>::Instance();

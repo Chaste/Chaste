@@ -83,7 +83,7 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(AbstractCellPop
 
         for (unsigned i = 0 ; i  < p_cell_edge_model->GetNumEdgeSrn(); i++)
         {
-            auto p_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_model->GetEdgeSrn(i));
+            auto p_model = std::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_model->GetEdgeSrn(i));
             double edge_delta = p_model->GetDelta();
             double edge_notch = p_model->GetNotch();
 
@@ -97,7 +97,7 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(AbstractCellPop
         /* Interior delta notch collection */
         //Filling interior delta/notch value, interior model must be specified for this edge-interior example
         assert(p_cell_edge_model->GetInteriorSrn() != nullptr);
-        auto p_interior_model = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_edge_model->GetInteriorSrn());
+        auto p_interior_model = std::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_edge_model->GetInteriorSrn());
 
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
         cell_iter->GetCellData()->SetItem("interior delta", p_interior_model->GetDelta());

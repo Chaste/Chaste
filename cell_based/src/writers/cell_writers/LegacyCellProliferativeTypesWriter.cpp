@@ -60,7 +60,7 @@ double LegacyCellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataFo
     if (pCell->HasCellProperty<CellLabel>())
     {
         CellPropertyCollection collection = pCell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+        std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(collection.GetProperty());
         colour = p_label->GetColour();
     }
     if (pCell->HasCellProperty<ApoptoticCellProperty>() || pCell->HasApoptosisBegun())
@@ -85,7 +85,7 @@ void LegacyCellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellP
     if (pCell->HasCellProperty<CellLabel>())
     {
         CellPropertyCollection collection = pCell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+        std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(collection.GetProperty());
         colour = p_label->GetColour();
     }
     if (pCell->HasCellProperty<ApoptoticCellProperty>() || pCell->HasApoptosisBegun())

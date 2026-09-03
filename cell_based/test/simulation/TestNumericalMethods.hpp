@@ -85,7 +85,7 @@ public:
             unsigned cells_up = 5;
 
             HoneycombMeshGenerator generator(cells_across, cells_up, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+            std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
             // Create cells
             std::vector<CellPtr> cells;
@@ -96,7 +96,7 @@ public:
             MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
             // Create a force collection
-            std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+            std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
             MAKE_PTR(PopulationTestingForce<2>, p_test_force);
             force_collection.push_back(p_test_force);
 
@@ -154,7 +154,7 @@ public:
         unsigned cells_up = 5;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -165,12 +165,12 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
         // Create a Boundary condition collection
-        std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<2,2> > > boundary_condition_collection;
+        std::vector<std::shared_ptr<AbstractCellPopulationBoundaryCondition<2,2> > > boundary_condition_collection;
         c_vector<double,2> point = zero_vector<double>(2);
         point(1) = 0.5;
         c_vector<double,2> normal = zero_vector<double>(2);
@@ -229,7 +229,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
@@ -269,7 +269,7 @@ public:
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
         HoneycombMeshGenerator generator(3, 3, 1);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create cells
@@ -281,7 +281,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
@@ -324,7 +324,7 @@ public:
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
         HoneycombMeshGenerator generator(3, 3, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
@@ -339,7 +339,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
@@ -379,7 +379,7 @@ public:
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
         HoneycombMeshGenerator generator(3, 3, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
@@ -394,7 +394,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
@@ -435,7 +435,7 @@ public:
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
         HoneycombMeshGenerator generator(3, 3, 1);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
@@ -453,7 +453,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
@@ -492,7 +492,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Impose a larger cell rearrangement threshold so that motion is uninhibited (see #1376)
         p_mesh->SetCellRearrangementThreshold(0.1);
@@ -507,7 +507,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 

@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "CellLabel.hpp"
 #include "ApcOneHitCellMutationState.hpp"
@@ -87,9 +87,9 @@ public:
 
     void TestCellPropertyRegistry()
     {
-        boost::shared_ptr<AbstractCellProperty> p_property1(
+        std::shared_ptr<AbstractCellProperty> p_property1(
                 CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_property2(
+        std::shared_ptr<AbstractCellProperty> p_property2(
                 CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         TS_ASSERT(p_property1 == p_property2);
@@ -97,7 +97,7 @@ public:
         TS_ASSERT_EQUALS(p_property1->IsSubType<AbstractCellMutationState>(), true);
         TS_ASSERT_EQUALS(p_property1->IsType<CellLabel>(), false);
 
-        std::vector<boost::shared_ptr<AbstractCellProperty> > properties =
+        std::vector<std::shared_ptr<AbstractCellProperty> > properties =
             CellPropertyRegistry::Instance()->rGetAllCellProperties();
         TS_ASSERT_EQUALS(properties.size(), 1u);
         TS_ASSERT(properties[0] == p_property1);
@@ -128,7 +128,7 @@ public:
         p_instance->Clear();
         p_instance->Get<ApcOneHitCellMutationState>();
 
-        std::vector<boost::shared_ptr<AbstractCellProperty> > property_ordering;
+        std::vector<std::shared_ptr<AbstractCellProperty> > property_ordering;
         property_ordering.push_back(p_instance->Get<WildTypeCellMutationState>());
         property_ordering.push_back(p_instance->Get<ApcOneHitCellMutationState>());
         property_ordering.push_back(p_instance->Get<ApoptoticCellProperty>());
@@ -140,12 +140,12 @@ public:
 
         TS_ASSERT_THROWS_THIS(p_instance->SpecifyOrdering(property_ordering), "An ordering has already been specified.");
 
-        std::vector<boost::shared_ptr<AbstractCellProperty> > properties = p_instance->rGetAllCellProperties();
+        std::vector<std::shared_ptr<AbstractCellProperty> > properties = p_instance->rGetAllCellProperties();
         TS_ASSERT_EQUALS(properties.size(), 4u);
         TS_ASSERT_EQUALS(properties[0]->IsType<WildTypeCellMutationState>(), true);
         TS_ASSERT_EQUALS(properties[1]->IsType<ApcOneHitCellMutationState>(), true);
         TS_ASSERT_EQUALS(properties[2]->IsType<ApoptoticCellProperty>(), true);
-        TS_ASSERT_EQUALS((boost::static_pointer_cast<ApoptoticCellProperty>(properties[2]))->GetColour(), 6u);
+        TS_ASSERT_EQUALS((std::static_pointer_cast<ApoptoticCellProperty>(properties[2]))->GetColour(), 6u);
         TS_ASSERT_EQUALS(properties[3]->IsType<CellLabel>(), true);
         p_instance->Clear();
     }
@@ -202,7 +202,7 @@ public:
 
         // Save
         {
-            boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+            std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
 
             TS_ASSERT_EQUALS(p_label->IsType<CellLabel>(), true);
             TS_ASSERT_EQUALS(p_label->IsSubType<AbstractCellProperty>(), true);
@@ -221,7 +221,7 @@ public:
             delete p_registry;
         }
 
-        // Restore boost::shared_ptr to cell property
+        // Restore std::shared_ptr to cell property
         {
             CellPropertyRegistry::Instance()->Clear();
 
@@ -234,7 +234,7 @@ public:
 
             input_arch >> p_registry;
 
-            boost::shared_ptr<AbstractCellProperty> p_label = p_registry->Get<CellLabel>();
+            std::shared_ptr<AbstractCellProperty> p_label = p_registry->Get<CellLabel>();
 
             TS_ASSERT_EQUALS(p_label->IsType<CellLabel>(), true);
             TS_ASSERT_EQUALS(p_label->IsSubType<AbstractCellProperty>(), true);

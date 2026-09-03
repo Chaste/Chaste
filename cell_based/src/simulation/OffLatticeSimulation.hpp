@@ -95,13 +95,13 @@ private:
 protected:
 
     /** The mechanics used to determine the new location of the cells, a list of the forces. */
-    std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > > mForceCollection;
+    std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > > mForceCollection;
 
     /** List of boundary conditions. */
-    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > > mBoundaryConditions;
+    std::vector<std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > > mBoundaryConditions;
 
     /** The numerical method to use in this simulation. Defaults to the explicit forward Euler method. */
-    boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
+    std::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
 
     /** Variable for the allowed number of adaptive time step changes before outputting underlying exception. */
     unsigned mMaxAdaptiveTimeSteps = 5;
@@ -158,7 +158,7 @@ public:
      *
      * @param pForce pointer to a force law
      */
-    void AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce);
+    void AddForce(std::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce);
 
     /**
      * Remove all the forces.
@@ -170,7 +170,7 @@ public:
      *
      * @param pBoundaryCondition pointer to a boundary condition
      */
-    void AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> >  pBoundaryCondition);
+    void AddCellPopulationBoundaryCondition(std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> >  pBoundaryCondition);
 
     /**
      * Method to remove all the cell population boundary conditions
@@ -182,12 +182,12 @@ public:
      *
      * @param pNumericalMethod pointer to a numerical method object
      */
-    void SetNumericalMethod(boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod);
+    void SetNumericalMethod(std::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod);
 
     /**
      * @return the current numerical method.
      */
-    const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > GetNumericalMethod() const;
+    const std::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > GetNumericalMethod() const;
 
     /**
      * Set the maximum number of adaptive timesteps that can be attempted before outputting the underlying exception.
@@ -222,7 +222,7 @@ public:
      *
      * @return mForceCollection the vector of pointers to forces attached to this simulation
      */
-    const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& rGetForceCollection() const;
+    const std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& rGetForceCollection() const;
 };
 
 // Serialization for Boost >= 1.36

@@ -53,8 +53,8 @@ class TestNhsModelWithBackwardSolver : public CxxTest::TestSuite
 private:
     double GetSampleCaIValue()
     {
-        boost::shared_ptr<EulerIvpOdeSolver> p_euler_solver(new EulerIvpOdeSolver);
-        boost::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
+        std::shared_ptr<EulerIvpOdeSolver> p_euler_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
         CellLuoRudy1991FromCellML lr91(p_euler_solver, p_zero_stimulus);
         return lr91.rGetStateVariables()[lr91.GetStateVariableIndex("cytosolic_calcium_concentration")];
     }

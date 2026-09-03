@@ -296,25 +296,25 @@ void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rP
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
+void NodeBasedCellPopulation<DIM>::AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+void NodeBasedCellPopulation<DIM>::AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
+void NodeBasedCellPopulation<DIM>::AcceptPopulationEventWriter(std::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
 {
     pPopulationEventWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
+void NodeBasedCellPopulation<DIM>::AcceptCellWriter(std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -721,7 +721,7 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentC
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AddMovedCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode)
+void NodeBasedCellPopulation<DIM>::AddMovedCell(CellPtr pCell, std::shared_ptr<Node<DIM> > pNode)
 {
     // Create a new node
     mpNodesOnlyMesh->AddMovedNode(pNode);
@@ -761,17 +761,17 @@ void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
 
     if (!PetscTools::AmTopMost())
     {
-        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
+        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
         mpCellsRecvRight = mRightCommunicator.SendRecvObject(p_cells_right, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
     }
     if (!PetscTools::AmMaster())
     {
-        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
+        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mpCellsRecvLeft = mLeftCommunicator.SendRecvObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
     }
     else if ( mpNodesOnlyMesh->GetIsPeriodicAcrossProcsFromBoxCollection()  )
     {
-        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
+        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mpCellsRecvLeft = mLeftCommunicator.SendRecvObject(p_cells_left, PetscTools::GetNumProcs() - 1, mCellCommunicationTag, PetscTools::GetNumProcs() - 1, mCellCommunicationTag, status);
 }
 
@@ -779,7 +779,7 @@ void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
     // otherwise there will be a cyclic send-receive and it will stall
     if ( PetscTools::AmTopMost() && mpNodesOnlyMesh->GetIsPeriodicAcrossProcsFromBoxCollection() )
     {
-        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
+        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
         mpCellsRecvRight = mRightCommunicator.SendRecvObject(p_cells_right, 0, mCellCommunicationTag, 0, mCellCommunicationTag, status);
     }
 }
@@ -802,26 +802,26 @@ void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
 {
     if (!PetscTools::AmTopMost())
     {
-        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
+        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
         unsigned tag = CalculateMessageTag( PetscTools::GetMyRank(), PetscTools::GetMyRank()+1 );
         mRightCommunicator.ISendObject(p_cells_right, PetscTools::GetMyRank() + 1, tag);
     }
     if (!PetscTools::AmMaster())
     {
         unsigned tag = CalculateMessageTag( PetscTools::GetMyRank(), PetscTools::GetMyRank()-1 );
-        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
+        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mLeftCommunicator.ISendObject(p_cells_left, PetscTools::GetMyRank() - 1, tag);
     }
     else if ( mpNodesOnlyMesh->GetIsPeriodicAcrossProcsFromBoxCollection() )
     {
         unsigned tag = CalculateMessageTag( PetscTools::GetMyRank(), PetscTools::GetNumProcs()-1 );
-        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
+        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mLeftCommunicator.ISendObject(p_cells_left, PetscTools::GetNumProcs()-1, tag);
     }
     if ( PetscTools::AmTopMost() && mpNodesOnlyMesh->GetIsPeriodicAcrossProcsFromBoxCollection() )
     {
         unsigned tag = CalculateMessageTag( PetscTools::GetMyRank(), 0 );
-        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
+        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
         mRightCommunicator.ISendObject(p_cells_right, 0, tag);
     }
 
@@ -904,7 +904,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
              ++iter)
         {
             // Make a shared pointer to the node to make sure it is correctly deleted.
-            boost::shared_ptr<Node<DIM> > p_node(iter->second);
+            std::shared_ptr<Node<DIM> > p_node(iter->second);
             AddMovedCell(iter->first, p_node);
         }
     }
@@ -914,7 +914,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
              iter != mpCellsRecvRight->end();
              ++iter)
         {
-            boost::shared_ptr<Node<DIM> > p_node(iter->second);
+            std::shared_ptr<Node<DIM> > p_node(iter->second);
             AddMovedCell(iter->first, p_node);
         }
     }
@@ -1011,7 +1011,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
                 iter != mpCellsRecvLeft->end();
                 ++iter)
         {
-            boost::shared_ptr<Node<DIM> > p_node(iter->second);
+            std::shared_ptr<Node<DIM> > p_node(iter->second);
             AddHaloCell(iter->first, p_node);
 
         }
@@ -1022,7 +1022,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
                 iter != mpCellsRecvRight->end();
                 ++iter)
         {
-            boost::shared_ptr<Node<DIM> > p_node(iter->second);
+            std::shared_ptr<Node<DIM> > p_node(iter->second);
             AddHaloCell(iter->first, p_node);
         }
     }
@@ -1031,7 +1031,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AddHaloCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode)
+void NodeBasedCellPopulation<DIM>::AddHaloCell(CellPtr pCell, std::shared_ptr<Node<DIM> > pNode)
 {
     mHaloCells.push_back(pCell);
 

@@ -136,7 +136,7 @@ public:
          * to ghost nodes).
          */
         CylindricalHoneycombMeshGenerator generator(6, 9, 2);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         /*
@@ -218,7 +218,7 @@ public:
         /* First we create a cylindrical mesh, and get the cell location indices, exactly as before.
          * Note that time is re-initialized to zero and random number generator is re-seeded to zero in the `AbstractCellBasedTestSuite`.*/
         CylindricalHoneycombMeshGenerator generator(6, 9, 2);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 

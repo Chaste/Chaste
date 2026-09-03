@@ -123,7 +123,7 @@ class ExceptionStimulusCellFactory : public AbstractCardiacCellFactory<ELEMENT_D
 {
 protected:
     /** The stimulus to apply at stimulated nodes */
-    boost::shared_ptr<ExceptionStimulus> mpStimulus;
+    std::shared_ptr<ExceptionStimulus> mpStimulus;
 
 public:
     /**
@@ -151,7 +151,7 @@ class DelayedTotalStimCellFactory : public AbstractCardiacCellFactory<1>
 {
 private:
     // define a new stimulus
-    boost::shared_ptr<SimpleStimulus> mpIntraStimulus;
+    std::shared_ptr<SimpleStimulus> mpIntraStimulus;
 
 public:
     DelayedTotalStimCellFactory(double mag)
@@ -590,7 +590,7 @@ public:
          * output or can replace it.
          */
          // Duplicate this with a single trace at node 5
-        boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5, 0.1));
+        std::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5, 0.1));
         p_bidomain_problem->AddOutputModifier(trace_5);
 
         // for coverage:
@@ -980,8 +980,8 @@ public:
 
         {
             //MultipleVariablesBidomain.xml uses FaberRudy.  Interrogate a model to get all the state variables
-            boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
-            boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+            std::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
+            std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
             CellFaberRudy2000FromCellML temporary_fr2000_ode_system(p_solver, p_stimulus);
             TS_ASSERT_EQUALS(temporary_fr2000_ode_system.rGetStateVariableNames().size(), 25u);
 
@@ -1099,7 +1099,7 @@ public:
         BidomainProblem<1> bidomain_problem( &cell_factory );
 
         // Single trace at node 5
-        boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5u, 0.1));
+        std::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5u, 0.1));
         bidomain_problem.AddOutputModifier(trace_5);
 
         bidomain_problem.SetMesh(&mesh);

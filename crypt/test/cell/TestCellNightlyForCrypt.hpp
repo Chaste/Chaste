@@ -77,8 +77,8 @@ public:
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
-        boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
-        boost::shared_ptr<AbstractCellProperty> p_transit_type(new TransitCellProliferativeType);
+        std::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
+        std::shared_ptr<AbstractCellProperty> p_transit_type(new TransitCellProliferativeType);
         CellPtr p_wnt_cell(new Cell(p_apc1, p_cell_cycle_model1));
         p_wnt_cell->SetCellProliferativeType(p_transit_type);
         p_wnt_cell->InitialiseCellCycleModel();
@@ -151,8 +151,8 @@ public:
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
-        boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
-        boost::shared_ptr<AbstractCellProperty> p_transit_type(new TransitCellProliferativeType);
+        std::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+        std::shared_ptr<AbstractCellProperty> p_transit_type(new TransitCellProliferativeType);
         CellPtr p_wnt_cell(new Cell(p_bcat1, p_cell_cycle_model1));
         p_wnt_cell->SetCellProliferativeType(p_transit_type);
         p_wnt_cell->InitialiseCellCycleModel();
@@ -226,17 +226,17 @@ public:
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
-        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
-        boost::shared_ptr<AbstractCellProperty> p_transit_type(new TransitCellProliferativeType);
+        std::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        std::shared_ptr<AbstractCellProperty> p_transit_type(new TransitCellProliferativeType);
         CellPtr p_wnt_cell(new Cell(p_apc2, p_cell_cycle_model1));
         p_wnt_cell->SetCellProliferativeType(p_transit_type);
         p_wnt_cell->InitialiseCellCycleModel();
 
-        boost::shared_ptr<AbstractCellMutationState> p_this_state = p_wnt_cell->GetMutationState();
+        std::shared_ptr<AbstractCellMutationState> p_this_state = p_wnt_cell->GetMutationState();
 
         TS_ASSERT_EQUALS(p_this_state->IsType<ApcTwoHitCellMutationState>(), true);
 
-        boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
 
         p_wnt_cell->SetMutationState(p_apc1);
 

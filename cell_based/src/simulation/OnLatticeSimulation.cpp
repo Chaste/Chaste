@@ -52,7 +52,7 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
 }
 
 template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
+void OnLatticeSimulation<DIM>::AddUpdateRule(std::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
     // This static_cast is fine, since otherwise an exception would have been thrown in the constructor
     static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
@@ -92,7 +92,7 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
     // This static_cast is fine, since otherwise an exception would have been thrown in the constructor
     auto collection = static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->GetUpdateRuleCollection();
 
-    for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter = collection.begin();
+    for (typename std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter = collection.begin();
          iter != collection.end();
          ++iter)
     {

@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "BuskeAdhesiveForce.hpp"
 #include "BuskeElasticForce.hpp"
@@ -236,7 +236,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(2, 1, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -298,7 +298,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(2, 1, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;

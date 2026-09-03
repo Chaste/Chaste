@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCRYPTCELLSGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "HoneycombMeshGenerator.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "CryptCellsGenerator.hpp"
@@ -61,7 +61,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -119,7 +119,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -182,7 +182,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -212,7 +212,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -246,7 +246,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -269,7 +269,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -305,7 +305,7 @@ public:
           unsigned crypt_width = 4;
           unsigned crypt_height = 6;
           CylindricalHoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height);
-          boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = mesh_generator.GetCylindricalMesh();
+          std::shared_ptr<Cylindrical2dVertexMesh> p_mesh = mesh_generator.GetCylindricalMesh();
 
           double y0 = 1.0;
           double y1 = 2.0;
@@ -364,7 +364,7 @@ public:
           unsigned crypt_width = 4;
           unsigned crypt_height = 6;
           CylindricalHoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height);
-          boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = mesh_generator.GetCylindricalMesh();
+          std::shared_ptr<Cylindrical2dVertexMesh> p_mesh = mesh_generator.GetCylindricalMesh();
 
           // Create cells
           std::vector<CellPtr> cells;

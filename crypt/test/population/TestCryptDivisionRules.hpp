@@ -92,11 +92,11 @@ public:
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Set the division rule for our population to be the random direction division rule
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<1,1> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<1,1>());
+        std::shared_ptr<AbstractCentreBasedDivisionRule<1,1> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<1,1>());
         cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<1,1> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
+        std::shared_ptr<AbstractCentreBasedDivisionRule<1,1> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
 
         std::pair<c_vector<double, 1>, c_vector<double, 1> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
@@ -130,11 +130,11 @@ public:
         CellPtr p_cell0 = *(cell_population.Begin());
 
         // Set the division rule for our population to be the random direction division rule
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<2,2>());
+        std::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<2,2>());
         cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
+        std::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
 
         std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
@@ -163,11 +163,11 @@ public:
         CellPtr p_cell0 = *(cell_population.Begin());
 
         // Set the division rule for our population to be the random direction division rule
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<3,3> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<3,3>());
+        std::shared_ptr<AbstractCentreBasedDivisionRule<3,3> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<3,3>());
         cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<3,3> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
+        std::shared_ptr<AbstractCentreBasedDivisionRule<3,3> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
 
         TS_ASSERT_THROWS_THIS(p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population),
             "CryptCentreBasedDivisionRule is not implemented for SPACE_DIM == 3");
@@ -199,11 +199,11 @@ public:
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Set the division rule for our population to be the random direction division rule
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new CryptVertexBasedDivisionRule<2>());
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new CryptVertexBasedDivisionRule<2>());
         cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
 
         c_vector<double, 2> division_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
         TS_ASSERT_DELTA(division_axis[0], 1.0, 1e-4);
@@ -220,7 +220,7 @@ public:
 
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 4, 0, 0,1,0,0,false, true); // Periodic in x
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 6 cells in the bottom 2 rows
         std::vector<unsigned> location_indices;
@@ -257,11 +257,11 @@ public:
         p_new_cell->SetBirthTime(-1);
 
         // Set the division rule for our population to be the cryot shoving division rule
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new CryptShovingCaBasedDivisionRule());
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new CryptShovingCaBasedDivisionRule());
         cell_population.SetCaBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population and try to add new cell by dividing cell at site 0;
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
 
         // Select left cell in bottom row
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
@@ -329,7 +329,7 @@ public:
 
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0, 1, 0, 0, false, true); // x periodic
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 9 cells, one for each node
         std::vector<unsigned> location_indices;
@@ -355,11 +355,11 @@ public:
         p_new_cell->SetBirthTime(-1);
 
         // Set the division rule for our population to be the crypt shoving division rule
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new CryptShovingCaBasedDivisionRule());
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new CryptShovingCaBasedDivisionRule());
         cell_population.SetCaBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population and try to add new cell by dividing cell at site 0
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
 
         // Select bottom left cell
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
@@ -375,7 +375,7 @@ public:
         std::string archive_file = "CryptCentreBasedDivisionRule.arch";
 
         {
-            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule(new CryptCentreBasedDivisionRule<2,2>());
+            std::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule(new CryptCentreBasedDivisionRule<2,2>());
 
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
@@ -384,7 +384,7 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule;
+            std::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule;
 
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
@@ -402,7 +402,7 @@ public:
         std::string archive_file = "CryptVertexBasedDivisionRule.arch";
 
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new CryptVertexBasedDivisionRule<2>());
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new CryptVertexBasedDivisionRule<2>());
 
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
@@ -411,7 +411,7 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
 
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();

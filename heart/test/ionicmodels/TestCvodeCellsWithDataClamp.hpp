@@ -85,8 +85,8 @@ private:
 
 
 
-        boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
-        boost::shared_ptr<AbstractStimulusFunction> p_empty_stimulus;
+        std::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
+        std::shared_ptr<AbstractStimulusFunction> p_empty_stimulus;
 
         // N.B. Because we use the Shannon model as a lot of examples,
         // here it is actually a Shannon->WithModifiers->WithDataClamp->CvodeCell
@@ -220,7 +220,7 @@ private:
     }
 
 #ifdef CHASTE_CVODE
-    boost::shared_ptr<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp >> mpModel;
+    std::shared_ptr<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp >> mpModel;
 #endif
 
 public:
@@ -269,7 +269,7 @@ public:
             TS_ASSERT_EQUALS(mpModel->HasModifier("membrane_slow_delayed_rectifier_potassium_current"), true);
             TS_ASSERT_DELTA(mpModel->GetModifier("membrane_slow_delayed_rectifier_potassium_current")->Calc(0,1), 0.0, 1e-12);
 
-            boost::shared_ptr<AbstractModifier> p_fixed(new FixedModifier(fixed_modifier_value));
+            std::shared_ptr<AbstractModifier> p_fixed(new FixedModifier(fixed_modifier_value));
             mpModel->SetModifier("membrane_slow_delayed_rectifier_potassium_current", p_fixed);
 
             TS_ASSERT_DELTA(mpModel->GetModifier("membrane_slow_delayed_rectifier_potassium_current")->Calc(0,1), fixed_modifier_value, 1e-12);
@@ -301,7 +301,7 @@ public:
 
             AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* p_modifiers_cell = static_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>*>(p_cell);
             TS_ASSERT_EQUALS(p_modifiers_cell->HasModifier("membrane_slow_delayed_rectifier_potassium_current"),true);
-            boost::shared_ptr<AbstractModifier> p_modifier = p_modifiers_cell->GetModifier("membrane_slow_delayed_rectifier_potassium_current");
+            std::shared_ptr<AbstractModifier> p_modifier = p_modifiers_cell->GetModifier("membrane_slow_delayed_rectifier_potassium_current");
             TS_ASSERT_DELTA(p_modifier->Calc(2 /*param*/,3 /*time*/), fixed_modifier_value, 1e-12); // Fixed modifier returns 56 from above..
 
             // Check data clamp was archived correctly.

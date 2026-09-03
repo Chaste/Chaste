@@ -80,14 +80,14 @@ public:
         OutputFileHandler file_handler1 = OutputFileHandler("TestVtkSceneWithMeshBasedPopulation/2d/");
 
         PottsMeshGenerator<2> generator(50, 2, 4, 50, 2, 4);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
-        auto  p_cell_population = boost::make_shared<PottsBasedCellPopulation<2> >(*p_mesh, cells);
+        auto  p_cell_population = std::make_shared<PottsBasedCellPopulation<2> >(*p_mesh, cells);
         p_cell_population->SetTemperature(0.1);
         p_cell_population->SetNumSweepsPerTimestep(1);
 
@@ -97,14 +97,14 @@ public:
         simulator.SetDt(0.1);
         simulator.SetSamplingTimestepMultiple(10);
 
-        auto p_scene = boost::make_shared<VtkScene<2> >();
+        auto p_scene = std::make_shared<VtkScene<2> >();
         p_scene->SetCellPopulation(p_cell_population);
         p_scene->SetIsInteractive(true);
         p_scene->SetSaveAsImages(false);
         p_scene->GetCellPopulationActorGenerator()->SetShowPottsMeshEdges(true);
         p_scene->SetOutputFilePath(file_handler1.GetOutputDirectoryFullPath()+"/cell_population");
 
-        auto p_scene_modifier = boost::make_shared<VtkSceneModifier<2> >();
+        auto p_scene_modifier = std::make_shared<VtkSceneModifier<2> >();
         p_scene_modifier->SetVtkScene(p_scene);
         p_scene_modifier->SetUpdateFrequency(10);
         p_scene->Start();
@@ -124,14 +124,14 @@ public:
         OutputFileHandler file_handler1 = OutputFileHandler("TestVtkSceneWithMeshBasedPopulation/3d/");
 
         PottsMeshGenerator<3> generator(50, 2, 4, 50, 2, 4, 50, 2, 4);
-        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
-        auto p_cell_population = boost::make_shared<PottsBasedCellPopulation<3> >(*p_mesh, cells);
+        auto p_cell_population = std::make_shared<PottsBasedCellPopulation<3> >(*p_mesh, cells);
         p_cell_population->SetTemperature(0.1);
         p_cell_population->SetNumSweepsPerTimestep(1);
 
@@ -141,7 +141,7 @@ public:
         simulator.SetDt(0.1);
         simulator.SetSamplingTimestepMultiple(100);
 
-        auto p_scene = boost::make_shared<VtkScene<3> >();
+        auto p_scene = std::make_shared<VtkScene<3> >();
         p_scene->SetCellPopulation(p_cell_population);
         p_scene->SetIsInteractive(true);
         p_scene->SetSaveAsImages(false);
@@ -149,7 +149,7 @@ public:
         p_scene->GetCellPopulationActorGenerator()->SetShowPottsMeshOutlines(true);
         p_scene->SetOutputFilePath(file_handler1.GetOutputDirectoryFullPath()+"/cell_population");
 
-        auto p_scene_modifier = boost::make_shared<VtkSceneModifier<3> >();
+        auto p_scene_modifier = std::make_shared<VtkSceneModifier<3> >();
         p_scene_modifier->SetVtkScene(p_scene);
         p_scene->Start();
 

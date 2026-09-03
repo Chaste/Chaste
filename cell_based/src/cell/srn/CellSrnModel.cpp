@@ -48,12 +48,12 @@ CellSrnModel::CellSrnModel(const CellSrnModel &rModel)
      */
     if (rModel.mpInteriorSrnModel != nullptr)
     {
-        this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.GetInteriorSrn()->CreateSrnModel()));
+        this->SetInteriorSrnModel(std::shared_ptr<AbstractSrnModel>(rModel.GetInteriorSrn()->CreateSrnModel()));
     }
     mIsEdgeBasedModel = rModel.HasEdgeModel();
     for (auto iter : rModel.mEdgeSrnModels)
     {
-        mEdgeSrnModels.push_back(boost::shared_ptr<AbstractSrnModel>(iter->CreateSrnModel()));
+        mEdgeSrnModels.push_back(std::shared_ptr<AbstractSrnModel>(iter->CreateSrnModel()));
     }
 }
 

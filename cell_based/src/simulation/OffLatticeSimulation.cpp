@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OffLatticeSimulation.hpp"
 
-#include <boost/make_shared.hpp>
+#include <memory>
 
 #include "CellBasedEventHandler.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
@@ -54,7 +54,7 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce)
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddForce(std::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce)
 {
     mForceCollection.push_back(pForce);
 }
@@ -66,7 +66,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllForces()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > pBoundaryCondition)
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddCellPopulationBoundaryCondition(std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > pBoundaryCondition)
 {
     mBoundaryConditions.push_back(pBoundaryCondition);
 }
@@ -78,19 +78,19 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllCellPopulationBoundar
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetNumericalMethod(boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod)
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetNumericalMethod(std::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod)
 {
     mpNumericalMethod = pNumericalMethod;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetNumericalMethod() const
+const std::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetNumericalMethod() const
 {
     return mpNumericalMethod;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::rGetForceCollection() const
+const std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::rGetForceCollection() const
 {
     return mForceCollection;
 }
@@ -186,7 +186,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::ApplyBoundaries(std::map<Node<SPACE_DIM>*,c_vector<double, SPACE_DIM> > oldNodeLoctions)
 {
     // Apply any boundary conditions
-    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
+    for (typename std::vector<std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
          bcs_iter != mBoundaryConditions.end();
          ++bcs_iter)
     {
@@ -194,7 +194,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::ApplyBoundaries(std::map<Node<
     }
 
     // Verify that each boundary condition is now satisfied
-    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
+    for (typename std::vector<std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
          bcs_iter != mBoundaryConditions.end();
          ++bcs_iter)
     {
@@ -233,7 +233,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
     // Use a forward Euler method by default, unless a numerical method has been specified already
     if (mpNumericalMethod == nullptr)
     {
-        mpNumericalMethod = boost::make_shared<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >();
+        mpNumericalMethod = std::make_shared<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >();
     }
     mpNumericalMethod->SetCellPopulation(dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation)));
     mpNumericalMethod->SetForceCollection(&mForceCollection);
@@ -245,7 +245,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetu
 {
     // Loop over forces
     *rParamsFile << "\n\t<Forces>\n";
-    for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > >::iterator iter = mForceCollection.begin();
+    for (typename std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > >::iterator iter = mForceCollection.begin();
          iter != mForceCollection.end();
          ++iter)
     {
@@ -256,7 +256,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetu
 
     // Loop over cell population boundary conditions
     *rParamsFile << "\n\t<CellPopulationBoundaryConditions>\n";
-    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator iter = mBoundaryConditions.begin();
+    for (typename std::vector<std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator iter = mBoundaryConditions.begin();
          iter != mBoundaryConditions.end();
          ++iter)
     {

@@ -89,7 +89,7 @@ public:
         TS_ASSERT_DELTA(dy[0], 1.0, tol);
 
         // System name & free var info shouldn't fall over if there isn't any
-        boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode1.GetSystemInformation();
+        std::shared_ptr<const AbstractOdeSystemInformation> p_info = ode1.GetSystemInformation();
 
         TS_ASSERT_EQUALS(ode1.GetSystemName(), "");
         TS_ASSERT_EQUALS(p_info->GetSystemName(), "");
@@ -134,7 +134,7 @@ public:
     void TestParameters()
     {
         ParameterisedOde ode;
-        boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
+        std::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
 
         TS_ASSERT_EQUALS(ode.GetSystemName(), "ParameterisedOde");
         TS_ASSERT_EQUALS(p_info->GetSystemName(), "ParameterisedOde");
@@ -250,7 +250,7 @@ public:
         TS_ASSERT(!ode.HasAttribute("missing"));
         TS_ASSERT_THROWS_THIS(ode.GetAttribute("missing"), "No attribute 'missing' found.");
 
-        boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
+        std::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
         TS_ASSERT_EQUALS(p_info->GetNumberOfAttributes(), 1u);
         TS_ASSERT(p_info->HasAttribute("attr"));
         TS_ASSERT_DELTA(p_info->GetAttribute("attr"), 1.1, 1e-12);
@@ -293,7 +293,7 @@ public:
         }
         { // Load with param name changed
             ParameterisedOde ode;
-            boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
+            std::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
             AbstractOdeSystemInformation* p_mod_info = const_cast<AbstractOdeSystemInformation*>(p_info.get());
             std::string new_name("new_param_name");
             TS_ASSERT_DIFFERS(p_mod_info->mParameterNames[0], new_name);
@@ -312,7 +312,7 @@ public:
         }
         { // Load with a parameter added
             ParameterisedOde ode;
-            boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
+            std::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
             AbstractOdeSystemInformation* p_mod_info = const_cast<AbstractOdeSystemInformation*>(p_info.get());
 
             p_mod_info->mParameterNames.push_back("new_name");
@@ -330,7 +330,7 @@ public:
         }
         { // Load with a parameter added, and the constructor providing a default
             ParameterisedOde ode;
-            boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
+            std::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
             AbstractOdeSystemInformation* p_mod_info = const_cast<AbstractOdeSystemInformation*>(p_info.get());
 
             p_mod_info->mParameterNames.push_back("new_name");
@@ -360,7 +360,7 @@ public:
     void TestDerivedQuantities()
     {
         ParameterisedOde ode;
-        boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
+        std::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
 
         TS_ASSERT_EQUALS(ode.GetNumberOfDerivedQuantities(), 1u);
         TS_ASSERT_EQUALS(ode.HasDerivedQuantity("2a_plus_y"), true);

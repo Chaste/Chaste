@@ -94,8 +94,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryBoundaryCellWriter.hpp"
 
 // Boost
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -122,8 +121,8 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<3; i++)
         {
@@ -227,8 +226,8 @@ public:
 
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<3; i++)
@@ -317,7 +316,7 @@ public:
 
         // Create a regular vertex mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create some cells, each with a cell-cycle model that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
@@ -412,11 +411,11 @@ public:
 
         // Create a regular vertex mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create some cells
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
@@ -515,8 +514,8 @@ public:
 
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<3; i++)
@@ -613,8 +612,8 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<3; i++)
         {
@@ -697,7 +696,7 @@ public:
 
         // Create a simple CA-based cell population
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -786,9 +785,9 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_mutant_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_mutant_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<2; i++)
         {
@@ -885,8 +884,8 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<3; i++)
         {
@@ -978,11 +977,11 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_mutant_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_mutant_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
 
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<2; i++)
@@ -1088,11 +1087,11 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_mutant_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_mutant_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
 
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<2; i++)
@@ -1198,13 +1197,13 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        boost::shared_ptr<CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver> >
+        std::shared_ptr<CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver> >
             p_solver(CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver>::Instance());
         p_solver->SetSizeOfOdeSystem(6);
         p_solver->Initialise();
 
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<3; i++)
         {
@@ -1267,8 +1266,8 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<3; i++)
         {
@@ -1339,10 +1338,10 @@ public:
 
         // Create a simple vertex-based cell population
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
-        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
@@ -1418,10 +1417,10 @@ public:
 
             // Create a simple vertex-based cell population
             HoneycombVertexMeshGenerator generator(4, 6);
-            boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+            std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
-            boost::shared_ptr<AbstractCellProperty> p_diff_type(
+            std::shared_ptr<AbstractCellProperty> p_diff_type(
                     CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
@@ -1463,7 +1462,7 @@ public:
         {
             // Create a simple CA-based cell population
             PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-            boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+            std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1543,8 +1542,8 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<3; i++)
         {
@@ -1636,7 +1635,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+        auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
         CellsGenerator<NoCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
 
@@ -1737,7 +1736,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+        auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
         CellsGenerator<NoCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
 
@@ -1776,7 +1775,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+        auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
         CellsGenerator<NoCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
 

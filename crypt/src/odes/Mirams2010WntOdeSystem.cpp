@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 
 Mirams2010WntOdeSystem::Mirams2010WntOdeSystem(double wntLevel,
-                                               boost::shared_ptr<AbstractCellMutationState> pMutationState,
+                                               std::shared_ptr<AbstractCellMutationState> pMutationState,
                                                std::vector<double> stateVariables)
     : AbstractOdeSystem(3),
       mpMutationState(pMutationState),
@@ -88,7 +88,7 @@ Mirams2010WntOdeSystem::Mirams2010WntOdeSystem(double wntLevel,
     }
 }
 
-void Mirams2010WntOdeSystem::SetMutationState(boost::shared_ptr<AbstractCellMutationState> pMutationState)
+void Mirams2010WntOdeSystem::SetMutationState(std::shared_ptr<AbstractCellMutationState> pMutationState)
 {
     mpMutationState = pMutationState;
 }
@@ -154,7 +154,7 @@ void Mirams2010WntOdeSystem::EvaluateYDerivatives(double time, const std::vector
     rDY[2] = 0.0; // do not change the Wnt level
 }
 
-const boost::shared_ptr<AbstractCellMutationState> Mirams2010WntOdeSystem::GetMutationState() const
+const std::shared_ptr<AbstractCellMutationState> Mirams2010WntOdeSystem::GetMutationState() const
 {
     return mpMutationState;
 }

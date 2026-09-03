@@ -2,7 +2,7 @@
 name: pychaste
 
 # Smart pointer holder type declared in every class wrapper.
-smart_ptr_type: boost::shared_ptr
+smart_ptr_type: std::shared_ptr
 
 # Default pybind11 return_value_policy for methods returning a pointer.
 pointer_call_policy: reference
@@ -32,6 +32,7 @@ typecasters:
 # Headers added to every class wrapper.
 source_includes:
   - <map>
+  - <memory>
   - <set>
   - <string>
   - <vector>

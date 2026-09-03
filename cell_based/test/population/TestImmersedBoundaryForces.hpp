@@ -55,10 +55,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "UblasCustomFunctions.hpp"
 
-#include <boost/pointer_cast.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
-
 // Immersed boundary forces tested in this test suite
 #include "ImmersedBoundaryLinearInteractionForce.hpp"
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
@@ -754,7 +750,7 @@ public:
 
             //Create cells
             std::vector<CellPtr> cells;
-            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
@@ -870,7 +866,7 @@ public:
 
             //Create cells
             std::vector<CellPtr> cells;
-            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
@@ -928,7 +924,7 @@ public:
 
             //Create cells
             std::vector<CellPtr> cells;
-            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
@@ -987,7 +983,7 @@ public:
 
             //Create cells
             std::vector<CellPtr> cells;
-            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
@@ -1047,7 +1043,7 @@ public:
 
             // Create cells
             std::vector<CellPtr> cells;
-            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
@@ -1108,7 +1104,7 @@ public:
 
             // Create cells
             std::vector<CellPtr> cells;
-            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
@@ -1158,7 +1154,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryKinematicFeedbackForce.arch";
 
         {
-            auto p_force = boost::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1170,12 +1166,12 @@ public:
             p_force->SetNormalNoiseStdDev(4.56);
 
             // Serialize via pointer to the base class
-            auto p_base = boost::static_pointer_cast<AbstractImmersedBoundaryForce<2>>(p_force);
+            auto p_base = std::static_pointer_cast<AbstractImmersedBoundaryForce<2>>(p_force);
             output_arch << p_base;
         }
 
         {
-            boost::shared_ptr<AbstractImmersedBoundaryForce<2>> p_force;
+            std::shared_ptr<AbstractImmersedBoundaryForce<2>> p_force;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -1183,7 +1179,7 @@ public:
 
             // Restore from the archive
             input_arch >> p_force;
-            auto p_derived_force = boost::dynamic_pointer_cast<ImmersedBoundaryKinematicFeedbackForce<2>>(p_force);
+            auto p_derived_force = std::dynamic_pointer_cast<ImmersedBoundaryKinematicFeedbackForce<2>>(p_force);
 
             // Check member variables have been correctly archived
             TS_ASSERT_DELTA(p_derived_force->GetSpringConst(), 1.23, 1e-6);
@@ -1230,7 +1226,7 @@ public:
 
             //Create cells
             std::vector<CellPtr> cells;
-            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
@@ -1338,7 +1334,7 @@ public:
 
             //Create cells
             std::vector<CellPtr> cells;
-            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
@@ -1387,7 +1383,7 @@ public:
 
             //Create cells
             std::vector<CellPtr> cells;
-            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
@@ -1439,7 +1435,7 @@ public:
 
             //Create cells
             std::vector<CellPtr> cells;
-            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            auto p_diff_type = std::make_shared<DifferentiatedCellProliferativeType>();
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
@@ -1481,7 +1477,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryLinearDifferentialAdhesionForce.arch";
 
         {
-            auto p_force = boost::make_shared<ImmersedBoundaryLinearDifferentialAdhesionForce<2>>();
+            auto p_force = std::make_shared<ImmersedBoundaryLinearDifferentialAdhesionForce<2>>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1492,12 +1488,12 @@ public:
             p_force->SetNormalNoiseStdDev(4.56);
 
             // Serialize via pointer to the base class
-            auto p_base = boost::static_pointer_cast<AbstractImmersedBoundaryForce<2>>(p_force);
+            auto p_base = std::static_pointer_cast<AbstractImmersedBoundaryForce<2>>(p_force);
             output_arch << p_base;
         }
 
         {
-            boost::shared_ptr<AbstractImmersedBoundaryForce<2>> p_force;
+            std::shared_ptr<AbstractImmersedBoundaryForce<2>> p_force;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -1505,7 +1501,7 @@ public:
 
             // Restore from the archive
             input_arch >> p_force;
-            auto p_derived_force = boost::dynamic_pointer_cast<ImmersedBoundaryLinearDifferentialAdhesionForce<2>>(p_force);
+            auto p_derived_force = std::dynamic_pointer_cast<ImmersedBoundaryLinearDifferentialAdhesionForce<2>>(p_force);
 
             // Check member variables have been correctly archived
             TS_ASSERT(p_derived_force->GetAdditiveNormalNoise());

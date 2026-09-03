@@ -795,7 +795,7 @@ unsigned ImmersedBoundarySimulationModifier<DIM>::GetNodeNeighbourUpdateFrequenc
 
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForce(
-    boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > pForce)
+    std::shared_ptr<AbstractImmersedBoundaryForce<DIM> > pForce)
 {
     mForceCollection.push_back(pForce);
 }

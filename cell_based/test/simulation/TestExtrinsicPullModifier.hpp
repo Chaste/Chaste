@@ -71,7 +71,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -131,10 +131,10 @@ public:
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(node_idx)->rGetLocation()[0], 2, 1e-6);
 
         // Test set/get methods
-        std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
-        TS_ASSERT(boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter));
-        boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetApplyExtrinsicPullToAllNodes(true);
-        boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetSpeed(2.0);
+        std::vector<std::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
+        TS_ASSERT(std::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter));
+        std::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetApplyExtrinsicPullToAllNodes(true);
+        std::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetSpeed(2.0);
 
         simulator.SetEndTime(4.0*simulator.GetDt());
 
@@ -154,7 +154,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;

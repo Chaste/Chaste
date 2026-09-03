@@ -285,7 +285,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
 
         // Make cells with r<1/2 apoptotic (so no source term)
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i=0; i<cells.size(); i++)
         {
@@ -418,7 +418,7 @@ public:
     void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(6,6,0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -426,7 +426,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
 
         // Make cells with x < 3.0 apoptotic (so no source term)
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                        cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i=0; i<cells.size(); i++)
         {
@@ -478,7 +478,7 @@ public:
     void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(6,6,0);
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -488,7 +488,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
 
         // Make cells with x < 3.0 apoptotic (so no source term)
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i=0; i<cells.size(); i++)
         {
@@ -543,7 +543,7 @@ public:
     void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(6,6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre-based tests
 
@@ -553,7 +553,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_differentiated_type);
 
         // Make cells with x < 3.0 apoptotic (so no source term)
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i=0; i<cells.size(); i++)
         {
@@ -609,7 +609,7 @@ public:
     void TestPottsBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(24, 6, 4, 24, 6, 4);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Scale so cells are on top of those in the above centre-based tests
         p_mesh->Translate(-1.5, -1.5);
@@ -621,7 +621,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_differentiated_type);
 
         // Make cells with x < 3.0 apoptotic (so no source term)
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i=0; i<cells.size(); i++)
         {
@@ -676,7 +676,7 @@ public:
     void TestCaBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(6, 0, 0, 6, 0, 0);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Scale so cells are on top of those in the above centre-based tests
         p_mesh->Scale(1.0, 1.0*sqrt(3.0)*0.5);
@@ -694,7 +694,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_differentiated_type);
 
         // Make cells with x < 3.0 apoptotic (so no source term)
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i=0; i<cells.size(); i++)
         {

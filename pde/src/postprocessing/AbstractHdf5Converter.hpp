@@ -64,7 +64,7 @@ protected:
     const FileFinder& mrH5Folder;
 
     /** Pointer to reader of the dataset to be converted. */
-    boost::shared_ptr<Hdf5DataReader> mpReader;
+    std::shared_ptr<Hdf5DataReader> mpReader;
 
     /** Number of variables to output. Read from the reader. */
     unsigned mNumVariables;

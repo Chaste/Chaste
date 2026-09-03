@@ -92,7 +92,7 @@ public:
      *
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    TysonNovakCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+    TysonNovakCellCycleModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = std::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Initialise the cell-cycle model at the start of a simulation.

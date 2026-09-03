@@ -86,7 +86,7 @@ protected:
      * Pointer to a ChasteCuboid storing the outer boundary for the FE mesh.
      * Stored as a member to facilitate archiving.
      */
-    boost::shared_ptr<ChasteCuboid<DIM> > mpMeshCuboid;
+    std::shared_ptr<ChasteCuboid<DIM> > mpMeshCuboid;
 
     /**
      * The step size to be used in the FE mesh.
@@ -133,10 +133,10 @@ public:
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
-                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+    AbstractBoxDomainPdeModifier(std::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=std::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                 std::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=std::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                  bool isNeumannBoundaryCondition=true,
-                                 boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
+                                 std::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=std::shared_ptr<ChasteCuboid<DIM> >(),
                                  double stepSize=1.0,
                                  Vec solution=nullptr);
 
@@ -227,7 +227,7 @@ public:
      * @param pMeshCuboid the outer boundary for the FE mesh.
      * @param stepSize the step size to be used in the FE mesh.
      */
-    void GenerateFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize);
+    void GenerateFeMesh(std::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize);
 
     /**
      * Helper method to generate a pde mesh.
@@ -236,7 +236,7 @@ public:
      * @param stepSize the step size to be used in the FE mesh.
      * @param pMesh a pointer to the mesh to be created
      */
-    void GenerateAndReturnFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize, TetrahedralMesh<DIM,DIM>* pMesh);
+    void GenerateAndReturnFeMesh(std::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize, TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
      * Helper method to copy the PDE solution to CellData

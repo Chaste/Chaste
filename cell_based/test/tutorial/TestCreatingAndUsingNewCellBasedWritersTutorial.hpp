@@ -227,7 +227,7 @@ public:
         EXIT_IF_PARALLEL;
 
         HoneycombMeshGenerator generator(10, 10);
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetCircularMesh(5);
+        std::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetCircularMesh(5);
 
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);

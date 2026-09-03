@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(DOUBLE_UNSET, pOdeSolver),
       mBetaCateninDivisionThreshold(100)// MAGIC NUMBER!
 {
-    if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
+    if (mpOdeSolver == std::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
 #ifdef CHASTE_CVODE
         mpOdeSolver = CellCycleModelOdeSolver<SingleOdeWntCellCycleModel, CvodeAdaptor>::Instance();

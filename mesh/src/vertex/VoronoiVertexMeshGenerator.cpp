@@ -34,8 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VoronoiVertexMeshGenerator.hpp"
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #if BOOST_VERSION >= 105200
 
@@ -96,18 +95,18 @@ void VoronoiVertexMeshGenerator::GenerateVoronoiMesh()
     }
 }
 
-boost::shared_ptr<MutableVertexMesh<2,2> > VoronoiVertexMeshGenerator::GetMesh()
+std::shared_ptr<MutableVertexMesh<2,2> > VoronoiVertexMeshGenerator::GetMesh()
 {
     return mpMesh;
 }
 
-boost::shared_ptr<MutableVertexMesh<2,2> > VoronoiVertexMeshGenerator::GetMeshAfterReMesh()
+std::shared_ptr<MutableVertexMesh<2,2> > VoronoiVertexMeshGenerator::GetMeshAfterReMesh()
 {
     mpMesh->ReMesh();
     return mpMesh;
 }
 
-boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalMesh()
+std::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalMesh()
 {
     /*
      * METHOD OUTLINE:
@@ -260,7 +259,7 @@ boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalM
      *
      * We then reposition all nodes to be within the box [0, width]x[0, height] to make mesh look nicer when visualised.
      */
-    mpTorMesh = boost::make_shared<Toroidal2dVertexMesh>(width, height, new_nodes, new_elems);
+    mpTorMesh = std::make_shared<Toroidal2dVertexMesh>(width, height, new_nodes, new_elems);
 
     mpTorMesh->ReMesh();
 
@@ -674,7 +673,7 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
     {
         mpMesh.reset();
     }
-    mpMesh = boost::make_shared<MutableVertexMesh<2,2> >(nodes, elements);
+    mpMesh = std::make_shared<MutableVertexMesh<2,2> >(nodes, elements);
 }
 
 void VoronoiVertexMeshGenerator::ValidateInputAndSetMembers()

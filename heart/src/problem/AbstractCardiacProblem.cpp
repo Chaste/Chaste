@@ -219,7 +219,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::CreateMeshFrom
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetBoundaryConditionsContainer(boost::shared_ptr<BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> > pBcc)
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetBoundaryConditionsContainer(std::shared_ptr<BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> > pBcc)
 {
     this->mpBoundaryConditionsContainer = pBcc;
 }
@@ -456,7 +456,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
     {
         progress_reporter_dir = ""; // progress printed to CHASTE_TEST_OUTPUT
     }
-    for (boost::shared_ptr<AbstractOutputModifier> p_output_modifier : mOutputModifiers)
+    for (std::shared_ptr<AbstractOutputModifier> p_output_modifier : mOutputModifiers)
     {
         p_output_modifier->InitialiseAtStart(this->mpMesh->GetDistributedVectorFactory(), this->mpMesh->rGetNodePermutation());
         p_output_modifier->ProcessSolutionAtTimeStep(stepper.GetTime(), initial_condition, PROBLEM_DIM);
@@ -548,7 +548,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
             HeartEventHandler::EndEvent(HeartEventHandler::WRITE_OUTPUT);
         }
 
-        for (boost::shared_ptr<AbstractOutputModifier> p_output_modifier : mOutputModifiers)
+        for (std::shared_ptr<AbstractOutputModifier> p_output_modifier : mOutputModifiers)
         {
             p_output_modifier->ProcessSolutionAtTimeStep(stepper.GetTime(), mSolution, PROBLEM_DIM);
         }
@@ -574,7 +574,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
 
     // Close the file that stores voltage values
     progress_reporter.PrintFinalising();
-    for (boost::shared_ptr<AbstractOutputModifier> p_output_modifier : mOutputModifiers)
+    for (std::shared_ptr<AbstractOutputModifier> p_output_modifier : mOutputModifiers)
     {
         p_output_modifier->FinaliseAtEnd();
     }

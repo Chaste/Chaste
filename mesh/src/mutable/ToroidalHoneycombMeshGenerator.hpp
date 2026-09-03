@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "HoneycombMeshGenerator.hpp"
 #include "Toroidal2dMesh.hpp"
 
@@ -67,12 +67,12 @@ public:
     /**
      * @return a 2D honeycomb mesh
      */
-    boost::shared_ptr<MutableMesh<2,2> > GetMesh();
+    std::shared_ptr<MutableMesh<2,2> > GetMesh();
 
     /**
      * @return a 2D honeycomb mesh with periodic left/right and top/bottom boundaries
      */
-    boost::shared_ptr<Toroidal2dMesh> GetToroidalMesh();
+    std::shared_ptr<Toroidal2dMesh> GetToroidalMesh();
 };
 
 #endif /*TOROIDALHONEYCOMBMESHGENERATOR_HPP_*/

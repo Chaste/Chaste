@@ -34,8 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator(unsigned numElementsAcross,
                                                            unsigned numElementsUp,
@@ -134,16 +133,16 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
             nodes[i]->SetPoint(nodes[i+numElementsAcross]->GetPoint());
         }
     }
-    mpMesh = boost::make_shared<Cylindrical2dVertexMesh>(numElementsAcross, nodes, elements, cellRearrangementThreshold, t2Threshold);
+    mpMesh = std::make_shared<Cylindrical2dVertexMesh>(numElementsAcross, nodes, elements, cellRearrangementThreshold, t2Threshold);
 }
 
-boost::shared_ptr<MutableVertexMesh<2,2> > CylindricalHoneycombVertexMeshGenerator::GetMesh()
+std::shared_ptr<MutableVertexMesh<2,2> > CylindricalHoneycombVertexMeshGenerator::GetMesh()
 {
     EXCEPTION("A cylindrical mesh was created but a normal mesh is being requested.");
     return mpMesh; // Not really
 }
 
-boost::shared_ptr<Cylindrical2dVertexMesh> CylindricalHoneycombVertexMeshGenerator::GetCylindricalMesh()
+std::shared_ptr<Cylindrical2dVertexMesh> CylindricalHoneycombVertexMeshGenerator::GetCylindricalMesh()
 {
-    return boost::static_pointer_cast<Cylindrical2dVertexMesh>(mpMesh);
+    return std::static_pointer_cast<Cylindrical2dVertexMesh>(mpMesh);
 }
