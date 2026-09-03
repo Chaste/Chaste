@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \f]
  *
  * For two cells whose separation is greater than the sum of their radii
- * (i.e. overlap < 0, cells are stretched), an exponential attraction force is used:
+ * (i.e. overlap > 0, cells are stretched), an exponential attraction force is used:
  * \f[
  * \mathbf{F} = \mu \hat{\mathbf{r}} (d - s) e^{-\alpha(d-s)/s}
  * \f]
@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \f$d\f$ is the distance between cell centres, and \f$\alpha\f$ controls the
  * range of attraction.
  *
- * This force is designed for use with NodeBasedCellPopulation.
+ * This force supports both mesh-based and node-based cell populations.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class PathmanathanInteractionForce : public AbstractVariableSizeTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>

@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * labelled and unlabelled cells (as defined by the CellLabel cell
  * property). Inherits from PathmanathanInteractionForce.
  *
- * Designed for use in node-based simulations.
+ * Supports both mesh-based and node-based simulations.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class DifferentialAdhesionPathmanathanInteractionForce : public PathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>
