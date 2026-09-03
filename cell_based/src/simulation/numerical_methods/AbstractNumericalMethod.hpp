@@ -72,7 +72,6 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & mUseAdaptiveTimestep;
-        archive & mUseUpdateNodeLocation;
         archive & mGhostNodeForcesEnabled;
     }
 
@@ -92,17 +91,6 @@ protected:
      * Initialized to false in the AbstractNumericalMethod constructor.
      */
     bool mUseAdaptiveTimestep;
-
-    /**
-     * A boolean flag indicating whether non-forward Euler methods are supported for this type of cell
-     * population. Allows us to fall back to the old method of updating node positions for populations
-     * that require it (This is only for NodeBasedCellPopulationWithBuskeUpdates).
-     *
-     * Initialized to false in the AbstractNumericalMethod constructor.
-     *
-     * \todo #2087 Consider replacing this with static_casts
-     */
-    bool mUseUpdateNodeLocation;
 
     /**
      * A boolean indicating whether this cell population type contains ghost nodes.
@@ -197,23 +185,21 @@ public:
     void SetUseAdaptiveTimestep(bool useAdaptiveTimestep);
 
     /**
-     * Set mUseUpdateNodeLocation.
-     *
-     * @param useUpdateNodeLocation whether to use the population method UpdateNodeLocations()
-     */
-    void SetUseUpdateNodeLocation(bool useUpdateNodeLocation);
-
-    /**
-     * Get mUseUpdateNodeLocation.
-     *
-     * @return whether the population method UpdateNodeLocations() is being used
-     */
-    bool GetUseUpdateNodeLocation();
-
-    /**
      * @return whether the numerical method uses an adaptive time step.
      */
     bool HasAdaptiveTimestep();
+
+    /**
+     * @return whether this numerical method always delegates position updates to the cell
+     * population's own UpdateNodeLocations() method, rather than performing its own
+     * force-based integration.
+     *
+     * Defaults to false; overridden to return true by NoNumericalMethod, which is the only
+     * numerical method that may be paired with a cell population whose UpdateNodeLocations()
+     * is not NEVER_REACHED (currently NodeBasedCellPopulationWithBuskeUpdate and
+     * ImmersedBoundaryCellPopulation). This pairing is enforced in SetCellPopulation().
+     */
+    virtual bool DelegatesToPopulation();
 
     /**
      * Updates node positions according to Newton's 2nd law with overdamping.

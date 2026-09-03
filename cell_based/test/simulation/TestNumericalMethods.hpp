@@ -48,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulationWithParticles.hpp"
 #include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -67,7 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
 #include "RK4NumericalMethod.hpp"
-#include "Warnings.hpp"
+#include "NoNumericalMethod.hpp"
 
 
 #include "PetscSetupAndFinalize.hpp"
@@ -115,7 +117,8 @@ public:
             TS_ASSERT_EQUALS(saved_locations.size(), cell_population.GetNumRealCells());
         }
 
-        // This tests the exceptions for Node based with Buske Update
+        // This tests the enforced pairing between NoNumericalMethod and populations that
+        // manage their own node position updates (here, NodeBasedCellPopulationWithBuskeUpdate)
         {
             // Create a simple mesh
             TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -133,16 +136,44 @@ public:
             // Create a cell population, with no ghost nodes at the moment
             NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(mesh, cells);
 
+            // A numerical method that does its own integration must not be paired with a
+            // population that manages its own updates
+            ForwardEulerNumericalMethod<2> fe_method;
+            TS_ASSERT_THROWS_THIS(fe_method.SetCellPopulation(&cell_population),
+                "NoNumericalMethod must be used if and only if the cell population manages its own "
+                "node position updates (currently NodeBasedCellPopulationWithBuskeUpdate and "
+                "ImmersedBoundaryCellPopulation).");
 
-            // Create Numerical method
-            ForwardEulerNumericalMethod<2> numerical_method;
+            // NoNumericalMethod is the correct pairing, and should not throw
+            NoNumericalMethod<2> no_method;
+            TS_ASSERT_THROWS_NOTHING(no_method.SetCellPopulation(&cell_population));
+        }
 
-            numerical_method.SetCellPopulation(&cell_population);
+        // This tests the same enforced pairing for ImmersedBoundaryCellPopulation, the other
+        // population type that manages its own node position updates
+        {
+            EXIT_IF_PARALLEL;    // ImmersedBoundaryPalisadeMeshGenerator doesn't work in parallel.
 
-            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Non-Euler steppers are not yet implemented for NodeBasedCellPopulationWithBuskeUpdate");
-            Warnings::QuietDestroy();
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
 
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+            // A numerical method that does its own integration must not be paired with a
+            // population that manages its own updates
+            RK4NumericalMethod<2> rk4_method;
+            TS_ASSERT_THROWS_THIS(rk4_method.SetCellPopulation(&cell_population),
+                "NoNumericalMethod must be used if and only if the cell population manages its own "
+                "node position updates (currently NodeBasedCellPopulationWithBuskeUpdate and "
+                "ImmersedBoundaryCellPopulation).");
+
+            // NoNumericalMethod is the correct pairing, and should not throw
+            NoNumericalMethod<2> no_method;
+            TS_ASSERT_THROWS_NOTHING(no_method.SetCellPopulation(&cell_population));
         }
     }
 
@@ -399,13 +430,14 @@ public:
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
-        // Create numerical method for testing
-        MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
+        // Create numerical method for testing: NodeBasedCellPopulationWithBuskeUpdate manages
+        // its own node position updates, so NoNumericalMethod is the required pairing
+        MAKE_PTR(NoNumericalMethod<2>, p_no_method);
 
         double dt = 0.01;
 
-        p_fe_method->SetCellPopulation(&cell_population);
-        p_fe_method->SetForceCollection(&force_collection);
+        p_no_method->SetCellPopulation(&cell_population);
+        p_no_method->SetForceCollection(&force_collection);
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
@@ -417,7 +449,7 @@ public:
 
         // Update positions and check the answer
         // Currently this throws an error as not set up correctly as it is in a simulation #2087
-        TS_ASSERT_THROWS_THIS(p_fe_method->UpdateAllNodePositions(dt),"You must provide a rowPreallocation argument for a large sparse system");
+        TS_ASSERT_THROWS_THIS(p_no_method->UpdateAllNodePositions(dt),"You must provide a rowPreallocation argument for a large sparse system");
 
         // for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         // {
@@ -545,15 +577,16 @@ public:
 
     void TestSettingAndGettingFlags()
     {
-        // Create numerical methods for testing
+        // Ordinary numerical methods do their own integration
         MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
+        TS_ASSERT(!(p_fe_method->DelegatesToPopulation()));
 
-        // mUseUpdateNodeLocation should default to false
-        TS_ASSERT(!(p_fe_method->GetUseUpdateNodeLocation()));
+        MAKE_PTR(RK4NumericalMethod<2>, p_rk4_method);
+        TS_ASSERT(!(p_rk4_method->DelegatesToPopulation()));
 
-        // Set mUseUpdateNodeLocation to true and check
-        p_fe_method->SetUseUpdateNodeLocation(true);
-        TS_ASSERT(p_fe_method->GetUseUpdateNodeLocation());
+        // NoNumericalMethod always delegates to the cell population
+        MAKE_PTR(NoNumericalMethod<2>, p_no_method);
+        TS_ASSERT(p_no_method->DelegatesToPopulation());
     }
 
     void TestUpdateAllNodePositionsRK4WithMeshBased()
@@ -633,16 +666,13 @@ public:
         // Create numerical method for testing
         MAKE_PTR(RK4NumericalMethod<2>, p_rk4_method);
 
-        double dt = 0.01;
-
-        p_rk4_method->SetCellPopulation(&cell_population);
-
-        // Suppress the warning issued by SetCellPopulation for non-Euler methods
-        Warnings::QuietDestroy();
-
-        // RK4 does not support NodeBasedCellPopulationWithBuskeUpdate; an exception should be thrown
-        TS_ASSERT_THROWS_THIS(p_rk4_method->UpdateAllNodePositions(dt),
-            "RK4NumericalMethod does not support NodeBasedCellPopulationWithBuskeUpdate. Use ForwardEulerNumericalMethod instead.");
+        // RK4NumericalMethod does its own integration, so it cannot be paired with a population
+        // that manages its own node position updates; the exception is thrown as soon as the
+        // population is set, regardless of which concrete non-delegating method is used
+        TS_ASSERT_THROWS_THIS(p_rk4_method->SetCellPopulation(&cell_population),
+            "NoNumericalMethod must be used if and only if the cell population manages its own "
+            "node position updates (currently NodeBasedCellPopulationWithBuskeUpdate and "
+            "ImmersedBoundaryCellPopulation).");
     }
 
     void TestRK4ArchivingOfNumericalMethod()

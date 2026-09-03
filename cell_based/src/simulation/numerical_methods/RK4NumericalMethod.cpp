@@ -49,86 +49,74 @@ RK4NumericalMethod<ELEMENT_DIM,SPACE_DIM>::~RK4NumericalMethod()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void RK4NumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt)
 {
-    if (!this->mUseUpdateNodeLocation)
+    // Store initial node locations
+    auto old_node_locations = this->SaveCurrentNodeLocations();
+
+    // Apply boundary conditions to the initial positions, then resave
+    this->ImposeBoundaryConditions(old_node_locations);
+    old_node_locations = this->SaveCurrentNodeLocations();
+
+    // Compute k1 = F(r^t) / nu
+    auto k1 = this->ComputeForcesIncludingDamping();
+
+    // Update to r^t + dt*k1/2 and compute k2
+    unsigned index = 0;
+    for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+         node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter, ++index)
     {
-        // Store initial node locations
-        auto old_node_locations = this->SaveCurrentNodeLocations();
-
-        // Apply boundary conditions to the initial positions, then resave
-        this->ImposeBoundaryConditions(old_node_locations);
-        old_node_locations = this->SaveCurrentNodeLocations();
-
-        // Compute k1 = F(r^t) / nu
-        auto k1 = this->ComputeForcesIncludingDamping();
-
-        // Update to r^t + dt*k1/2 and compute k2
-        unsigned index = 0;
-        for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
-             node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
-             ++node_iter, ++index)
-        {
-            c_vector<double, SPACE_DIM> new_location = node_iter->rGetLocation() + (dt/2.0) * k1[index];
-            this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
-        }
-        this->ImposeBoundaryConditions(old_node_locations);
-
-        // Compute k2 = F(r^t + dt*k1/2) / nu
-        auto k2 = this->ComputeForcesIncludingDamping();
-
-        // Update to r^t + dt*k2/2 (from old locations) and compute k3
-        index = 0;
-        for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
-             node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
-             ++node_iter, ++index)
-        {
-            c_vector<double, SPACE_DIM> old_location = old_node_locations.find(&(*node_iter))->second;
-            c_vector<double, SPACE_DIM> new_location = old_location + (dt/2.0) * k2[index];
-            this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
-        }
-        this->ImposeBoundaryConditions(old_node_locations);
-
-        // Compute k3 = F(r^t + dt*k2/2) / nu
-        auto k3 = this->ComputeForcesIncludingDamping();
-
-        // Update to r^t + dt*k3 (from old locations) and compute k4
-        index = 0;
-        for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
-             node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
-             ++node_iter, ++index)
-        {
-            c_vector<double, SPACE_DIM> old_location = old_node_locations.find(&(*node_iter))->second;
-            c_vector<double, SPACE_DIM> new_location = old_location + dt * k3[index];
-            this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
-        }
-        this->ImposeBoundaryConditions(old_node_locations);
-
-        // Compute k4 = F(r^t + dt*k3) / nu
-        auto k4 = this->ComputeForcesIncludingDamping();
-
-        // Final RK4 position update: r^(t+1) = r^t + (dt/6)*(k1 + 2*k2 + 2*k3 + k4)
-        index = 0;
-        for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
-             node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
-             ++node_iter, ++index)
-        {
-            c_vector<double, SPACE_DIM> effective_force = (k1[index] + 2.0*k2[index] + 2.0*k3[index] + k4[index]) / 6.0;
-            c_vector<double, SPACE_DIM> old_location = old_node_locations.find(&(*node_iter))->second;
-            c_vector<double, SPACE_DIM> displacement = dt * effective_force;
-
-            this->DetectStepSizeExceptions(node_iter->GetIndex(), displacement, dt);
-
-            c_vector<double, SPACE_DIM> new_location = old_location + displacement;
-            this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
-        }
+        c_vector<double, SPACE_DIM> new_location = node_iter->rGetLocation() + (dt/2.0) * k1[index];
+        this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
     }
-    else
+    this->ImposeBoundaryConditions(old_node_locations);
+
+    // Compute k2 = F(r^t + dt*k1/2) / nu
+    auto k2 = this->ComputeForcesIncludingDamping();
+
+    // Update to r^t + dt*k2/2 (from old locations) and compute k3
+    index = 0;
+    for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+         node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter, ++index)
     {
-        /*
-         * RK4 is not compatible with NodeBasedCellPopulationWithBuskeUpdate, which requires the
-         * population to handle its own position updates. Throw an informative exception rather
-         * than reaching unreachable code.
-         */
-        EXCEPTION("RK4NumericalMethod does not support NodeBasedCellPopulationWithBuskeUpdate. Use ForwardEulerNumericalMethod instead.");
+        c_vector<double, SPACE_DIM> old_location = old_node_locations.find(&(*node_iter))->second;
+        c_vector<double, SPACE_DIM> new_location = old_location + (dt/2.0) * k2[index];
+        this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
+    }
+    this->ImposeBoundaryConditions(old_node_locations);
+
+    // Compute k3 = F(r^t + dt*k2/2) / nu
+    auto k3 = this->ComputeForcesIncludingDamping();
+
+    // Update to r^t + dt*k3 (from old locations) and compute k4
+    index = 0;
+    for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+         node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter, ++index)
+    {
+        c_vector<double, SPACE_DIM> old_location = old_node_locations.find(&(*node_iter))->second;
+        c_vector<double, SPACE_DIM> new_location = old_location + dt * k3[index];
+        this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
+    }
+    this->ImposeBoundaryConditions(old_node_locations);
+
+    // Compute k4 = F(r^t + dt*k3) / nu
+    auto k4 = this->ComputeForcesIncludingDamping();
+
+    // Final RK4 position update: r^(t+1) = r^t + (dt/6)*(k1 + 2*k2 + 2*k3 + k4)
+    index = 0;
+    for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+         node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter, ++index)
+    {
+        c_vector<double, SPACE_DIM> effective_force = (k1[index] + 2.0*k2[index] + 2.0*k3[index] + k4[index]) / 6.0;
+        c_vector<double, SPACE_DIM> old_location = old_node_locations.find(&(*node_iter))->second;
+        c_vector<double, SPACE_DIM> displacement = dt * effective_force;
+
+        this->DetectStepSizeExceptions(node_iter->GetIndex(), displacement, dt);
+
+        c_vector<double, SPACE_DIM> new_location = old_location + displacement;
+        this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
     }
 }
 
