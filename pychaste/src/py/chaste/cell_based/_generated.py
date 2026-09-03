@@ -1813,20 +1813,6 @@ class ForwardEulerNumericalMethod(TemplateClass):
     }
 
 
-class RK4NumericalMethod(TemplateClass):
-    _instantiations = {
-        ("1", "1"): RK4NumericalMethod_1_1,
-        ("1",): RK4NumericalMethod_1_1,
-        ("1", "2"): RK4NumericalMethod_1_2,
-        ("2", "2"): RK4NumericalMethod_2_2,
-        ("2",): RK4NumericalMethod_2_2,
-        ("1", "3"): RK4NumericalMethod_1_3,
-        ("2", "3"): RK4NumericalMethod_2_3,
-        ("3", "3"): RK4NumericalMethod_3_3,
-        ("3",): RK4NumericalMethod_3_3,
-    }
-
-
 class GeneralisedLinearSpringForce(TemplateClass):
     _instantiations = {
         ("1", "1"): GeneralisedLinearSpringForce_1_1,
@@ -2153,6 +2139,20 @@ class PythonSimulationModifier(TemplateClass):
     _instantiations = {
         ("2",): PythonSimulationModifier_2,
         ("3",): PythonSimulationModifier_3,
+    }
+
+
+class RK4NumericalMethod(TemplateClass):
+    _instantiations = {
+        ("1", "1"): RK4NumericalMethod_1_1,
+        ("1",): RK4NumericalMethod_1_1,
+        ("1", "2"): RK4NumericalMethod_1_2,
+        ("2", "2"): RK4NumericalMethod_2_2,
+        ("2",): RK4NumericalMethod_2_2,
+        ("1", "3"): RK4NumericalMethod_1_3,
+        ("2", "3"): RK4NumericalMethod_2_3,
+        ("3", "3"): RK4NumericalMethod_3_3,
+        ("3",): RK4NumericalMethod_3_3,
     }
 
 

@@ -223,7 +223,6 @@ subpackages:
     - FixedSequenceCellCycleModel
     - FixedVertexBasedDivisionRule
     - ForwardEulerNumericalMethod
-    - RK4NumericalMethod
     - GammaG1CellCycleModel
     - GeneralisedLinearSpringForce
     - Goldbeter1991SrnModel
@@ -262,6 +261,7 @@ subpackages:
     - PlaneBoundaryCondition
     - PottsBasedCellPopulation
     - PythonSimulationModifier
+    - RK4NumericalMethod
     - RadialCellDataDistributionWriter
     - RandomCaSwitchingUpdateRule
     - RandomCellKiller
