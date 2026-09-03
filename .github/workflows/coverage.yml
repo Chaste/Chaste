@@ -21,7 +21,7 @@ jobs:
     # silently under-reports coverage rather than failing. The portability-* images build
     # PETSc from source with --download-parmetis=1 --download-hypre=1.
     container:
-      image: chaste/runner:portability-dev
+      image: chaste/runner:portability-tip
       env:
         RUNNER_OFF: 1
       options: --user 0 --cpus 4
