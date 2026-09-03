@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteBuildRoot.hpp"
 #include "FileFinder.hpp"
+#include "FilesystemPermissions.hpp"
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
 #include "ChasteSyscalls.hpp"
@@ -52,6 +53,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestOutputFileHandler : public CxxTest::TestSuite
 {
+private:
+    void AssertPermissions(const fs::path& rPath, fs::perms expectedPermissions)
+    {
+#ifndef _MSC_VER
+        TS_ASSERT_EQUALS(static_cast<unsigned>(fs::status(rPath).permissions() & fs::perms::all),
+                         static_cast<unsigned>(expectedPermissions));
+#endif
+    }
+
 public:
 
     void TestHandler()
@@ -96,6 +106,8 @@ public:
 
         p_file_stream = handler2.OpenOutputFile("test_file");
         TS_ASSERT(FileFinder(handler2.GetOutputDirectoryFullPath() + "test_file").Exists());
+        AssertPermissions(handler2.GetOutputDirectoryFullPath() + "test_file",
+                          FilesystemPermissions::GetFilePermissions());
 
         p_file_stream = handler2.OpenOutputFile("test_", 34, ".txt");
         TS_ASSERT(FileFinder(handler2.GetOutputDirectoryFullPath() + "test_34.txt").Exists());
@@ -114,9 +126,12 @@ public:
         // Check the CopyFileTo method
         FileFinder source_file("global/test/TestOutputFileHandler.hpp", RelativeTo::ChasteSourceRoot);
         TS_ASSERT(!handler2.FindFile("TestOutputFileHandler.hpp").Exists());
+        AssertPermissions(handler2.GetOutputDirectoryFullPath() + OutputFileHandler::SIG_FILE_NAME,
+                          FilesystemPermissions::GetFilePermissions());
         PetscTools::Barrier("TestOutputFileHandler-0");
         FileFinder dest_file = handler2.CopyFileTo(source_file);
         TS_ASSERT(dest_file.Exists());
+        AssertPermissions(dest_file.GetAbsolutePath(), FilesystemPermissions::GetFilePermissions());
         FileFinder missing_file("global/no_file", RelativeTo::ChasteSourceRoot);
         TS_ASSERT_THROWS_CONTAINS(handler2.CopyFileTo(missing_file), "Can only copy single files");
         FileFinder global_dir("global", RelativeTo::ChasteSourceRoot);

@@ -195,8 +195,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellMutationStateCount()
 {
     std::vector<unsigned> mutation_state_count;
-    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties
-        = mpCellPropertyRegistry->rGetAllCellProperties();
+    const auto& r_cell_properties = mpCellPropertyRegistry->rGetAllCellProperties();
 
     // Calculate mutation states count
     for (unsigned i=0; i<r_cell_properties.size(); i++)
@@ -217,7 +216,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellMut
         assert(local_size == global_size);
 
         std::vector<unsigned> mutation_counts(global_size);
-        MPI_Allreduce(&mutation_state_count[0], &mutation_counts[0], mutation_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
+        MPI_Allreduce(mutation_state_count.data(), mutation_counts.data(), mutation_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
 
         mutation_state_count = mutation_counts;
     }
@@ -229,8 +228,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellProliferativeTypeCount()
 {
     std::vector<unsigned> proliferative_type_count;
-    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties
-        = mpCellPropertyRegistry->rGetAllCellProperties();
+    const auto& r_cell_properties = mpCellPropertyRegistry->rGetAllCellProperties();
 
     // Calculate proliferative types count
     for (unsigned i=0; i<r_cell_properties.size(); i++)
@@ -252,7 +250,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellPro
         assert(local_size == global_size);
 
         std::vector<unsigned> total_types_counts(global_size);
-        MPI_Allreduce(&proliferative_type_count[0], &total_types_counts[0], total_types_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
+        MPI_Allreduce(proliferative_type_count.data(), total_types_counts.data(), total_types_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
 
         proliferative_type_count = total_types_counts;
     }
@@ -311,7 +309,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
     if (PetscTools::IsParallel())
     {
         std::vector<unsigned> phase_counts(cell_cycle_phase_count.size(), 0u);
-        MPI_Allreduce(&cell_cycle_phase_count[0], &phase_counts[0], phase_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
+        MPI_Allreduce(cell_cycle_phase_count.data(), phase_counts.data(), phase_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
 
         cell_cycle_phase_count = phase_counts;
     }

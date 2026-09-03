@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "Exception.hpp"
+#include "FilesystemPermissions.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "OutputFileHandler.hpp"
 #include "PosixPathFixer.hpp"
@@ -292,7 +293,7 @@ void RecursiveCopy(const fs::path& rFromPath, const fs::path& rToPath)
     {
         // Create the destination folder
         EXCEPT_IF(fs::exists(dest));
-        fs::create_directory(dest);
+        FilesystemPermissions::CreateDirectoryWithPermissions(dest);
         // Recursively copy our contents
         fs::directory_iterator end_iter;
         for (fs::directory_iterator dir_iter(rFromPath); dir_iter != end_iter; ++dir_iter)
@@ -302,7 +303,7 @@ void RecursiveCopy(const fs::path& rFromPath, const fs::path& rToPath)
     }
     else
     {
-        fs::copy_file(rFromPath, dest); // Just copy!
+        FilesystemPermissions::CopyFileWithPermissions(rFromPath, dest);
     }
 }
 

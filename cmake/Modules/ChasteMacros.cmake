@@ -587,6 +587,10 @@ macro(Chaste_DO_TEST_COMMON component)
                     # if the test has already been defined, add it to this test pack
                     get_property(test_labels TEST ${testTargetName} PROPERTY LABELS)
                     list(APPEND test_labels ${type}_${component})
+                    list(FIND Chaste_DEPENDS_core ${component} _core_component_index)
+                    if (NOT _core_component_index EQUAL -1)
+                        list(APPEND test_labels ${type}_core)
+                    endif ()
                     set_property(TEST ${testTargetName} PROPERTY LABELS "${test_labels}")
 
                 else()
@@ -602,7 +606,16 @@ macro(Chaste_DO_TEST_COMMON component)
                     endif()
 
 
-                    set_property(TEST ${testTargetName} PROPERTY LABELS ${type}_${component})
+                    # Every test is labelled <testpack>_<component>. Tests belonging to a
+                    # "core" component (see Chaste_DEPENDS_core) additionally get a
+                    # <testpack>_core label, so that e.g. `ctest -L Continuous_core` selects
+                    # all core-component tests in one go.
+                    set (_test_labels ${type}_${component})
+                    list (FIND Chaste_DEPENDS_core ${component} _core_component_index)
+                    if (NOT _core_component_index EQUAL -1)
+                        list (APPEND _test_labels ${type}_core)
+                    endif ()
+                    set_property(TEST ${testTargetName} PROPERTY LABELS ${_test_labels})
 
                     if (Chaste_INSTALL_TESTS AND NOT(${component} MATCHES "^project"))
                         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${old_testTargetName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
@@ -648,6 +661,11 @@ macro(Chaste_DO_TEST_COMMON component)
                 if ((NOT ${component} STREQUAL python) AND (NOT (${filename} MATCHES ".py$")))
                     add_dependencies(${component} ${exeTargetName})
                     add_dependencies(${type} ${exeTargetName})
+                    # ...and to the combined target for this test pack of this component,
+                    # so that e.g. Continuous_cell_based builds only what it will run.
+                    if (TARGET ${type}_${component})
+                        add_dependencies(${type}_${component} ${exeTargetName})
+                    endif()
                 endif()
             endforeach(filename ${testpack})
         endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
