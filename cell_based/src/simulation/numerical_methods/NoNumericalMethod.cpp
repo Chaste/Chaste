@@ -53,6 +53,16 @@ bool NoNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DelegatesToPopulation()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void NoNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetUseAdaptiveTimestep(bool useAdaptiveTimestep)
+{
+    if (useAdaptiveTimestep)
+    {
+        EXCEPTION("NoNumericalMethod never throws a StepSizeException, so adaptive timestepping "
+                  "would have no effect. This is not currently supported.");
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NoNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt)
 {
     this->mpCellPopulation->UpdateNodeLocations(dt);

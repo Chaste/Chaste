@@ -247,19 +247,21 @@ public:
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // This displacement is larger than half the CellRearrangementThreshold, so should cause a warning to be thrown.
+        // ImmersedBoundaryCellPopulation no longer overrides CheckForStepSizeException(): all
+        // movement restriction for immersed boundary is handled directly within
+        // UpdateNodeLocations() (see TestOverlyLargeDisplacements()), using CharacteristicNodeSpacing
+        // rather than CellRearrangementThreshold. CheckForStepSizeException() here is therefore just
+        // the plain inherited AbstractOffLatticeCellPopulation behaviour: it only ever checks
+        // against AbsoluteMovementThreshold, and never modifies the displacement or warns.
         c_vector<double, 2> displacement;
         displacement[0] = 0.8;
         displacement[1] = 0.8;
 
-        // Test Warnings: displacement > half CellRearrangementThreshold but below AbsoluteMovementThreshold
-        // should clamp the displacement and issue a warning, but NOT throw.
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         TS_ASSERT_THROWS_NOTHING(cell_population.CheckForStepSizeException(0, displacement, 0.1));
-        TS_ASSERT_DELTA(norm_2(displacement), 0.5 * p_mesh->GetCellRearrangementThreshold(), 1e-12);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
-        Warnings::QuietDestroy();
+        TS_ASSERT_DELTA(displacement[0], 0.8, 1e-12);
+        TS_ASSERT_DELTA(displacement[1], 0.8, 1e-12);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
 
         // Test StepSizeException: displacement exceeding the AbsoluteMovementThreshold (default 2.0)
         // should throw a StepSizeException via the base-class check.

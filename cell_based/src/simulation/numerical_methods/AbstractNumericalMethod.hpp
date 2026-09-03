@@ -182,7 +182,7 @@ public:
      *
      * @param useAdaptiveTimestep whether to use an adaptive time step
      */
-    void SetUseAdaptiveTimestep(bool useAdaptiveTimestep);
+    virtual void SetUseAdaptiveTimestep(bool useAdaptiveTimestep);
 
     /**
      * @return whether the numerical method uses an adaptive time step.

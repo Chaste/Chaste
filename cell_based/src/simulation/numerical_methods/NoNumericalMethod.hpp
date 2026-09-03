@@ -91,6 +91,18 @@ public:
     virtual bool DelegatesToPopulation();
 
     /**
+     * Overridden SetUseAdaptiveTimestep() method.
+     *
+     * NoNumericalMethod never throws a StepSizeException (the cell population's own
+     * UpdateNodeLocations() is entirely responsible for any movement restriction), so
+     * enabling adaptive timestepping here could never have any effect. Rather than allow
+     * that to be silently set and silently do nothing, this throws.
+     *
+     * @param useAdaptiveTimestep whether to use an adaptive time step
+     */
+    virtual void SetUseAdaptiveTimestep(bool useAdaptiveTimestep);
+
+    /**
      * Overridden UpdateAllNodePositions() method.
      *
      * Delegates entirely to the cell population's own UpdateNodeLocations() method.

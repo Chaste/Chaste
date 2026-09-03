@@ -587,6 +587,14 @@ public:
         // NoNumericalMethod always delegates to the cell population
         MAKE_PTR(NoNumericalMethod<2>, p_no_method);
         TS_ASSERT(p_no_method->DelegatesToPopulation());
+
+        // NoNumericalMethod never throws a StepSizeException, so adaptive timestepping could
+        // never have any effect; disabling it is a no-op, but enabling it should throw rather
+        // than silently doing nothing
+        TS_ASSERT_THROWS_NOTHING(p_no_method->SetUseAdaptiveTimestep(false));
+        TS_ASSERT_THROWS_THIS(p_no_method->SetUseAdaptiveTimestep(true),
+            "NoNumericalMethod never throws a StepSizeException, so adaptive timestepping "
+            "would have no effect. This is not currently supported.");
     }
 
     void TestUpdateAllNodePositionsRK4WithMeshBased()
