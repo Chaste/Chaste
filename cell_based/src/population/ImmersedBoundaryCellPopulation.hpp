@@ -101,12 +101,6 @@ private:
     unsigned mReMeshFrequency;
 
     /**
-     * Distance above which a vertex movement will trigger a step size
-     * exception.
-     */
-    double mCellRearrangementThreshold;
-
-    /**
      * Overridden WriteVtkResultsToFile() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where
@@ -135,7 +129,6 @@ private:
         archive& mPopulationHasActiveSources;
         archive& mInteractionDistance;
         archive& mReMeshFrequency;
-        archive& mCellRearrangementThreshold;
     }
 
     /**
@@ -280,19 +273,6 @@ public:
      * @return the intrinsic node spacing
      */
     double GetIntrinsicSpacing() const;
-
-    /**
-     * Set the maximum distance two nodes should be allowed to move apart from each other
-     * in a single step.
-     *
-     * @param newThreshold the new cell rearrangement threshold
-     */
-    void SetCellRearrangementThreshold(double newThreshold);
-
-    /**
-     * @return mCellRearrangementThreshold.
-     */
-    double GetCellRearrangementThreshold() const;
 
     /**
      * Overridden GetLocationOfCellCentre() method. Find the centre of mass of a
@@ -603,7 +583,6 @@ namespace serialization
         ar& t->DoesPopulationHaveActiveSources();
         ar& t->GetInteractionDistance();
         ar& t->GetReMeshFrequency();
-        ar& t->GetCellRearrangementThreshold();
     }
 
     /**
@@ -623,15 +602,12 @@ namespace serialization
         ar >> interactionDistance;
         unsigned int reMeshFrequency = 1;
         ar >> reMeshFrequency;
-        double cellRearrangementThreshold = 0.5;
-        ar >> cellRearrangementThreshold;
 
         // Invoke inplace constructor to initialise instance
         ::new (t) ImmersedBoundaryCellPopulation<DIM>(*p_mesh);
         t->SetIfPopulationHasActiveSources(hasActiveSources);
         t->SetInteractionDistance(interactionDistance);
         t->SetReMeshFrequency(reMeshFrequency);
-        t->SetCellRearrangementThreshold(cellRearrangementThreshold);
     }
 }
 } // namespace ...

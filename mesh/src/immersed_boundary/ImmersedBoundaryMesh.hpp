@@ -92,9 +92,6 @@ protected:
      */
     double mSummaryOfNodeLocations;
 
-    /** The distance above which a cell vertex moving will trigger a step size exception */
-    double mCellRearrangementThreshold;
-
     /**
      * A halo distance around the unit square, used when calculating the node voronoi diagram
      */
@@ -627,9 +624,8 @@ public:
     /**
      * Divide an element along a specified axis.
      *
-     * If the new nodes (intersections of axis with element) are within
-     * mCellRearrangementThreshold of existing nodes then they are
-     * moved 2*mCellRearrangementThreshold away.
+     * The two daughter elements are separated by mElementDivisionSpacing, measured
+     * perpendicular to the axis of division (see DivideElement()).
      *
      * @param pElement the element to divide
      * @param axisOfDivision axis to divide the element by
@@ -666,16 +662,6 @@ public:
      * @return mNeighbourDist
      */
     double GetNeighbourDist() const;
-
-    /**
-     * @param cellRearrangementThreshold the new value of mCellRearrangementThreshold
-     */
-    void SetCellRearrangementThreshold(double cellRearrangementThreshold);
-
-    /**
-     * @return the maximum distance a cell vertex can move without triggering a step size exception
-     */
-    double GetCellRearrangementThreshold();
 
     /**
      * @param neighbourDist the new value of mNeighbourDist

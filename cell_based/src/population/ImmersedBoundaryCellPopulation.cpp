@@ -56,8 +56,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(
       mIntrinsicSpacing(0.01),
       mPopulationHasActiveSources(false),
       mOutputNodeRegionToVtk(false),
-      mReMeshFrequency(UINT_MAX),
-      mCellRearrangementThreshold(0.5)
+      mReMeshFrequency(UINT_MAX)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
     mpImmersedBoundaryDivisionRule.reset(new ShortAxisImmersedBoundaryDivisionRule<DIM>());
@@ -95,8 +94,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(
       mIntrinsicSpacing(0.01),
       mPopulationHasActiveSources(false),
       mOutputNodeRegionToVtk(false),
-      mReMeshFrequency(UINT_MAX),
-      mCellRearrangementThreshold(0.5)
+      mReMeshFrequency(UINT_MAX)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
 }
@@ -196,18 +194,6 @@ template <unsigned DIM>
 unsigned ImmersedBoundaryCellPopulation<DIM>::GetReMeshFrequency() const
 {
     return mReMeshFrequency;
-}
-
-template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::SetCellRearrangementThreshold(double newThreshold)
-{
-    mCellRearrangementThreshold = newThreshold;
-}
-
-template <unsigned DIM>
-double ImmersedBoundaryCellPopulation<DIM>::GetCellRearrangementThreshold() const
-{
-    return mCellRearrangementThreshold;
 }
 
 template <unsigned DIM>
