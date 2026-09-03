@@ -118,6 +118,11 @@ class VtkScene
     bool mHasStarted = false;
 
     /**
+     * Has the animation writer been started but not yet ended
+     */
+    bool mAnimationWriterStarted = false;
+
+    /**
      * The cell population
      */
     boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > mpCellPopulationGenerator;
@@ -131,9 +136,9 @@ public:
     VtkScene();
 
     /**
-     * Destructor
+     * Destructor. Finalises any in-progress animation output.
      */
-    virtual ~VtkScene() = default;
+    virtual ~VtkScene();
 
     /**
      * Finalise and close the animation file, if one is being written.

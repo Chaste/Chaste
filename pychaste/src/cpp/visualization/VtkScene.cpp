@@ -87,11 +87,18 @@ VtkScene<DIM>::VtkScene()
 }
 
 template <unsigned DIM>
+VtkScene<DIM>::~VtkScene()
+{
+    End();
+}
+
+template <unsigned DIM>
 void VtkScene<DIM>::End()
 {
-    if (mSaveAsAnimation && mHasStarted)
+    if (mAnimationWriterStarted)
     {
         mAnimationWriter->End();
+        mAnimationWriterStarted = false;
     }
 }
 
@@ -245,6 +252,7 @@ void VtkScene<DIM>::Start()
             mAnimationWriter->SetFileName((mOutputFilePath + ".ogg").c_str());
             mAnimationWriter->SetRate(ANIMATION_FRAME_RATE);
             mAnimationWriter->Start();
+            mAnimationWriterStarted = true;
         }
     }
 
