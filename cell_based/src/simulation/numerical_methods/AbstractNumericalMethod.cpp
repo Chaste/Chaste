@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractNumericalMethod.hpp"
 #include "StepSizeException.hpp"
 #include "Warnings.hpp"
-#include "AbstractCentreBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CellBasedEventHandler.hpp"

@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CRYPTPROJECTIONFORCE_HPP_
 #define CRYPTPROJECTIONFORCE_HPP_
 
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A force law for use in crypt projection simulations.
  */
-class CryptProjectionForce : public GeneralisedLinearSpringForce<2>
+class CryptProjectionForce : public LinearSpringForce<2>
 {
     friend class TestCryptProjectionForce;
 
@@ -61,7 +61,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<GeneralisedLinearSpringForce<2> >(*this);
+        archive & boost::serialization::base_object<LinearSpringForce<2> >(*this);
         archive & mA;
         archive & mB;
         archive & mIncludeWntChemotaxis;

@@ -54,7 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <map>
 
-#include "DynamicVentilationProblem.hpp"
 #include "CommandLineArguments.hpp"
 #include "PetscSetupAndFinalize.hpp"
 

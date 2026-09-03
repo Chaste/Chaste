@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 
 CryptProjectionForce::CryptProjectionForce()
-    : GeneralisedLinearSpringForce<2>(),
+    : LinearSpringForce<2>(),
       mIncludeWntChemotaxis(false),
       mWntChemotaxisStrength(100.0)
 {
@@ -126,7 +126,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     c_vector<double,2> node_a_location_2d = rCellPopulation.GetNode(nodeAGlobalIndex)->rGetLocation();
     c_vector<double,2> node_b_location_2d = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
 
-    // "Get the unit vector parallel to the line joining the two nodes" [GeneralisedLinearSpringForce]
+    // "Get the unit vector parallel to the line joining the two nodes" [LinearSpringForce]
 
     // Create a unit vector in the direction of the 3D spring
     c_vector<double,3> unit_difference = mNode3dLocationMap[nodeBGlobalIndex] - mNode3dLocationMap[nodeAGlobalIndex];
@@ -164,9 +164,9 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
 
     /*
      * If the cells are both newly divided, then the rest length of the spring
-     * connecting them grows linearly with time, until mMeinekeSpringGrowthDuration hour after division.
+     * connecting them grows linearly with time, until mSpringGrowthDuration hour after division.
      */
-    if (ageA < mMeinekeSpringGrowthDuration && ageB < mMeinekeSpringGrowthDuration)
+    if (ageA < mSpringGrowthDuration && ageB < mSpringGrowthDuration)
     {
         /*
          * The spring rest length increases from a predefined small parameter
@@ -175,10 +175,10 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
         std::pair<CellPtr,CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
         if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
         {
-            double lambda = mMeinekeDivisionRestingSpringLength;
-            rest_length = lambda + (1.0 - lambda) * ageA/mMeinekeSpringGrowthDuration;
+            double lambda = mDivisionRestingSpringLength;
+            rest_length = lambda + (1.0 - lambda) * ageA/mSpringGrowthDuration;
         }
-        if (ageA+SimulationTime::Instance()->GetTimeStep() >= mMeinekeSpringGrowthDuration)
+        if (ageA+SimulationTime::Instance()->GetTimeStep() >= mSpringGrowthDuration)
         {
             // This spring is about to go out of scope
             p_static_cast_cell_population->UnmarkSpring(cell_pair);
@@ -223,7 +223,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     multiplication_factor *= VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
 
     // Calculate the 3D force between the two points
-    c_vector<double,3> force_between_nodes = multiplication_factor * this->GetMeinekeSpringStiffness() * unit_difference * (distance_between_nodes - rest_length);
+    c_vector<double,3> force_between_nodes = multiplication_factor * this->GetSpringStiffness() * unit_difference * (distance_between_nodes - rest_length);
 
     // Calculate an outward normal unit vector to the tangent plane of the crypt surface at the 3D point corresponding to node B
     c_vector<double,3> outward_normal_unit_vector;
@@ -303,7 +303,7 @@ void CryptProjectionForce::OutputForceParameters(out_stream& rParamsFile)
     *rParamsFile << "\t\t\t<WntChemotaxisStrength>" << mWntChemotaxisStrength << "</WntChemotaxisStrength>\n";
 
     // Call method on direct parent class
-    GeneralisedLinearSpringForce<2>::OutputForceParameters(rParamsFile);
+    LinearSpringForce<2>::OutputForceParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

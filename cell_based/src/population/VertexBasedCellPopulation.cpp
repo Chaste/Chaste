@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "T2SwapCellKiller.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "CellSrnModel.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT2SwapLocationsWriter.hpp"

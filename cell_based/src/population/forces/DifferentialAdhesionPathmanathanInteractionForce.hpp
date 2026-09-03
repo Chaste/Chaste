@@ -33,23 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DIFFERENTIALADHESIONGENERALISEDLINEARSPRINGFORCE_HPP_
-#define DIFFERENTIALADHESIONGENERALISEDLINEARSPRINGFORCE_HPP_
+#ifndef DIFFERENTIALADHESIONPATHMANATHANINTERACTIONFORCE_HPP_
+#define DIFFERENTIALADHESIONPATHMANATHANINTERACTIONFORCE_HPP_
 
-#include "GeneralisedLinearSpringForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
+
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
 /**
- * A class for a simple two-body differential adhesion force law between
+ * A class for a two-body differential adhesion force law between
  * labelled and unlabelled cells (as defined by the CellLabel cell
- * property).
+ * property). Inherits from PathmanathanInteractionForce.
  *
- * Designed for use in node and mesh-based simulations.
- *
- * \todo #2266 - throw exceptions if using other cell population objects?
- * \todo #2266 - override CalculateForceBetweenNodes() to use a default rest length of 1.0 for all springs?
+ * Supports both mesh-based and node-based simulations.
  */
-template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class DifferentialAdhesionGeneralisedLinearSpringForce : public GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class DifferentialAdhesionPathmanathanInteractionForce : public PathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>
 {
 private :
 
@@ -63,7 +63,7 @@ private :
      * Note that for homotypic interactions between neighbouring
      * unlabelled cells, we use the multiplier value 1.0 that is
      * returned by the method VariableSpringConstantMultiplicationFactor()
-     * in the parent class GeneralisedLinearSpringForce.
+     * in the parent class PathmanathanInteractionForce.
      */
     double mHomotypicLabelledSpringConstantMultiplier;
 
@@ -87,7 +87,7 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<PathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mHomotypicLabelledSpringConstantMultiplier;
         archive & mHeterotypicSpringConstantMultiplier;
     }
@@ -97,7 +97,7 @@ public :
     /**
      * Constructor.
      */
-    DifferentialAdhesionGeneralisedLinearSpringForce();
+    DifferentialAdhesionPathmanathanInteractionForce();
 
     /**
      * Overridden VariableSpringConstantMultiplicationFactor() method.
@@ -152,6 +152,6 @@ public :
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(DifferentialAdhesionGeneralisedLinearSpringForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(DifferentialAdhesionPathmanathanInteractionForce)
 
-#endif /*DIFFERENTIALADHESIONGENERALISEDLINEARSPRINGFORCE_HPP_*/
+#endif /*DIFFERENTIALADHESIONPATHMANATHANINTERACTIONFORCE_HPP_*/
