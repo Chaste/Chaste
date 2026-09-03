@@ -554,7 +554,6 @@ modules:
       - name: BuskeCompressionForce
       - name: BuskeElasticForce
       - name: ChemotacticForce
-      - name: DifferentialAdhesionGeneralisedLinearSpringForce
       - name: DiffusionForce
       - name: DiscreteSystemForceCalculator
         excluded: True # internal calculator; returns vector<vector<double>>
@@ -574,7 +573,6 @@ modules:
           - PybindUblasTypeCaster.hpp
 
       - name: FarhadifarForce
-      - name: GeneralisedLinearSpringForce
       - name: ImmersedBoundaryKinematicFeedbackForce
       - name: ImmersedBoundaryLinearDifferentialAdhesionForce
       - name: ImmersedBoundaryLinearInteractionForce
@@ -582,7 +580,6 @@ modules:
       - name: ImmersedBoundaryMorseInteractionForce
       - name: ImmersedBoundaryMorseMembraneForce
       - name: NagaiHondaForce
-      - name: RepulsionForce
       - name: WelikyOsterForce
 
       - name: DifferentialAdhesionLinearSpringForce
