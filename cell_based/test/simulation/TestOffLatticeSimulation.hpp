@@ -362,11 +362,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-
         cell_population.SetWriteVtkAsPoints(true);
-
-
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -396,7 +392,7 @@ public:
         // Check that the number of nodes is equal to the number of cells
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
-        // Check that the correct number of cells are killed all cells on left or bottom of 3x5 block
+        // Check that the correct number of cells are killed: all cells on the left or bottom of the 3x5 block
         unsigned num_deaths = 7u;
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), num_deaths);
 

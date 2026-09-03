@@ -80,7 +80,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  1. reverts all node positions to their state at the start of the sub-step, and
  *  2. retries the step with the suggested smaller sub-step size which is a power of 2 smaller.
- *     i.e. the timestep is halved until the movement threshold met.
+ *     i.e. the timestep is halved until the movement threshold is met.
  *
  * Each macro time step `dt` may therefore be completed in several sub-steps that sum to
  * `dt`. If more than `mMaxAdaptiveTimeSteps` consecutive sub-steps fail, the simulation

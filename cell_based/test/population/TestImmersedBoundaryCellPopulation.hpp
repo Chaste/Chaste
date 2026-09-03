@@ -272,6 +272,7 @@ public:
         TS_ASSERT_THROWS(cell_population.CheckForStepSizeException(0, large_displacement, 0.1),
                          const StepSizeException&);
     }
+
     void TestValidateException()
     {
         // Create an immersed boundary cell population object
