@@ -799,6 +799,59 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputInitialCellGeometryAndState(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t<InitialCellGeometryAndState>\n";
+
+    const unsigned cell_level = 3u;
+    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        unsigned location_index = GetLocationIndexUsingCell(*cell_iter);
+        *rParamsFile << "\t\t<Cell index=\"" << location_index << "\">\n";
+
+        c_vector<double, SPACE_DIM> location = GetLocationOfCellCentre(*cell_iter);
+        *rParamsFile << "\t\t\t<Location>";
+        for (unsigned d = 0; d < SPACE_DIM; d++)
+        {
+            *rParamsFile << location[d];
+            if (d + 1 < SPACE_DIM)
+            {
+                *rParamsFile << " ";
+            }
+        }
+        *rParamsFile << "</Location>\n";
+
+        CHASTE_PARAM_EXPR(rParamsFile, cell_level, MutationState, (*cell_iter)->GetMutationState()->GetIdentifier());
+
+        boost::shared_ptr<CellData> p_cell_data = (*cell_iter)->GetCellData();
+        if (p_cell_data && p_cell_data->GetNumItems() > 0)
+        {
+            *rParamsFile << "\t\t\t<CellData>\n";
+            std::vector<std::string> keys = p_cell_data->GetKeys();
+            for (const std::string& key : keys)
+            {
+                *rParamsFile << "\t\t\t\t<Variable name=\"" << key << "\">" << p_cell_data->GetItem(key) << "</Variable>\n";
+            }
+            *rParamsFile << "\t\t\t</CellData>\n";
+        }
+
+        *rParamsFile << "\t\t\t<CellCycleModel>\n";
+        (*cell_iter)->GetCellCycleModel()->OutputCellCycleModelInfo(rParamsFile);
+        *rParamsFile << "\t\t\t</CellCycleModel>\n";
+
+        *rParamsFile << "\t\t\t<SrnModel>\n";
+        (*cell_iter)->GetSrnModel()->OutputSrnModelInfo(rParamsFile);
+        *rParamsFile << "\t\t\t</SrnModel>\n";
+
+        *rParamsFile << "\t\t</Cell>\n";
+    }
+
+    *rParamsFile << "\t</InitialCellGeometryAndState>\n";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     const unsigned level = 2;

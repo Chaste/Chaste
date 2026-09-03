@@ -759,6 +759,17 @@ public:
     void OutputCellPopulationInfo(out_stream& rParamsFile);
 
     /**
+     * Outputs the initial cell geometry and per-cell biological state to file.
+     *
+     * For each cell, the output includes the cell centre location, mutation state,
+     * cell data, cell-cycle model info (via OutputCellCycleModelInfo) and SRN model
+     * info (via OutputSrnModelInfo).
+     *
+     * @param rParamsFile the file stream to which the data are output
+     */
+    void OutputInitialCellGeometryAndState(out_stream& rParamsFile);
+
+    /**
      * Outputs CellPopulation parameters to file
      *
      * As this method is pure virtual, it must be overridden

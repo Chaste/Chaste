@@ -735,6 +735,13 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 
         *parameter_file << "\n</Chaste>\n";
         parameter_file->close();
+
+        // Output initial cell geometry and per-cell biological state
+        out_stream initial_state_file = output_file_handler.OpenOutputFile("initial_cell_geometry.dat");
+        *initial_state_file << "<Chaste>\n";
+        mrCellPopulation.OutputInitialCellGeometryAndState(initial_state_file);
+        *initial_state_file << "</Chaste>\n";
+        initial_state_file->close();
     }
 }
 

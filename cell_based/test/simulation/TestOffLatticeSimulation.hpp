@@ -1087,6 +1087,10 @@ public:
         info_file.open(command.c_str());
         TS_ASSERT(info_file.is_open());
         info_file.close();
+
+        FileFinder generated_geom(results_dir + "initial_cell_geometry.dat", RelativeTo::Absolute);
+        FileFinder reference_geom("cell_based/test/data/TestOffLatticeSimulationOutputParameters/initial_cell_geometry.dat", RelativeTo::ChasteSourceRoot);
+        TS_ASSERT(FileComparison(generated_geom, reference_geom).CompareFiles());
     }
 
     /**
