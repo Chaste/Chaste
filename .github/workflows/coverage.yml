@@ -125,22 +125,15 @@ jobs:
         working-directory: chaste-build-dir
 
       - name: Run coverage
-        # --exclude drops system and module (boost/petsc/...) headers at capture time, so
-        # geninfo never processes them and never emits their thousands of consistency
-        # warnings. These external paths are not Chaste's code and would be stripped anyway;
-        # filtering them here rather than after --capture keeps the log readable and removes
-        # the source of the fatal lcov 2.x `inconsistent`/`mismatch` errors on STL headers.
-        #
-        # lcov 2.x makes fatal several conditions 1.x only warned about (mismatch,
-        # inconsistent, unused); all are demoted back to warnings via `ignore_errors` in
-        # cmake/Config/lcovrc, which both commands below load. See there for why they are
-        # benign. Do not add a --ignore-errors flag here: on the command line it REPLACES
-        # the rc list rather than merging, which would silently re-arm the other categories.
+        # Exclude patterns and error-ignores live in cmake/Config/lcovrc (shared with the
+        # local `make coverage` target); excludes apply at capture time, so no --exclude
+        # args and no `lcov --remove` pass are needed. Pass an explicit --parallel (not 0:
+        # geninfo's auto-detect ignores the container's --cpus). Do not pass --ignore-errors
+        # here: on the command line it REPLACES the rc list instead of merging.
         run: |
           su runner << 'EOF'
           set -e
-          lcov --config-file ../cmake/Config/lcovrc --directory . --capture --exclude '/usr/*' --exclude '*/modules/*' --output-file coverage.info
-          lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info
+          lcov --config-file ../cmake/Config/lcovrc --directory . --capture --parallel 4 --output-file coverage.info
           EOF
         working-directory: chaste-build-dir
 
