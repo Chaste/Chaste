@@ -322,6 +322,12 @@ from chaste._pychaste_all import (
     ForwardEulerNumericalMethod_2_2,
     ForwardEulerNumericalMethod_2_3,
     ForwardEulerNumericalMethod_3_3,
+    RK4NumericalMethod_1_1,
+    RK4NumericalMethod_1_2,
+    RK4NumericalMethod_1_3,
+    RK4NumericalMethod_2_2,
+    RK4NumericalMethod_2_3,
+    RK4NumericalMethod_3_3,
     GammaG1CellCycleModel,
     GeneralisedLinearSpringForce_1_1,
     GeneralisedLinearSpringForce_1_2,
@@ -900,6 +906,13 @@ __all__ = [
     "ForwardEulerNumericalMethod_2_2",
     "ForwardEulerNumericalMethod_2_3",
     "ForwardEulerNumericalMethod_3_3",
+    "RK4NumericalMethod",
+    "RK4NumericalMethod_1_1",
+    "RK4NumericalMethod_1_2",
+    "RK4NumericalMethod_1_3",
+    "RK4NumericalMethod_2_2",
+    "RK4NumericalMethod_2_3",
+    "RK4NumericalMethod_3_3",
     "GammaG1CellCycleModel",
     "GeneralisedLinearSpringForce",
     "GeneralisedLinearSpringForce_1_1",
@@ -1784,6 +1797,20 @@ class ForwardEulerNumericalMethod(TemplateClass):
         ("2", "3"): ForwardEulerNumericalMethod_2_3,
         ("3", "3"): ForwardEulerNumericalMethod_3_3,
         ("3",): ForwardEulerNumericalMethod_3_3,
+    }
+
+
+class RK4NumericalMethod(TemplateClass):
+    _instantiations = {
+        ("1", "1"): RK4NumericalMethod_1_1,
+        ("1",): RK4NumericalMethod_1_1,
+        ("1", "2"): RK4NumericalMethod_1_2,
+        ("2", "2"): RK4NumericalMethod_2_2,
+        ("2",): RK4NumericalMethod_2_2,
+        ("1", "3"): RK4NumericalMethod_1_3,
+        ("2", "3"): RK4NumericalMethod_2_3,
+        ("3", "3"): RK4NumericalMethod_3_3,
+        ("3",): RK4NumericalMethod_3_3,
     }
 
 
