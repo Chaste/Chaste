@@ -2511,7 +2511,7 @@ void TestDifferentialAdhesionPathmanathanInteractionForceMethods()
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Test that a subclass of AbstractTwoBodyInteractionForce throws the correct exception
-        GeneralisedLinearSpringForce<2> spring_force;
+        LinearSpringForce<2> spring_force;
         TS_ASSERT_THROWS_THIS(spring_force.AddForceContribution(cell_population),
                 "Subclasses of AbstractTwoBodyInteractionForce are to be used with subclasses of AbstractOffLatticeCellPopulation only");
     }
