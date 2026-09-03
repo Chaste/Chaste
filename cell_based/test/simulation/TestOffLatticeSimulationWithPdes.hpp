@@ -70,12 +70,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "CellPopulationAreaWriter.hpp"
-#include "PetscSetupAndFinalize.hpp"
-#include "EllipticBoxDomainPdeModifier.hpp"
 #include "EllipticGrowingDomainPdeModifier.hpp"
 #include "RadialCellDataDistributionWriter.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "EllipticBoxDomainPdeModifier.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {

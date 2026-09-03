@@ -280,10 +280,10 @@ CHASTE_CLASS_EXPORT(MyOdeSystem)
 CHASTE_CLASS_EXPORT(MySrnModel)
 
 /*
- * Need to re-include this after `SerializationExportWrapperForCpp.hpp`. This is to export the
- * components that would normally be in a seperate cpp file.
+ * The solver export wrapper header is already included above. We repeat the export here after
+ * `SerializationExportWrapperForCpp.hpp` to export the components that would normally be in a
+ * separate cpp file.
  */
-#include "CellCycleModelOdeSolverExportWrapper.hpp"
 EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(MySrnModel)
 
 /*

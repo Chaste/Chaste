@@ -67,7 +67,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "DiffusionCaUpdateRule.hpp"
-#include "CellsGenerator.hpp"
 #include "NoCellCycleModel.hpp"
 #include "RandomCellKiller.hpp"
 

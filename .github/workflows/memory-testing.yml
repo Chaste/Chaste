@@ -9,6 +9,9 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: read
+
 env:
   # Read by cmake/process_valgrind_output.py to label the generated report. head_ref and
   # pull_request.head.sha are only set for pull_request events, so they fall back to the

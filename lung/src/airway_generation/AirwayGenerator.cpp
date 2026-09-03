@@ -66,7 +66,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLine.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkMassProperties.h"
 #include "vtkPolyDataConnectivityFilter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkAppendFilter.h"
