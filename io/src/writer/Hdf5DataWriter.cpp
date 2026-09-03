@@ -230,7 +230,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                 // Read data from hyperslab in the file into the hyperslab in memory
                 mIncompleteNodeIndices.clear();
                 mIncompleteNodeIndices.resize(num_node_indices);
-                H5Aread(attribute_id, H5T_NATIVE_UINT, &mIncompleteNodeIndices[0]);
+                H5Aread(attribute_id, H5T_NATIVE_UINT, mIncompleteNodeIndices.data());
                 // Assume there is no permutation when extending.  We're going throw an exception at the
                 // end of the block (so setting mIncompletePermIndices is only for safety.
                 mIncompletePermIndices = mIncompleteNodeIndices;
@@ -629,7 +629,7 @@ void Hdf5DataWriter::EndDefineMode()
                          H5P_DEFAULT, H5P_DEFAULT);
 
         // Write to the attribute (the original node index labels)
-        H5Awrite(attr, H5T_NATIVE_UINT, &mIncompleteNodeIndices[0]);
+        H5Awrite(attr, H5T_NATIVE_UINT, mIncompleteNodeIndices.data());
 
         H5Sclose(colspace);
         H5Aclose(attr);
@@ -1041,7 +1041,9 @@ void Hdf5DataWriter::WriteCache()
     H5Pset_dxpl_mpio(property_list_id, H5FD_MPIO_COLLECTIVE);
 
     // Write!
-    H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, &mDataCache[0]);
+    // mDataCache is empty on a process with nothing to write, which must still take part in
+    // this collective write, so use data() rather than indexing element [0].
+    H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, mDataCache.data());
 
     // Tidy up
     H5Sclose(memspace);

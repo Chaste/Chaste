@@ -33,6 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
 #include <limits>
 #include "AbstractTetrahedralMesh.hpp"
 
@@ -975,14 +976,8 @@ c_vector<double, 2> AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMi
             ++ele_iter)
     {
         c_vector<double, 2> ele_min_max = ele_iter->CalculateMinMaxEdgeLengths();
-        if (ele_min_max[0] < min_max[0])
-        {
-            min_max[0] = ele_min_max[0];
-        }
-        if (ele_min_max[1] > min_max[1])
-        {
-            min_max[1] = ele_min_max[1];
-        }
+        min_max[0] = std::min(min_max[0], ele_min_max[0]);
+        min_max[1] = std::max(min_max[1], ele_min_max[1]);
     }
     return min_max;
 }
