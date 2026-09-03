@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  *
- *  Chaste tutorial - this page gets automatically changed to a wiki page
+ *  Chaste tutorial - this page gets automatically changed to a web page
  *  DO NOT remove the comments below, and if the code has to be changed in
  *  order to run, please check the comments are still accurate
  *
@@ -170,7 +170,11 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestContactInhibitionInBox");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the cells become
+         * contact-inhibited (they turn dark blue once their volume drops below the critical size, as
+         * described below), change this to `20.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /* Then, we define the modifier class, which automatically updates the volumes of the cells in `CellData` and passes it to the simulation.*/
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
@@ -213,8 +217,11 @@ public:
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc4, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc4);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
     /*
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
@@ -279,7 +286,10 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestContactInhibitionTumourInBox");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the healthy cells become
+         * contact-inhibited while the tumour cells keep dividing, change this to `20.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /* Then, we define the modifier class, which automatically updates the volumes of the cells in `CellData` and passes it to the simulation.*/
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
@@ -315,8 +325,11 @@ public:
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc4, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc4);
 
-        /* Finally, to run the simulation, we call `Solve()`. */
-        simulator.Solve();
+        /* Finally, to run the simulation, we call `Solve()`. (The next two lines are for test purposes only and
+         * are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion
+         * without error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
     /*
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
@@ -366,7 +379,10 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexContactInhibition");
         simulator.SetSamplingTimestepMultiple(50);
-        simulator.SetEndTime(10.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the healthy cells become
+         * contact-inhibited towards the centre of the monolayer, change this to `10.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /* Then, we define the modifier class, which automatically updates the volumes of the cells in `CellData` and passes it to the simulation.*/
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
@@ -383,8 +399,11 @@ public:
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*

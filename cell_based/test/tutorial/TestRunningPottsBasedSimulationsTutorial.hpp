@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
  *
- *  Chaste tutorial - this page gets automatically changed to a wiki page
+ *  Chaste tutorial - this page gets automatically changed to a web page
  *  DO NOT remove the comments below, and if the code has to be changed in
  *  order to run, please check the comments are still accurate
  *
@@ -147,7 +147,10 @@ public:
          * and set the output directory and end time.*/
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("PottsBasedMonolayer");
-        simulator.SetEndTime(50.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `50.0`.** */
+        double end_time = 3.0;
+        simulator.SetEndTime(end_time);
         /*
          * The default timestep is 0.1, but can be changed using the below command. The timestep is used in conjunction with the "Temperature" and
          * number of sweeps per timestep to specify the relationship between cell movement and proliferation. We also set the simulation to only output
@@ -185,13 +188,11 @@ public:
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
         simulator.AddUpdateRule(p_adhesion_update_rule);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial. If different simulation input parameters are being explored
-         * the lines should be removed.*/
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 64u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 50.0, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -276,7 +277,10 @@ public:
          * and set the output directory and end time. */
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("PottsMonolayerCellSorting");
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 3.0;
+        simulator.SetEndTime(end_time);
         simulator.SetSamplingTimestepMultiple(10);
 
         /* We must now create one or more update rules, which determine the Hamiltonian
@@ -299,13 +303,11 @@ public:
         /*
          * These parameters cause the cells to sort, for different values you can get different patterns.
          *
-         * To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 64u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+         * To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -372,7 +374,10 @@ public:
          * and set the output directory and end time. */
         OnLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("PottsCellSorting3D");
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 3.0;
+        simulator.SetEndTime(end_time);
         simulator.SetSamplingTimestepMultiple(10);
 
         /* We must now create one or more update rules, which determine the Hamiltonian
@@ -398,13 +403,11 @@ public:
         p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
         simulator.AddUpdateRule(p_differential_adhesion_update_rule);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 64u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*

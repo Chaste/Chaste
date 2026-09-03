@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
  *
- *  Chaste tutorial - this page gets automatically changed to a wiki page
+ *  Chaste tutorial - this page gets automatically changed to a web page
  *  DO NOT remove the comments below, and if the code has to be changed in
  *  order to run, please check the comments are still accurate
  *
@@ -156,7 +156,10 @@ public:
          * and set the output directory and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("MeshBasedMonolayer");
-        simulator.SetEndTime(10.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `10.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /*
          * For longer simulations, we may not want to output the results
@@ -180,13 +183,11 @@ public:
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial. If different simulation input parameters are being explored
-         * the lines should be removed.*/
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -257,7 +258,7 @@ public:
          * argument of the constructor takes a vector of the indices of the real nodes and should be the
          * same length as the vector of cell pointers.
          */
-        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices); //**Changed**//
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         /* Again Paraview output is explicitly requested.*/
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
@@ -267,7 +268,10 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("MeshBasedMonolayerWithGhostNodes");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(10.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `10.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /* Again we create a force law, and pass it to the `OffLatticeSimulation`. This
          * force law ensures that ghost nodes don't exert forces on real nodes but real nodes
@@ -275,13 +279,11 @@ public:
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*

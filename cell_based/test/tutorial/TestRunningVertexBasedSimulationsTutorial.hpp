@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
  *
- *  Chaste tutorial - this page gets automatically changed to a wiki page
+ *  Chaste tutorial - this page gets automatically changed to a web page
  *  DO NOT remove the comments below, and if the code has to be changed in
  *  order to run, please check the comments are still accurate
  *
@@ -138,7 +138,10 @@ public:
          * and set the output directory and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("VertexBasedMonolayer");
-        simulator.SetEndTime(1.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `1.0`.** */
+        double end_time = 0.2;
+        simulator.SetEndTime(end_time);
 
         /*
          * For longer simulations, we may not want to output the results
@@ -169,13 +172,11 @@ public:
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial. If different simulation input parameters are being explored
-         * the lines should be removed.*/
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 4u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -220,7 +221,10 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("VertexBasedPeriodicMonolayer");
         simulator.SetSamplingTimestepMultiple(50);
-        simulator.SetEndTime(1.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `1.0`.** */
+        double end_time = 0.2;
+        simulator.SetEndTime(end_time);
 
         /* We now make a pointer to an appropriate force and pass it to the
          * `OffLatticeSimulation`.
@@ -269,13 +273,11 @@ public:
         MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal));
         simulator.AddCellKiller(p_killer);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 12u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*

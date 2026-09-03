@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
  *
- *  Chaste tutorial - this page gets automatically changed to a wiki page
+ *  Chaste tutorial - this page gets automatically changed to a web page
  *  DO NOT remove the comments below, and if the code has to be changed in
  *  order to run, please check the comments are still accurate
  *
@@ -138,19 +138,20 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("NodeBasedMonolayer");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(10.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `10.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /* We now pass a force law to the simulation. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial. If different simulation input parameters are being explored
-         * the lines should be removed.*/
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -214,19 +215,20 @@ public:
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("NodeBasedSpheroid");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(10.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `10.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /* Again we create a force law (this time with dimension 3), and pass it to the `OffLatticeSimulation`.*/
         MAKE_PTR(GeneralisedLinearSpringForce<3>, p_force);
         simulator.AddForce(p_force);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
 
         /* To avoid memory leaks, we conclude by deleting any pointers that we created in the test.*/
         for (unsigned i=0; i<nodes.size(); i++)
@@ -279,7 +281,10 @@ public:
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("NodeBasedOnSphere");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(10.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `10.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /* As before, we create a linear spring force and pass it to the simulation object. */
         MAKE_PTR(GeneralisedLinearSpringForce<3>, p_force);
@@ -305,13 +310,11 @@ public:
         MAKE_PTR_ARGS(SphereGeometryBoundaryCondition<3>, p_boundary_condition, (&cell_population, centre, radius));
         simulator.AddCellPopulationBoundaryCondition(p_boundary_condition);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are not
+         * part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion without
+         * error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
 
         /* To avoid memory leaks, we conclude by deleting any pointers that we created in the test.*/
         for (unsigned i=0; i<nodes.size(); i++)

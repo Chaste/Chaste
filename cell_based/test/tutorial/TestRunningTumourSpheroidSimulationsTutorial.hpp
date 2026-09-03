@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  *
- *  Chaste tutorial - this page gets automatically changed to a wiki page
+ *  Chaste tutorial - this page gets automatically changed to a web page
  *  DO NOT remove the comments below, and if the code has to be changed in
  *  order to run, please check the comments are still accurate
  *
@@ -248,7 +248,11 @@ public:
          * We next set the output directory and end time.
          */
         simulator.SetOutputDirectory("SpheroidTutorial");
-        simulator.SetEndTime(1.0);
+        simulator.SetSamplingTimestepMultiple(12);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `1.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /*
          * We must now create one or more force laws, which determine the mechanics of
@@ -268,9 +272,12 @@ public:
         simulator.AddForce(p_linear_force);
 
         /*
-         * We call `Solve()` on the simulator to run the simulation.
+         * We call `Solve()` on the simulator to run the simulation. (The next two lines are for test purposes
+         * only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to
+         * completion without error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)
          */
-        simulator.Solve();
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*

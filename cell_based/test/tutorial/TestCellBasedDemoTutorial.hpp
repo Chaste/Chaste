@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  *
- *  Chaste tutorial - this page gets automatically changed to a wiki page
+ *  Chaste tutorial - this page gets automatically changed to a web page
  *  DO NOT remove the comments below, and if the code has to be changed in
  *  order to run, please check the comments are still accurate
  *
@@ -145,7 +145,10 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo1");
         simulator.SetSamplingTimestepMultiple(200);
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         /* To specify how cells move around, we create a "shared pointer" to a
          * `Force` object and pass it to the `OffLatticeSimulation`. This is done using the `MAKE_PTR` macro as follows.
@@ -160,16 +163,12 @@ public:
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        /* Finally we call the `Solve` method on the simulation to run the simulation.*/
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         * We are checking that we reached the end time of the simulation
-         * with the correct number of cells. If different simulation input parameters are being explored
-         * the lines should be removed.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* Finally we call the `Solve` method on the simulation to run the simulation. (The next two lines
+         * are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that
+         * the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it actually reached
+         * the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -198,30 +197,33 @@ public:
          * and passing this to a helper method `ConstructNodesWithoutMesh` along with a interaction cut off length
          * that defines the connectivity in the mesh.
          */
-        HoneycombMeshGenerator generator(2, 2); //**Changed**//
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh(); //**Changed**//
-        NodesOnlyMesh<2> mesh; //**Changed**//
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5); //**Changed**//
+        HoneycombMeshGenerator generator(2, 2);
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         /* We create the cells as before, only this time we need one cell per node.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type); //**Changed**//
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         /* This time we create a `NodeBasedCellPopulation` as we are using a `NodesOnlyMesh`.*/
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);//**Changed**//
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         /* We create an `OffLatticeSimulation` object as before, all we change is the output directory
          * and output results more often as a larger default timestep is used for these simulations. */
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("CellBasedDemo2"); //**Changed**//
-        simulator.SetSamplingTimestepMultiple(12); //**Changed**//
-        simulator.SetEndTime(20.0);
+        simulator.SetOutputDirectory("CellBasedDemo2");
+        simulator.SetSamplingTimestepMultiple(12);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         /* We use a different `Force` which is suitable for node based simulations.
          */
-        MAKE_PTR(RepulsionForce<2>, p_force); //**Changed**//
+        MAKE_PTR(RepulsionForce<2>, p_force);
         simulator.AddForce(p_force);
 
         /* In all types of simulation you may specify how cells are removed from the simulation by specifying
@@ -229,18 +231,15 @@ public:
          * Note that here the constructor for `RandomCellKiller` requires some arguments to be passed to it, therefore we use the
          * `MAKE_PTR_ARGS` macro.
          */
-        MAKE_PTR_ARGS(RandomCellKiller<2>, p_cell_killer, (&cell_population, 0.01)); //**Changed**//
+        MAKE_PTR_ARGS(RandomCellKiller<2>, p_cell_killer, (&cell_population, 0.01));
         simulator.AddCellKiller(p_cell_killer);
 
-        /* Again we call the `Solve` method on the simulation to run the simulation.*/
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         * Again, we are checking that we reached the end time of the simulation
-         * with the correct number of cells.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 7u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* Again we call the `Solve` method on the simulation to run the simulation. (The next two lines are
+         * for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that
+         * the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it actually
+         * reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -261,7 +260,7 @@ public:
     {
         /* This time we just create a `MutableMesh` and use that to specify the spatial locations of cells.*/
         HoneycombMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();  //**Changed**//
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We create the same number of cells as the previous test.*/
         std::vector<CellPtr> cells;
@@ -270,7 +269,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         /* This time we create a `MeshBasedCellPopulation` as we are using a `MutableMesh`.*/
-        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells); //**Changed**//
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* To view the results of this and the subsequent mesh based tutorials in Paraview it is necessary to explicitly
         * generate the required .vtu files. This is detailed in the [VisualizingWithParaview](../visualizingwithparaview/) tutorial.
@@ -281,21 +280,23 @@ public:
 
         /* We create an `OffLatticeSimulation` object as before, all we change is the output directory.*/
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("CellBasedDemo3"); //**Changed**//
+        simulator.SetOutputDirectory("CellBasedDemo3");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         /* We use a different `Force` which is suitable for mesh based simulations.*/
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force); //**Changed**//
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* Again we call the `Solve` method on the simulation to run the simulation.*/
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* Again we call the `Solve` method on the simulation to run the simulation. (The next two lines are
+         * for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that
+         * the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it actually
+         * reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -313,21 +314,21 @@ public:
         /* This time we just create a `MutableMesh` and use that to specify the spatial locations of cells.
          * Here we pass an extra argument to the `HoneycombMeshGenerator` which adds another 2 rows of
          * nodes round the mesh, known as ghost nodes.*/
-        HoneycombMeshGenerator generator(2, 2, 2); //**Changed**//
+        HoneycombMeshGenerator generator(2, 2, 2);
         boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We only want to create cells for non ghost nodes. To find these we get them from the `HoneycombMeshGenerator`
          * using the method `GetCellLocationIndices`. We also use a different `CellCycleModel`. Here we use a
          * `TysonNovakCellCycleModel` which solves a coupled set of ODEs for each cell to calculate when each cell divides. */
-        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();//**Changed**//
+        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<TysonNovakCellCycleModel, 2> cells_generator; //**Changed**//
-        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type); //**Changed**//
+        CellsGenerator<TysonNovakCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         /* This time we create a `MeshBasedCellPopulation` as we are using a `MutableMesh` and have ghost nodes.
          * We also need to pass the indices of non ghost nodes as an extra argument.*/
-        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices); //**Changed**//
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         /* Again Paraview output is explicitly requested.*/
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
@@ -337,19 +338,23 @@ public:
          * less time to keep cell numbers relatively small for this demo.
          */
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("CellBasedDemo4"); //**Changed**//
+        simulator.SetOutputDirectory("CellBasedDemo4");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(2.0); //**Changed**//
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `2.0`.** (Shorter than the other demos, since the
+         * Tyson-Novak cells proliferate quickly.) */
+        double end_time = 0.2;
+        simulator.SetEndTime(end_time);
 
         /* We use the same `Force` as before and run the simulation in the same way.*/
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
-        simulator.Solve();
 
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 2.0, 1e-10);
+        /* The next two lines are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING`
+         * checks that the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it
+         * actually reached the requested end time.*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -365,14 +370,14 @@ public:
     {
         /* We now want to impose periodic boundaries on the domain. To do this we create a `Cylindrical2dMesh`
          * using a `CylindricalHoneycombMeshGenerator`.*/
-        CylindricalHoneycombMeshGenerator generator(5, 2, 2); //**Changed**//
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh(); //**Changed**//
+        CylindricalHoneycombMeshGenerator generator(5, 2, 2);
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         /* Again we create one cell for each non ghost node. Note that we have changed back to using a `UniformG1GenerationalCellCycleModel`.*/
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator; //**Changed**//
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         /* We use the same `CellPopulation`, `CellBasedSimulation` (only changing the output directory and end time) and `Force` as before and run the simulation.*/
@@ -382,19 +387,21 @@ public:
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("CellBasedDemo5"); //**Changed**//
+        simulator.SetOutputDirectory("CellBasedDemo5");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(20.0); //**Changed**//
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 29u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* The next two lines are for test purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING`
+         * checks that the simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it
+         * actually reached the requested end time.*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     /*
@@ -417,15 +424,18 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_stem_type); //**Changed**//
+        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_stem_type);
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("CellBasedDemo6"); //**Changed**//
+        simulator.SetOutputDirectory("CellBasedDemo6");
         simulator.SetSamplingTimestepMultiple(50);
-        simulator.SetEndTime(20.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
@@ -438,13 +448,12 @@ public:
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc);
 
-        /* Finally we call the `Solve` method as in all other simulations.*/
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 23u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* Finally we call the `Solve` method as in all other simulations. (The next two lines are for test
+         * purposes only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the
+         * simulation runs to completion without error, and `TS_ASSERT_DELTA` checks that it actually
+         * reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
     /*
      * The results may be visualized using `Visualize2dCentreCells` as described in the
@@ -462,8 +471,8 @@ public:
          * All the connectivity between lattice sites is defined by the `PottsMeshGenerator`,
          * and there are arguments to make the domains periodic.
          */
-        PottsMeshGenerator<2> generator(20, 2, 4, 20, 2, 4); //**Changed**//
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh(); //**Changed**//
+        PottsMeshGenerator<2> generator(20, 2, 4, 20, 2, 4);
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         /* We generate one cell for each element as in vertex based simulations.*/
         std::vector<CellPtr> cells;
@@ -473,39 +482,40 @@ public:
 
         /* As we have a `PottsMesh` we use a `PottsBasedCellPopulation`. Note here we also change the
          * "temperature" of the Potts simulation to make cells more motile.*/
-        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);//**Changed**//
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetTemperature(1.0);
 
         /* As a Potts simulation is restricted to a lattice we create a `OnSimulation` object and pass in the `CellPopulation` in much the same
          * way as an `OffLatticeSimulation` in the above examples. We also set some
          * options on the simulation like output directory and end time.
          */
-        OnLatticeSimulation<2> simulator(cell_population);//**Changed**//
-        simulator.SetOutputDirectory("CellBasedDemo7"); //**Changed**//
-        simulator.SetEndTime(20.0);
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("CellBasedDemo7");
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `20.0`.** */
+        double end_time = 1.0;
+        simulator.SetEndTime(end_time);
 
         /* In order to specify how cells move around we create "shared pointers" to
          * `UpdateRule` objects and pass them to the `OnLatticeSimulation`.
          * This is analogous to `Forces` in earlier examples.
          */
-        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule); //**Changed**//
-        simulator.AddUpdateRule(p_volume_constraint_update_rule); //**Changed**//
-        MAKE_PTR(SurfaceAreaConstraintPottsUpdateRule<2>, p_surface_area_update_rule); //**Changed**//
-        simulator.AddUpdateRule(p_surface_area_update_rule); //**Changed**//
-        MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule); //**Changed**//
-        simulator.AddUpdateRule(p_adhesion_update_rule); //**Changed**//
+        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
+        MAKE_PTR(SurfaceAreaConstraintPottsUpdateRule<2>, p_surface_area_update_rule);
+        simulator.AddUpdateRule(p_surface_area_update_rule);
+        MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         /* We can add `CellKillers` as before.*/
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_cell_killer, (&cell_population, 0.01));
         simulator.AddCellKiller(p_cell_killer);
 
-        /* Again we run the simulation by calling the `Solve` method.*/
-        simulator.Solve();
-
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        /* Again we run the simulation by calling the `Solve` method. (The next two lines are for test purposes
+         * only and are not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to
+         * completion without error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*

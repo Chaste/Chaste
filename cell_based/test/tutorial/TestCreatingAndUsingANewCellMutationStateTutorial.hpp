@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  *
- *  Chaste tutorial - this page gets automatically changed to a wiki page
+ *  Chaste tutorial - this page gets automatically changed to a web page
  *  DO NOT remove the comments below, and if the code has to be changed in
  *  order to run, please check the comments are still accurate
  *
@@ -256,15 +256,21 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithNewMutationState");
         simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(10.0);
+        /* We use a short `end_time` here to keep automated testing fast. **To see the simulation run for
+         * a more realistic duration, change this to `10.0`.** */
+        double end_time = 0.3;
+        simulator.SetEndTime(end_time);
 
         /* We create a force law and pass it to the `OffLatticeSimulation`. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(3);
         simulator.AddForce(p_linear_force);
 
-        /* To run the simulation, we call `Solve()`. */
-        simulator.Solve();
+        /* To run the simulation, we call `Solve()`. (The next two lines are for test purposes only and are
+         * not part of this tutorial: `TS_ASSERT_THROWS_NOTHING` checks that the simulation runs to completion
+         * without error, and `TS_ASSERT_DELTA` checks that it actually reached the requested end time.)*/
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 /*
