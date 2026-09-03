@@ -40,7 +40,13 @@ jobs:
         echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
-        sudo apt install chaste-dependencies
+        sudo apt install chaste-dependencies lld
+        # mold on jammy (22.04) is an old, buggy version (1.0.3) that produces
+        # binaries that segfault at runtime; only install it on noble (24.04),
+        # where it's known to work. CMake falls back to lld where mold is absent.
+        if [ "${{ matrix.codename }}" = "noble" ]; then
+          sudo apt install mold
+        fi
 
     - name: Downgrade libexpat1 (native ubuntu-22.04 only)
       if: ${{ matrix.os == 'ubuntu-22.04' }}

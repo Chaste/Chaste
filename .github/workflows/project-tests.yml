@@ -39,7 +39,7 @@ jobs:
         echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
-        sudo apt install chaste-dependencies
+        sudo apt install chaste-dependencies lld
 
     - name: checkout project
       uses: actions/checkout@v6

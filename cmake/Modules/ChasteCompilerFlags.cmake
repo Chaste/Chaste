@@ -148,4 +148,33 @@ else()
     message(WARNING "Unknown CXX compiler type ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
+################################
+#  Faster linker (optional)   #
+################################
+# Chaste links each test individually. mold/lld are substantially faster.
+# This uses mold or lld automatically (ON by default) if available, otherwise
+# falls back to ld
+if (UNIX AND NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC"))
+    option(Chaste_USE_FAST_LINKER "Use mold or lld instead of the system default linker, if available" ON)
+    if (Chaste_USE_FAST_LINKER)
+        find_program(MOLD_EXECUTABLE mold)
+        find_program(LLD_EXECUTABLE ld.lld)
+        if (MOLD_EXECUTABLE)
+            set(Chaste_FAST_LINKER_FLAG "-fuse-ld=mold")
+            message(STATUS "Using mold as the linker (found at ${MOLD_EXECUTABLE})")
+        elseif (LLD_EXECUTABLE)
+            set(Chaste_FAST_LINKER_FLAG "-fuse-ld=lld")
+            message(STATUS "Using lld as the linker (found at ${LLD_EXECUTABLE})")
+        else ()
+            set(Chaste_FAST_LINKER_FLAG "")
+            message(STATUS "Neither mold nor lld found; using the default linker. Install mold for significantly faster builds.")
+        endif ()
+        if (Chaste_FAST_LINKER_FLAG)
+            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${Chaste_FAST_LINKER_FLAG}")
+            set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${Chaste_FAST_LINKER_FLAG}")
+            set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${Chaste_FAST_LINKER_FLAG}")
+        endif ()
+    endif ()
+endif ()
+
 set(Chaste_SHARED_LINKER_FLAGS "${Chaste_SHARED_LINKER_FLAGS}" CACHE STRING "Project-wide shared linker flags" FORCE)

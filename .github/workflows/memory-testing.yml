@@ -116,6 +116,13 @@ jobs:
           sparse-checkout: cmake/process_valgrind_output.py
           sparse-checkout-cone-mode: false
 
+      - name: install dependencies
+        run: |
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          sudo apt update
+          sudo apt install chaste-dependencies lld
+
       - name: download all component logs
         uses: actions/download-artifact@v8
         with:
