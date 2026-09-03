@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SphereGeometryBoundaryCondition.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
 template<unsigned DIM>
@@ -126,15 +127,10 @@ bool SphereGeometryBoundaryCondition<DIM>::VerifyBoundaryCondition()
 template<unsigned DIM>
 void SphereGeometryBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<CentreOfSphere>";
-    for (unsigned index=0; index != DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
-    {
-        *rParamsFile << mCentreOfSphere[index] << ",";
-    }
-    *rParamsFile << mCentreOfSphere[DIM-1] << "</CentreOfSphere>\n";
-
-    *rParamsFile << "\t\t\t<RadiusOfSphere>" << mRadiusOfSphere << "</RadiusOfSphere>\n";
-    *rParamsFile << "\t\t\t<MaximumDistance>" << mMaximumDistance << "</MaximumDistance>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM_CVECTOR(rParamsFile, level, mCentreOfSphere);
+    CHASTE_PARAM(rParamsFile, level, mRadiusOfSphere);
+    CHASTE_PARAM(rParamsFile, level, mMaximumDistance);
 
     // Call method on direct parent class
     AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);

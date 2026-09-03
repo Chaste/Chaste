@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "FixedSequenceCellCycleModel.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -117,7 +118,11 @@ void FixedSequenceCellCycleModel::SetTransitCellG1Duration(double transitCellG1D
 
 void FixedSequenceCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-     *rParamsFile << "\t\t\t<Rate>" << CellCycleTimesGenerator::Instance()->GetRate() << "</Rate>\n";
+    const unsigned level = 3;
+    // TODO (#552): Rate is obtained from a singleton (CellCycleTimesGenerator) rather than a
+    // member variable. Investigate whether it should be stored as a member variable so that
+    // CHASTE_PARAM(rParamsFile, level, mRate) can be used here.
+    CHASTE_PARAM_EXPR(rParamsFile, level, Rate, CellCycleTimesGenerator::Instance()->GetRate());
 
     // Call method on direct parent class
     AbstractSimpleGenerationalCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

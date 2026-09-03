@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PlanarPolarisedFarhadifarForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 PlanarPolarisedFarhadifarForce<DIM>::PlanarPolarisedFarhadifarForce()
@@ -115,7 +116,8 @@ double PlanarPolarisedFarhadifarForce<DIM>::GetBoundaryLineTensionParameter()
 template<unsigned DIM>
 void PlanarPolarisedFarhadifarForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<PlanarPolarisedLineTensionMultiplier>" << mPlanarPolarisedLineTensionMultiplier << "</PlanarPolarisedLineTensionMultiplier>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mPlanarPolarisedLineTensionMultiplier);
 
     // Call method on direct parent class
     FarhadifarForce<DIM>::OutputForceParameters(rParamsFile);

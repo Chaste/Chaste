@@ -48,8 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CaBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
 #include "CheckpointArchiveTypes.hpp"
+#include "ConstBoundaryCondition.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "EllipticBoxDomainPdeModifier.hpp"
+#include "FileComparison.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MeshBasedCellPopulation.hpp"
@@ -760,6 +762,35 @@ public:
         TS_ASSERT_DELTA(p_cell_62->GetCellData()->GetItem("variable_grad_x"), -0.0117, 1e-2);
         TS_ASSERT_DELTA(p_cell_62->GetCellData()->GetItem("variable_grad_y"), 0.0510, 1e-2);
         TS_ASSERT_DELTA(p_cell_62->GetCellData()->GetItem("variable_grad_z"), -0.0435, 1e-2);
+    }
+
+    void TestEllipticBoxDomainPdeModifierOutputParameters()
+    {
+        EXIT_IF_PARALLEL;
+        std::string output_directory = "TestEllipticBoxDomainPdeModifierOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, -0.1, 1.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        ChastePoint<2> lower(-1.0, -1.0);
+        ChastePoint<2> upper(1.0, 1.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_modifier, (p_pde, p_bc, false, p_cuboid, 2.0));
+        p_modifier->SetDependentVariableName("u");
+
+        out_stream modifier_parameter_file = output_file_handler.OpenOutputFile("EllipticBoxDomainPdeModifier.parameters");
+        p_modifier->OutputSimulationModifierParameters(modifier_parameter_file);
+        modifier_parameter_file->close();
+
+        FileFinder generated = output_file_handler.FindFile("EllipticBoxDomainPdeModifier.parameters");
+        FileFinder reference("cell_based/test/data/TestEllipticBoxDomainPdeModifierOutputParameters/EllipticBoxDomainPdeModifier.parameters",
+                             RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated, reference);
+        TS_ASSERT(comparer.CompareFiles());
     }
 };
 

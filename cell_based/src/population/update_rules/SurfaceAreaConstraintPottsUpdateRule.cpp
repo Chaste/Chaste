@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 SurfaceAreaConstraintPottsUpdateRule<DIM>::SurfaceAreaConstraintPottsUpdateRule()
@@ -200,8 +201,9 @@ void SurfaceAreaConstraintPottsUpdateRule<DIM>::SetMatureCellTargetSurfaceArea(d
 template<unsigned DIM>
 void SurfaceAreaConstraintPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<DeformationEnergyParameter>" << mDeformationEnergyParameter << "</DeformationEnergyParameter>\n";
-    *rParamsFile << "\t\t\t<MatureCellTargetSurfaceArea>" << mMatureCellTargetSurfaceArea << "</MatureCellTargetSurfaceArea>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mDeformationEnergyParameter);
+    CHASTE_PARAM(rParamsFile, level, mMatureCellTargetSurfaceArea);
 
     // Call method on direct parent class
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);

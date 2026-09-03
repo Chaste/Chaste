@@ -248,7 +248,12 @@ void AbstractPdeModifier<DIM>::SetOutputSolutionAtPdeNodes(bool outputSolutionAt
 template<unsigned DIM>
 void AbstractPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    // No parameters to output, so just call method on direct parent class
+    *rParamsFile << "\t\t\t<DependentVariableName>" << mDependentVariableName << "</DependentVariableName>\n";
+    *rParamsFile << "\t\t\t<IsNeumannBoundaryCondition>" << mIsNeumannBoundaryCondition << "</IsNeumannBoundaryCondition>\n";
+    *rParamsFile << "\t\t\t<OutputGradient>" << mOutputGradient << "</OutputGradient>\n";
+    *rParamsFile << "\t\t\t<OutputSolutionAtPdeNodes>" << mOutputSolutionAtPdeNodes << "</OutputSolutionAtPdeNodes>\n";
+
+    // Call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 

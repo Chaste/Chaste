@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractOnLatticeCellPopulation.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh,
@@ -108,8 +109,9 @@ std::set<unsigned> AbstractOnLatticeCellPopulation<DIM>::GetNeighbouringNodeIndi
 template<unsigned DIM>
 void AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<UpdateNodesInRandomOrder>" << mUpdateNodesInRandomOrder << "</UpdateNodesInRandomOrder>\n";
-    *rParamsFile << "\t\t<IterateRandomlyOverUpdateRuleCollection>" << mIterateRandomlyOverUpdateRuleCollection << "</IterateRandomlyOverUpdateRuleCollection>\n";
+    const unsigned level = 2;
+    CHASTE_PARAM(rParamsFile, level, mUpdateNodesInRandomOrder);
+    CHASTE_PARAM(rParamsFile, level, mIterateRandomlyOverUpdateRuleCollection);
 
     // Call method on direct parent class
     AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);

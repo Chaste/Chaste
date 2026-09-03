@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractTargetAreaModifier.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 AbstractTargetAreaModifier<DIM>::AbstractTargetAreaModifier()
@@ -91,7 +92,8 @@ void AbstractTargetAreaModifier<DIM>::SetReferenceTargetArea(double referenceTar
 template<unsigned DIM>
 void AbstractTargetAreaModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<ReferenceTargetArea>" << mReferenceTargetArea << "</ReferenceTargetArea>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mReferenceTargetArea);
 
     // Next, call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);

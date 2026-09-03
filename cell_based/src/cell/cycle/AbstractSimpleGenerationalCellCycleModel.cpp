@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 AbstractSimpleGenerationalCellCycleModel::AbstractSimpleGenerationalCellCycleModel()
     : AbstractSimplePhaseBasedCellCycleModel(),
@@ -145,7 +146,8 @@ unsigned AbstractSimpleGenerationalCellCycleModel::GetMaxTransitGenerations() co
 
 void AbstractSimpleGenerationalCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<MaxTransitGenerations>" << mMaxTransitGenerations << "</MaxTransitGenerations>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mMaxTransitGenerations);
 
     // Call method on direct parent class
     AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

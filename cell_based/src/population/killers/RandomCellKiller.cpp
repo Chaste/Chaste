@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "RandomCellKiller.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 RandomCellKiller<DIM>::RandomCellKiller(AbstractCellPopulation<DIM>* pCellPopulation, double probabilityOfDeathInAnHour)
@@ -92,7 +93,8 @@ void RandomCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 template<unsigned DIM>
 void RandomCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<ProbabilityOfDeathInAnHour>" << mProbabilityOfDeathInAnHour << "</ProbabilityOfDeathInAnHour>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mProbabilityOfDeathInAnHour);
 
     // Call method on direct parent class
     AbstractCellKiller<DIM>::OutputCellKillerParameters(rParamsFile);

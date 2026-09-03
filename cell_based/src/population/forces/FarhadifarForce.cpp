@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "FarhadifarForce.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 template<unsigned DIM>
 FarhadifarForce<DIM>::FarhadifarForce()
@@ -263,11 +264,12 @@ void FarhadifarForce<DIM>::SetTargetAreaParameter(double targetAreaParameter)
 template<unsigned DIM>
 void FarhadifarForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<AreaElasticityParameter>" << mAreaElasticityParameter << "</AreaElasticityParameter>\n";
-    *rParamsFile << "\t\t\t<PerimeterContractilityParameter>" << mPerimeterContractilityParameter << "</PerimeterContractilityParameter>\n";
-    *rParamsFile << "\t\t\t<LineTensionParameter>" << mLineTensionParameter << "</LineTensionParameter>\n";
-    *rParamsFile << "\t\t\t<BoundaryLineTensionParameter>" << mBoundaryLineTensionParameter << "</BoundaryLineTensionParameter>\n";
-    *rParamsFile << "\t\t\t<TargetAreaParameter>" << mTargetAreaParameter << "</TargetAreaParameter>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mAreaElasticityParameter);
+    CHASTE_PARAM(rParamsFile, level, mPerimeterContractilityParameter);
+    CHASTE_PARAM(rParamsFile, level, mLineTensionParameter);
+    CHASTE_PARAM(rParamsFile, level, mBoundaryLineTensionParameter);
+    CHASTE_PARAM(rParamsFile, level, mTargetAreaParameter);
 
     // Call method on direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PottsBasedCellPopulation.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "AbstractPottsUpdateRule.hpp"
 #include "NodesOnlyMesh.hpp"
@@ -486,8 +487,9 @@ MutableMesh<DIM,DIM>* PottsBasedCellPopulation<DIM>::GetMutableMesh()
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<Temperature>" << mTemperature << "</Temperature>\n";
-    *rParamsFile << "\t\t<NumSweepsPerTimestep>" << mNumSweepsPerTimestep << "</NumSweepsPerTimestep>\n";
+    const unsigned level = 2;
+    CHASTE_PARAM(rParamsFile, level, mTemperature);
+    CHASTE_PARAM(rParamsFile, level, mNumSweepsPerTimestep);
 
     // Call method on direct parent class
     AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);

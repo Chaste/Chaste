@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VertexBasedCellPopulation.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "Warnings.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "StepSizeException.hpp"
@@ -850,10 +851,17 @@ void VertexBasedCellPopulation<DIM>::SetOutputCellRearrangementLocations(bool ou
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<CellRearrangementThreshold>" << mpMutableVertexMesh->GetCellRearrangementThreshold() << "</CellRearrangementThreshold>\n";
-    *rParamsFile << "\t\t<T2Threshold>" <<  mpMutableVertexMesh->GetT2Threshold() << "</T2Threshold>\n";
-    *rParamsFile << "\t\t<CellRearrangementRatio>" << mpMutableVertexMesh->GetCellRearrangementRatio() << "</CellRearrangementRatio>\n";
-    *rParamsFile << "\t\t<OutputCellRearrangementLocations>" << mOutputCellRearrangementLocations << "</OutputCellRearrangementLocations>\n";
+    const unsigned level = 2;
+    // TODO (#552): CellRearrangementThreshold, T2Threshold, and CellRearrangementRatio are
+    // properties of the MutableVertexMesh. Consider moving these to
+    // MutableVertexMesh::OutputMeshParameters() and removing them here.
+    CHASTE_PARAM_EXPR(rParamsFile, level, CellRearrangementThreshold, mpMutableVertexMesh->GetCellRearrangementThreshold());
+    CHASTE_PARAM_EXPR(rParamsFile, level, T2Threshold, mpMutableVertexMesh->GetT2Threshold());
+    CHASTE_PARAM_EXPR(rParamsFile, level, CellRearrangementRatio, mpMutableVertexMesh->GetCellRearrangementRatio());
+    CHASTE_PARAM(rParamsFile, level, mOutputCellRearrangementLocations);
+    CHASTE_PARAM(rParamsFile, level, mRestrictVertexMovement);
+    CHASTE_PARAM(rParamsFile, level, mWriteCellVtkResults);
+    CHASTE_PARAM(rParamsFile, level, mWriteEdgeVtkResults);
 
     // Add the division rule parameters
     *rParamsFile << "\t\t<VertexBasedDivisionRule>\n";

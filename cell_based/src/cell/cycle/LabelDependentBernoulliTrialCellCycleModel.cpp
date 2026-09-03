@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LabelDependentBernoulliTrialCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
+#include "CellBasedXmlParameters.hpp"
 
 LabelDependentBernoulliTrialCellCycleModel::LabelDependentBernoulliTrialCellCycleModel()
     : AbstractCellCycleModel(),
@@ -133,8 +134,10 @@ double LabelDependentBernoulliTrialCellCycleModel::GetAverageStemCellCycleTime()
 
 void LabelDependentBernoulliTrialCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<DivisionProbability>" << mDivisionProbability << "</DivisionProbability>\n";
-    *rParamsFile << "\t\t\t<MinimumDivisionAge>" << mMinimumDivisionAge << "</MinimumDivisionAge>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM(rParamsFile, level, mDivisionProbability);
+    CHASTE_PARAM(rParamsFile, level, mLabelledDivisionProbability);
+    CHASTE_PARAM(rParamsFile, level, mMinimumDivisionAge);
 
     // Call method on direct parent class
     AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

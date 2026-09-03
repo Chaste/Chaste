@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PlaneBoundaryCondition.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
@@ -211,20 +212,10 @@ bool PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::VerifyBoundaryCondition()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<PointOnPlane>";
-    for (unsigned index=0; index != SPACE_DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
-    {
-        *rParamsFile << mPointOnPlane[index] << ",";
-    }
-    *rParamsFile << mPointOnPlane[SPACE_DIM-1] << "</PointOnPlane>\n";
-
-    *rParamsFile << "\t\t\t<NormalToPlane>";
-    for (unsigned index=0; index != SPACE_DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
-    {
-        *rParamsFile << mNormalToPlane[index] << ",";
-    }
-    *rParamsFile << mNormalToPlane[SPACE_DIM-1] << "</NormalToPlane>\n";
-    *rParamsFile << "\t\t\t<UseJiggledNodesOnPlane>" << mUseJiggledNodesOnPlane << "</UseJiggledNodesOnPlane>\n";
+    const unsigned level = 3;
+    CHASTE_PARAM_CVECTOR(rParamsFile, level, mPointOnPlane);
+    CHASTE_PARAM_CVECTOR(rParamsFile, level, mNormalToPlane);
+    CHASTE_PARAM(rParamsFile, level, mUseJiggledNodesOnPlane);
 
     // Call method on direct parent class
     AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);

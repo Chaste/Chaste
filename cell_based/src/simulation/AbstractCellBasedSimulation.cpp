@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <set>
 #include "AbstractCellBasedSimulation.hpp"
+#include "CellBasedXmlParameters.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 #include "ExecutableSupport.hpp"
@@ -697,7 +698,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
         // Output simulation details
         std::string simulation_type = GetIdentifier();
 
-        *parameter_file << "<Chaste>\n";
+        *parameter_file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        *parameter_file << "<Chaste xmlns=\"https://chaste.github.io/\">\n";
         *parameter_file << "\n\t<" << simulation_type << ">\n";
         OutputSimulationParameters(parameter_file);
         *parameter_file << "\t</" << simulation_type << ">\n";
@@ -739,13 +741,15 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<Dt>" << mDt << "</Dt>\n";
-    *rParamsFile << "\t\t<EndTime>" << mEndTime << "</EndTime>\n";
-    *rParamsFile << "\t\t<UpdateCellPopulation>" << mUpdateCellPopulation << "</UpdateCellPopulation>\n";
-    *rParamsFile << "\t\t<SamplingTimestepMultiple>" << mSamplingTimestepMultiple << "</SamplingTimestepMultiple>\n";
-    *rParamsFile << "\t\t<UpdatingTimestepMultiple>" << mUpdatingTimestepMultiple << "</UpdatingTimestepMultiple>\n";
-    *rParamsFile << "\t\t<OutputDivisionLocations>" << mOutputDivisionLocations << "</OutputDivisionLocations>\n";
-    *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
+    const unsigned level = 2;
+    CHASTE_PARAM(rParamsFile, level, mDt);
+    CHASTE_PARAM(rParamsFile, level, mEndTime);
+    CHASTE_PARAM(rParamsFile, level, mNoBirth);
+    CHASTE_PARAM(rParamsFile, level, mUpdateCellPopulation);
+    CHASTE_PARAM(rParamsFile, level, mSamplingTimestepMultiple);
+    CHASTE_PARAM(rParamsFile, level, mUpdatingTimestepMultiple);
+    CHASTE_PARAM(rParamsFile, level, mOutputDivisionLocations);
+    CHASTE_PARAM(rParamsFile, level, mOutputCellVelocities);
 }
 
 // Explicit instantiation
