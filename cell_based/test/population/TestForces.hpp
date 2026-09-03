@@ -1407,6 +1407,11 @@ void TestDifferentialAdhesionPathmanathanInteractionForceMethods()
 
         SimpleLogarithmicRepulsionForce<2> repulsion_force;
 
+        // The default repulsion parameter is dimension-dependent
+        TS_ASSERT_DELTA(repulsion_force.GetRepulsionParameter(), 15.0, 1e-6);
+        SimpleLogarithmicRepulsionForce<1> repulsion_force_1d;
+        TS_ASSERT_DELTA(repulsion_force_1d.GetRepulsionParameter(), 30.0, 1e-6);
+
         for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
