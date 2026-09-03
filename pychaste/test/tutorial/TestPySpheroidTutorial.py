@@ -106,7 +106,7 @@ class TestPySpheroidTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
 
         ## To view the results of this and the next test in Paraview it is necessary to explicitly generate the required .vtu files.
 
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 
         ## We then pass in the cell population into an `OffLatticeSimulation`, and set the output directory and end time.
 

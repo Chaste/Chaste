@@ -116,7 +116,7 @@ void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& 
 
             if (mScaleByCellVolume)
             {
-                // If scaling by cell volume then use volume her instead of cell count
+                // If scaling by cell volume then use volume here instead of cell count
                 cell_weight = mrCellPopulation.GetVolumeOfCell(*cell_iter);
 
                 if (cell_weight <1e-6)

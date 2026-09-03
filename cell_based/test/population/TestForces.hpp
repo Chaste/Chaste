@@ -48,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "PottsMeshGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "ChemotacticForce.hpp"
@@ -2494,6 +2496,24 @@ void TestDifferentialAdhesionPathmanathanInteractionForceMethods()
         SimpleLogarithmicRepulsionForce<2> simple_logarithmic_repulsion_force;
         TS_ASSERT_THROWS_THIS(simple_logarithmic_repulsion_force.AddForceContribution(mesh_cell_population),
                 "SimpleLogarithmicRepulsionForce is to be used with a NodeBasedCellPopulation only");
+    }
+
+    void TestAbstractTwoBodyInteractionForceThrowsWithOnLatticeCellPopulation()
+    {
+        // Create a PottsBasedCellPopulation, which is on-lattice rather than off-lattice
+        PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2, 1, 1, 1, true);
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Test that a subclass of AbstractTwoBodyInteractionForce throws the correct exception
+        GeneralisedLinearSpringForce<2> spring_force;
+        TS_ASSERT_THROWS_THIS(spring_force.AddForceContribution(cell_population),
+                "Subclasses of AbstractTwoBodyInteractionForce are to be used with subclasses of AbstractOffLatticeCellPopulation only");
     }
 
     void TestDiffusionForceIn1D()
