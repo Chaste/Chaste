@@ -473,8 +473,7 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, N_Vector& rDest)
     if (p_dest == rSrc.data()) return;
 
     // Check dest size
-    long size = NV_LENGTH_S(rDest);
-    assert(size == (long)rSrc.size());
+    assert(NV_LENGTH_S(rDest) == (long)rSrc.size());
 
     // Copy data
     std::copy(rSrc.begin(), rSrc.end(), p_dest);
