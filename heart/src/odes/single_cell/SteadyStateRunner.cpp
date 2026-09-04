@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <functional>
+#include <numeric>
+
 #include "SteadyStateRunner.hpp"
 #include "ZeroStimulus.hpp"
 
@@ -87,11 +90,9 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
         CopyToStdVector(mpModel->rGetStateVariables(), new_state_vars);
 
         // Calculate the change in the norm of the state variables
-        double temp = 0;
-        for (unsigned j = 0; j < old_state_vars.size(); j++)
-        {
-            temp += fabs(new_state_vars[j] - old_state_vars[j]);
-        }
+        double temp = std::inner_product(old_state_vars.begin(), old_state_vars.end(),
+                                         new_state_vars.begin(), 0.0, std::plus<double>(),
+                                         [](double oldVar, double newVar) { return fabs(newVar - oldVar); });
 
         if (temp < 1e-6)
         {

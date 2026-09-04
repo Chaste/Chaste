@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
+#include <numeric>
+
 #include "LobePropertiesCalculator.hpp"
 
 #ifdef CHASTE_VTK
@@ -66,15 +68,9 @@ void LobePropertiesCalculator::AddLobe(vtkSmartPointer<vtkPolyData> pLobeSurface
 
 double LobePropertiesCalculator::GetTotalVolume()
 {
-    double total_volume = 0.0;
-
-    std::map< std::string, std::pair< vtkSmartPointer<vtkPolyData>, LungLocation> >::iterator iter;
-    for (iter = mLobesMap.begin(); iter != mLobesMap.end(); ++iter)
-    {
-        total_volume += GetLobeVolume(iter->second.first);
-    }
-
-    return total_volume;
+    return std::accumulate(mLobesMap.begin(), mLobesMap.end(), 0.0,
+                           [this](double total, const auto& rLobe)
+                           { return total + GetLobeVolume(rLobe.second.first); });
 }
 
 double LobePropertiesCalculator::GetLobeVolume(const std::string& rName)

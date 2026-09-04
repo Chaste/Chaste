@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
+#include <numeric>
+
 #include "CombinedOdeSystem.hpp"
 #include "CombinedOdeSystemInformation.hpp"
 
@@ -41,11 +43,9 @@ CombinedOdeSystem::CombinedOdeSystem(std::vector<AbstractOdeSystem*> odeSystems)
     : AbstractOdeSystem(1) // number of state variables will be set properly below
 {
     mOdeSystems = odeSystems;
-    mNumberOfStateVariables = 0;
-    for (unsigned i=0; i<odeSystems.size(); i++)
-    {
-        mNumberOfStateVariables += odeSystems[i]->GetNumberOfStateVariables();
-    }
+    mNumberOfStateVariables = std::accumulate(odeSystems.begin(), odeSystems.end(), 0u,
+        [](unsigned total, const AbstractOdeSystem* pSystem)
+        { return total + pSystem->GetNumberOfStateVariables(); });
     mpSystemInfo = CombinedOdeSystemInformation::Instance(odeSystems);
     ResetToInitialConditions();
 
