@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * AbstractParameterisedSystem and some tests.
  */
 
+#include <algorithm>
 #include <cassert>
 #include <vector>
 
@@ -455,10 +456,7 @@ inline void CopyToStdVector(const N_Vector& rSrc, std::vector<double>& rDest)
     long size = NV_LENGTH_S(rSrc);
     rDest.resize(size);
     // Copy data
-    for (long i = 0; i < size; i++)
-    {
-        rDest[i] = p_src[i];
-    }
+    std::copy(p_src, p_src + size, rDest.begin());
 }
 
 /**
@@ -475,14 +473,10 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, N_Vector& rDest)
     if (p_dest == rSrc.data()) return;
 
     // Check dest size
-    long size = NV_LENGTH_S(rDest);
-    assert(size == (long)rSrc.size());
+    assert(NV_LENGTH_S(rDest) == (long)rSrc.size());
 
     // Copy data
-    for (long i = 0; i < size; i++)
-    {
-        p_dest[i] = rSrc[i];
-    }
+    std::copy(rSrc.begin(), rSrc.end(), p_dest);
 }
 
 /**

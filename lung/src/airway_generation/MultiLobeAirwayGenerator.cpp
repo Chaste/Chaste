@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
+#include <algorithm>
+
 #include <map>
 
 #include "MultiLobeAirwayGenerator.hpp"
@@ -98,20 +100,10 @@ void MultiLobeAirwayGenerator::AddLobe(vtkSmartPointer<vtkPolyData> pLobeSurface
 
 unsigned MultiLobeAirwayGenerator::GetNumLobes(LungLocation lungLocation)
 {
-    unsigned lobe_count = 0u;
-
     typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-    for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
-         generators_iter != mLobeGenerators.end();
-         ++generators_iter)
-    {
-        if (generators_iter->second == lungLocation)
-        {
-            lobe_count++;
-        }
-    }
-
-    return lobe_count;
+    return static_cast<unsigned>(std::count_if(mLobeGenerators.begin(), mLobeGenerators.end(),
+                                               [lungLocation](const pair_type& rGenerator)
+                                               { return rGenerator.second == lungLocation; }));
 }
 
 void MultiLobeAirwayGenerator::AssignGrowthApices()
