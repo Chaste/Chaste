@@ -140,13 +140,13 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
+     * @param pPde A shared pointer to a linear PDE object (defaults to nullptr)
      * @param pBoundaryCondition A shared pointer to an abstract boundary condition
-     *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
+     *     (defaults to nullptr, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
-     * @param solution solution vector (defaults to NULL)
+     * @param solution solution vector (defaults to nullptr)
      */
-    AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=NULL,
+    AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=nullptr,
                         boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                         bool isNeumannBoundaryCondition=true,
                         Vec solution=nullptr);

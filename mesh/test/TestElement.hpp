@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-typedef BoundaryElement<2,3> BOUNDARY_ELEMENT_2_3;
+using BOUNDARY_ELEMENT_2_3 = BoundaryElement<2,3>;
 
 class TestElement : public CxxTest::TestSuite
 {

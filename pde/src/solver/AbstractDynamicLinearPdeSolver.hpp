@@ -88,7 +88,7 @@ protected:
     /** The last actual timestep used. */
     double mLastWorkingTimeStep;
 
-    /** A controller which determines what timestep to use (defaults to NULL). */
+    /** A controller which determines what timestep to use (defaults to nullptr). */
     AbstractTimeAdaptivityController* mpTimeAdaptivityController;
 
     /**
@@ -506,7 +506,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetTimeAdaptivityController(AbstractTimeAdaptivityController* pTimeAdaptivityController)
 {
     assert(pTimeAdaptivityController != nullptr);
-    assert(mpTimeAdaptivityController == NULL);
+    assert(mpTimeAdaptivityController == nullptr);
     mpTimeAdaptivityController = pTimeAdaptivityController;
 }
 

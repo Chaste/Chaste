@@ -103,7 +103,7 @@ public:
      *
      * @return a copy of the current SRN model.
      */
-    virtual AbstractSrnModel* CreateSrnModel();
+    [[nodiscard]] virtual AbstractSrnModel* CreateSrnModel();
 
     /**
      * Overriden ResetForDivision() method for custom cell division mitosis

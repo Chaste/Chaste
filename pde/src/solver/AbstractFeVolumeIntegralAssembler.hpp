@@ -86,7 +86,7 @@ protected:
     GaussianQuadratureRule<ELEMENT_DIM>* mpQuadRule;
 
     /** Basis function for use with normal elements. */
-    typedef LinearBasisFunction<ELEMENT_DIM> BasisFunction;
+    using BasisFunction = LinearBasisFunction<ELEMENT_DIM>;
 
     /**
      * Compute the derivatives of all basis functions at a point within an element.

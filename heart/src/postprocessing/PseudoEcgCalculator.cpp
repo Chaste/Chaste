@@ -134,7 +134,7 @@ void PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::WritePseudoEcg ()
                           << "_" << mProbeElectrode.GetWithDefault(1)
                           << "_" << mProbeElectrode.GetWithDefault(2) << ".dat";
     OutputFileHandler output_file_handler(HeartConfig::Instance()->GetOutputDirectory() + "/output", false);
-    out_stream p_file=out_stream(NULL);
+    out_stream p_file=out_stream(nullptr);
     if (PetscTools::AmMaster())
     {
         p_file = output_file_handler.OpenOutputFile(stream.str());

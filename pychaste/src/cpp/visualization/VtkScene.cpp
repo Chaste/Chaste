@@ -252,7 +252,7 @@ void VtkScene<DIM>::Start()
 
     if (mIsInteractive)
     {
-        mpRenderWindowInteractor->Initialize();
+        mpRenderWindow->Render();
     }
 }
 

@@ -126,7 +126,7 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
             archive & conductivity;
         }
 
-        bool has_solution = (this->mSolution != NULL);
+        bool has_solution = (this->mSolution != nullptr);
         archive & has_solution;
         if (has_solution)
         {

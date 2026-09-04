@@ -100,7 +100,7 @@ public:
      *
      * @return the new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    [[nodiscard]] AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
      * Overridden OutputCellCycleModelParameters() method.

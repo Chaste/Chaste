@@ -53,10 +53,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // these typedefs are just because can't have lines such as
 //  TS_ASSERT_THROWS_NOTHING(p_mesh_reader=new TrianglesMeshReader<2,2>(name));
 // because the macro thinks the comma separates two arguments
-typedef TrianglesMeshReader<1,1> READER_1D;
-typedef TrianglesMeshReader<2,2> READER_2D;
-typedef TrianglesMeshReader<3,3> READER_3D;
-typedef TrianglesMeshReader<0,1> READER_0D_IN_1D;
+using READER_1D = TrianglesMeshReader<1,1>;
+using READER_2D = TrianglesMeshReader<2,2>;
+using READER_3D = TrianglesMeshReader<3,3>;
+using READER_0D_IN_1D = TrianglesMeshReader<0,1>;
 
 
 class TestTrianglesMeshReader : public CxxTest::TestSuite

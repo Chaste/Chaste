@@ -43,8 +43,8 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
     ReplicatableVector& rElectricsInitialCondition,
     const std::string& rOutputDir)
    : mrMechanicsSolver(rMechanicsSolver),
-     mpVtkElastictyWriter(NULL),
-     mpInterpolater(NULL)
+     mpVtkElastictyWriter(nullptr),
+     mpInterpolater(nullptr)
 {
 
 #ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar

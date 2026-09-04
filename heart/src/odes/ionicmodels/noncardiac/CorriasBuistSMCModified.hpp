@@ -165,7 +165,7 @@ public:
      * @param pStateVariables the state variables of this model
      * @return the total ionic current
      */
-    double GetIIonic(const std::vector<double>* pStateVariables=NULL);
+    double GetIIonic(const std::vector<double>* pStateVariables=nullptr);
 
     /**
      * Compute the RHS of the FitHugh-Nagumo system of ODEs

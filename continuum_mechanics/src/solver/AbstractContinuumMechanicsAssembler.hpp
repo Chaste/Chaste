@@ -301,7 +301,7 @@ public:
         QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(pMesh);
         DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(pMesh);
 
-        if ((p_quad_mesh == NULL) && (p_distributed_quad_mesh == NULL))
+        if ((p_quad_mesh == nullptr) && (p_distributed_quad_mesh == nullptr))
         {
             EXCEPTION("Continuum mechanics assemblers require a quadratic mesh");
         }
@@ -327,7 +327,7 @@ public:
 //template<unsigned DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
 //void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX>::SetCurrentSolution(Vec currentSolution)
 //{
-//    assert(currentSolution != NULL);
+//    assert(currentSolution != nullptr);
 //
 //    // Replicate the current solution and store so can be used in AssembleOnElement
 //    HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
@@ -346,7 +346,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
     assert(this->mAssembleMatrix || this->mAssembleVector);
     if (this->mAssembleMatrix)
     {
-        if (this->mMatrixToAssemble == NULL)
+        if (this->mMatrixToAssemble == nullptr)
         {
             EXCEPTION("Matrix to be assembled has not been set");
         }
@@ -358,7 +358,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
 
     if (this->mAssembleVector)
     {
-        if (this->mVectorToAssemble == NULL)
+        if (this->mVectorToAssemble == nullptr)
         {
             EXCEPTION("Vector to be assembled has not been set");
         }

@@ -71,7 +71,7 @@ public:
         return rOdeSolution[0];
     }
 
-    c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX, unsigned index, Element<SPACE_DIM,SPACE_DIM>* pElement=NULL)
+    c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX, unsigned index, Element<SPACE_DIM,SPACE_DIM>* pElement=nullptr)
     {
         return identity_matrix<double>(SPACE_DIM);
     }

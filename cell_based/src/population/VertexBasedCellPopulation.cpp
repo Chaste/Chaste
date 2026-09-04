@@ -994,19 +994,19 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshFor
          edge_iter != tetrahedral_edges.end();
          ++edge_iter)
     {
-        std::pair<unsigned, unsigned> this_edge = *edge_iter;
+        auto [node_first, node_second] = *edge_iter;
 
         // To be a boundary edge both nodes need to be boundary nodes.
         bool is_boundary_edge = false;
-        if (this_edge.first  < mpMutableVertexMesh->GetNumNodes() &&
-            this_edge.second  < mpMutableVertexMesh->GetNumNodes())
+        if (node_first  < mpMutableVertexMesh->GetNumNodes() &&
+            node_second  < mpMutableVertexMesh->GetNumNodes())
         {
-            is_boundary_edge = (mpMutableVertexMesh->GetNode(this_edge.first)->IsBoundaryNode() &&
-                                mpMutableVertexMesh->GetNode(this_edge.second)->IsBoundaryNode() );
+            is_boundary_edge = (mpMutableVertexMesh->GetNode(node_first)->IsBoundaryNode() &&
+                                mpMutableVertexMesh->GetNode(node_second)->IsBoundaryNode() );
         }
         unsigned is_boundary_edge_unsigned = is_boundary_edge ? 1 : 0;
 
-        (*p_edge_file) << edge_index++ << "\t" << this_edge.first << "\t" << this_edge.second << "\t" << is_boundary_edge_unsigned << std::endl;
+        (*p_edge_file) << edge_index++ << "\t" << node_first << "\t" << node_second << "\t" << is_boundary_edge_unsigned << std::endl;
     }
     p_edge_file->close();
 

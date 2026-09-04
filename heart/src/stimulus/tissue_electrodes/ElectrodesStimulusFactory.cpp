@@ -122,7 +122,7 @@ void ElectrodesStimulusFactory<DIM>::GroundSecondElectrode(bool grounded)
 template<unsigned DIM>
 void ElectrodesStimulusFactory<DIM>::SetCompatibleExtracellularStimulus()
 {
-    assert(this->mpMesh!=NULL);
+    assert(this->mpMesh!=nullptr);
     try
     {
         CheckForElectrodesIntersection();

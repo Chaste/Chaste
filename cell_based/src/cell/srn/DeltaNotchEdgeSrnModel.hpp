@@ -105,7 +105,7 @@ public:
      *
      * @return a copy of the current SRN model.
      */
-    virtual AbstractSrnModel* CreateSrnModel();
+    [[nodiscard]] virtual AbstractSrnModel* CreateSrnModel();
 
     /**
      * Initialise the SRN model at the start of a simulation.
@@ -222,7 +222,7 @@ public:
     virtual void SplitEdgeSrn(const double relativePosition);
 };
 
-typedef boost::shared_ptr<DeltaNotchEdgeSrnModel> DeltaNotchEdgeSrnModelPtr;
+using DeltaNotchEdgeSrnModelPtr = boost::shared_ptr<DeltaNotchEdgeSrnModel>;
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"

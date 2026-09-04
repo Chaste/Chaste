@@ -109,7 +109,7 @@ public:
      * Overridden builder method to create new copies of this cell-cycle model.
      * @return a pointer to the GammaG1CellCycleModel created.
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    [[nodiscard]] AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
      * Set mShape.

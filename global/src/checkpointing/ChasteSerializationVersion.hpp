@@ -77,8 +77,8 @@ struct version<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
  * @param N  the version number
  */
 #define CHASTE_VERSION_CONTENT(N)                             \
-    typedef boost::mpl::int_<N> type;                         \
-    typedef boost::mpl::integral_c_tag tag;                   \
+    using type = boost::mpl::int_<N>; \
+    using tag = boost::mpl::integral_c_tag; \
     BOOST_STATIC_CONSTANT(int, value = version::type::value)
 
 #else // BOOST_VERSION >= 104400
