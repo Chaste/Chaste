@@ -252,17 +252,12 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
                 c_vector<double, SPACE_DIM> position = rNodes[index]->rGetLocation();
 
                 // Update max/min
-                for (unsigned i = 0; i < SPACE_DIM; i++)
-                {
-                    if (position[i] < minimum_point[i])
-                    {
-                        minimum_point[i] = position[i];
-                    }
-                    if (position[i] > maximum_point[i])
-                    {
-                        maximum_point[i] = position[i];
-                    }
-                }
+                std::transform(std::begin(position), std::end(position), std::begin(minimum_point),
+                               std::begin(minimum_point),
+                               [](double a, double b) { return std::min(a, b); });
+                std::transform(std::begin(position), std::end(position), std::begin(maximum_point),
+                               std::begin(maximum_point),
+                               [](double a, double b) { return std::max(a, b); });
             }
         }
     }
