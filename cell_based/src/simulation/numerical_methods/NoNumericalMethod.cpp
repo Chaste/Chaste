@@ -33,57 +33,56 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "ForwardEulerNumericalMethod.hpp"
+#include "NoNumericalMethod.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ForwardEulerNumericalMethod()
+NoNumericalMethod<ELEMENT_DIM,SPACE_DIM>::NoNumericalMethod()
     : AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::~ForwardEulerNumericalMethod()
+NoNumericalMethod<ELEMENT_DIM,SPACE_DIM>::~NoNumericalMethod()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt)
+bool NoNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DelegatesToPopulation()
 {
-    // Apply forces to each cell, and save a vector of net forces F
-    std::vector<c_vector<double, SPACE_DIM> > forces = this->ComputeForcesIncludingDamping();
+    return true;
+}
 
-    unsigned index = 0;
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
-         node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
-         ++node_iter, ++index)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void NoNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetUseAdaptiveTimestep(bool useAdaptiveTimestep)
+{
+    if (useAdaptiveTimestep)
     {
-        // Get the current node location and calculate the new location according to the forward Euler method
-        const c_vector<double, SPACE_DIM>& r_old_location = node_iter->rGetLocation();
-        c_vector<double, SPACE_DIM> displacement = dt * forces[index];
-
-        // In the vertex-based case, the displacement may be scaled if the cell rearrangement threshold is exceeded
-        this->DetectStepSizeExceptions(node_iter->GetIndex(), displacement, dt);
-
-        c_vector<double, SPACE_DIM> new_location = r_old_location + displacement;
-        this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
+        EXCEPTION("NoNumericalMethod never throws a StepSizeException, so adaptive timestepping "
+                  "would have no effect. This is not currently supported.");
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodParameters(out_stream& rParamsFile)
+void NoNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt)
+{
+    this->mpCellPopulation->UpdateNodeLocations(dt);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void NoNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodParameters(out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
     AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class ForwardEulerNumericalMethod<1,1>;
-template class ForwardEulerNumericalMethod<1,2>;
-template class ForwardEulerNumericalMethod<2,2>;
-template class ForwardEulerNumericalMethod<1,3>;
-template class ForwardEulerNumericalMethod<2,3>;
-template class ForwardEulerNumericalMethod<3,3>;
+template class NoNumericalMethod<1,1>;
+template class NoNumericalMethod<1,2>;
+template class NoNumericalMethod<2,2>;
+template class NoNumericalMethod<1,3>;
+template class NoNumericalMethod<2,3>;
+template class NoNumericalMethod<3,3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(ForwardEulerNumericalMethod)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(NoNumericalMethod)

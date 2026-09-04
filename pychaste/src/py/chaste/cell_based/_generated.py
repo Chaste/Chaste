@@ -407,6 +407,12 @@ from chaste._pychaste_all import (
     NagaiHondaForce_2,
     NagaiHondaForce_3,
     NoCellCycleModel,
+    NoNumericalMethod_1_1,
+    NoNumericalMethod_1_2,
+    NoNumericalMethod_1_3,
+    NoNumericalMethod_2_2,
+    NoNumericalMethod_2_3,
+    NoNumericalMethod_3_3,
     NodeBasedCellPopulationWithBuskeUpdate_1,
     NodeBasedCellPopulationWithBuskeUpdate_2,
     NodeBasedCellPopulationWithBuskeUpdate_3,
@@ -464,6 +470,12 @@ from chaste._pychaste_all import (
     PottsBasedCellPopulation_3,
     PythonSimulationModifier_2,
     PythonSimulationModifier_3,
+    RK4NumericalMethod_1_1,
+    RK4NumericalMethod_1_2,
+    RK4NumericalMethod_1_3,
+    RK4NumericalMethod_2_2,
+    RK4NumericalMethod_2_3,
+    RK4NumericalMethod_3_3,
     RadialCellDataDistributionWriter_1_1,
     RadialCellDataDistributionWriter_1_2,
     RadialCellDataDistributionWriter_1_3,
@@ -1020,6 +1032,13 @@ __all__ = [
     "NagaiHondaForce_2",
     "NagaiHondaForce_3",
     "NoCellCycleModel",
+    "NoNumericalMethod",
+    "NoNumericalMethod_1_1",
+    "NoNumericalMethod_1_2",
+    "NoNumericalMethod_1_3",
+    "NoNumericalMethod_2_2",
+    "NoNumericalMethod_2_3",
+    "NoNumericalMethod_3_3",
     "NodeBasedCellPopulation",
     "NodeBasedCellPopulationWithBuskeUpdate",
     "NodeBasedCellPopulationWithBuskeUpdate_1",
@@ -1091,6 +1110,13 @@ __all__ = [
     "PythonSimulationModifier",
     "PythonSimulationModifier_2",
     "PythonSimulationModifier_3",
+    "RK4NumericalMethod",
+    "RK4NumericalMethod_1_1",
+    "RK4NumericalMethod_1_2",
+    "RK4NumericalMethod_1_3",
+    "RK4NumericalMethod_2_2",
+    "RK4NumericalMethod_2_3",
+    "RK4NumericalMethod_3_3",
     "RadialCellDataDistributionWriter",
     "RadialCellDataDistributionWriter_1_1",
     "RadialCellDataDistributionWriter_1_2",
@@ -2021,6 +2047,20 @@ class NagaiHondaForce(TemplateClass):
     }
 
 
+class NoNumericalMethod(TemplateClass):
+    _instantiations = {
+        ("1", "1"): NoNumericalMethod_1_1,
+        ("1",): NoNumericalMethod_1_1,
+        ("1", "2"): NoNumericalMethod_1_2,
+        ("2", "2"): NoNumericalMethod_2_2,
+        ("2",): NoNumericalMethod_2_2,
+        ("1", "3"): NoNumericalMethod_1_3,
+        ("2", "3"): NoNumericalMethod_2_3,
+        ("3", "3"): NoNumericalMethod_3_3,
+        ("3",): NoNumericalMethod_3_3,
+    }
+
+
 class NodeBasedCellPopulation(TemplateClass):
     _instantiations = {
         ("1",): NodeBasedCellPopulation_1,
@@ -2159,6 +2199,20 @@ class PythonSimulationModifier(TemplateClass):
     _instantiations = {
         ("2",): PythonSimulationModifier_2,
         ("3",): PythonSimulationModifier_3,
+    }
+
+
+class RK4NumericalMethod(TemplateClass):
+    _instantiations = {
+        ("1", "1"): RK4NumericalMethod_1_1,
+        ("1",): RK4NumericalMethod_1_1,
+        ("1", "2"): RK4NumericalMethod_1_2,
+        ("2", "2"): RK4NumericalMethod_2_2,
+        ("2",): RK4NumericalMethod_2_2,
+        ("1", "3"): RK4NumericalMethod_1_3,
+        ("2", "3"): RK4NumericalMethod_2_3,
+        ("3", "3"): RK4NumericalMethod_3_3,
+        ("3",): RK4NumericalMethod_3_3,
     }
 
 

@@ -302,24 +302,29 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
 {
     double length = norm_2(rDisplacement);
 
-    if(mRestrictVertexMovement)
+    /* There are two reasons to adjust movement in a vertex model:
+     * - either the movement is large enough to cause a T2 swap,
+     * - or the movement is too large (i.e. larger than AbsoluteMovementThreshold).
+     *
+     * In the first case we want to restrict movement but not throw an exception, just a warning.
+     * In the second case we want to throw an exception which can be used by the adaptive timestepper.
+     * This is handled in the parent class, which checks for movement above the AbsoluteMovementThreshold
+     * and throws an exception. In this class we check for movement above half the CellRearrangementThreshold
+     * and restrict movement if this is the case, but only throw an exception if movement is above the
+     * AbsoluteMovementThreshold.
+     */
+
+    // Check for movement above the AbsoluteMovementThreshold first, and throw an exception if exceeded
+    AbstractOffLatticeCellPopulation<DIM, DIM>::CheckForStepSizeException(nodeIndex, rDisplacement, dt);
+
+    if (mRestrictVertexMovement)
     {
         if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
         {
+            // restrict the movement
             rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
 
-            std::ostringstream message;
-            message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
-            message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
-
-            double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
-
-            // The first time we see this behaviour, throw a StepSizeException, but not more than once
-            if(mThrowStepSizeException)
-            {
-                mThrowStepSizeException = false;
-                throw StepSizeException(suggested_step, message.str(), false);
-            }
+            WARN_ONCE_ONLY("Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
         }
     }
 }

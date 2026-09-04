@@ -248,6 +248,7 @@ subpackages:
     - NagaiHondaDifferentialAdhesionForce
     - NagaiHondaForce
     - NoCellCycleModel
+    - NoNumericalMethod
     - NodeBasedCellPopulation
     - NodeBasedCellPopulationWithBuskeUpdate
     - NodeBasedCellPopulationWithParticles
@@ -263,6 +264,7 @@ subpackages:
     - PlaneBoundaryCondition
     - PottsBasedCellPopulation
     - PythonSimulationModifier
+    - RK4NumericalMethod
     - RadialCellDataDistributionWriter
     - RandomCaSwitchingUpdateRule
     - RandomCellKiller
