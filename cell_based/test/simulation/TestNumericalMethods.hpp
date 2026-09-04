@@ -781,8 +781,55 @@ public:
         // With adaptivity switched on, the same non-terminal StepSizeException should be
         // rethrown so that the adaptive timestep loop can catch it and retry with a smaller step.
         numerical_method.SetUseAdaptiveTimestep(true);
-        TS_ASSERT_THROWS_ANYTHING(numerical_method.DetectStepSizeExceptions(0, displacement, dt));
+        TS_ASSERT_THROWS(numerical_method.DetectStepSizeExceptions(0, displacement, dt), StepSizeException&);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+    }
+
+    void TestNoNumericalMethodArchiving()
+    {
+        EXIT_IF_PARALLEL;
+
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NoNumericalMethod.arch";
+
+        {
+            // Archive a NoNumericalMethod through a pointer to the abstract base class, as
+            // happens when an OffLatticeSimulation with an immersed boundary or Buske
+            // population is saved.
+            AbstractNumericalMethod<2,2>* const p_method = new NoNumericalMethod<2,2>();
+
+            // Give a base-class member a non-default value so we can check it round-trips
+            // (mGhostNodeForcesEnabled is initialised to true in the constructor).
+            p_method->mGhostNodeForcesEnabled = false;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_method;
+
+            delete p_method;
+        }
+
+        {
+            AbstractNumericalMethod<2,2>* p_method;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_method;
+
+            // The restored object should still be a NoNumericalMethod, and hence delegate
+            // node position updates to the cell population.
+            TS_ASSERT((dynamic_cast<NoNumericalMethod<2,2>*>(p_method) != nullptr));
+            TS_ASSERT_EQUALS(p_method->DelegatesToPopulation(), true);
+            TS_ASSERT_EQUALS(p_method->HasAdaptiveTimestep(), false);
+
+            // The base-class member serialised via NoNumericalMethod::serialize() should have
+            // been restored.
+            TS_ASSERT_EQUALS(p_method->mGhostNodeForcesEnabled, false);
+
+            delete p_method;
+        }
     }
 };
 
