@@ -21,12 +21,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "ubuntu-22.04"
-            codename: "jammy"
+          - os: "ubuntu-26.04"
+            codename: "resolute"
             cc: "gcc"
             cxx: "g++"
-          - os: "ubuntu-22.04"
-            codename: "jammy"
+          - os: "ubuntu-26.04"
+            codename: "resolute"
             cc: "icx"
             cxx: "icpx"
           - os: "ubuntu-24.04"
@@ -41,7 +41,17 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
+
+    # Force baseline amd64 packages: the 26.04 runner image enables the amd64v3 apt
+    # variant, whose FMA/AVX2 library builds break tests with hard-coded expected
+    # values. See https://github.com/Chaste/Chaste/issues/581#issuecomment-5540384065
+    - name: disable amd64v3 packages
+      if: ${{ matrix.codename == 'resolute' }}
+      run: |
+        grep -rl Architecture-Variants /etc/apt/apt.conf.d/ | xargs -r sudo rm -v || true
+        sudo apt-get update
+        sudo apt-get install --reinstall -y libc6 libstdc++6 libgcc-s1
 
     - name: install dependencies
       run: |
@@ -49,13 +59,6 @@ jobs:
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
-
-    - name: Downgrade libexpat1 (native ubuntu-22.04 only)
-      if: ${{ matrix.os == 'ubuntu-22.04' }}
-      run: |
-        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
-          sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
-        fi
 
     - name: install and set up Intel LLVM compiler
       run: |

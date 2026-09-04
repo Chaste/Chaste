@@ -15,7 +15,7 @@ jobs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
 
     strategy:
       fail-fast: false
@@ -32,17 +32,17 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu resolute/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
 
     - name: checkout project
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: ${{ matrix.project_org }}/${{ matrix.project_repo }}
         path: projects/${{ matrix.project_repo }}

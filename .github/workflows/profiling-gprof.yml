@@ -15,7 +15,7 @@ jobs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
@@ -33,14 +33,14 @@ jobs:
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
       - name: checkout Chaste
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Chaste/Chaste
           path: Chaste
 
       - name: install dependencies
         run: |
-          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu resolute/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
           sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
           sudo apt update
           sudo apt install chaste-dependencies
@@ -108,7 +108,7 @@ jobs:
           path: ./profile
 
       - name: checkout profiling-gprof
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Chaste/profiling-gprof
           path: profiling-gprof
@@ -121,7 +121,7 @@ jobs:
           cp ./profile/* ${GPROF_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
 
       - name: setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.x'
 

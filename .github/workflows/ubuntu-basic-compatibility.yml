@@ -21,10 +21,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "ubuntu-22.04"
-            codename: "jammy"
           - os: "ubuntu-24.04"
             codename: "noble"
+          - os: "ubuntu-26.04"
+            codename: "resolute"
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: install dependencies
       run: |
@@ -41,13 +41,6 @@ jobs:
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
-
-    - name: Downgrade libexpat1 (native ubuntu-22.04 only)
-      if: ${{ matrix.os == 'ubuntu-22.04' }}
-      run: |
-        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
-          sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
-        fi
 
     - name: compiler version
       run: |

@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: ["ubuntu:22.04", "ubuntu:24.04", "ubuntu:26.04"]
+        image: ["ubuntu:24.04", "ubuntu:26.04"]
 
     runs-on: ubuntu-latest
 
@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Make build and test directories
         run: |
