@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "VertexBasedCellPopulation.hpp"
 #include "Warnings.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
@@ -1068,16 +1070,13 @@ bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(uns
     {
         std::set<unsigned> containing_element_indices = this->GetNode(pdeNodeIndex)->rGetContainingElementIndices();
 
-        for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
-             iter != containing_element_indices.end();
-             iter++)
-        {
-            if (this->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
-            {
-                non_apoptotic_cell_present = false;
-                break;
-            }
-        }
+        non_apoptotic_cell_present =
+            std::none_of(containing_element_indices.begin(), containing_element_indices.end(),
+                         [this](unsigned elemIndex)
+                         {
+                             return this->GetCellUsingLocationIndex(elemIndex)
+                                 ->template HasCellProperty<ApoptoticCellProperty>();
+                         });
     }
     else
     {

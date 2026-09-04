@@ -32,6 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+#include <algorithm>
+
 #include "MutableElement.hpp"
 #include "RandomNumberGenerator.hpp"
 #include <cassert>
@@ -254,16 +256,8 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::RebuildEdges()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableElement<ELEMENT_DIM, SPACE_DIM>::IsElementOnBoundary() const
 {
-    bool is_element_on_boundary = false;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
-    {
-        if (this->GetNode(i)->IsBoundaryNode())
-        {
-            is_element_on_boundary = true;
-            break;
-        }
-    }
-    return is_element_on_boundary;
+    return std::any_of(this->mNodes.begin(), this->mNodes.end(),
+                       [](const Node<SPACE_DIM>* pNode) { return pNode->IsBoundaryNode(); });
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -568,16 +562,8 @@ void MutableElement<1, SPACE_DIM>::RebuildEdges(){
 template<unsigned SPACE_DIM>
 bool MutableElement<1, SPACE_DIM>::IsElementOnBoundary() const
 {
-    bool is_element_on_boundary = false;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
-    {
-        if (this->GetNode(i)->IsBoundaryNode())
-        {
-            is_element_on_boundary = true;
-            break;
-        }
-    }
-    return is_element_on_boundary;
+    return std::any_of(this->mNodes.begin(), this->mNodes.end(),
+                       [](const Node<SPACE_DIM>* pNode) { return pNode->IsBoundaryNode(); });
 }
 
 // Explicit instantiation
