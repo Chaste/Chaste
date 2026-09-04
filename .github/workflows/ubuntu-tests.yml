@@ -43,22 +43,15 @@ jobs:
     - name: checkout repository
       uses: actions/checkout@v7
 
-    # The Ubuntu 26.04 cloud image the GitHub runner is built from enables the amd64v3
-    # archive variant by default, so apt pulls x86-64-v3 (FMA/AVX2) builds of PETSc,
-    # BLAS/LAPACK etc. Their fused-multiply-add rounding differs from the baseline amd64
-    # builds used on the 24.04 leg and on developers' machines, which makes a handful of
-    # cell_based tests with hard-coded expected values diverge. Force the baseline amd64
-    # packages so CI matches a stock install.
-    # TODO: drop this once those tests are made platform-independent.
+    # Force baseline amd64 packages: the 26.04 runner image enables the amd64v3 apt
+    # variant, whose FMA/AVX2 library builds break tests with hard-coded expected
+    # values. See https://github.com/Chaste/Chaste/issues/581#issuecomment-5540384065
     - name: disable amd64v3 packages
       if: ${{ matrix.codename == 'resolute' }}
       run: |
-        echo "Before:"; apt-config dump APT::Architecture-Variants || true
-        files=$(grep -rl 'Architecture-Variants' /etc/apt/apt.conf.d/ 2>/dev/null || true)
-        if [ -n "$files" ]; then echo "$files" | xargs sudo rm -fv; fi
-        printf '#clear APT::Architecture-Variants;\n' | sudo tee /etc/apt/apt.conf.d/zz-no-arch-variants
+        grep -rl Architecture-Variants /etc/apt/apt.conf.d/ | xargs -r sudo rm -v || true
         sudo apt-get update
-        echo "After:"; apt-config dump APT::Architecture-Variants || true
+        sudo apt-get install --reinstall -y libc6 libstdc++6 libgcc-s1
 
     - name: install dependencies
       run: |
