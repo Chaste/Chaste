@@ -70,9 +70,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ForwardEulerNumericalMethod.hpp"
 #include "RK4NumericalMethod.hpp"
 #include "NoNumericalMethod.hpp"
+#include "StepSizeException.hpp"
+#include "Warnings.hpp"
 
 
 #include "PetscSetupAndFinalize.hpp"
+
+/**
+ * Helper class used only by TestNumericalMethods::TestDetectStepSizeExceptionsWithNonTerminalException
+ * to force AbstractNumericalMethod::DetectStepSizeExceptions() to catch a non-terminal
+ * StepSizeException, regardless of the behaviour of any real cell population.
+ */
+class MeshBasedCellPopulationWithNonTerminalStepSizeException : public MeshBasedCellPopulation<2>
+{
+public:
+
+    MeshBasedCellPopulationWithNonTerminalStepSizeException(MutableMesh<2,2>& rMesh, std::vector<CellPtr>& rCells)
+        : MeshBasedCellPopulation<2>(rMesh, rCells)
+    {
+    }
+
+    void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,2>& rDisplacement, double dt)
+    {
+        throw StepSizeException(0.5*dt, "Non-terminal step size exception for testing.", false);
+    }
+};
 
 class TestNumericalMethods : public AbstractCellBasedTestSuite
 {
@@ -710,6 +732,57 @@ public:
 
             TS_ASSERT_EQUALS(rk4_method.HasAdaptiveTimestep(), true);
         }
+    }
+
+    void TestDetectStepSizeExceptionsWithNonTerminalException()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
+        Warnings::QuietDestroy();
+
+        // Create a simple mesh
+        HoneycombMeshGenerator generator(3, 3, 0);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        // Create a cell population that always throws a non-terminal StepSizeException
+        MeshBasedCellPopulationWithNonTerminalStepSizeException cell_population(*p_mesh, cells);
+
+        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        MAKE_PTR(PopulationTestingForce<2>, p_test_force);
+        force_collection.push_back(p_test_force);
+
+        ForwardEulerNumericalMethod<2> numerical_method;
+        numerical_method.SetCellPopulation(&cell_population);
+        numerical_method.SetForceCollection(&force_collection);
+
+        c_vector<double, 2> displacement = zero_vector<double>(2);
+        double dt = 0.01;
+
+        // With adaptivity switched off, a non-terminal StepSizeException should just be
+        // converted into a single WARN_ONCE_ONLY warning rather than being rethrown, even
+        // when the check is triggered more than once.
+        TS_ASSERT_EQUALS(numerical_method.HasAdaptiveTimestep(), false);
+
+        TS_ASSERT_THROWS_NOTHING(numerical_method.DetectStepSizeExceptions(0, displacement, dt));
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+
+        TS_ASSERT_THROWS_NOTHING(numerical_method.DetectStepSizeExceptions(0, displacement, dt));
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Non-terminal step size exception for testing.");
+
+        Warnings::QuietDestroy();
+
+        // With adaptivity switched on, the same non-terminal StepSizeException should be
+        // rethrown so that the adaptive timestep loop can catch it and retry with a smaller step.
+        numerical_method.SetUseAdaptiveTimestep(true);
+        TS_ASSERT_THROWS_ANYTHING(numerical_method.DetectStepSizeExceptions(0, displacement, dt));
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
     }
 };
 
