@@ -32,6 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+#include <numeric>
+
 #include "DistributedBoxCollection.hpp"
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
@@ -527,16 +529,9 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
     /**
      * Calculate change in balance of loads by shifting the left/bottom boundary in either direction
      */
-    int local_load = 0;
-    for (unsigned i=0; i<localDistribution.size(); i++)
-    {
-        local_load += localDistribution[i];
-    }
-    int load_on_left_proc = 0;
-    for (unsigned i=0; i<node_distr_on_left_process.size(); i++)
-    {
-        load_on_left_proc += node_distr_on_left_process[i];
-    }
+    int local_load = std::accumulate(localDistribution.begin(), localDistribution.end(), 0);
+    int load_on_left_proc = std::accumulate(node_distr_on_left_process.begin(),
+                                            node_distr_on_left_process.end(), 0);
 
     if (!PetscTools::AmMaster())
     {

@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <numeric>
+
 #include "ImmersedBoundarySimulationModifier.hpp"
 
 #include <memory>
@@ -463,11 +465,9 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
         combined_sources.insert(combined_sources.end(), r_balance_sources.begin(), r_balance_sources.end());
 
         // Find the combined element source strength
-        double cumulative_strength = 0.0;
-        for (unsigned source_idx = 0; source_idx < r_element_sources.size(); source_idx++)
-        {
-            cumulative_strength += r_element_sources[source_idx]->GetStrength();
-        }
+        double cumulative_strength = std::accumulate(r_element_sources.begin(), r_element_sources.end(), 0.0,
+            [](double total, const std::shared_ptr<FluidSource<DIM>>& pSource)
+            { return total + pSource->GetStrength(); });
 
         // Calculate the required balancing strength, and apply it to all balancing sources
         double balance_strength = -1.0 * cumulative_strength / (double)r_balance_sources.size();
