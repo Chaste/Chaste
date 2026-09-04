@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "AbstractRushLarsenCardiacCell.hpp"
 
 #include <cassert>
@@ -62,10 +64,7 @@ OdeSolution AbstractRushLarsenCardiacCell::Compute(double tStart, double tEnd, d
     //     using Rush Larsen method or forward Euler as appropriate
 
     // Check length of time interval
-    if (tSamp < mDt)
-    {
-        tSamp = mDt;
-    }
+    tSamp = std::max(tSamp, mDt);
     const unsigned n_steps = (unsigned) floor((tEnd - tStart)/tSamp + 0.5);
     assert(fabs(tStart+n_steps*tSamp - tEnd) < 1e-12);
     const unsigned n_small_steps = (unsigned) floor(tSamp/mDt+0.5);

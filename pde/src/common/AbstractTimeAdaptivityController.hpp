@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTTIMEADAPTIVITYCONTROLLER_HPP_
 #define ABSTRACTTIMEADAPTIVITYCONTROLLER_HPP_
 
+#include <algorithm>
+
 #include "PetscVecTools.hpp"
 
 /**
@@ -92,16 +94,10 @@ public:
      */
     double GetNextTimeStep(double currentTime, Vec currentSolution)
     {
+        // Note that std::clamp returns a reference, so the value being clamped must be
+        // a named local rather than a temporary
         double dt = ComputeTimeStep(currentTime, currentSolution);
-        if (dt < mMinimumTimeStep)
-        {
-            dt = mMinimumTimeStep;
-        }
-        if (dt > mMaximumTimeStep)
-        {
-            dt = mMaximumTimeStep;
-        }
-        return dt;
+        return std::clamp(dt, mMinimumTimeStep, mMaximumTimeStep);
     }
 };
 
