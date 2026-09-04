@@ -43,6 +43,23 @@ jobs:
     - name: checkout repository
       uses: actions/checkout@v7
 
+    # The Ubuntu 26.04 cloud image the GitHub runner is built from enables the amd64v3
+    # archive variant by default, so apt pulls x86-64-v3 (FMA/AVX2) builds of PETSc,
+    # BLAS/LAPACK etc. Their fused-multiply-add rounding differs from the baseline amd64
+    # builds used on the 24.04 leg and on developers' machines, which makes a handful of
+    # cell_based tests with hard-coded expected values diverge. Force the baseline amd64
+    # packages so CI matches a stock install.
+    # TODO: drop this once those tests are made platform-independent.
+    - name: disable amd64v3 packages
+      if: ${{ matrix.codename == 'resolute' }}
+      run: |
+        echo "Before:"; apt-config dump APT::Architecture-Variants || true
+        files=$(grep -rl 'Architecture-Variants' /etc/apt/apt.conf.d/ 2>/dev/null || true)
+        if [ -n "$files" ]; then echo "$files" | xargs sudo rm -fv; fi
+        printf '#clear APT::Architecture-Variants;\n' | sudo tee /etc/apt/apt.conf.d/zz-no-arch-variants
+        sudo apt-get update
+        echo "After:"; apt-config dump APT::Architecture-Variants || true
+
     - name: install dependencies
       run: |
         echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
@@ -108,27 +125,6 @@ jobs:
     - name: run Continuous test pack
       run: ctest -j4 -L Continuous --output-on-failure
       working-directory: chaste-build-dir
-
-    # Diagnostic (temporary): the four cell_based failures on the 26.04 gcc leg are
-    # suspected to come from glibc's amd64v3 (FMA/AVX2) libm transcendentals, not from
-    # Chaste's own code. Re-run just those tests with the CPU-optimised libm paths
-    # disabled via GLIBC_TUNABLES. If they PASS here but FAIL in the baseline above,
-    # the glibc FMA libm is confirmed as the cause (and explains why the icx leg,
-    # which uses Intel libimf rather than glibc libm, is unaffected).
-    - name: diagnose libm FP divergence (glibc hwcaps)
-      if: ${{ always() && matrix.cc == 'gcc' && matrix.codename == 'resolute' }}
-      working-directory: chaste-build-dir
-      run: |
-        echo "===== CPU features of interest ====="
-        grep -m1 '^flags' /proc/cpuinfo | tr ' ' '\n' | grep -E '^(fma|avx2|avx|avx512f|sse4_2)$' | sort -u | paste -sd' '
-        echo "===== glibc version ====="
-        ldd --version | head -1
-        FAILING='^(TestCellPopulationWriters|TestOffLatticeSimulation|TestOffLatticeSimulationWithNodeBasedCellPopulation|TestVolumeTrackingModifier)$'
-        echo "===== BASELINE: default glibc libm ====="
-        ctest -j4 -R "$FAILING" --output-on-failure || true
-        echo "===== FORCED: AVX2/FMA/AVX/AVX512 libm paths disabled ====="
-        GLIBC_TUNABLES=glibc.cpu.hwcaps=-AVX512F,-AVX512VL,-AVX512DQ,-AVX512BW,-AVX2,-AVX,-FMA,-FMA4 \
-          ctest -j4 -R "$FAILING" --output-on-failure || true
 
     - name: run Nightly test pack
       run: ctest -j4 -L Nightly --output-on-failure
