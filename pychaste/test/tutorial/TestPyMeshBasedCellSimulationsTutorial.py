@@ -117,7 +117,7 @@ class TestPyMeshBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
         ## For a list of possible forces see subclasses of `AbstractForce`. Note that some of these forces are not compatible with mesh-based simulations,
         ## see the specific class documentation for details. If you try to use an incompatible class then you will receive a warning.
 
-        force = chaste.cell_based.GeneralisedLinearSpringForce[2, 2]()
+        force = chaste.cell_based.LinearSpringForce[2, 2]()
         simulator.AddForce(force)
 
         ## Save snapshot images of the population during the simulation
@@ -202,7 +202,7 @@ class TestPyMeshBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
         ## Again we create a force law, and pass it to the `OffLatticeSimulation`.
         ## This force law ensures that ghost nodes don't exert forces on real nodes but real nodes exert forces on ghost nodes.
 
-        force = chaste.cell_based.GeneralisedLinearSpringForce[2, 2]()
+        force = chaste.cell_based.LinearSpringForce[2, 2]()
         simulator.AddForce(force)
 
         ## To run the simulation, we call `Solve()`.

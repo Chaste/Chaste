@@ -33,25 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "DifferentialAdhesionGeneralisedLinearSpringForce.hpp"
+#include "DifferentialAdhesionLinearSpringForce.hpp"
 #include "CellLabel.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::DifferentialAdhesionGeneralisedLinearSpringForce()
-   : GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>(),
+DifferentialAdhesionLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::DifferentialAdhesionLinearSpringForce()
+   : LinearSpringForce<ELEMENT_DIM, SPACE_DIM>(),
      mHomotypicLabelledSpringConstantMultiplier(1.0),
      mHeterotypicSpringConstantMultiplier(1.0)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::VariableSpringConstantMultiplicationFactor(
+double DifferentialAdhesionLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::VariableSpringConstantMultiplicationFactor(
     unsigned nodeAGlobalIndex,
     unsigned nodeBGlobalIndex,
     AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
     bool isCloserThanRestLength)
 {
-
     if (isCloserThanRestLength)
     {
         return 1.0;
@@ -87,49 +86,49 @@ double DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>:
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::GetHomotypicLabelledSpringConstantMultiplier()
+double DifferentialAdhesionLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::GetHomotypicLabelledSpringConstantMultiplier()
 {
     return mHomotypicLabelledSpringConstantMultiplier;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetHomotypicLabelledSpringConstantMultiplier(double labelledSpringConstantMultiplier)
+void DifferentialAdhesionLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetHomotypicLabelledSpringConstantMultiplier(double labelledSpringConstantMultiplier)
 {
     assert(labelledSpringConstantMultiplier > 0.0);
     mHomotypicLabelledSpringConstantMultiplier = labelledSpringConstantMultiplier;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::GetHeterotypicSpringConstantMultiplier()
+double DifferentialAdhesionLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::GetHeterotypicSpringConstantMultiplier()
 {
     return mHeterotypicSpringConstantMultiplier;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetHeterotypicSpringConstantMultiplier(double heterotypicSpringConstantMultiplier)
+void DifferentialAdhesionLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetHeterotypicSpringConstantMultiplier(double heterotypicSpringConstantMultiplier)
 {
     assert(heterotypicSpringConstantMultiplier > 0.0);
     mHeterotypicSpringConstantMultiplier = heterotypicSpringConstantMultiplier;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
+void DifferentialAdhesionLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<HomotypicLabelledSpringConstantMultiplier>" << mHomotypicLabelledSpringConstantMultiplier << "</HomotypicLabelledSpringConstantMultiplier>\n";
     *rParamsFile << "\t\t\t<HeterotypicSpringConstantMultiplier>" << mHeterotypicSpringConstantMultiplier << "</HeterotypicSpringConstantMultiplier>\n";
 
     // Call direct parent class
-    GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(rParamsFile);
+    LinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class DifferentialAdhesionGeneralisedLinearSpringForce<1,1>;
-template class DifferentialAdhesionGeneralisedLinearSpringForce<1,2>;
-template class DifferentialAdhesionGeneralisedLinearSpringForce<2,2>;
-template class DifferentialAdhesionGeneralisedLinearSpringForce<1,3>;
-template class DifferentialAdhesionGeneralisedLinearSpringForce<2,3>;
-template class DifferentialAdhesionGeneralisedLinearSpringForce<3,3>;
+template class DifferentialAdhesionLinearSpringForce<1,1>;
+template class DifferentialAdhesionLinearSpringForce<1,2>;
+template class DifferentialAdhesionLinearSpringForce<2,2>;
+template class DifferentialAdhesionLinearSpringForce<1,3>;
+template class DifferentialAdhesionLinearSpringForce<2,3>;
+template class DifferentialAdhesionLinearSpringForce<3,3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(DifferentialAdhesionGeneralisedLinearSpringForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(DifferentialAdhesionLinearSpringForce)

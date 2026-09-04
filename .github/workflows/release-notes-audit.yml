@@ -1,0 +1,39 @@
+name: Release notes audit
+
+# Weekly sweep for merged PRs not yet on the "changes since last release" page.
+# Findings go in issue #641; there is no per-PR status check. See issue #640.
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'   # Mondays 06:17 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Print the report without editing issue #641'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    if: github.repository == 'Chaste/Chaste'
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: run release notes audit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}          # read PRs, edit issue #641
+          WEBSITE_TOKEN: ${{ secrets.WEBSITE_ACCESS }}   # read the private changes page
+          ORG_READ_TOKEN: ${{ secrets.ORG_READ_TOKEN }}  # list org members (read:org)
+        run: |
+          python python/infra/CheckReleaseNotes.py \
+            ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }}

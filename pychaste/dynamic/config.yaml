@@ -535,31 +535,66 @@ modules:
 
       ##=== cell_based: Chaste/cell_based/src/population/forces
       - name: AbstractForce
+        template_substitutions: &full_force_template_substitutions
+          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+            replacement: [[1, 1], [1, 2], [2, 2], [1, 3], [2, 3], [3, 3]]
+
       - name: AbstractTwoBodyInteractionForce
+        template_substitutions: *full_force_template_substitutions
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: AbstractVariableSizeTwoBodyInteractionForce
+        template_substitutions: *full_force_template_substitutions
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
       - name: AbstractImmersedBoundaryForce
       - name: BuskeAdhesiveForce
       - name: BuskeCompressionForce
       - name: BuskeElasticForce
       - name: ChemotacticForce
-      - name: DifferentialAdhesionGeneralisedLinearSpringForce
       - name: DiffusionForce
-
       - name: DiscreteSystemForceCalculator
         excluded: True # internal calculator; returns vector<vector<double>>
+      - name: LinearSpringForce
+        template_substitutions: *full_force_template_substitutions
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: PathmanathanInteractionForce
+        template_substitutions: *full_force_template_substitutions
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: SimpleLogarithmicRepulsionForce
+        template_substitutions: *full_force_template_substitutions
+        source_includes:
+          - PybindUblasTypeCaster.hpp
 
       - name: FarhadifarForce
-      - name: GeneralisedLinearSpringForce
       - name: ImmersedBoundaryKinematicFeedbackForce
       - name: ImmersedBoundaryLinearDifferentialAdhesionForce
       - name: ImmersedBoundaryLinearInteractionForce
       - name: ImmersedBoundaryLinearMembraneForce
       - name: ImmersedBoundaryMorseInteractionForce
       - name: ImmersedBoundaryMorseMembraneForce
-      - name: NagaiHondaDifferentialAdhesionForce
       - name: NagaiHondaForce
-      - name: PlanarPolarisedFarhadifarForce
-      - name: RepulsionForce
       - name: WelikyOsterForce
+
+      - name: DifferentialAdhesionLinearSpringForce
+        template_substitutions: *full_force_template_substitutions
+
+      - name: DifferentialAdhesionPathmanathanInteractionForce
+        template_substitutions: *full_force_template_substitutions
+
+      - name: NagaiHondaDifferentialAdhesionForce
+        excluded_methods:
+          - GetAdhesionParameter
+
+      - name: PlanarPolarisedFarhadifarForce
+        excluded_methods:
+          - GetLineTensionParameter
 
       ##=== cell_based: Chaste/cell_based/src/population/killers
       - name: AbstractCellKiller
@@ -629,6 +664,8 @@ modules:
       ##=== cell_based: Chaste/cell_based/src/simulation/numerical_methods
       - name: AbstractNumericalMethod
       - name: ForwardEulerNumericalMethod
+      - name: RK4NumericalMethod
+      - name: NoNumericalMethod
       - name: StepSizeException
         excluded: True # internal control-flow exception, not user-facing
 

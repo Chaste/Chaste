@@ -33,29 +33,37 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef REPULSIONFORCE_HPP_
-#define REPULSIONFORCE_HPP_
+#ifndef RK4NUMERICALMETHOD_HPP_
+#define RK4NUMERICALMETHOD_HPP_
 
-#include "GeneralisedLinearSpringForce.hpp"
-#include "NodeBasedCellPopulation.hpp"
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
+#include "AbstractNumericalMethod.hpp"
 
 /**
- * A class for a simple two-body repulsion force law. Designed
- * for use in node-based simulations
+ * Implements the 4th-order Runge-Kutta (RK4) time stepping scheme for
+ * off-lattice cell-based simulations.
  *
- * The force just creates a linear repulsive force between cells
- * with a nonlinear separation less than 2. This force does not
- * take a cell's age or cell cycle phase into account.
+ * Solves the equations of motion dr/dt = F/nu
+ * using the classic 4th-order Runge-Kutta scheme:
+ *
+ * k1 = F(r^t) / nu
+ * k2 = F(r^t + dt*k1/2) / nu
+ * k3 = F(r^t + dt*k2/2) / nu
+ * k4 = F(r^t + dt*k3) / nu
+ * r^(t+1) = r^t + (dt/6) * (k1 + 2*k2 + 2*k3 + k4)
  */
-template<unsigned DIM>
-class RepulsionForce : public GeneralisedLinearSpringForce<DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class RK4NumericalMethod : public AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>
 {
-private :
+private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
+
     /**
-     * Archive the object and its member variables.
+     * Save or restore the simulation.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -63,35 +71,38 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<GeneralisedLinearSpringForce<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> >(*this);
     }
 
-public :
+public:
 
     /**
      * Constructor.
      */
-    RepulsionForce();
+    RK4NumericalMethod();
 
     /**
-     * Overridden AddForceContribution() method.
-     *
-     * @param rCellPopulation reference to the CellPopulation
+     * Destructor.
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    virtual ~RK4NumericalMethod();
 
     /**
-     * Outputs force Parameters to file
+     * Overridden UpdateAllNodePositions() method.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param rParamsFile the file stream to which the parameters are output
+     * @param dt Time step size
      */
-    virtual void OutputForceParameters(out_stream& rParamsFile);
+    void UpdateAllNodePositions(double dt);
+
+    /**
+     * Overridden OutputNumericalMethodParameters() method.
+     *
+     * @param rParamsFile Reference to the parameter output filestream
+     */
+    virtual void OutputNumericalMethodParameters(out_stream& rParamsFile);
 };
 
+// Serialization for Boost >= 1.36
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(RepulsionForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(RK4NumericalMethod)
 
-#endif /*REPULSIONFORCE_HPP_*/
+#endif /*RK4NUMERICALMETHOD_HPP_*/

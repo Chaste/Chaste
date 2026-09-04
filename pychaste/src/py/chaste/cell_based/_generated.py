@@ -276,12 +276,18 @@ from chaste._pychaste_all import (
     DeltaNotchTrackingModifier_1,
     DeltaNotchTrackingModifier_2,
     DeltaNotchTrackingModifier_3,
-    DifferentialAdhesionGeneralisedLinearSpringForce_1_1,
-    DifferentialAdhesionGeneralisedLinearSpringForce_1_2,
-    DifferentialAdhesionGeneralisedLinearSpringForce_1_3,
-    DifferentialAdhesionGeneralisedLinearSpringForce_2_2,
-    DifferentialAdhesionGeneralisedLinearSpringForce_2_3,
-    DifferentialAdhesionGeneralisedLinearSpringForce_3_3,
+    DifferentialAdhesionLinearSpringForce_1_1,
+    DifferentialAdhesionLinearSpringForce_1_2,
+    DifferentialAdhesionLinearSpringForce_1_3,
+    DifferentialAdhesionLinearSpringForce_2_2,
+    DifferentialAdhesionLinearSpringForce_2_3,
+    DifferentialAdhesionLinearSpringForce_3_3,
+    DifferentialAdhesionPathmanathanInteractionForce_1_1,
+    DifferentialAdhesionPathmanathanInteractionForce_1_2,
+    DifferentialAdhesionPathmanathanInteractionForce_1_3,
+    DifferentialAdhesionPathmanathanInteractionForce_2_2,
+    DifferentialAdhesionPathmanathanInteractionForce_2_3,
+    DifferentialAdhesionPathmanathanInteractionForce_3_3,
     DifferentialAdhesionPottsUpdateRule_1,
     DifferentialAdhesionPottsUpdateRule_2,
     DifferentialAdhesionPottsUpdateRule_3,
@@ -323,12 +329,6 @@ from chaste._pychaste_all import (
     ForwardEulerNumericalMethod_2_3,
     ForwardEulerNumericalMethod_3_3,
     GammaG1CellCycleModel,
-    GeneralisedLinearSpringForce_1_1,
-    GeneralisedLinearSpringForce_1_2,
-    GeneralisedLinearSpringForce_1_3,
-    GeneralisedLinearSpringForce_2_2,
-    GeneralisedLinearSpringForce_2_3,
-    GeneralisedLinearSpringForce_3_3,
     Goldbeter1991SrnModel,
     HeterotypicBoundaryLengthWriter_1_1,
     HeterotypicBoundaryLengthWriter_1_2,
@@ -385,6 +385,12 @@ from chaste._pychaste_all import (
     LegacyCellProliferativeTypesWriter_2_2,
     LegacyCellProliferativeTypesWriter_2_3,
     LegacyCellProliferativeTypesWriter_3_3,
+    LinearSpringForce_1_1,
+    LinearSpringForce_1_2,
+    LinearSpringForce_1_3,
+    LinearSpringForce_2_2,
+    LinearSpringForce_2_3,
+    LinearSpringForce_3_3,
     MeshBasedCellPopulationWithGhostNodes_1,
     MeshBasedCellPopulationWithGhostNodes_2,
     MeshBasedCellPopulationWithGhostNodes_3,
@@ -401,6 +407,12 @@ from chaste._pychaste_all import (
     NagaiHondaForce_2,
     NagaiHondaForce_3,
     NoCellCycleModel,
+    NoNumericalMethod_1_1,
+    NoNumericalMethod_1_2,
+    NoNumericalMethod_1_3,
+    NoNumericalMethod_2_2,
+    NoNumericalMethod_2_3,
+    NoNumericalMethod_3_3,
     NodeBasedCellPopulationWithBuskeUpdate_1,
     NodeBasedCellPopulationWithBuskeUpdate_2,
     NodeBasedCellPopulationWithBuskeUpdate_3,
@@ -435,6 +447,12 @@ from chaste._pychaste_all import (
     OnLatticeSimulation_1,
     OnLatticeSimulation_2,
     OnLatticeSimulation_3,
+    PathmanathanInteractionForce_1_1,
+    PathmanathanInteractionForce_1_2,
+    PathmanathanInteractionForce_1_3,
+    PathmanathanInteractionForce_2_2,
+    PathmanathanInteractionForce_2_3,
+    PathmanathanInteractionForce_3_3,
     PlanarPolarisedFarhadifarForce_1,
     PlanarPolarisedFarhadifarForce_2,
     PlanarPolarisedFarhadifarForce_3,
@@ -452,6 +470,12 @@ from chaste._pychaste_all import (
     PottsBasedCellPopulation_3,
     PythonSimulationModifier_2,
     PythonSimulationModifier_3,
+    RK4NumericalMethod_1_1,
+    RK4NumericalMethod_1_2,
+    RK4NumericalMethod_1_3,
+    RK4NumericalMethod_2_2,
+    RK4NumericalMethod_2_3,
+    RK4NumericalMethod_3_3,
     RadialCellDataDistributionWriter_1_1,
     RadialCellDataDistributionWriter_1_2,
     RadialCellDataDistributionWriter_1_3,
@@ -473,9 +497,6 @@ from chaste._pychaste_all import (
     RandomDirectionVertexBasedDivisionRule_1,
     RandomDirectionVertexBasedDivisionRule_2,
     RandomDirectionVertexBasedDivisionRule_3,
-    RepulsionForce_1,
-    RepulsionForce_2,
-    RepulsionForce_3,
     ShortAxisImmersedBoundaryDivisionRule_1,
     ShortAxisImmersedBoundaryDivisionRule_2,
     ShortAxisImmersedBoundaryDivisionRule_3,
@@ -485,6 +506,12 @@ from chaste._pychaste_all import (
     ShovingCaBasedDivisionRule_1,
     ShovingCaBasedDivisionRule_2,
     ShovingCaBasedDivisionRule_3,
+    SimpleLogarithmicRepulsionForce_1_1,
+    SimpleLogarithmicRepulsionForce_1_2,
+    SimpleLogarithmicRepulsionForce_1_3,
+    SimpleLogarithmicRepulsionForce_2_2,
+    SimpleLogarithmicRepulsionForce_2_3,
+    SimpleLogarithmicRepulsionForce_3_3,
     SimpleOxygenBasedCellCycleModel,
     SimpleTargetAreaModifier_1,
     SimpleTargetAreaModifier_2,
@@ -843,13 +870,20 @@ __all__ = [
     "DeltaNotchTrackingModifier_1",
     "DeltaNotchTrackingModifier_2",
     "DeltaNotchTrackingModifier_3",
-    "DifferentialAdhesionGeneralisedLinearSpringForce",
-    "DifferentialAdhesionGeneralisedLinearSpringForce_1_1",
-    "DifferentialAdhesionGeneralisedLinearSpringForce_1_2",
-    "DifferentialAdhesionGeneralisedLinearSpringForce_1_3",
-    "DifferentialAdhesionGeneralisedLinearSpringForce_2_2",
-    "DifferentialAdhesionGeneralisedLinearSpringForce_2_3",
-    "DifferentialAdhesionGeneralisedLinearSpringForce_3_3",
+    "DifferentialAdhesionLinearSpringForce",
+    "DifferentialAdhesionLinearSpringForce_1_1",
+    "DifferentialAdhesionLinearSpringForce_1_2",
+    "DifferentialAdhesionLinearSpringForce_1_3",
+    "DifferentialAdhesionLinearSpringForce_2_2",
+    "DifferentialAdhesionLinearSpringForce_2_3",
+    "DifferentialAdhesionLinearSpringForce_3_3",
+    "DifferentialAdhesionPathmanathanInteractionForce",
+    "DifferentialAdhesionPathmanathanInteractionForce_1_1",
+    "DifferentialAdhesionPathmanathanInteractionForce_1_2",
+    "DifferentialAdhesionPathmanathanInteractionForce_1_3",
+    "DifferentialAdhesionPathmanathanInteractionForce_2_2",
+    "DifferentialAdhesionPathmanathanInteractionForce_2_3",
+    "DifferentialAdhesionPathmanathanInteractionForce_3_3",
     "DifferentialAdhesionPottsUpdateRule",
     "DifferentialAdhesionPottsUpdateRule_1",
     "DifferentialAdhesionPottsUpdateRule_2",
@@ -901,13 +935,6 @@ __all__ = [
     "ForwardEulerNumericalMethod_2_3",
     "ForwardEulerNumericalMethod_3_3",
     "GammaG1CellCycleModel",
-    "GeneralisedLinearSpringForce",
-    "GeneralisedLinearSpringForce_1_1",
-    "GeneralisedLinearSpringForce_1_2",
-    "GeneralisedLinearSpringForce_1_3",
-    "GeneralisedLinearSpringForce_2_2",
-    "GeneralisedLinearSpringForce_2_3",
-    "GeneralisedLinearSpringForce_3_3",
     "Goldbeter1991SrnModel",
     "HeterotypicBoundaryLengthWriter",
     "HeterotypicBoundaryLengthWriter_1_1",
@@ -978,6 +1005,13 @@ __all__ = [
     "LegacyCellProliferativeTypesWriter_2_2",
     "LegacyCellProliferativeTypesWriter_2_3",
     "LegacyCellProliferativeTypesWriter_3_3",
+    "LinearSpringForce",
+    "LinearSpringForce_1_1",
+    "LinearSpringForce_1_2",
+    "LinearSpringForce_1_3",
+    "LinearSpringForce_2_2",
+    "LinearSpringForce_2_3",
+    "LinearSpringForce_3_3",
     "MeshBasedCellPopulation",
     "MeshBasedCellPopulationWithGhostNodes",
     "MeshBasedCellPopulationWithGhostNodes_1",
@@ -998,6 +1032,13 @@ __all__ = [
     "NagaiHondaForce_2",
     "NagaiHondaForce_3",
     "NoCellCycleModel",
+    "NoNumericalMethod",
+    "NoNumericalMethod_1_1",
+    "NoNumericalMethod_1_2",
+    "NoNumericalMethod_1_3",
+    "NoNumericalMethod_2_2",
+    "NoNumericalMethod_2_3",
+    "NoNumericalMethod_3_3",
     "NodeBasedCellPopulation",
     "NodeBasedCellPopulationWithBuskeUpdate",
     "NodeBasedCellPopulationWithBuskeUpdate_1",
@@ -1040,6 +1081,13 @@ __all__ = [
     "OnLatticeSimulation_1",
     "OnLatticeSimulation_2",
     "OnLatticeSimulation_3",
+    "PathmanathanInteractionForce",
+    "PathmanathanInteractionForce_1_1",
+    "PathmanathanInteractionForce_1_2",
+    "PathmanathanInteractionForce_1_3",
+    "PathmanathanInteractionForce_2_2",
+    "PathmanathanInteractionForce_2_3",
+    "PathmanathanInteractionForce_3_3",
     "PlanarPolarisedFarhadifarForce",
     "PlanarPolarisedFarhadifarForce_1",
     "PlanarPolarisedFarhadifarForce_2",
@@ -1062,6 +1110,13 @@ __all__ = [
     "PythonSimulationModifier",
     "PythonSimulationModifier_2",
     "PythonSimulationModifier_3",
+    "RK4NumericalMethod",
+    "RK4NumericalMethod_1_1",
+    "RK4NumericalMethod_1_2",
+    "RK4NumericalMethod_1_3",
+    "RK4NumericalMethod_2_2",
+    "RK4NumericalMethod_2_3",
+    "RK4NumericalMethod_3_3",
     "RadialCellDataDistributionWriter",
     "RadialCellDataDistributionWriter_1_1",
     "RadialCellDataDistributionWriter_1_2",
@@ -1088,10 +1143,6 @@ __all__ = [
     "RandomDirectionVertexBasedDivisionRule_1",
     "RandomDirectionVertexBasedDivisionRule_2",
     "RandomDirectionVertexBasedDivisionRule_3",
-    "RepulsionForce",
-    "RepulsionForce_1",
-    "RepulsionForce_2",
-    "RepulsionForce_3",
     "ShortAxisImmersedBoundaryDivisionRule",
     "ShortAxisImmersedBoundaryDivisionRule_1",
     "ShortAxisImmersedBoundaryDivisionRule_2",
@@ -1104,6 +1155,13 @@ __all__ = [
     "ShovingCaBasedDivisionRule_1",
     "ShovingCaBasedDivisionRule_2",
     "ShovingCaBasedDivisionRule_3",
+    "SimpleLogarithmicRepulsionForce",
+    "SimpleLogarithmicRepulsionForce_1_1",
+    "SimpleLogarithmicRepulsionForce_1_2",
+    "SimpleLogarithmicRepulsionForce_1_3",
+    "SimpleLogarithmicRepulsionForce_2_2",
+    "SimpleLogarithmicRepulsionForce_2_3",
+    "SimpleLogarithmicRepulsionForce_3_3",
     "SimpleOxygenBasedCellCycleModel",
     "SimpleTargetAreaModifier",
     "SimpleTargetAreaModifier_1",
@@ -1681,17 +1739,31 @@ class DeltaNotchTrackingModifier(TemplateClass):
     }
 
 
-class DifferentialAdhesionGeneralisedLinearSpringForce(TemplateClass):
+class DifferentialAdhesionLinearSpringForce(TemplateClass):
     _instantiations = {
-        ("1", "1"): DifferentialAdhesionGeneralisedLinearSpringForce_1_1,
-        ("1",): DifferentialAdhesionGeneralisedLinearSpringForce_1_1,
-        ("1", "2"): DifferentialAdhesionGeneralisedLinearSpringForce_1_2,
-        ("2", "2"): DifferentialAdhesionGeneralisedLinearSpringForce_2_2,
-        ("2",): DifferentialAdhesionGeneralisedLinearSpringForce_2_2,
-        ("1", "3"): DifferentialAdhesionGeneralisedLinearSpringForce_1_3,
-        ("2", "3"): DifferentialAdhesionGeneralisedLinearSpringForce_2_3,
-        ("3", "3"): DifferentialAdhesionGeneralisedLinearSpringForce_3_3,
-        ("3",): DifferentialAdhesionGeneralisedLinearSpringForce_3_3,
+        ("1", "1"): DifferentialAdhesionLinearSpringForce_1_1,
+        ("1",): DifferentialAdhesionLinearSpringForce_1_1,
+        ("1", "2"): DifferentialAdhesionLinearSpringForce_1_2,
+        ("2", "2"): DifferentialAdhesionLinearSpringForce_2_2,
+        ("2",): DifferentialAdhesionLinearSpringForce_2_2,
+        ("1", "3"): DifferentialAdhesionLinearSpringForce_1_3,
+        ("2", "3"): DifferentialAdhesionLinearSpringForce_2_3,
+        ("3", "3"): DifferentialAdhesionLinearSpringForce_3_3,
+        ("3",): DifferentialAdhesionLinearSpringForce_3_3,
+    }
+
+
+class DifferentialAdhesionPathmanathanInteractionForce(TemplateClass):
+    _instantiations = {
+        ("1", "1"): DifferentialAdhesionPathmanathanInteractionForce_1_1,
+        ("1",): DifferentialAdhesionPathmanathanInteractionForce_1_1,
+        ("1", "2"): DifferentialAdhesionPathmanathanInteractionForce_1_2,
+        ("2", "2"): DifferentialAdhesionPathmanathanInteractionForce_2_2,
+        ("2",): DifferentialAdhesionPathmanathanInteractionForce_2_2,
+        ("1", "3"): DifferentialAdhesionPathmanathanInteractionForce_1_3,
+        ("2", "3"): DifferentialAdhesionPathmanathanInteractionForce_2_3,
+        ("3", "3"): DifferentialAdhesionPathmanathanInteractionForce_3_3,
+        ("3",): DifferentialAdhesionPathmanathanInteractionForce_3_3,
     }
 
 
@@ -1784,20 +1856,6 @@ class ForwardEulerNumericalMethod(TemplateClass):
         ("2", "3"): ForwardEulerNumericalMethod_2_3,
         ("3", "3"): ForwardEulerNumericalMethod_3_3,
         ("3",): ForwardEulerNumericalMethod_3_3,
-    }
-
-
-class GeneralisedLinearSpringForce(TemplateClass):
-    _instantiations = {
-        ("1", "1"): GeneralisedLinearSpringForce_1_1,
-        ("1",): GeneralisedLinearSpringForce_1_1,
-        ("1", "2"): GeneralisedLinearSpringForce_1_2,
-        ("2", "2"): GeneralisedLinearSpringForce_2_2,
-        ("2",): GeneralisedLinearSpringForce_2_2,
-        ("1", "3"): GeneralisedLinearSpringForce_1_3,
-        ("2", "3"): GeneralisedLinearSpringForce_2_3,
-        ("3", "3"): GeneralisedLinearSpringForce_3_3,
-        ("3",): GeneralisedLinearSpringForce_3_3,
     }
 
 
@@ -1937,6 +1995,20 @@ class LegacyCellProliferativeTypesWriter(TemplateClass):
     }
 
 
+class LinearSpringForce(TemplateClass):
+    _instantiations = {
+        ("1", "1"): LinearSpringForce_1_1,
+        ("1",): LinearSpringForce_1_1,
+        ("1", "2"): LinearSpringForce_1_2,
+        ("2", "2"): LinearSpringForce_2_2,
+        ("2",): LinearSpringForce_2_2,
+        ("1", "3"): LinearSpringForce_1_3,
+        ("2", "3"): LinearSpringForce_2_3,
+        ("3", "3"): LinearSpringForce_3_3,
+        ("3",): LinearSpringForce_3_3,
+    }
+
+
 class MeshBasedCellPopulation(TemplateClass):
     _instantiations = {
         ("1", "1"): MeshBasedCellPopulation_1_1,
@@ -1972,6 +2044,20 @@ class NagaiHondaForce(TemplateClass):
         ("1",): NagaiHondaForce_1,
         ("2",): NagaiHondaForce_2,
         ("3",): NagaiHondaForce_3,
+    }
+
+
+class NoNumericalMethod(TemplateClass):
+    _instantiations = {
+        ("1", "1"): NoNumericalMethod_1_1,
+        ("1",): NoNumericalMethod_1_1,
+        ("1", "2"): NoNumericalMethod_1_2,
+        ("2", "2"): NoNumericalMethod_2_2,
+        ("2",): NoNumericalMethod_2_2,
+        ("1", "3"): NoNumericalMethod_1_3,
+        ("2", "3"): NoNumericalMethod_2_3,
+        ("3", "3"): NoNumericalMethod_3_3,
+        ("3",): NoNumericalMethod_3_3,
     }
 
 
@@ -2057,6 +2143,20 @@ class OnLatticeSimulation(TemplateClass):
     }
 
 
+class PathmanathanInteractionForce(TemplateClass):
+    _instantiations = {
+        ("1", "1"): PathmanathanInteractionForce_1_1,
+        ("1",): PathmanathanInteractionForce_1_1,
+        ("1", "2"): PathmanathanInteractionForce_1_2,
+        ("2", "2"): PathmanathanInteractionForce_2_2,
+        ("2",): PathmanathanInteractionForce_2_2,
+        ("1", "3"): PathmanathanInteractionForce_1_3,
+        ("2", "3"): PathmanathanInteractionForce_2_3,
+        ("3", "3"): PathmanathanInteractionForce_3_3,
+        ("3",): PathmanathanInteractionForce_3_3,
+    }
+
+
 class PlanarPolarisedFarhadifarForce(TemplateClass):
     _instantiations = {
         ("1",): PlanarPolarisedFarhadifarForce_1,
@@ -2099,6 +2199,20 @@ class PythonSimulationModifier(TemplateClass):
     _instantiations = {
         ("2",): PythonSimulationModifier_2,
         ("3",): PythonSimulationModifier_3,
+    }
+
+
+class RK4NumericalMethod(TemplateClass):
+    _instantiations = {
+        ("1", "1"): RK4NumericalMethod_1_1,
+        ("1",): RK4NumericalMethod_1_1,
+        ("1", "2"): RK4NumericalMethod_1_2,
+        ("2", "2"): RK4NumericalMethod_2_2,
+        ("2",): RK4NumericalMethod_2_2,
+        ("1", "3"): RK4NumericalMethod_1_3,
+        ("2", "3"): RK4NumericalMethod_2_3,
+        ("3", "3"): RK4NumericalMethod_3_3,
+        ("3",): RK4NumericalMethod_3_3,
     }
 
 
@@ -2154,14 +2268,6 @@ class RandomDirectionVertexBasedDivisionRule(TemplateClass):
     }
 
 
-class RepulsionForce(TemplateClass):
-    _instantiations = {
-        ("1",): RepulsionForce_1,
-        ("2",): RepulsionForce_2,
-        ("3",): RepulsionForce_3,
-    }
-
-
 class ShortAxisImmersedBoundaryDivisionRule(TemplateClass):
     _instantiations = {
         ("1",): ShortAxisImmersedBoundaryDivisionRule_1,
@@ -2183,6 +2289,20 @@ class ShovingCaBasedDivisionRule(TemplateClass):
         ("1",): ShovingCaBasedDivisionRule_1,
         ("2",): ShovingCaBasedDivisionRule_2,
         ("3",): ShovingCaBasedDivisionRule_3,
+    }
+
+
+class SimpleLogarithmicRepulsionForce(TemplateClass):
+    _instantiations = {
+        ("1", "1"): SimpleLogarithmicRepulsionForce_1_1,
+        ("1",): SimpleLogarithmicRepulsionForce_1_1,
+        ("1", "2"): SimpleLogarithmicRepulsionForce_1_2,
+        ("2", "2"): SimpleLogarithmicRepulsionForce_2_2,
+        ("2",): SimpleLogarithmicRepulsionForce_2_2,
+        ("1", "3"): SimpleLogarithmicRepulsionForce_1_3,
+        ("2", "3"): SimpleLogarithmicRepulsionForce_2_3,
+        ("3", "3"): SimpleLogarithmicRepulsionForce_3_3,
+        ("3",): SimpleLogarithmicRepulsionForce_3_3,
     }
 
 
