@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ParabolicBoxDomainPdeModifier.hpp"
+
+#include <algorithm>
 #include "SimpleLinearParabolicSolver.hpp"
 #include "VtkMeshWriter.hpp"
 #include "MutableMesh.hpp"
@@ -194,14 +196,9 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
         cell_iter != rCellPopulation.End();
         ++cell_iter)
     {
-        const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+        double radius = norm_2(rCellPopulation.GetLocationOfCellCentre(*cell_iter));
 
-        double radius = norm_2(r_position_of_cell.rGetLocation());
-
-        if (max_radius < radius)
-        {
-            max_radius = radius;
-        }
+        max_radius = std::max(max_radius, radius);
     }
 
     // Create mesh from cell centres so can interpolate tissue velocity onto mpFeMesh
