@@ -1,8 +1,9 @@
-name: Profiling GPerftools
+name: "T2: Profiling (gperftools)"
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - '**'
   push:
@@ -14,9 +15,20 @@ permissions:
 
 jobs:
 
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   build-and-test:
 
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    name: "T2 · gperftools profiling run"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier2 == 'true'
+
+    concurrency:
+      group: tier-2-profiling-gperftools-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
 
     runs-on: ubuntu-24.04
 
@@ -143,7 +155,7 @@ jobs:
 
   publish-results:
 
-    name: Publish results (non-fork PRs only)
+    name: "T2 · publish gperftools results (non-fork PRs only)"
     needs: build-and-test
     runs-on: ubuntu-latest
     # only when index exists AND it's being run from the primary repo (Chaste/Chaste)

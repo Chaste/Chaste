@@ -1,7 +1,8 @@
-name: Doxygen
+name: "T1: Doxygen"
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches:
       - develop
@@ -12,13 +13,23 @@ on:
         required: true
 
 jobs:
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   on_pull_request:
+    name: "T1 · doxygen coverage"
     runs-on: ubuntu-latest
+
+    needs: gate
 
     if: >
       github.event_name == 'pull_request' &&
-      !contains(github.event.pull_request.labels.*.name, 'ci:off') &&
+      needs.gate.outputs.run_tier1 == 'true' &&
       github.repository == 'Chaste/Chaste'
+
+    concurrency:
+      group: tier-1-doxygen-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
     steps:
       - name: checkout code

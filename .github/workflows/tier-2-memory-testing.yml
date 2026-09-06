@@ -1,8 +1,9 @@
-name: Memory testing
+name: "T2: Memory testing"
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - '**'
   push:
@@ -23,9 +24,20 @@ env:
 
 jobs:
 
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   build-and-test:
 
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    name: "T2 · memtest"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier2 == 'true'
+
+    concurrency:
+      group: tier-2-memory-testing-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
 
     runs-on: ubuntu-26.04
 
@@ -91,13 +103,13 @@ jobs:
 
   aggregate:
 
-    name: Aggregate memtest results
-    needs: build-and-test
+    name: "T2 · aggregate memtest results"
+    needs: [gate, build-and-test]
     runs-on: ubuntu-26.04
     # Run even if one or more components failed (e.g. found a leak), so the combined
-    # report is always produced. Skip only if the whole run was cancelled or CI
-    # is disabled for this PR.
-    if: ${{ !cancelled() && !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    # report is always produced. Skip only if the whole run was cancelled or this
+    # tier isn't enabled for this PR.
+    if: ${{ !cancelled() && needs.gate.outputs.run_tier2 == 'true' }}
 
     env:
       MEMTEST_DIR: ${{ github.workspace }}/memtest
@@ -166,7 +178,7 @@ jobs:
 
   publish-results:
 
-    name: Publish results (non-fork PRs only)
+    name: "T2 · publish memtest results (non-fork PRs only)"
     needs: aggregate
     runs-on: ubuntu-26.04
     # Publish whenever a report was produced, including when the aggregate job failed

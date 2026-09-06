@@ -1,8 +1,9 @@
-name: Ubuntu compilers
+name: "T1: Compilers (u2404)"
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - '**'
   push:
@@ -11,33 +12,44 @@ on:
 
 jobs:
 
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   compiler-all-libs:
 
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    name: "T1 · compiler build (all libraries)"
 
-    runs-on: ubuntu-22.04
+    needs: gate
+
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-u2404-compilers-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
       matrix:
         include:
-          - cc: "clang-13"
-            cxx: "clang++-13"
-            build-type: "Debug"
-          - cc: "clang-14"
-            cxx: "clang++-14"
-            build-type: "Release"
-          - cc: "gcc-10"
-            cxx: "g++-10"
-            build-type: "Release"
           - cc: "gcc-12"
             cxx: "g++-12"
             build-type: "Debug"
-          - cc: "icx"
-            cxx: "icpx"
+          - cc: "gcc-13"
+            cxx: "g++-13"
+            build-type: "Release"
+          - cc: "gcc-14"
+            cxx: "g++-14"
             build-type: "Debug"
-          - cc: "icx"
-            cxx: "icpx"
+          - cc: "clang-16"
+            cxx: "clang++-16"
+            build-type: "Release"
+          - cc: "clang-17"
+            cxx: "clang++-17"
+            build-type: "Debug"
+          - cc: "clang-18"
+            cxx: "clang++-18"
             build-type: "Release"
 
     env:
@@ -51,7 +63,7 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies

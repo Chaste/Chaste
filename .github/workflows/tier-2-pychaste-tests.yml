@@ -1,19 +1,29 @@
-name: PyChaste Ubuntu tests
+name: "T2: PyChaste tests"
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - "**"
-
-# Limit concurrent runs to one per branch
-concurrency:
-  group: pychaste-ubuntu-tests-${{ github.ref }}
-  cancel-in-progress: true
+  push:
+    branches:
+      - develop
 
 jobs:
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   pychaste-ubuntu-tests:
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    name: "T2 · PyChaste build & test"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier2 == 'true'
+
+    concurrency:
+      group: tier-2-pychaste-tests-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
 
     strategy:
       fail-fast: false

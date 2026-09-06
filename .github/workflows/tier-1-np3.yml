@@ -1,8 +1,9 @@
-name: Ubuntu np3
+name: "T1: Parallel (np3)"
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - '**'
   push:
@@ -11,9 +12,20 @@ on:
 
 jobs:
 
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   build-and-test:
 
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    name: "T1 · parallel build & test (np3)"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-np3-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
     runs-on: self-hosted-np3
 

@@ -1,8 +1,9 @@
-name: Project tests
+name: "T2: Project tests"
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - '**'
   push:
@@ -11,9 +12,20 @@ on:
 
 jobs:
 
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   build-and-test:
 
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    name: "T2 · projects build & test"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier2 == 'true'
+
+    concurrency:
+      group: tier-2-project-tests-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
 
     runs-on: ubuntu-22.04
 

@@ -1,8 +1,9 @@
-name: Portability
+name: "T2: Portability"
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - "**"
   push:
@@ -12,8 +13,19 @@ on:
     - cron: "22 22 * * 0"
 
 jobs:
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   build-and-test:
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    name: "T2 · build & test"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier2 == 'true'
+
+    concurrency:
+      group: tier-2-portability-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
 
     strategy:
       fail-fast: false

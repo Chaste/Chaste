@@ -1,8 +1,9 @@
-name: Ubuntu infrastructure
+name: "T1: Infrastructure"
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - '**'
   push:
@@ -11,11 +12,22 @@ on:
 
 jobs:
 
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   build-and-test:
+
+    name: "T1 · infrastructure & whitespace"
+
+    needs: gate
 
     runs-on: ubuntu-24.04
 
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-infrastructure-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir

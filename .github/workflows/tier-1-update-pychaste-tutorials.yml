@@ -1,7 +1,8 @@
-name: Update tutorials
+name: "T1: PyChaste tutorials"
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - '**'
   push:
@@ -11,9 +12,17 @@ on:
 
 jobs:
 
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   generate-tutorial-markdown:
+    name: "T1 · generate pychaste tutorials"
+    needs: gate
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    if: needs.gate.outputs.run_tier1 == 'true'
+    concurrency:
+      group: tier-1-update-pychaste-tutorials-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
     steps:
       - name: checkout Chaste
         uses: actions/checkout@v6
@@ -25,28 +34,33 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: generate user-tutorial markdown
+      - name: install dependencies
         run: |
-          python GenerateUserTutorials.py
+          python -m pip install jupyterlab
+
+      - name: generate pychaste tutorial markdown
+        run: |
+          python GeneratePyChasteTutorials.py
         working-directory: python/infra
 
-      - name: Upload archive files
+      - name: upload archive files
         uses: actions/upload-artifact@v7
         with:
-          name: user-tutorial-markdown
+          name: pychaste-tutorial-markdown
           path: |
-            tutorials/UserTutorials/*.md
+            pychaste/src/py/doc/tutorial/*.md
 
   upload-to-website:
+    name: "T1 · publish pychaste tutorials"
     needs: generate-tutorial-markdown
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'Chaste/Chaste'
     steps:
-      - name: Download user-tutorial-to markdown
+      - name: Download pychaste-tutorial-markdown
         uses: actions/download-artifact@v8
         with:
-          name: user-tutorial-markdown
-          path: tutorials/UserTutorials
+          name: pychaste-tutorial-markdown
+          path: pychaste/src/py/doc/tutorial
 
       - name: Checkout website repository
         uses: actions/checkout@v6
@@ -61,13 +75,13 @@ jobs:
 
       - name: Copy markdown to website repository
         run: |
-          cp tutorials/UserTutorials/*.md chaste-website/site/content/docs/user-tutorials/
+          cp pychaste/src/py/doc/tutorial/*.md chaste-website/site/content/pychaste/tutorials
 
       - name: Commit and push if changed
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
           git add --all
-          git commit -m "update user tutorials" || echo "No changes to commit"
+          git commit -m "update pychaste tutorials" || echo "No changes to commit"
           git push
         working-directory: chaste-website

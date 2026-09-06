@@ -1,8 +1,9 @@
-name: Ubuntu tests
+name: "T1: Compilers (u2204)"
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - '**'
   push:
@@ -11,28 +12,45 @@ on:
 
 jobs:
 
-  build-and-test:
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
 
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+  compiler-all-libs:
 
-    runs-on: ${{ matrix.os }}
+    name: "T1 · compiler build (all libraries)"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-u2204-compilers-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: "ubuntu-22.04"
-            codename: "jammy"
-            cc: "gcc"
-            cxx: "g++"
-          - os: "ubuntu-22.04"
-            codename: "jammy"
-            cc: "icx"
+          - cc: "clang-13"
+            cxx: "clang++-13"
+            build-type: "Debug"
+          - cc: "clang-14"
+            cxx: "clang++-14"
+            build-type: "Release"
+          - cc: "gcc-10"
+            cxx: "g++-10"
+            build-type: "Release"
+          - cc: "gcc-12"
+            cxx: "g++-12"
+            build-type: "Debug"
+          - cc: "icx"
             cxx: "icpx"
-          - os: "ubuntu-24.04"
-            codename: "noble"
-            cc: "gcc"
-            cxx: "g++"
+            build-type: "Debug"
+          - cc: "icx"
+            cxx: "icpx"
+            build-type: "Release"
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
@@ -45,17 +63,10 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
-
-    - name: Downgrade libexpat1 (native ubuntu-22.04 only)
-      if: ${{ matrix.os == 'ubuntu-22.04' }}
-      run: |
-        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
-          sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
-        fi
 
     - name: install and set up Intel LLVM compiler
       run: |
@@ -77,7 +88,7 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Release ..
+      run: cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
       working-directory: chaste-build-dir
 
     - name: build core libraries
@@ -100,31 +111,8 @@ jobs:
       run: cmake --build . --parallel 4 --target chaste_lung
       working-directory: chaste-build-dir
 
-    - name: build continuous test pack
-      run: cmake --build . --parallel 4 --target Continuous
-      working-directory: chaste-build-dir
-
-    - name: build nightly test pack
-      run: cmake --build . --parallel 4 --target Nightly
-      working-directory: chaste-build-dir
-
-    - name: build parallel test pack
-      run: cmake --build . --parallel 4 --target Parallel
-      working-directory: chaste-build-dir
-
-    - name: run Continuous test pack
-      run: ctest -j4 -L Continuous --output-on-failure
-      working-directory: chaste-build-dir
-
-    - name: run Nightly test pack
-      run: ctest -j4 -L Nightly --output-on-failure
-      working-directory: chaste-build-dir
-
-    - name: run Parallel test pack
-      run: ctest -j4 -L Parallel --output-on-failure
-      working-directory: chaste-build-dir
-
     - name: run TestChasteBuildInfo
       run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
         ctest -V -R TestChasteBuildInfo
       working-directory: chaste-build-dir

@@ -1,7 +1,8 @@
-name: Update how-tos
+name: "T1: How-tos"
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - '**'
   push:
@@ -10,9 +11,17 @@ on:
   workflow_dispatch:
 
 jobs:
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   generate-how-to-markdown:
+    name: "T1 · generate how-tos"
+    needs: gate
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    if: needs.gate.outputs.run_tier1 == 'true'
+    concurrency:
+      group: tier-1-update-how-tos-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
     steps:
       - name: checkout code
         uses: actions/checkout@v6
@@ -35,6 +44,7 @@ jobs:
             chaste_howto_webpage.md
 
   upload-to-website:
+    name: "T1 · publish how-tos"
     needs: generate-how-to-markdown
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'Chaste/Chaste'
