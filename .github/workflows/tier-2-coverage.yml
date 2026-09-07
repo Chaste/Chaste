@@ -24,6 +24,14 @@ jobs:
       group: tier-2-coverage-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
 
+    # Single-entry matrix: a skipped re-run then posts only the bare "T2 · ..."
+    # check and cannot overwrite this job's real "T2 · ... (default)" result.
+    # See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [default]
+
     runs-on: ubuntu-latest
 
     # Do not move this job to a plain Ubuntu runner with `apt install chaste-dependencies`.

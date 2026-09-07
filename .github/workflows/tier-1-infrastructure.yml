@@ -29,6 +29,14 @@ jobs:
       group: tier-1-infrastructure-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
+    # Single-entry matrix: a skipped re-run (e.g. after a ci:tier2 relabel) then
+    # posts only the bare "T1 · ..." check and cannot overwrite this job's real
+    # "T1 · ... (default)" result. See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [default]
+
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       CC: gcc

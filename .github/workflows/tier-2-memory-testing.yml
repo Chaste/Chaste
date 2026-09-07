@@ -111,6 +111,14 @@ jobs:
     # tier isn't enabled for this PR.
     if: ${{ !cancelled() && needs.gate.outputs.run_tier2 == 'true' }}
 
+    # Single-entry matrix: a skipped re-run then posts only the bare "T2 · ..."
+    # check and cannot overwrite this job's real "T2 · ... (default)" result.
+    # See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [default]
+
     env:
       MEMTEST_DIR: ${{ github.workspace }}/memtest
 
@@ -185,6 +193,14 @@ jobs:
     # because a memory problem was found - those are the results most worth publishing.
     # Only from the primary repo (Chaste/Chaste), which holds the push token.
     if: ${{ !cancelled() && needs.aggregate.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
+
+    # Single-entry matrix: a skipped re-run then posts only the bare "T2 · ..."
+    # check and cannot overwrite this job's real "T2 · ... (default)" result.
+    # See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [default]
 
     env:
       MEMTEST_DIR: ${{ github.workspace }}/memory-testing

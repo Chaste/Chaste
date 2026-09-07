@@ -13,11 +13,11 @@
 # any of those cases).
 #
 # The cancel_tierN outputs feed job-level `concurrency.cancel-in-progress`
-# blocks: they are false only when this run was triggered by a labeled/
-# unlabeled event whose label has no bearing on tier N (it is not ci:tierN,
-# not a deeper tier that implies it, and not ci:off), so toggling an
-# unrelated label can never cancel a genuinely in-progress run of a tier it
-# does not affect.
+# blocks: they are true only when this event actually changes whether
+# tier N should be running (see relevant_tierN below), so toggling an
+# unrelated label - or escalating ci:tier1 -> ci:tier2, which leaves an
+# in-progress tier-1 run alone - can never cancel a genuinely in-progress
+# run of a tier it does not affect.
 name: CI gate (reusable)
 
 on:
@@ -84,25 +84,38 @@ jobs:
           fi
 
           # relevant_tierN: for a labeled/unlabeled event, true only if the
-          # label that changed can affect whether tier N should be running -
-          # i.e. it is ci:tierN itself, a deeper tier that implies it
-          # (ci:tier2 implies tier 1), or ci:off (which disables every tier).
+          # label that changed can change whether tier N should be running.
           # Always true for any other event (push, opened, synchronize,
           # reopened) - those are real changes.
           #
-          # Escalating ci:tier1 -> ci:tier2 is therefore relevant to tier 1:
-          # its jobs are re-run and any in-progress tier-1 run is superseded,
-          # so tier 1 and tier 2 report from the same run rather than a stale
-          # earlier tier-1 run being left to report on its own. Toggling an
-          # unrelated label stays a no-op for every tier.
+          #   tier0  only ci:off changes it.
+          #   tier1  ci:off (disables everything); ci:tier1 unless ci:tier2
+          #          is also present; ci:tier2 only when ci:tier1 is absent
+          #          (tier 1 has to start/stop with tier 2 in that case).
+          #   tier2  ci:off, or ci:tier2.
+          #
+          # Escalating ci:tier1 -> ci:tier2 while ci:tier1 stays put is NOT
+          # relevant to tier 1: an already-running or finished tier-1 run is
+          # left exactly as it is - never re-run, never cancelled. Its checks
+          # survive the relabel because every gated tier job runs under a
+          # matrix, so a skipped re-run posts only the bare job name and
+          # cannot overwrite the real "<name> (config)" check. Toggling an
+          # unrelated label is a no-op for every tier.
           relevant_tier0=true
           if $is_label_event && [[ "$ADDED_LABEL" != "ci:off" ]]; then
             relevant_tier0=false
           fi
 
           relevant_tier1=true
-          if $is_label_event && [[ "$ADDED_LABEL" != "ci:tier1" && "$ADDED_LABEL" != "ci:tier2" && "$ADDED_LABEL" != "ci:off" ]]; then
+          if $is_label_event; then
             relevant_tier1=false
+            if [[ "$ADDED_LABEL" == "ci:off" ]]; then
+              relevant_tier1=true
+            elif [[ "$ADDED_LABEL" == "ci:tier1" ]] && ! has "ci:tier2"; then
+              relevant_tier1=true
+            elif [[ "$ADDED_LABEL" == "ci:tier2" ]] && ! has "ci:tier1"; then
+              relevant_tier1=true
+            fi
           fi
 
           relevant_tier2=true

@@ -29,6 +29,14 @@ jobs:
 
     runs-on: ubuntu-22.04
 
+    # Single-entry matrix: a skipped re-run then posts only the bare "T2 · ..."
+    # check and cannot overwrite this job's real "T2 · ... (default)" result.
+    # See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [default]
+
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
@@ -107,6 +115,14 @@ jobs:
     runs-on: ubuntu-latest
     # only when index exists AND it's being run from the primary repo (Chaste/Chaste)
     if: ${{needs.build-and-test.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
+
+    # Single-entry matrix: a skipped re-run then posts only the bare "T2 · ..."
+    # check and cannot overwrite this job's real "T2 · ... (default)" result.
+    # See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [default]
 
     env:
       GPROF_DIR: ${{ github.workspace }}/profiling-gprof
