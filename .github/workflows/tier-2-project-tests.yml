@@ -17,7 +17,7 @@ jobs:
 
   build-and-test:
 
-    name: "T2 · projects build & test"
+    name: "T2 · project tests"
 
     needs: gate
 
@@ -32,9 +32,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # `project_repo` is the only base dimension, so it is the only value
+        # GitHub puts in the check name. Per-project org, pinned ref and build
+        # targets ride along in `include:` and stay out of the name.
+        project_repo: ["CellBasedComparison2017"]
         include:
-          - project_org: "Chaste"
-            project_repo: "CellBasedComparison2017"
+          - project_repo: "CellBasedComparison2017"
+            project_org: "Chaste"
             ref: "8bb7287d0dfb55316892707faab2945cca3d48ea"
             build_target: "project_CellBasedComparison2017"
             test_target: "project_CellBasedComparison2017"

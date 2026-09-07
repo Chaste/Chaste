@@ -17,7 +17,7 @@ jobs:
 
   compiler-all-libs:
 
-    name: "T1 · compiler build (u2204)"
+    name: "T1 · compilers u2204"
 
     needs: gate
 
@@ -32,23 +32,39 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # `config` is the only base dimension, so it is the only value GitHub
+        # puts in the check name. The compiler, its C++ driver and the build
+        # type ride along in `include:` and stay out of the name.
+        config:
+          - clang-13-debug
+          - clang-14-release
+          - gcc-10-release
+          - gcc-12-debug
+          - icx-debug
+          - icx-release
         include:
-          - cc: "clang-13"
+          - config: clang-13-debug
+            cc: "clang-13"
             cxx: "clang++-13"
             build-type: "Debug"
-          - cc: "clang-14"
+          - config: clang-14-release
+            cc: "clang-14"
             cxx: "clang++-14"
             build-type: "Release"
-          - cc: "gcc-10"
+          - config: gcc-10-release
+            cc: "gcc-10"
             cxx: "g++-10"
             build-type: "Release"
-          - cc: "gcc-12"
+          - config: gcc-12-debug
+            cc: "gcc-12"
             cxx: "g++-12"
             build-type: "Debug"
-          - cc: "icx"
+          - config: icx-debug
+            cc: "icx"
             cxx: "icpx"
             build-type: "Debug"
-          - cc: "icx"
+          - config: icx-release
+            cc: "icx"
             cxx: "icpx"
             build-type: "Release"
 

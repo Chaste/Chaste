@@ -17,7 +17,7 @@ jobs:
 
   build-and-test:
 
-    name: "T0 · build & test (all packs)"
+    name: "T0 · build & test"
 
     needs: gate
 
@@ -32,16 +32,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # `spec` is the only base dimension, so it is the only value GitHub
+        # puts in the check name. The runner OS, its codename and the compiler
+        # ride along in `include:` and stay out of the name.
+        spec:
+          - jammy-gcc
+          - jammy-icx
+          - noble-gcc
         include:
-          - os: "ubuntu-22.04"
+          - spec: jammy-gcc
+            os: "ubuntu-22.04"
             codename: "jammy"
             cc: "gcc"
             cxx: "g++"
-          - os: "ubuntu-22.04"
+          - spec: jammy-icx
+            os: "ubuntu-22.04"
             codename: "jammy"
             cc: "icx"
             cxx: "icpx"
-          - os: "ubuntu-24.04"
+          - spec: noble-gcc
+            os: "ubuntu-24.04"
             codename: "noble"
             cc: "gcc"
             cxx: "g++"

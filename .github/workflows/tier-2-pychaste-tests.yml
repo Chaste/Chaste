@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/_ci-gate.yml
 
   pychaste-ubuntu-tests:
-    name: "T2 · PyChaste build & test"
+    name: "T2 · pychaste tests"
 
     needs: gate
 
