@@ -98,9 +98,9 @@ jobs:
           # relevant to tier 1: an already-running or finished tier-1 run is
           # left exactly as it is - never re-run, never cancelled. Its checks
           # survive the relabel because every gated tier job runs under a
-          # matrix, so a skipped re-run posts only the bare job name and
-          # cannot overwrite the real "<name> (config)" check. Toggling an
-          # unrelated label is a no-op for every tier.
+          # matrix: a skipped re-run posts only the bare job name and cannot
+          # overwrite the real "<name> (ran)" check. Toggling an unrelated
+          # label is a no-op for every tier.
           relevant_tier0=true
           if $is_label_event && [[ "$ADDED_LABEL" != "ci:off" ]]; then
             relevant_tier0=false

@@ -24,13 +24,14 @@ jobs:
       group: tier-2-coverage-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
 
-    # Single-entry matrix: a skipped re-run then posts only the bare "T2 · ..."
-    # check and cannot overwrite this job's real "T2 · ... (default)" result.
-    # See _ci-gate.yml.
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
     strategy:
       fail-fast: false
       matrix:
-        config: [default]
+        config: [ran]
 
     runs-on: ubuntu-latest
 

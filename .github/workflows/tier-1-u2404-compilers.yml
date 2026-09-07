@@ -17,7 +17,7 @@ jobs:
 
   compiler-all-libs:
 
-    name: "T1 · compiler build (all libraries)"
+    name: "T1 · compiler build (u2404)"
 
     needs: gate
 
