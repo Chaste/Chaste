@@ -5,10 +5,6 @@ on:
     types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - '**'
-  push:
-    branches:
-      - develop
-  workflow_dispatch:
 
 jobs:
 
@@ -57,39 +53,3 @@ jobs:
           name: pychaste-tutorial-markdown
           path: |
             pychaste/src/py/doc/tutorial/*.md
-
-  upload-to-website:
-    name: "T1 · publish pychaste tutorials"
-    needs: generate-tutorial-markdown
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.repository == 'Chaste/Chaste'
-    steps:
-      - name: Download pychaste-tutorial-markdown
-        uses: actions/download-artifact@v8
-        with:
-          name: pychaste-tutorial-markdown
-          path: pychaste/src/py/doc/tutorial
-
-      - name: Checkout website repository
-        uses: actions/checkout@v6
-        with:
-          repository: Chaste/Chaste.github.io
-          token: ${{ secrets.WEBSITE_ACCESS }}
-          path: chaste-website
-          fetch-depth: 0  # Fetch all history for all tags and branches
-
-      - name: Display structure of downloaded files
-        run: ls -R
-
-      - name: Copy markdown to website repository
-        run: |
-          cp pychaste/src/py/doc/tutorial/*.md chaste-website/site/content/pychaste/tutorials
-
-      - name: Commit and push if changed
-        run: |
-          git config user.name "github-action"
-          git config user.email "github-action"
-          git add --all
-          git commit -m "update pychaste tutorials" || echo "No changes to commit"
-          git push
-        working-directory: chaste-website
