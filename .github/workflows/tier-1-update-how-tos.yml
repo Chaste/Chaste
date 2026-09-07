@@ -3,8 +3,6 @@ name: "T1: How-tos"
 on:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
-    branches:
-      - '**'
 
 jobs:
   gate:
