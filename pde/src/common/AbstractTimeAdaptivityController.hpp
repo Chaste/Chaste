@@ -94,10 +94,9 @@ public:
      */
     double GetNextTimeStep(double currentTime, Vec currentSolution)
     {
-        // Note that std::clamp returns a reference, so the value being clamped must be
-        // a named local rather than a temporary
         double dt = ComputeTimeStep(currentTime, currentSolution);
-        return std::clamp(dt, mMinimumTimeStep, mMaximumTimeStep);
+        dt = std::clamp(dt, mMinimumTimeStep, mMaximumTimeStep);
+        return dt;
     }
 };
 
