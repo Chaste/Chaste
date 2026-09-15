@@ -1,28 +1,42 @@
-name: Project tests
+name: "T1: Project tests"
 
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - '**'
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches:
       - develop
 
 jobs:
 
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   build-and-test:
 
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    name: "T1 · project tests"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-project-tests-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
     runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
       matrix:
+        # `project_repo` is the only base dimension, so it is the only value
+        # GitHub puts in the check name. Per-project org, pinned ref and build
+        # targets ride along in `include:` and stay out of the name.
+        project_repo: ["CellBasedComparison2017"]
         include:
-          - project_org: "Chaste"
-            project_repo: "CellBasedComparison2017"
+          - project_repo: "CellBasedComparison2017"
+            project_org: "Chaste"
             ref: "8bb7287d0dfb55316892707faab2945cca3d48ea"
             build_target: "project_CellBasedComparison2017"
             test_target: "project_CellBasedComparison2017"

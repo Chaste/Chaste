@@ -1,10 +1,9 @@
-name: Portability
+name: "T1: Portability"
 
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - "**"
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches:
       - develop
@@ -12,32 +11,67 @@ on:
     - cron: "22 22 * * 0"
 
 jobs:
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   build-and-test:
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    name: "T1 · portability"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-portability-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
     strategy:
       fail-fast: false
       matrix:
+        # `variant` is the only base dimension, so it is the only value GitHub
+        # puts in the check name. The runner image and any extra cmake args
+        # ride along in `include:` and stay out of the name.
+        variant:
+          - "01"
+          - "01-no-cvode-vtk"
+          - "02"
+          - "03"
+          - "04"
+          - "05"
+          - "tip"
+          - "jammy"
+          - "noble"
+          - "resolute"
         include:
-          - image: portability-01
+          - variant: "01"
+            image: portability-01
             extra-build-args: ""
-          - image: portability-01
+          - variant: "01-no-cvode-vtk"
+            image: portability-01
             extra-build-args: "-DChaste_USE_CVODE=OFF -DChaste_USE_VTK=OFF"
-          - image: portability-02
+          - variant: "02"
+            image: portability-02
             extra-build-args: ""
-          - image: portability-03
+          - variant: "03"
+            image: portability-03
             extra-build-args: ""
-          - image: portability-04
+          - variant: "04"
+            image: portability-04
             extra-build-args: ""
-          - image: portability-05
+          - variant: "05"
+            image: portability-05
             extra-build-args: ""
-          - image: portability-tip
+          - variant: "tip"
+            image: portability-tip
             extra-build-args: ""
-          - image: portability-jammy
+          - variant: "jammy"
+            image: portability-jammy
             extra-build-args: ""
-          - image: portability-noble
+          - variant: "noble"
+            image: portability-noble
             extra-build-args: ""
-          - image: portability-resolute
+          - variant: "resolute"
+            image: portability-resolute
             extra-build-args: ""
 
     runs-on: ubuntu-latest

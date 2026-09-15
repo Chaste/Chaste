@@ -1,43 +1,50 @@
-name: Ubuntu tests
+name: "T1: Intel Compiler"
+
+# The one full build-and-test using the Intel compiler. Deliberately its own
+# workflow, separate from tier-1-compilers.yml, so it is never confused with
+# that file's compile-only sweep: this job builds every library AND runs the
+# Continuous/Nightly/Parallel test packs, not just a build check.
 
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - '**'
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches:
       - develop
 
 jobs:
 
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
   build-and-test:
 
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+    name: "T1 · intel compiler"
 
-    runs-on: ${{ matrix.os }}
+    needs: gate
 
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-intel-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+
+    runs-on: ubuntu-24.04
+
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: "ubuntu-22.04"
-            codename: "jammy"
-            cc: "gcc"
-            cxx: "g++"
-          - os: "ubuntu-22.04"
-            codename: "jammy"
-            cc: "icx"
-            cxx: "icpx"
-          - os: "ubuntu-24.04"
-            codename: "noble"
-            cc: "gcc"
-            cxx: "g++"
+        config: [ran]
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
-      CC: ${{ matrix.cc }}
-      CXX: ${{ matrix.cxx }}
+      CC: icx
+      CXX: icpx
 
     steps:
     - name: checkout repository
@@ -45,17 +52,10 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
-
-    - name: Downgrade libexpat1 (native ubuntu-22.04 only)
-      if: ${{ matrix.os == 'ubuntu-22.04' }}
-      run: |
-        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
-          sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
-        fi
 
     - name: install and set up Intel LLVM compiler
       run: |
@@ -65,7 +65,6 @@ jobs:
         sudo apt install intel-oneapi-compiler-dpcpp-cpp
         source /opt/intel/oneapi/setvars.sh
         printenv >> $GITHUB_ENV
-      if: ${{ matrix.cc == 'icx' }}
 
     - name: compiler version
       run: |

@@ -1,0 +1,47 @@
+name: "T1: How-tos"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
+  generate-how-to-markdown:
+    name: "T1 · generate how-tos"
+    needs: gate
+    runs-on: ubuntu-latest
+    if: needs.gate.outputs.run_tier1 == 'true'
+    concurrency:
+      group: tier-1-update-how-tos-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [ran]
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6
+
+      - name: setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: generate how-to markdown
+        run: |
+          python GenerateHowTos.py
+        working-directory: python/infra
+
+      - name: Upload archive files
+        uses: actions/upload-artifact@v7
+        with:
+          name: how-to-markdown
+          path: |
+            chaste_howto_webpage.md
+
