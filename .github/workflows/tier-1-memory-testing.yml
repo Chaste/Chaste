@@ -1,4 +1,4 @@
-name: "T2: Memory testing"
+name: "T1: Memory testing"
 
 on:
   workflow_dispatch:
@@ -27,15 +27,15 @@ jobs:
 
   build-and-test:
 
-    name: "T2 · memtest"
+    name: "T1 · memtest"
 
     needs: gate
 
-    if: needs.gate.outputs.run_tier2 == 'true'
+    if: needs.gate.outputs.run_tier1 == 'true'
 
     concurrency:
-      group: tier-2-memory-testing-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
-      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
+      group: tier-1-memory-testing-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
     runs-on: ubuntu-26.04
 
@@ -101,13 +101,13 @@ jobs:
 
   aggregate:
 
-    name: "T2 · aggregate memtest results"
+    name: "T1 · aggregate memtest results"
     needs: [gate, build-and-test]
     runs-on: ubuntu-26.04
     # Run even if one or more components failed (e.g. found a leak), so the combined
     # report is always produced. Skip only if the whole run was cancelled or this
     # tier isn't enabled for this PR.
-    if: ${{ !cancelled() && needs.gate.outputs.run_tier2 == 'true' }}
+    if: ${{ !cancelled() && needs.gate.outputs.run_tier1 == 'true' }}
 
     # One-value matrix: GitHub names a running job "<name> (ran)" but a
     # skipped one just "<name>", so a skipped re-run (e.g. from an
@@ -185,7 +185,7 @@ jobs:
 
   publish-results:
 
-    name: "T2 · publish memtest results (non-fork PRs only)"
+    name: "T1 · publish memtest results (non-fork PRs only)"
     needs: aggregate
     runs-on: ubuntu-26.04
     # Publish whenever a report was produced, including when the aggregate job failed

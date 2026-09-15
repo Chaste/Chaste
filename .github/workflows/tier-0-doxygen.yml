@@ -1,4 +1,4 @@
-name: "T1: Doxygen"
+name: "T0: Doxygen"
 
 on:
   pull_request:
@@ -9,18 +9,18 @@ jobs:
     uses: ./.github/workflows/_ci-gate.yml
 
   coverage:
-    name: "T1 · doxygen coverage"
+    name: "T0 · doxygen coverage"
     runs-on: ubuntu-latest
 
     needs: gate
 
     if: >
-      needs.gate.outputs.run_tier1 == 'true' &&
+      needs.gate.outputs.run_tier0 == 'true' &&
       github.repository == 'Chaste/Chaste'
 
     concurrency:
-      group: tier-1-doxygen-${{ github.event.pull_request.number || github.ref }}
-      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+      group: tier-0-doxygen-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier0 == 'true' }}
 
     # One-value matrix: GitHub names a running job "<name> (ran)" but a
     # skipped one just "<name>", so a skipped re-run (e.g. from an

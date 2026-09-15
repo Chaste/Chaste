@@ -1,4 +1,4 @@
-name: "T2: Portability"
+name: "T1: Portability"
 
 on:
   workflow_dispatch:
@@ -15,15 +15,15 @@ jobs:
     uses: ./.github/workflows/_ci-gate.yml
 
   build-and-test:
-    name: "T2 · portability"
+    name: "T1 · portability"
 
     needs: gate
 
-    if: needs.gate.outputs.run_tier2 == 'true'
+    if: needs.gate.outputs.run_tier1 == 'true'
 
     concurrency:
-      group: tier-2-portability-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
-      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
+      group: tier-1-portability-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
     strategy:
       fail-fast: false

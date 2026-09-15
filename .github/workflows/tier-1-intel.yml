@@ -1,4 +1,9 @@
-name: "T1: Compilers (u2204)"
+name: "T1: Intel Compiler"
+
+# The one full build-and-test using the Intel compiler. Deliberately its own
+# workflow, separate from tier-1-compilers.yml, so it is never confused with
+# that file's compile-only sweep: this job builds every library AND runs the
+# Continuous/Nightly/Parallel test packs, not just a build check.
 
 on:
   workflow_dispatch:
@@ -13,63 +18,33 @@ jobs:
   gate:
     uses: ./.github/workflows/_ci-gate.yml
 
-  compiler-all-libs:
+  build-and-test:
 
-    name: "T1 · compilers u2204"
+    name: "T1 · intel compiler"
 
     needs: gate
 
     if: needs.gate.outputs.run_tier1 == 'true'
 
     concurrency:
-      group: tier-1-u2204-compilers-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      group: tier-1-intel-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
     strategy:
       fail-fast: false
       matrix:
-        # `config` is the only base dimension, so it is the only value GitHub
-        # puts in the check name. The compiler, its C++ driver and the build
-        # type ride along in `include:` and stay out of the name.
-        config:
-          - clang-13-debug
-          - clang-14-release
-          - gcc-10-release
-          - gcc-12-debug
-          - icx-debug
-          - icx-release
-        include:
-          - config: clang-13-debug
-            cc: "clang-13"
-            cxx: "clang++-13"
-            build-type: "Debug"
-          - config: clang-14-release
-            cc: "clang-14"
-            cxx: "clang++-14"
-            build-type: "Release"
-          - config: gcc-10-release
-            cc: "gcc-10"
-            cxx: "g++-10"
-            build-type: "Release"
-          - config: gcc-12-debug
-            cc: "gcc-12"
-            cxx: "g++-12"
-            build-type: "Debug"
-          - config: icx-debug
-            cc: "icx"
-            cxx: "icpx"
-            build-type: "Debug"
-          - config: icx-release
-            cc: "icx"
-            cxx: "icpx"
-            build-type: "Release"
+        config: [ran]
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
-      CC: ${{ matrix.cc }}
-      CXX: ${{ matrix.cxx }}
+      CC: icx
+      CXX: icpx
 
     steps:
     - name: checkout repository
@@ -77,7 +52,7 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
@@ -90,7 +65,6 @@ jobs:
         sudo apt install intel-oneapi-compiler-dpcpp-cpp
         source /opt/intel/oneapi/setvars.sh
         printenv >> $GITHUB_ENV
-      if: ${{ matrix.cc == 'icx' }}
 
     - name: compiler version
       run: |
@@ -102,7 +76,7 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
+      run: cmake -DCMAKE_BUILD_TYPE=Release ..
       working-directory: chaste-build-dir
 
     - name: build core libraries
@@ -125,8 +99,31 @@ jobs:
       run: cmake --build . --parallel 4 --target chaste_lung
       working-directory: chaste-build-dir
 
+    - name: build continuous test pack
+      run: cmake --build . --parallel 4 --target Continuous
+      working-directory: chaste-build-dir
+
+    - name: build nightly test pack
+      run: cmake --build . --parallel 4 --target Nightly
+      working-directory: chaste-build-dir
+
+    - name: build parallel test pack
+      run: cmake --build . --parallel 4 --target Parallel
+      working-directory: chaste-build-dir
+
+    - name: run Continuous test pack
+      run: ctest -j4 -L Continuous --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run Nightly test pack
+      run: ctest -j4 -L Nightly --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run Parallel test pack
+      run: ctest -j4 -L Parallel --output-on-failure
+      working-directory: chaste-build-dir
+
     - name: run TestChasteBuildInfo
       run: |
-        cmake --build . --target TestChasteBuildInfo --parallel 4
         ctest -V -R TestChasteBuildInfo
       working-directory: chaste-build-dir

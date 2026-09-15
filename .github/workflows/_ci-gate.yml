@@ -1,12 +1,10 @@
 # Shared label-gating logic for the tiered CI scheme (see issue #657). Every
 # PR-triggered workflow calls this instead of re-implementing its own label
-# checks, so the ci:off / ci:tier1 / ci:tier2 rules live in exactly one
-# place.
+# checks, so the ci:off / ci:all rules live in exactly one place.
 #
 # Tiers:
 #   tier0 - always on, opt out with the "ci:off" label
-#   tier1 - opt in with "ci:tier1" or "ci:tier2"
-#   tier2 - opt in with "ci:tier2" (implies tier1)
+#   tier1 - opt in with "ci:all"
 #
 # A push to develop, a manual workflow_dispatch, or a scheduled run always
 # runs everything, regardless of labels (there are no PR labels to read in
@@ -15,9 +13,8 @@
 # The cancel_tierN outputs feed job-level `concurrency.cancel-in-progress`
 # blocks: they are true only when this event actually changes whether
 # tier N should be running (see relevant_tierN below), so toggling an
-# unrelated label - or escalating ci:tier1 -> ci:tier2, which leaves an
-# in-progress tier-1 run alone - can never cancel a genuinely in-progress
-# run of a tier it does not affect.
+# unrelated label can never cancel a genuinely in-progress run of a tier
+# it does not affect.
 name: CI gate (reusable)
 
 on:
@@ -27,14 +24,10 @@ on:
         value: ${{ jobs.evaluate.outputs.run_tier0 }}
       run_tier1:
         value: ${{ jobs.evaluate.outputs.run_tier1 }}
-      run_tier2:
-        value: ${{ jobs.evaluate.outputs.run_tier2 }}
       cancel_tier0:
         value: ${{ jobs.evaluate.outputs.cancel_tier0 }}
       cancel_tier1:
         value: ${{ jobs.evaluate.outputs.cancel_tier1 }}
-      cancel_tier2:
-        value: ${{ jobs.evaluate.outputs.cancel_tier2 }}
 
 jobs:
   evaluate:
@@ -42,10 +35,8 @@ jobs:
     outputs:
       run_tier0: ${{ steps.eval.outputs.run_tier0 }}
       run_tier1: ${{ steps.eval.outputs.run_tier1 }}
-      run_tier2: ${{ steps.eval.outputs.run_tier2 }}
       cancel_tier0: ${{ steps.eval.outputs.cancel_tier0 }}
       cancel_tier1: ${{ steps.eval.outputs.cancel_tier1 }}
-      cancel_tier2: ${{ steps.eval.outputs.cancel_tier2 }}
     steps:
       - id: eval
         env:
@@ -74,13 +65,8 @@ jobs:
           fi
 
           enabled_tier1=false
-          if ! $off && { $force_all || has "ci:tier1" || has "ci:tier2"; }; then
+          if ! $off && { $force_all || has "ci:all"; }; then
             enabled_tier1=true
-          fi
-
-          enabled_tier2=false
-          if ! $off && { $force_all || has "ci:tier2"; }; then
-            enabled_tier2=true
           fi
 
           # relevant_tierN: for a labeled/unlabeled event, true only if the
@@ -89,38 +75,15 @@ jobs:
           # reopened) - those are real changes.
           #
           #   tier0  only ci:off changes it.
-          #   tier1  ci:off (disables everything); ci:tier1 unless ci:tier2
-          #          is also present; ci:tier2 only when ci:tier1 is absent
-          #          (tier 1 has to start/stop with tier 2 in that case).
-          #   tier2  ci:off, or ci:tier2.
-          #
-          # Escalating ci:tier1 -> ci:tier2 while ci:tier1 stays put is NOT
-          # relevant to tier 1: an already-running or finished tier-1 run is
-          # left exactly as it is - never re-run, never cancelled. Its checks
-          # survive the relabel because every gated tier job runs under a
-          # matrix: a skipped re-run posts only the bare job name and cannot
-          # overwrite the real "<name> (ran)" check. Toggling an unrelated
-          # label is a no-op for every tier.
+          #   tier1  ci:off (disables everything) or ci:all.
           relevant_tier0=true
           if $is_label_event && [[ "$ADDED_LABEL" != "ci:off" ]]; then
             relevant_tier0=false
           fi
 
           relevant_tier1=true
-          if $is_label_event; then
+          if $is_label_event && [[ "$ADDED_LABEL" != "ci:off" && "$ADDED_LABEL" != "ci:all" ]]; then
             relevant_tier1=false
-            if [[ "$ADDED_LABEL" == "ci:off" ]]; then
-              relevant_tier1=true
-            elif [[ "$ADDED_LABEL" == "ci:tier1" ]] && ! has "ci:tier2"; then
-              relevant_tier1=true
-            elif [[ "$ADDED_LABEL" == "ci:tier2" ]] && ! has "ci:tier1"; then
-              relevant_tier1=true
-            fi
-          fi
-
-          relevant_tier2=true
-          if $is_label_event && [[ "$ADDED_LABEL" != "ci:tier2" && "$ADDED_LABEL" != "ci:off" ]]; then
-            relevant_tier2=false
           fi
 
           # A tier only actually runs when it's enabled AND this specific
@@ -129,20 +92,16 @@ jobs:
           # running or done.
           run_tier0=false;  ! $off           && $relevant_tier0 && run_tier0=true
           run_tier1=false;  $enabled_tier1    && $relevant_tier1 && run_tier1=true
-          run_tier2=false;  $enabled_tier2    && $relevant_tier2 && run_tier2=true
 
           # cancel_tierN reuses the same relevance test: only a label change
           # that actually matters to tier N is allowed to cancel an
           # in-progress run of it.
           cancel_tier0=$relevant_tier0
           cancel_tier1=$relevant_tier1
-          cancel_tier2=$relevant_tier2
 
           {
             echo "run_tier0=$run_tier0"
             echo "run_tier1=$run_tier1"
-            echo "run_tier2=$run_tier2"
             echo "cancel_tier0=$cancel_tier0"
             echo "cancel_tier1=$cancel_tier1"
-            echo "cancel_tier2=$cancel_tier2"
           } >> "$GITHUB_OUTPUT"

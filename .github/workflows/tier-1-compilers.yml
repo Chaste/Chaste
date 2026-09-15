@@ -1,4 +1,4 @@
-name: "T1: Compilers (u2404)"
+name: "T1: Compilers"
 
 on:
   workflow_dispatch:
@@ -15,17 +15,22 @@ jobs:
 
   compiler-all-libs:
 
-    name: "T1 · compilers u2404"
+    name: "T1 · compilers"
 
     needs: gate
 
     if: needs.gate.outputs.run_tier1 == 'true'
 
     concurrency:
-      group: tier-1-u2404-compilers-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      group: tier-1-compilers-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
       cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
-    runs-on: ubuntu-24.04
+    # TODO before merge: confirm `ubuntu-26.04` is available as a hosted
+    # runner label, confirm its apt codename below (used in the Chaste
+    # dependencies repo line), and confirm gcc-15 / clang-22 are available
+    # as versioned packages on it rather than only as the unversioned
+    # default compiler.
+    runs-on: ubuntu-26.04
 
     strategy:
       fail-fast: false
@@ -33,37 +38,32 @@ jobs:
         # `config` is the only base dimension, so it is the only value GitHub
         # puts in the check name. The compiler, its C++ driver and the build
         # type ride along in `include:` and stay out of the name.
+        #
+        # Only the latest available compilers on the latest ubuntu LTS: this
+        # is a breadth check for compiler-specific build breaks, not a
+        # historical-version regression suite. No icx here - the one
+        # icx build-and-test lives in tier-1-intel.yml.
         config:
-          - gcc-12-debug
-          - gcc-13-release
-          - gcc-14-debug
-          - clang-16-release
-          - clang-17-debug
-          - clang-18-release
+          - gcc-15-debug
+          - gcc-15-release
+          - clang-22-debug
+          - clang-22-release
         include:
-          - config: gcc-12-debug
-            cc: "gcc-12"
-            cxx: "g++-12"
+          - config: gcc-15-debug
+            cc: "gcc-15"
+            cxx: "g++-15"
             build-type: "Debug"
-          - config: gcc-13-release
-            cc: "gcc-13"
-            cxx: "g++-13"
+          - config: gcc-15-release
+            cc: "gcc-15"
+            cxx: "g++-15"
             build-type: "Release"
-          - config: gcc-14-debug
-            cc: "gcc-14"
-            cxx: "g++-14"
+          - config: clang-22-debug
+            cc: "clang-22"
+            cxx: "clang++-22"
             build-type: "Debug"
-          - config: clang-16-release
-            cc: "clang-16"
-            cxx: "clang++-16"
-            build-type: "Release"
-          - config: clang-17-debug
-            cc: "clang-17"
-            cxx: "clang++-17"
-            build-type: "Debug"
-          - config: clang-18-release
-            cc: "clang-18"
-            cxx: "clang++-18"
+          - config: clang-22-release
+            cc: "clang-22"
+            cxx: "clang++-22"
             build-type: "Release"
 
     env:
@@ -76,21 +76,15 @@ jobs:
       uses: actions/checkout@v6
 
     - name: install dependencies
+      # TODO before merge: "resolute" is an UNVERIFIED guess at 26.04's
+      # codename, not a confirmed value - replace with the real codename
+      # (and confirm chaste.github.io/ubuntu actually serves a directory
+      # for it) before this workflow is relied on.
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu resolute/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
-
-    - name: install and set up Intel LLVM compiler
-      run: |
-        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-        sudo wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
-        sudo apt update
-        sudo apt install intel-oneapi-compiler-dpcpp-cpp
-        source /opt/intel/oneapi/setvars.sh
-        printenv >> $GITHUB_ENV
-      if: ${{ matrix.cc == 'icx' }}
 
     - name: compiler version
       run: |

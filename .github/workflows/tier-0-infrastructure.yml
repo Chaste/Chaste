@@ -1,4 +1,4 @@
-name: "T1: Infrastructure"
+name: "T0: Infrastructure"
 
 on:
   workflow_dispatch:
@@ -15,17 +15,17 @@ jobs:
 
   build-and-test:
 
-    name: "T1 · infrastructure & whitespace"
+    name: "T0 · infrastructure & whitespace"
 
     needs: gate
 
     runs-on: ubuntu-24.04
 
-    if: needs.gate.outputs.run_tier1 == 'true'
+    if: needs.gate.outputs.run_tier0 == 'true'
 
     concurrency:
-      group: tier-1-infrastructure-${{ github.event.pull_request.number || github.ref }}
-      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+      group: tier-0-infrastructure-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier0 == 'true' }}
 
     # One-value matrix: GitHub names a running job "<name> (ran)" but a
     # skipped one just "<name>", so a skipped re-run (e.g. from an

@@ -1,4 +1,4 @@
-name: "T2: PyChaste tests"
+name: "T1: PyChaste tests"
 
 on:
   workflow_dispatch:
@@ -13,15 +13,15 @@ jobs:
     uses: ./.github/workflows/_ci-gate.yml
 
   pychaste-ubuntu-tests:
-    name: "T2 · pychaste tests"
+    name: "T1 · pychaste tests"
 
     needs: gate
 
-    if: needs.gate.outputs.run_tier2 == 'true'
+    if: needs.gate.outputs.run_tier1 == 'true'
 
     concurrency:
-      group: tier-2-pychaste-tests-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
-      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
+      group: tier-1-pychaste-tests-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
     strategy:
       fail-fast: false

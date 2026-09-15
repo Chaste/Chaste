@@ -1,4 +1,4 @@
-name: "T2: Project tests"
+name: "T1: Project tests"
 
 on:
   workflow_dispatch:
@@ -15,15 +15,15 @@ jobs:
 
   build-and-test:
 
-    name: "T2 · project tests"
+    name: "T1 · project tests"
 
     needs: gate
 
-    if: needs.gate.outputs.run_tier2 == 'true'
+    if: needs.gate.outputs.run_tier1 == 'true'
 
     concurrency:
-      group: tier-2-project-tests-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
-      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier2 == 'true' }}
+      group: tier-1-project-tests-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
 
     runs-on: ubuntu-22.04
 

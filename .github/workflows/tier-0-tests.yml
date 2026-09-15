@@ -25,34 +25,26 @@ jobs:
       group: tier-0-tests-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
       cancel-in-progress: ${{ needs.gate.outputs.cancel_tier0 == 'true' }}
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
       matrix:
         # `spec` is the only base dimension, so it is the only value GitHub
-        # puts in the check name. The runner OS, its codename and the compiler
-        # ride along in `include:` and stay out of the name.
+        # puts in the check name. The compiler, its C++ driver and the build
+        # type ride along in `include:` and stay out of the name.
         spec:
-          - jammy-gcc
-          - jammy-icx
-          - noble-gcc
+          - gcc-debug
+          - clang-release
         include:
-          - spec: jammy-gcc
-            os: "ubuntu-22.04"
-            codename: "jammy"
-            cc: "gcc"
-            cxx: "g++"
-          - spec: jammy-icx
-            os: "ubuntu-22.04"
-            codename: "jammy"
-            cc: "icx"
-            cxx: "icpx"
-          - spec: noble-gcc
-            os: "ubuntu-24.04"
-            codename: "noble"
-            cc: "gcc"
-            cxx: "g++"
+          - spec: gcc-debug
+            cc: "gcc-14"
+            cxx: "g++-14"
+            build-type: "Debug"
+          - spec: clang-release
+            cc: "clang-18"
+            cxx: "clang++-18"
+            build-type: "Release"
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
@@ -65,27 +57,10 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
-
-    - name: Downgrade libexpat1 (native ubuntu-22.04 only)
-      if: ${{ matrix.os == 'ubuntu-22.04' }}
-      run: |
-        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
-          sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
-        fi
-
-    - name: install and set up Intel LLVM compiler
-      run: |
-        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-        sudo wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
-        sudo apt update
-        sudo apt install intel-oneapi-compiler-dpcpp-cpp
-        source /opt/intel/oneapi/setvars.sh
-        printenv >> $GITHUB_ENV
-      if: ${{ matrix.cc == 'icx' }}
 
     - name: compiler version
       run: |
@@ -97,7 +72,7 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Release ..
+      run: cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
       working-directory: chaste-build-dir
 
     - name: build core libraries
