@@ -10,7 +10,7 @@ on:
 
 jobs:
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   pychaste-ubuntu-tests:
     name: "T1 · pychaste tests"
@@ -43,6 +43,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Make build and test directories
         run: |
@@ -93,7 +95,7 @@ jobs:
             python3-numpy \
             python3-petsc4py-real \
             python3-pip \
-            python3-vtk${{ env.VTK_VERSION }} \
+            python3-vtk${VTK_VERSION} \
             python3-xvfbwrapper \
             xvfb
 

@@ -12,7 +12,7 @@ on:
 
 jobs:
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   build-and-test:
     name: "T1 · portability"
@@ -89,6 +89,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Compiler version
         run: |

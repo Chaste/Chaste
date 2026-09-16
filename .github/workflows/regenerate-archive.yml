@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: compiler version
         run: |

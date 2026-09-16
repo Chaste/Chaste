@@ -67,6 +67,7 @@ jobs:
           # `git describe --tags` can reach the latest tag; otherwise the version
           # falls back to 0 (e.g. chaste-0.devN...).
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Determine package version
         run: |

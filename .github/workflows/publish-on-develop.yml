@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: install dependencies
         run: |
@@ -60,6 +62,7 @@ jobs:
           path: doxygen-latest
           fetch-depth: 0
           token: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
+          persist-credentials: false
         if: always()
 
       - name: copy results
@@ -73,8 +76,11 @@ jobs:
           git config user.email "github-action"
           git add --all
           git commit -m "update doxygen-latest" || echo "No changes to commit"
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/doxygen-latest.git"
           git push
         working-directory: doxygen-latest
+        env:
+          TOKEN: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
         if: always()
 
   website-docs:
@@ -86,6 +92,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0  # history needed for per-tutorial revision info
+          persist-credentials: false
 
       - name: setup python
         uses: actions/setup-python@v6
@@ -114,6 +121,7 @@ jobs:
           token: ${{ secrets.WEBSITE_ACCESS }}
           path: chaste-website
           fetch-depth: 0  # Fetch all history for all tags and branches
+          persist-credentials: false
 
       - name: copy markdown into website repository
         run: |
@@ -127,5 +135,8 @@ jobs:
           git config user.email "github-action"
           git add --all
           git commit -m "update how-tos and tutorials" || echo "No changes to commit"
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/Chaste.github.io.git"
           git push
         working-directory: chaste-website
+        env:
+          TOKEN: ${{ secrets.WEBSITE_ACCESS }}

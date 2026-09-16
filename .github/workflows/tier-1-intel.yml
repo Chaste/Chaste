@@ -16,7 +16,7 @@ on:
 jobs:
 
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   build-and-test:
 
@@ -49,6 +49,8 @@ jobs:
     steps:
     - name: checkout repository
       uses: actions/checkout@v6
+      with:
+        persist-credentials: false
 
     - name: install dependencies
       run: |

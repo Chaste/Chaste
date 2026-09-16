@@ -14,7 +14,7 @@ permissions:
 jobs:
 
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   build-and-test:
 
@@ -63,6 +63,7 @@ jobs:
         with:
           repository: Chaste/Chaste
           path: Chaste
+          persist-credentials: false
 
       - name: install dependencies
         run: |
@@ -195,13 +196,16 @@ jobs:
           path: profiling-gperftools
           fetch-depth: 0
           token: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
+          persist-credentials: false
 
       - name: copy results
         # raw .prof files are deliberately not published: they are only useful with the
         # matching test binaries, and remain available in the workflow artifact
         run: |
-          mkdir ${GPERFTOOLS_RESULTS_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}
-          cp ./profile/*.txt ./profile/*.svg ./profile/index.html ${GPERFTOOLS_RESULTS_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
+          mkdir ${GPERFTOOLS_RESULTS_DIR}/log-files/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}
+          cp ./profile/*.txt ./profile/*.svg ./profile/index.html ${GPERFTOOLS_RESULTS_DIR}/log-files/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}/
+        env:
+          NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME: ${{ needs.build-and-test.outputs.datetime }}
 
       - name: setup python
         uses: actions/setup-python@v6
@@ -221,9 +225,14 @@ jobs:
           git config user.email "github-action"
           git add --all
           git commit -m "upload gperftools profiling results" || echo "No changes to commit"
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/profiling-gperftools.git"
           git push
         working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
+        env:
+          TOKEN: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
 
       - name: results URL on chaste.github.io
         run: |
-          echo https://chaste.github.io/profiling-gperftools/${{ needs.build-and-test.outputs.datetime }}/index.html
+          echo https://chaste.github.io/profiling-gperftools/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}/index.html
+        env:
+          NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME: ${{ needs.build-and-test.outputs.datetime }}

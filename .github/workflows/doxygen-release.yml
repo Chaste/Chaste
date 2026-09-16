@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: install dependencies
         run: |
@@ -28,7 +30,9 @@ jobs:
 
       - name: build doxygen
         run: |
-          ( cat Doxyfile ; echo "PROJECT_NUMBER=${{ github.event.inputs.doxygen_name }}" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=${GITHUB_EVENT_INPUTS_DOXYGEN_NAME}" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+        env:
+          GITHUB_EVENT_INPUTS_DOXYGEN_NAME: ${{ github.event.inputs.doxygen_name }}
 
       - name: check doxygen coverage
         run: |

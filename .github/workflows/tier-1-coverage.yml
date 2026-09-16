@@ -10,7 +10,7 @@ on:
 
 jobs:
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   build-and-test:
     name: "T1 · coverage build & test"
@@ -57,6 +57,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Compiler version
         run: |

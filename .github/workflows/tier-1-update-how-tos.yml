@@ -6,7 +6,7 @@ on:
 
 jobs:
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   generate-how-to-markdown:
     name: "T1 · generate how-tos"
@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: setup python
         uses: actions/setup-python@v6

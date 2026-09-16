@@ -7,7 +7,7 @@ on:
 jobs:
 
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   generate-tutorial-markdown:
     name: "T1 · generate pychaste tutorials"
@@ -30,6 +30,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Fetch all history in order to get revision info for tutorial files
+          persist-credentials: false
 
       - name: setup python
         uses: actions/setup-python@v6
