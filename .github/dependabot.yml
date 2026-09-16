@@ -10,3 +10,10 @@ updates:
       actions:
         patterns:
           - "*"
+
+  - package-ecosystem: "pip"
+    directory: "/.github/workflows"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 14
