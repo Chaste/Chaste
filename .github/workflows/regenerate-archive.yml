@@ -3,6 +3,9 @@ name: Regenerate archive
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
 

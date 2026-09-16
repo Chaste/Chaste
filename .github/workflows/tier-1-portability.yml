@@ -10,6 +10,9 @@ on:
   schedule:
     - cron: "22 22 * * 0"
 
+permissions:
+  contents: read
+
 jobs:
   gate:
     uses: $/.github/workflows/_ci-gate.yml

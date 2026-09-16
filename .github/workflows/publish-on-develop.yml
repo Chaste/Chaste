@@ -17,6 +17,9 @@ on:
       - develop
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
 
   doxygen-latest:
