@@ -18,9 +18,9 @@ Bishop et al. Martin J. Bishop, Gernot Plank, Rebecca A. B. Burton, Jürgen E. S
 "Development of an anatomically detailed MRI-derived rabbit ventricular model and assessment of its impact on simulations of electrophysiological function" 
 (Am J Physiol Heart Circ Physiol, 2010).
 
-The full-resolution mesh has been released as Open Source data and is available to download from www.cs.ox.ac.uk/chaste. The full resolution mesh
+The full-resolution mesh has been released as Open Source data and is available to download from https://chaste.cs.ox.ac.uk/old-chaste-data/downloads/ . The full resolution mesh
 has an average edge-length of 125 microns, this mesh has an average edge length of 482 microns.
 
 We would like to ask any user:
-	- not to re-distribute the mesh, but point any potential user to www.cs.ox.ac.uk/chaste for our own tracking purposes.
-	- acknowledge source if used for presentation / publication. For details contact chaste-users@maillist.ox.ac.uk
+	- not to re-distribute the mesh, but point any potential user to https://chaste.github.io for our own tracking purposes.
+	- acknowledge source if used for presentation / publication. For details contact via https://chaste.github.io
