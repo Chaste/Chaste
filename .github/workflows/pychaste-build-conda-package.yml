@@ -25,6 +25,9 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
 jobs:
   build-conda-package:
     strategy:

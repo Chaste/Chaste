@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "TrianglesMeshWriter.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
@@ -139,7 +139,7 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<3>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -178,7 +178,7 @@ public:
         simulator.SetOutputDirectory("TestSolveMethodSpheroidSimulation3D");
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<3>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -275,7 +275,7 @@ public:
         simulator.SetEndTime(0.1);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<3>, p_linear_force);
         p_linear_force->SetCutOffLength(1.0);
         simulator.AddForce(p_linear_force);
 

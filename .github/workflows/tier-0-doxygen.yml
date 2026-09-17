@@ -1,0 +1,62 @@
+name: "T0: Doxygen"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
+  coverage:
+    name: "T0 · doxygen coverage"
+    runs-on: ubuntu-latest
+
+    needs: gate
+
+    if: >
+      needs.gate.outputs.run_tier0 == 'true' &&
+      github.repository == 'Chaste/Chaste'
+
+    concurrency:
+      group: tier-0-doxygen-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier0 == 'true' }}
+
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [ran]
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6
+
+      - name: install dependencies
+        run: |
+          sudo apt-get install graphviz
+          wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz
+          tar -xzvf doxygen-1.9.8.linux.bin.tar.gz
+
+      - name: build doxygen
+        run: |
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=PR_branch::${{ github.head_ref }}" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+
+      - name: check doxygen coverage
+        run: |
+          mkdir doxygen/coverage
+          python python/infra/ParseDoxygen.py doxygen-output.log doxygen-error.log doxygen/coverage
+
+      - name: print doxygen coverage errors
+        if: failure()
+        run: |
+          echo "Printing file contents:"
+          for FILE in doxygen/coverage/*; do
+          echo "------------------------"
+          echo "Contents of $FILE:"
+          cat "$FILE"
+          echo "------------------------"
+          done

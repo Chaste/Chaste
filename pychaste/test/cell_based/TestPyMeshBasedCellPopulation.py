@@ -57,7 +57,7 @@ class TestPyMeshBasedCellPopulation(chaste.cell_based.AbstractCellBasedTestSuite
 
         # Make the cell population
         cell_population = chaste.cell_based.MeshBasedCellPopulation[2, 2](mesh, cells)
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 
         # Set up the visualizer
         scene = chaste.visualization.VtkScene[2]()
@@ -76,7 +76,7 @@ class TestPyMeshBasedCellPopulation(chaste.cell_based.AbstractCellBasedTestSuite
         simulator.SetEndTime(5.0)
         simulator.SetSamplingTimestepMultiple(12)
 
-        force = chaste.cell_based.GeneralisedLinearSpringForce[2, 2]()
+        force = chaste.cell_based.LinearSpringForce[2, 2]()
         simulator.AddForce(force)
         simulator.AddSimulationModifier(modifier)
         simulator.Solve()

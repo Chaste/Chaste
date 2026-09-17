@@ -304,7 +304,7 @@ if (Chaste_ENABLE_PYCHASTE)
     FetchContent_Declare(
         cppwg
         GIT_REPOSITORY https://github.com/Chaste/cppwg.git
-        GIT_TAG stable
+        GIT_TAG v0.5.0
         GIT_SHALLOW 1
     )
     FetchContent_MakeAvailable(cppwg)
@@ -866,12 +866,13 @@ if (Chaste_COVERAGE)
                        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_COVERAGE_CPUS}" "-L" "Continuous" "--output-on-failure"
                        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-L" "Parallel" "--output-on-failure"
 
-                       # Capturing lcov counters and generating report
-                       COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
-                       COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */test/* */3rdparty/* */global/src/random/* Debug/* Debug_*/* cxxtest/* --output-file ${_outputname}.info.cleaned
+                       # Capture, then build the HTML. Exclude patterns live in
+                       # cmake/Config/lcovrc (shared with the CI workflow) and apply at
+                       # capture time, so no `lcov --remove` pass is needed.
+                       COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --parallel ${Chaste_COVERAGE_CPUS} --output-file ${_outputname}.info
                        set (_page_title "\"Chaste Coverage Results for commit ${Chaste_REVISION}\"")
-                       COMMAND ${GENHTML_PATH} --title "${_page_title}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
-                       COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
+                       COMMAND ${GENHTML_PATH} --title "${_page_title}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info
+                       COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info
                        COMMAND ${Python3_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_coverage_output.py" "${_outputname}"
 
                        DEPENDS Continuous Parallel

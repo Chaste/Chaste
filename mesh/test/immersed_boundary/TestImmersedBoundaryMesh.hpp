@@ -224,7 +224,6 @@ public:
         ib_mesh.SetCharacteristicNodeSpacing(2.34);
         ib_mesh.SetElementDivisionSpacing(3.45);
         ib_mesh.SetNumGridPtsXAndY(678u);
-        ib_mesh.SetCellRearrangementThreshold(0.05);
 
         TS_ASSERT_DELTA(ib_mesh.GetNeighbourDist(), 1.23, 1e-12);
         TS_ASSERT_DELTA(ib_mesh.GetCharacteristicNodeSpacing(), 2.34, 1e-12);
@@ -236,8 +235,6 @@ public:
         ib_mesh.SetNumGridPtsY(567u);
         TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsX(), 456u);
         TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsY(), 567u);
-
-        TS_ASSERT_EQUALS(ib_mesh.GetCellRearrangementThreshold(), 0.05);
     }
 
     void TestGetVectorFromAtoB()

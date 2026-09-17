@@ -68,6 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "ImmersedBoundaryEnumerations.hpp"
 #include "OffLatticeSimulation.hpp"
+#include "Warnings.hpp"
 #include "ShortAxisImmersedBoundaryDivisionRule.hpp"
 #include "SmartPointers.hpp"
 #include "UniformCellCycleModel.hpp"
@@ -79,6 +80,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryLinearInteractionForce.hpp"
+#include "StepSizeException.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -244,12 +246,31 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetThrowsStepSizeException(true);
 
+        // ImmersedBoundaryCellPopulation no longer overrides CheckForStepSizeException(): all
+        // movement restriction for immersed boundary is handled directly within
+        // UpdateNodeLocations() (see TestOverlyLargeDisplacements()), using CharacteristicNodeSpacing
+        // rather than CellRearrangementThreshold. CheckForStepSizeException() here is therefore just
+        // the plain inherited AbstractOffLatticeCellPopulation behaviour: it only ever checks
+        // against AbsoluteMovementThreshold, and never modifies the displacement or warns.
         c_vector<double, 2> displacement;
         displacement[0] = 0.8;
         displacement[1] = 0.8;
-        TS_ASSERT_THROWS_ANYTHING(cell_population.CheckForStepSizeException(0, displacement, 0.1));
+
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+        TS_ASSERT_THROWS_NOTHING(cell_population.CheckForStepSizeException(0, displacement, 0.1));
+        TS_ASSERT_DELTA(displacement[0], 0.8, 1e-12);
+        TS_ASSERT_DELTA(displacement[1], 0.8, 1e-12);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+
+        // Test StepSizeException: displacement exceeding the AbsoluteMovementThreshold (default 2.0)
+        // should throw a StepSizeException via the base-class check.
+        // norm_2 of (2.0, 2.0) = sqrt(8) ≈ 2.83, which exceeds the default threshold of 2.0.
+        c_vector<double, 2> large_displacement;
+        large_displacement[0] = 2.0;
+        large_displacement[1] = 2.0;
+        TS_ASSERT_THROWS(cell_population.CheckForStepSizeException(0, large_displacement, 0.1),
+                         const StepSizeException&);
     }
 
     void TestValidateException()

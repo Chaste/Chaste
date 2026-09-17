@@ -80,7 +80,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Chaste tutorials. */
 #include "HoneycombMeshGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
@@ -330,7 +330,7 @@ public:
         simulator.SetEndTime(1.0);
 
         /* We create a force law and pass it to the `OffLatticeSimulation`. */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(3);
         simulator.AddForce(p_linear_force);
 

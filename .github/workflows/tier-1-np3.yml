@@ -1,0 +1,72 @@
+name: "T1: Parallel (np3)"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches:
+      - develop
+
+jobs:
+
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
+  build-and-test:
+
+    name: "T1 · parallel build & test (np3)"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-np3-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+
+    runs-on: self-hosted-np3
+
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [ran]
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CC: gcc
+      CXX: g++
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v6
+
+    - name: compiler version
+      run: |
+        ${CXX} --version
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DChaste_NUM_CPUS_TEST=3 ..
+      working-directory: chaste-build-dir
+
+    - name: build continuous test pack
+      run: cmake --build . --parallel 10 --target Continuous
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir
+
+    - name: run continuous test pack
+      run: ctest -L Continuous --output-on-failure
+      working-directory: chaste-build-dir

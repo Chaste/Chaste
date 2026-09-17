@@ -56,8 +56,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
           mCharacteristicNodeSpacing(DOUBLE_UNSET),
           mElementDivisionSpacing(DOUBLE_UNSET),
           mNeighbourDist(0.1),
-          mSummaryOfNodeLocations(0.0),
-          mCellRearrangementThreshold(0.05)
+          mSummaryOfNodeLocations(0.0)
 {
     // Clear mNodes and mElements
     Clear();
@@ -697,18 +696,6 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::AddNode(
     pNewNode->SetIndex(this->mNodes.size());
     this->mNodes.push_back(pNewNode);
     return this->mNodes.size() - 1;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetCellRearrangementThreshold(double cellRearrangementThreshold)
-{
-    mCellRearrangementThreshold = cellRearrangementThreshold;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCellRearrangementThreshold()
-{
-    return mCellRearrangementThreshold;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

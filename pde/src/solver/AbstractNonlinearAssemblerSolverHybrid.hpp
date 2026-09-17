@@ -475,8 +475,7 @@ PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeResidual(SNES snes,
                                                                       void* pContext)
 {
     // Extract the solver from the void*
-    AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* p_solver =
-        (AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>*) pContext;
+    auto* p_solver = (AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>*) pContext;
 
     p_solver->ComputeResidual(currentGuess, residualVector);
 
@@ -492,8 +491,7 @@ PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeJacobian(SNES snes,
                                                                       void* pContext)
 {
     // Extract the solver from the void*
-    AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* p_solver =
-        (AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>*) pContext;
+    auto* p_solver = (AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>*) pContext;
 
     p_solver->ComputeJacobian(currentGuess, &globalJacobian);
 
@@ -508,8 +506,7 @@ PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeJacobian(SNES snes,
                                                                       void* pContext)
 {
     // Extract the solver from the void*
-    AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* p_solver =
-        (AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>*) pContext;
+    auto* p_solver = (AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>*) pContext;
 
     p_solver->ComputeJacobian(currentGuess, pGlobalJacobian);
 

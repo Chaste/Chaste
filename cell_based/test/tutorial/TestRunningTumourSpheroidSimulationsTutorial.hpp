@@ -72,7 +72,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "SmartPointers.hpp"
@@ -254,16 +254,16 @@ public:
          * We must now create one or more force laws, which determine the mechanics of
          * the cell population. As in the crypt simulation tutorial, we assume that a cell
          * experiences a force from each neighbour that can be represented as a linear overdamped
-         * spring, so we use a `GeneralisedLinearSpringForce` object.
+         * spring, so we use a `LinearSpringForce` object.
          * Note that we have called the method `SetCutOffLength` on the
-         * `GeneralisedLinearSpringForce` before passing it to the simulator: this call
+         * `LinearSpringForce` before passing it to the simulator: this call
          * modifies the force law so that two neighbouring cells do not impose
          * a force on each other if they are located more than 3 units (=3 cell widths)
          * away from each other. This modification is necessary when no ghost nodes are used,
          * for example to avoid artificially large forces between cells that lie close together
          * on the spheroid boundary.
          */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(3);
         simulator.AddForce(p_linear_force);
 

@@ -602,7 +602,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9567, 1e-4);
 
-        // Compare with the mesh-based and node basedcell population result
+        // Compare with the mesh-based and node based cell population result
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9550, 1e-2);
     }
 

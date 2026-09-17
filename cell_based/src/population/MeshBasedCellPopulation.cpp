@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cylindrical2dVertexMesh.hpp"
 #include "Toroidal2dMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
-#include "NodesOnlyMesh.hpp"
 #include "CellId.hpp"
 #include "CellVolumesWriter.hpp"
 #include "CellPopulationElementWriter.hpp"

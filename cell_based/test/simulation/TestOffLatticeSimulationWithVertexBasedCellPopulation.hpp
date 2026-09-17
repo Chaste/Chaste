@@ -401,6 +401,10 @@ public:
         ////////////////////////////////////////////
         p_mesh->SetCellRearrangementThreshold(0.05);
         simulator.SetDt(0.1);
+        // With this large dt, closing the void legitimately produces node displacements of just
+        // over 2.5 in a single step; raise AbsoluteMovementThreshold (default 2.0) to accommodate
+        // this rather than shrinking dt, which was found to change the emergent mesh topology.
+        cell_population.SetAbsoluteMovementThreshold(3.0);
         ////////////////////////////////////////////
 
         // Run simulation
