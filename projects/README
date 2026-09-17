@@ -3,4 +3,4 @@ You can put user projects in this directory, to make use of the Chaste build sys
 
 We recommend that user projects be standalone Git repositories, hosted by the user, based on our template project.
 
-See https://chaste.github.io/docs/user-guides/user-projects/ for more information.
+See <https://chaste.github.io/docs/user-guides/user-projects/> for more information.
