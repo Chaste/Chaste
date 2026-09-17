@@ -76,7 +76,7 @@ jobs:
         run: sudo apt install autoconf automake libtool libunwind-dev graphviz
 
       - name: setup go
-        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: 'stable'
 
@@ -208,7 +208,7 @@ jobs:
           NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME: ${{ needs.build-and-test.outputs.datetime }}
 
       - name: setup python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.x'
 
