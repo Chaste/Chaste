@@ -172,7 +172,15 @@ if (UNIX AND ${CMAKE_CXX_COMPILER_ID} IN_LIST Chaste_FAST_LINKER_COMPILERS)
         # Older mold releases (e.g. 1.0.3, as shipped by some distros' package managers)
         # are known to produce binaries that crash at runtime. Require at least the
         # version shipped with Ubuntu 24.04 (Noble), which is known to be reliable.
-        set(Chaste_MOLD_MIN_VERSION 2.30.0)
+        # On ARM64, mold < 2.42.0 can also crash linking large binaries with an
+        # internal "max_thunk_size" assertion in its range-extension-thunk code
+        # (mold issue #1538, fixed by mold commit 5beb02714c); require that floor
+        # there instead.
+        if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64)$")
+            set(Chaste_MOLD_MIN_VERSION 2.42.0)
+        else ()
+            set(Chaste_MOLD_MIN_VERSION 2.30.0)
+        endif ()
         set(Chaste_mold_new_enough FALSE)
         if (MOLD_EXECUTABLE)
             execute_process(COMMAND ${MOLD_EXECUTABLE} --version OUTPUT_VARIABLE Chaste_mold_version_output)
