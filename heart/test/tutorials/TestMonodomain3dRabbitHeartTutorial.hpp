@@ -1,4 +1,4 @@
-    /*
+/*
 
 Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
@@ -184,11 +184,11 @@ public:
 
 /*
  * **Note** if you were doing a 'real' scientific simulation you would want to use a higher
- * resolution mesh. A version of this can be found on the [https://chaste.cs.ox.ac.uk/old-chaste-data/downloads/data/related/ Chaste download website]
+ * resolution mesh. A version of this can be found on the <https://chaste.cs.ox.ac.uk/old-chaste-data/downloads/data/compat/>.
  *
- * Navigate to the "Data" tab, and download either
- *  * [source:/data/public/OxfordRabbitHeart/OxfordRabbitHeart_binary.tgz OxfordRabbitHeart_binary.tgz]  - 599MB, or
- *  * [source:/data/public/OxfordRabbitHeart/OxfordRabbitHeartWithBath_binary.tgz OxfordRabbitHeartWithBath_binary.tgz]  - 846MB.
+ * Download either
+ *  * OxfordRabbitHeart_binary.tgz  - 599MB, or
+ *  * OxfordRabbitHeartWithBath_binary.tgz  - 846MB.
  *
  * These will probably require HPC resources, and finer ODE and PDE time steps than we used here.
  *
