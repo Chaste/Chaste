@@ -8,10 +8,13 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: read
+
 jobs:
 
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   build-and-test:
 
@@ -52,10 +55,11 @@ jobs:
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
       - name: checkout Chaste
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           repository: Chaste/Chaste
           path: Chaste
+          persist-credentials: false
 
       - name: install dependencies
         run: |
@@ -100,7 +104,7 @@ jobs:
         if: always()
 
       - name: upload profile artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: profile-files
           path: ${{ env.CHASTE_BUILD_DIR }}/profile
@@ -130,26 +134,29 @@ jobs:
     steps:
 
       - name: download profile artifact
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: profile-files
           path: ./profile
 
       - name: checkout profiling-gprof
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           repository: Chaste/profiling-gprof
           path: profiling-gprof
           fetch-depth: 0
           token: ${{ secrets.PROFILING_GPROF_ACCESS }}
+          persist-credentials: false
 
       - name: copy results
         run: |
-          mkdir ${GPROF_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}
-          cp ./profile/* ${GPROF_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
+          mkdir ${GPROF_DIR}/log-files/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}
+          cp ./profile/* ${GPROF_DIR}/log-files/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}/
+        env:
+          NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME: ${{ needs.build-and-test.outputs.datetime }}
 
       - name: setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: '3.x'
 
@@ -166,9 +173,14 @@ jobs:
           git config user.email "github-action"
           git add --all
           git commit -m "upload gprof profiling results" || echo "No changes to commit"
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/profiling-gprof.git"
           git push
         working-directory: ${{ env.GPROF_DIR }}
+        env:
+          TOKEN: ${{ secrets.PROFILING_GPROF_ACCESS }}
 
       - name: results URL on chaste.github.io
         run: |
-          echo https://chaste.github.io/profiling-gprof/2025-09-29_15-55-53/${{ needs.build-and-test.outputs.datetime }}/index.html
+          echo https://chaste.github.io/profiling-gprof/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}/index.html
+        env:
+          NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME: ${{ needs.build-and-test.outputs.datetime }}

@@ -14,7 +14,7 @@ permissions:
 jobs:
 
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   build-and-test:
 
@@ -59,10 +59,11 @@ jobs:
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
       - name: checkout Chaste
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Chaste/Chaste
           path: Chaste
+          persist-credentials: false
 
       - name: install dependencies
         run: |
@@ -75,13 +76,13 @@ jobs:
         run: sudo apt install autoconf automake libtool libunwind-dev graphviz
 
       - name: setup go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
           go-version: 'stable'
 
       - name: cache go pprof
         id: cache-pprof
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/go/bin/pprof
           key: go-pprof-${{ runner.os }}-${{ env.GO_PPROF_VERSION }}
@@ -95,7 +96,7 @@ jobs:
 
       - name: cache gperftools
         id: cache-gperftools
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.GPERFTOOLS_PREFIX }}
           key: gperftools-${{ runner.os }}-${{ env.GPERFTOOLS_VERSION }}
@@ -153,7 +154,7 @@ jobs:
         if: always()
 
       - name: upload profile artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: profile-files
           path: ${{ env.CHASTE_BUILD_DIR }}/profile
@@ -183,28 +184,31 @@ jobs:
     steps:
 
       - name: download profile artifact
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: profile-files
           path: ./profile
 
       - name: checkout results repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Chaste/profiling-gperftools
           path: profiling-gperftools
           fetch-depth: 0
           token: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
+          persist-credentials: false
 
       - name: copy results
         # raw .prof files are deliberately not published: they are only useful with the
         # matching test binaries, and remain available in the workflow artifact
         run: |
-          mkdir ${GPERFTOOLS_RESULTS_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}
-          cp ./profile/*.txt ./profile/*.svg ./profile/index.html ${GPERFTOOLS_RESULTS_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
+          mkdir ${GPERFTOOLS_RESULTS_DIR}/log-files/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}
+          cp ./profile/*.txt ./profile/*.svg ./profile/index.html ${GPERFTOOLS_RESULTS_DIR}/log-files/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}/
+        env:
+          NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME: ${{ needs.build-and-test.outputs.datetime }}
 
       - name: setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: '3.x'
 
@@ -221,9 +225,14 @@ jobs:
           git config user.email "github-action"
           git add --all
           git commit -m "upload gperftools profiling results" || echo "No changes to commit"
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/profiling-gperftools.git"
           git push
         working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
+        env:
+          TOKEN: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
 
       - name: results URL on chaste.github.io
         run: |
-          echo https://chaste.github.io/profiling-gperftools/${{ needs.build-and-test.outputs.datetime }}/index.html
+          echo https://chaste.github.io/profiling-gperftools/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}/index.html
+        env:
+          NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME: ${{ needs.build-and-test.outputs.datetime }}
