@@ -181,6 +181,6 @@ jobs:
 
       - name: results URL on chaste.github.io
         run: |
-          echo https://chaste.github.io/profiling-gprof/2025-09-29_15-55-53/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}/index.html
+          echo https://chaste.github.io/profiling-gprof/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}/index.html
         env:
           NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME: ${{ needs.build-and-test.outputs.datetime }}
