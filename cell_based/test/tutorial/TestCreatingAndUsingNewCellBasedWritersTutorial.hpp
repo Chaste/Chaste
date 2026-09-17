@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "CellMutationStatesCountWriter.hpp"
@@ -274,9 +274,9 @@ public:
         simulator.SetEndTime(10.0);
 
         /* Next we create a force law and pass it to the `OffLatticeSimulation`, and call `Solve()` to run the simulation. */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
     }

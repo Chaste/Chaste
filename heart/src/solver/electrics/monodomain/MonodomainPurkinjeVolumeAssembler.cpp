@@ -53,11 +53,9 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)> MonodomainPurkinjeVolumeAss
     c_vector<double,1> empty_u; /* should pass in rU(1) here, but it won't be used */
     c_matrix<double,1,SPACE_DIM> empty_grad_u; /* ditto above */
 
-    c_matrix<double,ELEMENT_DIM+1,ELEMENT_DIM+1> normal_monodomain_mat
-        = mMonodomainAssembler.ComputeMatrixTerm(rPhi,rGradPhi,rX,empty_u,empty_grad_u,pElement);
+    c_matrix<double,ELEMENT_DIM+1,ELEMENT_DIM+1> normal_monodomain_mat = mMonodomainAssembler.ComputeMatrixTerm(rPhi,rGradPhi,rX,empty_u,empty_grad_u,pElement);
 
-    c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)> ret
-        = zero_matrix<double>(2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1));
+    c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)> ret = zero_matrix<double>(2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1));
 
     // even rows, even columns
     matrix_slice<c_matrix<double, 2*ELEMENT_DIM+2, 2*ELEMENT_DIM+2> >

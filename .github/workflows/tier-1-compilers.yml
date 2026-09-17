@@ -1,0 +1,126 @@
+name: "T1: Compilers"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches:
+      - develop
+
+jobs:
+
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
+  compiler-all-libs:
+
+    name: "T1 · compilers"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-compilers-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+
+    # TODO before merge: confirm `ubuntu-26.04` is available as a hosted
+    # runner label, confirm its apt codename below (used in the Chaste
+    # dependencies repo line), and confirm gcc-15 / clang-22 are available
+    # as versioned packages on it rather than only as the unversioned
+    # default compiler.
+    runs-on: ubuntu-26.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # `config` is the only base dimension, so it is the only value GitHub
+        # puts in the check name. The compiler, its C++ driver and the build
+        # type ride along in `include:` and stay out of the name.
+        #
+        # Only the latest available compilers on the latest ubuntu LTS: this
+        # is a breadth check for compiler-specific build breaks, not a
+        # historical-version regression suite. No icx here - the one
+        # icx build-and-test lives in tier-1-intel.yml.
+        config:
+          - gcc-15-debug
+          - gcc-15-release
+          - clang-22-debug
+          - clang-22-release
+        include:
+          - config: gcc-15-debug
+            cc: "gcc-15"
+            cxx: "g++-15"
+            build-type: "Debug"
+          - config: gcc-15-release
+            cc: "gcc-15"
+            cxx: "g++-15"
+            build-type: "Release"
+          - config: clang-22-debug
+            cc: "clang-22"
+            cxx: "clang++-22"
+            build-type: "Debug"
+          - config: clang-22-release
+            cc: "clang-22"
+            cxx: "clang++-22"
+            build-type: "Release"
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v6
+
+    - name: install dependencies
+      # TODO before merge: "resolute" is an UNVERIFIED guess at 26.04's
+      # codename, not a confirmed value - replace with the real codename
+      # (and confirm chaste.github.io/ubuntu actually serves a directory
+      # for it) before this workflow is relied on.
+      run: |
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu resolute/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+        sudo apt update
+        sudo apt install chaste-dependencies
+
+    - name: compiler version
+      run: |
+        ${CXX} --version
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
+      working-directory: chaste-build-dir
+
+    - name: build core libraries
+      run: cmake --build . --parallel 4 --target chaste_core
+      working-directory: chaste-build-dir
+
+    - name: build cell_based
+      run: cmake --build . --parallel 4 --target chaste_cell_based
+      working-directory: chaste-build-dir
+
+    - name: build crypt
+      run: cmake --build . --parallel 4 --target chaste_crypt
+      working-directory: chaste-build-dir
+
+    - name: build heart
+      run: cmake --build . --parallel 4 --target chaste_heart
+      working-directory: chaste-build-dir
+
+    - name: build lung
+      run: cmake --build . --parallel 4 --target chaste_lung
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir

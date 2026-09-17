@@ -7,28 +7,31 @@
     // If you prefer to start with a container with the latest Chaste release pre-built, use the following line:
     // "image": "chaste/release",
     // Note: specific versions can be selected by adding one of the the tags listed on Docker Hub e.g.:
-    // "image": "chaste/release:2021.1",
+    // "image": "chaste/release:2026.1",
     // Otherwise, to start from a bare environment with no pre-built Chaste libraries, uncomment the following line:
     "image": "chaste/base",
 
     "mounts": [
+        // The following lines bind mount the source folder on the host into
+        // the target path in the container. This is useful for sharing test
+        // output files between the host OS and the Docker container.
+        // NOTE: The source directory "output" must already exist on the host.
+        // NOTE: This can cause permissions problems when writing files on
+        // macOS which causes a few tests to fail. See the following issues:
+        // https://github.com/Chaste/chaste-docker/issues/25
+        // https://github.com/Chaste/Chaste/issues/548
+
+        // {
+        //     "source": "${localWorkspaceFolder}/output",
+        //     "target": "/home/chaste/output",
+        //     "type": "bind"
+        // },
+
         {
             "source": "chaste_data",
             "target": "/home/chaste",
             // "target": "${containerEnv:CHASTE_DIR}",
             "type": "volume"
-        },
-        {
-            // Warning: This mounts the source folder on the host into the target path in the container.
-            // It therefore needs the source directory to already exist on the host.
-            // "output" is a known folder in the repo but this choice could be revised.
-            // "source": "${localWorkspaceFolder}/../output",
-            "source": "${localWorkspaceFolder}/output",
-            "target": "/home/chaste/output",
-            // "target": "${containerEnv:CHASTE_TEST_OUTPUT}",
-            "type": "bind"
-            // NOTE: This can cause permissions problems when writing files on macOS.
-            // https://github.com/Chaste/chaste-docker/issues/25
         }
     ],
 

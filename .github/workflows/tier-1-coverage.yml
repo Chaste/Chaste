@@ -1,0 +1,179 @@
+name: "T1: Coverage"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches:
+      - develop
+
+jobs:
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
+  build-and-test:
+    name: "T1 · coverage build & test"
+    needs: gate
+
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-coverage-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [ran]
+
+    runs-on: ubuntu-latest
+
+    # Do not move this job to a plain Ubuntu runner with `apt install chaste-dependencies`.
+    # That was the original setup and was deliberately abandoned in #32: Ubuntu's system
+    # PETSc lacks ParMetis and Hypre, which stops PetscMatrixPartitioning from running and
+    # silently under-reports coverage rather than failing. The portability-* images build
+    # PETSc from source with --download-parmetis=1 --download-hypre=1.
+    container:
+      image: chaste/runner:portability-tip
+      env:
+        RUNNER_OFF: 1
+      options: --user 0 --cpus 4
+
+    env:
+      CC: gcc
+      CXX: g++
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Compiler version
+        run: |
+          ${CXX} --version
+
+      - name: Make build and test directories
+        run: |
+          mkdir -p chaste-build-dir
+          mkdir -p chaste-test-dir
+          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
+
+      - name: Create module loading script
+        run: |
+          cat > load_modules.sh << 'EOF'
+          #!/bin/bash
+          source /etc/profile.d/modules.sh
+          module use /home/runner/modules/modulefiles
+          module avail
+          module load boost petsc_hdf5 sundials vtk xercesc xsd
+          module list
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Authorize runner user
+        run: |
+          chown -R runner:runner .
+
+      # Each `su runner` heredoc below starts with `set -e`. The heredoc shell does not
+      # inherit the outer shell's -e, so without it only the last command's exit status
+      # propagates and an earlier failure is silently ignored.
+
+      - name: CMake Configure
+        run: |
+          su runner << 'EOF'
+          set -e
+          source load_modules.sh
+          cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=4 ..
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Build Continuous
+        run: |
+          su runner << 'EOF'
+          set -e
+          source load_modules.sh
+          cmake --build . --target Continuous --parallel 4
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Build Parallel
+        run: |
+          su runner << 'EOF'
+          set -e
+          source load_modules.sh
+          cmake --build . --target Parallel --parallel 4
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Run TestChasteBuildInfo
+        run: |
+          su runner << 'EOF'
+          set -e
+          source load_modules.sh
+          ctest -V -R TestChasteBuildInfo
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Run Continuous
+        run: |
+          su runner << 'EOF'
+          set -e
+          source load_modules.sh
+          ctest -j4 -L Continuous --output-on-failure
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Run Parallel
+        run: |
+          su runner << 'EOF'
+          set -e
+          source load_modules.sh
+          ctest -L Parallel --output-on-failure
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Run coverage
+        # Exclude patterns and error-ignores live in cmake/Config/lcovrc (shared with the
+        # local `make coverage` target); excludes apply at capture time, so no --exclude
+        # args and no `lcov --remove` pass are needed. Pass an explicit --parallel (not 0:
+        # geninfo's auto-detect ignores the container's --cpus). Do not pass --ignore-errors
+        # here: on the command line it REPLACES the rc list instead of merging.
+        run: |
+          su runner << 'EOF'
+          set -e
+          lcov --config-file ../cmake/Config/lcovrc --directory . --capture --parallel 4 --output-file coverage.info
+          EOF
+        working-directory: chaste-build-dir
+
+      # Uploaded before the codecov step so the coverage data is retained even if the
+      # upload below fails.
+      - name: Upload as artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-info
+          path: chaste-build-dir/coverage.info
+
+      - name: Upload to codecov
+        uses: codecov/codecov-action@v7
+        # Skip on forks running this workflow against their own repository, where the upload
+        # has nowhere useful to go. Note this does not skip pull requests from forks, which
+        # run in the upstream repository's context and whose coverage we do want.
+        if: github.repository == 'Chaste/Chaste'
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: chaste-build-dir/coverage.info
+          disable_search: true
+          # Pull requests from forks cannot read secrets, so they upload tokenlessly and are
+          # subject to codecov's global rate limit. Don't fail those runs for something the
+          # contributor cannot fix.
+          fail_ci_if_error: ${{ secrets.CODECOV_TOKEN != '' }}

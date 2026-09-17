@@ -1,0 +1,90 @@
+name: "T1: Project tests"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches:
+      - develop
+
+jobs:
+
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
+  build-and-test:
+
+    name: "T1 · project tests"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-project-tests-${{ github.event.pull_request.number || github.ref }}-${{ strategy.job-index }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # `project_repo` is the only base dimension, so it is the only value
+        # GitHub puts in the check name. Per-project org, pinned ref and build
+        # targets ride along in `include:` and stay out of the name.
+        project_repo: ["CellBasedComparison2017"]
+        include:
+          - project_repo: "CellBasedComparison2017"
+            project_org: "Chaste"
+            ref: "8bb7287d0dfb55316892707faab2945cca3d48ea"
+            build_target: "project_CellBasedComparison2017"
+            test_target: "project_CellBasedComparison2017"
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v6
+
+    - name: install dependencies
+      run: |
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+        sudo apt update
+        sudo apt install chaste-dependencies
+
+    - name: checkout project
+      uses: actions/checkout@v6
+      with:
+        repository: ${{ matrix.project_org }}/${{ matrix.project_repo }}
+        path: projects/${{ matrix.project_repo }}
+        ref: ${{ matrix.ref }}
+
+    - name: compiler version
+      run: |
+        g++ --version
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DChaste_ERROR_ON_WARNING=OFF ..
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir
+
+    - name: build targets
+      run: cmake --build . --parallel 4 --target ${{ matrix.build_target }}
+      working-directory: chaste-build-dir
+
+    - name: run Nightly test pack
+      run: ctest -j4 -L ${{ matrix.test_target }}
+      working-directory: chaste-build-dir

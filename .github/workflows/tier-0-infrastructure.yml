@@ -1,0 +1,90 @@
+name: "T0: Infrastructure"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches:
+      - develop
+
+jobs:
+
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
+  build-and-test:
+
+    name: "T0 · infrastructure & whitespace"
+
+    needs: gate
+
+    runs-on: ubuntu-24.04
+
+    if: needs.gate.outputs.run_tier0 == 'true'
+
+    concurrency:
+      group: tier-0-infrastructure-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier0 == 'true' }}
+
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [ran]
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CC: gcc
+      CXX: g++
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v6
+
+    - name: install dependencies
+      run: |
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+        sudo apt update
+        sudo apt install chaste-dependencies
+
+    - name: compiler version
+      run: |
+        ${CXX} --version
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_BUILD_TYPE=Debug ..
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir
+
+    - name: run infrastructure checks
+      run: cmake --build . --target infrastructure
+      working-directory: chaste-build-dir
+
+    - name: run check for tabs and trailing whitespace
+      run: |
+        cmake --build . --target infrastructure_whitespace
+        if ! git diff --quiet --exit-code; then
+          echo
+          echo "Error: check for tabs and trailing whitespace failed."
+          echo "Run python/infra/RemoveTabsAndTrailingWhitespace.py and commit the results."
+          echo "The following files have problems:"
+          echo
+          git status
+          exit 1
+        fi
+      working-directory: chaste-build-dir

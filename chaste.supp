@@ -47,6 +47,41 @@
    ...
    fun:orte_init
 }
+# OpenMPI replaced ORTE with PRRTE/PMIx in version 5, but OpenMPI 4 also uses PMIx. PMIx runs
+# its own progress thread, which is still going when the process exits, and it allocates from
+# several sites there: attribute-string caching (malloc/strdup/pmix_bfrops_base_value_load), a
+# key/value hash cache (pmix_hash_fetch), and others. Each site was previously suppressed by
+# name, but the set keeps growing and the distribution libpmix is unsymbolised, so the frames
+# rarely match anyway. Instead, identify the leak by the one thing common to all of them: it
+# originates in libpmix and terminates at the progress thread's entry point. What valgrind
+# reports depends on how far the thread has got when it is killed -- an indirect loss while
+# the parent allocation is still live, or a possible loss once it is judged alone -- so both
+# kinds are matched here, or a fraction of runs fail whichever way they lose the race. Scoped
+# to indirect/possible only, so a genuine 'definite' leak on that thread is still reported.
+# Note this requires 'indirect' and 'possible' to be in --errors-for-leak-kinds (see
+# cmake/Modules/ChasteMacros.cmake), as valgrind only consults the suppression files for leak
+# kinds that it treats as errors.
+{
+   PMIx progress thread (any allocation site)
+   Memcheck:Leak
+   match-leak-kinds: indirect,possible
+   ...
+   obj:*/libpmix.so*
+   ...
+   fun:start_thread
+   fun:clone
+}
+# OpenMPI 5 selects its byte-transport layer through UCX, which probes every installed
+# transport including ROCm. The ROCm probe leaks whether or not any GPU is present.
+# The existing PetscInitialize rules below cover malloc/calloc/realloc but not operator new.
+{
+   PetscInitialize    mpi_init (operator new)
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:_Znwm
+   ...
+   fun:PetscInitialize
+}
 # HDF5
 ######
 {
@@ -138,6 +173,19 @@
    socketcall.getsockopt(optlen_out)
    ...
    fun:PetscInitialize
+}
+# VTK / oneTBB
+##############
+# VTK 9.5 uses oneTBB as the backend for vtkSMPTools. Its worker threads are still running
+# at exit, so valgrind reports their stacks and TLS blocks as possibly lost.
+{
+   VTK oneTBB worker thread stacks
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   ...
+   fun:pthread_create*
+   obj:*/libtbb.so*
 }
 # Tetgen
 ########

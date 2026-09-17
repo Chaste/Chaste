@@ -1,0 +1,174 @@
+name: "T1: Profiling (gprof)"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches:
+      - develop
+
+jobs:
+
+  gate:
+    uses: ./.github/workflows/_ci-gate.yml
+
+  build-and-test:
+
+    name: "T1 · gprof profiling run"
+
+    needs: gate
+
+    if: needs.gate.outputs.run_tier1 == 'true'
+
+    concurrency:
+      group: tier-1-profiling-gprof-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier1 == 'true' }}
+
+    runs-on: ubuntu-22.04
+
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [ran]
+
+    env:
+      CHASTE_DIR: ${{ github.workspace }}/Chaste
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
+
+    outputs:
+      index: ${{ steps.index-exists.outputs.index }}
+      datetime: ${{ steps.get-datetime.outputs.datetime }}
+
+    steps:
+
+      - name: get current datetime
+        id: get-datetime
+        run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
+
+      - name: checkout Chaste
+        uses: actions/checkout@v6
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
+
+      - name: install dependencies
+        run: |
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          sudo apt update
+          sudo apt install chaste-dependencies
+
+      - name: make build and test directories
+        run: |
+          mkdir -p ${CHASTE_BUILD_DIR}
+          mkdir -p ${CHASTE_TEST_OUTPUT}
+
+      - name: cmake configure
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_PROFILE_GPROF_CPUS=4 ..
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: run TestChasteBuildInfo
+        run: |
+          cmake --build . --target TestChasteBuildInfo --parallel 4
+          ctest -V -R TestChasteBuildInfo
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: build profiling test pack
+        run: cmake --build . --target Profile --parallel 4
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: run profiling tests
+        run: cmake --build . --target profile --parallel 1
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: check if index file successfully created
+        id: index-exists
+        run: |
+          if [ -e ${CHASTE_BUILD_DIR}/profile/index.html ]; then
+            echo "Index file exists"
+            echo "index=True"  >> $GITHUB_OUTPUT
+          else
+            echo "Index file does not exist"
+            echo "index=False"  >> $GITHUB_OUTPUT
+          fi
+        if: always()
+
+      - name: upload profile artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: profile-files
+          path: ${{ env.CHASTE_BUILD_DIR }}/profile
+        if: always() && steps.index-exists.outputs.index == 'True'
+
+
+  publish-results:
+
+    name: "T1 · publish gprof results (non-fork PRs only)"
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    # only when index exists AND it's being run from the primary repo (Chaste/Chaste)
+    if: ${{needs.build-and-test.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
+
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [ran]
+
+    env:
+      GPROF_DIR: ${{ github.workspace }}/profiling-gprof
+
+    steps:
+
+      - name: download profile artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: profile-files
+          path: ./profile
+
+      - name: checkout profiling-gprof
+        uses: actions/checkout@v6
+        with:
+          repository: Chaste/profiling-gprof
+          path: profiling-gprof
+          fetch-depth: 0
+          token: ${{ secrets.PROFILING_GPROF_ACCESS }}
+
+      - name: copy results
+        run: |
+          mkdir ${GPROF_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}
+          cp ./profile/* ${GPROF_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
+
+      - name: setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: generate index file
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install dominate
+          python write_index.py
+        working-directory: ${{ env.GPROF_DIR }}
+
+      - name: commit and push results
+        run: |
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git add --all
+          git commit -m "upload gprof profiling results" || echo "No changes to commit"
+          git push
+        working-directory: ${{ env.GPROF_DIR }}
+
+      - name: results URL on chaste.github.io
+        run: |
+          echo https://chaste.github.io/profiling-gprof/2025-09-29_15-55-53/${{ needs.build-and-test.outputs.datetime }}/index.html

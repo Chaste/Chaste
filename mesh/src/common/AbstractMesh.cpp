@@ -492,7 +492,9 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumContainingElement
 {
     if (mNodes.empty())
     {
-        return 0u;
+        // This can happen in parallel if a process isn't assigned any nodes.
+        // Covered in TestDistributedTetrahedralMesh::TestConstructLinearMeshSmallest but only when there are 3 or more processes
+        return 0u; // LCOV_EXCL_LINE
     }
     return (*std::max_element(mNodes.begin(), mNodes.end(),
                               [](const Node<SPACE_DIM>* a, const Node<SPACE_DIM>* b)

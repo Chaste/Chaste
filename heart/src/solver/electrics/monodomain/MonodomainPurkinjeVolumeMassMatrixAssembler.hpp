@@ -105,8 +105,7 @@ public:
 //            }
         }
 
-        c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)> ret
-                = zero_matrix<double>(2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1));
+        c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)> ret = zero_matrix<double>(2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1));
         // even rows, even columns
         matrix_slice<c_matrix<double, 2*ELEMENT_DIM+2, 2*ELEMENT_DIM+2> >
         slice00(ret, slice(0, 2, ELEMENT_DIM+1), slice(0, 2, ELEMENT_DIM+1));

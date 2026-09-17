@@ -127,8 +127,7 @@ void TysonNovakCellCycleModel::InitialiseDaughterCell()
          * would be incorrect. We must therefore access the CellProliferativeType via the cell's
          * CellPropertyCollection.
          */
-        boost::shared_ptr<AbstractCellProperty> p_transit_type =
-        mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
+        auto p_transit_type = mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_transit_type);
     }
 }

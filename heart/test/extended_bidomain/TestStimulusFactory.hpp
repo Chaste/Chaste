@@ -54,7 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractChasteRegion.hpp"
 #include "ChasteCuboid.hpp"
 #include "ChasteNodesList.hpp"
-#include "ElectrodesStimulusFactory.hpp"
 #include "LuoRudy1991.hpp"
 #include "PlaneStimulusCellFactory.hpp"
 #include "ZeroNetChargeElectrodes.hpp"

@@ -1,0 +1,5 @@
+			<SpringStiffness>15</SpringStiffness>
+			<DivisionRestingSpringLength>0.5</DivisionRestingSpringLength>
+			<SpringGrowthDuration>1</SpringGrowthDuration>
+			<UseCutOffLength>0</UseCutOffLength>
+			<CutOffLength>1.79769e+308</CutOffLength>

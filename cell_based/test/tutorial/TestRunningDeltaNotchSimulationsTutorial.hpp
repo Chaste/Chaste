@@ -77,7 +77,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "NagaiHondaForce.hpp"
 #include "SimpleTargetAreaModifier.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellAgesWriter.hpp"
@@ -249,7 +250,7 @@ public:
         simulator.AddSimulationModifier(p_modifier);
 
         /* As we are using a node-based cell population, we use an appropriate force law. */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(PathmanathanInteractionForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 

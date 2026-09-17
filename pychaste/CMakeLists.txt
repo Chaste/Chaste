@@ -119,7 +119,7 @@ list(APPEND PYCHASTE_INCLUDE_DIRS ${_include_dirs})
 # When the library has been built, it can be used in Python code
 # as `from chaste._pychaste_all import *`.
 
-file(GLOB_RECURSE PYCHASTE_WRAPPER_SOURCES
+file(GLOB_RECURSE PYCHASTE_WRAPPER_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/wrappers/all/*.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/wrappers/all/*.hpp
 )

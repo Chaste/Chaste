@@ -66,7 +66,7 @@ class TestLinearSpringWithVariableSpringConstantsForce : public AbstractCellBase
 {
 public:
 
-    void TestGeneralisedLinearSpringForceWithSpringConstantsForIngeBCatCellsSimulationNoGhostsFails()
+    void TestLinearSpringWithVariableSpringConstantsForceWithSpringConstantsForIngeBCatCellsSimulationNoGhostsFails()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -107,7 +107,7 @@ public:
         SimulationTime::Destroy();
     }
 
-    void TestGeneralisedLinearSpringForceWithSpringConstantsForIngeBCatCellsSimulationWithGhosts()
+    void TestLinearSpringWithVariableSpringConstantsForceWithSpringConstantsForIngeBCatCellsSimulationWithGhosts()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -149,7 +149,7 @@ public:
         SimulationTime::Destroy();
     }
 
-    void TestGeneralisedLinearSpringForceWithSpringConstantsForIngeBCatCells()
+    void TestLinearSpringWithVariableSpringConstantsForceWithSpringConstantsForIngeBCatCells()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -193,7 +193,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestGeneralisedLinearSpringForceWithEdgeLengthBasedSpring()
+    void TestLinearSpringWithVariableSpringConstantsForceWithEdgeLengthBasedSpring()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -364,7 +364,7 @@ public:
         TS_ASSERT_DELTA(new_force[0]*new_force[0] + new_force[1]*new_force[1], 4.34024, 1e-3);
     }
 
-    void TestGeneralisedLinearSpringForceWithEdgeBasedSpringsOnPeriodicMesh()
+    void TestLinearSpringWithVariableSpringConstantsForceWithEdgeBasedSpringsOnPeriodicMesh()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -499,7 +499,7 @@ public:
         }
     }
 
-    void TestGeneralisedLinearSpringForceWithSpringConstantsForMutantCells()
+    void TestLinearSpringWithVariableSpringConstantsForceWithSpringConstantsForMutantCells()
     {
         // Create a small cell population
         std::vector<Node<2>*> nodes;
@@ -549,7 +549,7 @@ public:
         TS_ASSERT_DELTA(norm_2(linear_force.CalculateForceBetweenNodes(3, 0, cell_population)), 45.0, 1e-10);
     }
 
-    void TestGeneralisedLinearSpringForceWithSpringConstantsForApoptoticCells()
+    void TestLinearSpringWithVariableSpringConstantsForceWithSpringConstantsForApoptoticCells()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 

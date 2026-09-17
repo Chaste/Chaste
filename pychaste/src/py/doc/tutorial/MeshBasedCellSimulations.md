@@ -73,7 +73,7 @@ To view the results of this and the next test in Paraview it is necessary to exp
 generate the required .vtu files.
 
 ```python
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 ```
 We can set up a `VtkScene` to do a quick visualization of the population before running the analysis.
 
@@ -170,7 +170,7 @@ and should be the same length as the vector of cell pointers.
 Again Paraview output is explicitly requested.
 
 ```python
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 ```
 We can set up a `VtkScene` to do a quick visualization of the population before running the analysis.
 
@@ -256,7 +256,7 @@ class TestPyMeshBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
 
         cell_population = chaste.cell_based.MeshBasedCellPopulation[2, 2](mesh, cells)
 
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 
         scene = chaste.visualization.VtkScene[2]()
         scene.SetCellPopulation(cell_population)
@@ -299,7 +299,7 @@ class TestPyMeshBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
 
         cell_population = chaste.cell_based.MeshBasedCellPopulationWithGhostNodes[2](mesh, cells, locs)
 
-        cell_population.AddPopulationWriterVoronoiDataWriter()
+        cell_population.AddPopulationWriter["VoronoiDataWriter"]()
 
         scene = chaste.visualization.VtkScene[2]()
         scene.SetCellPopulation(cell_population)

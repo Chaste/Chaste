@@ -52,7 +52,6 @@ the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src
 #include "Shannon2004.hpp"
 
 #include "CellMLToSharedLibraryConverter.hpp"
-#include "AbstractCvodeCell.hpp"
 #include "AbstractCardiacCellWithModifiers.hpp"
 #include "AbstractModifier.hpp"
 
