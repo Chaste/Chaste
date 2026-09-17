@@ -22,5 +22,5 @@ The full-resolution mesh has been released as Open Source data and is available 
 has an average edge-length of 125 microns, this mesh has an average edge length of 482 microns.
 
 We would like to ask any user:
-	- not to re-distribute the mesh, but point any potential user to https://chaste.git-hub.io for our own tracking purposes.
-	- acknowledge source if used for presentation / publication. For details contact via https://chaste.git-hub.io
+	- not to re-distribute the mesh, but point any potential user to https://chaste.github.io for our own tracking purposes.
+	- acknowledge source if used for presentation / publication. For details contact via https://chaste.github.io
