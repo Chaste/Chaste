@@ -148,4 +148,90 @@ else()
     message(WARNING "Unknown CXX compiler type ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
+################################
+#  Faster linker (optional)   #
+################################
+# Chaste links each test individually. mold/lld are substantially faster than the
+# system default linker. Chaste_FAST_LINKER selects which to use:
+#   AUTO    (default) - mold if available and new enough, else lld, else the default linker
+#   MOLD    - require mold (>= Chaste_MOLD_MIN_VERSION); error if unavailable
+#   LLD     - require lld; error if unavailable
+#   DEFAULT - always use the system default linker
+# The selected linker is applied via CMake's native linker-selection mechanism
+# (CMAKE_LINKER_TYPE, CMake >= 3.29) or by passing -fuse-ld= flags directly on older
+# CMake / on compilers CMake doesn't document LINKER_TYPE support for (IntelLLVM).
+set(Chaste_FAST_LINKER_COMPILERS "GNU" "Clang" "AppleClang" "IntelLLVM")
+if (UNIX AND ${CMAKE_CXX_COMPILER_ID} IN_LIST Chaste_FAST_LINKER_COMPILERS)
+    set(Chaste_FAST_LINKER "AUTO" CACHE STRING "Linker to use: AUTO, MOLD, LLD, or DEFAULT")
+    set_property(CACHE Chaste_FAST_LINKER PROPERTY STRINGS AUTO MOLD LLD DEFAULT)
+
+    if (NOT Chaste_FAST_LINKER STREQUAL "DEFAULT")
+        find_program(MOLD_EXECUTABLE mold)
+        find_program(LLD_EXECUTABLE ld.lld)
+
+        # Older mold releases (e.g. 1.0.3, as shipped by some distros' package managers)
+        # are known to produce binaries that crash at runtime. Require at least the
+        # version shipped with Ubuntu 24.04 (Noble), which is known to be reliable.
+        set(Chaste_MOLD_MIN_VERSION 2.30.0)
+        set(Chaste_mold_new_enough FALSE)
+        if (MOLD_EXECUTABLE)
+            execute_process(COMMAND ${MOLD_EXECUTABLE} --version OUTPUT_VARIABLE Chaste_mold_version_output)
+            string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" Chaste_mold_version "${Chaste_mold_version_output}")
+            if (Chaste_mold_version VERSION_GREATER_EQUAL Chaste_MOLD_MIN_VERSION)
+                set(Chaste_mold_new_enough TRUE)
+            endif ()
+        endif ()
+
+        set(Chaste_LINKER_TYPE "")
+        if (Chaste_FAST_LINKER STREQUAL "MOLD")
+            if (NOT Chaste_mold_new_enough)
+                message(FATAL_ERROR "Chaste_FAST_LINKER=MOLD, but no suitable mold (>= ${Chaste_MOLD_MIN_VERSION}) was found")
+            endif ()
+            set(Chaste_LINKER_TYPE "MOLD")
+            message(STATUS "Using mold ${Chaste_mold_version} as the linker")
+        elseif (Chaste_FAST_LINKER STREQUAL "LLD")
+            if (NOT LLD_EXECUTABLE)
+                message(FATAL_ERROR "Chaste_FAST_LINKER=LLD, but lld was not found")
+            endif ()
+            set(Chaste_LINKER_TYPE "LLD")
+            message(STATUS "Using lld as the linker")
+        else () # AUTO
+            if (Chaste_mold_new_enough)
+                set(Chaste_LINKER_TYPE "MOLD")
+                message(STATUS "Using mold ${Chaste_mold_version} as the linker")
+            elseif (MOLD_EXECUTABLE)
+                message(STATUS "Found mold ${Chaste_mold_version}, older than the required ${Chaste_MOLD_MIN_VERSION}; ignoring it")
+            endif ()
+
+            if (NOT Chaste_LINKER_TYPE AND LLD_EXECUTABLE)
+                set(Chaste_LINKER_TYPE "LLD")
+                message(STATUS "Using lld as the linker")
+            endif ()
+
+            if (NOT Chaste_LINKER_TYPE)
+                message(STATUS "No suitable fast linker found; using the default linker. "
+                                "Install one with 'sudo apt install mold' or 'sudo apt install lld'.")
+            endif ()
+        endif ()
+
+        if (Chaste_LINKER_TYPE)
+            if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.29 AND NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "IntelLLVM")
+                # Native mechanism: CMake picks the right invocation for the active
+                # compiler/toolchain and applies it to every target's LINKER_TYPE.
+                set(CMAKE_LINKER_TYPE "${Chaste_LINKER_TYPE}")
+                message(STATUS "Selected via CMAKE_LINKER_TYPE (CMake ${CMAKE_VERSION})")
+            else ()
+                # Pre-3.29 CMake (or IntelLLVM, undocumented for LINKER_TYPE): pass
+                # the flag directly, as before.
+                string(TOLOWER "${Chaste_LINKER_TYPE}" Chaste_fast_linker_suffix)
+                set(Chaste_FAST_LINKER_FLAG "-fuse-ld=${Chaste_fast_linker_suffix}")
+                set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${Chaste_FAST_LINKER_FLAG}")
+                set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${Chaste_FAST_LINKER_FLAG}")
+                set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${Chaste_FAST_LINKER_FLAG}")
+                message(STATUS "Selected via -fuse-ld= linker flags (CMake ${CMAKE_VERSION} / ${CMAKE_CXX_COMPILER_ID})")
+            endif ()
+        endif ()
+    endif ()
+endif ()
+
 set(Chaste_SHARED_LINKER_FLAGS "${Chaste_SHARED_LINKER_FLAGS}" CACHE STRING "Project-wide shared linker flags" FORCE)

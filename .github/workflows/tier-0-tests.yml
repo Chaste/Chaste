@@ -44,10 +44,12 @@ jobs:
             cc: "gcc-14"
             cxx: "g++-14"
             build-type: "Debug"
+            fast-linker: "MOLD"
           - spec: clang-release
             cc: "clang-18"
             cxx: "clang++-18"
             build-type: "Release"
+            fast-linker: "LLD"
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
@@ -65,7 +67,7 @@ jobs:
         echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
-        sudo apt install chaste-dependencies
+        sudo apt install chaste-dependencies mold lld
 
     - name: compiler version
       run: |
@@ -77,7 +79,7 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
+      run: cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DChaste_FAST_LINKER=${{ matrix.fast-linker }} ..
       working-directory: chaste-build-dir
 
     - name: build core libraries
