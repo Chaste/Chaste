@@ -74,13 +74,24 @@ jobs:
         if: always()
 
       - name: commit and push if changed
+        # A concurrent push (e.g. an overlapping run of this same workflow) can reject
+        # this push as non-fast-forward; rebase onto the new remote state and retry.
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
           git add --all
           git commit -m "update doxygen-latest" || echo "No changes to commit"
           git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/doxygen-latest.git"
-          git push
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            if [ "${attempt}" -eq 5 ]; then
+              echo "push failed after 5 attempts" >&2
+              exit 1
+            fi
+            sleep "$(( (RANDOM % 5) + 1 ))"
+            echo "push rejected, pulling and retrying (attempt ${attempt})"
+            git pull --rebase
+          done
         working-directory: doxygen-latest
         env:
           TOKEN: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
@@ -133,13 +144,24 @@ jobs:
           cp pychaste/src/py/doc/tutorial/*.md chaste-website/site/content/pychaste/tutorials
 
       - name: commit and push if changed
+        # A concurrent push (e.g. an overlapping run of this same workflow) can reject
+        # this push as non-fast-forward; rebase onto the new remote state and retry.
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
           git add --all
           git commit -m "update how-tos and tutorials" || echo "No changes to commit"
           git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/Chaste.github.io.git"
-          git push
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            if [ "${attempt}" -eq 5 ]; then
+              echo "push failed after 5 attempts" >&2
+              exit 1
+            fi
+            sleep "$(( (RANDOM % 5) + 1 ))"
+            echo "push rejected, pulling and retrying (attempt ${attempt})"
+            git pull --rebase
+          done
         working-directory: chaste-website
         env:
           TOKEN: ${{ secrets.WEBSITE_ACCESS }}
