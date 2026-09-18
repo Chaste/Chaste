@@ -166,7 +166,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
         {
             // Create a temporary folder within heart/dynamic
             std::stringstream folder_name;
-            folder_name << "dynamic/tmp_" << getpid() << "_" << time(NULL);
+            folder_name << "dynamic/tmp_" << getpid() << "_" << time(nullptr);
 
 #ifdef CHASTE_CMAKE
             tmp_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);

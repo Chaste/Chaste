@@ -488,7 +488,7 @@ public:
             {
                 ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
                 boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-                AbstractTetrahedralMesh<2,2>* p_mesh_abstract3 = NULL;
+                AbstractTetrahedralMesh<2,2>* p_mesh_abstract3 = nullptr;
                 (*p_arch) >> p_mesh_abstract3;
 
                 //Double check that the cables are intact
@@ -502,7 +502,7 @@ public:
             }
             else
             {
-                typedef ArchiveOpener<boost::archive::text_iarchive, std::ifstream> InputArchiveOpener;
+                using InputArchiveOpener = ArchiveOpener<boost::archive::text_iarchive, std::ifstream>;
                 if (PetscTools::GetMyRank() > 0)
                 {
                     // Should not read this archive because none exists here.
@@ -515,7 +515,7 @@ public:
                     // this archive was written on one process.
                     InputArchiveOpener arch_opener(archive_dir, archive_file);
                     boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-                    AbstractTetrahedralMesh<2,2>* p_mesh3 = NULL;
+                    AbstractTetrahedralMesh<2,2>* p_mesh3 = nullptr;
                     TS_ASSERT_THROWS_THIS((*p_arch) >> p_mesh3,
                                           "This archive was written for a different number of processors");
 

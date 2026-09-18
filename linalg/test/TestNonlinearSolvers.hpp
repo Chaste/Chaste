@@ -71,7 +71,7 @@ public:
         PetscVecTools::SetElement(initial_guess, 0, -1e16);
         PetscVecTools::SetElement(initial_guess, 1, -1e8);
         PetscVecTools::Finalise(initial_guess);
-        TS_ASSERT_THROWS_THIS(solver_newton.Solve(&ComputeTestResidual, &(ComputeTestJacobian), initial_guess, length, NULL),
+        TS_ASSERT_THROWS_THIS(solver_newton.Solve(&ComputeTestResidual, &(ComputeTestJacobian), initial_guess, length, nullptr),
                 "Iteration 27, unable to find damping factor such that residual decreases in update direction");
         PetscTools::Destroy(initial_guess);
     }
@@ -92,11 +92,11 @@ public:
 
         // Solve using petsc solver
         Vec answer_petsc = solver_petsc.Solve(&ComputeTestResidual, &ComputeTestJacobian,
-                                              initial_guess, length, NULL);
+                                              initial_guess, length, nullptr);
 
         // Solve using newton method
         Vec answer_newton = solver_newton.Solve(&ComputeTestResidual, &ComputeTestJacobian,
-                                                initial_guess, length, NULL);
+                                                initial_guess, length, nullptr);
 
         // Replicate the answers so we can access them without worrying about parallel stuff
         ReplicatableVector answer_petsc_repl(answer_petsc);
@@ -133,13 +133,13 @@ public:
 
         // Solve using petsc solver
         Vec answer_petsc = solver_petsc.Solve(&ComputeTestResidual3d, &ComputeTestJacobian3d,
-                                              initial_guess, length, NULL);
+                                              initial_guess, length, nullptr);
 
         // Solve using newton method
         solver_newton.SetTolerance(1e-10);                      // to cover this method
         solver_newton.SetWriteStats();                          // to cover this method
         Vec answer_newton = solver_newton.Solve(&ComputeTestResidual3d, &ComputeTestJacobian3d,
-                                                initial_guess, length, NULL);
+                                                initial_guess, length, nullptr);
 
         // Replicate the answers so we can access them without worrying about parallel stuff
         ReplicatableVector answer_petsc_repl(answer_petsc);
@@ -157,7 +157,7 @@ public:
         // Check the residual really did have scaled norm within the tolerance
         Vec residual;
         VecDuplicate(answer_newton, &residual);
-        ComputeTestResidual3d(NULL, answer_newton, residual, NULL);
+        ComputeTestResidual3d(nullptr, answer_newton, residual, nullptr);
         double norm;
         VecNorm(residual, NORM_2, &norm);
         TS_ASSERT_LESS_THAN(norm/length, 1e-10);

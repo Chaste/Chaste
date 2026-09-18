@@ -682,7 +682,7 @@ public:
         boost::shared_ptr<AbstractCardiacCell> p_purkinje_cell2(new CellLuoRudy1991FromCellML(p_solver, p_stimulus));
         boost::shared_ptr<AbstractCardiacCell> p_myocardial_cell2(new CellLuoRudy1991FromCellML(p_solver, p_zero_stimulus));
         PurkinjeCellFactory cell_factory;
-        cell_factory.CreateJunction(NULL, p_purkinje_cell2.get(), p_myocardial_cell2.get(), pvj_resistance);
+        cell_factory.CreateJunction(nullptr, p_purkinje_cell2.get(), p_myocardial_cell2.get(), pvj_resistance);
 
         // As above, should have zero current across the junction initially (with no external stimulus)
         TS_ASSERT_DELTA(p_purkinje_cell2->GetStimulus(dummy_time), 0.0, 1e-6);

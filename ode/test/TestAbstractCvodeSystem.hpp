@@ -63,7 +63,7 @@ public:
         Cvode1 ode1;
         // dy
         N_Vector y = ode1.GetInitialConditions();
-        N_Vector dy = NULL;
+        N_Vector dy = nullptr;
         CreateVectorIfEmpty(dy, 1);
 
         ode1.EvaluateYDerivatives(1.0, y, dy);
@@ -82,7 +82,7 @@ public:
         Cvode1 ode;
         TS_ASSERT_EQUALS(ode.GetNumberOfStateVariables(), 1u);
 
-        N_Vector v = NULL;
+        N_Vector v = nullptr;
         CreateVectorIfEmpty(v, 2);
 
         TS_ASSERT_THROWS_THIS(ode.SetDefaultInitialConditions(v),
@@ -314,7 +314,7 @@ public:
         TS_ASSERT_EQUALS(state, "This is a test.\nState:\n\tVariable_1:1 dimensionless\n\tVariable_2:2 dimensionless\n");
 
         // Dump user-supplied values
-        N_Vector rY = NULL;
+        N_Vector rY = nullptr;
         CreateVectorIfEmpty(rY, 2);
         SetVectorComponent(rY, 0, 0.0);
         SetVectorComponent(rY, 1, 1.0);

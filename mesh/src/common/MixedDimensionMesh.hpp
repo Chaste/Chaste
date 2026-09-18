@@ -106,10 +106,10 @@ public:
      bool CalculateDesignatedOwnershipOfCableElement( unsigned globalElementIndex );
 
      /** Iterator type over #mNodeToCablesMapping. */
-     typedef typename std::multimap<const Node<SPACE_DIM>*, Element<1u, SPACE_DIM>*>::iterator NodeCableIterator;
+     using NodeCableIterator = typename std::multimap<const Node<SPACE_DIM>*, Element<1u, SPACE_DIM>*>::iterator;
 
      /** The type returned by GetCablesAtNode. */
-     typedef std::pair<NodeCableIterator, NodeCableIterator> CableRangeAtNode;
+     using CableRangeAtNode = std::pair<NodeCableIterator, NodeCableIterator>;
 
      /**
       * @return the cables that are attached to the given node.
@@ -153,7 +153,7 @@ public:
     //////////////////////////////////////////////////////////////////////
 
     /** Definition of cable element Iterator type. */
-    typedef typename std::vector<Element<1, SPACE_DIM> *>::const_iterator CableElementIterator;
+    using CableElementIterator = typename std::vector<Element<1, SPACE_DIM> *>::const_iterator;
 
     /**
      * @return a pointer to the first boundary element in the mesh.

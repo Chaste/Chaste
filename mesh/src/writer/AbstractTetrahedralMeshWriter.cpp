@@ -373,7 +373,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
         // Write each node's data
         unsigned default_marker = UINT_MAX;
 
-        typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+        using NodeIterType = typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator;
         for (NodeIterType iter = rMesh.GetNodeIteratorBegin();
              iter != rMesh.GetNodeIteratorEnd();
              ++iter)
@@ -450,13 +450,13 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     this->mNumBoundaryElements = mpMesh->GetNumBoundaryElements();
     this->mNumCableElements = mpMesh->GetNumCableElements();
 
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    using NodeIterType = typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
-    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElemIterType;
+    using ElemIterType = typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
 
-    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator BoundaryElemIterType;
+    using BoundaryElemIterType = typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator;
     mpIters->pBoundaryElemIter = new BoundaryElemIterType(mpMesh->GetBoundaryElementIteratorBegin());
 
     // Use this process's first element to gauge the size of all the elements
@@ -544,7 +544,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             MeshEventHandler::BeginEvent(MeshEventHandler::NODE);
             boost::scoped_array<double> raw_coords(new double[SPACE_DIM]);
             // Slaves concentrate the Nodes
-            typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+            using NodeIterType = typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator;
             for (NodeIterType it = mpMesh->GetNodeIteratorBegin(); it != mpMesh->GetNodeIteratorEnd(); ++it)
             {
                 for (unsigned j=0; j<SPACE_DIM; j++)
@@ -559,7 +559,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             MeshEventHandler::BeginEvent(MeshEventHandler::ELE);
             // Slaves concentrate the Elements for which they are owners
             boost::scoped_array<unsigned> raw_indices(new unsigned[mNodesPerElement]); // Assuming that we don't have parallel quadratic elements
-            typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElementIterType;
+            using ElementIterType = typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator;
             for (ElementIterType it = mpMesh->GetElementIteratorBegin(); it != mpMesh->GetElementIteratorEnd(); ++it)
             {
                 unsigned index = it->GetIndex();
@@ -579,7 +579,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             if (ELEMENT_DIM != 1)  /// \todo #2351 Also exclude VTK writer
             {
                 boost::scoped_array<unsigned> raw_face_indices(new unsigned[ELEMENT_DIM]); // Assuming that we don't have parallel quadratic meshes
-                typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator BoundaryElementIterType;
+                using BoundaryElementIterType = typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator;
                 for (BoundaryElementIterType it = mpMesh->GetBoundaryElementIteratorBegin(); it != mpMesh->GetBoundaryElementIteratorEnd(); ++it)
                 {
                     unsigned index = (*it)->GetIndex();
@@ -599,7 +599,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             // Slaves concentrate the cable elements for which they are owners
             if (mpMixedMesh)
             {
-                typedef typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableElementIterator CableElementIterType;
+                using CableElementIterType = typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableElementIterator;
                 for (CableElementIterType it = mpMixedMesh->GetCableElementIteratorBegin(); it != mpMixedMesh->GetCableElementIteratorEnd(); ++it)
                 {
                     unsigned index =(*it)->GetIndex();

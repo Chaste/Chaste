@@ -119,7 +119,7 @@ void VoltageInterpolaterOntoMechanicsMesh<DIM>::OutputToCmgui(std::vector<std::s
     DistributedVectorFactory factory(mrElectricsMesh.GetNumNodes());
     Vec voltage = factory.CreateVec();
     std::vector<double> interpolated_voltages(mrMechanicsMesh.GetNumNodes());
-    Vec voltage_coarse = NULL;
+    Vec voltage_coarse = nullptr;
 
     for (unsigned time_step=0; time_step<num_timesteps; time_step++)
     {
@@ -132,7 +132,7 @@ void VoltageInterpolaterOntoMechanicsMesh<DIM>::OutputToCmgui(std::vector<std::s
 
             InterpolateOnCoarseMesh(interpolated_voltages, voltage_repl);
 
-            if (voltage_coarse != NULL)
+            if (voltage_coarse != nullptr)
             {
                 PetscTools::Destroy(voltage_coarse);
             }
@@ -144,7 +144,7 @@ void VoltageInterpolaterOntoMechanicsMesh<DIM>::OutputToCmgui(std::vector<std::s
         p_writer->AdvanceAlongUnlimitedDimension();
     }
 
-    if (voltage_coarse != NULL)
+    if (voltage_coarse != nullptr)
     {
         PetscTools::Destroy(voltage);
         PetscTools::Destroy(voltage_coarse);

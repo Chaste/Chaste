@@ -134,7 +134,7 @@ PROBLEM_CLASS* CardiacSimulationArchiver<PROBLEM_CLASS>::Migrate(const FileFinde
     unsigned num_procs, archive_version;
     info_file >> num_procs >> archive_version;
 
-    PROBLEM_CLASS *p_unarchived_simulation = NULL; // Shouldn't be necessary but is on some setups!
+    PROBLEM_CLASS *p_unarchived_simulation = nullptr; // Shouldn't be necessary but is on some setups!
 
     // Avoid the DistributedVectorFactory throwing a 'wrong number of processes' exception when loading,
     // and make it get the original DistributedVectorFactory from the archive so we can compare against
@@ -156,7 +156,7 @@ PROBLEM_CLASS* CardiacSimulationArchiver<PROBLEM_CLASS>::Migrate(const FileFinde
 
         // Work out how many more process-specific files to load
         DistributedVectorFactory* p_factory = p_unarchived_simulation->rGetMesh().GetDistributedVectorFactory();
-        assert(p_factory != NULL);
+        assert(p_factory != nullptr);
         unsigned original_num_procs = p_factory->GetOriginalFactory()->GetNumProcs();
         assert(original_num_procs == num_procs); // Paranoia
 

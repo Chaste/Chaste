@@ -145,7 +145,7 @@ public:
      *
      * @return the new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    [[nodiscard]] AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
      * @return the total beta-catenin concentration

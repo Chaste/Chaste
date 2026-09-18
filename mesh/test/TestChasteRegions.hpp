@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-typedef ChasteCuboid<3> POINT_3D;
+using POINT_3D = ChasteCuboid<3>;
 
 class TestRegions : public CxxTest::TestSuite
 {

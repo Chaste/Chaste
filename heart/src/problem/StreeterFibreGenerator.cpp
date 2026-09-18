@@ -148,7 +148,7 @@ double StreeterFibreGenerator<SPACE_DIM>::GetFibreMaxAngle(
 template<unsigned SPACE_DIM>
 StreeterFibreGenerator<SPACE_DIM>::StreeterFibreGenerator(AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh)
     : AbstractPerElementWriter<SPACE_DIM,SPACE_DIM,SPACE_DIM*SPACE_DIM>(&rMesh),
-      mpGeometryInfo(NULL),
+      mpGeometryInfo(nullptr),
       mApexToBase(zero_vector<double>(SPACE_DIM)),
       mLogInfo(false)
 {
@@ -187,7 +187,7 @@ template<unsigned SPACE_DIM>
 void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& rOutputDirectory)
 {
     assert(SPACE_DIM == 3);
-    if (mpGeometryInfo == NULL)
+    if (mpGeometryInfo == nullptr)
     {
         EXCEPTION("Files defining the heart surfaces not set");
     }

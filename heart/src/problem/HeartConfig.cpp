@@ -209,7 +209,7 @@ boost::shared_ptr<HeartConfig> HeartConfig::mpInstance;
 
 HeartConfig* HeartConfig::Instance()
 {
-    if (mpInstance.get() == NULL)
+    if (mpInstance.get() == nullptr)
     {
         mpInstance.reset(new HeartConfig);
     }
@@ -222,7 +222,7 @@ HeartConfig::HeartConfig()
           mUseFixedNumberIterations(false),
           mEvaluateNumItsEveryNSolves(UINT_MAX)
 {
-    assert(mpInstance.get() == NULL);
+    assert(mpInstance.get() == nullptr);
     mUseFixedSchemaLocation = true;
     SetDefaultSchemaLocations();
 

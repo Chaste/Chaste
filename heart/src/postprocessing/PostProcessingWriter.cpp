@@ -78,9 +78,9 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
     {
         std::vector<std::pair<double,double> > apd_maps;
         HeartConfig::Instance()->GetApdMaps(apd_maps);
-        for (unsigned i=0; i<apd_maps.size(); i++)
+        for (const auto& [min_val, max_val] : apd_maps)
         {
-            WriteApdMapFile(apd_maps[i].first, apd_maps[i].second);
+            WriteApdMapFile(min_val, max_val);
         }
     }
 
@@ -466,7 +466,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(
     OutputFileHandler output_file_handler(HeartConfig::Instance()->GetOutputDirectory() + "/" + rFolder, false);
     PetscTools::BeginRoundRobin();
     {
-        out_stream p_file=out_stream(NULL);
+        out_stream p_file=out_stream(nullptr);
         //Open file
         if (PetscTools::AmMaster())
         {

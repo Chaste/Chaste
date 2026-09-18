@@ -116,7 +116,7 @@ CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::CellCycleModelOdeSolver()
      * care if a second instance is constructed when loading an archive, since
      * archiving the shared_ptr will ensure that the 'singleton' is correctly
      * serialized. Thus, here we do not require an assertion that mpInstance is
-     * NULL, as we do in the constructors of the SimulationTime singleton class.
+     * nullptr, as we do in the constructors of the SimulationTime singleton class.
      */
 }
 

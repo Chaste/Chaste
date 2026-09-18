@@ -58,8 +58,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkVersion.h>
 #endif
 
-typedef Hdf5ToVtkConverter<3,3> VTK_3D;
-typedef Hdf5ToMeshalyzerConverter<3,3> MESHA_3D;
+using VTK_3D = Hdf5ToVtkConverter<3,3>;
+using MESHA_3D = Hdf5ToMeshalyzerConverter<3,3>;
 
 /* HOW_TO_TAG Cardiac/Post-processing
  * Convert already generated simulation (HDF5) results to text, VTK or Meshalyzer format.
