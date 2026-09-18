@@ -42,6 +42,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
+#ifdef CHASTE_USE_POOLED_ELEMENT_ALLOCATOR
+#include <new>
+#include <boost/pool/pool.hpp>
+#endif
+
 #include "AbstractTetrahedralElement.hpp"
 #include "Node.hpp"
 #include "ChastePoint.hpp"
@@ -52,6 +57,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class Element : public AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>
 {
+#ifdef CHASTE_USE_POOLED_ELEMENT_ALLOCATOR
+private:
+    /**
+     * @return the memory pool used by operator new/delete for this (ELEMENT_DIM, SPACE_DIM)
+     * combination
+     */
+    static boost::pool<>& rGetMemoryPool();
+#endif
+
 public:
 
     /**
@@ -62,6 +76,26 @@ public:
      * @param registerWithNodes  whether to tell the nodes that they are contained in this element
      */
     Element(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes, bool registerWithNodes=true);
+
+#ifdef CHASTE_USE_POOLED_ELEMENT_ALLOCATOR
+    /**
+     * Allocate memory for an Element from a per-(ELEMENT_DIM, SPACE_DIM) pool (see
+     * Chaste_USE_POOLED_ELEMENT_ALLOCATOR in the main CMakeLists.txt), rather than from the
+     * default allocator
+     *
+     * @param size must equal sizeof(Element<ELEMENT_DIM, SPACE_DIM>); asserted, since the pool
+     * is fixed-size
+     * @return the allocated memory
+     */
+    static void* operator new(std::size_t size);
+
+    /**
+     * Return memory for an Element to the pool.
+     *
+     * @param pElement the memory to free
+     */
+    static void operator delete(void* pElement);
+#endif
 
     /**
      * "Copy" constructor which allows a new index to be specified.
