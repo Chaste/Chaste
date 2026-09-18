@@ -19,29 +19,22 @@ jobs:
     name: "build release docs"
     runs-on: ubuntu-latest
     if: github.repository == 'Chaste/Chaste'
-    env:
-      # Pinned (not auto-updated) so generated HTML stays byte-stable between
-      # runs; bump both together when a version change is actually wanted.
-      DOXYGEN_VERSION: "1.9.8"
-      DOXYGEN_SHA256: "dda773bdc62384b7d796fe8b6c5029daad72483e4c8ad4abf6ee9fb98b649388"
     steps:
       - name: checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: install dependencies
-        run: |
-          sudo apt-get install graphviz
-          wget "https://github.com/doxygen/doxygen/releases/download/Release_${DOXYGEN_VERSION//./_}/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz"
-          echo "${DOXYGEN_SHA256}  doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz" | sha256sum -c -
-          tar -xzvf "doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz"
+      - name: install doxygen
+        id: install-doxygen
+        uses: $/.github/actions/install-doxygen
 
       - name: build doxygen
         run: |
-          ( cat Doxyfile ; echo "PROJECT_NUMBER=${GITHUB_EVENT_INPUTS_DOXYGEN_NAME}" ) | "doxygen-${DOXYGEN_VERSION}/bin/doxygen" - 2>doxygen-error.log 1>doxygen-output.log
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=${GITHUB_EVENT_INPUTS_DOXYGEN_NAME}" ) | "${STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN}" - 2>doxygen-error.log 1>doxygen-output.log
         env:
           GITHUB_EVENT_INPUTS_DOXYGEN_NAME: ${{ github.event.inputs.doxygen_name }}
+          STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN: ${{ steps.install-doxygen.outputs.bin }}
 
       - name: check doxygen coverage
         run: |
