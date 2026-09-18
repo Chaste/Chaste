@@ -59,6 +59,11 @@ _local/
 /apps/src/Chaste
 /apps/src/MeshConvert
 
+# Local cmake configuration in /apps
+/apps/texttest/chaste/run_acceptance.cmake
+/apps/texttest/weekly/run_acceptance.cmake
+
+
 # IDE files
 \.vscode/
 cmake-build*
