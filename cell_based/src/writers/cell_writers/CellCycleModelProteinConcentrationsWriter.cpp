@@ -70,7 +70,7 @@ void CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitCel
         std::vector<double> proteins = p_model->GetProteinConcentrations();
         for (unsigned i=0; i<proteins.size(); i++)
         {
-            *this->mpOutStream << proteins[i] << " ";
+            this->WriteDoubleAndSpace(proteins[i]);
         }
     }
 

@@ -72,10 +72,10 @@ void ImmersedBoundaryBoundaryCellWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
     *this->mpOutStream << location_index << " " << cell_id << " ";
     for (unsigned i=0; i<SPACE_DIM; ++i)
     {
-        *this->mpOutStream << centre_location[i] << " ";
+        this->WriteDoubleAndSpace(centre_location[i]);
     }
 
-    *this->mpOutStream << boundary << " ";
+    this->WriteDoubleAndSpace(boundary);
 }
 
 // Explicit instantiation
