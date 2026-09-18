@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "MutableVertexMesh.hpp"
 
 #include "LogFile.hpp"
@@ -1092,17 +1094,10 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
                                           elements_of_node_b.begin(), elements_of_node_b.end(),
                                           std::inserter(shared_elements, shared_elements.begin()));
 
-                    bool both_nodes_share_triangular_element = false;
-                    for (std::set<unsigned>::const_iterator it = shared_elements.begin();
-                         it != shared_elements.end();
-                         ++it)
-                    {
-                        if (this->GetElement(*it)->GetNumNodes() <= 3)
-                        {
-                            both_nodes_share_triangular_element = true;
-                            break;
-                        }
-                    }
+                    bool both_nodes_share_triangular_element =
+                        std::any_of(shared_elements.begin(), shared_elements.end(),
+                                    [this](unsigned elemIndex)
+                                    { return this->GetElement(elemIndex)->GetNumNodes() <= 3; });
 
                     // ...and if none are, then perform the required type of swap and halt the search, returning true
                     if (!both_nodes_share_triangular_element)
