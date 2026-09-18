@@ -225,38 +225,42 @@ jobs:
           persist-credentials: false
 
       - name: copy results
+        # The run id is appended to the directory name so concurrent runs (which could
+        # otherwise share the same datetime) never collide.
         run: |
-          mkdir ${MEMTEST_DIR}/log-files/${NEEDS_AGGREGATE_OUTPUTS_DATETIME}
-          cp ./memtest/* ${MEMTEST_DIR}/log-files/${NEEDS_AGGREGATE_OUTPUTS_DATETIME}/
+          RESULTS_SUBDIR="${NEEDS_AGGREGATE_OUTPUTS_DATETIME}-${GITHUB_RUN_ID}"
+          mkdir "${MEMTEST_DIR}/log-files/${RESULTS_SUBDIR}"
+          cp ./memtest/* "${MEMTEST_DIR}/log-files/${RESULTS_SUBDIR}/"
         env:
           NEEDS_AGGREGATE_OUTPUTS_DATETIME: ${{ needs.aggregate.outputs.datetime }}
 
-      - name: setup python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: '3.x'
-
-      - name: generate index file
-        run: |
-          python -m pip install --upgrade pip setuptools wheel
-          python -m pip install dominate
-          python write_index.py
-        working-directory: ${{ env.MEMTEST_DIR }}
-
       - name: commit and push results
+        # log-files/index.html is generated at Pages deploy time in the results repo
+        # (not committed from here), so each run only ever adds its own new,
+        # disjoint directory; a rebase-and-retry on a rejected push is therefore
+        # always conflict-free against concurrent runs.
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
           git add --all
           git commit -m "upload memtest results" || echo "No changes to commit"
           git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/memory-testing.git"
-          git push
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            if [ "${attempt}" -eq 5 ]; then
+              echo "push failed after 5 attempts" >&2
+              exit 1
+            fi
+            sleep "$(( (RANDOM % 5) + 1 ))"
+            echo "push rejected, pulling and retrying (attempt ${attempt})"
+            git pull --rebase
+          done
         working-directory: ${{ env.MEMTEST_DIR }}
         env:
           TOKEN: ${{ secrets.MEMORY_TESTING_ACCESS }}
 
       - name: results URL on chaste.github.io
         run: |
-          echo https://chaste.github.io/memory-testing/${NEEDS_AGGREGATE_OUTPUTS_DATETIME}/index.html
+          echo "https://chaste.github.io/memory-testing/${NEEDS_AGGREGATE_OUTPUTS_DATETIME}-${GITHUB_RUN_ID}/index.html"
         env:
           NEEDS_AGGREGATE_OUTPUTS_DATETIME: ${{ needs.aggregate.outputs.datetime }}
