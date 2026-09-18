@@ -40,15 +40,15 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: install dependencies
-        run: |
-          sudo apt-get install graphviz
-          wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz
-          tar -xzvf doxygen-1.9.8.linux.bin.tar.gz
+      - name: install doxygen
+        id: install-doxygen
+        uses: $/.github/actions/install-doxygen
 
       - name: build doxygen
         run: |
-          ( cat Doxyfile ; echo "PROJECT_NUMBER=PR_branch::${GITHUB_HEAD_REF}" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=PR_branch::${GITHUB_HEAD_REF}" ) | "${STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN}" - 2>doxygen-error.log 1>doxygen-output.log
+        env:
+          STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN: ${{ steps.install-doxygen.outputs.bin }}
 
       - name: check doxygen coverage
         run: |
