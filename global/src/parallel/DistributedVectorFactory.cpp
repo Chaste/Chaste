@@ -167,6 +167,7 @@ Vec DistributedVectorFactory::CreateVec(unsigned stride)
     VecSetBlockSize(vec, stride);
     VecSetSizes(vec, stride*(mHi-mLo), stride*mProblemSize);
     VecSetType(vec,VECMPI);
+    VecSetFromOptions(vec);
     //VecCreateMPIWithArray(PETSC_COMM_WORLD, stride, stride*(mHi-mLo), stride*mProblemSize, CHASTE_PETSC_NULLPTR/*No array*/, &vec);
 #else
     VecCreateMPI(PETSC_COMM_WORLD, stride*(mHi-mLo), stride*mProblemSize, &vec);
