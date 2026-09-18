@@ -915,13 +915,9 @@ c_vector<double,SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetSi
         c_vector<double,SPACE_DIM> displacement;
         displacement = centre - cell_location;
 
-        for (unsigned i=0; i<SPACE_DIM; i++)
-        {
-            if (displacement[i] > max_distance_from_centre[i])
-            {
-                max_distance_from_centre[i] = displacement[i];
-            }
-        }
+        std::transform(std::begin(displacement), std::end(displacement), std::begin(max_distance_from_centre),
+                       std::begin(max_distance_from_centre),
+                       [](double a, double b) { return std::max(a, b); });
     }
 
     return max_distance_from_centre;

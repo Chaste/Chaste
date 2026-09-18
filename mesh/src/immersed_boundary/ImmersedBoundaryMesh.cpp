@@ -490,17 +490,14 @@ ChasteCuboid<SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateB
     {
         c_vector<double, SPACE_DIM> vec_to_node = this->GetVectorFromAtoB(ref_point, p_elem->GetNode(node_idx)->rGetLocation());
 
-        for (unsigned dim = 0; dim < SPACE_DIM; dim++)
-        {
-            if (vec_to_node[dim] < bottom_left[dim])
-            {
-                bottom_left[dim] = vec_to_node[dim];
-            }
-            else if (vec_to_node[dim] > top_right[dim])
-            {
-                top_right[dim] = vec_to_node[dim];
-            }
-        }
+        // Note that bottom_left is never positive and top_right is never negative, so a given
+        // component can only ever update one of the two; the original "else if" was redundant.
+        std::transform(std::begin(vec_to_node), std::end(vec_to_node), std::begin(bottom_left),
+                       std::begin(bottom_left),
+                       [](double a, double b) { return std::min(a, b); });
+        std::transform(std::begin(vec_to_node), std::end(vec_to_node), std::begin(top_right),
+                       std::begin(top_right),
+                       [](double a, double b) { return std::max(a, b); });
     }
 
     // Create Chaste points, rescaled by the location of node zero

@@ -34,6 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractBoxDomainPdeModifier.hpp"
+
+#include <algorithm>
+
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
 
@@ -130,32 +133,23 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
         if (this->mSetBcsOnBoundingSphere)
         {
             // First find the centre of the tissue by choosing the midpoint of the extrema.
-            c_vector<double, DIM> tissue_maxima = zero_vector<double>(DIM);
-            c_vector<double, DIM> tissue_minima = zero_vector<double>(DIM);
-            for (unsigned i = 0; i < DIM; i++)
-            {
-                tissue_maxima[i] = -DBL_MAX;
-                tissue_minima[i] = DBL_MAX;
-            }
-
+            c_vector<double, DIM> tissue_maxima = scalar_vector<double>(DIM, -DBL_MAX);
+            c_vector<double, DIM> tissue_minima = scalar_vector<double>(DIM, DBL_MAX);
 
             for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
                 cell_iter != rCellPopulation.End();
                 ++cell_iter)
             {
-                const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                // Note that GetLocationOfCellCentre returns a c_vector by value; the previous code
+                // bound it to a const ChastePoint reference, silently constructing a temporary.
+                const c_vector<double, DIM> location_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-                for (unsigned i = 0; i < DIM; i++)
-                {
-                    if (r_position_of_cell[i] > tissue_maxima[i])
-                    {
-                        tissue_maxima[i] = r_position_of_cell[i];
-                    }
-                    if (r_position_of_cell[i] < tissue_minima[i])
-                    {
-                        tissue_minima[i] = r_position_of_cell[i];
-                    }
-                }
+                std::transform(std::begin(location_of_cell), std::end(location_of_cell), std::begin(tissue_maxima),
+                               std::begin(tissue_maxima),
+                               [](double a, double b) { return std::max(a, b); });
+                std::transform(std::begin(location_of_cell), std::end(location_of_cell), std::begin(tissue_minima),
+                               std::begin(tissue_minima),
+                               [](double a, double b) { return std::min(a, b); });
             }
 
             c_vector<double, DIM> tissue_centre = 0.5*(tissue_maxima + tissue_minima);
@@ -166,14 +160,9 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
                 cell_iter != rCellPopulation.End();
                 ++cell_iter)
             {
-                const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                double radius = norm_2(tissue_centre - rCellPopulation.GetLocationOfCellCentre(*cell_iter));
 
-                double radius = norm_2(tissue_centre - r_position_of_cell.rGetLocation());
-
-                if (tissue_radius < radius)
-                {
-                    tissue_radius = radius;
-                }
+                tissue_radius = std::max(tissue_radius, radius);
             }
 
             // Apply boundary condition to the nodes outside the tissue_radius

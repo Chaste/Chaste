@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VoronoiVertexMeshGenerator.hpp"
+#include <algorithm>
+
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -273,14 +275,9 @@ boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalM
     {
         const c_vector<double, 2>& r_this_node_location = mpTorMesh->GetNode(node_idx)->rGetLocation();
 
-        if (r_this_node_location[0] < min_x_y[0])
-        {
-            min_x_y[0] = r_this_node_location[0];
-        }
-        if (r_this_node_location[1] < min_x_y[1])
-        {
-            min_x_y[1] = r_this_node_location[1];
-        }
+        std::transform(std::begin(r_this_node_location), std::end(r_this_node_location), std::begin(min_x_y),
+                       std::begin(min_x_y),
+                       [](double a, double b) { return std::min(a, b); });
     }
 
     // Second loop applies the offset, min_x_y, to each node in the mesh
