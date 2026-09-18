@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include <boost/scoped_array.hpp>
 
 #include "CaBasedCellPopulation.hpp"
@@ -654,10 +656,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     // Create a counter to keep track of how many cells are at a lattice site
     unsigned num_sites = this->mrMesh.GetNumNodes();
     boost::scoped_array<unsigned> number_of_cells_at_site(new unsigned[num_sites]);
-    for (unsigned i=0; i<num_sites; i++)
-    {
-        number_of_cells_at_site[i] = 0;
-    }
+    std::fill_n(number_of_cells_at_site.get(), num_sites, 0u);
 
     // Populate a vector of nodes associated with cell locations, by iterating through the list of cells
     std::vector<Node<DIM>*> nodes;

@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <numeric>
+
 #include "RandomNumberGenerator.hpp"
 #include "Exception.hpp"
 
@@ -164,10 +166,7 @@ void RandomNumberGenerator::Reseed(unsigned seed)
 void RandomNumberGenerator::Shuffle(unsigned num, std::vector<unsigned>& rValues)
 {
     rValues.resize(num);
-    for (unsigned i = 0; i < num; i++)
-    {
-        rValues[i] = i;
-    }
+    std::iota(rValues.begin(), rValues.end(), 0u);
 
     for (unsigned end = num - 1; end > 0; end--)
     {

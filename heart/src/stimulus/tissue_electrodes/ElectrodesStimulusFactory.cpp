@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "ElectrodesStimulusFactory.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "HeartConfig.hpp"
@@ -96,20 +98,13 @@ void ElectrodesStimulusFactory<DIM>::CheckForElectrodesIntersection()
         }
     }
     PetscTools::Barrier();
-    for (unsigned node_index = 0; node_index < nodes_in_all_electrodes.size(); node_index++)
+    // A node collected twice belongs to two electrodes. Sorting makes any duplicates
+    // adjacent, which replaces the previous O(n^2) pairwise scan with O(n log n).
+    std::sort(nodes_in_all_electrodes.begin(), nodes_in_all_electrodes.end());
+    if (std::adjacent_find(nodes_in_all_electrodes.begin(), nodes_in_all_electrodes.end())
+        != nodes_in_all_electrodes.end())
     {
-        unsigned number_of_hits = 0;
-        for (unsigned node_to_check = 0; node_to_check < nodes_in_all_electrodes.size(); node_to_check++)
-        {
-            if (nodes_in_all_electrodes[node_index] == nodes_in_all_electrodes[node_to_check] )
-            {
-                number_of_hits++;
-            }
-        }
-        if (number_of_hits>1)
-        {
-            EXCEPTION("Two or more electrodes intersect with each other");
-        }
+        EXCEPTION("Two or more electrodes intersect with each other");
     }
 }
 

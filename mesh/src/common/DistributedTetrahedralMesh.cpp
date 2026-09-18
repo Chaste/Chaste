@@ -1493,10 +1493,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         mpi_idx_t = MPI_INT;
     }
     boost::scoped_array<int> int_element_distribution(new int[num_procs+1]);
-    for (unsigned i=0; i<num_procs+1; ++i)
-    {
-        int_element_distribution[i] = element_distribution[i];
-    }
+    // Note the deliberate narrowing from idx_t (64 bit on Windows) to int for the MPI call
+    std::copy(element_distribution.get(), element_distribution.get() + num_procs + 1,
+              int_element_distribution.get());
     MPI_Allgatherv(local_partition.get(), num_local_elements, mpi_idx_t,
                    global_element_partition.get(), element_counts.get(), int_element_distribution.get(), mpi_idx_t, PETSC_COMM_WORLD);
 
