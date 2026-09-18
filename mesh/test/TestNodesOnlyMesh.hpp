@@ -91,7 +91,7 @@ public:
         {
             for (unsigned i=0; i<nodes.size(); i+=PetscTools::GetNumProcs())
             {
-                TS_ASSERT(!(mesh.mNodesMapping.find(i) == mesh.mNodesMapping.end()));
+                TS_ASSERT(!(std::find(mesh.mNodesMapping.begin(), mesh.mNodesMapping.end(), i) == mesh.mNodesMapping.end()));
                 TS_ASSERT_EQUALS(mesh.SolveNodeMapping(i), mesh.mNodesMapping[i]);
             }
         }
@@ -153,7 +153,7 @@ public:
         {
             for (unsigned i=0; i<nodes.size(); i+=PetscTools::GetNumProcs())
             {
-                TS_ASSERT(!(mesh.mNodesMapping.find(i) == mesh.mNodesMapping.end()));
+                TS_ASSERT(!(std::find(mesh.mNodesMapping.begin(), mesh.mNodesMapping.end(), i) == mesh.mNodesMapping.end()));
                 TS_ASSERT_EQUALS(mesh.SolveNodeMapping(i), mesh.mNodesMapping[i]);
             }
         }

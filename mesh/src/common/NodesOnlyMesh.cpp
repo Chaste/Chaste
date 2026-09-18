@@ -93,7 +93,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
             this->mNodes.push_back(p_node_copy);
 
             // Update the node map
-            mNodesMapping[p_node_copy->GetIndex()] = this->mNodes.size()-1;
+            SetNodeMapping(p_node_copy->GetIndex(), this->mNodes.size()-1);
         }
     }
 }
@@ -126,14 +126,22 @@ std::vector<bool>& NodesOnlyMesh<SPACE_DIM>::rGetInitiallyOwnedNodes()
 template<unsigned SPACE_DIM>
 unsigned NodesOnlyMesh<SPACE_DIM>::SolveNodeMapping(unsigned index) const
 {
-    std::map<unsigned, unsigned>::const_iterator node_position = mNodesMapping.find(index);
-
-    if (node_position == mNodesMapping.end())
+    if (index >= mNodesMapping.size() || mNodesMapping[index] == UNSIGNED_UNSET)
     {
         EXCEPTION("Requested node " << index << " does not belong to process " << PetscTools::GetMyRank());
     }
 
-    return node_position->second;
+    return mNodesMapping[index];
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::SetNodeMapping(unsigned globalIndex, unsigned localIndex)
+{
+    if (globalIndex >= mNodesMapping.size())
+    {
+        mNodesMapping.resize(globalIndex + 1, UNSIGNED_UNSET);
+    }
+    mNodesMapping[globalIndex] = localIndex;
 }
 
 template<unsigned SPACE_DIM>
@@ -263,7 +271,11 @@ void NodesOnlyMesh<SPACE_DIM>::RemoveDeletedNodes(NodeMap& map)
         {
             map.SetDeleted((*node_iter)->GetIndex());
 
-            mNodesMapping.erase((*node_iter)->GetIndex());
+            unsigned deleted_global_index = (*node_iter)->GetIndex();
+            if (deleted_global_index < mNodesMapping.size())
+            {
+                mNodesMapping[deleted_global_index] = UNSIGNED_UNSET;
+            }
 
             // Free memory before erasing the pointer from the list of nodes.
             delete (*node_iter);
@@ -283,7 +295,7 @@ void NodesOnlyMesh<SPACE_DIM>::UpdateNodeIndices()
     for (unsigned location_in_vector=0; location_in_vector < this->mNodes.size(); location_in_vector++)
     {
         unsigned global_index = this->mNodes[location_in_vector]->GetIndex();
-        mNodesMapping[global_index] = location_in_vector;
+        SetNodeMapping(global_index, location_in_vector);
     }
 }
 
@@ -378,7 +390,7 @@ void NodesOnlyMesh<SPACE_DIM>::AddNodeWithFixedIndex(Node<SPACE_DIM>* pNewNode)
     mMaxAddedNodeIndex = (pNewNode->GetIndex() > mMaxAddedNodeIndex) ? pNewNode->GetIndex() : mMaxAddedNodeIndex;
 
     // Update mNodesMapping
-    mNodesMapping[pNewNode->GetIndex()] = location_in_nodes_vector;
+    SetNodeMapping(pNewNode->GetIndex(), location_in_nodes_vector);
 
     // Then update cell radius to default.
     pNewNode->SetRadius(0.5);

@@ -105,7 +105,7 @@ private:
         {
             unsigned new_index = indices[i];
             this->mNodes[i]->SetIndex(new_index);
-            this->mNodesMapping[new_index] = i;
+            this->SetNodeMapping(new_index, i);
         }
         mMaxAddedNodeIndex = *(std::max_element(indices.begin(), indices.end()));
         mIndexCounter = mMaxAddedNodeIndex + 1; // Next available fresh index
@@ -117,8 +117,28 @@ private:
     /** Nodes separated by a distance less than mMaximumInteractionDistance are neighbours. */
     double mMaximumInteractionDistance;
 
-    /** A map from node global index to local index in mNodes. */
-    std::map<unsigned, unsigned> mNodesMapping;
+    /**
+     * A map from node global index to local index in mNodes, stored as a vector indexed
+     * directly by global index (with UNSIGNED_UNSET marking indices this process doesn't
+     * own) rather than a std::map, since SolveNodeMapping() is called extremely frequently
+     * and a vector lookup is much cheaper than a tree lookup.
+     *
+     * Note: when running with more than one process, global indices for a given process are
+     * sparse (spaced by the number of processes - see GetNextAvailableIndex()), so this
+     * vector uses more memory than a map would in that case. For a single process, indices
+     * are dense and this is a straightforward win.
+     */
+    std::vector<unsigned> mNodesMapping;
+
+    /**
+     * Record that global index globalIndex is at position localIndex in mNodes, growing
+     * mNodesMapping (padding new entries with UNSIGNED_UNSET) if globalIndex is not yet
+     * within its range.
+     *
+     * @param globalIndex the global index of the node
+     * @param localIndex its position in mNodes
+     */
+    void SetNodeMapping(unsigned globalIndex, unsigned localIndex);
 
     /** A map from halo node global index to local index in mHaloNodes. */
     std::map<unsigned, unsigned> mHaloNodesMapping;

@@ -117,16 +117,16 @@ protected:
      * Sends nodes back to the positions given in the input map. Used after a failed step
      * when adaptivity is turned on.
      *
-     * @param oldNodeLoctions A map linking nodes to their old positions.
+     * @param rOldNodeLoctions A map linking nodes to their old positions.
      */
-    void RevertToOldLocations(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions);
+    void RevertToOldLocations(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLoctions);
 
     /**
      * Applies any boundary conditions.
      *
-     * @param oldNodeLoctions Mapping between node indices and old node locations
+     * @param rOldNodeLoctions Mapping between node indices and old node locations
      */
-    void ApplyBoundaries(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions);
+    void ApplyBoundaries(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLoctions);
 
     /**
      * Overridden SetupSolve() method to clear the forces applied to the nodes.

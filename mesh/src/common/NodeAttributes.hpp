@@ -66,6 +66,9 @@ private:
     /** A bool indicating whether the neighbours of this node have been calculated yet. */
     bool mNeighboursSetUp;
 
+    /** Whether a neighbour has been added to mNeighbourIndices since it was last de-duplicated. */
+    bool mNeighboursDirty;
+
     /** Whether the node represents a particle or not: Used for NodeBasedCellPopulationWithParticles */
     bool mIsParticle;
 

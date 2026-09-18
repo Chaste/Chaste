@@ -171,10 +171,10 @@ template<unsigned DIM>
 std::set<unsigned> CaBasedCellPopulation<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
 {
     unsigned index = this->GetLocationIndexUsingCell(pCell);
-    std::set<unsigned> candidates = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(index);
+    const std::vector<unsigned>& candidates = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(index);
 
     std::set<unsigned> neighbour_indices;
-    for (std::set<unsigned>::iterator iter = candidates.begin();
+    for (std::vector<unsigned>::const_iterator iter = candidates.begin();
          iter != candidates.end();
          ++iter)
     {
@@ -298,7 +298,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
             // Find a random available neighbouring node to overwrite current site
-            std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
+            const std::vector<unsigned>& neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
             std::vector<double> neighbouring_node_propensities;
             std::vector<unsigned> neighbouring_node_indices_vector;
 
@@ -307,7 +307,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 unsigned num_neighbours = neighbouring_node_indices.size();
                 double probability_of_not_moving = 1.0;
 
-                for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+                for (std::vector<unsigned>::const_iterator iter = neighbouring_node_indices.begin();
                      iter != neighbouring_node_indices.end();
                      ++iter)
                 {
@@ -410,7 +410,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             }
 
             // Find a random available neighbouring node to switch cells with the current site
-            std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
+            const std::vector<unsigned>& neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
 
             unsigned neighbour_location_index;
 
@@ -419,12 +419,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 unsigned num_neighbours = neighbouring_node_indices.size();
                 unsigned chosen_neighbour = p_gen->randMod(num_neighbours);
 
-                std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-                for (unsigned j=0; j<chosen_neighbour; j++)
-                {
-                    neighbour_iter++;
-                }
-                neighbour_location_index = *neighbour_iter;
+                neighbour_location_index = neighbouring_node_indices[chosen_neighbour];
 
                 bool is_cell_on_node_index = mAvailableSpaces[node_index] == 0 ? true : false;
                 bool is_cell_on_neighbour_location_index = mAvailableSpaces[neighbour_location_index] == 0 ? true : false;

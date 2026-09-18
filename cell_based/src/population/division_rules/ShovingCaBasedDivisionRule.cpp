@@ -75,7 +75,7 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellP
     PottsMesh<SPACE_DIM>* p_static_cast_mesh = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()));
 
     // Get the set of neighbouring node indices
-    std::set<unsigned> neighbouring_node_indices = p_static_cast_mesh->GetMooreNeighbouringNodeIndices(parent_node_index);
+    const std::vector<unsigned>& neighbouring_node_indices = p_static_cast_mesh->GetMooreNeighbouringNodeIndices(parent_node_index);
     unsigned num_neighbours = neighbouring_node_indices.size();
 
     // Check cell is not on the boundary
@@ -87,7 +87,7 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellP
     double total_propensity = 0.0;
 
     // Select neighbour at random
-    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+    for (std::vector<unsigned>::const_iterator neighbour_iter = neighbouring_node_indices.begin();
          neighbour_iter != neighbouring_node_indices.end();
          ++neighbour_iter)
     {
@@ -143,20 +143,14 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellP
             move_number++;
             current_node_index = target_node_index;
 
-            std::set<unsigned> neighbouring_node_indices = p_static_cast_mesh->GetMooreNeighbouringNodeIndices(current_node_index);
+            const std::vector<unsigned>& neighbouring_node_indices = p_static_cast_mesh->GetMooreNeighbouringNodeIndices(current_node_index);
 
             // Check cell is not on the boundary
             IsNodeOnBoundary(neighbouring_node_indices.size());
 
             // Select the appropriate neighbour
-            std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-            for (unsigned i=0; i<counter; i++)
-            {
-                ++neighbour_iter;
-            }
-            assert(neighbour_iter != neighbouring_node_indices.end());
-
-            target_node_index = *neighbour_iter;
+            assert(counter < neighbouring_node_indices.size());
+            target_node_index = neighbouring_node_indices[counter];
 
             std::pair<unsigned, unsigned> new_move(current_node_index, target_node_index);
 
