@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "BackwardEulerIvpOdeSolver.hpp"
+#include <algorithm>
 #include <cmath>
 
 void BackwardEulerIvpOdeSolver::ComputeResidual(AbstractOdeSystem* pAbstractOdeSystem,
@@ -110,15 +111,10 @@ void BackwardEulerIvpOdeSolver::SolveLinearSystem()
 
 double BackwardEulerIvpOdeSolver::ComputeNorm(double* pVector)
 {
-    double norm = 0.0;
-    for (unsigned i=0; i<mSizeOfOdeSystem; i++)
-    {
-        if (fabs(pVector[i]) > norm)
-        {
-            norm = fabs(pVector[i]);
-        }
-    }
-    return norm;
+    assert(mSizeOfOdeSystem > 0);
+    // The infinity norm: the largest magnitude of any entry
+    return fabs(*std::max_element(pVector, pVector + mSizeOfOdeSystem,
+                                  [](double a, double b) { return fabs(a) < fabs(b); }));
 }
 
 void BackwardEulerIvpOdeSolver::ComputeNumericalJacobian(AbstractOdeSystem* pAbstractOdeSystem,

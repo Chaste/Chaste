@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CardiacElectroMechanicsProblem.hpp"
 
+#include <algorithm>
+
 #include "OutputFileHandler.hpp"
 #include "ReplicatableVector.hpp"
 #include "HeartConfig.hpp"
@@ -793,7 +795,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             mInterpolatedVoltages[i] = interpolated_voltage;
         }
 
-        LOG(2, "  Setting Ca_I. max value = " << Max(mInterpolatedCalciumConcs));
+        LOG(2, "  Setting Ca_I. max value = " << *std::max_element(mInterpolatedCalciumConcs.begin(), mInterpolatedCalciumConcs.end()));
 
         // NOTE IF NHS: HERE WE SHOULD PERHAPS CHECK WHETHER THE CELL MODELS HAVE Ca_Trop
         // AND UPDATE FROM NHS TO CELL_MODEL, BUT NOT SURE HOW TO DO THIS.. (esp for implicit)
@@ -956,17 +958,6 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     delete p_electrics_solver;
 
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::ALL);
-}
-
-template<unsigned DIM, unsigned ELEC_PROB_DIM>
-double CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Max(std::vector<double>& vec)
-{
-    double max = -1e200;
-    for (unsigned i=0; i<vec.size(); i++)
-    {
-        if (vec[i]>max) max=vec[i];
-    }
-    return max;
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
