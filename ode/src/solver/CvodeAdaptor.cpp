@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifdef CHASTE_CVODE
 
 #include "CvodeAdaptor.hpp"
 
@@ -658,5 +657,3 @@ long int CvodeAdaptor::GetMaxSteps()
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(CvodeAdaptor)
-
-#endif // CHASTE_CVODE

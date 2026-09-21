@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifdef CHASTE_CVODE
 
 #include <sstream>
 #include <iostream>
@@ -125,5 +124,3 @@ void AbstractCvodeCellWithDataClamp::TurnOnDataClamp(double conductance)
     this->SetParameter("membrane_data_clamp_current_conductance", conductance);
     mDataClampIsOn = true;
 }
-
-#endif // CHASTE_CVODEWITHDATACLAMP

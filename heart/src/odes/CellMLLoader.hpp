@@ -76,13 +76,11 @@ public:
      */
     boost::shared_ptr<AbstractCardiacCell> LoadCardiacCell(void);
 
-#ifdef CHASTE_CVODE
     /**
      * Make an AbstractCvodeCell, using the default stimulus from the CellML file (if present).
      * @return a pointer to the cell
      */
     boost::shared_ptr<AbstractCvodeCell> LoadCvodeCell(void);
-#endif
 
 private:
     /** The location of the CellML file to convert */
