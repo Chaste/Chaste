@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifdef CHASTE_CVODE
 #ifndef TWODIMCVODESYSTEM_HPP_
 #define TWODIMCVODESYSTEM_HPP_
 
@@ -73,5 +72,4 @@ void OdeSystemInformation<TwoDimCvodeSystem>::Initialise()
 
 
 #endif /*TWODIMCVODESYSTEM_HPP_*/
-#endif // CHASTE_CVODE
 
