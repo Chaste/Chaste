@@ -486,7 +486,6 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
         EXCEPTION("SetInitialCondition() must be called prior to SolveAndWriteResultsToFile()");
     }
 
-#ifdef CHASTE_VTK
     // Create a .pvd output file
     OutputFileHandler output_file_handler(this->mOutputDirectory, mClearOutputDirectory);
     mpVtkMetaFile = output_file_handler.OpenOutputFile("results.pvd");
@@ -535,18 +534,11 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     *mpVtkMetaFile << "    </Collection>\n";
     *mpVtkMetaFile << "</VTKFile>\n";
     mpVtkMetaFile->close();
-#else //CHASTE_VTK
-// LCOV_EXCL_START // We only test this in weekly builds
-    WARNING("VTK is not installed and is required for this functionality");
-// LCOV_EXCL_STOP
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::WriteVtkResultsToFile(Vec solution, unsigned numTimeStepsElapsed)
 {
-#ifdef CHASTE_VTK
-
     // Create a new VTK file for this time step
     std::stringstream time;
     time << numTimeStepsElapsed;
@@ -617,7 +609,6 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     *mpVtkMetaFile << "\" group=\"\" part=\"0\" file=\"results_";
     *mpVtkMetaFile << numTimeStepsElapsed;
     *mpVtkMetaFile << ".vtu\"/>\n";
-#endif // CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
