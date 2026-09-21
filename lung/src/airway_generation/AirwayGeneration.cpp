@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include "vtkVersion.h"
 #include "vtkPolyVertex.h"
 
 AirwayGeneration::AirwayGeneration(unsigned generation_number) : mGenerationNumber(generation_number), mDistributionRadius(DBL_MAX)

@@ -65,9 +65,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "SingleTraceOutputModifier.hpp"
 
-#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include <vtkVersion.h>
-
 /**
  * This stimulus causes an exception to be thrown when normally a simple stimulus would activate.
  *

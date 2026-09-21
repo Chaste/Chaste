@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CmguiMeshWriter.hpp"
 
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include "vtkVersion.h"
 #include "vtkAppendFilter.h"
 #include "vtkSTLReader.h"
 #include "vtkUnstructuredGrid.h"

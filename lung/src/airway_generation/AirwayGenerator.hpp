@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include "vtkVersion.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkPolyData.h"

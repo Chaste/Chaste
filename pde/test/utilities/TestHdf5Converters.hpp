@@ -53,9 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 
 
-#define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
-#include <vtkVersion.h>
-
 typedef Hdf5ToVtkConverter<3,3> VTK_3D;
 typedef Hdf5ToMeshalyzerConverter<3,3> MESHA_3D;
 

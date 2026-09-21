@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <vtkCellTypes.h>
+#include <vtkVersion.h>
 
 #include "VtkMeshReader.hpp"
 #include "Exception.hpp"
