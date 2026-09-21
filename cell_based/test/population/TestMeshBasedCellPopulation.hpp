@@ -959,7 +959,6 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-#ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
 
         // Initial condition files
@@ -978,7 +977,6 @@ public:
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
- #endif //CHASTE_VTK
     }
 
     void TestWriteResultsToFileWithAlternativeAddWriterMethods()
@@ -1098,7 +1096,6 @@ public:
         FileComparison(results_dir + "new_cellages.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/cellages.dat").CompareFiles();
         FileComparison(results_dir + "new_divisions.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/divisions.dat").CompareFiles();
 
-#ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
 
         // Initial condition files
@@ -1129,7 +1126,6 @@ public:
         TS_ASSERT_DELTA(ages_data[2], 2.0, 1e-9);
         TS_ASSERT_DELTA(ages_data[3], 3.0, 1e-9);
         TS_ASSERT_DELTA(ages_data[4], 4.0, 1e-9);
-#endif //CHASTE_VTK
     }
 
     void TestCellPopulationWritersIn3d()

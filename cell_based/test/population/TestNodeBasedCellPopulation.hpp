@@ -1212,7 +1212,6 @@ public:
         FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").CompareFiles();
 
         // Test VTK output
-#ifdef CHASTE_VTK
         node_based_cell_population.WriteVtkResultsToFile(output_directory);
 
         // Read VTK file and check it doesn't cause any problems
@@ -1277,7 +1276,6 @@ public:
         TS_ASSERT_DELTA(ancestors_data[1], 1.0, 1e-9);
         TS_ASSERT_DELTA(ancestors_data[2], 2.0, 1e-9);
         TS_ASSERT_DELTA(ancestors_data[3], 3.0, 1e-9);
-#endif
     }
 
     void TestNodeBasedCellPopulationOutputWriters3d()
@@ -1350,7 +1348,6 @@ public:
         FileComparison(results_dir + "cellappliedforce.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellappliedforce.dat").CompareFiles();
 
         // Test VTK output
-#ifdef CHASTE_VTK
         cell_population.WriteVtkResultsToFile(output_directory);
 
         // Read VTK file and check it doesn't cause any problems
@@ -1391,7 +1388,6 @@ public:
         {
             TS_ASSERT_DELTA(ancestors_data[i], i, 1e-9);
         }
-#endif
     }
 
     void TestWritingCellCyclePhases()

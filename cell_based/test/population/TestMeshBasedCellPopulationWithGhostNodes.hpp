@@ -867,7 +867,6 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-#ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
 
         //Initial condition files
@@ -886,7 +885,6 @@ public:
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWithGhostNodesWriteResultsToFile/results.pvd").CompareFiles();
- #endif //CHASTE_VTK
     }
 
 
