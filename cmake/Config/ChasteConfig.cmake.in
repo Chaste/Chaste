@@ -20,22 +20,12 @@ if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
     message("-- Found Chaste libraries in ${Chaste_BINARY_DIR}")
     add_definitions(-DCHASTE_CMAKE)
 
-    set(Chaste_USE_VTK @Chaste_USE_VTK@)
-    if (Chaste_USE_VTK)
-        add_definitions(-DCHASTE_VTK)
-    endif()
+    add_definitions(-DCHASTE_VTK)
 
+    add_definitions(-DCHASTE_CVODE)
+    add_definitions(-DCHASTE_SUNDIALS_VERSION=@Chaste_SUNDIALS_VERSION@)
 
-    set(Chaste_USE_CVODE @Chaste_USE_CVODE@)
-    if (Chaste_USE_CVODE)
-        add_definitions(-DCHASTE_CVODE)
-        add_definitions(-DCHASTE_SUNDIALS_VERSION=@Chaste_SUNDIALS_VERSION@)
-    endif()
-
-    set(Chaste_USE_XERCES @Chaste_USE_XERCES@)
-    if (Chaste_USE_XERCES)
-        add_definitions(-DCHASTE_XERCES)
-    endif()
+    add_definitions(-DCHASTE_XERCES)
 
     find_package(Python3 REQUIRED)
     set(Chaste_PYTHON_DIR @EXPORT_Chaste_PYTHON_DIR@)

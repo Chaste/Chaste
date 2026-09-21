@@ -116,10 +116,7 @@ include (ChasteMacros)
 set (Chaste_NUM_CPUS_TEST 1 CACHE STRING "Number of cpus to use when running tests.")
 
 
-option (Chaste_USE_VTK "Compile Chaste with VTK support" ON)
-option (Chaste_USE_CVODE "Compile Chaste with CVODE support" ON)
-
-option (Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
+include (ChasteDeprecatedOptions)
 
 option (Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
 option (Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
@@ -326,74 +323,72 @@ endif ()
 ################################
 ####  Find VTK
 ################################
-if (Chaste_USE_VTK)
-    # The complexity here is for two reasons:
-    #   1. VTK has renamed its components several times
-    #   2. From VTK 9, a simple call to find_package(VTK) will try to find QT, which is not a Chaste dependency
-    #
-    # We first find the VTK common library, which can have one of two names: this will populate the VTK version
-    # number. This is then used to find the specific list of required VTK components.
+# The complexity here is for two reasons:
+#   1. VTK has renamed its components several times
+#   2. From VTK 9, a simple call to find_package(VTK) will try to find QT, which is not a Chaste dependency
+#
+# We first find the VTK common library, which can have one of two names: this will populate the VTK version
+# number. This is then used to find the specific list of required VTK components.
 
-    # List of possible base modules across different VTK versions
-    set(POSSIBLE_VTK_BASE_MODULES vtkCommonCore CommonCore)
+# List of possible base modules across different VTK versions
+set(POSSIBLE_VTK_BASE_MODULES vtkCommonCore CommonCore)
 
-    foreach (BASE_MODULE ${POSSIBLE_VTK_BASE_MODULES})
-        find_package(VTK COMPONENTS ${BASE_MODULE} QUIET)
-        if (VTK_FOUND)
-            message (STATUS "VTK version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
-            break()
-        endif ()
-    endforeach ()
-
-    if (NOT ${VTK_FOUND})
-        message(FATAL_ERROR "Did not find VTK")
+foreach (BASE_MODULE ${POSSIBLE_VTK_BASE_MODULES})
+    find_package(VTK COMPONENTS ${BASE_MODULE} QUIET)
+    if (VTK_FOUND)
+        message (STATUS "VTK version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+        break()
     endif ()
+endforeach ()
 
-    # Depending on the VTK version, we need different components.
-    set (_vtk_modules "")
-    if (VTK_MAJOR_VERSION LESS 9)
-        list (APPEND _vtk_modules
-                vtkCommonCore vtkCommonDataModel vtkFiltersCore
-                vtkFiltersGeneral vtkFiltersGeneric vtkFiltersGeometry
-                vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
-                vtkIOLegacy vtkIOParallelXML vtkIOXML
-             )
-        if (Chaste_ENABLE_PYCHASTE)
-            # Additional modules required by PyChaste
-            list (APPEND _vtk_modules
-                    vtkInteractionStyle vtkIOImage vtkIOMovie
-                    vtkRenderingAnnotation vtkRenderingCore vtkRenderingFreeType
-                    vtkWrappingPythonCore
-                 )
-            if (VTK_MAJOR_VERSION LESS 7)
-                list (APPEND _vtk_modules vtkRenderingOpenGL)
-            else ()
-                list (APPEND _vtk_modules
-                        vtkFiltersProgrammable vtkFiltersVerdict
-                        vtkRenderingOpenGL2
-                     )
-            endif ()
-        endif ()
-    else ()
-        # VTK 9.0 and above require the following
-        list (APPEND _vtk_modules
-                CommonCore CommonDataModel FiltersCore FiltersGeneral
-                FiltersGeneric FiltersGeometry FiltersModeling FiltersSources
-                IOCore IOGeometry IOLegacy IOParallelXML IOXML
-             )
-        if (Chaste_ENABLE_PYCHASTE)
-            # Additional modules required by PyChaste
-            list (APPEND _vtk_modules
-                    FiltersProgrammable FiltersVerdict InteractionStyle IOImage
-                    IOMovie IOOggTheora RenderingAnnotation RenderingCore
-                    RenderingFreeType RenderingOpenGL2 WrappingPythonCore
-                 )
-        endif ()
-    endif ()
-    find_package (VTK COMPONENTS ${_vtk_modules} REQUIRED)
-
-    add_definitions (-DCHASTE_VTK)
+if (NOT ${VTK_FOUND})
+    message(FATAL_ERROR "Did not find VTK")
 endif ()
+
+# Depending on the VTK version, we need different components.
+set (_vtk_modules "")
+if (VTK_MAJOR_VERSION LESS 9)
+    list (APPEND _vtk_modules
+            vtkCommonCore vtkCommonDataModel vtkFiltersCore
+            vtkFiltersGeneral vtkFiltersGeneric vtkFiltersGeometry
+            vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
+            vtkIOLegacy vtkIOParallelXML vtkIOXML
+         )
+    if (Chaste_ENABLE_PYCHASTE)
+        # Additional modules required by PyChaste
+        list (APPEND _vtk_modules
+                vtkInteractionStyle vtkIOImage vtkIOMovie
+                vtkRenderingAnnotation vtkRenderingCore vtkRenderingFreeType
+                vtkWrappingPythonCore
+             )
+        if (VTK_MAJOR_VERSION LESS 7)
+            list (APPEND _vtk_modules vtkRenderingOpenGL)
+        else ()
+            list (APPEND _vtk_modules
+                    vtkFiltersProgrammable vtkFiltersVerdict
+                    vtkRenderingOpenGL2
+                 )
+        endif ()
+    endif ()
+else ()
+    # VTK 9.0 and above require the following
+    list (APPEND _vtk_modules
+            CommonCore CommonDataModel FiltersCore FiltersGeneral
+            FiltersGeneric FiltersGeometry FiltersModeling FiltersSources
+            IOCore IOGeometry IOLegacy IOParallelXML IOXML
+         )
+    if (Chaste_ENABLE_PYCHASTE)
+        # Additional modules required by PyChaste
+        list (APPEND _vtk_modules
+                FiltersProgrammable FiltersVerdict InteractionStyle IOImage
+                IOMovie IOOggTheora RenderingAnnotation RenderingCore
+                RenderingFreeType RenderingOpenGL2 WrappingPythonCore
+             )
+    endif ()
+endif ()
+find_package (VTK COMPONENTS ${_vtk_modules} REQUIRED)
+
+add_definitions (-DCHASTE_VTK)
 
 
 ################################
@@ -500,23 +495,21 @@ list (APPEND Chaste_INCLUDES "${PARMETIS_INCLUDE_DIR}")
 ################################
 ####  Find Sundials
 ################################
-if (Chaste_USE_CVODE)
-    if (BUILD_SHARED_LIBS)
-        set (SUNDIALS_USE_STATIC_LIBRARIES OFF)
-    else ()
-        set (SUNDIALS_USE_STATIC_LIBRARIES ON)
-    endif ()
-    find_package (SUNDIALS COMPONENTS  sundials_cvode sundials_nvecserial REQUIRED)
-    if (SUNDIALS_VERSION_MAJOR GREATER_EQUAL 7) # Newer CVODE requires a core sundials library to be linked in
-        find_package (SUNDIALS COMPONENTS  sundials_core REQUIRED)
-    endif ()
-    list (APPEND Chaste_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
-    #chaste_add_libraries(Chaste_LINK_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES Chaste_LINK_LIBRARIES)
-    list (APPEND Chaste_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
-    add_definitions (-DCHASTE_CVODE)
-    math (EXPR Chaste_SUNDIALS_VERSION "${SUNDIALS_VERSION_MAJOR}*10000 + ${SUNDIALS_VERSION_MINOR}*100 + ${SUNDIALS_VERSION_SUBMINOR}")
-    add_definitions (-DCHASTE_SUNDIALS_VERSION=${Chaste_SUNDIALS_VERSION})
+if (BUILD_SHARED_LIBS)
+    set (SUNDIALS_USE_STATIC_LIBRARIES OFF)
+else ()
+    set (SUNDIALS_USE_STATIC_LIBRARIES ON)
 endif ()
+find_package (SUNDIALS COMPONENTS  sundials_cvode sundials_nvecserial REQUIRED)
+if (SUNDIALS_VERSION_MAJOR GREATER_EQUAL 7) # Newer CVODE requires a core sundials library to be linked in
+    find_package (SUNDIALS COMPONENTS  sundials_core REQUIRED)
+endif ()
+list (APPEND Chaste_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
+#chaste_add_libraries(Chaste_LINK_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES Chaste_LINK_LIBRARIES)
+list (APPEND Chaste_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
+add_definitions (-DCHASTE_CVODE)
+math (EXPR Chaste_SUNDIALS_VERSION "${SUNDIALS_VERSION_MAJOR}*10000 + ${SUNDIALS_VERSION_MINOR}*100 + ${SUNDIALS_VERSION_SUBMINOR}")
+add_definitions (-DCHASTE_SUNDIALS_VERSION=${Chaste_SUNDIALS_VERSION})
 
 
 # ParMETIS and Sundials might need MPI, so add MPI libraries after these
@@ -524,26 +517,22 @@ endif ()
 list (APPEND Chaste_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
 # make sure VTK libraries added after HDF5 so VTK's link with HDF5 isn't used
-if (Chaste_USE_VTK)
-    if (VTK_MAJOR_VERSION LESS 9)
-        list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
-        list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
-    else ()
-        target_link_libraries(Chaste_COMMON_DEPS INTERFACE ${VTK_LIBRARIES})
-    endif ()
+if (VTK_MAJOR_VERSION LESS 9)
+    list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
+    list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
+else ()
+    target_link_libraries(Chaste_COMMON_DEPS INTERFACE ${VTK_LIBRARIES})
 endif ()
 
 
 ################################
 ####  Find Xerces and XSD
 ################################
-if (Chaste_USE_XERCES)
-    find_package (Xerces REQUIRED)
-    find_package (XSD REQUIRED)
-    list (APPEND Chaste_INCLUDES "${XERCESC_INCLUDE}" "${XSD_INCLUDE_DIRS}")
-    list (APPEND Chaste_LINK_LIBRARIES "${XERCESC_LIBRARY}")
-    add_definitions (-DCHASTE_XERCES)
-endif ()
+find_package (Xerces REQUIRED)
+find_package (XSD REQUIRED)
+list (APPEND Chaste_INCLUDES "${XERCESC_INCLUDE}" "${XSD_INCLUDE_DIRS}")
+list (APPEND Chaste_LINK_LIBRARIES "${XERCESC_LIBRARY}")
+add_definitions (-DCHASTE_XERCES)
 
 
 add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
