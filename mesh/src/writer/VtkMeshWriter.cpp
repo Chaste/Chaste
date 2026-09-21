@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MixedDimensionMesh.hpp"
 #include "NodesOnlyMesh.hpp"
 
-#ifdef CHASTE_VTK
 #include "vtkQuadraticTetra.h"
 #include "vtkQuadraticTriangle.h"
 
@@ -768,5 +767,3 @@ template class VtkMeshWriter<1,3>;
 template class VtkMeshWriter<2,2>; // Actually used
 template class VtkMeshWriter<2,3>;
 template class VtkMeshWriter<3,3>; // Actually used
-
-#endif //CHASTE_VTK

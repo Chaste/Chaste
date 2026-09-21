@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkMeshReader.hpp"
 #include "CmguiMeshWriter.hpp"
 
-#ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 #include "vtkAppendFilter.h"
@@ -50,8 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkCellArray.h"
-
-#if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
 MultiLobeAirwayGenerator::MultiLobeAirwayGenerator(TetrahedralMesh<1,3>& rAirwaysMesh, bool pointDistanceLimit) :
                                                                                          mAirwaysMesh(rAirwaysMesh),
@@ -277,9 +274,7 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
 
     // Merge points cannot be set in vtk5.6 but defaults to on
     // In vtk5.8 and higher we must explicitly set it to be on
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 8) || VTK_MAJOR_VERSION >= 6)
     append_filter->MergePointsOn();
-#endif
 
     // Merge in the major airways, the mesh has to be converted to a vtk unstructured grid first
     // We use the Chaste VtkMeshWriter to write the mesh to disk then load it back in as a vtu.
@@ -425,7 +420,3 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
     CmguiMeshWriter<1,3> cmgui_writer(rOutputDirectory, rBaseName, false);
     cmgui_writer.WriteFilesUsingMesh(combined_mesh);
 }
-
-#endif // (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6
-
-#endif //CHASTE_VTK

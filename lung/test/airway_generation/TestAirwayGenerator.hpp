@@ -740,16 +740,6 @@ public:
     #endif
     }
 
-    void TestDummyClassCoverage()
-    {
-#if !(defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6))
-       EXIT_IF_PARALLEL;
-
-       AirwayGenerator generator;
-
-    #endif
-    }
-
 private:
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
     vtkSmartPointer<vtkPolyData> CreateSphere(unsigned resolution = 18, double radius = 1.0)

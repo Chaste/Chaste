@@ -39,8 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifdef CHASTE_VTK
-
 #include <vtkCellTypes.h>
 
 #include "VtkMeshReader.hpp"
@@ -553,4 +551,3 @@ template class VtkMeshReader<1,3>;
 template class VtkMeshReader<2,2>;
 template class VtkMeshReader<2,3>;
 template class VtkMeshReader<3,3>;
-#endif // CHASTE_VTK

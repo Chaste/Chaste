@@ -40,13 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <cassert>
 
-#ifdef CHASTE_VTK
-
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 #include "vtkPolyVertex.h"
-
-#if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
 AirwayGeneration::AirwayGeneration(unsigned generation_number) : mGenerationNumber(generation_number), mDistributionRadius(DBL_MAX)
 {}
@@ -143,7 +139,3 @@ double AirwayGeneration::GetDistributionRadius()
 {
     return mDistributionRadius;
 }
-
-#endif //( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
-#endif //CHASTE_VTK

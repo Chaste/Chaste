@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "LobePropertiesCalculator.hpp"
 
-#ifdef CHASTE_VTK
-
 #include "vtkMassProperties.h"
 #include "vtkSTLReader.h"
 
@@ -103,7 +101,3 @@ double LobePropertiesCalculator::GetLobeVolumeFraction(vtkSmartPointer<vtkPolyDa
 {
     return GetLobeVolume(pLobeSurface)/GetTotalVolume();
 }
-
-#endif // CHASTE_VTK
-
-
