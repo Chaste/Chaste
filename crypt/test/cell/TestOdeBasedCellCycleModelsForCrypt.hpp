@@ -113,9 +113,9 @@ public:
 
         /*
          * For coverage, we create another cell-cycle model that is identical except that we
-         * manually pass in an ODE solver. In this case, our ODE solver (RungeKutta4IvpOdeSolver)
-         * is the same type as the solver used by the cell-cycle model if no solver is provided
-         * (unless CVODE is used), so our results should be identical.
+         * manually pass in an ODE solver. In this case, our ODE solver (CvodeAdaptor)
+         * is the same type as the solver used by the cell-cycle model if no solver is provided,
+         * so our results should be identical.
          */
         boost::shared_ptr<CellCycleModelOdeSolver<WntCellCycleModel, CvodeAdaptor> >
             p_solver(CellCycleModelOdeSolver<WntCellCycleModel, CvodeAdaptor>::Instance());

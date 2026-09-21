@@ -33,11 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/*
- * Note: Do not put any VTK-specific functionality in this file, as we
- * don't ever test it with VTK support turned off!
- */
-
 // Most of the work is done by this class.  It must be included first.
 //#include "CardiacSimulation.hpp"
 

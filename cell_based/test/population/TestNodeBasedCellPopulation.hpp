@@ -1077,7 +1077,7 @@ public:
     {
         EXIT_IF_PARALLEL;    // Population writers don't work in parallel yet
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
@@ -1282,7 +1282,7 @@ public:
     {
         EXIT_IF_PARALLEL;    // Population writers don't work in parallel yet
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
@@ -1394,7 +1394,7 @@ public:
     {
         EXIT_IF_PARALLEL;    // Population writers dont work in parallel yet.
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh

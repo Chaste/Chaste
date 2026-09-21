@@ -461,7 +461,7 @@ public:
 
     void TestWritersWithImmersedBoundaryCellPopulation()
     {
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
 
         // Create an immersed boundary cell population object

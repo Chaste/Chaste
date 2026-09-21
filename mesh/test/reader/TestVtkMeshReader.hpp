@@ -80,7 +80,6 @@ private:
         return std::search(doubled_sequence.begin(), doubled_sequence.end(), target.begin(), target.end()) != doubled_sequence.end();
     }
 
-    //Requires  "sudo aptitude install libvtk5-dev" or similar
 public:
 
     /**

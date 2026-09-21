@@ -57,12 +57,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * Note that the airway generation code is dependent of having VTK installed.  However, we cannot put a guard around the
- * whole file since that gives compiler errors if VTK is not installed.  Instead we guard the internals of each test, and
- * any includes that will be missing if VTK is not present.
- */
-
-/*
  * We include some VTK classes to allow STL files to be read
  */
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)

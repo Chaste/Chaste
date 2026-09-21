@@ -68,9 +68,6 @@ class NodesOnlyMesh;
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VtkMeshWriter : public AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
-
-//Requires  "sudo aptitude install libvtk5-dev" or similar
-
 private:
     bool mWriteParallelFiles; /**< Whether to write parallel (.pvtu + .vtu for each process) files, defaults to false */
 

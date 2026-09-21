@@ -703,7 +703,7 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the maximum cell ID to zero (to account for previous tests)
@@ -891,7 +891,7 @@ public:
     void TestCellPopulationWritersIn3dWithGhostNodes()
     {
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the Maximum cell ID to zero (to account for previous tests)

@@ -44,12 +44,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A class written using the visitor pattern for writing to file, for each cell,
  * the level of a variable stored in CellData.
  *
- * The output file is called cell[variable name].dat. If VTK is switched on,
- * then the writer also specifies the VTK output for each cell, which is stored in
- * the VTK cell data "Cell [variable name]".
+ * The output file is called cell[variable name].dat. The writer also specifies the VTK
+ * output for each cell, which is stored in the VTK cell data "Cell [variable name]".
  *
- * Note: if VTK is switched on then everything in CellData will be output as VTK cell
- * data already but this is the best way to output to a .dat file.
+ * Note: everything in CellData will be output as VTK cell data already but this is the
+ * best way to output to a .dat file.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellDataItemWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>

@@ -788,7 +788,7 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the maximum cell ID to zero (to account for previous tests)
@@ -983,7 +983,7 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the maximum cell ID to zero (to account for previous tests)
@@ -1133,7 +1133,7 @@ public:
         // Cannot write cell populations in parallel
         EXIT_IF_PARALLEL;
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the Maximum cell Id to zero (to account for previous tests)

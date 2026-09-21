@@ -916,7 +916,7 @@ public:
 
     void TestVertexBasedCellPopulationWriteResultsToFile()
     {
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
@@ -1561,7 +1561,7 @@ public:
      */
     void TestOutputVtkCellEdges()
     {
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
@@ -1629,7 +1629,7 @@ public:
      */
     void TestOutputVtkCellEdgesWithInterior()
     {
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
@@ -1696,7 +1696,7 @@ public:
          */
     void TestOutputVtkCell()
     {
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
