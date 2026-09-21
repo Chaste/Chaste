@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "LobePropertiesCalculator.hpp"
 
-#ifdef CHASTE_VTK
-
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 #include "vtkSmartPointer.h"
@@ -54,15 +52,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTriangleFilter.h"
 
 
-#endif //CHASTE_VTK
-
 class TestLobePropertiesCalculator : public CxxTest::TestSuite
 {
 public:
     void TestVolumes()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         LobePropertiesCalculator calculator;
         calculator.AddLobe(CreateSphere(1.0,0.0,-1.0,1.0), LEFT, "lll");
         calculator.AddLobe(CreateSphere(1.0,0.0,1.0,1.5), LEFT, "lul");
@@ -84,13 +78,10 @@ public:
         //Just do some independent checks
         TS_ASSERT_DELTA(calculator.GetLobeVolume(CreateSphere(-1.0,0.0,1.0,1.0)), 4*M_PI/3, 2e-1);
         TS_ASSERT_DELTA(calculator.GetLobeVolumeFraction(CreateSphere(-1.0,0.0,1.0,1.0)), 0.08, 2e-1);
-#endif
     }
 
     void TestRealVolumeFractions()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         LobePropertiesCalculator calculator;
         calculator.AddLobe("lung/test/data/lll.stl", LEFT, "lll");
         calculator.AddLobe("lung/test/data/lul.stl", LEFT, "lul");
@@ -104,11 +95,9 @@ public:
         TS_ASSERT_DELTA(calculator.GetLobeVolumeFraction("rll"), 0.2264, 1e-3);
         TS_ASSERT_DELTA(calculator.GetLobeVolumeFraction("rml"), 0.0987, 1e-3);
         TS_ASSERT_DELTA(calculator.GetLobeVolumeFraction("rul"), 0.2241, 1e-3);
-#endif
     }
 
 private:
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
     vtkSmartPointer<vtkPolyData> CreateSphere(double XCentre, double YCentre, double ZCentre, double radius)
     {
         vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
@@ -121,7 +110,6 @@ private:
         vtkSmartPointer<vtkPolyData> sphere_data = sphere->GetOutput();
         return sphere_data;
     }
-#endif
 };
 
 #endif /*_TESTLOBEPROPERTIESCALCULATOR_HPP_*/

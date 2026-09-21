@@ -41,8 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "TetrahedralMesh.hpp"
 
-#ifdef CHASTE_VTK
-
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 #include "vtkSmartPointer.h"
@@ -52,15 +50,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkSTLReader.h"
 
-#endif //CHASTE_VTK
-
 class TestAirwayGeneration : public CxxTest::TestSuite
 {
 public:
     void TestGeneration()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         //We are only testing point assignment, so directions are arbitrary
@@ -137,11 +131,9 @@ public:
             TS_ASSERT_EQUALS(generation.GetApices()[2].mPointCloud->GetNumberOfPoints(), 250);
             TS_ASSERT_EQUALS(generation.GetApices()[3].mPointCloud->GetNumberOfPoints(), 247);
         }
-#endif
     }
 
 private:
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
     vtkSmartPointer<vtkPolyData> CreatePointCube()
     {
         vtkSmartPointer<vtkPolyData> cube = vtkSmartPointer<vtkPolyData>::New();
@@ -172,7 +164,6 @@ private:
 
         return cube;
     }
-#endif
 };
 
 #endif /* TESTAIRWAYGENERATOR_HPP_ */

@@ -44,8 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-#ifdef CHASTE_VTK
-
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 #include "vtkSmartPointer.h"
@@ -59,15 +57,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMassProperties.h"
 
 
-#endif //CHASTE_VTK
-
 class TestMultiLobeAirwayGenerator : public CxxTest::TestSuite
 {
 public:
     void TestAddLobes()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         TetrahedralMesh<1,3> airways_mesh;
@@ -84,13 +78,10 @@ public:
 
         generator.AddLobe("lung/test/data/rll.stl", RIGHT);
         TS_ASSERT_EQUALS(generator.GetNumLobes(RIGHT), 2u);
-#endif
     }
 
     void TestAssignGrowthApicesAndDistributePoints()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         //Major airways mesh has 4 end points at (+/-2,0,0) and (0,+/-2,0), one is unused
@@ -134,13 +125,10 @@ public:
             }
         }
 
-    #endif
     }
 
     void TestDistributePointsByVolume()
     {
-    #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         //Major airways mesh has 4 end points at (+/-2,0,0) and (0,+/-2,0), two are unused
@@ -185,10 +173,8 @@ public:
             }
         }
 
-    #endif
     }
 
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
     const static unsigned sNumTrials=3u;
     // IsInsideSurface contains randomisation: a direction is which to look for surface crossing.  This means that,
     // in corner cases, it might not be repeatable.
@@ -201,7 +187,6 @@ public:
         }
         return count;
     }
-#endif
 
 //     void doNotTestProblemWithPointMembershipClassificationCube()
 //     {
@@ -255,7 +240,6 @@ public:
 
     void TestProblemWithPointMembershipClassificationSphere()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
         std::cout << "For information, VTK is "<<VTK_MAJOR_VERSION<<"."<<VTK_MINOR_VERSION<<".\n";
         // This code is for #3002
@@ -300,13 +284,10 @@ public:
             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0]+point_spacing, bounds[2]+point_spacing, bounds[4]),               0u);
             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0]+point_spacing, bounds[2]+point_spacing, bounds[4]+point_spacing), sNumTrials);
         //}
-#endif
     }
 
     void TestGenerate()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         TetrahedralMesh<1,3> airways_mesh;
@@ -361,11 +342,9 @@ public:
 
         ///\todo Check radii etc
 
-    #endif
     }
 
 private:
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
     vtkSmartPointer<vtkPolyData> CreateSphere(double XCentre, double YCentre, double ZCentre)
     {
         vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
@@ -378,7 +357,6 @@ private:
         vtkSmartPointer<vtkPolyData> sphere_data = sphere->GetOutput();
         return sphere_data;
     }
-#endif
 
 // #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 //     vtkSmartPointer<vtkPolyData> CreateCube(double XCentre, double YCentre, double ZCentre)

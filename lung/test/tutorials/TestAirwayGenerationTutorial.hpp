@@ -61,7 +61,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * whole file since that gives compiler errors if VTK is not installed.  Instead we guard the internals of each test, and
  * any includes that will be missing if VTK is not present.
  */
-#ifdef CHASTE_VTK
 
 /*
  * We include some VTK classes to allow STL files to be read
@@ -70,8 +69,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkSTLReader.h"
-
-#endif // CHASTE_VTK
 
 /* The usual headers are included */
 #include <cxxtest/TestSuite.h>
@@ -91,8 +88,6 @@ public: // Tests should be public!
 
     void TestGenerateAirways()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         /* First, we load up a mesh containing the centre lines and radii of the central airways extracted from
@@ -196,7 +191,6 @@ public: // Tests should be public!
          */
         generator.Generate("TestAirwayGenerationTutorial", "example_complete_conducting_airway");
 
-#endif // VTK >= 5.6
     }
 };
 

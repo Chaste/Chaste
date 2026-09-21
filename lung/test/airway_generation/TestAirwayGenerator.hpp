@@ -45,8 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/numeric/ublas/vector_proxy.hpp>
 
-#ifdef CHASTE_VTK
-
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 #include "vtkSmartPointer.h"
@@ -56,8 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkSTLReader.h"
 
-#endif //CHASTE_VTK
-
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -66,8 +62,6 @@ class TestAirwayGenerator : public CxxTest::TestSuite
 public:
     void TestCreatePointCloud()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere(50);
@@ -104,13 +98,10 @@ public:
 
         std::set<unsigned>& invalid_ids = generator.GetInvalidIds();
         TS_ASSERT_EQUALS(invalid_ids.size(), 0u);
-#endif
     }
 
     void TestCreatePointCloudOtherMethods()
             {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         {
@@ -132,12 +123,10 @@ public:
             TS_ASSERT_EQUALS(point_data->GetNumberOfPoints(), 51);
 
         }
-#endif
             }
 
     void TestSplitPointCloud()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
 
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere();
@@ -177,12 +166,10 @@ public:
             TS_ASSERT_LESS_THAN(coords[1], 0.0);
         }
 
-#endif
     }
 
     void TestAddInitialApex()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
 
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere();
@@ -208,13 +195,11 @@ public:
         //The generator only supports generations up to 30
         TS_ASSERT_THROWS_THIS(generator.AddInitialApex(origin, direction, parent_direction, 10.0, 35),
                               "Error: Airway generation can only generate up to 30 generations.");
-#endif
     }
 
 
     void TestInsertBranch()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
 
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere(50);
@@ -254,12 +239,10 @@ public:
         TS_ASSERT_DELTA(end_location[0], inserted_end_location[0], 1e-8);
         TS_ASSERT_DELTA(end_location[1], inserted_end_location[1], 1e-8);
         TS_ASSERT_DELTA(end_location[2], inserted_end_location[2], 1e-8);
-#endif
     }
 
     void TestGrowApex()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
 
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere(100);
@@ -319,12 +302,10 @@ public:
         TS_ASSERT_DELTA(new_apex_2.mOriginalDirection[1], -1/branch_length, 1e-2);
         TS_ASSERT_DELTA(new_apex_2.mOriginalDirection[2], 3.0/8.0/branch_length, 1e-2);
 
-#endif
     }
 
     void TestInvalidateClosestPoint()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
 
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere(50);
@@ -350,12 +331,10 @@ public:
         TS_ASSERT(invalid_ids.count(92));
         TS_ASSERT(invalid_ids.count(49));
 
-#endif
     }
 
     void TestGrowTerminalLengthApex()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
 
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere();
@@ -379,7 +358,6 @@ public:
         //Test that no apices were added and that points were invalidated
         TS_ASSERT_EQUALS(generator.GetGenerations()[1].GetApices().size(), 0u);
         TS_ASSERT_EQUALS(generator.GetInvalidIds().size(), 2u);
-#endif
     }
 //
 //    void xxxTestGrowTerminalPointsApex()
@@ -410,7 +388,6 @@ public:
 //
     void TestCheckAngleAndLength()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
 
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere();
@@ -468,12 +445,10 @@ public:
             TS_ASSERT_DELTA(centre[1], 1.0, 1e-6);
             TS_ASSERT_DELTA(centre[2], 0.0, 1e-6);
         }
-#endif
     }
 
     void TestOutsideHostVolume()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
 
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere();
@@ -492,12 +467,10 @@ public:
         //Test that the branch was not generated
         TS_ASSERT_EQUALS(generator.GetAirwayTree()->GetNumberOfPoints(), 1);
         TS_ASSERT_EQUALS(generator.GetAirwayTree()->GetNumberOfCells(), 0);
-#endif
     }
 
     void TestGenerate()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere();
 
@@ -533,12 +506,10 @@ public:
         writer->SetInput(generator.GetAirwayTree());
 #endif
         writer->Write();*/
-#endif
     }
 
     void TestHorsfieldOrder()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
 
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere();
@@ -612,13 +583,11 @@ public:
         writer->SetInput(generator.GetAirwayTree());
 #endif
         writer->Write();*/
-#endif
     }
 
 
     void TestGenerateDecomposedAirways()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere();
 
@@ -667,13 +636,11 @@ public:
         TS_ASSERT(finder_6.Exists() && !finder_6.IsEmpty());
         TS_ASSERT(finder_7.Exists() && !finder_7.IsEmpty());
         TS_ASSERT(finder_8.Exists() && !finder_8.IsEmpty());
-#endif
     }
 
 
     void TestCalculateLobeVolume()
     {
-    #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
        EXIT_IF_PARALLEL;
 
        vtkSmartPointer<vtkPolyData> sphere = CreateSphere(100);
@@ -683,12 +650,10 @@ public:
        //The sphere is coarsely meshed, hence relatively large tolerance
        TS_ASSERT_DELTA(generator.CalculateLobeVolume(), 4.0/3.0*M_PI, 1e-2);
 
-    #endif
     }
 
     void TestEndBranchDistanceLimit()
     {
-    #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
         vtkSmartPointer<vtkPolyData> sphere = CreateSphere(100, 100.0); //lung sized sphere to test distance limit
 
@@ -737,11 +702,9 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(assigned_points, previous_assigned_points);
             previous_assigned_points = assigned_points;
         }
-    #endif
     }
 
 private:
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
     vtkSmartPointer<vtkPolyData> CreateSphere(unsigned resolution = 18, double radius = 1.0)
     {
         vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
@@ -753,7 +716,6 @@ private:
         vtkSmartPointer<vtkPolyData> sphere_data = sphere->GetOutput();
         return sphere_data;
     }
-#endif
 };
 
 #endif /* TESTAIRWAYGENERATOR_HPP_ */
