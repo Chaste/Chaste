@@ -92,8 +92,6 @@ public:
     }
 };
 
-#ifdef CHASTE_CVODE
-
 /**
  *
  * Cell Factory defining Shannon cells for 1d chain.
@@ -187,7 +185,6 @@ public:
         return p_cell;
     }
 };
-#endif // CHASTE_CVODE
 
 /**
  * This class tests that a CVODE tissue simulation gets comparable results to those
@@ -298,7 +295,6 @@ public:
 //            TS_ASSERT(CompareBenchmarkResults(fe_node_100, be_node_100, 1.1)); // More than a milliVolt of difference with B.E.
 //        }
 
-#ifdef CHASTE_CVODE
         // First test a CVODE adaptor
         // The ODE system remains the same (std::vectors) and standard vectors are converted into N_Vectors
         // every time CVODE talks to the ODE system.
@@ -350,7 +346,6 @@ public:
             TS_ASSERT(CompareBenchmarkResults(fe_node_0, cvode_node_0, 0.4));     // Only 0.2 -- 0.4mV difference with CVODE
             TS_ASSERT(CompareBenchmarkResults(fe_node_100, cvode_node_100, 0.4)); // Only 0.2 -- 0.4mV difference with CVODE
         }
-#endif // CHASTE_CVODE
     }
 };
 

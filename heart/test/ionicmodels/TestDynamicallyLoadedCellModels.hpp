@@ -175,12 +175,9 @@ public:
             TS_ASSERT(hpp_file.IsNewerThan(cellml_file));
 
            // We can't now call LoadCvodeCell on this loader
-#ifdef CHASTE_CVODE
             TS_ASSERT_THROWS_THIS(loader.LoadCvodeCell(),
                                   "You cannot call both LoadCvodeCell and LoadCardiacCell on the same CellMLLoader.");
-#endif
         }
-#ifdef CHASTE_CVODE
         {
             OutputFileHandler handler("TestCvodeCellMLLoader", true);
             std::vector<std::string> options = boost::assign::list_of("--expose-annotated-variables");
@@ -194,7 +191,6 @@ public:
             TS_ASSERT_THROWS_THIS(loader.LoadCardiacCell(),
                                   "You cannot call both LoadCvodeCell and LoadCardiacCell on the same CellMLLoader.");
         }
-#endif
     }
 
     /**
@@ -347,7 +343,6 @@ public:
             p_loader = converter.Convert(copied_file2);
             RunLr91Test(*p_loader, 0u, true, 0.3);
         }
-#ifdef CHASTE_CVODE
         {
             // With a for_model section and Cvode
             args[1] = "--cvode";
@@ -358,7 +353,6 @@ public:
             RunLr91Test(*p_loader, 0u, true, 1, 560.0); // Large tolerance due to different ODE solver
 
         }
-#endif
     }
 //
 //    void TestArchiving()

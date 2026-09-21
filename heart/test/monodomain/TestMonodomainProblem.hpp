@@ -107,7 +107,6 @@ public:
     }
 };
 
-#ifdef CHASTE_CVODE
 /*
  * Cell factory for TestOutputDoesNotDependOnPrintTimestep. Returns CVODE cells
  */
@@ -144,7 +143,6 @@ public:
         return p_cell;
     }
 };
-#endif // CHASTE_CVODE
 
 class TestMonodomainProblem : public CxxTest::TestSuite
 {
@@ -1407,8 +1405,6 @@ public:
 
     void TestOutputDoesNotDependOnPrintTimestep()
     {
-#ifdef CHASTE_CVODE
-
         // Switch this back on to watch linear solver converge on each step.
         //PetscTools::SetOption("-ksp_monitor", "");
 
@@ -1474,9 +1470,6 @@ public:
         // N.B. This tolerance can be reduced to less than 1e-6 if you reduce the ODE+PDE time step to 0.001 instead of 0.01ms.
         // This would be unfeasibly small for 'proper' simulations though, so not sure how to proceed with this!
         TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 5e-3);
-#else
-        std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
-#endif // CHASTE_CVODE
     }
 
     /*
@@ -1488,7 +1481,6 @@ public:
      */
     void TestCvodeErrorHandling()
     {
-#ifdef CHASTE_CVODE
         std::cout << "Don't worry about a few errors below here, we are testing that we can recover from them!" << std::endl;
         const double mesh_spacing = 0.1;
         const double x_size = 1.0;
@@ -1506,9 +1498,6 @@ public:
         monodomain_problem.SetMesh(&mesh);
         monodomain_problem.Initialise();
         monodomain_problem.Solve();
-#else
-        std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
-#endif // CHASTE_CVODE
     }
 
     void TestArchivingOfSingleTraceOutputModifier()
