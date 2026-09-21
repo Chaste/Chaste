@@ -588,7 +588,6 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell([[maybe_unused]] CellPtr pC
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-#ifdef CHASTE_VTK
     // Store the present time as a string
     std::stringstream time;
     time << SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -695,7 +694,6 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
         // Parallel vtu files  .vtu -> .pvtu
         *(this->mpVtkMetaFile) << ".pvtu\"/>\n";
     }
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>

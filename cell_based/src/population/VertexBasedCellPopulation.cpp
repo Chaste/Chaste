@@ -488,8 +488,6 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string& rDirectory)
 {
-#ifdef CHASTE_VTK
-
     // Create mesh writer for VTK output
     VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
@@ -571,13 +569,11 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::string& rDirectory)
 {
-#ifdef CHASTE_VTK
     //Writes cell only data
     {
         // Create mesh writer for VTK output
@@ -802,7 +798,6 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>
