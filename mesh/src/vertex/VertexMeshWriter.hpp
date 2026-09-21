@@ -39,8 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMesh;
 
-#ifdef CHASTE_VTK
-//Requires  "sudo aptitude install libvtk5-dev" or similar
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkDoubleArray.h>
 #include <vtkCellData.h>
@@ -51,7 +49,6 @@ class VertexMesh;
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 #include <vtkDataCompressor.h>
-#endif //CHASTE_VTK
 
 #include "VertexMesh.hpp"
 #include "AbstractMeshWriter.hpp"
@@ -85,11 +82,8 @@ private:
     /** What was the last index written to #mpNodeMap ? */
     unsigned mNodeMapCurrentIndex;
 
-#ifdef CHASTE_VTK
-//Requires  "sudo aptitude install libvtk5-dev" or similar
 ///\todo Merge into VtkMeshWriter (#1076)
     vtkUnstructuredGrid* mpVtkUnstructedMesh;
-#endif //CHASTE_VTK
 
 public:
 

@@ -91,10 +91,8 @@ ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMeshWriter(c
             NEVER_REACHED;
     }
 
-#ifdef CHASTE_VTK
     // Dubious, since we shouldn't yet know what any details of the mesh are.
     mpVtkUnstructedMesh = vtkUnstructuredGrid::New();
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -109,10 +107,8 @@ ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryMeshWriter(
 
     delete mpIters;
 
-#ifdef CHASTE_VTK
 // Dubious, since we shouldn't yet know what any details of the mesh are.
     mpVtkUnstructedMesh->Delete(); // Reference counted
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -242,7 +238,6 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
 {
-#ifdef CHASTE_VTK
     if constexpr (SPACE_DIM == 2)
     {
         // Create VTK mesh
@@ -275,13 +270,11 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Immer
     {
         NEVER_REACHED;
     }
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
-#ifdef CHASTE_VTK
     /**
      * To allow viewing in Paraview, we have to treat differently cells which overlap the boundaries, as there is no
      * support for periodicity in Paraview.
@@ -464,7 +457,6 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
     {
         NEVER_REACHED;
     }
-#endif //CHASTE_VTK
 }
 
 //LCOV_EXCL_START
@@ -481,7 +473,6 @@ void ImmersedBoundaryMeshWriter<1, 1>::MakeVtkMesh(ImmersedBoundaryMesh<1, 1>& r
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
 {
-#ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
     for (unsigned i=0; i<dataPayload.size(); i++)
@@ -492,13 +483,11 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string
     vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
     p_cell_data->AddArray(p_scalars);
     p_scalars->Delete(); // Reference counted
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName, std::vector<double> dataPayload)
 {
-#ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
     for (double scalar : dataPayload)
@@ -509,7 +498,6 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::strin
     vtkPointData* p_point_data = mpVtkUnstructedMesh->GetPointData();
     p_point_data->AddArray(p_scalars);
     p_scalars->Delete(); // Reference counted
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

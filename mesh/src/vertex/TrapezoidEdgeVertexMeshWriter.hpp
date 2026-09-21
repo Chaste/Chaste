@@ -39,8 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMesh;
 
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
 #define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkCellData.h>
 #include <vtkConvexPointSet.h>
@@ -53,7 +51,6 @@ class VertexMesh;
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
-#endif // CHASTE_VTK
 
 #include "AbstractMeshWriter.hpp"
 #include "NodeMap.hpp"
@@ -89,11 +86,8 @@ private:
      */
     VertexMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh = nullptr;
 
-#ifdef CHASTE_VTK
-    // Requires  "sudo apt install libvtk7-dev" or similar
     ///\todo Merge into VtkMeshWriter (#1076)
     vtkUnstructuredGrid* mpVtkUnstructedMesh = nullptr;
-#endif // CHASTE_VTK
 
 public:
     /**

@@ -65,10 +65,8 @@ VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::VertexMeshWriter(const std::string& rD
     mpIters->pNodeIter = nullptr;
     mpIters->pElemIter = nullptr;
 
-#ifdef CHASTE_VTK
      // Dubious, since we shouldn't yet know what any details of the mesh are.
      mpVtkUnstructedMesh = vtkUnstructuredGrid::New();
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -87,10 +85,8 @@ VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::~VertexMeshWriter()
         delete mpNodeMap;
     }
 
-#ifdef CHASTE_VTK
      // Dubious, since we shouldn't yet know what any details of the mesh are.
      mpVtkUnstructedMesh->Delete(); // Reference counted
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -205,7 +201,6 @@ ElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElement()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
 {
-#ifdef CHASTE_VTK
     assert(SPACE_DIM==3 || SPACE_DIM == 2);    // LCOV_EXCL_LINE
 
     // Create VTK mesh
@@ -235,7 +230,6 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEM
     //p_writer->PrintSelf(std::cout, vtkIndent());
     p_writer->Write();
     p_writer->Delete(); // Reference counted
-#endif //CHASTE_VTK
 }
 
 /**
@@ -247,7 +241,6 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEM
 template<>
 void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::string stamp)
 {
-#ifdef CHASTE_VTK
     // Create VTK mesh
     VertexMesh<2, 2>* p_mesh_for_vtk = rMesh.GetMeshForVtk();
     MakeVtkMesh(*p_mesh_for_vtk);
@@ -276,13 +269,11 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::str
     //p_writer->PrintSelf(std::cout, vtkIndent());
     p_writer->Write();
     p_writer->Delete(); // Reference counted
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
-#ifdef CHASTE_VTK
     // Make the Vtk mesh
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
@@ -328,13 +319,11 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
         mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
         p_cell->Delete(); // Reference counted
     }
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
 {
-#ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
     for (unsigned i=0; i<dataPayload.size(); i++)
@@ -345,13 +334,11 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName,
     vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
     p_cell_data->AddArray(p_scalars);
     p_scalars->Delete(); // Reference counted
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName, std::vector<double> dataPayload)
 {
-#ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
     for (unsigned i=0; i<dataPayload.size(); i++)
@@ -362,7 +349,6 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName
     vtkPointData* p_point_data = mpVtkUnstructedMesh->GetPointData();
     p_point_data->AddArray(p_scalars);
     p_scalars->Delete(); // Reference counted
-#endif //CHASTE_VTK
 }
 
 ///\todo Mesh should be const (#1076)

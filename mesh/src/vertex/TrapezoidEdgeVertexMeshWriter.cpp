@@ -42,25 +42,20 @@ TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::TrapezoidEdgeVertexMeshWr
                                                                                      const bool clearOutputDir)
         : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir)
 {
-#ifdef CHASTE_VTK
     // Dubious, since we shouldn't yet know what any details of the mesh are.
     mpVtkUnstructedMesh = vtkUnstructuredGrid::New();
-#endif // CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::~TrapezoidEdgeVertexMeshWriter()
 {
-#ifdef CHASTE_VTK
     mpVtkUnstructedMesh->Delete();
-#endif // CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                                                                               const std::string& stamp)
 {
-#ifdef CHASTE_VTK
     assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
 
     // Create VTK mesh
@@ -90,7 +85,6 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Ve
     // p_writer->PrintSelf(std::cout, vtkIndent());
     p_writer->Write();
     p_writer->Delete(); // Reference counted
-#endif // CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -99,7 +93,6 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh([[maybe_
     // Only 2D version is supported at the moment
     if constexpr (SPACE_DIM == 2)
     {
-#ifdef CHASTE_VTK
         // Make the Vtk mesh
         vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
         p_pts->GetData()->SetName("Vertex positions");
@@ -195,14 +188,12 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh([[maybe_
 
         // For 2D case. For 3D, we should sum the total number of faces + num_elements
         assert(total_num_edges + num_elements == mpVtkUnstructedMesh->GetNumberOfCells());
-#endif // CHASTE_VTK
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
 {
-#ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
     for (unsigned i = 0; i < dataPayload.size(); i++)
@@ -213,7 +204,6 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::str
     vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
     p_cell_data->AddArray(p_scalars);
     p_scalars->Delete(); // Reference counted
-#endif // CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
