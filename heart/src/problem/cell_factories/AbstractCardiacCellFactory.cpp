@@ -49,7 +49,6 @@ AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
     else
     {
         AbstractCardiacCellInterface* p_cell = CreateCardiacCellForTissueNode(pNode);
-#ifdef CHASTE_CVODE
         if (dynamic_cast<AbstractCvodeCell*>(p_cell))
         {
 #if CHASTE_SUNDIALS_VERSION >= 20400
@@ -61,7 +60,6 @@ AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
             // Use the PDE timestep as the [maximum] CVODE timestep.
             static_cast<AbstractCvodeCell*>(p_cell)->SetTimestep(HeartConfig::Instance()->GetPdeTimeStep());
         }
-#endif // CHASTE_CVODE
         return p_cell;
     }
 }
