@@ -51,12 +51,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupUtils.hpp"
 #include "PetscTools.hpp"
 
-#ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkVersion.h>
-#endif
 
-#ifdef CHASTE_CVODE
 #include <sundials/sundials_config.h>
 #if CHASTE_SUNDIALS_VERSION >= 20600
 #if CHASTE_SUNDIALS_VERSION >= 30000
@@ -70,7 +67,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 #define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_PACKAGE_VERSION
 #endif // SUNDIALS >= 2.6.0
-#endif
 
 //#include <xsd/cxx/version.hxx>
 #include <xercesc/util/XercesVersion.hpp>
@@ -306,6 +302,12 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t\t<PT-Scotch>" << SCOTCH_VERSION<<"."<<SCOTCH_RELEASE<<"."<<SCOTCH_PATCHLEVEL<<"</PT-Scotch>"<< std::endl;
 #endif //no PARMETIS_MAJOR_VERSION
     output << "\t\t\t<PETSc>" << PETSC_VERSION_MAJOR << "." << PETSC_VERSION_MINOR << "." << PETSC_VERSION_SUBMINOR << "</PETSc>\n";
+    output << "\t\t\t<SUNDIALS>" << CHASTE_SUNDIALS_PACKAGE_VERSION << "</SUNDIALS>";
+#if CHASTE_SUNDIALS_VERSION < 30000
+    output << "<!-- includes Cvode of a different version number -->";
+#endif
+    output << std::endl;
+    output << "\t\t\t<VTK>" << VTK_MAJOR_VERSION << "." << VTK_MINOR_VERSION << "</VTK>\n";
     output << "\t\t\t<Xerces>" << XERCES_FULLVERSIONDOT << "</Xerces>\n";
 
     output << "\t\t</CompiledIn>\n";
@@ -313,23 +315,6 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t<Binaries>\n";
     output << "\t\t\t<XSD>" << ChasteBuildInfo::GetXsdVersion() << "</XSD>\n";
     output << "\t\t</Binaries>\n";
-
-    output << "\t\t<Optional>\n";
-#ifdef CHASTE_CVODE
-    output << "\t\t\t<SUNDIALS>" << CHASTE_SUNDIALS_PACKAGE_VERSION << "</SUNDIALS>";
-#if CHASTE_SUNDIALS_VERSION < 30000
-    output << "<!-- includes Cvode of a different version number -->";
-#endif
-    output << std::endl;
-#else
-    output << "\t\t\t<SUNDIALS>no</SUNDIALS>\n";
-#endif
-#ifdef CHASTE_VTK
-    output << "\t\t\t<VTK>" << VTK_MAJOR_VERSION << "." << VTK_MINOR_VERSION << "</VTK>\n";
-#else
-    output << "\t\t\t<VTK>no</VTK>\n";
-#endif
-    output << "\t\t</Optional>\n";
 
     output << "\t</Libraries>\n";
 

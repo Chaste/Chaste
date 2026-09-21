@@ -68,11 +68,7 @@ int main(int argc, char *argv[])
         else
         {
             std::string base=basename(argv[1]);
-#ifdef CHASTE_VTK
             ExecutableSupport::Print("Note: for VTK reading, give the full file path (including '.vtu' extension)");
-#else
-            ExecutableSupport::Print("Note: VTK reading is not supported");
-#endif
 
             ExecutableSupport::Print("Opening "+base+" mesh file(s).");
 
