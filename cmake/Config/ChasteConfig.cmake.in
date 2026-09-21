@@ -20,12 +20,9 @@ if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
     message("-- Found Chaste libraries in ${Chaste_BINARY_DIR}")
     add_definitions(-DCHASTE_CMAKE)
 
-    add_definitions(-DCHASTE_VTK)
+    include(${Chaste_CMAKE_DIR}/cmake/Modules/ChasteLegacyDefinitions.cmake)
 
-    add_definitions(-DCHASTE_CVODE)
     add_definitions(-DCHASTE_SUNDIALS_VERSION=@Chaste_SUNDIALS_VERSION@)
-
-    add_definitions(-DCHASTE_XERCES)
 
     find_package(Python3 REQUIRED)
     set(Chaste_PYTHON_DIR @EXPORT_Chaste_PYTHON_DIR@)

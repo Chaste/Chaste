@@ -388,8 +388,6 @@ else ()
 endif ()
 find_package (VTK COMPONENTS ${_vtk_modules} REQUIRED)
 
-add_definitions (-DCHASTE_VTK)
-
 
 ################################
 ####  Find Boost
@@ -507,7 +505,6 @@ endif ()
 list (APPEND Chaste_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
 #chaste_add_libraries(Chaste_LINK_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES Chaste_LINK_LIBRARIES)
 list (APPEND Chaste_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
-add_definitions (-DCHASTE_CVODE)
 math (EXPR Chaste_SUNDIALS_VERSION "${SUNDIALS_VERSION_MAJOR}*10000 + ${SUNDIALS_VERSION_MINOR}*100 + ${SUNDIALS_VERSION_SUBMINOR}")
 add_definitions (-DCHASTE_SUNDIALS_VERSION=${Chaste_SUNDIALS_VERSION})
 
@@ -532,7 +529,8 @@ find_package (Xerces REQUIRED)
 find_package (XSD REQUIRED)
 list (APPEND Chaste_INCLUDES "${XERCESC_INCLUDE}" "${XSD_INCLUDE_DIRS}")
 list (APPEND Chaste_LINK_LIBRARIES "${XERCESC_LIBRARY}")
-add_definitions (-DCHASTE_XERCES)
+
+include (ChasteLegacyDefinitions)
 
 
 add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
@@ -793,6 +791,9 @@ configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
 file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake
         DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
 
+file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteLegacyDefinitions.cmake
+        DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
+
 file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake
         DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
 
@@ -810,6 +811,7 @@ install(FILES
 
 install(FILES
         "${Chaste_BINARY_DIR}/cmake/Modules/ChasteMacros.cmake"
+        "${Chaste_BINARY_DIR}/cmake/Modules/ChasteLegacyDefinitions.cmake"
         "${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake"
         DESTINATION lib/chaste/cmake/Modules
         COMPONENT Config)
