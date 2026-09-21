@@ -47,16 +47,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // CVODE headers
 #include <sundials/sundials_nvector.h>
 
-#if CHASTE_SUNDIALS_VERSION >= 30000
 #if CHASTE_SUNDIALS_VERSION < 70000
 #include <cvode/cvode_direct.h> /* access to CVDls interface            */
 #endif
 #include <sundials/sundials_types.h> /* defs. of realtype, sunindextype      */
 #include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
 #include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
-#else
-#include <cvode/cvode_dense.h>
-#endif
 
 #if CHASTE_SUNDIALS_VERSION >= 60000
 #include "CvodeContextManager.hpp"  // access to shared SUNContext object required by Sundials 6.0+
@@ -234,12 +230,10 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
         // Set up CVODE's memory.
 #if CHASTE_SUNDIALS_VERSION >= 60000
         mpCvodeMem = CVodeCreate(CV_BDF, CvodeContextManager::Instance()->GetSundialsContext());
-#elif CHASTE_SUNDIALS_VERSION >= 40000
+#else
         //  v4.0.0 release notes: instead of specifying the nonlinear iteration type when creating the CVODE(S) memory structure,
         //  CVODE(S) uses the SUNNONLINSOL_NEWTON module implementation of a Newton iteration by default.
         mpCvodeMem = CVodeCreate(CV_BDF);
-#else
-        mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
 #endif
 
         if (mpCvodeMem == nullptr)
@@ -253,35 +247,22 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
         // Set the user data
         mData.pSystem = pOdeSystem;
         mData.pY = &rInitialY;
-#if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeSetUserData(mpCvodeMem, (void*)(&mData));
-#else
-        CVodeSetFdata(mpCvodeMem, (void*)(&mData));
-#endif
 
 // Setup CVODE
-#if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeInit(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values);
         CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
-#else
-        CVodeMalloc(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values,
-                    CV_SS, mRelTol, &mAbsTol);
-#endif
 
         // Set the rootfinder function if wanted
         if (mCheckForRoots)
         {
-#if CHASTE_SUNDIALS_VERSION >= 20400
             CVodeRootInit(mpCvodeMem, 1, CvodeRootAdaptor);
-#else
-            CVodeRootInit(mpCvodeMem, 1, CvodeRootAdaptor, (void*)(&mData));
-#endif
         }
 
         /* Create dense SUNMatrix for use in linear solves */
 #if CHASTE_SUNDIALS_VERSION >= 60000
         mpSundialsDenseMatrix = SUNDenseMatrix(rInitialY.size(), rInitialY.size(), CvodeContextManager::Instance()->GetSundialsContext());
-#elif CHASTE_SUNDIALS_VERSION >= 30000
+#else
         mpSundialsDenseMatrix = SUNDenseMatrix(rInitialY.size(), rInitialY.size());
 #endif
 
@@ -291,22 +272,12 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 
         /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
         CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
-#elif CHASTE_SUNDIALS_VERSION >= 40000
+#else
         /* Create dense SUNLinearSolver object for use by CVode */
         mpSundialsLinearSolver = SUNLinSol_Dense(initial_values, mpSundialsDenseMatrix);
 
         /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
         CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
-#elif CHASTE_SUNDIALS_VERSION >= 30000
-        /* Create dense SUNLinearSolver object for use by CVode */
-        mpSundialsLinearSolver = SUNDenseLinearSolver(initial_values, mpSundialsDenseMatrix);
-
-        /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
-        CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
-#else
-        // CVODE < v3.0.0
-        // Attach a linear solver for Newton iteration
-        CVDense(mpCvodeMem, rInitialY.size());
 #endif
     }
     else if (reinit) // Could be new ODE system, or new Y values
@@ -314,21 +285,11 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
         // Set the user data
         mData.pSystem = pOdeSystem; // stays the same on a re-initialize
         mData.pY = &rInitialY; // changes on a re-initialize
-#if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeSetUserData(mpCvodeMem, (void*)(&mData));
-#else
-        CVodeSetFdata(mpCvodeMem, (void*)(&mData));
-#endif
 
-#if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeReInit(mpCvodeMem, startTime, initial_values);
         CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
-#else
-        CVodeReInit(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values,
-                    CV_SS, mRelTol, &mAbsTol);
-#endif
 
-#if CHASTE_SUNDIALS_VERSION >= 30000
         if (mpSundialsLinearSolver)
         {
             /* Free the linear solver memory */
@@ -353,22 +314,12 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 
         /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
         CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
-#elif CHASTE_SUNDIALS_VERSION >= 40000
+#else
         /* Create dense SUNLinSol_Dense object for use by CVode */
         mpSundialsLinearSolver = SUNLinSol_Dense(initial_values, mpSundialsDenseMatrix);
 
         /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
         CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
-#else
-        /* Create dense SUNLinearSolver object for use by CVode */
-        mpSundialsLinearSolver = SUNDenseLinearSolver(initial_values, mpSundialsDenseMatrix);
-
-        /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
-        CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
-#endif
-#else
-        // Attach a linear solver for Newton iteration
-        CVDense(mpCvodeMem, rInitialY.size());
 #endif
     }
 
@@ -390,7 +341,6 @@ void CvodeAdaptor::FreeCvodeMemory()
     }
     mpCvodeMem = nullptr;
 
-#if CHASTE_SUNDIALS_VERSION >= 30000
     if (mpSundialsLinearSolver)
     {
         /* Free the linear solver memory */
@@ -404,7 +354,6 @@ void CvodeAdaptor::FreeCvodeMemory()
         SUNMatDestroy(mpSundialsDenseMatrix);
     }
     mpSundialsDenseMatrix = nullptr;
-#endif
 }
 
 void CvodeAdaptor::SetForceReset(bool autoReset)
@@ -584,17 +533,11 @@ CvodeAdaptor::CvodeAdaptor(double relTol, double absTol)
           mCheckForRoots(false),
           mLastSolutionState(nullptr),
           mLastSolutionTime(0.0),
-#if CHASTE_SUNDIALS_VERSION >= 20400
           mForceReset(false),
-#else
-          mForceReset(true),
-#endif
           mForceMinimalReset(false)
-#if CHASTE_SUNDIALS_VERSION >= 30000
           ,
           mpSundialsDenseMatrix(nullptr),
           mpSundialsLinearSolver(nullptr)
-#endif
 {
 }
 

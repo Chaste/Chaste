@@ -60,32 +60,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // CVODE headers
 #include <nvector/nvector_serial.h>
 
-#if CHASTE_SUNDIALS_VERSION >= 30000
 #if CHASTE_SUNDIALS_VERSION < 70000
 #include <cvode/cvode_direct.h> /* access to CVDls interface            */
 #endif
 #include <sundials/sundials_types.h> /* defs. of realtype, sunindextype      */
 #include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
 #include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
-#else
-#include <sundials/sundials_dense.h> /* definitions DlsMat DENSE_ELEM */
-#endif
 
 // CVODE changed their dense matrix type...
-#if CHASTE_SUNDIALS_VERSION >= 30000
 #define CHASTE_CVODE_DENSE_MATRIX SUNMatrix
-#elif CHASTE_SUNDIALS_VERSION >= 20400
-#define CHASTE_CVODE_DENSE_MATRIX DlsMat
-#else
-#define CHASTE_CVODE_DENSE_MATRIX DenseMat
-#endif
 
 // CVODE changed their way of referencing elements of a matrix. So we will copy their notation in examples.
-#if CHASTE_SUNDIALS_VERSION >= 30000
 #define IJth(A, i, j) SM_ELEMENT_D(A, i, j)
-#else
-#define IJth(A, i, j) DENSE_ELEM(A, i, j)
-#endif
 
 /**
  * Abstract OdeSystem class for Cvode systems (N_Vector instead of std::vector)
@@ -278,12 +264,10 @@ private:
     /** Whether to ignore changes in the state variables when deciding whether to reset. */
     bool mForceMinimalReset;
 
-#if CHASTE_SUNDIALS_VERSION >= 30000
     /** Working memory for CVODE to store a dense matrix */
     SUNMatrix mpSundialsDenseMatrix;
     /** Working memory for CVODE's linear solver */
     SUNLinearSolver mpSundialsLinearSolver;
-#endif
 
 protected:
     /** Whether we have an analytic Jacobian. */

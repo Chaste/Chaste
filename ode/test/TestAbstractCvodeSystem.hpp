@@ -356,17 +356,6 @@ public:
 
     void TestSequentialSolveCalls()
     {
-        /*
-         * All of the tests in this section pass when using Sundials >= 2.4.0
-         * with 'ForcedReset' defaulting to false.
-         *
-         * Unfortunately they don't pass when using Sundials 2.3.0, probably because it
-         * isn't as smart about going back in time when it sees changes in the RHS function.
-         * (done as parameter changes here).
-         *
-         * So this messiness means that we have to switch on 'Forced Resetting' for
-         * Sundials 2.3.0 as default to make sure it gives good answers.
-         */
         {
             ParameterisedCvode ode;
 
@@ -412,11 +401,7 @@ public:
                 ode.SetParameter("a", i); // dy/dt = a
                 ode.Solve(15.0 + i, i + 16.0, 1.0);
             }
-#if CHASTE_SUNDIALS_VERSION >= 20400
             TS_ASSERT_DELTA(ode.GetStateVariable(0u), 50.0, 1e-12); // N.B. This is wrong!
-#else
-            TS_ASSERT_DELTA(ode.GetStateVariable(0u), 40.8181, 1e-4); // N.B. This is also wrong!
-#endif
             // (We tricked ODE system by resetting a state variable in minimal reset mode).
         }
     }

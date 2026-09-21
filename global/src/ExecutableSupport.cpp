@@ -55,18 +55,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkVersion.h>
 
 #include <sundials/sundials_config.h>
-#if CHASTE_SUNDIALS_VERSION >= 20600
-#if CHASTE_SUNDIALS_VERSION >= 30000
-// SUNDIALS 3.0 upwards uses SUNDIALS_VERSION instead of SUNDIALS_PACKAGE_VERSION.
-#define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_VERSION
-#else
-// SUNDIALS 2.6 upwards defines SUNDIALS_PACKAGE_VERSION with quotes...
-#include <boost/preprocessor/stringize.hpp>
-#define CHASTE_SUNDIALS_PACKAGE_VERSION BOOST_PP_STRINGIZE(SUNDIALS_PACKAGE_VERSION)
-#endif // SUNDIALS >= 3.0.0
-#else
-#define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_PACKAGE_VERSION
-#endif // SUNDIALS >= 2.6.0
 
 //#include <xsd/cxx/version.hxx>
 #include <xercesc/util/XercesVersion.hpp>
@@ -302,11 +290,7 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t\t<PT-Scotch>" << SCOTCH_VERSION<<"."<<SCOTCH_RELEASE<<"."<<SCOTCH_PATCHLEVEL<<"</PT-Scotch>"<< std::endl;
 #endif //no PARMETIS_MAJOR_VERSION
     output << "\t\t\t<PETSc>" << PETSC_VERSION_MAJOR << "." << PETSC_VERSION_MINOR << "." << PETSC_VERSION_SUBMINOR << "</PETSc>\n";
-    output << "\t\t\t<SUNDIALS>" << CHASTE_SUNDIALS_PACKAGE_VERSION << "</SUNDIALS>";
-#if CHASTE_SUNDIALS_VERSION < 30000
-    output << "<!-- includes Cvode of a different version number -->";
-#endif
-    output << std::endl;
+    output << "\t\t\t<SUNDIALS>" << SUNDIALS_VERSION << "</SUNDIALS>\n";
     output << "\t\t\t<VTK>" << VTK_MAJOR_VERSION << "." << VTK_MINOR_VERSION << "</VTK>\n";
     output << "\t\t\t<Xerces>" << XERCES_FULLVERSIONDOT << "</Xerces>\n";
 
