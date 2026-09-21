@@ -47,7 +47,6 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
      mpInterpolater(NULL)
 {
 
-#ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
     //create an internal copy of the quadratic mesh (we will modify node locations for oputput)
     mpVtkOutputMesh = new QuadraticMesh<DIM>();
     mpVtkOutputMesh->ConstructFromMesh(rQuadMesh);
@@ -91,16 +90,13 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
     assert(mInterpolatedVoltagesNodeWise.size()==rQuadMesh.GetNumNodes());
     mpVtkWriter->WriteDeformedFiles();
 
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
 CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsVtkHandler()
 {
-#ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
     delete mpVtkWriter;
     delete mpVtkOutputMesh;
-#endif
     delete mpInterpolater;
     delete mpVtkElastictyWriter;
 }
@@ -108,7 +104,6 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsVt
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
 void CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::WriteSolution(unsigned counter, ReplicatableVector& rElectricsSolution)
 {
-#ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
     //Apply deformation solution to mechanics mesh (the one in the writer object, not the one used by the solver!)
     mpVtkWriter->ApplyDeformation(mrMechanicsSolver.rGetDeformedPosition());
     mpVtkWriter->SetOutputBaseFileName("deformed_mechanics_mesh_" + std::to_string(counter));
@@ -130,7 +125,6 @@ void CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::WriteSolution(unsigne
 
     //write to file
     mpVtkWriter->WriteDeformedFiles();
-#endif
 }
 
 
