@@ -124,7 +124,6 @@ public:
                 TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 50, 2);
             }
         }
-
     }
 
     void TestDistributePointsByVolume()
@@ -172,7 +171,6 @@ public:
                 TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 50, 6);
             }
         }
-
     }
 
     const static unsigned sNumTrials=3u;
@@ -331,7 +329,6 @@ public:
         TS_ASSERT_DELTA(composite_mesh.GetNode(18)->rGetNodeAttributes()[1], 0.0, 1e-6);
 
         ///\todo Check radii etc
-
     }
 
 private:

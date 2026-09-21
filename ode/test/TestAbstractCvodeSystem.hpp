@@ -351,7 +351,6 @@ public:
         // This covers both cases in the code.
         TS_ASSERT_THROWS_CONTAINS(ode_system.Solve(0.0, 2.0, h_value, 0.1),
                                   "CVODE failed to solve system");
-
     }
 
     void TestSequentialSolveCalls()

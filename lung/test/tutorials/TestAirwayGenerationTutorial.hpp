@@ -184,7 +184,6 @@ public: // Tests should be public!
          * and radius information to be view as a series of tubes.
          */
         generator.Generate("TestAirwayGenerationTutorial", "example_complete_conducting_airway");
-
     }
 };
 

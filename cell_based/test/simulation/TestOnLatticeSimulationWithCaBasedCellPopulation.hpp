@@ -396,28 +396,27 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT(simulator.GetNumDeaths() > 0);
 
-            // Check that the ordering in the vtk file is correct
-            OutputFileHandler output_file_handler("TestCaMonolayerWithApoptoticCellKiller", false);
-            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        // Check that the ordering in the vtk file is correct
+        OutputFileHandler output_file_handler("TestCaMonolayerWithApoptoticCellKiller", false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-            // Read in the final timepoint
-            FileFinder vtk_file2(results_dir + "results_from_time_0/results_5.vtu", RelativeTo::Absolute);
-            TS_ASSERT(vtk_file2.Exists());
-            vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
-            p_reader->SetFileName(vtk_file2.GetAbsolutePath().c_str());
-            p_reader->Update();
+        // Read in the final timepoint
+        FileFinder vtk_file2(results_dir + "results_from_time_0/results_5.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file2.Exists());
+        vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+        p_reader->SetFileName(vtk_file2.GetAbsolutePath().c_str());
+        p_reader->Update();
 
-            // The point index should be the same as the entry in the "Location Index For Test" array at this stage.
-            vtkSmartPointer<vtkUnstructuredGrid> p_grid = p_reader->GetOutput();
-            unsigned counter = 0;
-            for (CaBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
-            {
-                unsigned location_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
-                TS_ASSERT(counter < unsigned(p_grid->GetNumberOfPoints()));
-                TS_ASSERT_EQUALS(location_index, unsigned(p_grid->GetPointData()->GetArray("Location Index For Test")->GetTuple1(counter)));
-                counter++;
-            }
-
+        // The point index should be the same as the entry in the "Location Index For Test" array at this stage.
+        vtkSmartPointer<vtkUnstructuredGrid> p_grid = p_reader->GetOutput();
+        unsigned counter = 0;
+        for (CaBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
+        {
+            unsigned location_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+            TS_ASSERT(counter < unsigned(p_grid->GetNumberOfPoints()));
+            TS_ASSERT_EQUALS(location_index, unsigned(p_grid->GetPointData()->GetArray("Location Index For Test")->GetTuple1(counter)));
+            counter++;
+        }
     }
 
     void TestCaMonolayerWithRandomSwitching()

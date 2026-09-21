@@ -89,7 +89,6 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
     mpVtkWriter->AddTensorCellData("deformation_gradient_F", mStrains);
     assert(mInterpolatedVoltagesNodeWise.size()==rQuadMesh.GetNumNodes());
     mpVtkWriter->WriteDeformedFiles();
-
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>

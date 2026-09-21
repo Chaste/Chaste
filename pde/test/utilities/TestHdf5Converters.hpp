@@ -155,7 +155,6 @@ public:
                                                 + "/vtk_output/cube_2mm_12_elements.vtu");
             TS_ASSERT_EQUALS(vtk_mesh_reader2.GetNumNodes(), 12u);
         }
-
     }
 
     /**

@@ -1304,7 +1304,6 @@ public:
         TS_ASSERT_DELTA(v_at_last[0], 13.146, 1e-3);
         TS_ASSERT_DELTA(v_at_last[110], 13.146, 1e-3);
         TS_ASSERT_DELTA(v_at_last[220], -83.855, 1e-3);
-
     }
 
     /**

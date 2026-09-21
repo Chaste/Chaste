@@ -164,7 +164,6 @@ public:
 
             TS_ASSERT_LESS_THAN(coords[1], 0.0);
         }
-
     }
 
     void TestAddInitialApex()
@@ -300,7 +299,6 @@ public:
         TS_ASSERT_DELTA(new_apex_2.mOriginalDirection[0], 0.0, 1e-2);
         TS_ASSERT_DELTA(new_apex_2.mOriginalDirection[1], -1/branch_length, 1e-2);
         TS_ASSERT_DELTA(new_apex_2.mOriginalDirection[2], 3.0/8.0/branch_length, 1e-2);
-
     }
 
     void TestInvalidateClosestPoint()
@@ -329,7 +327,6 @@ public:
         TS_ASSERT(invalid_ids.count(0));
         TS_ASSERT(invalid_ids.count(92));
         TS_ASSERT(invalid_ids.count(49));
-
     }
 
     void TestGrowTerminalLengthApex()
@@ -638,7 +635,6 @@ public:
 
        //The sphere is coarsely meshed, hence relatively large tolerance
        TS_ASSERT_DELTA(generator.CalculateLobeVolume(), 4.0/3.0*M_PI, 1e-2);
-
     }
 
     void TestEndBranchDistanceLimit()

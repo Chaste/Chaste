@@ -177,7 +177,6 @@ public:
 
         TS_ASSERT_THROWS_THIS( first_element_data = invalid_mesh_reader.GetNextElementData(),
                                "Element is not of expected type (vtkTetra/vtkTriangle)" );
-
     }
 
     void TestGetNextFaceData(void)
@@ -490,7 +489,6 @@ public:
             Node<3> *iterator_node = (it)->GetNode(1);
             TS_ASSERT_EQUALS(iterator_node, mesh_node);
         }
-
     }
 
     /**
@@ -541,7 +539,6 @@ public:
             TS_ASSERT_EQUALS(element_data.AttributeValue, i + 1.5);
         }
         TS_ASSERT_THROWS_THIS(mesh_reader.GetNextCableElementData(), "Trying to read data for a cable element that doesn't exist");
-
     }
     /**
      * Check that we can build a 3D MixedDimensionMesh using the VTK mesh reader.

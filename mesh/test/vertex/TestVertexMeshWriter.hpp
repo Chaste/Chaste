@@ -231,7 +231,6 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-
     }
 
     void TestVertexMeshWriterIn3dWithoutFaces()

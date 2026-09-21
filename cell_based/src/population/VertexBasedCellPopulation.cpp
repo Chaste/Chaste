@@ -568,7 +568,6 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
-
 }
 
 template<unsigned DIM>

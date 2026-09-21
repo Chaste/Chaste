@@ -255,7 +255,6 @@ public:
 
             TS_ASSERT_DELTA(testvalue, exact_solution, global_error);
         }
-
     }
 
     void TestGlobalErrorSystemOf2Equations()

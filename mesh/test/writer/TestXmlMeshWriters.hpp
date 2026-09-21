@@ -878,7 +878,6 @@ public:
             TS_ASSERT_EQUALS(vtk_reader.GetNumEdges(), reader.GetNumEdges());
             TS_ASSERT_EQUALS(vtk_reader.GetNumEdges(), mesh.GetNumBoundaryElements());
         }
-
     }
 
     //Test that the vtk mesh writer can output a 2D mesh embedded in 3D space
@@ -901,7 +900,6 @@ public:
             TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 1632u);
             TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 32u);
         }
-
     }
 
     void TestXdmfWriter()

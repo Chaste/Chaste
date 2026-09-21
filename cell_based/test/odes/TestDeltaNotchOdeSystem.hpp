@@ -153,7 +153,6 @@ public:
 
     void TestSetStateVariables()
     {
-
         std::vector<double> state_vars;
         state_vars.push_back(0.0);
         state_vars.push_back(1.0);

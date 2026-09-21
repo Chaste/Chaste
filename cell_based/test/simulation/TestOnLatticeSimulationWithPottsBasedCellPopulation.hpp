@@ -373,7 +373,6 @@ public:
         TS_ASSERT(vtk_file_3.Exists());
         FileFinder vtk_file_4(results_dir + "results_from_time_0/outlines_10.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file_4.Exists());
-
     }
 
     void TestPottsMonolayerCellSortingPeriodic()
@@ -650,7 +649,6 @@ public:
         // It is changed to cell_id as this is preferable for VTK output.
         TS_ASSERT_EQUALS(cell_ids.size(), 1000u);
         TS_ASSERT_DELTA(*max_element(cell_ids.begin(), cell_ids.end()), 63.0, 1e-12);
-
     }
 
     c_vector<unsigned, 6> mNodes; // TO check after save and load.
