@@ -50,6 +50,7 @@ if (XSD_EXECUTABLE)
         set (xsd_version "undertermined")
         message (WARNING "XSD found, but version undetermined")
     endif ()
+    set (XSD_VERSION "${xsd_version}")
 
 endif (XSD_EXECUTABLE)
 
