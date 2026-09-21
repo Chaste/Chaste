@@ -54,7 +54,6 @@ class TestVtkNonlinearElasticitySolutionWriter : public CxxTest::TestSuite
 public:
     void TestException()
     {
-#ifdef CHASTE_VTK
         QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
 
         // set up a solver object
@@ -67,12 +66,10 @@ public:
 
         VtkNonlinearElasticitySolutionWriter<3> vtk_writer(solver);
         TS_ASSERT_THROWS_THIS(vtk_writer.Write(),"No output directory was given to the mechanics solver");
-#endif //CHASTE_VTK
     }
 
     void TestVtuFile()
     {
-#ifdef CHASTE_VTK
         for (unsigned run=0; run<3; run++)
         {
             std::stringstream dir;
@@ -192,7 +189,6 @@ public:
 
             }
         }
-#endif //CHASTE_VTK
     }
 };
 

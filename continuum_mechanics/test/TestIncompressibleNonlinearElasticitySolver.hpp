@@ -847,11 +847,9 @@ public:
                 FileFinder exnode1_file("nonlin_elas_functional_data/cmgui/solution_1.exnode", RelativeTo::ChasteTestOutput);
                 TS_ASSERT(exnode1_file.Exists());
 
-#ifdef CHASTE_VTK
                 //Check the VTK file exists
                 FileFinder vtk_file("nonlin_elas_functional_data/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
                 TS_ASSERT(vtk_file.Exists());
-#endif
 
                 solver.rGetCurrentSolution().clear();
                 solver.rGetCurrentSolution().resize(solver.mNumDofs, 0.0);
@@ -1525,11 +1523,9 @@ public:
        VtkNonlinearElasticitySolutionWriter<3> vtk_writer(solver);
        vtk_writer.Write();
 
-#ifdef CHASTE_VTK
        //Check the VTK file exists
        FileFinder vtk_file("nonlin_elas_functional_data/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
        TS_ASSERT(vtk_file.Exists());
-#endif
     }
 
 
