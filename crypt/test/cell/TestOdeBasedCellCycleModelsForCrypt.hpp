@@ -117,17 +117,11 @@ public:
          * is the same type as the solver used by the cell-cycle model if no solver is provided
          * (unless CVODE is used), so our results should be identical.
          */
-#ifdef CHASTE_CVODE
         boost::shared_ptr<CellCycleModelOdeSolver<WntCellCycleModel, CvodeAdaptor> >
             p_solver(CellCycleModelOdeSolver<WntCellCycleModel, CvodeAdaptor>::Instance());
         p_solver->Initialise();
         p_solver->CheckForStoppingEvents();
         p_solver->SetMaxSteps(10000);
-#else
-        boost::shared_ptr<CellCycleModelOdeSolver<WntCellCycleModel, RungeKutta4IvpOdeSolver> >
-            p_solver(CellCycleModelOdeSolver<WntCellCycleModel, RungeKutta4IvpOdeSolver>::Instance());
-        p_solver->Initialise();
-#endif //CHASTE_CVODE
 
         WntCellCycleModel* p_other_cell_model = new WntCellCycleModel(p_solver);
         p_other_cell_model->SetDimension(2);
@@ -166,11 +160,7 @@ public:
 
         std::vector<double> test_results = p_cell_model->GetProteinConcentrations();
         std::vector<double> other_test_results = p_other_cell_model->GetProteinConcentrations();
-#ifdef CHASTE_CVODE
         TS_ASSERT_DELTA(test_results[0], 0.7329922345, tol);
-#else
-        TS_ASSERT_DELTA(test_results[0], 7.330036281693106e-01, tol);
-#endif //CHASTE_CVODE
         TS_ASSERT_DELTA(test_results[1], 1.715690244022676e-01, tol);
         TS_ASSERT_DELTA(test_results[2], 6.127460817296076e-02, tol);
         TS_ASSERT_DELTA(test_results[3], 1.549402358669023e-07, tol);
@@ -180,11 +170,7 @@ public:
         TS_ASSERT_DELTA(test_results[7], 0.5*7.415537855270896e-03, tol);
         TS_ASSERT_DELTA(test_results[8], 0.0, tol);
 
-#ifdef CHASTE_CVODE
         TS_ASSERT_DELTA(other_test_results[0], 0.7329922345, tol);
-#else
-        TS_ASSERT_DELTA(other_test_results[0], 7.330036281693106e-01, tol);
-#endif //CHASTE_CVODE
         TS_ASSERT_DELTA(other_test_results[1], 1.715690244022676e-01, tol);
         TS_ASSERT_DELTA(other_test_results[2], 6.127460817296076e-02, tol);
         TS_ASSERT_DELTA(other_test_results[3], 1.549402358669023e-07, tol);
@@ -247,12 +233,8 @@ public:
 
         double tol = 1e-4;
 
-#ifdef CHASTE_CVODE
         const double expected_g1_duration = 6.18461;
         tol = 1e-5;
-#else
-        const double expected_g1_duration = 6.1959;
-#endif //CHASTE_CVODE
 
         // Progress through the cell cycle under a constant Wnt concentration
         for (unsigned i=0; i<21*num_timesteps/30.0; i++)
@@ -482,11 +464,7 @@ public:
 
         // These numbers (below) have been lifted from the above test for hypothesis one -
         // and so are probably not correct for hypothesis two if run for long enough
-#ifdef CHASTE_CVODE
         const double expected_g1_duration = 6.18461;
-#else
-        const double expected_g1_duration = 6.1959;
-#endif //CHASTE_CVODE
 
         // Progress through the cell cycle under a constant Wnt concentration
         for (unsigned i=0; i<num_timesteps; i++)
@@ -557,11 +535,7 @@ public:
         // Run the Wnt model for a full constant Wnt stimulus for 20 hours.
         // Model should enter S phase at 4.804 hrs and then finish dividing
         // 10 hours later at 14.804 hours.
-#ifdef CHASTE_CVODE
         double expected_g1_duration = 4.7998;
-#else
-        double expected_g1_duration = 4.8084;
-#endif //CHASTE_CVODE
 
         for (unsigned i=0; i<num_timesteps/2; i++)
         {
@@ -570,11 +544,7 @@ public:
         }
 
         p_cell_model_1->ResetForDivision();
-#ifdef CHASTE_CVODE
         expected_g1_duration = 4.806;
-#else
-        expected_g1_duration = 4.8084;
-#endif //CHASTE_CVODE
 
         TS_ASSERT_DELTA(SG2M_duration, 10.0, 1e-5);
         for (unsigned i=0; i<num_timesteps/2; i++)
@@ -621,11 +591,7 @@ public:
         // Run the Wnt model for a full constant Wnt stimulus for 20 hours.
         // Model should enter S phase at 7.82 hrs and then finish dividing
         // 10 hours later at 17.82 hours.
-#ifdef CHASTE_CVODE
         double expected_g1_duration = 7.81718;
-#else
-        double expected_g1_duration = 7.8342;
-#endif //CHASTE_CVODE
 
         for (unsigned i=0; i<num_timesteps/2; i++)
         {
@@ -634,11 +600,7 @@ public:
         }
 
         p_cell_model_1->ResetForDivision();
-#ifdef CHASTE_CVODE
         expected_g1_duration = 7.81873;
-#else
-        expected_g1_duration = 7.8342;
-#endif //CHASTE_CVODE
 
         // Test progress through the cell cycle
         for (unsigned i=0; i<num_timesteps/2; i++)
@@ -684,11 +646,7 @@ public:
         // Run the Wnt model for a full constant Wnt stimulus for 20 hours.
         // Model should enter S phase at 3.943 hrs and then finish dividing
         // 10 hours later at 13.9435 hours.
-#ifdef CHASTE_CVODE
         double expected_g1_duration = 3.93959;
-#else
-        double expected_g1_duration = 3.9455;
-#endif //CHASTE_CVODE
 
         // Test progress through the cell cycle
         for (unsigned i=0; i<num_timesteps/2; i++)
@@ -699,11 +657,7 @@ public:
 
         p_cell_model_2->ResetForDivision();
 
-#ifdef CHASTE_CVODE
         expected_g1_duration = 3.94529;
-#else
-        expected_g1_duration = 3.9455;
-#endif //CHASTE_CVODE
 
         // Test progress through the cell cycle
         for (unsigned i=0; i<num_timesteps/2; i++)
@@ -749,11 +703,7 @@ public:
         // Run the Wnt model for a full constant Wnt stimulus for 20 hours.
         // Model should enter S phase at 5.971 hrs and then finish dividing
         // 10 hours later at 15.971 hours.
-#ifdef CHASTE_CVODE
         double expected_g1_duration = 5.96441;
-#else
-        double expected_g1_duration = 5.9782;
-#endif //CHASTE_CVODE
 
         // Test progress through the cell cycle
         for (unsigned i=0; i<num_timesteps/2; i++)
@@ -763,11 +713,7 @@ public:
         }
 
         p_cell_model_2->ResetForDivision();
-#ifdef CHASTE_CVODE
         expected_g1_duration = 5.96016;
-#else
-        expected_g1_duration = 5.9782;
-#endif //CHASTE_CVODE
 
         // Test progress through the cell cycle
         for (unsigned i=0; i<num_timesteps/2; i++)

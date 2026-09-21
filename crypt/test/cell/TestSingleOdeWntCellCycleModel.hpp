@@ -122,12 +122,8 @@ public:
 
         double steady_beta_cat_at_wnt_equals_1 = p_cycle_model->GetBetaCateninConcentration();
 
-#ifdef CHASTE_CVODE
         TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4973, 2e-3);
         // (Different CVODE versions give slightly different answers here...)
-#else
-        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.5119, 1e-4);
-#endif
 
         // Divide the cell
         TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
@@ -202,12 +198,8 @@ public:
         }
 
         TS_ASSERT_DELTA(91.6693, p_cycle_model->GetBetaCateninConcentration(), 1e-3);
-#ifdef CHASTE_CVODE
         TS_ASSERT_DELTA(361.5455, p_cycle_model2->GetBetaCateninConcentration(), 5e-1);
         // Different versions of CVODE giving different answers here.
-#else
-        TS_ASSERT_DELTA(361.4677, p_cycle_model2->GetBetaCateninConcentration(), 1e-3);
-#endif
 
         TS_ASSERT_DELTA(p_cycle_model->GetBetaCateninDivisionThreshold(), 100, 1e-9);
         TS_ASSERT_DELTA(p_cycle_model2->GetBetaCateninDivisionThreshold(), 100, 1e-9);
