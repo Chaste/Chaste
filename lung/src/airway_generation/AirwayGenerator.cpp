@@ -118,11 +118,7 @@ vtkSmartPointer<vtkPolyData> AirwayGenerator::CreatePointCloudUsingTargetPoints(
 {
     //Determine the spacing of the points being generated
     vtkSmartPointer<vtkMassProperties> mass_properties = vtkSmartPointer<vtkMassProperties>::New();
-#if VTK_MAJOR_VERSION >= 6
     mass_properties->SetInputData(mLobeSurface);
-#else
-    mass_properties->SetInput(mLobeSurface);
-#endif
 
     double point_spacing = std::pow(mass_properties->GetVolume()/rApproxPoints, 1.0/3.0);
 
@@ -653,11 +649,7 @@ double AirwayGenerator::DistanceFromLobeSurface(double point[3])
 double AirwayGenerator::CalculateLobeVolume()
 {
     vtkSmartPointer<vtkMassProperties> mass_properties = vtkSmartPointer<vtkMassProperties>::New();
-#if VTK_MAJOR_VERSION >= 6
     mass_properties->SetInputData(mLobeSurface);
-#else
-    mass_properties->SetInput(mLobeSurface);
-#endif
 
     return mass_properties->GetVolume();
 }
@@ -666,11 +658,7 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
 {
     // Use a vtk connectivity filter to separate the airway tree
     vtkSmartPointer<vtkPolyDataConnectivityFilter> connectivity_filter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
-#if VTK_MAJOR_VERSION >= 6
     connectivity_filter->SetInputData(mAirwayTree);
-#else
-    connectivity_filter->SetInput(mAirwayTree);
-#endif
     connectivity_filter->Update();
     connectivity_filter->SetExtractionModeToSpecifiedRegions();
 
@@ -687,11 +675,7 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
         vtu_file_name << output.GetOutputDirectoryFullPath() << rOutputFileNameRoot << "_" << connected_region << ".vtu";
 
         vtkSmartPointer<vtkCleanPolyData> poly_clean = vtkSmartPointer<vtkCleanPolyData>::New();
-#if VTK_MAJOR_VERSION >= 6
         poly_clean->SetInputConnection(connectivity_filter->GetOutputPort());
-#else
-        poly_clean->SetInput(connectivity_filter->GetOutput());
-#endif
         poly_clean->Update();
 
         vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
@@ -727,11 +711,7 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
 
         vtkSmartPointer<vtkXMLUnstructuredGridWriter> vtu_writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
         vtu_writer->SetFileName(vtu_file_name.str().c_str());
-#if VTK_MAJOR_VERSION >= 6
         vtu_writer->SetInputData(filtered_grid);
-#else
-        vtu_writer->SetInput(filtered_grid);
-#endif
         vtu_writer->Write();
 
         // Load the vtu in to a Chaste mesh and serialize out in triangles/tetgen format

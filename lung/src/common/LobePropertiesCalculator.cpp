@@ -83,11 +83,7 @@ double LobePropertiesCalculator::GetLobeVolume(const std::string& rName)
 double LobePropertiesCalculator::GetLobeVolume(vtkSmartPointer<vtkPolyData> pLobeSurface)
 {
     vtkSmartPointer<vtkMassProperties> mass_properties = vtkSmartPointer<vtkMassProperties>::New();
-#if VTK_MAJOR_VERSION >= 6
         mass_properties->SetInputData(pLobeSurface);
-#else
-        mass_properties->SetInput(pLobeSurface);
-#endif
 
     return mass_properties->GetVolume();
 }

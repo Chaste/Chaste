@@ -343,6 +343,10 @@ if (NOT ${VTK_FOUND})
     message(FATAL_ERROR "Did not find VTK")
 endif ()
 
+if ("${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" VERSION_LESS 7.1)
+    message(FATAL_ERROR "VTK 7.1 or later is required, but found VTK ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+endif ()
+
 # Depending on the VTK version, we need different components.
 set (_vtk_modules "")
 if (VTK_MAJOR_VERSION LESS 9)
@@ -359,14 +363,10 @@ if (VTK_MAJOR_VERSION LESS 9)
                 vtkRenderingAnnotation vtkRenderingCore vtkRenderingFreeType
                 vtkWrappingPythonCore
              )
-        if (VTK_MAJOR_VERSION LESS 7)
-            list (APPEND _vtk_modules vtkRenderingOpenGL)
-        else ()
-            list (APPEND _vtk_modules
-                    vtkFiltersProgrammable vtkFiltersVerdict
-                    vtkRenderingOpenGL2
-                 )
-        endif ()
+        list (APPEND _vtk_modules
+                vtkFiltersProgrammable vtkFiltersVerdict
+                vtkRenderingOpenGL2
+             )
     endif ()
 else ()
     # VTK 9.0 and above require the following

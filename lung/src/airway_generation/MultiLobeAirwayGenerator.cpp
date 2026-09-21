@@ -272,8 +272,7 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
 {
     vtkSmartPointer<vtkAppendFilter> append_filter = vtkSmartPointer<vtkAppendFilter>::New();
 
-    // Merge points cannot be set in vtk5.6 but defaults to on
-    // In vtk5.8 and higher we must explicitly set it to be on
+    // We must explicitly set merging of points to be on
     append_filter->MergePointsOn();
 
     // Merge in the major airways, the mesh has to be converted to a vtk unstructured grid first
@@ -317,11 +316,7 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
     major_airways_reader->SetFileName(major_airways_file_name.c_str());
     major_airways_reader->Update();
 
-#if VTK_MAJOR_VERSION >= 6
     append_filter->AddInputData(major_airways_reader->GetOutput());
-#else
-    append_filter->AddInput(major_airways_reader->GetOutput());
-#endif
 
     // Loop over generators, generate and merge the results
     typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
@@ -334,11 +329,7 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
         generators_iter->first->CalculateRadii(mDiameterRatio);
         generators_iter->first->MarkStartIds();
 
-#if VTK_MAJOR_VERSION >= 6
         append_filter->AddInputData(generators_iter->first->GetAirwayTree());
-#else
-        append_filter->AddInput(generators_iter->first->GetAirwayTree());
-#endif
     }
 
     append_filter->Update();
@@ -348,18 +339,6 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
     vtkSmartPointer<vtkUnstructuredGrid> appended_grid = append_filter->GetOutput();
     vtkSmartPointer<vtkUnstructuredGrid> filtered_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     filtered_grid->SetPoints(appended_grid->GetPoints());
-
-#if VTK_MAJOR_VERSION == 6
-    /* Note that there is a bug in some versions of VTK 6 which involves filtering for
-     * duplicate points and attributes but not altering the size of the attribute vectors.
-     * This leads to attribute vectors which contain unintialised values.  See
-     * "BUG #15746: Fixes issues with Merge Points in vtkAppendFilter"
-     */
-    unsigned num_points = appended_grid->GetNumberOfPoints();
-    appended_grid->GetPointData()->GetArray("radius")->SetNumberOfTuples( num_points );
-    appended_grid->GetPointData()->GetArray("horsfield_order")->SetNumberOfTuples( num_points );
-    appended_grid->GetPointData()->GetArray("start_id")->SetNumberOfTuples( num_points );
-#endif
 
     filtered_grid->GetPointData()->AddArray(appended_grid->GetPointData()->GetArray("radius"));
     filtered_grid->GetPointData()->AddArray(appended_grid->GetPointData()->GetArray("horsfield_order"));
@@ -390,11 +369,7 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
 
     vtkSmartPointer<vtkXMLUnstructuredGridWriter> combined_vtu_writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
     combined_vtu_writer->SetFileName(output_file_name.c_str());
-#if VTK_MAJOR_VERSION >= 6
     combined_vtu_writer->SetInputData(filtered_grid);
-#else
-    combined_vtu_writer->SetInput(filtered_grid);
-#endif
     combined_vtu_writer->Write();
 
     // Load the vtu in to a Chaste mesh and serialize out in triangles/tetgen format

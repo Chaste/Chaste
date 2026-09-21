@@ -498,11 +498,7 @@ public:
 
         vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
         writer->SetFileName(output_file.c_str());
-#if VTK_MAJOR_VERSION >= 6
         writer->SetInputData(generator.GetAirwayTree());
-#else
-        writer->SetInput(generator.GetAirwayTree());
-#endif
         writer->Write();*/
     }
 
@@ -575,11 +571,7 @@ public:
 
         vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
         writer->SetFileName(output_file.c_str());
-#if VTK_MAJOR_VERSION >= 6
         writer->SetInputData(generator.GetAirwayTree());
-#else
-        writer->SetInput(generator.GetAirwayTree());
-#endif
         writer->Write();*/
     }
 

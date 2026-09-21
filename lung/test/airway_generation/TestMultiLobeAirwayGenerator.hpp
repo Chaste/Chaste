@@ -204,11 +204,7 @@ public:
 
 //         // See AirwayGenerator::CreatePointCloudUsingTargetPoints(const unsigned& rApproxPoints)
 //         vtkSmartPointer<vtkMassProperties> mass_properties = vtkSmartPointer<vtkMassProperties>::New();
-// #if VTK_MAJOR_VERSION >= 6
 //         mass_properties->SetInputData(lobe_surface);
-// #else
-//         mass_properties->SetInput(lobe_surface);
-// #endif
 //         double point_spacing = std::pow(mass_properties->GetVolume()/4, 1.0/3.0);
 //         TS_ASSERT_DELTA(point_spacing, 1.25992 /*2^(1/3)*/, 1e-5);
 //         TS_ASSERT_DELTA(mass_properties->GetVolume(), 8.0, 1e-5);
@@ -224,7 +220,7 @@ public:
 //         TS_ASSERT_EQUALS(yi_max, 2u);
 //         TS_ASSERT_EQUALS(zi_max, 2u);
 //         // This show why the loop in AirwayGenerator::CreatePointCloud() is doing different things when run with VTK 8.2
-//         //if (VTK_MAJOR_VERSION == 8u) {  // Reinstate if this test fails in VTK 5, 6 or7.
+//         //if (VTK_MAJOR_VERSION == 8u) {  // Reinstate if this test fails in VTK 7.
 //             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2],               bounds[4]),               sNumTrials);
 //             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2],               bounds[4]+point_spacing), 0u);
 //             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2]+point_spacing, bounds[4]),               0u);
@@ -252,11 +248,7 @@ public:
 
         // See AirwayGenerator::CreatePointCloudUsingTargetPoints(const unsigned& rApproxPoints)
         vtkSmartPointer<vtkMassProperties> mass_properties = vtkSmartPointer<vtkMassProperties>::New();
-#if VTK_MAJOR_VERSION >= 6
         mass_properties->SetInputData(lobe_surface);
-#else
-        mass_properties->SetInput(lobe_surface);
-#endif
         double point_spacing = std::pow(mass_properties->GetVolume()/4, 1.0/3.0);
         TS_ASSERT_DELTA(point_spacing, 1.00574 /* ~(Pi/3)^(1/3)*/, 1e-5);
         TS_ASSERT_DELTA(mass_properties->GetVolume(), 4.0693, 1e-5); /* Polyhedron based on sphere of volume 4*Pi/3 ~= 4.18879 */
@@ -272,7 +264,7 @@ public:
         TS_ASSERT_EQUALS(yi_max, 2u);
         TS_ASSERT_EQUALS(zi_max, 2u);
         // This show why the loop in AirwayGenerator::CreatePointCloud() is doing different things when run with VTK 8.2
-        //if (VTK_MAJOR_VERSION == 8u) {  // Reinstate if this test fails in VTK 5, 6 or7.
+        //if (VTK_MAJOR_VERSION == 8u) {  // Reinstate if this test fails in VTK 7.
             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2],               bounds[4]),               0u);
             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2],               bounds[4]+point_spacing), 0u);
             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2]+point_spacing, bounds[4]),               0u);

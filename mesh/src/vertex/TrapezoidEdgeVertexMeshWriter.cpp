@@ -64,11 +64,7 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Ve
     // Now write VTK mesh to file
     assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
     vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
-#if VTK_MAJOR_VERSION >= 6
     p_writer->SetInputData(mpVtkUnstructedMesh);
-#else
-    p_writer->SetInput(mpVtkUnstructedMesh);
-#endif
     // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
     // **** REMOVE WITH CAUTION *****
     p_writer->SetCompressor(nullptr);
