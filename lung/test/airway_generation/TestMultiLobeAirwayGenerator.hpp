@@ -190,7 +190,6 @@ public:
 
 //     void doNotTestProblemWithPointMembershipClassificationCube()
 //     {
-// #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 //         EXIT_IF_PARALLEL;
 //         std::cout << "For information, VTK is "<<VTK_MAJOR_VERSION<<"."<<VTK_MINOR_VERSION<<".\n";
 //         // This code is for #3002
@@ -235,7 +234,6 @@ public:
 //             TS_ASSERT_DIFFERS(CountIsInsideSurface(point_selector, bounds[0]+point_spacing, bounds[2]+point_spacing, bounds[4]),               0u);
 //             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0]+point_spacing, bounds[2]+point_spacing, bounds[4]+point_spacing), sNumTrials);
 //         //}
-// #endif
 //     }
 
     void TestProblemWithPointMembershipClassificationSphere()
@@ -358,7 +356,6 @@ private:
         return sphere_data;
     }
 
-// #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 //     vtkSmartPointer<vtkPolyData> CreateCube(double XCentre, double YCentre, double ZCentre)
 //     {
 
@@ -375,7 +372,6 @@ private:
 
 //         return triangle_filter->GetOutput();
 //     }
-// #endif
 };
 
 #endif /* TESTMULTILOBEAIRWAYGENERATOR_HPP_ */

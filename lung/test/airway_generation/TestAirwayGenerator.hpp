@@ -362,7 +362,6 @@ public:
 //
 //    void xxxTestGrowTerminalPointsApex()
 //    {
-//#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 //        EXIT_IF_PARALLEL;
 //
 //        vtkSmartPointer<vtkPolyData> sphere = CreateSphere();
@@ -381,7 +380,6 @@ public:
 //
 //        //Test that no child apices were created
 //        TS_ASSERT_EQUALS(generator.GetApices().size(), 0u);
-//#endif
 //    }
 //
 //
