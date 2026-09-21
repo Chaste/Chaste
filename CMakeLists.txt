@@ -284,8 +284,6 @@ message("Codegen version: ${Chaste_CODEGEN_VERSION}")
 
 # Get pychaste dependencies
 if (Chaste_ENABLE_PYCHASTE)
-    set(Chaste_USE_VTK ON)
-
     # Get pybind11
     include(FetchContent)
     FetchContent_Declare(
