@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryConditionsContainer.hpp"
 #include "AbstractOdeSystemForCoupledPdeSystem.hpp"
 #include "CvodeAdaptor.hpp"
-#include "BackwardEulerIvpOdeSolver.hpp"
 #include "Warnings.hpp"
 #include "VtkMeshWriter.hpp"
 
@@ -400,11 +399,7 @@ LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBL
          */
         if (!mpOdeSolver)
         {
-#ifdef CHASTE_CVODE
             mpOdeSolver.reset(new CvodeAdaptor);
-#else
-            mpOdeSolver.reset(new BackwardEulerIvpOdeSolver(mOdeSystemsAtNodes[0]->GetNumberOfStateVariables()));
-#endif //CHASTE_CVODE
         }
     }
 }
