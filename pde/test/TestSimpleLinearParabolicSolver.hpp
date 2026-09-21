@@ -426,10 +426,8 @@ public:
                                                 "pde/test/data", "results", false));
 
         // Test that there is a .vtu file
-#ifdef CHASTE_VTK
         FileFinder vtk_file = file_handler.FindFile("vtk_output/results.vtu");
         TS_ASSERT(vtk_file.Exists());
-#endif //CHASTE_VTK
 
         // Test that there are .txt files
         for (unsigned timestep=0; timestep<101; timestep++)
