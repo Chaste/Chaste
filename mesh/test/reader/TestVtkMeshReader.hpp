@@ -45,8 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <fstream>
 
-#ifdef CHASTE_VTK
-//Requires  "sudo aptitude install libvtk5-dev" or similar
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkDoubleArray.h>
 #include <vtkCellData.h>
@@ -54,7 +52,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridReader.h>
 #include <vtkXMLUnstructuredGridReader.h>
-#endif //CHASTE_VTK
 
 #include "TrianglesMeshReader.hpp"
 #include "TetrahedralMesh.hpp"
@@ -68,9 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 
-#ifdef CHASTE_VTK
 typedef VtkMeshReader<3,3> MESH_READER3;
-#endif //CHASTE_VTK
 
 class TestVtkMeshReader : public CxxTest::TestSuite
 {
@@ -93,13 +88,8 @@ public:
      */
     void TestFilesOpen(void)
     {
-#ifdef CHASTE_VTK
         TS_ASSERT_THROWS_NOTHING(MESH_READER3 mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu"));
         TS_ASSERT_THROWS_ANYTHING(MESH_READER3 mesh_reader("mesh/test/data/nofile.vtu"));
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     /**
@@ -107,17 +97,12 @@ public:
      */
     void TestOutputVtkUnstructuredGrid(void)
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
         vtkUnstructuredGrid* vtk_unstructed_grid = mesh_reader.OutputMeshAsVtkUnstructuredGrid();
 
         TS_ASSERT_EQUALS(vtk_unstructed_grid->GetNumberOfPoints(), 12);
         TS_ASSERT_EQUALS(vtk_unstructed_grid->GetNumberOfCells(), 12);
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     /**
@@ -127,7 +112,6 @@ public:
      */
     void TestGetNextNode(void)
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 12u);
@@ -149,15 +133,10 @@ public:
 
         TS_ASSERT_THROWS_THIS( next_node = mesh_reader.GetNextNode(),
                                "Trying to read data for a node that doesn't exist" );
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestGetNextElementData(void)
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
         // Coverage of GetOrderOfBoundaryElements()
@@ -200,16 +179,10 @@ public:
         TS_ASSERT_THROWS_THIS( first_element_data = invalid_mesh_reader.GetNextElementData(),
                                "Element is not of expected type (vtkTetra/vtkTriangle)" );
 
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestGetNextFaceData(void)
     {
-#ifdef CHASTE_VTK
-
         /*
          * Several points to note:
          *
@@ -289,15 +262,10 @@ public:
 
         // Finally, if we read an additional face, we expect an exception.
         TS_ASSERT_THROWS_THIS(mesh_reader.GetNextFaceData(), "Trying to read data for a boundary element that doesn't exist");
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestConstructFromVtkUnstructuredGridObject()
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader_1("mesh/test/data/cube_2mm_12_elements.vtu");
         vtkUnstructuredGrid* vtk_unstructed_grid = mesh_reader_1.OutputMeshAsVtkUnstructuredGrid();
 
@@ -316,15 +284,10 @@ public:
         TS_ASSERT_DELTA(next_node[0], 0.2, 1e-6);
         TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6);
         TS_ASSERT_DELTA(next_node[2], 0.0, 1e-6);
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestGenericReader()
     {
-#ifdef CHASTE_VTK
         std::shared_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu");
 
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 12u);
@@ -344,10 +307,6 @@ public:
         // Exception coverage
         TS_ASSERT_THROWS_THIS((GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu", 2, 2)),
                               "Quadratic meshes are only supported in Triangles format.");
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     /**
@@ -355,7 +314,6 @@ public:
      */
     void TestBuildTetrahedralMeshFromMeshReader(void)
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
 
         TetrahedralMesh<3,3> mesh;
@@ -452,10 +410,6 @@ public:
         TS_ASSERT_THROWS_ANYTHING( mesh_reader.GetPointData( "Non-existent data", not_there) );
         TS_ASSERT_THROWS_ANYTHING( mesh_reader.GetCellData( "Non-existent data", vectors_not_there) );
         TS_ASSERT_THROWS_ANYTHING( mesh_reader.GetPointData( "Non-existent data", vectors_not_there) );
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     /**
@@ -463,7 +417,6 @@ public:
      */
     void TestBuildDistributedTetrahedralMeshFromVtkMeshReader(void)
     {
- #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
 
         DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
@@ -539,10 +492,6 @@ public:
             TS_ASSERT_EQUALS(iterator_node, mesh_node);
         }
 
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     /**
@@ -550,7 +499,6 @@ public:
      */
     void TestBuild2DFromVtkMeshReader(void)
     {
-#ifdef CHASTE_VTK
     VtkMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements.vtu");
 
     TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 40u);
@@ -568,17 +516,12 @@ public:
     TS_ASSERT_EQUALS(centroid.size(), 200u);
     TS_ASSERT_DELTA(centroid[0](0), 0.0033, 1e-4);
     TS_ASSERT_DELTA(centroid[0](1), 0.0033, 1e-4);
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
     /**
      * Check that we can build a 2D MixedDimensionMesh using the VTK mesh reader.
      */
     void TestBuildMixedMesh2DFromVtkMeshReader(void)
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<2,2> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_2d.vtu");
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 10u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElementAttributes(), 1u);
@@ -600,17 +543,12 @@ public:
         }
         TS_ASSERT_THROWS_THIS(mesh_reader.GetNextCableElementData(), "Trying to read data for a cable element that doesn't exist");
 
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
     /**
      * Check that we can build a 3D MixedDimensionMesh using the VTK mesh reader.
      */
     void TestBuildMixedMeshTetrahedralMeshFromVtkMeshReader(void)
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_3d.vtu");
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 616u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 5u);
@@ -631,10 +569,6 @@ public:
         {
             TS_ASSERT_DELTA((*iter)->GetAttribute(), 2.0, 1e-9);
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     /**
@@ -642,7 +576,6 @@ public:
      */
     void TestLoadingSurfaceMeshFromVtkMeshReader(void)
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<2,3> mesh_reader("mesh/test/data/cylinder.vtu");
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 1632u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 32u);
@@ -657,10 +590,6 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1632u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 32u);
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 0u);
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
 
@@ -669,7 +598,6 @@ public:
      */
     void TestLoading1Din3DMeshFromVtkMeshReader(void)
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<1,3> mesh_reader("mesh/test/data/branched_1d_in_3d_mesh.vtu");
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 30u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 31u);
@@ -685,10 +613,6 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), mesh_reader.GetNumElements());
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_reader.GetNumEdges());
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 0u);
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 };
 
