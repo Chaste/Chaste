@@ -79,9 +79,9 @@ public:
      * Note: from Chaste release 2021.1 onward the earliest version of Boost supported is 1.58.
      *
      * NB: Produce archives with something similar to
-     *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/path/to/boost1.58 -DChaste_USE_CVODE=OFF /path/to/Chaste
+     *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/path/to/boost1.58 /path/to/Chaste
      *  # YOUR MILEAGE MAY VARY because CMake is very good at finding other versions of Boost:
-     *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/home/jmpf/boost_1_58 -DBoost_NO_SYSTEM_PATHS=ON -DBoost_NO_BOOST_CMAKE=ON -DChaste_USE_CVODE=FALSE ..
+     *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/home/jmpf/boost_1_58 -DBoost_NO_SYSTEM_PATHS=ON -DBoost_NO_BOOST_CMAKE=ON ..
      *  make TestGenerateSteadyStateCrypt
      *  ctest -R TestGenerateSteadyStateCrypt
      *  cp $CHASTE_TEST_OUTPUT/SteadyStateCrypt/archive/?*_150.* ../crypt/test/data/SteadyStateCrypt/archive/
@@ -123,9 +123,6 @@ public:
         {
             archive_handler.CopyFileTo(temp_file);
         }
-#ifndef CHASTE_CVODE
-        std::cout << "Warning: CVODE is off.  If this configuration of the test suite fails, but none of the others, then the archive was built with CVODE on.  If should be built with CVODE off." << std::endl;
-#endif //CHASTE_CVODE
 
         // Load and run crypt simulation
         CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load(test_to_profile, t);
