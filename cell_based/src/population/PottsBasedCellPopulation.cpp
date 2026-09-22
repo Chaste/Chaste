@@ -520,7 +520,6 @@ unsigned PottsBasedCellPopulation<DIM>::GetNumSweepsPerTimestep()
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-#ifdef CHASTE_VTK
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
     time << num_timesteps;
@@ -760,7 +759,6 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
         outline_mesh_writer.WriteVtkUsingMesh(cell_outline_mesh, time.str());
         outline_mesh_writer.WriteFilesUsingMesh(cell_outline_mesh);
     }
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>

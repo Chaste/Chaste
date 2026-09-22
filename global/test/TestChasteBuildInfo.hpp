@@ -54,6 +54,24 @@ public:
         ExecutableSupport::GetBuildInfo(info);
         std::cout << info << std::flush;
     }
+
+    /**
+     * Nothing inside Chaste tests these macros any more (VTK, CVODE and Xerces are required dependencies),
+     * but downstream code may still guard on them, so they must remain defined.
+     * See cmake/Modules/ChasteLegacyDefinitions.cmake.
+     */
+    void TestLegacyDependencyMacrosRemainDefined()
+    {
+#ifndef CHASTE_VTK
+        TS_FAIL("CHASTE_VTK must remain defined, see cmake/Modules/ChasteLegacyDefinitions.cmake");
+#endif
+#ifndef CHASTE_CVODE
+        TS_FAIL("CHASTE_CVODE must remain defined, see cmake/Modules/ChasteLegacyDefinitions.cmake");
+#endif
+#ifndef CHASTE_XERCES
+        TS_FAIL("CHASTE_XERCES must remain defined, see cmake/Modules/ChasteLegacyDefinitions.cmake");
+#endif
+    }
 };
 
 #endif /* TESTCHASTEBUILDINFO_HPP_ */

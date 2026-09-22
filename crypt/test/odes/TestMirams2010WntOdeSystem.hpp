@@ -61,7 +61,6 @@ public:
 
     void TestMirams2010WntOdeSystemSetup()
     {
-#ifdef CHASTE_CVODE
         double wnt_level = 0.5;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         Mirams2010WntOdeSystem wnt_system(wnt_level, p_state);
@@ -89,15 +88,10 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 67.5011, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 67.5011, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], wnt_level, 1e-4);
-#else
-        std::cout << "CVODE is not enabled. " << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_CVODE
     }
 
     void TestGarysWntOdeSystemApc2Hit()
     {
-#ifdef CHASTE_CVODE
         double wnt_level = 0.5;
         boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
         Mirams2010WntOdeSystem wnt_system(wnt_level, p_apc2);
@@ -123,15 +117,10 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 433.114, 2e-3); // Tolerances relaxed for
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 433.114, 2e-3); // different CVODE versions.
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], wnt_level, 1e-4);
-#else
-        std::cout << "CVODE is not enabled. " << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_CVODE
     }
 
     void TestGarysWntOdeSystemBetaCatenin1Hit()
     {
-#ifdef CHASTE_CVODE
         double wnt_level = 0.5;
         boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
         Mirams2010WntOdeSystem wnt_system(wnt_level, p_bcat1);
@@ -157,16 +146,11 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 67.5011, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 824.0259, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], wnt_level, 1e-4);
-#else
-        std::cout << "CVODE is not enabled. " << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_CVODE
     }
 
     void TestArchiving()
     {
         EXIT_IF_PARALLEL;
-#ifdef CHASTE_CVODE
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "mirams_ode.arch";
 
@@ -216,10 +200,6 @@ public:
             // Tidy up
             delete p_ode_system;
         }
-#else
-        std::cout << "CVODE is not enabled. " << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_CVODE
     }
 };
 

@@ -550,7 +550,6 @@ void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput(std::string spatialS
     {
         EXCEPTION("No output directory was given so no output was written, cannot convert to VTK format");
     }
-#ifdef CHASTE_VTK
     VtkMeshWriter<DIM, DIM> mesh_writer(this->mOutputDirectory + "/vtk", "solution", true);
 
     mesh_writer.AddPointData(spatialSolutionName, this->rGetSpatialSolution());
@@ -571,7 +570,6 @@ void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput(std::string spatialS
     mesh_writer.AddCellData("Attribute", element_attribute);
 
     mesh_writer.WriteFilesUsingMesh(this->mrQuadMesh);
-#endif
 }
 
 template<unsigned DIM>

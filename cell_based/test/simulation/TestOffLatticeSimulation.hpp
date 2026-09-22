@@ -160,7 +160,6 @@ public:
         TS_ASSERT(cell_velocities.CompareFiles(1e-2));
 
         // Test vtk files exist
-#ifdef CHASTE_VTK
         std::string results_dir = handler.GetOutputDirectoryFullPath();
 
         // Initial condition file
@@ -170,7 +169,6 @@ public:
         // Final file
         FileFinder vtk_file2(results_dir + "results_from_time_0/voronoi_results_60.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
-#endif //CHASTE_VTK
     }
 
     void TestOutputNodeVelocitiesWithGhostNodes()
@@ -226,7 +224,6 @@ public:
         TS_ASSERT(node_velocities.CompareFiles(1e-2));
 
         // Test vtk files exist
-#ifdef CHASTE_VTK
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Initial condition file
@@ -236,7 +233,6 @@ public:
         // Final file
         FileFinder vtk_file2(results_dir + "results_from_time_0/voronoi_results_60.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
-#endif //CHASTE_VTK
     }
 
     /**

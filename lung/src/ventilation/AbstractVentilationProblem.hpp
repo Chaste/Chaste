@@ -289,7 +289,6 @@ public:
      */
     virtual void Solve()=0;
 
-#ifdef CHASTE_VTK
     /**
      * Add flux and pressure data to a VtkMeshWriter.
      * @param rVtkWriter  the mesh writer ready for the data
@@ -303,7 +302,6 @@ public:
      * @param rFileBaseName The base name of the new VTK file.
      */
     void WriteVtk(const std::string& rDirName, const std::string& rFileBaseName);
-#endif // CHASTE_VTK
 
     /**
      * Set up per element dynamic resistance in the manner prescribed by

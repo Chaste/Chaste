@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A helper class which will dynamically load a CellML file and provide a method to get a pointer
- * to a new AbstractCardiacCell (or AbstractCvodeCell if CVODE is enabled).
+ * to a new AbstractCardiacCell (or AbstractCvodeCell).
  *
  * Note that you cannot call both LoadCardiacCell and LoadCvodeCell on the same object, since there
  * would be filename conflicts trying to create different classes in the same output folder.  Create
@@ -76,13 +76,11 @@ public:
      */
     boost::shared_ptr<AbstractCardiacCell> LoadCardiacCell(void);
 
-#ifdef CHASTE_CVODE
     /**
      * Make an AbstractCvodeCell, using the default stimulus from the CellML file (if present).
      * @return a pointer to the cell
      */
     boost::shared_ptr<AbstractCvodeCell> LoadCvodeCell(void);
-#endif
 
 private:
     /** The location of the CellML file to convert */

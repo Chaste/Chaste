@@ -788,7 +788,7 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the maximum cell ID to zero (to account for previous tests)
@@ -959,7 +959,6 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-#ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
 
         // Initial condition files
@@ -978,14 +977,13 @@ public:
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
- #endif //CHASTE_VTK
     }
 
     void TestWriteResultsToFileWithAlternativeAddWriterMethods()
     {
         EXIT_IF_PARALLEL;
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the maximum cell ID to zero (to account for previous tests)
@@ -1098,7 +1096,6 @@ public:
         FileComparison(results_dir + "new_cellages.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/cellages.dat").CompareFiles();
         FileComparison(results_dir + "new_divisions.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/divisions.dat").CompareFiles();
 
-#ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
 
         // Initial condition files
@@ -1129,7 +1126,6 @@ public:
         TS_ASSERT_DELTA(ages_data[2], 2.0, 1e-9);
         TS_ASSERT_DELTA(ages_data[3], 3.0, 1e-9);
         TS_ASSERT_DELTA(ages_data[4], 4.0, 1e-9);
-#endif //CHASTE_VTK
     }
 
     void TestCellPopulationWritersIn3d()
@@ -1137,7 +1133,7 @@ public:
         // Cannot write cell populations in parallel
         EXIT_IF_PARALLEL;
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the Maximum cell Id to zero (to account for previous tests)

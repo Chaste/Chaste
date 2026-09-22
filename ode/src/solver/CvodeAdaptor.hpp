@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifdef CHASTE_CVODE
 #ifndef _CVODEADAPTOR_HPP_
 #define _CVODEADAPTOR_HPP_
 
@@ -51,10 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cvode/cvode.h>
 #include <nvector/nvector_serial.h>
 
-#if CHASTE_SUNDIALS_VERSION >= 30000
 #include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
 #include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
-#endif
 
 #if CHASTE_SUNDIALS_VERSION >= 70000
 ///\todo We should prefer sunrealtype in our own code in future
@@ -181,12 +178,10 @@ private:
     /** Whether to ignore changes in the state variables when deciding whether to reset. */
     bool mForceMinimalReset;
 
-#if CHASTE_SUNDIALS_VERSION >= 30000
     /** Working memory for CVODE to store a dense matrix */
     SUNMatrix mpSundialsDenseMatrix;
     /** Working memory for CVODE's linear solver */
     SUNLinearSolver mpSundialsLinearSolver;
-#endif
 
     /**
      * Record where the last solve got to so we know whether to re-initialise.
@@ -355,4 +350,3 @@ public:
 CHASTE_CLASS_EXPORT(CvodeAdaptor)
 
 #endif // _CVODEADAPTOR_HPP_
-#endif // CHASTE_CVODE

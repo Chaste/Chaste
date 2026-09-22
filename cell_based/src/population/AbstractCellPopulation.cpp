@@ -503,22 +503,18 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseWritersFiles()
         p_pop_writer->CloseFile();
     }
 
-#ifdef CHASTE_VTK
     *mpVtkMetaFile << "    </Collection>\n";
     *mpVtkMetaFile << "</VTKFile>\n";
     mpVtkMetaFile->close();
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
 {
-#ifdef CHASTE_VTK
     mpVtkMetaFile = rOutputFileHandler.OpenOutputFile("results.pvd");
     *mpVtkMetaFile << "<?xml version=\"1.0\"?>\n";
     *mpVtkMetaFile << "<VTKFile type=\"Collection\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n";
     *mpVtkMetaFile << "    <Collection>\n";
-#endif //CHASTE_VTK
 
     if (mOutputResultsForChasteVisualizer)
     {

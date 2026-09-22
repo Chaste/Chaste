@@ -53,11 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-#ifdef CHASTE_VTK
-#define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
-#include <vtkVersion.h>
-#endif
-
 class TestVertexMeshWriter : public CxxTest::TestSuite
 {
 public:
@@ -109,7 +104,6 @@ public:
         FileComparison comparer2(results_file2,"mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d.cell");
         TS_ASSERT(comparer2.CompareFiles());
 
-#ifdef CHASTE_VTK
         std::vector<double> cell_ids;
         cell_ids.push_back(0.0);
         cell_ids.push_back(1.0);
@@ -131,10 +125,6 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-#else
-        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestVertexMeshWriterWithCylindricalMesh()
@@ -162,7 +152,6 @@ public:
         FileComparison comparer2(results_file2,"mesh/test/data/TestVertexMeshWriterWithCylindricalMesh/cyl_vertex_mesh_2d.cell");
         TS_ASSERT(comparer2.CompareFiles());
 
-#ifdef CHASTE_VTK
         VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
         std::vector<double> cell_ids;
         for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
@@ -189,10 +178,6 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-#else
-        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestVertexMeshWriterWithToroidalMesh()
@@ -220,7 +205,6 @@ public:
         FileComparison comparer2(results_file2,"mesh/test/data/TestVertexMeshWriterWithToroidalMesh/tor_vertex_mesh_2d.cell");
         TS_ASSERT(comparer2.CompareFiles());
 
-#ifdef CHASTE_VTK
         VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
         std::vector<double> cell_ids;
         for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
@@ -247,11 +231,6 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-
-#else
-        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestVertexMeshWriterIn3dWithoutFaces()
@@ -292,7 +271,6 @@ public:
         FileComparison comparer2(results_file2,"mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d.cell");
         TS_ASSERT(comparer2.CompareFiles());
 
-#ifdef CHASTE_VTK
         std::vector<double> cell_ids;
         cell_ids.push_back(0.0);
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
@@ -313,10 +291,6 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-#else
-        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestVertexMeshWriterIn3dWithFaces()
@@ -351,7 +325,6 @@ public:
         FileComparison comparer2(results_file2,"mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_faces.cell");
         TS_ASSERT(comparer2.CompareFiles());
 
-#ifdef CHASTE_VTK
         std::vector<double> cell_ids;
         cell_ids.push_back(0.0);
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
@@ -372,10 +345,6 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-#else
-        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestMeshWriterWithDeletedNode()

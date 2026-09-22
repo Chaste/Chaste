@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MixedDimensionMesh.hpp"
 #include "NodesOnlyMesh.hpp"
 
-#ifdef CHASTE_VTK
 #include "vtkQuadraticTetra.h"
 #include "vtkQuadraticTriangle.h"
 
@@ -201,11 +200,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
         MakeVtkMesh();
         assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
         vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
-#if VTK_MAJOR_VERSION >= 6
         p_writer->SetInputData(mpVtkUnstructedMesh);
-#else
-        p_writer->SetInput(mpVtkUnstructedMesh);
-#endif
         std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+".vtu";
         p_writer->SetFileName(vtk_file_name.c_str());
         //p_writer->PrintSelf(std::cout, vtkIndent());
@@ -737,11 +732,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
             p_writer->SetEndPiece(PetscTools::GetMyRank());
 
 
-#if VTK_MAJOR_VERSION >= 6
             p_writer->SetInputData(mpVtkUnstructedMesh);
-#else
-            p_writer->SetInput(mpVtkUnstructedMesh);
-#endif
             std::string pvtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+ ".pvtu";
             p_writer->SetFileName(pvtk_file_name.c_str());
             //p_writer->PrintSelf(std::cout, vtkIndent());
@@ -768,5 +759,3 @@ template class VtkMeshWriter<1,3>;
 template class VtkMeshWriter<2,2>; // Actually used
 template class VtkMeshWriter<2,3>;
 template class VtkMeshWriter<3,3>; // Actually used
-
-#endif //CHASTE_VTK

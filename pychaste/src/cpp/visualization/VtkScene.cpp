@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkPNGWriter.h>
 #include <vtkUnsignedCharArray.h>
-#include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
 
 // Initialise the VTK rendering backend's object factories. VTK_MODULE_INIT

@@ -359,7 +359,6 @@ public:
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
-#ifdef CHASTE_VTK
         //Test that VTK writer has produced some files
         OutputFileHandler handler("TestPottsCellSorting", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath();
@@ -374,8 +373,6 @@ public:
         TS_ASSERT(vtk_file_3.Exists());
         FileFinder vtk_file_4(results_dir + "results_from_time_0/outlines_10.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file_4.Exists());
-
- #endif //CHASTE_VTK
     }
 
     void TestPottsMonolayerCellSortingPeriodic()
@@ -429,7 +426,6 @@ public:
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
-#ifdef CHASTE_VTK
         //Test that VTK writer has produced some files
         OutputFileHandler handler("TestPottsCellSortingPeriodic", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath();
@@ -444,7 +440,6 @@ public:
         TS_ASSERT(vtk_file_3.Exists());
         FileFinder vtk_file_4(results_dir + "results_from_time_0/outlines_10.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file_4.Exists());
- #endif //CHASTE_VTK
     }
 
     void TestPottsSpheroidWithNoBirthOrDeath()
@@ -627,7 +622,6 @@ public:
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
-#ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
         OutputFileHandler handler("TestPotts3DCellSorting", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath();
@@ -655,8 +649,6 @@ public:
         // It is changed to cell_id as this is preferable for VTK output.
         TS_ASSERT_EQUALS(cell_ids.size(), 1000u);
         TS_ASSERT_DELTA(*max_element(cell_ids.begin(), cell_ids.end()), 63.0, 1e-12);
-
- #endif //CHASTE_VTK
     }
 
     c_vector<unsigned, 6> mNodes; // TO check after save and load.
