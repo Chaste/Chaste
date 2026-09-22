@@ -1,4 +1,4 @@
-Warning: These have been filtered by  /home/chaste/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
+Warning: These have been filtered by  /home/jmpf/Workspace/Chaste/acceptance/python/infra/RoundResultsFiles.py .
 This means that all floating point numbers have been rounded to 8 decimal places.
 0
 0
@@ -5019,7 +5019,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -0.452142
 -11.6874
 -13.9046
-2.13142
+2.13143
 0.118499
 -15.6478
 1.77291
@@ -6145,7 +6145,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -22.581
 -23.0544
 3.57021
-0.00528328
+0.00528327
 -23.0192
 2.94704
 0.0985068
@@ -17239,7 +17239,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 3.38019
 3.41447
 3.41154
-0.00477187
+0.00477186
 3.88502
 3.4064
 3.38689
@@ -18607,7 +18607,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 3.60385
 3.60904
 4.24284
--0.00010519
+-0.0001052
 4.3161
 3.4304
 3.60672
@@ -18640,7 +18640,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -4.4283
 3.37794
 -5.47839
-0.00643978
+0.00643977
 -17.9054
 -19.8465
 -19.2992
@@ -19366,7 +19366,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 3.74926
 3.74941
 3.75286
-3.7511
+3.75111
 3.61387
 3.75178
 3.74989
@@ -19413,7 +19413,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -5.40499
 3.69035
 3.4029
-4.27182
+4.27183
 2.07092
 3.74965
 3.74877
@@ -21435,7 +21435,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -13.0453
 -0.441707
 -0.68728
--0.345607
+-0.345606
 4.21924
 -16.8745
 3.15508
@@ -21515,7 +21515,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -12.6877
 -12.5849
 -18.1482
--0.0956739
+-0.0956738
 -11.925
 -17.0839
 -17.8133
@@ -21786,7 +21786,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 4.17424
 4.18436
 4.1762
--0.0820337
+-0.0820336
 -0.0908864
 -16.4225
 4.18491
@@ -23941,7 +23941,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 4.36516
 -16.6007
 -13.2943
--0.0188959
+-0.018896
 -10.8954
 5.05227
 3.36734
@@ -25469,7 +25469,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 0.969929
 5.11183
 -12.2844
-0.00565734
+0.00565733
 -16.363
 2.38805
 3.47598
@@ -26537,7 +26537,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -14.4537
 -15.0722
 4.3715
-1.54117
+1.54116
 5.30045
 0.639747
 4.42
@@ -28153,7 +28153,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -9.88462
 -0.686662
 -14.8473
--0.0849258
+-0.0849259
 4.70672
 4.4622
 -14.4866
@@ -34769,7 +34769,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -9.39285
 -9.55235
 -9.50142
--0.977553
+-0.977552
 -9.32348
 -8.81844
 -1.17823
@@ -37875,4 +37875,4 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -11.4026
 4.21131
 4.21106
-# Created by Chaste version 3.2.23000 (with uncommitted modifications) on Fri, 31 Oct 2014 12:48:24 +0000.  Chaste was built on Fri, 31 Oct 2014 12:38:50 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOptNative, shared libraries.  Checked-out project versions: DanH=22719M; JohnW=18696.
+# Created by Chaste version 2026.1.dc19cfe (with uncommitted modifications) on Tue, 04 Aug 2026 12:56:49 +0000.  Chaste was built on Mon, 03 Aug 2026 15:53:27 +0000 by machine (uname) 'Linux' using settings: Release.

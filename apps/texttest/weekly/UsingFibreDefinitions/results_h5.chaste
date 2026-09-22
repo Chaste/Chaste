@@ -450,11 +450,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Chaste Provenance" {
          DATATYPE  H5T_STRING {
-               STRSIZE 1023;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 1023;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "Created by Chaste version 2017.1.6ba68bb on Mon, 19 Mar 2018 16:03:03 +0000.  Chaste was built on Mon, 19 Mar 2018 13:44:16 +0000 by machine (uname) 'Linux scoop 4.4.0-101-generic #124-Ubuntu SMP Fri Nov 10 18:29:59 UTC 2017 x86_64' using settings: GccOpt, shared libraries.
@@ -470,11 +470,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Variable Details" {
          DATATYPE  H5T_STRING {
-               STRSIZE 100;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 100;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "ConductionVelocityFromNode200(cm_per_msec)"
@@ -489,11 +489,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Name" {
          DATATYPE  H5T_STRING {
-               STRSIZE 100;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 100;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "PaceNumber"
@@ -501,11 +501,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Unit" {
          DATATYPE  H5T_STRING {
-               STRSIZE 100;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 100;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "dimensionless"
@@ -23010,11 +23010,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Chaste Provenance" {
          DATATYPE  H5T_STRING {
-               STRSIZE 1023;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 1023;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "Created by Chaste version 2017.1.6ba68bb on Mon, 19 Mar 2018 16:03:01 +0000.  Chaste was built on Mon, 19 Mar 2018 13:44:16 +0000 by machine (uname) 'Linux scoop 4.4.0-101-generic #124-Ubuntu SMP Fri Nov 10 18:29:59 UTC 2017 x86_64' using settings: GccOpt, shared libraries.
@@ -23030,11 +23030,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Variable Details" {
          DATATYPE  H5T_STRING {
-               STRSIZE 100;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 100;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "V(mV)"
@@ -23052,11 +23052,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Name" {
          DATATYPE  H5T_STRING {
-               STRSIZE 100;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 100;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "Time"
@@ -23064,11 +23064,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Unit" {
          DATATYPE  H5T_STRING {
-               STRSIZE 100;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 100;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "msecs"
