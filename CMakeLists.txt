@@ -343,8 +343,13 @@ if (NOT ${VTK_FOUND})
     message(FATAL_ERROR "Did not find VTK")
 endif ()
 
-if ("${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" VERSION_LESS 7.1)
-    message(FATAL_ERROR "VTK 7.1 or later is required, but found VTK ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+# VTK 6.0 introduced the SetInputData()/SetInputConnection() pipeline API, which Chaste's
+# VTK code now uses unconditionally (it used to be optional, guarded by Chaste_USE_VTK), so
+# earlier versions definitely will not build. VTK 7.1 is the oldest version we actually test.
+if ("${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" VERSION_LESS 6.0)
+    message(FATAL_ERROR "VTK 6.0 or later is required, but found VTK ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+elseif ("${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" VERSION_LESS 7.1)
+    message(WARNING "VTK ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} found: Chaste might work, but we only test VTK 7.1 and later")
 endif ()
 
 # Depending on the VTK version, we need different components.
@@ -497,8 +502,14 @@ else ()
     set (SUNDIALS_USE_STATIC_LIBRARIES ON)
 endif ()
 find_package (SUNDIALS COMPONENTS  sundials_cvode sundials_nvecserial REQUIRED)
-if ("${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_SUBMINOR}" VERSION_LESS 5.8.0)
-    message(FATAL_ERROR "SUNDIALS 5.8.0 or later is required, but found SUNDIALS ${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_SUBMINOR}")
+# SUNDIALS 4.0.0 renamed the generic linear-solver API (CVDlsSetLinearSolver -> CVodeSetLinearSolver,
+# SUNDenseLinearSolver -> SUNLinSol_Dense), which Chaste's CVODE code now uses unconditionally (it used
+# to be optional, guarded by Chaste_USE_CVODE), so earlier versions definitely will not build.
+# SUNDIALS 5.8.0 is the oldest version we actually test.
+if ("${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_SUBMINOR}" VERSION_LESS 4.0.0)
+    message(FATAL_ERROR "SUNDIALS 4.0.0 or later is required, but found SUNDIALS ${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_SUBMINOR}")
+elseif ("${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_SUBMINOR}" VERSION_LESS 5.8.0)
+    message(WARNING "SUNDIALS ${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_SUBMINOR} found: Chaste might work, but we only test SUNDIALS 5.8.0 and later")
 endif ()
 if (SUNDIALS_VERSION_MAJOR GREATER_EQUAL 7) # Newer CVODE requires a core sundials library to be linked in
     find_package (SUNDIALS COMPONENTS  sundials_core REQUIRED)
@@ -528,8 +539,14 @@ endif ()
 ################################
 find_package (Xerces REQUIRED)
 find_package (XSD REQUIRED)
-if (XERCESC_VERSION AND XERCESC_VERSION VERSION_LESS 3.2.0)
-    message (FATAL_ERROR "Xerces-C 3.2.0 or later is required, but found Xerces-C ${XERCESC_VERSION}")
+# Xerces-C 3.0.0 introduced the DOM Level 3 LS serialization API (DOMLSSerializer /
+# createLSSerializer()), which Chaste's XML writing code now uses unconditionally (it used
+# to be optional, guarded by Chaste_USE_XERCES), so earlier versions definitely will not build.
+# Xerces-C 3.2.0 is the oldest version we actually test.
+if (XERCESC_VERSION AND XERCESC_VERSION VERSION_LESS 3.0.0)
+    message (FATAL_ERROR "Xerces-C 3.0.0 or later is required, but found Xerces-C ${XERCESC_VERSION}")
+elseif (XERCESC_VERSION AND XERCESC_VERSION VERSION_LESS 3.2.0)
+    message (WARNING "Xerces-C ${XERCESC_VERSION} found: Chaste might work, but we only test Xerces-C 3.2.0 and later")
 endif ()
 if (XSD_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$" AND XSD_VERSION VERSION_LESS 4.0.0)
     message (FATAL_ERROR "XSD 4.0.0 or later is required, but found XSD ${XSD_VERSION}")
