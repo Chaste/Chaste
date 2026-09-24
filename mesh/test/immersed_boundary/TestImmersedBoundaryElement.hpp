@@ -66,7 +66,7 @@ public:
         TS_ASSERT_EQUALS(element.GetNumNodes(), 4u);
 
         // Test SetFluidSource() and GetFluidSource() work correctly
-        TS_ASSERT(element.GetFluidSource() == NULL);
+        TS_ASSERT(element.GetFluidSource() == nullptr);
 
         auto source = std::make_shared<FluidSource<2>>(0, 0.5, 0.5);
         source->SetStrength(57.0);

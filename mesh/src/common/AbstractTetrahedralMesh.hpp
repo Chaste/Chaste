@@ -293,7 +293,7 @@ public:
     //////////////////////////////////////////////////////////////////////
 
     /** Definition of boundary element Iterator type. */
-    typedef typename std::vector<BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *>::const_iterator BoundaryElementIterator;
+    using BoundaryElementIterator = typename std::vector<BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *>::const_iterator;
 
     /** Forward declaration */
     class ElementIterator;

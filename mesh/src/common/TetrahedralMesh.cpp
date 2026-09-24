@@ -908,7 +908,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
     for (unsigned boundary_element_index = 0; boundary_element_index < numberOfFaces; boundary_element_index++)
     {
         /*
-         * Tetgen produces only boundary faces (set edgeMarkerList to NULL).
+         * Tetgen produces only boundary faces (set edgeMarkerList to nullptr).
          * Triangle marks which edges are on the boundary.
          */
         if (edgeMarkerList == nullptr || edgeMarkerList[boundary_element_index] == 1)

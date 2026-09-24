@@ -47,10 +47,10 @@ ExtendedBidomainProblem<DIM>::ExtendedBidomainProblem(
             AbstractCardiacCellFactory<DIM>* pCellFactory, AbstractCardiacCellFactory<DIM>* pSecondCellFactory, bool hasBath)
     : AbstractCardiacProblem<DIM,DIM, 3>(pCellFactory),
       mpSecondCellFactory(pSecondCellFactory),
-      mpExtendedBidomainTissue(NULL),
+      mpExtendedBidomainTissue(nullptr),
       mUserSpecifiedSecondCellConductivities(false),
       mUserHasSetBidomainValuesExplicitly(false),
-      mpExtracellularStimulusFactory(NULL),
+      mpExtracellularStimulusFactory(nullptr),
       mRowForAverageOfPhiZeroed(INT_MAX),
       mApplyAveragePhieZeroConstraintAfterSolving(false),
       mUserSuppliedExtracellularStimulus(false),
@@ -62,11 +62,11 @@ ExtendedBidomainProblem<DIM>::ExtendedBidomainProblem(
 template<unsigned DIM>
 ExtendedBidomainProblem<DIM>::ExtendedBidomainProblem()
     : AbstractCardiacProblem<DIM,DIM, 3>(),
-      mpSecondCellFactory(NULL),
-      mpExtendedBidomainTissue(NULL),
+      mpSecondCellFactory(nullptr),
+      mpExtendedBidomainTissue(nullptr),
       mUserSpecifiedSecondCellConductivities(false),
       mUserHasSetBidomainValuesExplicitly(false),
-      mpExtracellularStimulusFactory(NULL),
+      mpExtracellularStimulusFactory(nullptr),
       mRowForAverageOfPhiZeroed(INT_MAX),
       mApplyAveragePhieZeroConstraintAfterSolving(false),
       mUserSuppliedExtracellularStimulus(false)
@@ -104,7 +104,7 @@ Vec ExtendedBidomainProblem<DIM>::CreateInitialCondition()
 template<unsigned DIM>
 void ExtendedBidomainProblem<DIM>::ProcessExtracellularStimulus()
 {
-    if (mpExtracellularStimulusFactory == NULL) // user has not passed in any extracellular stimulus in any form
+    if (mpExtracellularStimulusFactory == nullptr) // user has not passed in any extracellular stimulus in any form
     {
         mpExtracellularStimulusFactory = new AbstractStimulusFactory<DIM>();
         // Create one (with default implementation to zero stimulus everywhere)
@@ -305,7 +305,7 @@ void ExtendedBidomainProblem<DIM>::SetNodeForAverageOfPhiZeroed(unsigned node)
 template<unsigned DIM>
 ExtendedBidomainTissue<DIM>* ExtendedBidomainProblem<DIM>::GetExtendedBidomainTissue()
 {
-    assert(mpExtendedBidomainTissue!=NULL);
+    assert(mpExtendedBidomainTissue!=nullptr);
     return mpExtendedBidomainTissue;
 }
 

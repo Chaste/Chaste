@@ -48,7 +48,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
                                                                              bool leakyLaminas,
                                                                              unsigned numFluidMeshPoints,
                                                                              double absoluteGap)
-    : mpMesh(NULL)
+    : mpMesh(nullptr)
 {
     // Check for sensible input
     assert(numCellsWide > 0);

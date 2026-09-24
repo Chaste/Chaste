@@ -95,11 +95,11 @@ public:
         boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Test ComputeConstantInUSourceTerm() method
-        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.01, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, nullptr), 0.01, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, p_mesh->GetElement(0)), 0.01, 1e-6);
 
         // Test ComputeLinearInUCoeffInSourceTerm() method
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, NULL), 0.05, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, nullptr), 0.05, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, p_mesh->GetElement(0)), 0.05, 1e-6);
     }
 
@@ -133,7 +133,7 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variable were archived correctly
-            TS_ASSERT(dynamic_cast<UniformSourceEllipticPde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<UniformSourceEllipticPde<2>*>(p_pde) != nullptr);
 
             UniformSourceEllipticPde<2>* p_static_cast_pde = static_cast<UniformSourceEllipticPde<2>*>(p_pde);
             TS_ASSERT_DELTA(p_static_cast_pde->GetConstantCoefficient(), 0.01, 1e-6);
@@ -270,7 +270,7 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<CellwiseSourceEllipticPde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<CellwiseSourceEllipticPde<2>*>(p_pde) != nullptr);
 
             CellwiseSourceEllipticPde<2>* p_static_cast_pde = static_cast<CellwiseSourceEllipticPde<2>*>(p_pde);
             TS_ASSERT_DELTA(p_static_cast_pde->GetConstantCoefficient(), 0.01, 1e-6);
@@ -470,7 +470,7 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<AveragedSourceEllipticPde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<AveragedSourceEllipticPde<2>*>(p_pde) != nullptr);
 
             AveragedSourceEllipticPde<2>* p_static_cast_pde = static_cast<AveragedSourceEllipticPde<2>*>(p_pde);
             TS_ASSERT_EQUALS(p_static_cast_pde->mrCellPopulation.GetNumRealCells(), 25u);

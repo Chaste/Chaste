@@ -1189,7 +1189,7 @@ void VertexMesh<3, 3>::ConstructFromMeshReader(AbstractMeshReader<3, 3>& rMeshRe
     for (unsigned elem_index = 0; elem_index < num_elements; elem_index++)
     {
         ///\todo Horrible hack! (#1076/#1377)
-        typedef VertexMeshReader<3, 3> VERTEX_MESH_READER;
+        using VERTEX_MESH_READER = VertexMeshReader<3, 3>;
         assert(dynamic_cast<VERTEX_MESH_READER*>(&rMeshReader) != nullptr);
 
         // Get the data for this element

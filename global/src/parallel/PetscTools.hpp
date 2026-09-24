@@ -73,7 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Older versions of PETSc used PetscTruth in place of PetscBool, so we define an alias for those installations.
  */
-typedef PetscTruth PetscBool;
+using PetscBool = PetscTruth;
 /**
  * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as
  * PetscViewerDestroy(VecView view) ) to a PETSc3.2 destroy via pointer call.
@@ -410,7 +410,7 @@ public:
          }
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7 or later
-         PetscOptionsSetValue(NULL, pOptionName, pOptionValue);
+         PetscOptionsSetValue(nullptr, pOptionName, pOptionValue);
 #else
          PetscOptionsSetValue(pOptionName, pOptionValue);
 #endif

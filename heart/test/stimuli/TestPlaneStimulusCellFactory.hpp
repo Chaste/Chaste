@@ -125,7 +125,7 @@ public:
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory_1;
 
-        HeartGeometryInformation<2>* p_info_from_cell_factory = NULL;
+        HeartGeometryInformation<2>* p_info_from_cell_factory = nullptr;
         //get it from the cell factory before setting it, it should throw...(covers the exception)
         TS_ASSERT_THROWS_THIS(cell_factory_1.GetHeartGeometryInformation(), "HeartGeometryInformation object has not been set in the cell factory");
 

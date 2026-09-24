@@ -137,7 +137,7 @@ private:
     {
         /* As we will access the cell type of the cell associated with this cell
          * cycle model, we should assert that this cell exists. */
-        assert(mpCell != NULL);
+        assert(mpCell != nullptr);
 
         /* We now set the G1 duration based on cell type. For stem and transit cells, we use the `RandomNumberGenerator`
          * singleton class to generate a random number U drawn from U[0,1], and
@@ -193,7 +193,7 @@ public:
      * the new cell-cycle model; this occurs when the associated cell has called its
      * `Divide()` method.
      */
-    AbstractCellCycleModel* CreateCellCycleModel()
+    [[nodiscard]] AbstractCellCycleModel* CreateCellCycleModel()
     {
         MyCellCycleModel* p_model = new MyCellCycleModel();
 

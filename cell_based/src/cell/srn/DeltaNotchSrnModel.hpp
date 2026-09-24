@@ -100,7 +100,7 @@ public:
      *
      * @return a copy of the current SRN model.
      */
-    AbstractSrnModel* CreateSrnModel();
+    [[nodiscard]] AbstractSrnModel* CreateSrnModel();
 
     /**
      * Initialise the SRN model at the start of a simulation.

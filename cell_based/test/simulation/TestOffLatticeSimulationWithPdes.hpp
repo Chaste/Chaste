@@ -519,7 +519,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.AddPopulationWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
-        typedef RadialCellDataDistributionWriter<2,2> RadWriter;
+        using RadWriter = RadialCellDataDistributionWriter<2,2>;
         MAKE_PTR(RadWriter, p_radial_writer);
         p_radial_writer->SetVariableName("oxygen");
         p_radial_writer->SetNumRadialBins(5);
@@ -688,7 +688,7 @@ public:
         // Run cell-based simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        TS_ASSERT(p_coarse_mesh != NULL);
+        TS_ASSERT(p_coarse_mesh != nullptr);
 
         ReplicatableVector pde_solution0(p_pde_modifier->GetSolution());
         ReplicatableVector pde_solution1(p_pde_modifier2->GetSolution());

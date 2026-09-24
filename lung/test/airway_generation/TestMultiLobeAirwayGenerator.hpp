@@ -119,7 +119,7 @@ public:
         generator.DistributePoints();
 
         //Check that the correct number of points have been distributed
-        typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
+        using pair_type = std::pair<AirwayGenerator*, LungLocation>;
         for (std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
             iter != generator.mLobeGenerators.end();
             ++iter)
@@ -170,7 +170,7 @@ public:
         generator.DistributePoints();
 
         //Check that the correct number of points have been distributed
-        typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
+        using pair_type = std::pair<AirwayGenerator*, LungLocation>;
         for (std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
             iter != generator.mLobeGenerators.end();
             ++iter)

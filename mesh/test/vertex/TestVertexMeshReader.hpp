@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * TS_ASSERT_THROWS_NOTHING(p_mesh_reader=new VertexMeshReader<2,2>(name));
  * because the macro thinks the comma separates two arguments
  */
-typedef VertexMeshReader<2,2> READER_2D;
+using READER_2D = VertexMeshReader<2,2>;
 
 class TestVertexMeshReader : public CxxTest::TestSuite
 {

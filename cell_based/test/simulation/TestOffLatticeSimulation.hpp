@@ -586,7 +586,7 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        typedef LinearSpringForce<2,3> Force;
+        using Force = LinearSpringForce<2,3>;
         MAKE_PTR(Force, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
@@ -636,7 +636,7 @@ public:
             simulator.SetEndTime(1.0);
 
             // Create a force law and pass it to the simulation
-            typedef LinearSpringForce<2,3> Force;
+            using Force = LinearSpringForce<2,3>;
             MAKE_PTR(Force, p_force);
             p_force->SetCutOffLength(1.5);
             simulator.AddForce(p_force);

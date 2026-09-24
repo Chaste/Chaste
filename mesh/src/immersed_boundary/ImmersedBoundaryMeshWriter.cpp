@@ -257,7 +257,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Immer
 #endif
         // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
         // **** REMOVE WITH CAUTION *****
-        p_writer->SetCompressor(NULL);
+        p_writer->SetCompressor(nullptr);
         // **** REMOVE WITH CAUTION *****
 
         std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
@@ -522,13 +522,13 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(Imm
     this->mNumElements = mpMesh->GetNumElements();
     mNumLaminas = mpMesh->GetNumLaminas();
 
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    using NodeIterType = typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
-    typedef typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryElementIterator ElemIterType;
+    using ElemIterType = typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryElementIterator;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
 
-    typedef typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryLaminaIterator LamIterType;
+    using LamIterType = typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryLaminaIterator;
     mpIters->pLamIter = new LamIterType(mpMesh->GetLaminaIteratorBegin());
 
     WriteFiles();
