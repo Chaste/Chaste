@@ -59,11 +59,11 @@ void CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCe
     c_vector<double, SPACE_DIM> cell_location = pCellPopulation->GetLocationOfCellCentre(pCell);
     for (unsigned i=0; i<SPACE_DIM; i++)
     {
-        *this->mpOutStream << cell_location[i] << " ";
+        this->WriteDoubleAndSpace(cell_location[i]);
     }
 
     // Write cell age
-    *this->mpOutStream << pCell->GetAge() << " ";
+    this->WriteDoubleAndSpace(pCell->GetAge());
 }
 
 // Explicit instantiation

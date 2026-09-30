@@ -76,7 +76,8 @@ void CellLabelWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractC
     c_vector<double, SPACE_DIM> coords = pCellPopulation->GetLocationOfCellCentre(pCell);
     for (unsigned i=0; i<SPACE_DIM; i++)
     {
-        *this->mpOutStream << " " << coords[i];
+        *this->mpOutStream << " ";
+        this->WriteDouble(coords[i]);
     }
 }
 

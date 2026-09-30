@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::NodeLocationWriter()
     : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("results.viznodes")
@@ -61,7 +62,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCell
 
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
-                *this->mpOutStream << position[i] << " ";
+                this->WriteDoubleAndSpace(position[i]);
             }
         }
     }
@@ -80,7 +81,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
 
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
-                *this->mpOutStream << position[i] << " ";
+                this->WriteDoubleAndSpace(position[i]);
             }
         }
     }

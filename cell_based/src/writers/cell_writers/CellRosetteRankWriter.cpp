@@ -73,10 +73,10 @@ void CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Abs
     *this->mpOutStream << location_index << " " << cell_id << " ";
     for (unsigned i=0; i<SPACE_DIM; i++)
     {
-        *this->mpOutStream << centre_location[i] << " ";
+        this->WriteDoubleAndSpace(centre_location[i]);
     }
 
-    *this->mpOutStream << rosette_rank << " ";
+    this->WriteDoubleAndSpace(rosette_rank);
 }
 
 // Explicit instantiation

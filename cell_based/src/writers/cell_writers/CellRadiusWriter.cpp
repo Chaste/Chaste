@@ -72,10 +72,10 @@ void CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Abstract
     *this->mpOutStream << location_index << " " << cell_id << " ";
     for (unsigned i=0; i<SPACE_DIM; i++)
     {
-        *this->mpOutStream << cell_location[i] << " ";
+        this->WriteDoubleAndSpace(cell_location[i]);
     }
 
-    *this->mpOutStream << cell_radius << " ";
+    this->WriteDoubleAndSpace(cell_radius);
 }
 
 // Explicit instantiation

@@ -121,7 +121,13 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCel
     num_heterotypic_pairs *= 0.5;
     total_num_pairs *= 0.5;
 
-    *this->mpOutStream << heterotypic_boundary_length << "\t" << total_shared_edges_length << "\t" << num_heterotypic_pairs << "\t" << total_num_pairs;
+    this->WriteDouble(heterotypic_boundary_length);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(total_shared_edges_length);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(num_heterotypic_pairs);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(total_num_pairs);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -186,7 +192,13 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellP
     num_heterotypic_pairs *= 0.5;
     total_num_pairs *= 0.5;
 
-    *this->mpOutStream << heterotypic_boundary_length << "\t" << total_shared_edges_length << "\t" << num_heterotypic_pairs << "\t" << total_num_pairs;
+    this->WriteDouble(heterotypic_boundary_length);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(total_shared_edges_length);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(num_heterotypic_pairs);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(total_num_pairs);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -269,7 +281,13 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCel
     num_heterotypic_pairs *= 0.5;
     total_num_pairs *= 0.5;
 
-    *this->mpOutStream << heterotypic_boundary_length << "\t" << total_shared_edges_length << "\t" << num_heterotypic_pairs << "\t" << total_num_pairs;
+    this->WriteDouble(heterotypic_boundary_length);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(total_shared_edges_length);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(num_heterotypic_pairs);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(total_num_pairs);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -366,7 +384,13 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCe
     num_heterotypic_pairs *= 0.5;
     total_num_pairs *= 0.5;
 
-    *this->mpOutStream << heterotypic_boundary_length << "\t" << total_shared_edges_length << "\t" << num_heterotypic_pairs << "\t" << total_num_pairs;
+    this->WriteDouble(heterotypic_boundary_length);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(total_shared_edges_length);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(num_heterotypic_pairs);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(total_num_pairs);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -428,7 +452,13 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedC
     num_heterotypic_pairs *= 0.5;
     total_num_pairs *= 0.5;
 
-    *this->mpOutStream << heterotypic_boundary_length << "\t" << total_shared_edges_length << "\t" << num_heterotypic_pairs << "\t" << total_num_pairs;
+    this->WriteDouble(heterotypic_boundary_length);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(total_shared_edges_length);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(num_heterotypic_pairs);
+    *this->mpOutStream << "\t";
+    this->WriteDouble(total_num_pairs);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -501,8 +531,10 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoun
     heterotypic_boundary_length *= 0.5;
     total_shared_edges_length *= 0.5;
 
-    *this->mpOutStream << heterotypic_boundary_length << '\t'
-                       << total_shared_edges_length << '\t'
+    this->WriteDouble(heterotypic_boundary_length);
+    *this->mpOutStream << '\t';
+    this->WriteDouble(total_shared_edges_length);
+    *this->mpOutStream << '\t'
                        << heterotypic_elem_pairs.size() << '\t'
                        << total_elem_pairs.size();
 }

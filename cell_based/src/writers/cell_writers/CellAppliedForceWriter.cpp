@@ -71,11 +71,11 @@ void CellAppliedForceWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Ab
     *this->mpOutStream << location_index << " " << cell_id << " ";
     for (unsigned i=0; i<SPACE_DIM; i++)
     {
-        *this->mpOutStream << cell_location[i] << " ";
+        this->WriteDoubleAndSpace(cell_location[i]);
     }
     for (unsigned i=0; i<SPACE_DIM; i++)
     {
-        *this->mpOutStream << applied_force[i] << " ";
+        this->WriteDoubleAndSpace(applied_force[i]);
     }
 }
 

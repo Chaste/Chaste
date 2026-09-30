@@ -36,6 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCELLBASEDWRITER_HPP_
 #define ABSTRACTCELLBASEDWRITER_HPP_
 
+#ifdef CHASTE_HAS_FLOAT_TO_CHARS
+#include <charconv>
+#endif
+
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "Identifiable.hpp"
@@ -114,6 +118,39 @@ public:
      * Add a newline character to mpOutStream.
      */
     virtual void WriteNewline();
+
+    /**
+     * Write a double to mpOutStream, with no surrounding whitespace. Where the standard library
+     * implements floating-point std::to_chars (see CHASTE_HAS_FLOAT_TO_CHARS in
+     * ChasteCompilerFlags.cmake), this converts directly to text with the same
+     * "%.6g"-equivalent formatting that operator<< produces under the default stream precision
+     * (6), bypassing the locale-aware iostream num_put machinery that profiling showed to
+     * dominate the cost of writing doubles to file. Where it isn't available, this falls back
+     * to the original operator<< behaviour.
+     *
+     * @param value the value to write
+     */
+    inline void WriteDouble(double value)
+    {
+#ifdef CHASTE_HAS_FLOAT_TO_CHARS
+        char buffer[32];
+        std::to_chars_result result = std::to_chars(buffer, buffer + sizeof(buffer), value, std::chars_format::general, 6);
+        mpOutStream->write(buffer, result.ptr - buffer);
+#else
+        *mpOutStream << value;
+#endif
+    }
+
+    /**
+     * Equivalent to WriteDouble(value) followed by a space.
+     *
+     * @param value the value to write
+     */
+    inline void WriteDoubleAndSpace(double value)
+    {
+        WriteDouble(value);
+        *mpOutStream << " ";
+    }
 
     /**
      * Set the output file name.

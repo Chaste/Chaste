@@ -54,7 +54,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double ancestor_index = (pCell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)pCell->GetAncestor();
-    *this->mpOutStream << ancestor_index << " ";
+    this->WriteDoubleAndSpace(ancestor_index);
 }
 
 // Explicit instantiation

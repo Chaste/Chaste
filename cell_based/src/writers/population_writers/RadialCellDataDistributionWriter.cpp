@@ -100,7 +100,8 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulatio
         }
 
         // Write results to file
-        *this->mpOutStream << radius_intervals[i] << " " << average_solution << " ";
+        this->WriteDoubleAndSpace(radius_intervals[i]);
+        this->WriteDoubleAndSpace(average_solution);
         lower_radius = radius_intervals[i];
     }
 }
@@ -156,7 +157,8 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCe
         }
 
         // Write results to file
-        *this->mpOutStream << radius_intervals[i] << " " << average_solution << " ";
+        this->WriteDoubleAndSpace(radius_intervals[i]);
+        this->WriteDoubleAndSpace(average_solution);
         lower_radius = radius_intervals[i];
     }
 }

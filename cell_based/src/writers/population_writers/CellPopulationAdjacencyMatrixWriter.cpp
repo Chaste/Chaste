@@ -131,7 +131,8 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
     *this->mpOutStream << num_cells << "\t";
     for (unsigned i=0; i<num_cells*num_cells; i++)
     {
-        *this->mpOutStream << adjacency_matrix[i] << "\t";
+        this->WriteDouble(adjacency_matrix[i]);
+        *this->mpOutStream << "\t";
     }
 }
 
@@ -215,7 +216,8 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBase
     *this->mpOutStream << num_cells << "\t";
     for (unsigned i=0; i<num_cells*num_cells; i++)
     {
-        *this->mpOutStream << adjacency_matrix[i] << "\t";
+        this->WriteDouble(adjacency_matrix[i]);
+        *this->mpOutStream << "\t";
     }
 }
 
