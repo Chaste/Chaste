@@ -131,6 +131,21 @@ if(PC_PETSc_VERSION)
     unset(_petsc_version_patch)
 endif()
 
+# Detect whether the found PETSc was built with CUDA support, by inspecting petscconf.h
+set(PETSc_HAVE_CUDA FALSE)
+foreach(_petsc_include_dir ${PETSc_INCLUDE_DIRS})
+    if(EXISTS "${_petsc_include_dir}/petscconf.h")
+        file(STRINGS "${_petsc_include_dir}/petscconf.h" _petsc_have_cuda_line REGEX "^#define PETSC_HAVE_CUDA 1")
+        if(_petsc_have_cuda_line)
+            set(PETSc_HAVE_CUDA TRUE)
+        endif()
+        unset(_petsc_have_cuda_line)
+    endif()
+endforeach()
+unset(_petsc_include_dir)
+set(PETSc_HAVE_CUDA ${PETSc_HAVE_CUDA} CACHE BOOL "Whether the found PETSc was built with CUDA support")
+mark_as_advanced(PETSc_HAVE_CUDA)
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PETSc
     REQUIRED_VARS PETSc_FOUND PETSc_INCLUDE_DIRS PETSc_LIBRARIES

@@ -113,6 +113,13 @@ void ExecutableSupport::InitializePetsc(int* pArgc, char*** pArgv)
     CommandLineArguments::Instance()->p_argv = pArgv;
     // Initialise PETSc
     PETSCEXCEPT(PetscInitialize(pArgc, pArgv, CHASTE_PETSC_NULLPTR, CHASTE_PETSC_NULLPTR));
+
+    // Configure mat/vec types to use if requested
+    if (CHASTE_PETSC_DEFAULT_OPTIONS[0] != '\0')
+    {
+        // Set by the Chaste_ENABLE_PETSC_CUDA CMake option; makes Mat/Vec objects default to CUDA types.
+        PetscOptionsInsertString(CHASTE_PETSC_NULLPTR, CHASTE_PETSC_DEFAULT_OPTIONS);
+    }
     // Set default output folder
     if (!mOutputDirectory.IsPathSet())
     {
