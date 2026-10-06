@@ -87,7 +87,6 @@ private:
         MeshEventHandler::EndEvent(MeshEventHandler::BINTRI);
 
 
-#ifdef CHASTE_VTK
         MeshEventHandler::BeginEvent(MeshEventHandler::VTK);
         {
             VtkMeshWriter<3,3> vtk_writer(directory_name, file_name, false);
@@ -104,7 +103,6 @@ private:
             parallel_vtk_writer.WriteFilesUsingMesh(cuboid_mesh);
         }
         MeshEventHandler::EndEvent(MeshEventHandler::PVTK);
-#endif //CHASTE_VTK
         MeshEventHandler::Headings();
         MeshEventHandler::Report();
     }

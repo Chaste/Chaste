@@ -70,7 +70,6 @@ jobs:
             -DBoost_NO_SYSTEM_PATHS=ON \
             -DBOOST_ROOT=${BOOST_ROOT} \
             -DCMAKE_BUILD_TYPE=Release \
-            -DChaste_USE_CVODE=FALSE \
             ${{ matrix.extra-build-args }} .."
         working-directory: chaste-build-dir
 

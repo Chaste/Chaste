@@ -775,14 +775,14 @@
     <xs:attribute name="vtk" type="yesno_type" default="no" use="optional">
       <xs:annotation>
         <xs:documentation>Convert mesh and voltage data to VTK format suitable for Paraview, Mayavi2
-          etc (.vtu file format). Requires that code has been compiled against vtkIO library (-DCHASTE_VTK).
+          etc (.vtu file format).
           www.vtk.org</xs:documentation>
       </xs:annotation>
     </xs:attribute>
     <xs:attribute name="parallel_vtk" type="yesno_type" default="no" use="optional">
       <xs:annotation>
         <xs:documentation>Convert mesh and voltage data to parallel VTK format suitable for Paraview, Mayavi2
-          etc (.pvtu file format). Requires that code has been compiled against vtkIO library (-DCHASTE_VTK).
+          etc (.pvtu file format).
           www.vtk.org</xs:documentation>
       </xs:annotation>
     </xs:attribute>

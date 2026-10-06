@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SteadyStateRunner.hpp"
 #include "ZeroStimulus.hpp"
 
-#ifdef CHASTE_CVODE
-
 void SteadyStateRunner::RunToSteadyStateImplementation()
 {
     // Get necessary things from stimulus current
@@ -106,5 +104,3 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
     mpModel->SetForceReset(force_reset_setting);
     mpModel->SetMinimalReset(minimal_reset_setting);
 }
-
-#endif // CHASTE_CVODE

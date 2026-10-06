@@ -84,7 +84,6 @@ public:
 
     void TestDeleteFirstOrder()
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<1,3> mesh_reader("lung/test/data/TestSubject002MajorAirways.vtu");
 
         MutableMesh<1,3> mesh;
@@ -112,7 +111,6 @@ public:
 // Uncomment to visualise
 //        VtkMeshWriter<1,3> mesh_writer("TestMajorAirwaysCentreLinesCleaner", "Novartis002Trimmed");
 //        mesh_writer.WriteFilesUsingMesh(mesh);
-#endif //CHASTE_VTK
     }
 
     void TestHeuristicCleanSimpleMesh()

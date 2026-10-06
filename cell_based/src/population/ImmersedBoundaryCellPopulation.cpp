@@ -587,7 +587,6 @@ template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(
     const std::string& rDirectory)
 {
-#ifdef CHASTE_VTK
     // Create mesh writer for VTK output
     ImmersedBoundaryMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
@@ -731,7 +730,6 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
-#endif //CHASTE_VTK
 }
 
 template <unsigned DIM>
