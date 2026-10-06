@@ -535,8 +535,6 @@ public:
     void TestWriteNodesWithoutMeshUsingVtk()
     {
         EXIT_IF_PARALLEL;    // Cannot write to file yet in parallel.
- #ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
@@ -584,10 +582,6 @@ public:
         {
             delete nodes[i];
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestWriteNodesWithoutMesh()

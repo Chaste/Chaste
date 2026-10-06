@@ -40,17 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utility>
 #include <iostream>
 
-#ifdef CHASTE_VTK
-
-#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include "vtkVersion.h"
-
 #include "TetrahedralMesh.hpp"
 #include "AirwayGenerator.hpp"
 #include "LungTools.hpp"
-
-#if  ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
 
 /**
  * Multi Lobe Airway Generator
@@ -208,28 +200,5 @@ private:
     /** A flag to turn on the point distance limit heuristic */
     bool mPointDistanceLimit;
 };
-
-#endif // (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6
-
-#endif //CHASTE_VTK
-
-#if !(defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6))
-
-/**
- * This is a fake class to suppress coverage warnings. To get the real class
- * you must build with VTK of version 5.6 or above.
- */
-class MultiLobeAirwayGenerator //This is here to suppress coverage warnings on machines that do not have vtk 5.6 or higher
-{
-public:
-    /**
-     * Fake constructor.
-     */
-    MultiLobeAirwayGenerator()
-    {
-        std::cout << "Dummy multi lobe airway generator class for coverage" << std::endl;
-    }
-};
-#endif //No VTK
 
 #endif // MULTI_LOBE_AIRWAY_GENERATOR_HPP_

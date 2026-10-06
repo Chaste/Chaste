@@ -200,39 +200,43 @@ jobs:
 
       - name: copy results
         # raw .prof files are deliberately not published: they are only useful with the
-        # matching test binaries, and remain available in the workflow artifact
+        # matching test binaries, and remain available in the workflow artifact.
+        # The run id is appended to the directory name so concurrent runs (which could
+        # otherwise share the same datetime) never collide.
         run: |
-          mkdir ${GPERFTOOLS_RESULTS_DIR}/log-files/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}
-          cp ./profile/*.txt ./profile/*.svg ./profile/index.html ${GPERFTOOLS_RESULTS_DIR}/log-files/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}/
+          RESULTS_SUBDIR="${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}-${GITHUB_RUN_ID}"
+          mkdir "${GPERFTOOLS_RESULTS_DIR}/log-files/${RESULTS_SUBDIR}"
+          cp ./profile/*.txt ./profile/*.svg ./profile/index.html "${GPERFTOOLS_RESULTS_DIR}/log-files/${RESULTS_SUBDIR}/"
         env:
           NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME: ${{ needs.build-and-test.outputs.datetime }}
 
-      - name: setup python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: '3.x'
-
-      - name: generate index file
-        run: |
-          python -m pip install --upgrade pip setuptools wheel
-          python -m pip install dominate
-          python write_index.py
-        working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
-
-      - name: commit results (dry run, no push)
+      - name: commit and push results
+        # log-files/index.html is generated at Pages deploy time in the results repo
+        # (not committed from here), so each run only ever adds its own new,
+        # disjoint directory; a rebase-and-retry on a rejected push is therefore
+        # always conflict-free against concurrent runs.
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
           git add --all
           git commit -m "upload gperftools profiling results" || echo "No changes to commit"
           git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/profiling-gperftools.git"
-          git push
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            if [ "${attempt}" -eq 5 ]; then
+              echo "push failed after 5 attempts" >&2
+              exit 1
+            fi
+            sleep "$(( (RANDOM % 5) + 1 ))"
+            echo "push rejected, pulling and retrying (attempt ${attempt})"
+            git pull --rebase
+          done
         working-directory: ${{ env.GPERFTOOLS_RESULTS_DIR }}
         env:
           TOKEN: ${{ secrets.PROFILING_GPERFTOOLS_ACCESS }}
 
       - name: results URL on chaste.github.io
         run: |
-          echo https://chaste.github.io/profiling-gperftools/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}/index.html
+          echo "https://chaste.github.io/profiling-gperftools/${NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME}-${GITHUB_RUN_ID}/index.html"
         env:
           NEEDS_BUILD_AND_TEST_OUTPUTS_DATETIME: ${{ needs.build-and-test.outputs.datetime }}

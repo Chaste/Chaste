@@ -420,14 +420,8 @@ public:
         // (if we do then the boundaries are probably working!)
 
         unsigned number_of_nodes = crypt.rGetMesh().GetNumNodes();
-#ifdef CHASTE_CVODE
-        // divisions occur marginally earlier with CVODE
         TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 99u);
         TS_ASSERT_EQUALS(number_of_nodes, 147u);
-#else
-        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 99u);
-        TS_ASSERT_EQUALS(number_of_nodes, 147u);
-#endif //CHASTE_CVODE
 
         // Tidy up
         WntConcentration<2>::Destroy();

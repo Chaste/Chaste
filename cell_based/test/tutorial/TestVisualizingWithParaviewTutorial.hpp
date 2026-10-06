@@ -57,8 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 'overlapping spheres' description of cell neighbours); and the fourth uses a
  * `VertexBasedCellPopulation` (in which each cell is represented by a polygon).
  * To be able to view these simulations, we must first have
- * downloaded and installed VTK and Paraview, and updated our hostconfig file
- * to ensure that it knows to use VTK.
+ * downloaded and installed Paraview.
  *
  * ### The test
  *

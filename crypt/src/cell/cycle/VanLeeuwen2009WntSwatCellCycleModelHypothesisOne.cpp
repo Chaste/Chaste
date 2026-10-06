@@ -40,17 +40,11 @@ VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::VanLeeuwen2009WntSwatCellCycle
 {
     if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
-#ifdef CHASTE_CVODE
         mpOdeSolver = CellCycleModelOdeSolver<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne, CvodeAdaptor>::Instance();
         mpOdeSolver->Initialise();
         // Chaste solvers always check for stopping events, CVODE needs to be instructed to do so
         mpOdeSolver->CheckForStoppingEvents();
         mpOdeSolver->SetMaxSteps(10000);
-#else
-        mpOdeSolver = CellCycleModelOdeSolver<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne, RungeKutta4IvpOdeSolver>::Instance();
-        mpOdeSolver->Initialise();
-        SetDt(0.00005);
-#endif //CHASTE_CVODE
     }
 }
 

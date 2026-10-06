@@ -45,10 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOdeSystemInformation.hpp"
 #include "AbstractParameterisedSystem.hpp"
 
-#ifdef CHASTE_CVODE
 // CVODE headers
 #include <nvector/nvector_serial.h>
-#endif // CHASTE_CVODE
 
 class AbstractOdeSystem; // Avoid cyclic include issues
 
@@ -187,7 +185,6 @@ public:
      */
     std::vector<std::vector<double> >& rGetDerivedQuantities(AbstractParameterisedSystem<std::vector<double> >* pOdeSystem);
 
-#ifdef CHASTE_CVODE
     /**
      * @return the derived quantities for this ODE system at each timestep.
      *
@@ -195,7 +192,6 @@ public:
      * @return  A std::vector of vectors of derived quantities for each time step.
      */
     std::vector<std::vector<double> >& rGetDerivedQuantities(AbstractParameterisedSystem<N_Vector>* pOdeSystem);
-#endif //CHASTE_CVODE
 
     /**
      * This method currently assumes that #mParameters is constant through time.

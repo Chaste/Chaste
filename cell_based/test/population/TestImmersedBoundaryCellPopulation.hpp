@@ -461,7 +461,7 @@ public:
 
     void TestWritersWithImmersedBoundaryCellPopulation()
     {
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
 
         // Create an immersed boundary cell population object
@@ -589,7 +589,6 @@ public:
 
         FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.parameters").CompareFiles();
 
-#ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
 
         // Initial condition file
@@ -603,7 +602,6 @@ public:
         // PVD file
         FileFinder vtk_file3(results_dir + "results.pvd", RelativeTo::Absolute);
         TS_ASSERT(vtk_file3.Exists());
- #endif //CHASTE_VTK
     }
 
     void TestArchiving()

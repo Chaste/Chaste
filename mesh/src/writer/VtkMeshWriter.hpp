@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VTKMESHWRITER_HPP_
 #define VTKMESHWRITER_HPP_
 
-#ifdef CHASTE_VTK
-//Requires  "sudo aptitude install libvtk5-dev" or similar
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkDoubleArray.h>
 #include <vtkCellData.h>
@@ -70,9 +68,6 @@ class NodesOnlyMesh;
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VtkMeshWriter : public AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
-
-//Requires  "sudo aptitude install libvtk5-dev" or similar
-
 private:
     bool mWriteParallelFiles; /**< Whether to write parallel (.pvtu + .vtu for each process) files, defaults to false */
 
@@ -244,7 +239,5 @@ public:
      */
     virtual ~VtkMeshWriter();
 };
-
-#endif //CHASTE_VTK
 
 #endif /*VTKMESHWRITER_HPP_*/

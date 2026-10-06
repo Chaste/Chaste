@@ -42,16 +42,11 @@ WntCellCycleModel::WntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOde
 {
     if (!mpOdeSolver)
     {
-#ifdef CHASTE_CVODE
         mpOdeSolver = CellCycleModelOdeSolver<WntCellCycleModel, CvodeAdaptor>::Instance();
         mpOdeSolver->Initialise();
         // Chaste solvers always check for stopping events, CVODE needs to be instructed to do so
         mpOdeSolver->CheckForStoppingEvents();
         mpOdeSolver->SetMaxSteps(10000);
-#else
-        mpOdeSolver = CellCycleModelOdeSolver<WntCellCycleModel, RungeKutta4IvpOdeSolver>::Instance();
-        mpOdeSolver->Initialise();
-#endif //CHASTE_CVODE
     }
 }
 

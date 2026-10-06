@@ -367,6 +367,4 @@ VECTOR AbstractParameterisedSystem<VECTOR>::ComputeDerivedQuantitiesFromCurrentS
 //////////////// Explicit instantiation//////////////
 
 template class AbstractParameterisedSystem<std::vector<double> >;
-#ifdef CHASTE_CVODE
 template class AbstractParameterisedSystem<N_Vector>;
-#endif

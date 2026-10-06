@@ -148,11 +148,7 @@ public:
 
         double SG2MDuration = p_cell_cycle_model1->GetSG2MDuration();
 
-#ifdef CHASTE_CVODE
         const double expected_g1_duration = 5.96441;
-#else
-        const double expected_g1_duration = 5.971;
-#endif //CHASTE_CVODE
 
         for (unsigned i=0; i<num_steps/2; i++)
         {
