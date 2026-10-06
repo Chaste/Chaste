@@ -127,7 +127,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * and `b2` has entries $\int g\phi_i dV$ (here $\phi_i$ are the linear basis functions).
  *
  * This is the linear system which we now write a solver to set up.
- * {{< callout context="note" title="Note" icon="info-circle" >}}
+ * {{< callout context="note" title="Note" icon="outline/info-circle" >}}
  * The main Chaste solvers assume a **STRIPED** data format, i.e. that the unknown vector
  * is:
  *
