@@ -49,9 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellRemovalLocationsWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
-#include "CellProliferativePhasesCountWriter.hpp"
-#include "CellProliferativeTypesCountWriter.hpp"
 #include "NodeLocationWriter.hpp"
 
 // These #includes are needed for SetDefaultCellMutationStateAndProliferativeTypeOrdering()
@@ -196,8 +193,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellMutationStateCount()
 {
     std::vector<unsigned> mutation_state_count;
-    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties
-        = mpCellPropertyRegistry->rGetAllCellProperties();
+    const auto& r_cell_properties = mpCellPropertyRegistry->rGetAllCellProperties();
 
     // Calculate mutation states count
     for (unsigned i=0; i<r_cell_properties.size(); i++)
@@ -230,8 +226,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellProliferativeTypeCount()
 {
     std::vector<unsigned> proliferative_type_count;
-    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties
-        = mpCellPropertyRegistry->rGetAllCellProperties();
+    const auto& r_cell_properties = mpCellPropertyRegistry->rGetAllCellProperties();
 
     // Calculate proliferative types count
     for (unsigned i=0; i<r_cell_properties.size(); i++)

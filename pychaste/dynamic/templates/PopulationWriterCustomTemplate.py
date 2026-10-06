@@ -35,8 +35,77 @@ import cppwg.templates.custom
 
 class PopulationWriterCustomTemplate(cppwg.templates.custom.Custom):
 
+    # The writer types this generator instantiates via AddCellWriter<...> etc.
+    # These names appear only in the generated code below, never in the parsed
+    # C++ signatures, so cppwg cannot auto-include their headers - the generator
+    # supplies them itself via get_class_cpp_source_includes().
+    cell_writers = [
+        "CellAgesWriter",
+        "CellAncestorWriter",
+        "CellAppliedForceWriter",
+        "CellCycleModelProteinConcentrationsWriter",
+        "CellDataItemWriter",
+        "CellDeltaNotchWriter",
+        "CellIdWriter",
+        "CellLabelWriter",
+        "CellLocationIndexWriter",
+        "CellMutationStatesWriter",
+        "CellProliferativePhasesWriter",
+        "CellProliferativeTypesWriter",
+        "CellRadiusWriter",
+        "CellRosetteRankWriter",
+        "CellVolumesWriter",
+        "LegacyCellProliferativeTypesWriter",
+    ]
+
+    cell_population_count_writers = [
+        "CellMutationStatesCountWriter",
+        "CellProliferativeTypesCountWriter",
+        "CellProliferativePhasesCountWriter",
+    ]
+
+    cell_population_event_writers = [
+        "CellDivisionLocationsWriter",
+        "CellRemovalLocationsWriter",
+    ]
+
+    population_writers = [
+        "BoundaryNodeWriter",
+        "CellPopulationAdjacencyMatrixWriter",
+        "CellPopulationAreaWriter",
+        "CellPopulationElementWriter",
+        "HeterotypicBoundaryLengthWriter",
+        "NodeLocationWriter",
+        "NodeVelocityWriter",
+        "RadialCellDataDistributionWriter",
+        "VertexIntersectionSwapLocationsWriter",
+        "VertexT1SwapLocationsWriter",
+        "VertexT2SwapLocationsWriter",
+        "VertexT3SwapLocationsWriter",
+        "VoronoiDataWriter",
+    ]
+
     def __init__(self):
         pass
+
+    def all_writers(self):
+        """Return every writer type this generator references."""
+        return (
+            self.cell_writers
+            + self.cell_population_count_writers
+            + self.cell_population_event_writers
+            + self.population_writers
+        )
+
+    def get_class_cpp_source_includes(self, *args, **kwargs):
+        """
+        Return the writer headers the generated AddCellWriter<...> code needs.
+
+        These are the headers previously listed by hand under the
+        population_includes source_includes anchor; keeping them here means the
+        writer list and its includes live in one place.
+        """
+        return [f"{writer}.hpp" for writer in self.all_writers()]
 
     def get_class_cpp_def_code(self, class_name):
         """
@@ -45,82 +114,39 @@ class PopulationWriterCustomTemplate(cppwg.templates.custom.Custom):
 
         code = ""
 
-        # Add cell writers
-        cell_writers = [
-            "CellAgesWriter",
-            "CellAncestorWriter",
-            "CellAppliedForceWriter",
-            "CellCycleModelProteinConcentrationsWriter",
-            "CellDataItemWriter",
-            "CellDeltaNotchWriter",
-            "CellIdWriter",
-            "CellLabelWriter",
-            "CellLocationIndexWriter",
-            "CellMutationStatesWriter",
-            "CellProliferativePhasesWriter",
-            "CellProliferativeTypesWriter",
-            "CellRadiusWriter",
-            "CellRosetteRankWriter",
-            "CellVolumesWriter",
-            "LegacyCellProliferativeTypesWriter",
-        ]
-
+        # Add cell writers. The binding name puts an underscore between the base
+        # method and the writer type (AddCellWriter_CellVolumesWriter), matching
+        # cppwg's instantiation naming (Foo_2) so the TemplateMethod descriptor
+        # exposes it as AddCellWriter[CellVolumesWriter]().
         cell_writer_template = """\
-        .def("AddCellWriter{writer}", &{class_name}::AddCellWriter<{writer}>)
+        .def("AddCellWriter_{writer}", &{class_name}::AddCellWriter<{writer}>)
 """
 
-        for writer in cell_writers:
+        for writer in self.cell_writers:
             replacements = {"class_name": class_name, "writer": writer}
             code += cell_writer_template.format(**replacements)
 
         # Add cell population count writers
-        cell_population_count_writers = [
-            "CellMutationStatesCountWriter",
-            "CellProliferativeTypesCountWriter",
-            "CellProliferativePhasesCountWriter",
-        ]
-
         cell_population_count_writer_template = """\
-        .def("AddCellPopulationCountWriter{writer}", &{class_name}::AddCellPopulationCountWriter<{writer}>)
+        .def("AddCellPopulationCountWriter_{writer}", &{class_name}::AddCellPopulationCountWriter<{writer}>)
 """
-        for writer in cell_population_count_writers:
+        for writer in self.cell_population_count_writers:
             replacements = {"class_name": class_name, "writer": writer}
             code += cell_population_count_writer_template.format(**replacements)
 
         # Add cell population event writers
-        cell_population_event_writers = [
-            "CellDivisionLocationsWriter",
-            "CellRemovalLocationsWriter",
-        ]
-
         cell_population_event_writer_template = """\
-        .def("AddCellPopulationEventWriter{writer}", &{class_name}::AddCellPopulationEventWriter<{writer}>)
+        .def("AddCellPopulationEventWriter_{writer}", &{class_name}::AddCellPopulationEventWriter<{writer}>)
 """
-        for writer in cell_population_event_writers:
+        for writer in self.cell_population_event_writers:
             replacements = {"class_name": class_name, "writer": writer}
             code += cell_population_event_writer_template.format(**replacements)
 
         # Add population writers
-        population_writers = [
-            "BoundaryNodeWriter",
-            "CellPopulationAdjacencyMatrixWriter",
-            "CellPopulationAreaWriter",
-            "CellPopulationElementWriter",
-            "HeterotypicBoundaryLengthWriter",
-            "NodeLocationWriter",
-            "NodeVelocityWriter",
-            "RadialCellDataDistributionWriter",
-            "VertexIntersectionSwapLocationsWriter",
-            "VertexT1SwapLocationsWriter",
-            "VertexT2SwapLocationsWriter",
-            "VertexT3SwapLocationsWriter",
-            "VoronoiDataWriter",
-        ]
-
         population_writer_template = """\
-        .def("AddPopulationWriter{writer}", &{class_name}::AddPopulationWriter<{writer}>)
+        .def("AddPopulationWriter_{writer}", &{class_name}::AddPopulationWriter<{writer}>)
 """
-        for writer in population_writers:
+        for writer in self.population_writers:
             replacements = {"class_name": class_name, "writer": writer}
             code += population_writer_template.format(**replacements)
 

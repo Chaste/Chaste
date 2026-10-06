@@ -110,7 +110,7 @@ class TestPyNodeBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
 
         ## We now pass a force law to the simulation.
 
-        force = chaste.cell_based.GeneralisedLinearSpringForce[2, 2]()
+        force = chaste.cell_based.LinearSpringForce[2, 2]()
         simulator.AddForce(force)
 
         ## Save snapshot images of the population during the simulation
@@ -190,7 +190,7 @@ class TestPyNodeBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
 
         ## We now pass a force law to the simulation.
 
-        force = chaste.cell_based.GeneralisedLinearSpringForce[3, 3]()
+        force = chaste.cell_based.LinearSpringForce[3, 3]()
         simulator.AddForce(force)
 
         ## Save snapshot images of the population during the simulation
@@ -255,7 +255,7 @@ class TestPyNodeBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
 
         ## We now pass a force law to the simulation.
 
-        force = chaste.cell_based.GeneralisedLinearSpringForce[3, 3]()
+        force = chaste.cell_based.LinearSpringForce[3, 3]()
         simulator.AddForce(force)
 
         ## This time we create a CellPopulationBoundaryCondition and pass this to the OffLatticeSimulation.

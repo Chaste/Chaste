@@ -56,11 +56,11 @@ from chaste.cell_based import (
     AbstractCellBasedTestSuite,
     CellsGenerator,
     DifferentiatedCellProliferativeType,
-    ForwardEulerNumericalMethod,
     ImmersedBoundaryCellPopulation,
     ImmersedBoundaryLinearInteractionForce,
     ImmersedBoundaryLinearMembraneForce,
     ImmersedBoundarySimulationModifier,
+    NoNumericalMethod,
     OffLatticeSimulation,
 )
 
@@ -150,8 +150,7 @@ class TestPyImmersedBoundaryTutorial(AbstractCellBasedTestSuite):
         ## the nodes/cells are not bound to a lattice.
 
         simulator = OffLatticeSimulation[2, 2](cell_population)
-        simulator.SetNumericalMethod(ForwardEulerNumericalMethod[2, 2]())
-        simulator.GetNumericalMethod().SetUseUpdateNodeLocation(True)
+        simulator.SetNumericalMethod(NoNumericalMethod[2, 2]())
 
         ## As we have an off-lattice simulation, we need a way to model the
         ## fluid. This is handled by the `ImmersedBoundarySimulationModifier`.
@@ -279,8 +278,7 @@ class TestPyImmersedBoundaryTutorial(AbstractCellBasedTestSuite):
         ## Now we create a simulator to manage the simulation
 
         simulator = OffLatticeSimulation[2, 2](cell_population)
-        simulator.SetNumericalMethod(ForwardEulerNumericalMethod[2, 2]())
-        simulator.GetNumericalMethod().SetUseUpdateNodeLocation(True)
+        simulator.SetNumericalMethod(NoNumericalMethod[2, 2]())
 
         ## We add an immersed boundary simulation modifier to the simulator
 
@@ -396,8 +394,7 @@ class TestPyImmersedBoundaryTutorial(AbstractCellBasedTestSuite):
         ## Create a simulator to manage the simulation
 
         simulator = OffLatticeSimulation[2, 2](cell_population)
-        simulator.SetNumericalMethod(ForwardEulerNumericalMethod[2, 2]())
-        simulator.GetNumericalMethod().SetUseUpdateNodeLocation(True)
+        simulator.SetNumericalMethod(NoNumericalMethod[2, 2]())
 
         ## Add an immersed boundary simulation modifier
 

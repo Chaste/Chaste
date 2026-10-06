@@ -77,6 +77,7 @@ simulation/TestDeltaNotchModifier.hpp
 simulation/TestDivisionBiasTrackingModifier.hpp
 simulation/TestExtrinsicPullModifier.hpp
 simulation/TestNumericalMethods.hpp
+simulation/TestOffLatticeSimulationWithAdaptivity.hpp
 simulation/TestImmersedBoundarySimulationModifier.hpp
 simulation/TestImmersedBoundarySvgWriter.hpp
 simulation/TestRepresentativeImmersedBoundarySimulations.hpp
@@ -114,6 +115,7 @@ tutorial/TestRunningNodeBasedSimulationsTutorial.hpp
 tutorial/TestRunningPottsBasedSimulationsTutorial.hpp
 tutorial/TestRunningSemBasedSimulationsTutorial.hpp
 tutorial/TestRunningSemRheologyTutorial.hpp
+tutorial/TestRunningWithRK4AndAdaptivityTutorial.hpp
 tutorial/TestRunningTumourSpheroidSimulationsTutorial.hpp
 tutorial/TestRunningVertexBasedSimulationsTutorial.hpp
 tutorial/TestVisualizingWithParaviewTutorial.hpp

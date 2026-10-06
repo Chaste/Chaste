@@ -1,0 +1,145 @@
+name: "Publish on develop"
+
+# Everything that publishes generated documentation when develop moves. Split
+# out of the tiered PR workflows (issue #657) so the PR checks stay minimal and
+# the "publish on push" behaviour lives in one place rather than as an
+# event-name guard on individual jobs in the tier workflows.
+#
+# Each job regenerates its own inputs from a fresh checkout, so nothing here
+# depends on an artifact produced by a PR run. That means PR-time generation
+# (the tier-1 "generate ..." / "doxygen coverage" checks) and push-time
+# generation here could in principle drift; that risk is accepted deliberately
+# in exchange for keeping the two concerns fully separate.
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  doxygen-latest:
+    name: "doxygen-latest"
+    runs-on: ubuntu-latest
+    if: github.repository == 'Chaste/Chaste'
+    steps:
+      - name: checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: install doxygen
+        id: install-doxygen
+        uses: $/.github/actions/install-doxygen
+
+      - name: build doxygen
+        run: |
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=Commit::$GITHUB_SHA" ) | "${STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN}" - 2>doxygen-error.log 1>doxygen-output.log
+        env:
+          STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN: ${{ steps.install-doxygen.outputs.bin }}
+
+      - name: check doxygen coverage
+        run: |
+          mkdir doxygen/coverage
+          python python/infra/ParseDoxygen.py doxygen-output.log doxygen-error.log doxygen/coverage
+
+      - name: print doxygen coverage errors
+        if: failure()
+        run: |
+          echo "Printing file contents:"
+          for FILE in doxygen/coverage/*; do
+          echo "------------------------"
+          echo "Contents of $FILE:"
+          cat "$FILE"
+          echo "------------------------"
+          done
+
+      - name: checkout doxygen-latest
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Chaste/doxygen-latest
+          path: doxygen-latest
+          fetch-depth: 0
+          token: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
+          persist-credentials: false
+        if: always()
+
+      - name: copy results
+        run: |
+          cp doxygen/html/* doxygen-latest/site/
+        if: always()
+
+      - name: commit and push if changed
+        run: |
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git add --all
+          git commit -m "update doxygen-latest" || echo "No changes to commit"
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/doxygen-latest.git"
+          git push
+        working-directory: doxygen-latest
+        env:
+          TOKEN: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
+        if: always()
+
+  website-docs:
+    name: "website docs (how-tos + tutorials)"
+    runs-on: ubuntu-latest
+    if: github.repository == 'Chaste/Chaste'
+    steps:
+      - name: checkout Chaste
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0  # history needed for per-tutorial revision info
+          persist-credentials: false
+
+      - name: setup python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.x'
+
+      - name: install dependencies
+        run: python -m pip install jupyterlab
+
+      - name: generate how-to markdown
+        run: python GenerateHowTos.py
+        working-directory: python/infra
+
+      - name: generate user-tutorial markdown
+        run: python GenerateUserTutorials.py
+        working-directory: python/infra
+
+      - name: generate pychaste-tutorial markdown
+        run: python GeneratePyChasteTutorials.py
+        working-directory: python/infra
+
+      - name: checkout website repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Chaste/Chaste.github.io
+          token: ${{ secrets.WEBSITE_ACCESS }}
+          path: chaste-website
+          fetch-depth: 0  # Fetch all history for all tags and branches
+          persist-credentials: false
+
+      - name: copy markdown into website repository
+        run: |
+          cp chaste_howto_webpage.md chaste-website/site/content/docs/how-tos/_index.md
+          cp tutorials/UserTutorials/*.md chaste-website/site/content/docs/user-tutorials/
+          cp pychaste/src/py/doc/tutorial/*.md chaste-website/site/content/pychaste/tutorials
+
+      - name: commit and push if changed
+        run: |
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git add --all
+          git commit -m "update how-tos and tutorials" || echo "No changes to commit"
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/Chaste.github.io.git"
+          git push
+        working-directory: chaste-website
+        env:
+          TOKEN: ${{ secrets.WEBSITE_ACCESS }}

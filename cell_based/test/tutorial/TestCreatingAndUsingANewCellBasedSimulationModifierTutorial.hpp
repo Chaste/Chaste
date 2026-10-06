@@ -77,7 +77,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "UniformCellCycleModel.hpp"
 #include "TransitCellProliferativeType.hpp"
-#include "RepulsionForce.hpp"
+#include "SimpleLogarithmicRepulsionForce.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
 //This test is always run sequentially (never in parallel)
@@ -245,7 +245,7 @@ public:
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(20.0);
 
-        MAKE_PTR(RepulsionForce<2>, p_force);
+        MAKE_PTR(SimpleLogarithmicRepulsionForce<2>, p_force);
         simulator.AddForce(p_force);
 
         /*

@@ -194,7 +194,7 @@ public:
      *
      * @param maxAdaptiveTimeStep max adaptive timestep parameter
      */
-    void SetMaxAdaptiveTimeStep(const unsigned maxAdaptiveTimeStep);
+    void SetMaxAdaptiveTimeStep(unsigned maxAdaptiveTimeStep);
 
     /**
      * @return the maximum allowed number of attempted timestep reductions.

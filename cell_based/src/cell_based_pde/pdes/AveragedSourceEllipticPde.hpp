@@ -119,7 +119,7 @@ public:
      * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
      * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
      * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
-     * @param scaleByCellVolume whether to scale by cell volume (defaults to)
+     * @param scaleByCellVolume whether to scale by cell volume (defaults to false)
      */
     AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,
                               double constantSourceCoefficient=0.0,

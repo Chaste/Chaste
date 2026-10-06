@@ -420,7 +420,7 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 
             if (num_cells[cell_location_index]==0)
             {
-                EXCEPTION("One or more of the cells doesnt contain any pde nodes so cant use Voronoi CellData calculation in the ");
+                EXCEPTION("One or more of the cells doesn't contain any pde nodes so can't use Voronoi CellData calculation");
             }
 
             double  solution_at_cell = cell_data[cell_location_index]/num_cells[cell_location_index];

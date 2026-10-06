@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "VoronoiDataWriter.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
@@ -104,7 +104,7 @@ public:
         simulator.SetEndTime(4.0);
         simulator.SetSamplingTimestepMultiple(12);
 
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
         simulator.AddSimulationModifier(p_scene_modifier);
         simulator.Solve();
@@ -146,8 +146,8 @@ public:
         simulator.SetDt(0.1);
         simulator.SetSamplingTimestepMultiple(100);
 
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_force);
-        p_force->SetMeinekeSpringStiffness(30.0); // default is 15.0;
+        MAKE_PTR(LinearSpringForce<3>, p_force);
+        p_force->SetSpringStiffness(30.0); // default is 15.0;
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
         simulator.AddSimulationModifier(p_scene_modifier);

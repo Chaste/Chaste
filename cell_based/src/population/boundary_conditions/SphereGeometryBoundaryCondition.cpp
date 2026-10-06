@@ -88,8 +88,7 @@ void SphereGeometryBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::ma
         if (fabs(radius - mRadiusOfSphere) > mMaximumDistance)
         {
             // ...move the cell back onto the surface of the sphere
-            c_vector<double, DIM> location_on_sphere =
-                mCentreOfSphere + mRadiusOfSphere*(cell_location - mCentreOfSphere)/radius;
+            c_vector<double, DIM> location_on_sphere = mCentreOfSphere + mRadiusOfSphere*(cell_location - mCentreOfSphere)/radius;
 
             unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
             Node<DIM>* p_node = this->mpCellPopulation->GetNode(node_index);

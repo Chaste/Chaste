@@ -315,8 +315,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
         }
     }
 
-    for (typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_it
-             = rMeshReader.GetElementIteratorBegin(elements_owned);
+    for (auto elem_it = rMeshReader.GetElementIteratorBegin(elements_owned);
          elem_it != rMeshReader.GetElementIteratorEnd();
          ++elem_it)
     {

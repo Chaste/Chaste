@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iomanip>
 #include "CryptSimulation2d.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "SloughingCellKiller.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -100,7 +100,7 @@ public:
             MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh);
             StochasticWntCellCycleModel ccm;
             SloughingCellKiller<2> killer(&crypt, 1.0);
-            GeneralisedLinearSpringForce<2> force;
+            LinearSpringForce<2> force;
             crypt.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
         }
 

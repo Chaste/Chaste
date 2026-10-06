@@ -48,7 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulationWithParticles.hpp"
 #include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
+#include "LinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -66,10 +68,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PopulationTestingForce.hpp"
 #include "PlaneBoundaryCondition.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
+#include "RK4NumericalMethod.hpp"
+#include "NoNumericalMethod.hpp"
+#include "StepSizeException.hpp"
 #include "Warnings.hpp"
 
 
 #include "PetscSetupAndFinalize.hpp"
+
+/**
+ * Helper class used only by TestNumericalMethods::TestDetectStepSizeExceptionsWithNonTerminalException
+ * to force AbstractNumericalMethod::DetectStepSizeExceptions() to catch a non-terminal
+ * StepSizeException, regardless of the behaviour of any real cell population.
+ */
+class MeshBasedCellPopulationWithNonTerminalStepSizeException : public MeshBasedCellPopulation<2>
+{
+public:
+
+    MeshBasedCellPopulationWithNonTerminalStepSizeException(MutableMesh<2,2>& rMesh, std::vector<CellPtr>& rCells)
+        : MeshBasedCellPopulation<2>(rMesh, rCells)
+    {
+    }
+
+    void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,2>& rDisplacement, double dt)
+    {
+        throw StepSizeException(0.5*dt, "Non-terminal step size exception for testing.", false);
+    }
+};
 
 class TestNumericalMethods : public AbstractCellBasedTestSuite
 {
@@ -114,7 +139,8 @@ public:
             TS_ASSERT_EQUALS(saved_locations.size(), cell_population.GetNumRealCells());
         }
 
-        // This tests the exceptions for Node based with Buske Update
+        // This tests the enforced pairing between NoNumericalMethod and populations that
+        // manage their own node position updates (here, NodeBasedCellPopulationWithBuskeUpdate)
         {
             // Create a simple mesh
             TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -132,16 +158,44 @@ public:
             // Create a cell population, with no ghost nodes at the moment
             NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(mesh, cells);
 
+            // A numerical method that does its own integration must not be paired with a
+            // population that manages its own updates
+            ForwardEulerNumericalMethod<2> fe_method;
+            TS_ASSERT_THROWS_THIS(fe_method.SetCellPopulation(&cell_population),
+                "NoNumericalMethod must be used if and only if the cell population manages its own "
+                "node position updates (currently NodeBasedCellPopulationWithBuskeUpdate and "
+                "ImmersedBoundaryCellPopulation).");
 
-            // Create Numerical method
-            ForwardEulerNumericalMethod<2> numerical_method;
+            // NoNumericalMethod is the correct pairing, and should not throw
+            NoNumericalMethod<2> no_method;
+            TS_ASSERT_THROWS_NOTHING(no_method.SetCellPopulation(&cell_population));
+        }
 
-            numerical_method.SetCellPopulation(&cell_population);
+        // This tests the same enforced pairing for ImmersedBoundaryCellPopulation, the other
+        // population type that manages its own node position updates
+        {
+            EXIT_IF_PARALLEL;    // ImmersedBoundaryPalisadeMeshGenerator doesn't work in parallel.
 
-            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Non-Euler steppers are not yet implemented for NodeBasedCellPopulationWithBuskeUpdate");
-            Warnings::QuietDestroy();
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
 
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+            // A numerical method that does its own integration must not be paired with a
+            // population that manages its own updates
+            RK4NumericalMethod<2> rk4_method;
+            TS_ASSERT_THROWS_THIS(rk4_method.SetCellPopulation(&cell_population),
+                "NoNumericalMethod must be used if and only if the cell population manages its own "
+                "node position updates (currently NodeBasedCellPopulationWithBuskeUpdate and "
+                "ImmersedBoundaryCellPopulation).");
+
+            // NoNumericalMethod is the correct pairing, and should not throw
+            NoNumericalMethod<2> no_method;
+            TS_ASSERT_THROWS_NOTHING(no_method.SetCellPopulation(&cell_population));
         }
     }
 
@@ -398,13 +452,14 @@ public:
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
-        // Create numerical method for testing
-        MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
+        // Create numerical method for testing: NodeBasedCellPopulationWithBuskeUpdate manages
+        // its own node position updates, so NoNumericalMethod is the required pairing
+        MAKE_PTR(NoNumericalMethod<2>, p_no_method);
 
         double dt = 0.01;
 
-        p_fe_method->SetCellPopulation(&cell_population);
-        p_fe_method->SetForceCollection(&force_collection);
+        p_no_method->SetCellPopulation(&cell_population);
+        p_no_method->SetForceCollection(&force_collection);
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
@@ -416,7 +471,7 @@ public:
 
         // Update positions and check the answer
         // Currently this throws an error as not set up correctly as it is in a simulation #2087
-        TS_ASSERT_THROWS_THIS(p_fe_method->UpdateAllNodePositions(dt),"You must provide a rowPreallocation argument for a large sparse system");
+        TS_ASSERT_THROWS_THIS(p_no_method->UpdateAllNodePositions(dt),"You must provide a rowPreallocation argument for a large sparse system");
 
         // for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         // {
@@ -544,15 +599,237 @@ public:
 
     void TestSettingAndGettingFlags()
     {
-        // Create numerical methods for testing
+        // Ordinary numerical methods do their own integration
         MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
+        TS_ASSERT(!(p_fe_method->DelegatesToPopulation()));
 
-        // mUseUpdateNodeLocation should default to false
-        TS_ASSERT(!(p_fe_method->GetUseUpdateNodeLocation()));
+        MAKE_PTR(RK4NumericalMethod<2>, p_rk4_method);
+        TS_ASSERT(!(p_rk4_method->DelegatesToPopulation()));
 
-        // Set mUseUpdateNodeLocation to true and check
-        p_fe_method->SetUseUpdateNodeLocation(true);
-        TS_ASSERT(p_fe_method->GetUseUpdateNodeLocation());
+        // NoNumericalMethod always delegates to the cell population
+        MAKE_PTR(NoNumericalMethod<2>, p_no_method);
+        TS_ASSERT(p_no_method->DelegatesToPopulation());
+
+        // NoNumericalMethod never throws a StepSizeException, so adaptive timestepping could
+        // never have any effect; disabling it is a no-op, but enabling it should throw rather
+        // than silently doing nothing
+        TS_ASSERT_THROWS_NOTHING(p_no_method->SetUseAdaptiveTimestep(false));
+        TS_ASSERT_THROWS_THIS(p_no_method->SetUseAdaptiveTimestep(true),
+            "NoNumericalMethod never throws a StepSizeException, so adaptive timestepping "
+            "would have no effect. This is not currently supported.");
+    }
+
+    void TestUpdateAllNodePositionsRK4WithMeshBased()
+    {
+        // Create a simple mesh
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create a cell population
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.SetDampingConstantNormal(1.1);
+
+        // Create a force collection
+        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        MAKE_PTR(PopulationTestingForce<2>, p_test_force);
+        force_collection.push_back(p_test_force);
+
+        // Create an empty boundary condition collection
+        std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<2,2> > > boundary_condition_collection;
+
+        // Create RK4 numerical method for testing
+        MAKE_PTR(RK4NumericalMethod<2>, p_rk4_method);
+
+        double dt = 0.01;
+
+        p_rk4_method->SetCellPopulation(&cell_population);
+        p_rk4_method->SetForceCollection(&force_collection);
+        p_rk4_method->SetBoundaryConditions(&boundary_condition_collection);
+
+        // Save starting positions
+        std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        {
+            old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
+            old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
+        }
+
+        // Update positions and check the answer
+        p_rk4_method->UpdateAllNodePositions(dt);
+
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        {
+            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
+
+            double damping = cell_population.GetDampingConstant(j);
+            c_vector<double, 2> expected_location;
+            expected_location = p_test_force->GetExpectedOneStepLocationRK4(j, damping, old_posns[j], dt);
+
+            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-6);
+        }
+    }
+
+    void TestRK4UpdateAllNodePositionsWithNodeBasedWithBuskeUpdate()
+    {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
+        HoneycombMeshGenerator generator(3, 3, 0);
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a NodesOnlyMesh
+        MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.0);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(*p_mesh, cells);
+
+        // Create numerical method for testing
+        MAKE_PTR(RK4NumericalMethod<2>, p_rk4_method);
+
+        // RK4NumericalMethod does its own integration, so it cannot be paired with a population
+        // that manages its own node position updates; the exception is thrown as soon as the
+        // population is set, regardless of which concrete non-delegating method is used
+        TS_ASSERT_THROWS_THIS(p_rk4_method->SetCellPopulation(&cell_population),
+            "NoNumericalMethod must be used if and only if the cell population manages its own "
+            "node position updates (currently NodeBasedCellPopulationWithBuskeUpdate and "
+            "ImmersedBoundaryCellPopulation).");
+    }
+
+    void TestRK4ArchivingOfNumericalMethod()
+    {
+        EXIT_IF_PARALLEL;
+
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "RK4NumericalMethod.arch";
+
+        {
+            RK4NumericalMethod<2> rk4_method;
+            rk4_method.SetUseAdaptiveTimestep(true);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << static_cast<const RK4NumericalMethod<2>&>(rk4_method);
+        }
+
+        {
+            RK4NumericalMethod<2> rk4_method;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> rk4_method;
+
+            TS_ASSERT_EQUALS(rk4_method.HasAdaptiveTimestep(), true);
+        }
+    }
+
+    void TestDetectStepSizeExceptionsWithNonTerminalException()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
+        Warnings::QuietDestroy();
+
+        // Create a simple mesh
+        HoneycombMeshGenerator generator(3, 3, 0);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        // Create a cell population that always throws a non-terminal StepSizeException
+        MeshBasedCellPopulationWithNonTerminalStepSizeException cell_population(*p_mesh, cells);
+
+        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        MAKE_PTR(PopulationTestingForce<2>, p_test_force);
+        force_collection.push_back(p_test_force);
+
+        ForwardEulerNumericalMethod<2> numerical_method;
+        numerical_method.SetCellPopulation(&cell_population);
+        numerical_method.SetForceCollection(&force_collection);
+
+        c_vector<double, 2> displacement = zero_vector<double>(2);
+        double dt = 0.01;
+
+        // With adaptivity switched off, a non-terminal StepSizeException should just be
+        // converted into a single WARN_ONCE_ONLY warning rather than being rethrown, even
+        // when the check is triggered more than once.
+        TS_ASSERT_EQUALS(numerical_method.HasAdaptiveTimestep(), false);
+
+        TS_ASSERT_THROWS_NOTHING(numerical_method.DetectStepSizeExceptions(0, displacement, dt));
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+
+        TS_ASSERT_THROWS_NOTHING(numerical_method.DetectStepSizeExceptions(0, displacement, dt));
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Non-terminal step size exception for testing.");
+
+        Warnings::QuietDestroy();
+
+        // With adaptivity switched on, the same non-terminal StepSizeException should be
+        // rethrown so that the adaptive timestep loop can catch it and retry with a smaller step.
+        numerical_method.SetUseAdaptiveTimestep(true);
+        TS_ASSERT_THROWS(numerical_method.DetectStepSizeExceptions(0, displacement, dt), StepSizeException&);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+    }
+
+    void TestNoNumericalMethodArchiving()
+    {
+        EXIT_IF_PARALLEL;
+
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NoNumericalMethod.arch";
+
+        {
+            // Archive a NoNumericalMethod through a pointer to the abstract base class, as
+            // happens when an OffLatticeSimulation with an immersed boundary or Buske
+            // population is saved.
+            AbstractNumericalMethod<2,2>* const p_method = new NoNumericalMethod<2,2>();
+
+            // Give a base-class member a non-default value so we can check it round-trips
+            // (mGhostNodeForcesEnabled is initialised to true in the constructor).
+            p_method->mGhostNodeForcesEnabled = false;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_method;
+
+            delete p_method;
+        }
+
+        {
+            AbstractNumericalMethod<2,2>* p_method;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_method;
+
+            // The restored object should still be a NoNumericalMethod, and hence delegate
+            // node position updates to the cell population.
+            TS_ASSERT((dynamic_cast<NoNumericalMethod<2,2>*>(p_method) != nullptr));
+            TS_ASSERT_EQUALS(p_method->DelegatesToPopulation(), true);
+            TS_ASSERT_EQUALS(p_method->HasAdaptiveTimestep(), false);
+
+            // The base-class member serialised via NoNumericalMethod::serialize() should have
+            // been restored.
+            TS_ASSERT_EQUALS(p_method->mGhostNodeForcesEnabled, false);
+
+            delete p_method;
+        }
     }
 };
 

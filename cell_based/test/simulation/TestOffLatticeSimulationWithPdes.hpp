@@ -47,7 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "OffLatticeSimulation.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "ApoptoticCellKiller.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
@@ -69,12 +70,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "CellPopulationAreaWriter.hpp"
-#include "PetscSetupAndFinalize.hpp"
-#include "EllipticBoxDomainPdeModifier.hpp"
 #include "EllipticGrowingDomainPdeModifier.hpp"
 #include "RadialCellDataDistributionWriter.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "EllipticBoxDomainPdeModifier.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
@@ -176,7 +178,7 @@ public:
          * method, the cells don't move (we need to call Solve() to set up the
          * .vizpdesolution file).
          */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(0.0001);
         simulator.AddForce(p_linear_force);
 
@@ -271,7 +273,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -377,7 +379,7 @@ public:
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -459,7 +461,7 @@ public:
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -542,7 +544,7 @@ public:
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -657,7 +659,7 @@ public:
         simulator.AddSimulationModifier(p_pde_modifier2);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -794,7 +796,7 @@ public:
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -864,7 +866,7 @@ public:
             simulator.AddSimulationModifier(p_pde_modifier);
 
             // Create a force law and pass it to the simulation
-            MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+            MAKE_PTR(LinearSpringForce<2>, p_linear_force);
             p_linear_force->SetCutOffLength(1.5);
             simulator.AddForce(p_linear_force);
 
@@ -963,7 +965,7 @@ public:
             simulator.AddSimulationModifier(p_pde_modifier);
 
             // Create a force law and pass it to the simulation
-            MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+            MAKE_PTR(LinearSpringForce<2>, p_linear_force);
             p_linear_force->SetCutOffLength(3.0);
             simulator.AddForce(p_linear_force);
 
@@ -1035,7 +1037,7 @@ public:
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<3>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -1153,7 +1155,7 @@ public:
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -1227,9 +1229,9 @@ public:
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         // Solve the system
         simulator.Solve();

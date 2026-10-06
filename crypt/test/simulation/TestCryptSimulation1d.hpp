@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "CryptSimulation1d.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "SloughingCellKiller.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
@@ -110,7 +110,7 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Run simulation
@@ -175,7 +175,7 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Add sloughing cell killer to simulation
@@ -285,7 +285,7 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Run simulation
@@ -351,7 +351,7 @@ public:
         simulator.SetEndTime(1.001);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Run simulation
@@ -442,7 +442,7 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Add sloughing cell killer to simulation
@@ -532,10 +532,10 @@ public:
         simulator.SetEndTime(1.35);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
 
-        // Set the MeinekeSpringGrowthDuration to be the shorter than the default MPhase Duration as Tyson Novak sells divide every 1.25 hours.
-        p_linear_force->SetMeinekeSpringGrowthDuration(0.1);
+        // Set the SpringGrowthDuration to be shorter than the default M-phase duration, as Tyson-Novak cells divide every 1.25 hours.
+        p_linear_force->SetSpringGrowthDuration(0.1);
 
         simulator.AddForce(p_linear_force);
 
@@ -620,7 +620,7 @@ public:
         simulator.SetEndTime(40);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Add sloughing cell killer to simulation
@@ -734,7 +734,7 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Run simulation
@@ -832,7 +832,7 @@ public:
         simulator.SetEndTime(0.1);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -980,7 +980,7 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Add sloughing cell killer to simulation

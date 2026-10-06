@@ -34,8 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellPopulation.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulationWriter(const std::string& rFileName)

@@ -1,0 +1,107 @@
+# Shared label-gating logic for the tiered CI scheme (see issue #657). Every
+# PR-triggered workflow calls this instead of re-implementing its own label
+# checks, so the ci:off / ci:all rules live in exactly one place.
+#
+# Tiers:
+#   tier0 - always on, opt out with the "ci:off" label
+#   tier1 - opt in with "ci:all"
+#
+# A push to develop, a manual workflow_dispatch, or a scheduled run always
+# runs everything, regardless of labels (there are no PR labels to read in
+# any of those cases).
+#
+# The cancel_tierN outputs feed job-level `concurrency.cancel-in-progress`
+# blocks: they are true only when this event actually changes whether
+# tier N should be running (see relevant_tierN below), so toggling an
+# unrelated label can never cancel a genuinely in-progress run of a tier
+# it does not affect.
+name: CI gate (reusable)
+
+on:
+  workflow_call:
+    outputs:
+      run_tier0:
+        value: ${{ jobs.evaluate.outputs.run_tier0 }}
+      run_tier1:
+        value: ${{ jobs.evaluate.outputs.run_tier1 }}
+      cancel_tier0:
+        value: ${{ jobs.evaluate.outputs.cancel_tier0 }}
+      cancel_tier1:
+        value: ${{ jobs.evaluate.outputs.cancel_tier1 }}
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    outputs:
+      run_tier0: ${{ steps.eval.outputs.run_tier0 }}
+      run_tier1: ${{ steps.eval.outputs.run_tier1 }}
+      cancel_tier0: ${{ steps.eval.outputs.cancel_tier0 }}
+      cancel_tier1: ${{ steps.eval.outputs.cancel_tier1 }}
+    steps:
+      - id: eval
+        env:
+          LABELS_CSV: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          EVENT_NAME: ${{ github.event_name }}
+          ACTION: ${{ github.event.action }}
+          ADDED_LABEL: ${{ github.event.label.name }}
+        run: |
+          has() { [[ ",${LABELS_CSV}," == *",$1,"* ]]; }
+
+          # A manual dispatch, a push to develop, or a scheduled run always
+          # runs everything - there are no PR labels to consult in any case.
+          force_all=false
+          if [[ "$EVENT_NAME" == "push" || "$EVENT_NAME" == "workflow_dispatch" || "$EVENT_NAME" == "schedule" ]]; then
+            force_all=true
+          fi
+
+          is_label_event=false
+          if [[ "$ACTION" == "labeled" || "$ACTION" == "unlabeled" ]]; then
+            is_label_event=true
+          fi
+
+          off=false
+          if ! $force_all && has "ci:off"; then
+            off=true
+          fi
+
+          enabled_tier1=false
+          if ! $off && { $force_all || has "ci:all"; }; then
+            enabled_tier1=true
+          fi
+
+          # relevant_tierN: for a labeled/unlabeled event, true only if the
+          # label that changed can change whether tier N should be running.
+          # Always true for any other event (push, opened, synchronize,
+          # reopened) - those are real changes.
+          #
+          #   tier0  only ci:off changes it.
+          #   tier1  ci:off (disables everything) or ci:all.
+          relevant_tier0=true
+          if $is_label_event && [[ "$ADDED_LABEL" != "ci:off" ]]; then
+            relevant_tier0=false
+          fi
+
+          relevant_tier1=true
+          if $is_label_event && [[ "$ADDED_LABEL" != "ci:off" && "$ADDED_LABEL" != "ci:all" ]]; then
+            relevant_tier1=false
+          fi
+
+          # A tier only actually runs when it's enabled AND this specific
+          # event is relevant to it - this is what stops an unrelated
+          # same-commit relabel from re-triggering a tier that is already
+          # running or done.
+          run_tier0=false;  ! $off           && $relevant_tier0 && run_tier0=true
+          run_tier1=false;  $enabled_tier1    && $relevant_tier1 && run_tier1=true
+
+          # cancel_tierN reuses the same relevance test: only a label change
+          # that actually matters to tier N is allowed to cancel an
+          # in-progress run of it.
+          cancel_tier0=$relevant_tier0
+          cancel_tier1=$relevant_tier1
+
+          {
+            echo "run_tier0=$run_tier0"
+            echo "run_tier1=$run_tier1"
+            echo "cancel_tier0=$cancel_tier0"
+            echo "cancel_tier1=$cancel_tier1"
+          } >> "$GITHUB_OUTPUT"

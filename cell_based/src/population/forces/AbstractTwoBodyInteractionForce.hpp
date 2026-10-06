@@ -146,4 +146,6 @@ public:
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 };
 
+TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractTwoBodyInteractionForce)
+
 #endif /*ABSTRACTTWOBODYINTERACTIONFORCE_HPP_*/

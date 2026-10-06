@@ -39,13 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 
 /**
- * A subclass of GeneralisedLinearSpringForce with variable spring constants.
+ * A subclass of LinearSpringForce with variable spring constants.
  */
 template<unsigned DIM>
-class LinearSpringWithVariableSpringConstantsForce : public GeneralisedLinearSpringForce<DIM>
+class LinearSpringWithVariableSpringConstantsForce : public LinearSpringForce<DIM>
 {
     friend class TestLinearSpringWithVariableSpringConstantsForce;
 
@@ -62,7 +62,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<GeneralisedLinearSpringForce<DIM> >(*this);
+        archive & boost::serialization::base_object<LinearSpringForce<DIM> >(*this);
         archive & mUseEdgeBasedSpringConstant;
         archive & mUseMutantSprings;
         archive & mMutantMutantMultiplier;

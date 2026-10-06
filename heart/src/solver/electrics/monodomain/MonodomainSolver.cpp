@@ -199,8 +199,7 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainSolver(
 
     if (HeartConfig::Instance()->GetUseStateVariableInterpolation())
     {
-        mpMonodomainCorrectionTermAssembler
-            = new MonodomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
+        mpMonodomainCorrectionTermAssembler = new MonodomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
         //We are going to need those caches after all
         pTissue->SetCacheReplication(true);
     }
