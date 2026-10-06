@@ -83,6 +83,8 @@ requirements:
     - metis
     - mpi4py
     - mpich
+    # Used by build.sh to generate the tutorial notebooks.
+    - nbformat
     - numpy
     - parmetis
     - petsc
