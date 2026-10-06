@@ -98,8 +98,8 @@ public:
         /*
          * For coverage, we create another cell-cycle model that is identical except that we
          * manually pass in an ODE solver. In this case, our ODE solver (BackwardEulerIvpOdeSolver)
-         * is the same type as the solver used by the cell-cycle model if no solver is provided
-         * (unless CVODE is used), so our results should be identical.
+         * is different to the solver used by the cell-cycle model if no solver is provided (CVODE),
+         * so the ODE solutions differ slightly, but the division times should still agree.
          */
         boost::shared_ptr<CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver> >
             p_solver(CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver>::Instance());

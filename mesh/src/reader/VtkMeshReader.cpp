@@ -39,9 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifdef CHASTE_VTK
-
 #include <vtkCellTypes.h>
+#include <vtkVersion.h>
 
 #include "VtkMeshReader.hpp"
 #include "Exception.hpp"
@@ -143,13 +142,8 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
     {
         vtkDataSetSurfaceFilter* p_surface = vtkDataSetSurfaceFilter::New();
         mpVtkFilterEdges = vtkFeatureEdges::New();
-#if VTK_MAJOR_VERSION >= 6
         p_surface->SetInputData(mpVtkUnstructuredGrid);
         mpVtkFilterEdges->SetInputConnection(p_surface->GetOutputPort());
-#else
-        p_surface->SetInput(mpVtkUnstructuredGrid);
-        mpVtkFilterEdges->SetInput(p_surface->GetOutput());
-#endif
         mpVtkFilterEdges->Update();
         mNumFaces = mpVtkFilterEdges->GetOutput()->GetNumberOfCells();
         p_surface->Delete();
@@ -157,11 +151,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
     else if (ELEMENT_DIM == 3u)
     {
         mpVtkGeometryFilter = vtkGeometryFilter::New();
-#if VTK_MAJOR_VERSION >= 6
         mpVtkGeometryFilter->SetInputData(mpVtkUnstructuredGrid);
-#else
-        mpVtkGeometryFilter->SetInput(mpVtkUnstructuredGrid);
-#endif
 
 #if (VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION >= 1)
         // Change to indexing in vtkGeometryFilter happened in VTK 9.1
@@ -553,4 +543,3 @@ template class VtkMeshReader<1,3>;
 template class VtkMeshReader<2,2>;
 template class VtkMeshReader<2,3>;
 template class VtkMeshReader<3,3>;
-#endif // CHASTE_VTK

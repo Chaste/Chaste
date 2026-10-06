@@ -7,8 +7,6 @@ on:
   push:
     branches:
       - develop
-  schedule:
-    - cron: "22 22 * * 0"
 
 permissions:
   contents: read
@@ -36,7 +34,6 @@ jobs:
         # ride along in `include:` and stay out of the name.
         variant:
           - "01"
-          - "01-no-cvode-vtk"
           - "02"
           - "03"
           - "04"
@@ -49,9 +46,6 @@ jobs:
           - variant: "01"
             image: portability-01
             extra-build-args: ""
-          - variant: "01-no-cvode-vtk"
-            image: portability-01
-            extra-build-args: "-DChaste_USE_CVODE=OFF -DChaste_USE_VTK=OFF"
           - variant: "02"
             image: portability-02
             extra-build-args: ""

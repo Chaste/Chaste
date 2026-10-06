@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractSteadyStateRunner.hpp"
 
-#ifdef CHASTE_CVODE
-
 AbstractSteadyStateRunner::AbstractSteadyStateRunner(boost::shared_ptr<AbstractCvodeCell> pModel)
         : mpModel(pModel),
           mNumEvaluations(0u),
@@ -101,5 +99,3 @@ void AbstractSteadyStateRunner::SetMaxNumPaces(unsigned numPaces)
     }
     mMaxNumPaces = numPaces;
 }
-
-#endif // CHASTE_CVODE

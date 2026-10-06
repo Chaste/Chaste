@@ -1077,7 +1077,7 @@ public:
     {
         EXIT_IF_PARALLEL;    // Population writers don't work in parallel yet
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
@@ -1212,7 +1212,6 @@ public:
         FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").CompareFiles();
 
         // Test VTK output
-#ifdef CHASTE_VTK
         node_based_cell_population.WriteVtkResultsToFile(output_directory);
 
         // Read VTK file and check it doesn't cause any problems
@@ -1277,14 +1276,13 @@ public:
         TS_ASSERT_DELTA(ancestors_data[1], 1.0, 1e-9);
         TS_ASSERT_DELTA(ancestors_data[2], 2.0, 1e-9);
         TS_ASSERT_DELTA(ancestors_data[3], 3.0, 1e-9);
-#endif
     }
 
     void TestNodeBasedCellPopulationOutputWriters3d()
     {
         EXIT_IF_PARALLEL;    // Population writers don't work in parallel yet
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
@@ -1350,7 +1348,6 @@ public:
         FileComparison(results_dir + "cellappliedforce.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellappliedforce.dat").CompareFiles();
 
         // Test VTK output
-#ifdef CHASTE_VTK
         cell_population.WriteVtkResultsToFile(output_directory);
 
         // Read VTK file and check it doesn't cause any problems
@@ -1391,14 +1388,13 @@ public:
         {
             TS_ASSERT_DELTA(ancestors_data[i], i, 1e-9);
         }
-#endif
     }
 
     void TestWritingCellCyclePhases()
     {
         EXIT_IF_PARALLEL;    // Population writers dont work in parallel yet.
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh

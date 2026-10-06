@@ -80,6 +80,17 @@ if(NOT Chaste_CASTXML_COMPILER)
                     " compiler. Wrapper generation may fail")
 endif()
 
+# cppwg parses headers with castxml, a separate tool invocation from the normal
+# compiler, so it does not automatically see definitions set globally via
+# add_definitions() (e.g. CHASTE_SUNDIALS_VERSION, CHASTE_VTK, CHASTE_CVODE,
+# CHASTE_XERCES). Forward them explicitly so headers preprocess the same way
+# for castxml as they do for the real build.
+get_directory_property(PYCHASTE_COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
+set(PYCHASTE_CASTXML_DEFINE_FLAGS "")
+foreach(_chaste_define IN LISTS PYCHASTE_COMPILE_DEFINITIONS)
+    string(APPEND PYCHASTE_CASTXML_DEFINE_FLAGS " -D${_chaste_define}")
+endforeach()
+
 # Command for generating wrappers.
 #  - gnu++17 (rather than c++17) and -Wno-missing-template-arg-list-after-template-kw
 #    silence a castxml/LLVM error on use of the template keyword without a
@@ -91,7 +102,7 @@ set(PYCHASTE_WRAPPER_GENERATION_COMMAND
         -i ${PYCHASTE_INCLUDE_DIRS}
         -l ${CMAKE_CURRENT_BINARY_DIR}/cppwg.log
         --std "gnu++17"
-        --castxml_cflags="-Wno-missing-template-arg-list-after-template-kw"
+        "--castxml_cflags=-Wno-missing-template-arg-list-after-template-kw${PYCHASTE_CASTXML_DEFINE_FLAGS}"
         --castxml_compiler ${Chaste_CASTXML_COMPILER}
 )
 

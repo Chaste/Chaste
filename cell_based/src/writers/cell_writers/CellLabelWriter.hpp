@@ -43,9 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A class written using the visitor pattern for writing cell labels to file.
  *
- * The output file is called results.vizlabels by default. If VTK is switched on,
- * then the writer also specifies the VTK output for each cell, which is stored in
- * the VTK cell data "Cell labels" by default.
+ * The output file is called results.vizlabels by default. The writer also specifies the
+ * VTK output for each cell, which is stored in the VTK cell data "Cell labels" by
+ * default.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellLabelWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>

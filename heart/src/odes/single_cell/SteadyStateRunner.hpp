@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _STEADYSTATERUNNER_HPP_
 #define _STEADYSTATERUNNER_HPP_
 
-#ifdef CHASTE_CVODE
-
 #include "AbstractSteadyStateRunner.hpp"
 #include "VectorHelperFunctions.hpp"
 
@@ -82,8 +80,6 @@ public:
        mTwoPaceScan(twoPaces)
     {};
 };
-
-#endif // CHASTE_CVODE
 
 #endif // _STEADYSTATERUNNER_HPP_
 

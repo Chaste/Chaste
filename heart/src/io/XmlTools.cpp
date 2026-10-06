@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <xsd/cxx/xml/dom/bits/error-handler-proxy.hxx>
 #include <xsd/cxx/tree/exceptions.hxx>
 
-#include "ChasteXsdVersion.hpp"
 #include "Exception.hpp"
 
 XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadXmlFile(
@@ -72,13 +71,8 @@ XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadXmlFile(
     {
         Finalize();
         // Test for missing schema/xml file
-#if CHASTE_XSD_VERSION_AT_LEAST(3, 0, 0)
         const ::xsd::cxx::tree::diagnostics<char>& diags = e.diagnostics();
         const ::xsd::cxx::tree::error<char>& first_error = diags[0];
-#else
-        const ::xsd::cxx::tree::errors<char>& errors = e.errors();
-        const ::xsd::cxx::tree::error<char>& first_error = errors[0];
-#endif
         if (first_error.line() == 0u)
         {
             std::cerr << first_error << std::endl;
@@ -136,8 +130,6 @@ XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadFileToDomDocument(
     const XMLCh ls_id [] = {chLatin_L, chLatin_S, chNull};
     DOMImplementation* p_impl(DOMImplementationRegistry::getDOMImplementation(ls_id));
 
-#if _XERCES_VERSION >= 30000
-    // Xerces-C++ 3.0.0 and later.
     XSD_DOM_AUTO_PTR<DOMLSParser> p_parser(p_impl->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS, 0));
     DOMConfiguration* p_conf(p_parser->getDomConfig());
 
@@ -198,55 +190,6 @@ XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadFileToDomDocument(
     // Set error handler.
     xml::dom::bits::error_handler_proxy<char> ehp(rErrorHandler);
     p_conf->setParameter(XMLUni::fgDOMErrorHandler, &ehp);
-
-#else // _XERCES_VERSION < 30000
-    // Same as above but for Xerces-C++ 2 series.
-    XSD_DOM_AUTO_PTR<DOMBuilder> p_parser(p_impl->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS, 0));
-
-    p_parser->setFeature(XMLUni::fgDOMComments, false);
-    p_parser->setFeature(XMLUni::fgDOMDatatypeNormalization, true);
-    p_parser->setFeature(XMLUni::fgDOMEntities, false);
-    p_parser->setFeature(XMLUni::fgDOMNamespaces, true);
-    p_parser->setFeature(XMLUni::fgDOMWhitespaceInElementContent, false);
-    p_parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
-
-    // Code taken from xsd/cxx/xml/dom/parsing-source.txx
-    if (validate)
-    {
-        p_parser->setFeature(XMLUni::fgDOMValidation, true);
-        p_parser->setFeature(XMLUni::fgXercesSchema, true);
-        p_parser->setFeature(XMLUni::fgXercesSchemaFullChecking, false);
-        if (!rProps.schema_location().empty())
-        {
-            xml::string locn(rProps.schema_location());
-            const void* p_locn(locn.c_str());
-            p_parser->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,
-                                  const_cast<void*>(p_locn));
-        }
-
-        if (!rProps.no_namespace_schema_location().empty())
-        {
-            xml::string locn(rProps.no_namespace_schema_location());
-            const void* p_locn(locn.c_str());
-
-            p_parser->setProperty(XMLUni::fgXercesSchemaExternalNoNameSpaceSchemaLocation,
-                                  const_cast<void*>(p_locn));
-        }
-    }
-    else
-    {
-        // This branch is only used by projects
-// LCOV_EXCL_START
-        p_parser->setFeature(XMLUni::fgDOMValidation, false);
-        p_parser->setFeature(XMLUni::fgXercesSchema, false);
-        p_parser->setFeature(XMLUni::fgXercesSchemaFullChecking, false);
-// LCOV_EXCL_STOP
-    }
-
-    xml::dom::bits::error_handler_proxy<char> ehp(rErrorHandler);
-    p_parser->setErrorHandler(&ehp);
-
-#endif // _XERCES_VERSION >= 30000
 
     // Do the parse
     XSD_DOM_AUTO_PTR<DOMDocument> p_doc(p_parser->parseURI(rFileName.c_str()));

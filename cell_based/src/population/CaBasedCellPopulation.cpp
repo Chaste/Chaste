@@ -624,7 +624,6 @@ void CaBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rPar
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-#ifdef CHASTE_VTK
     // Store the present time as a string
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
@@ -784,7 +783,6 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     {
         delete nodes[i];
     }
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>
