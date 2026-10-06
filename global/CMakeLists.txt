@@ -33,71 +33,109 @@
 find_package(Chaste COMPONENTS none)
 
 set(generate_dir ${CMAKE_CURRENT_BINARY_DIR}/src)
+set(provenance_dir ${CMAKE_CURRENT_BINARY_DIR}/provenance)
 
-#The generated timekeeper.cpp code below keeps track of build timestamp.
-#It is built and executed prior to starting a build and prints the timestamp
-#in a given format. This timestamp is used by Version.cpp, which is also auto-generated.
-file(WRITE ${generate_dir}/timekeeper.cpp
-"#include <iostream>
-#include <fstream>
-#include <ctime>
-int main( )
-{
-   time_t now = time(0);
-   tm* loc_time = localtime(&now);
-   char buffer[80];
-   strftime(buffer, 80, \"%a, %d %b %Y %H:%M:%S +0000\", loc_time);
+##########################################################################
+#  Generate Version.cpp and ChasteBuildInfo.cpp, fixed for the life of  #
+#  this cmake configuration                                             #
+##########################################################################
 
-   std::ofstream timestampFile;
-   timestampFile.open (\"build_timestamp\");
-   timestampFile << buffer;
-   timestampFile.close();
-   return 0;
-}
-")
-
-add_executable(timekeeper "${generate_dir}/timekeeper.cpp")
-target_link_libraries(timekeeper PRIVATE Chaste_COMMON_DEPS)
-
-###################################################################
-#  Setup command to generate Version and BuildInfo at build-time  #
-###################################################################
+# With a multi-config generator (such as Ninja Multi-Config) the configuration is only chosen at
+# build time, so anything depending on it is written as a generator expression below, and each
+# configuration gets its own copy of the two generated files. A single-config generator (Unix
+# Makefiles, plain Ninja) gets exactly the values CMAKE_BUILD_TYPE implies.
+get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 # Combine the CMAKE_CXX_FLAGS and CMAKE_CXX_FLAGS_<build_type> into one string with all the flags
-string(TOUPPER ${CMAKE_BUILD_TYPE} UPPERCASE_BUILD_TYPE)
-string(STRIP ${CMAKE_CXX_FLAGS} STRIPPED_CXX_FLAGS)
-string(STRIP ${CMAKE_CXX_FLAGS_${UPPERCASE_BUILD_TYPE}} STRIPPED_BUILD_TYPE_FLAGS)
-set(ALL_CXX_FLAGS "${STRIPPED_CXX_FLAGS} ${STRIPPED_BUILD_TYPE_FLAGS}")
+string(STRIP "${CMAKE_CXX_FLAGS}" STRIPPED_CXX_FLAGS)
+if (is_multi_config)
+    set(ALL_CXX_FLAGS "${STRIPPED_CXX_FLAGS}")
+    foreach (config ${CMAKE_CONFIGURATION_TYPES})
+        string(TOUPPER "${config}" upper_config)
+        string(STRIP "${CMAKE_CXX_FLAGS_${upper_config}}" config_flags)
+        # Escape the characters that would otherwise end or split the generator expression
+        string(REPLACE ">" "$<ANGLE-R>" config_flags "${config_flags}")
+        string(REPLACE "," "$<COMMA>" config_flags "${config_flags}")
+        string(APPEND ALL_CXX_FLAGS "$<$<CONFIG:${config}>: ${config_flags}>")
+    endforeach ()
+    set(Chaste_BUILD_DIR_NAME "$<CONFIG>")
+else ()
+    string(TOUPPER ${CMAKE_BUILD_TYPE} UPPERCASE_BUILD_TYPE)
+    string(STRIP "${CMAKE_CXX_FLAGS_${UPPERCASE_BUILD_TYPE}}" STRIPPED_BUILD_TYPE_FLAGS)
+    set(ALL_CXX_FLAGS "${STRIPPED_CXX_FLAGS} ${STRIPPED_BUILD_TYPE_FLAGS}")
+    set(Chaste_BUILD_DIR_NAME "${CMAKE_CFG_INTDIR}")
+endif ()
+set(Chaste_BUILD_TYPE "$<CONFIG>")
+set(Chaste_DEFAULT_TEST_OUTPUT "${Chaste_BINARY_DIR}/testoutput")
+set(time_size 80)
+set(time_format "%a, %d %b %Y %H:%M:%S %z")
 
-add_custom_command(OUTPUT
-    ${generate_dir}/Version.cpp
-    ${generate_dir}/ChasteBuildInfo.cpp
+# Every value substituted into these two files (version numbers, compiler info, build type,
+# xsd and chaste_codegen versions, and so on) is fixed for the life of a configuration, so
+# neither has any custom target or tie to a build-time step. configure_file() substitutes the
+# cmake variables, then file(GENERATE) evaluates the generator expressions, writing one output
+# per configuration. Both only touch an output whose content actually changed, so an ordinary
+# build, or a reconfigure that changes nothing, never recompiles either file.
+foreach (template Version.cpp ChasteBuildInfo_cmake.cpp)
+    string(REPLACE "_cmake" "" generated "${template}")
+    configure_file(
+        "${Chaste_SOURCE_DIR}/global/src/${template}.in"
+        "${generate_dir}/${generated}.genex"
+        )
+    file(GENERATE
+        OUTPUT "${generate_dir}/$<CONFIG>/${generated}"
+        INPUT "${generate_dir}/${generated}.genex"
+        )
+endforeach ()
+
+##########################################################################
+#  Generate build-time provenance: build timestamp and git state        #
+##########################################################################
+
+# provenance/licence.txt only changes when someone edits LICENSE itself, so it is a plain
+# configure-time copy rather than something generate_provenance needs to refresh below. The
+# "BSD 3-Clause License." heading and the "This file is part of Chaste." line (which belongs in
+# source file headers) are dropped, so the banner printed by Chaste executables is unchanged.
+file(READ "${Chaste_SOURCE_DIR}/LICENSE" licence_text)
+string(REPLACE "BSD 3-Clause License.\n\n" "" licence_text "${licence_text}")
+string(REPLACE "This file is part of Chaste.\n\n" "" licence_text "${licence_text}")
+# Each configuration gets its own provenance directory, named as ChasteBuildDirName() reports it
+# at runtime: "." for a single-config generator, so just provenance/ itself, or the configuration
+# name for a multi-config generator, so that building one configuration never overwrites the
+# build time or git state reported by another.
+if (is_multi_config)
+    set(provenance_config_dirs ${CMAKE_CONFIGURATION_TYPES})
+else ()
+    set(provenance_config_dirs "${Chaste_BUILD_DIR_NAME}")
+endif ()
+foreach (config_dir ${provenance_config_dirs})
+    file(WRITE "${provenance_dir}/${config_dir}/licence.txt" "${licence_text}")
+endforeach ()
+
+# generate_provenance has no tracked OUTPUT, so cmake always considers it out of date: its
+# recipe (cmake/Modules/ChasteGenerateProvenance.cmake) runs every time chaste_global is built,
+# giving the build timestamp and git state (Chaste's own, and that of each checked out project)
+# genuine per-build freshness. Nothing here is compiled, so refreshing these files never marks
+# chaste_global, or anything that depends on it, as needing to recompile or relink.
+add_custom_target(generate_provenance
     COMMAND ${CMAKE_COMMAND}
         "-DChaste_SOURCE_DIR=${Chaste_SOURCE_DIR}"
-        "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
-        "-DChaste_BUILD_DIR_NAME=${CMAKE_CFG_INTDIR}"
-        "-DChaste_DEFAULT_TEST_OUTPUT=${Chaste_BINARY_DIR}/testoutput"
-        "-DChaste_BUILD_TYPE=$<CONFIGURATION>"
-        "-Dtimekeeper_exe=$<TARGET_FILE:timekeeper>"
-        "-Dxsd_version=${xsd_version}"
-        "-Dgenerate_dir=${generate_dir}"
-        "-DChaste_UPDATE_PROVENANCE=${Chaste_UPDATE_PROVENANCE}"
         "-DChaste_PROJECTS=${Chaste_PROJECTS}"
-        "-DChaste_VERSION_MAJOR=${Chaste_VERSION_MAJOR}"
-        "-DChaste_VERSION_MINOR=${Chaste_VERSION_MINOR}"
-        "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}"
-        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-        "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-        "-DCMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}"
-        "-DALL_CXX_FLAGS=${ALL_CXX_FLAGS}"
+        "-Dprovenance_dir=${provenance_dir}/${Chaste_BUILD_DIR_NAME}"
         "-DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}"
-        "-DChaste_CODEGEN_VERSION=${Chaste_CODEGEN_VERSION}"
-        "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteGenerateVersionAndBuildInfo.cmake"
+        "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteGenerateProvenance.cmake"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    DEPENDS timekeeper
-    COMMENT "Generating Build Config and Version Info"
+    COMMENT "Refreshing build provenance"
     VERBATIM
     )
 
+chaste_do_component(global ${generate_dir}/$<CONFIG>/Version.cpp ${generate_dir}/$<CONFIG>/ChasteBuildInfo.cpp)
 
-chaste_do_component(global ${generate_dir}/Version.cpp ${generate_dir}/ChasteBuildInfo.cpp)
+add_dependencies(chaste_global generate_provenance)
+
+# Installed alongside the libraries and headers (matching the existing cxxtest/ and python/
+# folders below) so that an installed, out-of-tree Chaste (via ChasteConfig.cmake) still has
+# provenance to read, resolved at runtime via ChasteInstallRootDir().
+install(DIRECTORY "${provenance_dir}/${Chaste_BUILD_DIR_NAME}/"
+        DESTINATION lib/chaste/provenance
+        COMPONENT Config)

@@ -57,6 +57,14 @@ const char* ChasteBuildRootDir();
 const char* ChasteSourceRootDir();
 
 /**
+ * @return the install prefix (CMAKE_INSTALL_PREFIX) this Chaste was configured with.
+ * Will always give you the absolute path with a trailing slash. Used to locate an installed
+ * copy of the provenance/ directory when this Chaste is used out of tree, via ChasteConfig.cmake,
+ * rather than from its own source or build tree.
+ */
+const char* ChasteInstallRootDir();
+
+/**
  * @return the folder in which compiled files are placed for the given
  * Chaste component.
  * Will always give you the absolute path with a trailing slash.

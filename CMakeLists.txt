@@ -121,7 +121,13 @@ include (ChasteDeprecatedOptions)
 option (Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
 option (Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
 
-option (Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-linking of all Chaste libraries" ON)
+# A plain, non-cached snapshot of the current git revision, used only to label the coverage
+# and doxygen targets below: both are triggered manually, not part of an ordinary test build,
+# so a value that is fresh as of the last reconfigure (rather than every build) is fine here.
+# The provenance read by ChasteBuildInfo at runtime (see global/CMakeLists.txt) is generated
+# separately, and refreshed on every build.
+include (ChasteDetermineGitRevision)
+chaste_determine_git_revision ("${Chaste_SOURCE_DIR}" Chaste_REVISION Chaste_REVISION_MODIFIED)
 
 option(RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
