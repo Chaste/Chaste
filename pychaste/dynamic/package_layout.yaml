@@ -87,6 +87,7 @@ subpackages:
     - RandomNumberGenerator
     - RelativeTo
     - ReplicatableVector
+    - SourceRevision
     - TimeStepper
     - Timer
   mesh:

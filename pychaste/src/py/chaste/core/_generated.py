@@ -49,6 +49,7 @@ from chaste._pychaste_all import (
     RandomNumberGenerator,
     RelativeTo,
     ReplicatableVector,
+    SourceRevision,
     TimeStepper,
     Timer,
 )
@@ -64,6 +65,7 @@ __all__ = [
     "RandomNumberGenerator",
     "RelativeTo",
     "ReplicatableVector",
+    "SourceRevision",
     "TimeStepper",
     "Timer",
 ]
