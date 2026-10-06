@@ -56,11 +56,6 @@ cmake ${CMAKE_ARGS} \
 # the build-package-* scripts and forwarded through recipe.yaml) to avoid exhausting RAM.
 make -j "${CPU_COUNT}" pychaste
 
-# Generate the tutorial notebooks that ship as package data.
-${PYTHON} "${SRC_DIR}/python/infra/GeneratePyChasteTutorials.py" \
-  --format notebook \
-  --output-dir pychaste/package/chaste/notebooks
-
 # Install. --no-deps: the runtime dependencies (matplotlib, numpy, xvfbwrapper)
 # are provided as conda run requirements, so pip must not pull them from PyPI
 # (where e.g. building matplotlib from an sdist needs meson-python).

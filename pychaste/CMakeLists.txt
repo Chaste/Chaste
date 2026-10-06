@@ -177,3 +177,18 @@ foreach(file_path ${package_file_paths})
         COPYONLY
     )
 endforeach()
+
+################################
+####  Generate tutorial notebooks
+################################
+
+message(STATUS "Installing nbformat")
+execute_process(COMMAND ${chaste_python3_venv}/pip install --no-cache-dir "nbformat>=5.1")
+
+execute_process(
+    COMMAND ${chaste_python3_venv}/python
+        ${CMAKE_SOURCE_DIR}/python/infra/GeneratePyChasteTutorials.py
+        --format notebook
+        --output-dir ${CMAKE_CURRENT_BINARY_DIR}/package/chaste/notebooks
+    COMMAND_ERROR_IS_FATAL ANY
+)
