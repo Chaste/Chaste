@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ExecutableSupport.hpp"
 #include "Version.hpp"
+#include <sstream>
 #include "FakePetscSetup.hpp"
 
 /**
@@ -61,6 +62,23 @@ private:
         }
         const std::string offset = rTime.substr(rTime.size() - 5);
         return (offset[0] == '+' || offset[0] == '-') && offset.find_first_not_of("0123456789", 1) == std::string::npos;
+    }
+
+    /**
+     * @return whether rRevision is either unknown, or a full commit hash (SHA-1 or SHA-256) whose
+     * short form is its first SourceRevision::SHORT_COMMIT_LENGTH characters
+     * @param rRevision  a source revision
+     */
+    bool IsWellFormed(const SourceRevision& rRevision)
+    {
+        if (!rRevision.IsKnown())
+        {
+            return rRevision.GetShortCommit() == "unknown";
+        }
+        const std::string& r_commit = rRevision.rGetCommit();
+        return (r_commit.size() == 40u || r_commit.size() == 64u)
+               && r_commit.find_first_not_of("0123456789abcdef") == std::string::npos
+               && rRevision.GetShortCommit() == r_commit.substr(0, SourceRevision::SHORT_COMMIT_LENGTH);
     }
 
 public:
@@ -94,14 +112,34 @@ public:
         TS_ASSERT(licence.find("This file is part of Chaste.") == std::string::npos);
         TS_ASSERT(!licence.empty() && licence.back() != '\n');
 
-        // Every checked-out project with a version must also have a modified flag
-        const std::map<std::string, std::string>& r_versions = ChasteBuildInfo::rGetProjectVersions();
-        const std::map<std::string, std::string>& r_modified = ChasteBuildInfo::rGetIfProjectsModified();
-        TS_ASSERT_EQUALS(r_versions.size(), r_modified.size());
-        for (const auto& r_version : r_versions)
+        // Revisions are a full commit hash, shown shortened to a fixed length, or unknown; built
+        // from a git working copy, Chaste's own commit must be known
+        const SourceRevision chaste_revision = ChasteBuildInfo::GetChasteRevision();
+        TS_ASSERT(IsWellFormed(chaste_revision));
+        if (FileFinder(".git", RelativeTo::ChasteSourceRoot).Exists())
         {
-            TS_ASSERT_EQUALS(r_modified.count(r_version.first), 1u);
+            TS_ASSERT(chaste_revision.IsKnown());
         }
+        for (const auto& r_project : ChasteBuildInfo::GetProjectRevisions())
+        {
+            TS_ASSERT(IsWellFormed(r_project.second));
+        }
+
+        // The version string carries the short commit as build metadata, when it is known
+        std::stringstream expected_version;
+        expected_version << ChasteBuildInfo::GetMajorReleaseNumber() << "." << ChasteBuildInfo::GetMinorReleaseNumber();
+        if (chaste_revision.IsKnown())
+        {
+            expected_version << "+" << chaste_revision.GetShortCommit();
+        }
+        TS_ASSERT_EQUALS(ChasteBuildInfo::GetVersionString(), expected_version.str());
+
+        const SourceRevision unknown;
+        TS_ASSERT(!unknown.IsKnown() && !unknown.IsModified());
+        TS_ASSERT_EQUALS(unknown.GetShortCommit(), "unknown");
+        const SourceRevision known("0123456789abcdef0123456789abcdef01234567", true);
+        TS_ASSERT(known.IsKnown() && known.IsModified());
+        TS_ASSERT_EQUALS(known.GetShortCommit(), "0123456789ab");
 
         // Nothing inside Chaste tests these macros any more (VTK, CVODE and Xerces are required
         // dependencies), but downstream code may still guard on them, so they must remain defined.

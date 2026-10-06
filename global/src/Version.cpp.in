@@ -44,8 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * substituted directly into this file by cmake, exactly as before.
  *
  * A few methods instead return information that can change between two builds with no
- * reconfigure in between: the build timestamp, git revision and modified flag, and the
- * checked-out project versions. Rather than being substituted here, these are read at
+ * reconfigure in between: the build timestamp, and the commit and modified flag of Chaste and
+ * of each checked-out project. Rather than being substituted here, these are read at
  * runtime from plain files under a provenance/ directory, refreshed on every build by the
  * generate_provenance target in global/CMakeLists.txt. Embedding build-time-variable content
  * directly in this file would make it, and hence chaste_global, recompile and relink on
@@ -54,12 +54,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Version.hpp"
 #include "ChasteBuildRoot.hpp"
-#include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <ctime>
 #include <climits>
-#include <utility>
 #include <vector>
 
 namespace
@@ -136,19 +134,25 @@ std::string ReadProvenanceFile(const std::string& rName, const std::string& rDef
     return ReadFileIn(rGetProvenanceDir(), rName, rDefault);
 }
 
-/** A project's git/svn revision and whether it has uncommitted changes, keyed by project name. */
-typedef std::pair<std::map<std::string, std::string>, std::map<std::string, std::string> > ProjectInfo;
+/**
+ * @return the revision recorded in rDir, which holds the same "commit" and "modified" files for
+ * Chaste itself (the provenance directory) as for each checked-out project (its subdirectory of
+ * provenance/projects/), or an unknown, unmodified revision if they cannot be found.
+ *
+ * @param rDir  the directory to read from
+ */
+SourceRevision ReadRevision(const FileFinder& rDir)
+{
+    return SourceRevision(ReadFileIn(rDir, "commit", "unknown"), ReadFileIn(rDir, "modified", "false") == "true");
+}
 
 /**
- * @return the version and modified-flag maps for every checked-out project. The
- * subdirectories of provenance/projects/ are discovered with FileFinder::FindMatches, rather
- * than from any separate manifest, so this is the only place that needs to know how the
- * per-project files are laid out. Every project found gets an entry in both maps, so callers
- * can look up one map using the other's keys.
+ * @return the revision of every checked-out project. The subdirectories of provenance/projects/
+ * are discovered with FileFinder::FindMatches, rather than from any separate manifest.
  */
-ProjectInfo LoadProjectInfo()
+std::map<std::string, SourceRevision> LoadProjectRevisions()
 {
-    ProjectInfo info;
+    std::map<std::string, SourceRevision> revisions;
     const FileFinder& r_provenance_dir = rGetProvenanceDir();
     if (r_provenance_dir.IsPathSet())
     {
@@ -159,23 +163,12 @@ ProjectInfo LoadProjectInfo()
             {
                 if (r_project_dir.IsDir())
                 {
-                    const std::string name = r_project_dir.GetLeafName();
-                    info.first[name] = ReadFileIn(r_project_dir, "version", "Unknown");
-                    info.second[name] = ReadFileIn(r_project_dir, "modified", "False");
+                    revisions.emplace(r_project_dir.GetLeafName(), ReadRevision(r_project_dir));
                 }
             }
         }
     }
-    return info;
-}
-
-/**
- * @return the project information, read once per process.
- */
-const ProjectInfo& rGetProjectInfo()
-{
-    static const ProjectInfo info = LoadProjectInfo();
-    return info;
+    return revisions;
 }
 
 } // anonymous namespace
@@ -194,8 +187,11 @@ const char* ChasteBuildInfo::GetRootDir()
 std::string ChasteBuildInfo::GetVersionString()
 {
     std::stringstream version;
-    version << GetMajorReleaseNumber() << "." << GetMinorReleaseNumber()
-            << "." << std::hex << GetRevisionNumber() << std::dec;
+    version << GetMajorReleaseNumber() << "." << GetMinorReleaseNumber();
+    if (GetChasteRevision().IsKnown())
+    {
+        version << "+" << GetChasteRevision().GetShortCommit();
+    }
     return version.str();
 }
 
@@ -209,16 +205,10 @@ unsigned ChasteBuildInfo::GetMinorReleaseNumber()
     return ${Chaste_VERSION_MINOR}u;
 }
 
-unsigned long long ChasteBuildInfo::GetRevisionNumber()
+SourceRevision ChasteBuildInfo::GetChasteRevision()
 {
-    static const unsigned long long revision = strtoull(ReadProvenanceFile("git_revision", "0").c_str(), nullptr, 16);
+    static const SourceRevision revision = ReadRevision(rGetProvenanceDir());
     return revision;
-}
-
-bool ChasteBuildInfo::IsWorkingCopyModified()
-{
-    static const bool modified = (ReadProvenanceFile("git_modified", "false") == "true");
-    return modified;
 }
 
 const char* ChasteBuildInfo::GetBuildTime()
@@ -265,21 +255,17 @@ const char* ChasteBuildInfo::GetCompilerFlags()
     return "${ALL_CXX_FLAGS}";
 }
 
-const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()
+std::map<std::string, SourceRevision> ChasteBuildInfo::GetProjectRevisions()
 {
-    return rGetProjectInfo().first;
-}
-
-const std::map<std::string, std::string>& ChasteBuildInfo::rGetIfProjectsModified()
-{
-    return rGetProjectInfo().second;
+    static const std::map<std::string, SourceRevision> revisions = LoadProjectRevisions();
+    return revisions;
 }
 
 std::string ChasteBuildInfo::GetProvenanceString()
 {
     std::stringstream prov;
     prov << "Created by Chaste version " << GetVersionString();
-    if (IsWorkingCopyModified())
+    if (GetChasteRevision().IsModified())
     {
         prov << " (with uncommitted modifications)";
     }
@@ -287,12 +273,10 @@ std::string ChasteBuildInfo::GetProvenanceString()
     prov << "Chaste was built on " << GetBuildTime()
          << " by machine (uname) '" << GetBuilderUnameInfo()
          << "' using settings: " << GetBuildInformation();
-    const std::map<std::string, std::string>& r_project_versions = rGetProjectVersions();
-    for (std::map<std::string, std::string>::const_iterator iter = r_project_versions.begin();
-         iter != r_project_versions.end();
-         ++iter)
+    const std::map<std::string, SourceRevision> project_revisions = GetProjectRevisions();
+    for (auto iter = project_revisions.begin(); iter != project_revisions.end(); ++iter)
     {
-        if (iter == r_project_versions.begin())
+        if (iter == project_revisions.begin())
         {
             prov << ".  Checked-out project versions: ";
         }
@@ -300,7 +284,11 @@ std::string ChasteBuildInfo::GetProvenanceString()
         {
             prov << "; ";
         }
-        prov << iter->first << "=" << iter->second;
+        prov << iter->first << "=" << iter->second.GetShortCommit();
+        if (iter->second.IsModified())
+        {
+            prov << " (modified)";
+        }
     }
     prov << "." << std::endl;
     return prov.str();
