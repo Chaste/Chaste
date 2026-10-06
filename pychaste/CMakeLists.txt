@@ -37,6 +37,11 @@ find_package(Chaste COMPONENTS ${Chaste_DEPENDS_pychaste})
 
 chaste_do_component(pychaste)
 
+# The two trees built in the binary dir: the generated C++ wrapper sources,
+# and the staged Python package that gets pip installed.
+set(PYCHASTE_WRAPPER_DIR ${CMAKE_CURRENT_BINARY_DIR}/wrappers)
+set(PYCHASTE_PACKAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/package)
+
 ################################
 ####  Generate Python wrappers
 ################################
@@ -97,7 +102,7 @@ endforeach()
 #    following argument list, which appears in some boost headers.
 set(PYCHASTE_WRAPPER_GENERATION_COMMAND
     ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
-        -w ${CMAKE_CURRENT_BINARY_DIR}/wrappers
+        -w ${PYCHASTE_WRAPPER_DIR}
         -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/config.yaml
         -i ${PYCHASTE_INCLUDE_DIRS}
         -l ${CMAKE_CURRENT_BINARY_DIR}/cppwg.log
@@ -107,18 +112,18 @@ set(PYCHASTE_WRAPPER_GENERATION_COMMAND
 )
 
 # Generate wrappers if not already created
-if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/wrappers")
+if(NOT EXISTS "${PYCHASTE_WRAPPER_DIR}")
     execute_process(COMMAND ${PYCHASTE_WRAPPER_GENERATION_COMMAND} COMMAND_ERROR_IS_FATAL ANY)
 endif()
 
 # Target for manually re-generating the wrappers
 add_custom_target(pychaste_wrappers
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/wrappers
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${PYCHASTE_WRAPPER_DIR}
     COMMAND ${PYCHASTE_WRAPPER_GENERATION_COMMAND}
 )
 
 # Add generated wrappers to includes
-header_dirs("${CMAKE_CURRENT_BINARY_DIR}/wrappers" _include_dirs)
+header_dirs("${PYCHASTE_WRAPPER_DIR}" _include_dirs)
 list(APPEND PYCHASTE_INCLUDE_DIRS ${_include_dirs})
 
 ################################
@@ -131,8 +136,8 @@ list(APPEND PYCHASTE_INCLUDE_DIRS ${_include_dirs})
 # as `from chaste._pychaste_all import *`.
 
 file(GLOB_RECURSE PYCHASTE_WRAPPER_SOURCES CONFIGURE_DEPENDS
-    ${CMAKE_CURRENT_BINARY_DIR}/wrappers/all/*.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/wrappers/all/*.hpp
+    ${PYCHASTE_WRAPPER_DIR}/all/*.cpp
+    ${PYCHASTE_WRAPPER_DIR}/all/*.hpp
 )
 
 pybind11_add_module(_pychaste_all OPT_SIZE ${PYCHASTE_WRAPPER_SOURCES})
@@ -155,7 +160,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 set_target_properties(_pychaste_all PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/package/chaste
+    LIBRARY_OUTPUT_DIRECTORY ${PYCHASTE_PACKAGE_DIR}/chaste
 )
 
 add_dependencies(pychaste _pychaste_all)
@@ -173,7 +178,7 @@ list(FILTER package_file_paths EXCLUDE REGEX ".*\\.(dll|dylib|pyc|so)$")
 foreach(file_path ${package_file_paths})
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/py/${file_path}
-        ${CMAKE_CURRENT_BINARY_DIR}/package/${file_path}
+        ${PYCHASTE_PACKAGE_DIR}/${file_path}
         COPYONLY
     )
 endforeach()
@@ -189,6 +194,6 @@ execute_process(
     COMMAND ${chaste_python3_venv}/python
         ${CMAKE_SOURCE_DIR}/python/infra/GeneratePyChasteTutorials.py
         --format notebook
-        --output-dir ${CMAKE_CURRENT_BINARY_DIR}/package/chaste/notebooks
+        --output-dir ${PYCHASTE_PACKAGE_DIR}/chaste/notebooks
     COMMAND_ERROR_IS_FATAL ANY
 )
