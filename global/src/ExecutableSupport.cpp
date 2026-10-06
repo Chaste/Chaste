@@ -240,7 +240,7 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t<ProvenanceInfo>\n";
     output << "\t\t<VersionString>" << ChasteBuildInfo::GetVersionString() << "</VersionString> <!-- build specific -->\n";
     output << "\t\t<Revision>" << ChasteBuildInfo::GetChasteRevision().rGetCommit() << "</Revision>\n";
-    output << "\t\t<IsWorkingCopyModified>" << ChasteBuildInfo::GetChasteRevision().IsModified() << "</IsWorkingCopyModified>\n";
+    output << "\t\t<IsWorkingCopyModified>" << (ChasteBuildInfo::GetChasteRevision().IsModified() ? "True" : "False") << "</IsWorkingCopyModified>\n";
     output << "\t\t<BuildInformation>" << ChasteBuildInfo::GetBuildInformation() << "</BuildInformation>\n";
     output << "\t\t<BuildTime>" << ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
     output << "\t\t<CurrentTime>" << ChasteGetCurrentTime() << "</CurrentTime>\n";
@@ -255,8 +255,8 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
             // No projects are checked out for continuous builds normally!
             output << "\t\t\t<Project>" << std::endl;
             output << "\t\t\t\t<Name>" << r_project.first << "</Name>" << std::endl;
-            output << "\t\t\t\t<Version>" << r_project.second.rGetCommit() << "</Version>" << std::endl;
-            output << "\t\t\t\t<Modified>" << (r_project.second.IsModified() ? "True" : "False") << "</Modified>" << std::endl;
+            output << "\t\t\t\t<Revision>" << r_project.second.rGetCommit() << "</Revision>" << std::endl;
+            output << "\t\t\t\t<IsWorkingCopyModified>" << (r_project.second.IsModified() ? "True" : "False") << "</IsWorkingCopyModified>" << std::endl;
             output << "\t\t\t</Project>" << std::endl;
             // LCOV_EXCL_STOP
         }
