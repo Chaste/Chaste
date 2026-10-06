@@ -106,9 +106,13 @@ jobs:
     needs: [gate, build-and-test]
     runs-on: ubuntu-26.04
     # Run even if one or more components failed (e.g. found a leak), so the combined
-    # report is always produced. Skip only if the whole run was cancelled or this
-    # tier isn't enabled for this PR.
-    if: ${{ !cancelled() && needs.gate.outputs.run_tier1 == 'true' }}
+    # report is always produced. Skip if the whole run was cancelled, this tier isn't
+    # enabled for this PR, or build-and-test was cancelled outright (e.g. pre-empted by
+    # a concurrency-group duplicate of this same workflow, such as when a PR is opened
+    # with the ci:all label already attached, firing both an "opened" and a "labeled"
+    # event for the same commit): in that case there are no logs to aggregate, and the
+    # surviving duplicate run will produce the real report.
+    if: ${{ !cancelled() && needs.build-and-test.result != 'cancelled' && needs.gate.outputs.run_tier1 == 'true' }}
 
     # One-value matrix: GitHub names a running job "<name> (ran)" but a
     # skipped one just "<name>", so a skipped re-run (e.g. from an
