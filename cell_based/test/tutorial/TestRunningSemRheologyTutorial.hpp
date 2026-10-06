@@ -338,7 +338,6 @@ public:
         simulator.SetDt(0.01);
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<3> >());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
         simulator.AddForce(p_sem_force);
 
         OutputFileHandler results_handler("SemRheology", false);

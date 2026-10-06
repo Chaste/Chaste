@@ -347,7 +347,6 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(1.0);
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<3> >());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         MAKE_PTR(SemForce<3>, p_sem_force);
         p_sem_force->SetIntraScalingFactor(rho);

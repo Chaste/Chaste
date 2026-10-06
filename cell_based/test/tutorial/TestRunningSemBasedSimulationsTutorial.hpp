@@ -197,11 +197,10 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(1.0);
 
-        /* SEM simulations require the Forward Euler numerical method. We must also
-         * call `SetUseUpdateNodeLocation(false)` so that forces are applied via the
-         * standard ODE integration pathway, not the alternative node-update path. */
+        /* SEM simulations require a numerical method that performs its own force
+         * integration; we use `ForwardEulerNumericalMethod` here, though `RK4NumericalMethod`
+         * would work equally well. */
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2>>());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         /* We add `SemForce` and configure its parameters using the N-dependent scaling
          * from Sandersius & Newman (2008) Section 2. `ApplyNScaledIntraParameters`
@@ -302,7 +301,6 @@ public:
         simulator.SetEndTime(1.0);
 
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2>>());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         /* For a multi-cell simulation we set both intra-cellular (nodes within the same
          * element) and inter-cellular (nodes in different elements) force parameters.
@@ -407,7 +405,6 @@ public:
         simulator.SetEndTime(1.0);
 
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<3>>());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         /* We configure the force using the N-scaling parameters. Setting
          * `IntraScalingFactor` to `rho` before calling `ApplyNScaledIntraParameters`

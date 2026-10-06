@@ -176,7 +176,6 @@ public:
         simulator.SetSamplingTimestepMultiple(1);
         simulator.SetEndTime(0.03);
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2>>());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         // Create some force laws and pass them to the simulation
         MAKE_PTR(SemRegionalForce<2>, p_sem_force);
@@ -227,7 +226,6 @@ public:
         simulator.SetSamplingTimestepMultiple(1);
         simulator.SetEndTime(0.02);
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2> >());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         // No force is added: this test is about whether the PDE modifier can be driven by a SEM
         // population at all, so the nodes are deliberately left stationary.
@@ -289,7 +287,6 @@ public:
         simulator.SetSamplingTimestepMultiple(1);
         simulator.SetEndTime(0.02);
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2> >());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         // A uniform source drives the solution away from the boundary value in the interior
         MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (1.0));
@@ -378,7 +375,6 @@ public:
         simulator.SetSamplingTimestepMultiple(1);
         simulator.SetEndTime(0.03);
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<3>>());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         // Create some force laws and pass them to the simulation.
         // R_cell = scaleFactor/2, packing=1 (regular cubic grid), kappa0 chosen to match well_depth~0.001.
@@ -463,7 +459,6 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(0.05);
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<3>>());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         MAKE_PTR(SemForce<3>, p_sem_force);
         const double rho = 5.0;
@@ -530,7 +525,6 @@ public:
             simulator.SetSamplingTimestepMultiple(10);
             simulator.SetEndTime(0.2);
             simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2>>());
-            simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
             // Use N-scaled parameters (packing=1 for the regular grid) so the Morse dynamics
             // are stable at the generator's node spacing.
@@ -572,7 +566,6 @@ public:
             simulator.SetSamplingTimestepMultiple(10);
             simulator.SetEndTime(0.1);
             simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2>>());
-            simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
             MAKE_PTR(SemForce<2>, p_sem_force);
             const SemNScaledParameters params = p_sem_force->ApplyNScaledIntraParameters(p_mesh->GetNumNodes(), 0.25, 20.0, 0.0, 1.0);
