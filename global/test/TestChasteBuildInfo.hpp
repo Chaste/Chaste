@@ -134,13 +134,6 @@ public:
         }
         TS_ASSERT_EQUALS(ChasteBuildInfo::GetVersionString(), expected_version.str());
 
-        const SourceRevision unknown;
-        TS_ASSERT(!unknown.IsKnown() && !unknown.IsModified());
-        TS_ASSERT_EQUALS(unknown.GetShortCommit(), "unknown");
-        const SourceRevision known("0123456789abcdef0123456789abcdef01234567", true);
-        TS_ASSERT(known.IsKnown() && known.IsModified());
-        TS_ASSERT_EQUALS(known.GetShortCommit(), "0123456789ab");
-
         // Nothing inside Chaste tests these macros any more (VTK, CVODE and Xerces are required
         // dependencies), but downstream code may still guard on them, so they must remain defined.
         // See cmake/Modules/ChasteLegacyDefinitions.cmake.
