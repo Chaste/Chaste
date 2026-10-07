@@ -70,6 +70,17 @@ set(Chaste_DEFAULT_TEST_OUTPUT "${Chaste_BINARY_DIR}/testoutput")
 set(time_size 80)
 set(time_format "%a, %d %b %Y %H:%M:%S %z")
 
+# The licence text is compiled into Version.cpp as a raw string literal, so the banner printed
+# by Chaste executables never depends on finding a file at runtime. The "BSD 3-Clause License."
+# heading and the "This file is part of Chaste." line (which belongs in source file headers) are
+# dropped, so that banner is unchanged. LICENSE is a configure dependency, so editing it (such as
+# the annual copyright update) reconfigures and recompiles Version.cpp automatically.
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${Chaste_SOURCE_DIR}/LICENSE")
+file(READ "${Chaste_SOURCE_DIR}/LICENSE" licence_text)
+string(REPLACE "BSD 3-Clause License.\n\n" "" licence_text "${licence_text}")
+string(REPLACE "This file is part of Chaste.\n\n" "" licence_text "${licence_text}")
+string(STRIP "${licence_text}" licence_text)
+
 # Every value substituted into these two files (version numbers, compiler info, build type,
 # xsd and chaste_codegen versions, and so on) is fixed for the life of a configuration, so
 # neither has any custom target or tie to a build-time step. configure_file() substitutes the
@@ -92,31 +103,15 @@ endforeach ()
 #  Generate build-time provenance: build timestamp and git state        #
 ##########################################################################
 
-# provenance/licence.txt only changes when someone edits LICENSE itself, so it is a plain
-# configure-time copy rather than something generate_provenance needs to refresh below. The
-# "BSD 3-Clause License." heading and the "This file is part of Chaste." line (which belongs in
-# source file headers) are dropped, so the banner printed by Chaste executables is unchanged.
-file(READ "${Chaste_SOURCE_DIR}/LICENSE" licence_text)
-string(REPLACE "BSD 3-Clause License.\n\n" "" licence_text "${licence_text}")
-string(REPLACE "This file is part of Chaste.\n\n" "" licence_text "${licence_text}")
-# Each configuration gets its own provenance directory, named as ChasteBuildDirName() reports it
-# at runtime: "." for a single-config generator, so just provenance/ itself, or the configuration
-# name for a multi-config generator, so that building one configuration never overwrites the
-# build time or git state reported by another.
-if (is_multi_config)
-    set(provenance_config_dirs ${CMAKE_CONFIGURATION_TYPES})
-else ()
-    set(provenance_config_dirs "${Chaste_BUILD_DIR_NAME}")
-endif ()
-foreach (config_dir ${provenance_config_dirs})
-    file(WRITE "${provenance_dir}/${config_dir}/licence.txt" "${licence_text}")
-endforeach ()
-
 # generate_provenance has no tracked OUTPUT, so cmake always considers it out of date: its
 # recipe (cmake/Modules/ChasteGenerateProvenance.cmake) runs every time chaste_global is built,
 # giving the build timestamp and git state (Chaste's own, and that of each checked out project)
 # genuine per-build freshness. Nothing here is compiled, so refreshing these files never marks
-# chaste_global, or anything that depends on it, as needing to recompile or relink.
+# chaste_global, or anything that depends on it, as needing to recompile or relink. Each
+# configuration writes to its own directory, named as ChasteBuildDirName() reports it at runtime:
+# "." for a single-config generator, so just provenance/ itself, or the configuration name for a
+# multi-config generator, so that building one configuration never overwrites the build time or
+# git state reported by another.
 add_custom_target(generate_provenance
     COMMAND ${CMAKE_COMMAND}
         "-DChaste_SOURCE_DIR=${Chaste_SOURCE_DIR}"

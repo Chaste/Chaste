@@ -175,8 +175,7 @@ std::map<std::string, SourceRevision> LoadProjectRevisions()
 
 std::string ChasteBuildInfo::GetLicenceText()
 {
-    static const std::string licence = ReadProvenanceFile("licence.txt", "Licence text unavailable.");
-    return licence;
+    return R"licence(${licence_text})licence";
 }
 
 const char* ChasteBuildInfo::GetRootDir()
