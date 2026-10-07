@@ -125,7 +125,7 @@ jobs:
         working-directory: python/infra
 
       - name: generate pychaste-tutorial markdown
-        run: python GeneratePyChasteTutorials.py
+        run: python GeneratePyChasteTutorials.py --format markdown
         working-directory: python/infra
 
       - name: checkout website repository
@@ -141,7 +141,7 @@ jobs:
         run: |
           cp chaste_howto_webpage.md chaste-website/site/content/docs/how-tos/_index.md
           cp tutorials/UserTutorials/*.md chaste-website/site/content/docs/user-tutorials/
-          cp pychaste/src/py/doc/tutorial/*.md chaste-website/site/content/pychaste/tutorials
+          cp tutorials/PyChasteTutorials/*.md chaste-website/site/content/pychaste/tutorials
 
       - name: commit and push if changed
         # A concurrent push (e.g. an overlapping run of this same workflow) can reject

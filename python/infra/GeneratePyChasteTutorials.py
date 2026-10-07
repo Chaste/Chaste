@@ -30,21 +30,19 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import argparse
 import os
 import re
-import subprocess
-import warnings
 from pathlib import Path
 from subprocess import CalledProcessError, check_output
-from typing import List, Tuple
 
 import nbformat
 from nbformat import NotebookNode
 from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook
 
-CHASTE_SRC_DIR = Path(__file__).resolve().parent.parent.parent
+CHASTE_SRC_DIR = Path(__file__).resolve().parents[2]
 PYCHASTE_SRC_DIR = CHASTE_SRC_DIR / "pychaste"
-PYCHASTE_TUTORIAL_DIR = PYCHASTE_SRC_DIR / "src" / "py" / "doc" / "tutorial"
+PYCHASTE_TUTORIAL_DIR = CHASTE_SRC_DIR / "tutorials" / "PyChasteTutorials"
 HOWTO_TAG = "HOW_TO_TAG"
 
 # Status codes for use during parsing
@@ -97,7 +95,7 @@ def starts_comment(_stripped_line):
     return _stripped_line.startswith("##")
 
 
-def format_code_lines(code_lines: List[str]) -> str:
+def format_code_lines(code_lines: list[str]) -> str:
     """
     Formats a list of code lines into a Markdown code block with Python syntax highlighting.
 
@@ -141,7 +139,7 @@ def get_last_revision_hash(abs_file_path: Path) -> str:
         exit(e.returncode)
 
 
-def get_list_of_tutorial_files() -> List[Path]:
+def get_list_of_tutorial_files() -> list[Path]:
     """
     Scans the PYCHASTE_SRC_DIR directory recursively to find all files with a name
     matching 'TestPy*Tutorial.py', and returns a list of their resolved paths.
@@ -198,7 +196,7 @@ def get_title_from_file(abs_file_path: Path) -> str:
     return " ".join(words)
 
 
-def convert_tutorial_file(abs_file_path: Path) -> Tuple[str, NotebookNode, List[str]]:
+def convert_tutorial_file(abs_file_path: Path) -> tuple[str, NotebookNode, list[str]]:
     """
     Convert a single tutorial source file to markdown format.
 
@@ -423,14 +421,25 @@ def convert_tutorial_file(abs_file_path: Path) -> Tuple[str, NotebookNode, List[
     return "".join(markdown), notebook, code_store
 
 
-def write_tutorial(abs_file_path: Path) -> None:
+def write_tutorial(abs_file_path: Path, output_dir: Path, formats: set[str]) -> None:
     """
-    Convert a tutorial source file to a Hugo markdown file and a Jupyter notebook.
+    Convert a tutorial source file to a Hugo markdown file and/or a Jupyter notebook.
 
     :param abs_file_path: The Path object of the tutorial source file.
+    :param output_dir: The directory to write the generated files to.
+    :param formats: Which outputs to write: "markdown", "notebook", or both.
     """
     # Convert the tutorial file to markdown and Jupyter notebook format
     test_markdown, test_notebook, test_code = convert_tutorial_file(abs_file_path)
+    tutorial_name = get_output_file_name(abs_file_path)
+
+    if "notebook" in formats:
+        notebook_file_path = output_dir / f"{tutorial_name}.ipynb"
+        with open(notebook_file_path, "w", encoding="utf-8") as file:
+            nbformat.write(test_notebook, file)
+
+    if "markdown" not in formats:
+        return
 
     # Process the markdown file
     markdown = []
@@ -446,8 +455,7 @@ def write_tutorial(abs_file_path: Path) -> None:
     markdown.append("---")
 
     # Add the revision string
-    revision_string = get_revision_string_from_file(abs_file_path)
-    markdown.append(revision_string)
+    markdown.append(get_revision_string_from_file(abs_file_path))
     markdown.append("\n\nNote that the code is given in full at the bottom of the page.\n\n")
 
     # Add the tutorial content
@@ -470,23 +478,45 @@ def write_tutorial(abs_file_path: Path) -> None:
     # Postprocess to remove any cases of 2 blank lines
     markdown_string = markdown_string.replace("\n\n\n", "\n\n")
 
-    tutorial_name = get_output_file_name(abs_file_path)
-    markdown_file_path = PYCHASTE_TUTORIAL_DIR / f"{tutorial_name}.md"
+    markdown_file_path = output_dir / f"{tutorial_name}.md"
     with open(markdown_file_path, "w", encoding="utf-8") as file:
         file.write(markdown_string)
 
-    # Process the Jupyter notebook file
-    test_notebook["cells"].insert(0, new_markdown_cell(revision_string))
 
-    notebook_file_path = PYCHASTE_TUTORIAL_DIR / f"{tutorial_name}.ipynb"
-    with open(notebook_file_path, "w", encoding="utf-8") as file:
-        nbformat.write(test_notebook, file)
+def parse_arguments(argv=None) -> argparse.Namespace:
+    """
+    Parse command-line arguments.
+
+    :param argv: List of command-line arguments. If None, defaults to sys.argv.
+    :return: Namespace containing parsed arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Generate PyChaste tutorials from their test sources."
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=PYCHASTE_TUTORIAL_DIR,
+        help="Directory to write the generated tutorials to (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--format",
+        choices=["markdown", "notebook", "both"],
+        default="both",
+        help="Which outputs to generate (default: %(default)s)",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None) -> None:
+    args = parse_arguments(argv)
+
+    formats = {"markdown", "notebook"} if args.format == "both" else {args.format}
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+
+    for tutorial_file in get_list_of_tutorial_files():
+        write_tutorial(tutorial_file, args.output_dir, formats)
 
 
 if __name__ == "__main__":
-    PYCHASTE_TUTORIAL_DIR.mkdir(parents=True, exist_ok=True)
-    if any(PYCHASTE_TUTORIAL_DIR.iterdir()):
-        warnings.warn(f"{PYCHASTE_TUTORIAL_DIR} is not empty")
-
-    for tutorial_file in get_list_of_tutorial_files():
-        write_tutorial(tutorial_file)
+    main()
