@@ -41,7 +41,6 @@ jobs:
         'GIT_TAG=.'
         'CMAKE_BUILD_TYPE="Release"'
         'Chaste_ERROR_ON_WARNING="OFF"'
-        'Chaste_UPDATE_PROVENANCE="ON"'
       platforms: linux/amd64,linux/arm64
       output: image
       push: true

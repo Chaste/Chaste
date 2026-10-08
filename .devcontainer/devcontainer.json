@@ -77,10 +77,8 @@
         // "MY_VARIABLE": "${localEnv:MY_VARIABLE:default_value}"
         // "CMAKE_BUILD_TYPE": "${remoteEnv:CMAKE_BUILD_TYPE:Debug}",
         // "Chaste_ERROR_ON_WARNING": "${remoteEnv:Chaste_ERROR_ON_WARNING:ON}",
-        // "Chaste_UPDATE_PROVENANCE": "${remoteEnv:Chaste_UPDATE_PROVENANCE:OFF}"
         "CMAKE_BUILD_TYPE": "Debug",
-        "Chaste_ERROR_ON_WARNING": "ON",
-        "Chaste_UPDATE_PROVENANCE": "OFF"
+        "Chaste_ERROR_ON_WARNING": "ON"
     },
 
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
