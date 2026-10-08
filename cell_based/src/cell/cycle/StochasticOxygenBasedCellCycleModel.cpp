@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "StochasticOxygenBasedCellCycleModel.hpp"
 
 StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel()
@@ -74,10 +76,7 @@ void StochasticOxygenBasedCellCycleModel::GenerateStochasticG2Duration()
     mStochasticG2Duration = p_gen->NormalRandomDeviate(mean, standard_deviation);
 
     // Check that the normal random deviate has not returned a small or negative G2 duration
-    if (mStochasticG2Duration < mMinimumGapDuration)
-    {
-        mStochasticG2Duration = mMinimumGapDuration;
-    }
+    mStochasticG2Duration = std::max(mStochasticG2Duration, mMinimumGapDuration);
 }
 
 void StochasticOxygenBasedCellCycleModel::InitialiseDaughterCell()

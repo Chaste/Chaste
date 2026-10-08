@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTNONLINEARELASTICITYSOLVER_HPP_
 #define ABSTRACTNONLINEARELASTICITYSOLVER_HPP_
 
+#include <algorithm>
 #include <vector>
 #include <cmath>
 #include "AbstractContinuumMechanicsSolver.hpp"
@@ -2052,14 +2053,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveNonSnes(double tol)
         tol = NEWTON_REL_TOL*norm_resid;
 
         // LCOV_EXCL_START // not going to have tests in cts for everything
-        if (tol > MAX_NEWTON_ABS_TOL)
-        {
-            tol = MAX_NEWTON_ABS_TOL;
-        }
-        if (tol < MIN_NEWTON_ABS_TOL)
-        {
-            tol = MIN_NEWTON_ABS_TOL;
-        }
+        tol = std::clamp(tol, MIN_NEWTON_ABS_TOL, MAX_NEWTON_ABS_TOL);
         // LCOV_EXCL_STOP
     }
 
