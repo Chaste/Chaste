@@ -165,6 +165,22 @@ public:
      * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
      */
     virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num stem] [num transit] [num differentiated] [num default]
+     *
+     * where [num stem] denotes the number of cells in the population that have a StemCellProliferativeType,
+     * and so on. These counts are computed through the cell population method GetCellProliferativeTypeCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
+     *
+     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
+     */
+    virtual void Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"
