@@ -33,14 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "ExclusionCaBasedDivisionRule.hpp"
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned SPACE_DIM>
 bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(CellPtr pParentCell, CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
-    bool is_room = false;
-
     // Get node index corresponding to this cell
     unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
 
@@ -48,18 +48,9 @@ bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(CellPtr pParentCell
     std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()))->GetMooreNeighbouringNodeIndices(node_index);
 
     // Iterate through the neighbours to see if there are any available sites
-    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-         neighbour_iter != neighbouring_node_indices.end();
-         ++neighbour_iter)
-    {
-        if (rCellPopulation.IsSiteAvailable(*neighbour_iter, pParentCell))
-        {
-            is_room = true;
-            break;
-        }
-    }
-
-    return is_room;
+    return std::any_of(neighbouring_node_indices.begin(), neighbouring_node_indices.end(),
+                       [&](unsigned neighbourIndex)
+                       { return rCellPopulation.IsSiteAvailable(neighbourIndex, pParentCell); });
 }
 
 template<unsigned SPACE_DIM>
