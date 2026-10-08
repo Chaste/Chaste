@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include <map>
 #include "NodesOnlyMesh.hpp"
 #include "ChasteCuboid.hpp"
@@ -103,10 +105,8 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<boost
 {
     // This is not efficient. It should replace the corresponding raw ptr method if SetUpBoxCollection and Chaste Cuboid methods are changed to take shared ptrs.
     std::vector<Node<SPACE_DIM>*> temp_nodes(rNodes.size());
-    for (unsigned idx = 0; idx < rNodes.size(); idx++)
-    {
-        temp_nodes[idx] = rNodes[idx].get();
-    }
+    std::transform(rNodes.begin(), rNodes.end(), temp_nodes.begin(),
+                   [](const boost::shared_ptr<Node<SPACE_DIM> >& pNode) { return pNode.get(); });
 
     ConstructNodesWithoutMesh(temp_nodes, maxInteractionDistance);
 }

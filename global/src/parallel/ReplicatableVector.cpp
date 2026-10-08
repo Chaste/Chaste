@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "ReplicatableVector.hpp"
 #include "Exception.hpp"
 #include "PetscTools.hpp"
@@ -189,8 +191,5 @@ void ReplicatableVector::ReplicatePetscVector(Vec vec)
     // Copy into mData
     double* p_replicated;
     VecGetArray(mReplicated, &p_replicated);
-    for (unsigned i=0; i<size; i++)
-    {
-        mpData[i] = p_replicated[i];
-    }
+    std::copy(p_replicated, p_replicated + size, mpData);
 }

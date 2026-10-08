@@ -78,11 +78,7 @@ void DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::ComputeDistanceMap(
         const std::vector<unsigned>& rSourceNodeIndices,
         std::vector<double>& rNodeDistances)
 {
-    rNodeDistances.resize(mNumNodes);
-    for (unsigned index=0; index<mNumNodes; index++)
-    {
-        rNodeDistances[index] = DBL_MAX;
-    }
+    rNodeDistances.assign(mNumNodes, DBL_MAX);
     assert(mActivePriorityNodeIndexQueue.empty());
 
     if (mSingleTarget)
