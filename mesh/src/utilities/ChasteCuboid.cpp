@@ -36,6 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteCuboid.hpp"
 #include "Exception.hpp"
 
+#include <algorithm>
+#include <iterator>
+
 template <unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM>::ChasteCuboid(ChastePoint<SPACE_DIM>& rLowerPoint, ChastePoint<SPACE_DIM>& rUpperPoint)
     : mLowerCorner(rLowerPoint),
@@ -86,18 +89,11 @@ double ChasteCuboid<SPACE_DIM>::GetWidth(unsigned rDimension) const
 template <unsigned SPACE_DIM>
 unsigned ChasteCuboid<SPACE_DIM>::GetLongestAxis() const
 {
-    unsigned axis = 0;
-    double max_dimension = 0.0;
-    for (unsigned i=0; i<SPACE_DIM; i++)
-    {
-        double dimension =  mUpperCorner[i] - mLowerCorner[i];
-        if (dimension > max_dimension)
-        {
-            axis=i;
-            max_dimension = dimension;
-        }
-    }
-    return axis;
+    // The widths are non-negative by construction, so the longest axis is just the widest one.
+    // Note that std::max_element returns the first maximum, matching the original loop's tie-breaking.
+    c_vector<double, SPACE_DIM> widths = mUpperCorner.rGetLocation() - mLowerCorner.rGetLocation();
+    return static_cast<unsigned>(std::distance(std::begin(widths),
+                                               std::max_element(std::begin(widths), std::end(widths))));
 }
 
 // Explicit instantiation
