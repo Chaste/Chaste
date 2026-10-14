@@ -1,6 +1,6 @@
-Warning: These have been filtered by  /home/jmpf/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
+Warning: These have been filtered by  /home/jmpf/Workspace/Chaste/acceptance/python/infra/RoundResultsFiles.py .
 This means that all floating point numbers have been rounded to 8 decimal places.
-HDF5 "/home/jmpf/.texttest/tmp/chaste.19Mar155829.43577/chaste/resume_monodomain/SaveMonodomain/Monodomain_2d.h5" {
+HDF5 "/home/jmpf/.texttest/tmp/chaste.07Aug183209.278/chaste/resume_monodomain/SaveMonodomain/Monodomain_2d.h5" {
 GROUP "/" {
    DATASET "Data" {
       DATATYPE  H5T_IEEE_F64LE
@@ -55590,7 +55590,7 @@ GROUP "/" {
       (126,15,0): -9.66254,
       (126,16,0): -9.74553,
       (126,17,0): -9.81492,
-      (126,18,0): -9.87102,
+      (126,18,0): -9.87103,
       (126,19,0): -9.90391,
       (126,20,0): -9.91779,
       (126,21,0): -8.69049,
@@ -55632,7 +55632,7 @@ GROUP "/" {
       (126,57,0): -9.66254,
       (126,58,0): -9.74553,
       (126,59,0): -9.81492,
-      (126,60,0): -9.87102,
+      (126,60,0): -9.87103,
       (126,61,0): -9.90391,
       (126,62,0): -9.91779,
       (126,63,0): -8.69049,
@@ -55674,7 +55674,7 @@ GROUP "/" {
       (126,99,0): -9.66254,
       (126,100,0): -9.74553,
       (126,101,0): -9.81492,
-      (126,102,0): -9.87102,
+      (126,102,0): -9.87103,
       (126,103,0): -9.90391,
       (126,104,0): -9.91779,
       (126,105,0): -8.69049,
@@ -55716,7 +55716,7 @@ GROUP "/" {
       (126,141,0): -9.66254,
       (126,142,0): -9.74553,
       (126,143,0): -9.81492,
-      (126,144,0): -9.87102,
+      (126,144,0): -9.87103,
       (126,145,0): -9.90391,
       (126,146,0): -9.91779,
       (126,147,0): -8.69049,
@@ -55758,7 +55758,7 @@ GROUP "/" {
       (126,183,0): -9.66254,
       (126,184,0): -9.74553,
       (126,185,0): -9.81492,
-      (126,186,0): -9.87102,
+      (126,186,0): -9.87103,
       (126,187,0): -9.90391,
       (126,188,0): -9.91779,
       (126,189,0): -8.69049,
@@ -55800,7 +55800,7 @@ GROUP "/" {
       (126,225,0): -9.66254,
       (126,226,0): -9.74553,
       (126,227,0): -9.81492,
-      (126,228,0): -9.87102,
+      (126,228,0): -9.87103,
       (126,229,0): -9.90391,
       (126,230,0): -9.91779,
       (126,231,0): -8.69049,
@@ -55842,7 +55842,7 @@ GROUP "/" {
       (126,267,0): -9.66254,
       (126,268,0): -9.74553,
       (126,269,0): -9.81492,
-      (126,270,0): -9.87102,
+      (126,270,0): -9.87103,
       (126,271,0): -9.90391,
       (126,272,0): -9.91779,
       (126,273,0): -8.69049,
@@ -55884,7 +55884,7 @@ GROUP "/" {
       (126,309,0): -9.66254,
       (126,310,0): -9.74553,
       (126,311,0): -9.81492,
-      (126,312,0): -9.87102,
+      (126,312,0): -9.87103,
       (126,313,0): -9.90391,
       (126,314,0): -9.91779,
       (126,315,0): -8.69049,
@@ -55926,7 +55926,7 @@ GROUP "/" {
       (126,351,0): -9.66254,
       (126,352,0): -9.74553,
       (126,353,0): -9.81492,
-      (126,354,0): -9.87102,
+      (126,354,0): -9.87103,
       (126,355,0): -9.90391,
       (126,356,0): -9.91779,
       (126,357,0): -8.69049,
@@ -55968,7 +55968,7 @@ GROUP "/" {
       (126,393,0): -9.66254,
       (126,394,0): -9.74553,
       (126,395,0): -9.81492,
-      (126,396,0): -9.87102,
+      (126,396,0): -9.87103,
       (126,397,0): -9.90391,
       (126,398,0): -9.91779,
       (126,399,0): -8.69049,
@@ -56010,7 +56010,7 @@ GROUP "/" {
       (126,435,0): -9.66254,
       (126,436,0): -9.74553,
       (126,437,0): -9.81492,
-      (126,438,0): -9.87102,
+      (126,438,0): -9.87103,
       (126,439,0): -9.90391,
       (126,440,0): -9.91779,
       (127,0,0): -8.82087,
@@ -88650,11 +88650,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Chaste Provenance" {
          DATATYPE  H5T_STRING {
-               STRSIZE 1023;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 1023;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "Created by Chaste version 3.1.18256 (with uncommitted modifications) on Thu, 07 Mar 2013 23:36:40 +0000.  Chaste was built on Thu, 07 Mar 2013 23:36:19 +0000 by machine (uname) 'Linux travis 3.2.0-38-generic #61-Ubuntu SMP Tue Feb 19 12:18:21 UTC 2013 x86_64' using settings: default, shared libraries.  Checked-out project versions: FunctionalCuration=18244; GaryM=18242; RyanElkins=18243.
@@ -88670,11 +88670,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Variable Details" {
          DATATYPE  H5T_STRING {
-               STRSIZE 100;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 100;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "V(mV)"
@@ -88705,11 +88705,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Name" {
          DATATYPE  H5T_STRING {
-               STRSIZE 100;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 100;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "Time"
@@ -88717,11 +88717,11 @@ GROUP "/" {
       }
       ATTRIBUTE "Unit" {
          DATATYPE  H5T_STRING {
-               STRSIZE 100;
-               STRPAD H5T_STR_NULLTERM;
-               CSET H5T_CSET_ASCII;
-               CTYPE H5T_C_S1;
-            }
+            STRSIZE 100;
+            STRPAD H5T_STR_NULLTERM;
+            CSET H5T_CSET_ASCII;
+            CTYPE H5T_C_S1;
+         }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "msecs"
