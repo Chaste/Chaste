@@ -110,7 +110,7 @@ void ExecutableSupport::ShowCopyright()
     std::stringstream provenance_msg;
     provenance_msg << "This version of Chaste was compiled on:\n";
     provenance_msg << ChasteBuildInfo::GetBuildTime() << " by " << ChasteBuildInfo::GetBuilderUnameInfo() << " (uname)\n";
-    provenance_msg << "from revision number " << std::hex << ChasteBuildInfo::GetRevisionNumber() << std::dec << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
+    provenance_msg << "from revision " << ChasteBuildInfo::GetChasteRevision().GetShortCommit() << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
 
     // Only show one copy of copyright/header
     if (PetscTools::AmMaster())
@@ -222,7 +222,7 @@ void ExecutableSupport::WriteProvenanceInfoFile()
     std::stringstream provenance_msg;
     provenance_msg << "This version of Chaste was compiled on:\n";
     provenance_msg << ChasteBuildInfo::GetBuildTime() << " by " << ChasteBuildInfo::GetBuilderUnameInfo() << " (uname)\n";
-    provenance_msg << "from revision number " << std::hex << ChasteBuildInfo::GetRevisionNumber() << std::dec << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
+    provenance_msg << "from revision " << ChasteBuildInfo::GetChasteRevision().GetShortCommit() << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
     *out_file << provenance_msg.str();
 
     std::string output;
@@ -239,7 +239,8 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
 
     output << "\t<ProvenanceInfo>\n";
     output << "\t\t<VersionString>" << ChasteBuildInfo::GetVersionString() << "</VersionString> <!-- build specific -->\n";
-    output << "\t\t<IsWorkingCopyModified>" << ChasteBuildInfo::IsWorkingCopyModified() << "</IsWorkingCopyModified>\n";
+    output << "\t\t<Revision>" << ChasteBuildInfo::GetChasteRevision().rGetCommit() << "</Revision>\n";
+    output << "\t\t<IsWorkingCopyModified>" << (ChasteBuildInfo::GetChasteRevision().IsModified() ? "True" : "False") << "</IsWorkingCopyModified>\n";
     output << "\t\t<BuildInformation>" << ChasteBuildInfo::GetBuildInformation() << "</BuildInformation>\n";
     output << "\t\t<BuildTime>" << ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
     output << "\t\t<CurrentTime>" << ChasteGetCurrentTime() << "</CurrentTime>\n";
@@ -248,16 +249,14 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
 
     output << "\t\t<Projects>\n";
     {
-        const std::map<std::string, std::string>& r_projects_modified = ChasteBuildInfo::rGetIfProjectsModified();
-        const std::map<std::string, std::string>& r_projects_versions = ChasteBuildInfo::rGetProjectVersions();
-        for (const auto& r_project_version : r_projects_versions)
+        for (const auto& r_project : ChasteBuildInfo::GetProjectRevisions())
         {
             // LCOV_EXCL_START
             // No projects are checked out for continuous builds normally!
             output << "\t\t\t<Project>" << std::endl;
-            output << "\t\t\t\t<Name>" << r_project_version.first << "</Name>" << std::endl;
-            output << "\t\t\t\t<Version>" << r_project_version.second << "</Version>" << std::endl;
-            output << "\t\t\t\t<Modified>" << r_projects_modified.at(r_project_version.first) << "</Modified>" << std::endl;
+            output << "\t\t\t\t<Name>" << r_project.first << "</Name>" << std::endl;
+            output << "\t\t\t\t<Revision>" << r_project.second.rGetCommit() << "</Revision>" << std::endl;
+            output << "\t\t\t\t<IsWorkingCopyModified>" << (r_project.second.IsModified() ? "True" : "False") << "</IsWorkingCopyModified>" << std::endl;
             output << "\t\t\t</Project>" << std::endl;
             // LCOV_EXCL_STOP
         }

@@ -58,3 +58,10 @@ if (DEFINED Chaste_USE_XERCES)
     message (WARNING "Chaste_USE_XERCES (set to '${Chaste_USE_XERCES}') is deprecated and is now ignored: Xerces is a required dependency of Chaste.")
     unset (Chaste_USE_XERCES CACHE)
 endif ()
+
+# Build provenance (build timestamp, git revision) is no longer compiled into chaste_global, so
+# there is no longer a relink cascade for this option to guard against.
+if (DEFINED Chaste_UPDATE_PROVENANCE)
+    message (WARNING "Chaste_UPDATE_PROVENANCE (set to '${Chaste_UPDATE_PROVENANCE}') is deprecated and is now ignored: build provenance is refreshed on every build without needing to recompile or relink anything.")
+    unset (Chaste_UPDATE_PROVENANCE CACHE)
+endif ()
