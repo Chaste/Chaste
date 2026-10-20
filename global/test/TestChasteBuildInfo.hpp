@@ -93,7 +93,7 @@ public:
      * Checks that hold for any build. Kept to a single test, since this suite is mostly run just
      * to print the information above.
      */
-    void TestChecks()
+    void TestVersionChecks()
     {
         // ChasteBuildInfo reads its build-time provenance from plain files under provenance/ (see
         // global/src/Version.cpp.in), falling back on fixed defaults if they cannot be found, so
