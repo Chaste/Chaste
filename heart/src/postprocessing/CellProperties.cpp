@@ -325,10 +325,8 @@ std::vector<double> CellProperties::GetActionPotentialAmplitudes()
     CheckExceededThreshold();
     unsigned size = mPeakValues.size();
     std::vector<double> amplitudes(size);
-    for (unsigned i = 0; i < size; i++)
-    {
-        amplitudes[i] = (mPeakValues[i] - mRestingValues[i]);
-    }
+    std::transform(mPeakValues.begin(), mPeakValues.end(), mRestingValues.begin(), amplitudes.begin(),
+                   [](double peak, double resting) { return peak - resting; });
     return amplitudes;
 }
 

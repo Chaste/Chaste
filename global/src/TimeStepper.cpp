@@ -33,6 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 
@@ -55,17 +56,18 @@ TimeStepper::TimeStepper(double startTime, double endTime, double dt, bool enfor
     }
 
     // Remove any additionalTimes entries which fall too close to a time when the stepper would stop anyway
+    // Check if the vector is sorted in ascending order
+    auto unsorted_pair = std::adjacent_find(additionalTimes.begin(), additionalTimes.end(),
+                                             [](double a, double b) { return a >= b; });
+    if (unsorted_pair != additionalTimes.end())
+    {
+        unsigned i = std::distance(additionalTimes.begin(), unsorted_pair) + 1;
+        EXCEPTION("The additional times vector should be in ascending numerical order; "
+                  "entry " << i << " is less than or equal to entry " << i-1 << ".");
+    }
+
     for (unsigned i=0; i<additionalTimes.size(); i++)
     {
-        if (i > 0)
-        {
-            if (additionalTimes[i-1] >= additionalTimes[i])
-            {
-                EXCEPTION("The additional times vector should be in ascending numerical order; "
-                          "entry " << i << " is less than or equal to entry " << i-1 << ".");
-            }
-        }
-
         double time_interval = additionalTimes[i] - startTime;
 
         // When mDt divides this interval (and the interval is positive) then we are going there anyway
