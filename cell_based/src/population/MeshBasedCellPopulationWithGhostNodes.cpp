@@ -359,7 +359,6 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::OpenWritersFiles(OutputFileHand
 template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-#ifdef CHASTE_VTK
     // Store the present time as a string
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
@@ -491,7 +490,6 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>

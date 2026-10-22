@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellsGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -78,9 +78,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesCountWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
-#include "VoronoiDataWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
-#include "CellMutationStatesWriter.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -706,7 +703,7 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the maximum cell ID to zero (to account for previous tests)
@@ -870,7 +867,6 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-#ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
 
         //Initial condition files
@@ -889,14 +885,13 @@ public:
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWithGhostNodesWriteResultsToFile/results.pvd").CompareFiles();
- #endif //CHASTE_VTK
     }
 
 
     void TestCellPopulationWritersIn3dWithGhostNodes()
     {
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the Maximum cell ID to zero (to account for previous tests)
@@ -1258,7 +1253,7 @@ public:
                                                                  ghost_ghost_spring_stiffness,
                                                                  ghost_spring_rest_length);
 
-        GeneralisedLinearSpringForce<2> linear_force;
+        LinearSpringForce<2> linear_force;
 
         //Check all node forces are zero
         for (MutableMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();

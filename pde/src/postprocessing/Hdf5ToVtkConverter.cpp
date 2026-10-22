@@ -53,8 +53,6 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
                                                                bool usingOriginalNodeOrdering)
     : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "vtk_output",0u)
 {
-#ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
-
     // Write mesh in a suitable form for VTK
     FileFinder test_output("", RelativeTo::ChasteTestOutput);
     std::string output_directory = rInputDirectory.GetRelativePath(test_output) + "/" + this->mRelativeSubdirectory;
@@ -159,11 +157,9 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
         ///\todo What if the mesh has been scaled, translated or rotated?
         // Note that the next line will throw if the mesh has not been read from file
         std::string original_file = this->mpMesh->GetMeshFileBaseName();
-        std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
-            = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file);
+        auto p_original_mesh_reader = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file);
         vtk_writer.WriteFilesUsingMeshReader(*p_original_mesh_reader);
     }
-#endif //CHASTE_VTK
 }
 
 // Explicit instantiation

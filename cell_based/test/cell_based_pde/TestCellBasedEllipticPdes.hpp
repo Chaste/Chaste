@@ -420,7 +420,7 @@ public:
             double cell_area = cell_population.GetVolumeOfCell(*cell_iter);
             tissue_area += cell_area;
         }
-        // Note some cells have zero volume as Voronoi rtesselation isn't bounded
+        // Note some cells have zero volume as Voronoi tesselation isn't bounded
         TS_ASSERT_DELTA(tissue_area, 9.9592, 1e-4);
 
         constant_coefficient = 0.01;

@@ -398,7 +398,6 @@ public:
         FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.parameters").CompareFiles();
 
         // Test VTK output
-#ifdef CHASTE_VTK
         cell_population.WriteVtkResultsToFile(output_directory);
 
         // Read VTK file and check it doesn't cause any problems
@@ -480,7 +479,6 @@ public:
         TS_ASSERT_DELTA(var2_data[2], 3.0, 1e-9);
         TS_ASSERT_DELTA(var2_data[3], 4.0, 1e-9);
         TS_ASSERT_DELTA(var2_data[4], 5.0, 1e-9);
-#endif
     }
 
     void TestRemoveDeadCellsAndUpdate()

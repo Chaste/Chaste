@@ -633,7 +633,6 @@ public:
     void TestDynamicallyLoadingCvodeCell()
     {
         // Coverage - using native CVODE cells should no longer throw
-#ifdef CHASTE_CVODE
         OutputFileHandler handler_cvode("DynamicallyLoadedModelCvode");
         FileFinder cellml_file("heart/dynamic/luo_rudy_1991_dyn.cellml", RelativeTo::ChasteSourceRoot);
         handler_cvode.CopyFileTo(cellml_file);
@@ -647,9 +646,6 @@ public:
            FileFinder copied_file("DynamicallyLoadedModelCvode/luo_rudy_1991_dyn.cellml", RelativeTo::ChasteTestOutput);
         converter.Convert(copied_file);
         CardiacSimulation simulation("heart/test/data/xml/dynamic_cvode_model.xml");
-#else
-        std::cout << "CVODE is not enabled.\n";
-#endif
     }
 };
 

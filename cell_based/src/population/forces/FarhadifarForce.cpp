@@ -133,8 +133,7 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             unsigned local_index = p_element->GetNodeLocalIndex(node_index);
 
             // Add the force contribution from this cell's area elasticity (note the minus sign)
-            c_vector<double, DIM> element_area_gradient =
-                    p_cell_population->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
+            c_vector<double, DIM> element_area_gradient = p_cell_population->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
             area_elasticity_contribution -= GetAreaElasticityParameter()*(element_areas[elem_index] -
                     target_areas[elem_index])*element_area_gradient;
 
@@ -151,8 +150,7 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             double next_edge_line_tension_parameter = GetLineTensionParameter(p_this_node, p_next_node, *p_cell_population);
 
             // Compute the gradient of each these edges, computed at the present node
-            c_vector<double, DIM> previous_edge_gradient =
-                    -p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, previous_node_local_index);
+            c_vector<double, DIM> previous_edge_gradient = -p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, previous_node_local_index);
             c_vector<double, DIM> next_edge_gradient = p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, local_index);
 
             // Add the force contribution from cell-cell and cell-boundary line tension (note the minus sign)

@@ -78,11 +78,6 @@ class TestSingleCellSimulationTutorial : public CxxTest::TestSuite
 public:
     void TestShannonSimulation()
     {
-/* CVODE is still an optional Chaste dependency, but it is highly recommended for
- * working with single cell simulations. This tutorial code will only run if CVODE is installed and enabled
- * (see [InstallSundials](/docs/dev-guides/developer-install-guide/#sundials) for a manual installation if needed,
- * and [CmakeBuildGuide](/docs/dev-guides/cmake-build-guide/)). */
-#ifdef CHASTE_CVODE
         /*
          * ### Defining a CVODE model
          *
@@ -281,13 +276,6 @@ public:
          */
         TS_ASSERT_DELTA(apd, 211.9487, 1e-2);
         TS_ASSERT_DELTA(upstroke_velocity, 337.4159, 1.25);
-
-        /* CVODE is still an optional dependency for Chaste, but is required for this tutorial.
-         * If CVODE is not installed this tutorial will
-         * not do anything, but we can at least alert the user to this.*/
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif
     }
 };
 

@@ -82,9 +82,7 @@ void AbstractCardiacCellWithModifiers<CARDIAC_CELL>::SetModifier(const std::stri
 
 // Explicit Instantiation
 template class AbstractCardiacCellWithModifiers<AbstractCardiacCell>;
-#ifdef CHASTE_CVODE
 template class AbstractCardiacCellWithModifiers<AbstractCvodeCell>;
 template class AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>;
-#endif
 
 

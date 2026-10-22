@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryConditionsContainer.hpp"
 #include "AbstractOdeSystemForCoupledPdeSystem.hpp"
 #include "CvodeAdaptor.hpp"
-#include "BackwardEulerIvpOdeSolver.hpp"
 #include "Warnings.hpp"
 #include "VtkMeshWriter.hpp"
 
@@ -264,9 +263,7 @@ c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> Linea
     {
         double this_dudt_coefficient = mpPdeSystem->ComputeDuDtCoefficientFunction(rX, pde_index);
         c_matrix<double, SPACE_DIM, SPACE_DIM> this_pde_diffusion_term = mpPdeSystem->ComputeDiffusionTerm(rX, pde_index, pElement);
-        c_matrix<double, 1*(ELEMENT_DIM+1), 1*(ELEMENT_DIM+1)> this_stiffness_matrix =
-            prod(trans(rGradPhi), c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>(prod(this_pde_diffusion_term, rGradPhi)) )
-                + timestep_inverse * this_dudt_coefficient * outer_prod(rPhi, rPhi);
+        c_matrix<double, 1*(ELEMENT_DIM+1), 1*(ELEMENT_DIM+1)> this_stiffness_matrix = prod(trans(rGradPhi), c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>(prod(this_pde_diffusion_term, rGradPhi)) ) + timestep_inverse * this_dudt_coefficient * outer_prod(rPhi, rPhi);
 
         for (unsigned i=0; i<ELEMENT_DIM+1; i++)
         {
@@ -402,11 +399,7 @@ LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBL
          */
         if (!mpOdeSolver)
         {
-#ifdef CHASTE_CVODE
             mpOdeSolver.reset(new CvodeAdaptor);
-#else
-            mpOdeSolver.reset(new BackwardEulerIvpOdeSolver(mOdeSystemsAtNodes[0]->GetNumberOfStateVariables()));
-#endif //CHASTE_CVODE
         }
     }
 }
@@ -493,7 +486,6 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
         EXCEPTION("SetInitialCondition() must be called prior to SolveAndWriteResultsToFile()");
     }
 
-#ifdef CHASTE_VTK
     // Create a .pvd output file
     OutputFileHandler output_file_handler(this->mOutputDirectory, mClearOutputDirectory);
     mpVtkMetaFile = output_file_handler.OpenOutputFile("results.pvd");
@@ -542,18 +534,11 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     *mpVtkMetaFile << "    </Collection>\n";
     *mpVtkMetaFile << "</VTKFile>\n";
     mpVtkMetaFile->close();
-#else //CHASTE_VTK
-// LCOV_EXCL_START // We only test this in weekly builds
-    WARNING("VTK is not installed and is required for this functionality");
-// LCOV_EXCL_STOP
-#endif //CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::WriteVtkResultsToFile(Vec solution, unsigned numTimeStepsElapsed)
 {
-#ifdef CHASTE_VTK
-
     // Create a new VTK file for this time step
     std::stringstream time;
     time << numTimeStepsElapsed;
@@ -624,7 +609,6 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     *mpVtkMetaFile << "\" group=\"\" part=\"0\" file=\"results_";
     *mpVtkMetaFile << numTimeStepsElapsed;
     *mpVtkMetaFile << ".vtu\"/>\n";
-#endif // CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

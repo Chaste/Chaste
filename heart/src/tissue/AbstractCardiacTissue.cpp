@@ -89,8 +89,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     mCellsDistributed.resize(num_local_nodes);
 
     // Figure out if we're dealing with Purkinje
-    AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>* p_purkinje_cell_factory
-       = dynamic_cast<AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>*>(pCellFactory);
+    auto* p_purkinje_cell_factory = dynamic_cast<AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>*>(pCellFactory);
     if (p_purkinje_cell_factory)
     {
         mHasPurkinje = true;
@@ -111,8 +110,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
 
             if (mHasPurkinje)
             {
-                mPurkinjeCellsDistributed[local_index]
-                    = p_purkinje_cell_factory->CreatePurkinjeCellForNode(p_node, mCellsDistributed[local_index]);
+                mPurkinjeCellsDistributed[local_index] = p_purkinje_cell_factory->CreatePurkinjeCellForNode(p_node, mCellsDistributed[local_index]);
                 mPurkinjeCellsDistributed[local_index]->SetUsedInTissueSimulation();
             }
         }
@@ -499,11 +497,8 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 {
                     // solve ODE system at this node.
                     // Note: Voltage is not being updated. The voltage is updated in the PDE solve.
-#ifndef CHASTE_CVODE
-                    mCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
-#else
-                    // If CVODE is enabled, and this is a CVODE cell
-                    // there's a chance we can recover this by doing a reset so put the above call in a try...catch.
+                    // If this is a CVODE cell there's a chance we can recover an ODE solving problem by doing
+                    // a reset, so put the call in a try...catch.
                     try
                     {
                         mCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
@@ -526,7 +521,6 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                             throw e;
                         }
                     }
-#endif // CHASTE_CVODE
                 }
                 else
                 {

@@ -142,7 +142,7 @@ public:
          */
         //HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
         HeartConfig::Instance()->SetVisualizeWithCmgui(true);
-        /* The other option is to write in VTK format (which needs VTK installed), following
+        /* The other option is to write in VTK format, following
          * which the results can be loaded in the visualiser Paraview */
         //HeartConfig::Instance()->SetVisualizeWithVtk(true);
         /* If the mesh is a DistributedTetrahedralMesh then we can use parallel VTK files (.pvtu)*/

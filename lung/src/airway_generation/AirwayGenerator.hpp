@@ -42,12 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <deque>
 #include <set>
 
-#ifdef CHASTE_VTK
-
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include "vtkVersion.h"
-
-#if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
 #include "vtkSmartPointer.h"
 #include "vtkPolyData.h"
@@ -367,27 +362,5 @@ private:
      */
     void RadiiProcessPoint(unsigned pointId, unsigned startId, std::deque<unsigned>& rProcessedPoints);
 };
-
-#endif //( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
-#endif //CHASTE_VTK
-
-#if !(defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6))
-/**
- * This is a fake class to suppress coverage warnings. To get the real class
- * you must build with VTK of version 5.6 or above.
- */
-class AirwayGenerator //This is here to suppress coverage warnings on machines that do not have vtk 5.6 or higher
-{
-public:
-    /**
-     * Fake constructor.
-     */
-    AirwayGenerator()
-    {
-        std::cout << "Dummy airway generator class for coverage" << std::endl;
-    }
-};
-#endif //No VTK
 
 #endif // AIRWAY_GENERATOR_HPP_

@@ -64,11 +64,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionOpt.hpp"
 #include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionBackwardEulerOpt.hpp"
 
-#ifdef CHASTE_CVODE
 #include "LuoRudy1991Cvode.hpp"
 #include "LuoRudy1991CvodeOpt.hpp"
 #include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionCvodeOpt.hpp"
-#endif // CHASTE_CVODE
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -334,7 +332,6 @@ public:
         CheckAttributes(opt);
         CheckAttributes(be);
 
-#ifdef CHASTE_CVODE
         // CVODE version
         // test error from codegen about concentration
         Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLCvodeOpt cvode_model(p_solver, p_stimulus);
@@ -420,7 +417,6 @@ public:
         CheckAttributes(cvode_opt);
 
         delete cvode_lut;
-#endif // CHASTE_CVODE
 
         // Test the archiving code too
         OutputFileHandler handler("archive", false);
@@ -518,7 +514,6 @@ public:
                                    "Lr91BEFromCodegenZeroGna");
         CheckCellModelResults("Lr91BEFromCodegenZeroGna", "Lr91FromCodegenZeroGna", 2e-2);
 
-#ifdef CHASTE_CVODE
         // CVODE
         double max_dt = 1.0; //ms
         ck_start = clock();
@@ -562,7 +557,6 @@ public:
 
         // No stimulus at end time
         TS_ASSERT_DELTA(cvode_opt.GetIntracellularAreaStimulus(i_ionic_end_time), 0.0, 1e-12);
-#endif // CHASTE_CVODE
 
         // Load and check simulation results still match
         {

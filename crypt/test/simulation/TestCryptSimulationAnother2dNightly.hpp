@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptSimulation2d.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CryptCellsGenerator.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "WntConcentration.hpp"
 #include "RandomCellKiller.hpp"
 #include "SloughingCellKiller.hpp"
@@ -102,7 +102,7 @@ public:
         simulator.SetEndTime(4.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -143,7 +143,7 @@ public:
         simulator.SetEndTime(4.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -197,7 +197,7 @@ public:
         simulator.SetEndTime(12.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Run simulation
@@ -282,11 +282,11 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         // Unusual set-up here (corresponds to the Meineke crypt model parameters)
-        p_linear_force->SetMeinekeSpringStiffness(30.0);
-        // Sets the MeinekeSpringGrowthDuration to be the default MPhase duration
-        p_linear_force->SetMeinekeSpringGrowthDuration(static_cast<SimpleWntCellCycleModel*>(crypt.rGetCells().front()->GetCellCycleModel())->GetMDuration());
+        p_linear_force->SetSpringStiffness(30.0);
+        // Sets the SpringGrowthDuration to be the default MPhase duration
+        p_linear_force->SetSpringGrowthDuration(static_cast<SimpleWntCellCycleModel*>(crypt.rGetCells().front()->GetCellCycleModel())->GetMDuration());
         simulator.AddForce(p_linear_force);
 
         // Set up sloughing cell killer and pass in to simulation

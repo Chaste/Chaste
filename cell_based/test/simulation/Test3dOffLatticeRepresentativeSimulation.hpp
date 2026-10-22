@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "TrianglesMeshWriter.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -213,7 +213,7 @@ public:
         simulator.SetSamplingTimestepMultiple(12);
 
         // Create a force law and pass it to the OffLatticeSimulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_force);
+        MAKE_PTR(LinearSpringForce<3>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 

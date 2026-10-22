@@ -91,7 +91,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* The next header file defines a force law for describing the mechanical interactions
  * between neighbouring cells in the cell population.
  */
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 /* The next header file defines a class for writing output that can be visualized in Paraview. */
 #include "VoronoiDataWriter.hpp"
 /* Finally the following header ensures that the test never runs in parallel. */
@@ -177,7 +177,7 @@ public:
          * see the specific class documentation for details.  If you try to use an incompatible class
          * then you will receive a warning.
          */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
         /* To run the simulation, we call `Solve()`. */
@@ -207,7 +207,7 @@ public:
      * There are two solutions to this. The first is to define a cut off length on the force,
      * which can be done by using the command
      * `p_force->SetCutOffLength(1.5);`
-     * on the `GeneralisedLinearSpringForce`. Here there will be no forces exerted
+     * on the `LinearSpringForce`. Here there will be no forces exerted
      * on any "springs" which are longer than 1.5 cell radii.
      *
      * The second solution is to use 'ghost nodes'. Ghost nodes can be added to mesh-based
@@ -272,7 +272,7 @@ public:
         /* Again we create a force law, and pass it to the `OffLatticeSimulation`. This
          * force law ensures that ghost nodes don't exert forces on real nodes but real nodes
          * exert forces on ghost nodes.*/
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
         /* To run the simulation, we call `Solve()`. */

@@ -192,7 +192,7 @@ class TestPyPottsBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
 
         ## In order to visualize labelled cells we need to use the following command.
 
-        cell_population.AddCellWriterCellLabelWriter()
+        cell_population.AddCellWriter["CellLabelWriter"]()
 
         ## We then pass in the cell population into an `OffLatticeSimulation`, and set the output directory and end time
 
@@ -270,7 +270,7 @@ class TestPyPottsBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
 
         ## In order to visualize labelled cells we need to use the following command.
 
-        cell_population.AddCellWriterCellLabelWriter()
+        cell_population.AddCellWriter["CellLabelWriter"]()
 
         ## We then pass in the cell population into an `OffLatticeSimulation`, and set the output directory and end time
 

@@ -92,7 +92,6 @@ public:
 };
 
 // stimulate a block of cells (an interval in 1d, a block in a corner in 2d)
-#ifdef CHASTE_CVODE
 template<unsigned DIM>
 class BlockCellFactoryCvode : public AbstractCardiacCellFactory<DIM>
 {
@@ -130,7 +129,6 @@ public:
         return p_cell;
     }
 };
-#endif // CVODE
 
 // non-identical cell models
 class HeterogeneousCellFactory : public AbstractCardiacCellFactory<1>
@@ -357,7 +355,6 @@ public:
             final_voltage_svi.ReplicatePetscVector(monodomain_problem.GetSolution());
         }
 
-#ifdef CHASTE_CVODE
         ReplicatableVector final_voltage_svi_cvode;
         // SVI - state variable interpolation with CVODE cells
         {
@@ -375,7 +372,6 @@ public:
 
             final_voltage_svi_cvode.ReplicatePetscVector(monodomain_problem.GetSolution());
         }
-#endif //CHASTE_CVODE
 
         // SVIT - state variable interpolation on non-distributed tetrahedral mesh
         {
@@ -413,9 +409,7 @@ public:
 
         TS_ASSERT_DELTA(final_voltage_ici[20], ici_20, 8.0);  // These tolerances show difference in parallel,
         TS_ASSERT_DELTA(final_voltage_svi[20], svi_20, 3.0);  // note that SVI is more stable in the presence of multicore...
-#ifdef CHASTE_CVODE
         TS_ASSERT_DELTA(final_voltage_svi_cvode[20], svi_20, 3.0);
-#endif //Cvode
         TS_ASSERT_DELTA(final_voltage_svit[20], svi_20, 3.0);
 
         // node 130 (for h=0.02) is on the y-axis (cross-fibre direction), ICI CV is slower
@@ -424,9 +418,7 @@ public:
 
         TS_ASSERT_DELTA(final_voltage_ici[130], ici_130, 1.0);
         TS_ASSERT_DELTA(final_voltage_svi[130], svi_130, 0.2);
-#ifdef CHASTE_CVODE
         TS_ASSERT_DELTA(final_voltage_svi_cvode[130], svi_130, 0.3); // different CVODE versions = slightly different answer!
-#endif //cvode
         TS_ASSERT_DELTA(final_voltage_svit[130], svi_130, 0.2);
     }
 

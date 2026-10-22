@@ -41,15 +41,9 @@ DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(boost::shared_ptr<Abstrac
 {
     if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
-#ifdef CHASTE_CVODE
         mpOdeSolver = CellCycleModelOdeSolver<DeltaNotchInteriorSrnModel, CvodeAdaptor>::Instance();
         mpOdeSolver->Initialise();
         mpOdeSolver->SetMaxSteps(10000);
-#else
-        mpOdeSolver = CellCycleModelOdeSolver<DeltaNotchInteriorSrnModel, RungeKutta4IvpOdeSolver>::Instance();
-        mpOdeSolver->Initialise();
-        SetDt(0.001);
-#endif //CHASTE_CVODE
     }
     assert(mpOdeSolver->IsSetUp());
 }

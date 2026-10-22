@@ -54,8 +54,7 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)>
     {
         double bath_cond=HeartConfig::Instance()->GetBathConductivity(pElement->GetUnsignedAttribute());
 
-        c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> grad_phi_sigma_b_grad_phi =
-            bath_cond * prod(trans(rGradPhi), rGradPhi);
+        c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> grad_phi_sigma_b_grad_phi = bath_cond * prod(trans(rGradPhi), rGradPhi);
 
         c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)> ret = zero_matrix<double>(2*(ELEMENT_DIM+1));
 

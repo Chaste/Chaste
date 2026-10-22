@@ -55,7 +55,6 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
         EXCEPTION("No output directory was given to the mechanics solver");
     }
 
-#ifdef CHASTE_VTK
     VtkMeshWriter<DIM, DIM> mesh_writer(mpSolver->mOutputDirectory + "/vtk", "solution", true);
 
     // write the displacement
@@ -88,7 +87,6 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
 
     // final write
     mesh_writer.WriteFilesUsingMesh(mpSolver->mrQuadMesh);
-#endif // CHASTE_VTK
 }
 
 template<unsigned DIM>

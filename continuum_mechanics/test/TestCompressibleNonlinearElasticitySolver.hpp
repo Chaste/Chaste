@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CompressibleMooneyRivlinMaterialLaw.hpp"
 #include "MooneyRivlinMaterialLaw.hpp"
 #include "NonlinearElasticityTools.hpp"
-#include "MooneyRivlinMaterialLaw.hpp"
 #include "CompressibleExponentialLaw.hpp"
 #include "NumericFileComparison.hpp"
 #include "FileComparison.hpp"

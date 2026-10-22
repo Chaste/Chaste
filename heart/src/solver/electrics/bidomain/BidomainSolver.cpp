@@ -223,8 +223,7 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
 
     if (HeartConfig::Instance()->GetUseStateVariableInterpolation())
     {
-        mpBidomainCorrectionTermAssembler
-            = new BidomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
+        mpBidomainCorrectionTermAssembler = new BidomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
         //We are going to need those caches after all
         pTissue->SetCacheReplication(true);
     }

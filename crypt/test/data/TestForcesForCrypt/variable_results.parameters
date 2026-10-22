@@ -7,8 +7,8 @@
 			<BetaCatSpringScaler>3.02333</BetaCatSpringScaler>
 			<ApoptoticSpringTensionStiffness>3.75</ApoptoticSpringTensionStiffness>
 			<ApoptoticSpringCompressionStiffness>11.25</ApoptoticSpringCompressionStiffness>
-			<MeinekeSpringStiffness>15</MeinekeSpringStiffness>
-			<MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength>
-			<MeinekeSpringGrowthDuration>1</MeinekeSpringGrowthDuration>
+			<SpringStiffness>15</SpringStiffness>
+			<DivisionRestingSpringLength>0.5</DivisionRestingSpringLength>
+			<SpringGrowthDuration>1</SpringGrowthDuration>
 			<UseCutOffLength>1</UseCutOffLength>
 			<CutOffLength>1.5</CutOffLength>

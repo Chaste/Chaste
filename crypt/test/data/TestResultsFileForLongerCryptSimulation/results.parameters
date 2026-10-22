@@ -59,13 +59,13 @@
 	</SimulationModifiers>
 
 	<Forces>
-		<GeneralisedLinearSpringForce-2-2>
-			<MeinekeSpringStiffness>30</MeinekeSpringStiffness>
-			<MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength>
-			<MeinekeSpringGrowthDuration>0.72</MeinekeSpringGrowthDuration>
+		<LinearSpringForce-2-2>
+			<SpringStiffness>30</SpringStiffness>
+			<DivisionRestingSpringLength>0.5</DivisionRestingSpringLength>
+			<SpringGrowthDuration>0.72</SpringGrowthDuration>
 			<UseCutOffLength>0</UseCutOffLength>
 			<CutOffLength>1.79769e+308</CutOffLength>
-		</GeneralisedLinearSpringForce-2-2>
+		</LinearSpringForce-2-2>
 	</Forces>
 
 	<CellPopulationBoundaryConditions>
@@ -77,7 +77,7 @@
 	<NumericalMethod>
 		<ForwardEulerNumericalMethod-2-2>
 			<UseAdaptiveTimestep>0</UseAdaptiveTimestep> 
-			<UseUpdateNodeLocation>0</UseUpdateNodeLocation> 
+			<DelegatesToPopulation>0</DelegatesToPopulation> 
 			<GhostNodeForcesEnabled>0</GhostNodeForcesEnabled> 
 		</ForwardEulerNumericalMethod-2-2>
 	</NumericalMethod>

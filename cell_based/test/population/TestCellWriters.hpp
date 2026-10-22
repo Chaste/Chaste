@@ -51,7 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAncestor.hpp"
 #include "CellLabel.hpp"
 #include "CellsGenerator.hpp"
-#include "CellsGenerator.hpp"
 #include "DeltaNotchSrnModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "FileComparison.hpp"

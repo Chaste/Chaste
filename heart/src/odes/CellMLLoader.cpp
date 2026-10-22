@@ -106,13 +106,11 @@ boost::shared_ptr<AbstractCardiacCell> CellMLLoader::LoadCardiacCell(void)
     return p_model;
 }
 
-#ifdef CHASTE_CVODE
 boost::shared_ptr<AbstractCvodeCell> CellMLLoader::LoadCvodeCell(void)
 {
     AbstractCardiacCellInterface* p_loaded_cell = LoadCellMLFile(true);
     boost::shared_ptr<AbstractCvodeCell> p_model(dynamic_cast<AbstractCvodeCell*>(p_loaded_cell));
     return p_model;
 }
-#endif
 
 

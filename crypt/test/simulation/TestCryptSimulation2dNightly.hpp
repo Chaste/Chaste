@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptSimulation2d.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CryptCellsGenerator.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "WntConcentration.hpp"
 #include "RandomCellKiller.hpp"
 #include "SloughingCellKiller.hpp"
@@ -112,7 +112,7 @@ public:
         simulator.SetEndTime(12.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -186,7 +186,7 @@ public:
         simulator.SetEndTime(1);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Run simulation
@@ -277,7 +277,7 @@ public:
         simulator.SetEndTime(40); // hours
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -353,7 +353,7 @@ public:
         simulator.SetEndTime(12.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -406,7 +406,7 @@ public:
         simulator.SetEndTime(24.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -420,14 +420,8 @@ public:
         // (if we do then the boundaries are probably working!)
 
         unsigned number_of_nodes = crypt.rGetMesh().GetNumNodes();
-#ifdef CHASTE_CVODE
-        // divisions occur marginally earlier with CVODE
         TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 99u);
         TS_ASSERT_EQUALS(number_of_nodes, 147u);
-#else
-        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 99u);
-        TS_ASSERT_EQUALS(number_of_nodes, 147u);
-#endif //CHASTE_CVODE
 
         // Tidy up
         WntConcentration<2>::Destroy();
@@ -507,7 +501,7 @@ public:
         simulator.SetEndTime(12.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
@@ -569,7 +563,7 @@ public:
         simulator.SetEndTime(4.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation

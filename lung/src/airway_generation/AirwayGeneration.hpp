@@ -41,26 +41,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <iostream>
 
-#ifdef CHASTE_VTK
-
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include "vtkVersion.h"
-
-#if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
 /*
  * This block is here to prevent a conflict when including vtkPointLocator.h:
  *     From VTK 7.0, there is a variable HZ in vtkPointLocator.h which is #def'd in linux header asm-generic/param.h,
  *     so we temporarily #undef it prior to the include.  See #2883 for details.
  */
-#if (VTK_MAJOR_VERSION >= 7)
 #pragma push_macro("HZ")
 #undef HZ
 #include <vtkPointLocator.h>
 #pragma pop_macro("HZ")
-#else // (VTK_MAJOR_VERSION < 7)
-#include <vtkPointLocator.h>
-#endif // (VTK_MAJOR_VERSION >= 7)
 
 #include "vtkSmartPointer.h"
 #include "vtkPolyData.h"
@@ -138,28 +129,5 @@ private:
     /** The maximum radius within which a point can be distributed to an apex */
     double mDistributionRadius;
 };
-
-#endif //( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
-#endif //CHASTE_VTK
-
-#if !(defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6))
-
-/**
- * This is a fake class to suppress coverage warnings. To get the real class
- * you must build with VTK of version 5.6 or above.
- */
-class AirwayGeneration // This is here to suppress coverage warnings on machines that do not have vtk 5.6 or higher
-{
-public:
-    /**
-     * Fake constructor.
-     */
-    AirwayGeneration()
-    {
-        std::cout << "Dummy airway generation class for coverage" << std::endl;
-    }
-};
-#endif // No VTK
 
 #endif // AIRWAY_GENERATION_HPP_

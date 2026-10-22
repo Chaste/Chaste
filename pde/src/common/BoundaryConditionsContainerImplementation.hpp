@@ -554,8 +554,7 @@ bool BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Validate(Ab
     for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
     {
         // Iterate over surface elements
-        typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator elt_iter
-        = pMesh->GetBoundaryElementIteratorBegin();
+        auto elt_iter = pMesh->GetBoundaryElementIteratorBegin();
         while (valid && elt_iter != pMesh->GetBoundaryElementIteratorEnd())
         {
             if (!HasNeumannBoundaryCondition(*elt_iter, index_of_unknown))

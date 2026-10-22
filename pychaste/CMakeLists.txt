@@ -37,6 +37,11 @@ find_package(Chaste COMPONENTS ${Chaste_DEPENDS_pychaste})
 
 chaste_do_component(pychaste)
 
+# The two trees built in the binary dir: the generated C++ wrapper sources,
+# and the staged Python package that gets pip installed.
+set(PYCHASTE_WRAPPER_DIR ${CMAKE_CURRENT_BINARY_DIR}/wrappers)
+set(PYCHASTE_PACKAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/package)
+
 ################################
 ####  Generate Python wrappers
 ################################
@@ -80,34 +85,45 @@ if(NOT Chaste_CASTXML_COMPILER)
                     " compiler. Wrapper generation may fail")
 endif()
 
+# cppwg parses headers with castxml, a separate tool invocation from the normal
+# compiler, so it does not automatically see definitions set globally via
+# add_definitions() (e.g. CHASTE_SUNDIALS_VERSION, CHASTE_VTK, CHASTE_CVODE,
+# CHASTE_XERCES). Forward them explicitly so headers preprocess the same way
+# for castxml as they do for the real build.
+get_directory_property(PYCHASTE_COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
+set(PYCHASTE_CASTXML_DEFINE_FLAGS "")
+foreach(_chaste_define IN LISTS PYCHASTE_COMPILE_DEFINITIONS)
+    string(APPEND PYCHASTE_CASTXML_DEFINE_FLAGS " -D${_chaste_define}")
+endforeach()
+
 # Command for generating wrappers.
 #  - gnu++17 (rather than c++17) and -Wno-missing-template-arg-list-after-template-kw
 #    silence a castxml/LLVM error on use of the template keyword without a
 #    following argument list, which appears in some boost headers.
 set(PYCHASTE_WRAPPER_GENERATION_COMMAND
     ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
-        -w ${CMAKE_CURRENT_BINARY_DIR}/wrappers
+        -w ${PYCHASTE_WRAPPER_DIR}
         -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/config.yaml
         -i ${PYCHASTE_INCLUDE_DIRS}
         -l ${CMAKE_CURRENT_BINARY_DIR}/cppwg.log
         --std "gnu++17"
-        --castxml_cflags="-Wno-missing-template-arg-list-after-template-kw"
+        "--castxml_cflags=-Wno-missing-template-arg-list-after-template-kw${PYCHASTE_CASTXML_DEFINE_FLAGS}"
         --castxml_compiler ${Chaste_CASTXML_COMPILER}
 )
 
 # Generate wrappers if not already created
-if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/wrappers")
+if(NOT EXISTS "${PYCHASTE_WRAPPER_DIR}")
     execute_process(COMMAND ${PYCHASTE_WRAPPER_GENERATION_COMMAND} COMMAND_ERROR_IS_FATAL ANY)
 endif()
 
 # Target for manually re-generating the wrappers
 add_custom_target(pychaste_wrappers
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/wrappers
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${PYCHASTE_WRAPPER_DIR}
     COMMAND ${PYCHASTE_WRAPPER_GENERATION_COMMAND}
 )
 
 # Add generated wrappers to includes
-header_dirs("${CMAKE_CURRENT_BINARY_DIR}/wrappers" _include_dirs)
+header_dirs("${PYCHASTE_WRAPPER_DIR}" _include_dirs)
 list(APPEND PYCHASTE_INCLUDE_DIRS ${_include_dirs})
 
 ################################
@@ -119,9 +135,9 @@ list(APPEND PYCHASTE_INCLUDE_DIRS ${_include_dirs})
 # When the library has been built, it can be used in Python code
 # as `from chaste._pychaste_all import *`.
 
-file(GLOB_RECURSE PYCHASTE_WRAPPER_SOURCES
-    ${CMAKE_CURRENT_BINARY_DIR}/wrappers/all/*.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/wrappers/all/*.hpp
+file(GLOB_RECURSE PYCHASTE_WRAPPER_SOURCES CONFIGURE_DEPENDS
+    ${PYCHASTE_WRAPPER_DIR}/all/*.cpp
+    ${PYCHASTE_WRAPPER_DIR}/all/*.hpp
 )
 
 pybind11_add_module(_pychaste_all OPT_SIZE ${PYCHASTE_WRAPPER_SOURCES})
@@ -144,7 +160,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 set_target_properties(_pychaste_all PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/package/chaste
+    LIBRARY_OUTPUT_DIRECTORY ${PYCHASTE_PACKAGE_DIR}/chaste
 )
 
 add_dependencies(pychaste _pychaste_all)
@@ -162,7 +178,22 @@ list(FILTER package_file_paths EXCLUDE REGEX ".*\\.(dll|dylib|pyc|so)$")
 foreach(file_path ${package_file_paths})
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/py/${file_path}
-        ${CMAKE_CURRENT_BINARY_DIR}/package/${file_path}
+        ${PYCHASTE_PACKAGE_DIR}/${file_path}
         COPYONLY
     )
 endforeach()
+
+################################
+####  Generate tutorial notebooks
+################################
+
+message(STATUS "Installing nbformat")
+execute_process(COMMAND ${chaste_python3_venv}/pip install --no-cache-dir "nbformat>=5.1")
+
+execute_process(
+    COMMAND ${chaste_python3_venv}/python
+        ${CMAKE_SOURCE_DIR}/python/infra/GeneratePyChasteTutorials.py
+        --format notebook
+        --output-dir ${PYCHASTE_PACKAGE_DIR}/chaste/notebooks
+    COMMAND_ERROR_IS_FATAL ANY
+)

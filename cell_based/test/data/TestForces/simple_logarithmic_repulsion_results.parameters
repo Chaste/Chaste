@@ -1,0 +1,3 @@
+			<RepulsionParameter>15</RepulsionParameter>
+			<UseCutOffLength>0</UseCutOffLength>
+			<CutOffLength>1.79769e+308</CutOffLength>

@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _ABSTRACTSTEADYSTATERUNNER_HPP_
 #define _ABSTRACTSTEADYSTATERUNNER_HPP_
 
-#ifdef CHASTE_CVODE
-
 #include <boost/shared_ptr.hpp>
 #include "AbstractCvodeCell.hpp"
 #include "Exception.hpp"
@@ -133,6 +131,5 @@ public:
      */
     void SetMaxNumPaces(unsigned numPaces);
 };
-#endif // CHASTE_CVODE
 
 #endif // _ABSTRACTSTEADYSTATERUNNER_HPP_

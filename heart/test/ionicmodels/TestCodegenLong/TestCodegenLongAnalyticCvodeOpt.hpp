@@ -53,7 +53,6 @@ class TestCodegenLongAnalyticCvodeOpt : public CodegenLongHelperTestSuite
 public:
     void TestAnalyticCvodeCellsOpt()
     {
-#ifdef CHASTE_CVODE
         std::string dirname("TestCodegenLongCvodeAnalyticJ-opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
@@ -66,7 +65,6 @@ public:
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args);
-#endif
     }
 };
 

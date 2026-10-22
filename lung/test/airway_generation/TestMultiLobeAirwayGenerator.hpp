@@ -44,8 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-#ifdef CHASTE_VTK
-
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 #include "vtkSmartPointer.h"
@@ -59,15 +57,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMassProperties.h"
 
 
-#endif //CHASTE_VTK
-
 class TestMultiLobeAirwayGenerator : public CxxTest::TestSuite
 {
 public:
     void TestAddLobes()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         TetrahedralMesh<1,3> airways_mesh;
@@ -84,13 +78,10 @@ public:
 
         generator.AddLobe("lung/test/data/rll.stl", RIGHT);
         TS_ASSERT_EQUALS(generator.GetNumLobes(RIGHT), 2u);
-#endif
     }
 
     void TestAssignGrowthApicesAndDistributePoints()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         //Major airways mesh has 4 end points at (+/-2,0,0) and (0,+/-2,0), one is unused
@@ -133,14 +124,10 @@ public:
                 TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 50, 2);
             }
         }
-
-    #endif
     }
 
     void TestDistributePointsByVolume()
     {
-    #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         //Major airways mesh has 4 end points at (+/-2,0,0) and (0,+/-2,0), two are unused
@@ -184,11 +171,8 @@ public:
                 TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 50, 6);
             }
         }
-
-    #endif
     }
 
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
     const static unsigned sNumTrials=3u;
     // IsInsideSurface contains randomisation: a direction is which to look for surface crossing.  This means that,
     // in corner cases, it might not be repeatable.
@@ -201,11 +185,9 @@ public:
         }
         return count;
     }
-#endif
 
 //     void doNotTestProblemWithPointMembershipClassificationCube()
 //     {
-// #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 //         EXIT_IF_PARALLEL;
 //         std::cout << "For information, VTK is "<<VTK_MAJOR_VERSION<<"."<<VTK_MINOR_VERSION<<".\n";
 //         // This code is for #3002
@@ -220,11 +202,7 @@ public:
 
 //         // See AirwayGenerator::CreatePointCloudUsingTargetPoints(const unsigned& rApproxPoints)
 //         vtkSmartPointer<vtkMassProperties> mass_properties = vtkSmartPointer<vtkMassProperties>::New();
-// #if VTK_MAJOR_VERSION >= 6
 //         mass_properties->SetInputData(lobe_surface);
-// #else
-//         mass_properties->SetInput(lobe_surface);
-// #endif
 //         double point_spacing = std::pow(mass_properties->GetVolume()/4, 1.0/3.0);
 //         TS_ASSERT_DELTA(point_spacing, 1.25992 /*2^(1/3)*/, 1e-5);
 //         TS_ASSERT_DELTA(mass_properties->GetVolume(), 8.0, 1e-5);
@@ -240,7 +218,7 @@ public:
 //         TS_ASSERT_EQUALS(yi_max, 2u);
 //         TS_ASSERT_EQUALS(zi_max, 2u);
 //         // This show why the loop in AirwayGenerator::CreatePointCloud() is doing different things when run with VTK 8.2
-//         //if (VTK_MAJOR_VERSION == 8u) {  // Reinstate if this test fails in VTK 5, 6 or7.
+//         //if (VTK_MAJOR_VERSION == 8u) {  // Reinstate if this test fails in VTK 7.
 //             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2],               bounds[4]),               sNumTrials);
 //             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2],               bounds[4]+point_spacing), 0u);
 //             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2]+point_spacing, bounds[4]),               0u);
@@ -250,12 +228,10 @@ public:
 //             TS_ASSERT_DIFFERS(CountIsInsideSurface(point_selector, bounds[0]+point_spacing, bounds[2]+point_spacing, bounds[4]),               0u);
 //             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0]+point_spacing, bounds[2]+point_spacing, bounds[4]+point_spacing), sNumTrials);
 //         //}
-// #endif
 //     }
 
     void TestProblemWithPointMembershipClassificationSphere()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
         std::cout << "For information, VTK is "<<VTK_MAJOR_VERSION<<"."<<VTK_MINOR_VERSION<<".\n";
         // This code is for #3002
@@ -270,11 +246,7 @@ public:
 
         // See AirwayGenerator::CreatePointCloudUsingTargetPoints(const unsigned& rApproxPoints)
         vtkSmartPointer<vtkMassProperties> mass_properties = vtkSmartPointer<vtkMassProperties>::New();
-#if VTK_MAJOR_VERSION >= 6
         mass_properties->SetInputData(lobe_surface);
-#else
-        mass_properties->SetInput(lobe_surface);
-#endif
         double point_spacing = std::pow(mass_properties->GetVolume()/4, 1.0/3.0);
         TS_ASSERT_DELTA(point_spacing, 1.00574 /* ~(Pi/3)^(1/3)*/, 1e-5);
         TS_ASSERT_DELTA(mass_properties->GetVolume(), 4.0693, 1e-5); /* Polyhedron based on sphere of volume 4*Pi/3 ~= 4.18879 */
@@ -290,7 +262,7 @@ public:
         TS_ASSERT_EQUALS(yi_max, 2u);
         TS_ASSERT_EQUALS(zi_max, 2u);
         // This show why the loop in AirwayGenerator::CreatePointCloud() is doing different things when run with VTK 8.2
-        //if (VTK_MAJOR_VERSION == 8u) {  // Reinstate if this test fails in VTK 5, 6 or7.
+        //if (VTK_MAJOR_VERSION == 8u) {  // Reinstate if this test fails in VTK 7.
             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2],               bounds[4]),               0u);
             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2],               bounds[4]+point_spacing), 0u);
             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0],               bounds[2]+point_spacing, bounds[4]),               0u);
@@ -300,13 +272,10 @@ public:
             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0]+point_spacing, bounds[2]+point_spacing, bounds[4]),               0u);
             TS_ASSERT_EQUALS(CountIsInsideSurface(point_selector, bounds[0]+point_spacing, bounds[2]+point_spacing, bounds[4]+point_spacing), sNumTrials);
         //}
-#endif
     }
 
     void TestGenerate()
     {
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
-
         EXIT_IF_PARALLEL;
 
         TetrahedralMesh<1,3> airways_mesh;
@@ -360,22 +329,9 @@ public:
         TS_ASSERT_DELTA(composite_mesh.GetNode(18)->rGetNodeAttributes()[1], 0.0, 1e-6);
 
         ///\todo Check radii etc
-
-    #endif
-    }
-
-    void TestDummyClassCoverage()
-    {
-#if !(defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6))
-       EXIT_IF_PARALLEL;
-
-       MultiLobeAirwayGenerator generator;
-
-    #endif
     }
 
 private:
-#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
     vtkSmartPointer<vtkPolyData> CreateSphere(double XCentre, double YCentre, double ZCentre)
     {
         vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
@@ -388,9 +344,7 @@ private:
         vtkSmartPointer<vtkPolyData> sphere_data = sphere->GetOutput();
         return sphere_data;
     }
-#endif
 
-// #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 //     vtkSmartPointer<vtkPolyData> CreateCube(double XCentre, double YCentre, double ZCentre)
 //     {
 
@@ -407,7 +361,6 @@ private:
 
 //         return triangle_filter->GetOutput();
 //     }
-// #endif
 };
 
 #endif /* TESTMULTILOBEAIRWAYGENERATOR_HPP_ */

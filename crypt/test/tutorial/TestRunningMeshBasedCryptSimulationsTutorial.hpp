@@ -87,7 +87,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The next header file defines a force law, based on a linear spring, for describing
  * the mechanical interactions between neighbouring cells in the crypt.*/
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 /*
  * The next header file defines the class that simulates the evolution of a `CellPopulation`,
  * specialized to deal with the cylindrical crypt geometry.
@@ -183,11 +183,11 @@ public:
 
         /*
          * Before running the simulation, we must add one or more force laws, which determine the mechanical
-         * behaviour of the cell population. For this test, we use a `GeneralisedLinearSpringForce`, which assumes
+         * behaviour of the cell population. For this test, we use a `LinearSpringForce`, which assumes
          * that every cell experiences a force from each of its neighbours that can be represented as a linear overdamped
          * spring.
          */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         /*
@@ -256,7 +256,7 @@ public:
 
         /* As before, we create a force law and cell killer and pass these objects to the simulator, then call
          * `Solve()`. */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&cell_population, crypt_height));
         simulator.AddCellKiller(p_killer);

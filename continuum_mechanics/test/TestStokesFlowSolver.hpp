@@ -555,11 +555,9 @@ public:
         solver.Solve();
 
         solver.CreateVtkOutput("Velocity");
-#ifdef CHASTE_VTK
         //Check the VTK file exists
         FileFinder vtk_file("LidDrivenCavityStokesFlow/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
         TS_ASSERT(vtk_file.Exists());
-#endif
 
 
         double min_u = DBL_MAX;
@@ -728,11 +726,9 @@ public:
 
         solver.Solve();
         solver.CreateVtkOutput("Velocity");
-#ifdef CHASTE_VTK
         //Check the VTK file exists
         FileFinder vtk_file("LidDrivenCavityStokesFlow3d/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
         TS_ASSERT(vtk_file.Exists());
-#endif
 
         std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
 

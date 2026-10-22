@@ -195,18 +195,10 @@ std::set<unsigned> AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Get
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt)
 {
-    double length = norm_2(rDisplacement);
-
-    if ((length > this->mAbsoluteMovementThreshold) && (!this->IsGhostNode(nodeIndex)) && (!this->IsParticle(nodeIndex)))
+    if ((!this->IsGhostNode(nodeIndex)) && (!this->IsParticle(nodeIndex)))
     {
-        std::ostringstream message;
-        message << "Cells are moving by " << length;
-        message << ", which is more than the AbsoluteMovementThreshold: use a smaller timestep to avoid this exception.";
-
-        // Suggest a net time step that will give a movement smaller than the movement threshold
-        double new_step = 0.95*dt*(this->mAbsoluteMovementThreshold/length);
-
-        throw StepSizeException(new_step, message.str(), true); // terminate
+        // Call method on parent class
+        AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(nodeIndex, rDisplacement, dt);
     }
 }
 

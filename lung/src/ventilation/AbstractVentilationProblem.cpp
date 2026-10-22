@@ -242,9 +242,7 @@ void AbstractVentilationProblem::SolveOverTime(TimeStepper& rTimeStepper,
         void (*pBoundaryConditionFunction)(AbstractVentilationProblem*, TimeStepper& rTimeStepper, const Node<3>&),
         const std::string& rDirName, const std::string& rFileBaseName)
 {
-#ifdef CHASTE_VTK
     VtkMeshWriter<1, 3> vtk_writer(rDirName, rFileBaseName, false);
-#endif
 
     bool first_step=true;
     while (!rTimeStepper.IsTimeAtEnd())
@@ -274,14 +272,10 @@ void AbstractVentilationProblem::SolveOverTime(TimeStepper& rTimeStepper,
 
         std::ostringstream suffix_name;
         suffix_name <<  "_" << std::setw(6) << std::setfill('0') << rTimeStepper.GetTotalTimeStepsTaken();
-#ifdef CHASTE_VTK
         AddDataToVtk(vtk_writer, suffix_name.str());
-#endif
     }
 
-#ifdef CHASTE_VTK
     vtk_writer.WriteFilesUsingMesh(mMesh);
-#endif
 }
 
 void AbstractVentilationProblem::SolveProblemFromFile(const std::string& rInFilePath, const std::string& rOutFileDir, const std::string& rOutFileName)
@@ -322,12 +316,9 @@ void AbstractVentilationProblem::SolveProblemFromFile(const std::string& rInFile
         }
     }
     Solve();
-#ifdef CHASTE_VTK
     WriteVtk(rOutFileDir, rOutFileName);
-#endif
 }
 
-#ifdef CHASTE_VTK
 void AbstractVentilationProblem::WriteVtk(const std::string& rDirName, const std::string& rFileBaseName)
 {
     VtkMeshWriter<1, 3> vtk_writer(rDirName, rFileBaseName, false);
@@ -345,7 +336,6 @@ void AbstractVentilationProblem::AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter,
     rVtkWriter.AddCellData("Flux"+rSuffix, fluxes);
     rVtkWriter.AddPointData("Pressure"+rSuffix, pressures);
 }
-#endif // CHASTE_VTK
 
 
 void AbstractVentilationProblem::SetPerGenerationDynamicResistance()
@@ -364,8 +354,7 @@ void AbstractVentilationProblem::SetPerGenerationDynamicResistance()
      * Generation: 0     1     2     3     4     5     6     7     >7
      * Gamma:      0.162 0.239 0.244 0.295 0.175 0.303 0.356 0.566 0.327
      */
-    double per_generation_pedley[9] =
-            {0.162, 0.239, 0.244, 0.295, 0.175, 0.303, 0.356, 0.566, 0.327};
+    double per_generation_pedley[9] = {0.162, 0.239, 0.244, 0.295, 0.175, 0.303, 0.356, 0.566, 0.327};
 
     // Convert from gamma to C
     for (unsigned i=0; i<9; i++)

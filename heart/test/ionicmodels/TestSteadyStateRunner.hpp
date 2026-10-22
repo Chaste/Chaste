@@ -57,7 +57,6 @@ class TestSteadyStateRunner : public CxxTest::TestSuite
 public:
     void TestSteadyStateRunnerConverges(void)
     {
-#ifdef CHASTE_CVODE
         //////////// DEFINE PARAMETERS ///////////////
         // Get the frequency
         double hertz = 1.0;
@@ -129,9 +128,6 @@ public:
 
         // For coverage
         steady_runner.SuppressOutput();
-#else
-        std::cout << "CVODE must be enabled for the steady state runner to work." << std::endl;
-#endif //_CHASTE_CVODE
     }
 };
 

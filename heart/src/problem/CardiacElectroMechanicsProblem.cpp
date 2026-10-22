@@ -508,8 +508,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     // get an electrics solver from the problem. Note that we don't call
     // Solve() on the CardiacProblem class, we do the looping here.
-    AbstractDynamicLinearPdeSolver<DIM,DIM,ELEC_PROB_DIM>* p_electrics_solver
-       = mpElectricsProblem->CreateSolver();
+    AbstractDynamicLinearPdeSolver<DIM,DIM,ELEC_PROB_DIM>* p_electrics_solver = mpElectricsProblem->CreateSolver();
 
     // set up initial voltage etc
     Vec electrics_solution=NULL; //This will be set and used later
@@ -527,14 +526,12 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     if (mWriteOutput)
     {
-#ifdef CHASTE_VTK
         if (HeartConfig::Instance()->GetVisualizeWithVtk())
         {
             ReplicatableVector ic(initial_voltage);
             mpCardiacVtkWriter = new CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>(*mpMechanicsSolver,
                 *mpMechanicsMesh,*mpElectricsMesh, ic, mDeformationOutputDirectory);
         }
-#endif
         mpMechanicsSolver->SetWriteOutput();
         mpMechanicsSolver->WriteCurrentSpatialSolution("undeformed","nodes");
 
@@ -869,12 +866,10 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
             p_cmgui_writer->WriteDeformationPositions(rGetDeformedPosition(), counter);
 
-#ifdef CHASTE_VTK
             if (HeartConfig::Instance()->GetVisualizeWithVtk())
             {
                 mpCardiacVtkWriter->WriteSolution(counter,electrics_solution_repl);//writer will pick up mech solution from solver
             }
-#endif
             if (!mNoElectricsOutput)
             {
                 mpElectricsProblem->mpWriter->AdvanceAlongUnlimitedDimension();

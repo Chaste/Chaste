@@ -51,32 +51,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupUtils.hpp"
 #include "PetscTools.hpp"
 
-#ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkVersion.h>
-#endif
 
-#ifdef CHASTE_CVODE
 #include <sundials/sundials_config.h>
-#if CHASTE_SUNDIALS_VERSION >= 20600
-#if CHASTE_SUNDIALS_VERSION >= 30000
-// SUNDIALS 3.0 upwards uses SUNDIALS_VERSION instead of SUNDIALS_PACKAGE_VERSION.
-#define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_VERSION
-#else
-// SUNDIALS 2.6 upwards defines SUNDIALS_PACKAGE_VERSION with quotes...
-#include <boost/preprocessor/stringize.hpp>
-#define CHASTE_SUNDIALS_PACKAGE_VERSION BOOST_PP_STRINGIZE(SUNDIALS_PACKAGE_VERSION)
-#endif // SUNDIALS >= 3.0.0
-#else
-#define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_PACKAGE_VERSION
-#endif // SUNDIALS >= 2.6.0
-#endif
 
-// Note: the following are not a requirement for cell-based Chaste so may not be present!
 //#include <xsd/cxx/version.hxx>
-#ifdef CHASTE_XERCES
 #include <xercesc/util/XercesVersion.hpp>
-#endif
 
 // Check whether the version of ParMETIS being used is the one we wanted
 #ifdef CHASTE_PARMETIS_REQUIRED
@@ -129,7 +110,7 @@ void ExecutableSupport::ShowCopyright()
     std::stringstream provenance_msg;
     provenance_msg << "This version of Chaste was compiled on:\n";
     provenance_msg << ChasteBuildInfo::GetBuildTime() << " by " << ChasteBuildInfo::GetBuilderUnameInfo() << " (uname)\n";
-    provenance_msg << "from revision number " << std::hex << ChasteBuildInfo::GetRevisionNumber() << std::dec << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
+    provenance_msg << "from revision " << ChasteBuildInfo::GetChasteRevision().GetShortCommit() << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
 
     // Only show one copy of copyright/header
     if (PetscTools::AmMaster())
@@ -241,7 +222,7 @@ void ExecutableSupport::WriteProvenanceInfoFile()
     std::stringstream provenance_msg;
     provenance_msg << "This version of Chaste was compiled on:\n";
     provenance_msg << ChasteBuildInfo::GetBuildTime() << " by " << ChasteBuildInfo::GetBuilderUnameInfo() << " (uname)\n";
-    provenance_msg << "from revision number " << std::hex << ChasteBuildInfo::GetRevisionNumber() << std::dec << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
+    provenance_msg << "from revision " << ChasteBuildInfo::GetChasteRevision().GetShortCommit() << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
     *out_file << provenance_msg.str();
 
     std::string output;
@@ -258,7 +239,8 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
 
     output << "\t<ProvenanceInfo>\n";
     output << "\t\t<VersionString>" << ChasteBuildInfo::GetVersionString() << "</VersionString> <!-- build specific -->\n";
-    output << "\t\t<IsWorkingCopyModified>" << ChasteBuildInfo::IsWorkingCopyModified() << "</IsWorkingCopyModified>\n";
+    output << "\t\t<Revision>" << ChasteBuildInfo::GetChasteRevision().rGetCommit() << "</Revision>\n";
+    output << "\t\t<IsWorkingCopyModified>" << (ChasteBuildInfo::GetChasteRevision().IsModified() ? "True" : "False") << "</IsWorkingCopyModified>\n";
     output << "\t\t<BuildInformation>" << ChasteBuildInfo::GetBuildInformation() << "</BuildInformation>\n";
     output << "\t\t<BuildTime>" << ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
     output << "\t\t<CurrentTime>" << ChasteGetCurrentTime() << "</CurrentTime>\n";
@@ -267,16 +249,14 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
 
     output << "\t\t<Projects>\n";
     {
-        const std::map<std::string, std::string>& r_projects_modified = ChasteBuildInfo::rGetIfProjectsModified();
-        const std::map<std::string, std::string>& r_projects_versions = ChasteBuildInfo::rGetProjectVersions();
-        for (const auto& r_project_version : r_projects_versions)
+        for (const auto& r_project : ChasteBuildInfo::GetProjectRevisions())
         {
             // LCOV_EXCL_START
             // No projects are checked out for continuous builds normally!
             output << "\t\t\t<Project>" << std::endl;
-            output << "\t\t\t\t<Name>" << r_project_version.first << "</Name>" << std::endl;
-            output << "\t\t\t\t<Version>" << r_project_version.second << "</Version>" << std::endl;
-            output << "\t\t\t\t<Modified>" << r_projects_modified.at(r_project_version.first) << "</Modified>" << std::endl;
+            output << "\t\t\t\t<Name>" << r_project.first << "</Name>" << std::endl;
+            output << "\t\t\t\t<Revision>" << r_project.second.rGetCommit() << "</Revision>" << std::endl;
+            output << "\t\t\t\t<IsWorkingCopyModified>" << (r_project.second.IsModified() ? "True" : "False") << "</IsWorkingCopyModified>" << std::endl;
             output << "\t\t\t</Project>" << std::endl;
             // LCOV_EXCL_STOP
         }
@@ -293,9 +273,10 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t<Libraries>\n";
 
     output << "\t\t<CompiledIn>\n";
-    output << "\t\t\t<PETSc>" << PETSC_VERSION_MAJOR << "." << PETSC_VERSION_MINOR << "." << PETSC_VERSION_SUBMINOR << "</PETSc>\n";
     output << "\t\t\t<Boost>" << BOOST_VERSION / 100000 << "." << BOOST_VERSION / 100 % 1000 << "." << BOOST_VERSION % 100 << "</Boost>\n";
     output << "\t\t\t<HDF5>" << H5_VERS_MAJOR << "." << H5_VERS_MINOR << "." << H5_VERS_RELEASE << "</HDF5>\n";
+    // Parmetis and PT-Scotch are alternatives (only one is ever compiled in), so are kept adjacent
+    // rather than in strict alphabetical order.
 #ifdef PARMETIS_MAJOR_VERSION
     output << "\t\t\t<Parmetis>" << PARMETIS_MAJOR_VERSION << "." << PARMETIS_MINOR_VERSION;
 #ifdef PARMETIS_SUBMINOR_VERSION // they only added this in v4.? !!
@@ -307,34 +288,16 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t\t<Parmetis>[NONE]</Parmetis>" << std::endl;
     output << "\t\t\t<PT-Scotch>" << SCOTCH_VERSION<<"."<<SCOTCH_RELEASE<<"."<<SCOTCH_PATCHLEVEL<<"</PT-Scotch>"<< std::endl;
 #endif //no PARMETIS_MAJOR_VERSION
+    output << "\t\t\t<PETSc>" << PETSC_VERSION_MAJOR << "." << PETSC_VERSION_MINOR << "." << PETSC_VERSION_SUBMINOR << "</PETSc>\n";
+    output << "\t\t\t<SUNDIALS>" << SUNDIALS_VERSION << "</SUNDIALS>\n";
+    output << "\t\t\t<VTK>" << VTK_MAJOR_VERSION << "." << VTK_MINOR_VERSION << "</VTK>\n";
+    output << "\t\t\t<Xerces>" << XERCES_FULLVERSIONDOT << "</Xerces>\n";
 
     output << "\t\t</CompiledIn>\n";
 
     output << "\t\t<Binaries>\n";
     output << "\t\t\t<XSD>" << ChasteBuildInfo::GetXsdVersion() << "</XSD>\n";
     output << "\t\t</Binaries>\n";
-
-    output << "\t\t<Optional>\n";
-#ifdef CHASTE_CVODE
-    output << "\t\t\t<SUNDIALS>" << CHASTE_SUNDIALS_PACKAGE_VERSION << "</SUNDIALS>";
-#if CHASTE_SUNDIALS_VERSION < 30000
-    output << "<!-- includes Cvode of a different version number -->";
-#endif
-    output << std::endl;
-#else
-    output << "\t\t\t<SUNDIALS>no</SUNDIALS>\n";
-#endif
-#ifdef CHASTE_VTK
-    output << "\t\t\t<VTK>" << VTK_MAJOR_VERSION << "." << VTK_MINOR_VERSION << "</VTK>\n";
-#else
-    output << "\t\t\t<VTK>no</VTK>\n";
-#endif
-#ifdef CHASTE_XERCES
-    output << "\t\t\t<Xerces>" << XERCES_FULLVERSIONDOT << "</Xerces>\n"; // Note: not a requirement for cell-based so may not be present!
-#else
-    output << "\t\t\t<Xerces>no</Xerces>\n";
-#endif
-    output << "\t\t</Optional>\n";
 
     output << "\t</Libraries>\n";
 

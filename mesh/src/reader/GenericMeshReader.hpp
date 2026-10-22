@@ -91,25 +91,19 @@ std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > GenericMeshReader(c
         }
         catch (const Exception& r_memfem_exception)
         {
-#ifdef CHASTE_VTK
             try
             {
                 p_reader.reset(new VtkMeshReader<ELEMENT_DIM, SPACE_DIM>(rPathBaseName));
             }
             catch (const Exception& r_vtk_exception)
             {
-#endif // CHASTE_VTK
                 std::string eol("\n");
                 std::string combined_message = "Could not open appropriate mesh files for " + rPathBaseName + eol;
                 combined_message += "Triangle format: " + r_triangles_exception.GetShortMessage() + eol;
                 combined_message += "Memfem format: " + r_memfem_exception.GetShortMessage() + eol;
-#ifdef CHASTE_VTK
                 combined_message += "Vtk format: " + r_vtk_exception.GetShortMessage() + eol;
-#endif // CHASTE_VTK
                 EXCEPTION(combined_message);
-#ifdef CHASTE_VTK
             }
-#endif // CHASTE_VTK
         }
     }
     return p_reader;

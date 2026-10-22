@@ -1,0 +1,60 @@
+name: "Doxygen release docs"
+
+# Manually build the Doxygen documentation for a named release and attach the
+# HTML as a workflow artifact. Split out of tier-1-doxygen.yml (issue #657) so
+# that workflow is a pure PR check with no workflow_dispatch surface.
+
+on:
+  workflow_dispatch:
+    inputs:
+      doxygen_name:
+        description: 'Name (e.g. Release::2021.1)'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: "build release docs"
+    runs-on: ubuntu-latest
+    if: github.repository == 'Chaste/Chaste'
+    steps:
+      - name: checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: install doxygen
+        id: install-doxygen
+        uses: $/.github/actions/install-doxygen
+
+      - name: build doxygen
+        run: |
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=${GITHUB_EVENT_INPUTS_DOXYGEN_NAME}" ) | "${STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN}" - 2>doxygen-error.log 1>doxygen-output.log
+        env:
+          GITHUB_EVENT_INPUTS_DOXYGEN_NAME: ${{ github.event.inputs.doxygen_name }}
+          STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN: ${{ steps.install-doxygen.outputs.bin }}
+
+      - name: check doxygen coverage
+        run: |
+          mkdir doxygen/coverage
+          python python/infra/ParseDoxygen.py doxygen-output.log doxygen-error.log doxygen/coverage
+
+      - name: print doxygen coverage errors
+        if: failure()
+        run: |
+          echo "Printing file contents:"
+          for FILE in doxygen/coverage/*; do
+          echo "------------------------"
+          echo "Contents of $FILE:"
+          cat "$FILE"
+          echo "------------------------"
+          done
+
+      - name: upload documentation as artifact
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: doxygen-html
+          path: doxygen/html/
