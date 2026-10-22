@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <string>
-#include <set>
+#include <unordered_set>
 
 #include "AbstractTetrahedralMesh.hpp"
 #include "AbstractMeshReader.hpp"
@@ -363,10 +363,29 @@ public:
 
     private:
         /**
-         * Keep track of what edges have been visited.
-         * Each edge is stored as a pair of ordered indices.
+         * Hash functor for std::pair<unsigned, unsigned>, since std::pair has no default
+         * std::hash specialization. Combines both (32-bit) indices into one hash value.
          */
-        std::set< std::pair<unsigned, unsigned> > mEdgesVisited;
+        struct EdgePairHash
+        {
+            /**
+             * @param rPair the node index pair to hash
+             * @return the hash value
+             */
+            std::size_t operator()(const std::pair<unsigned, unsigned>& rPair) const
+            {
+                return (static_cast<std::size_t>(rPair.first) << 32) | static_cast<std::size_t>(rPair.second);
+            }
+        };
+
+        /**
+         * Keep track of what edges have been visited.
+         * Each edge is stored as a pair of ordered indices. An unordered_set is used rather
+         * than a set since only membership testing and insertion are needed (no ordered
+         * iteration), and the number of distinct edges scales with mesh size rather than
+         * being small and fixed, so the O(1) average operations matter for larger meshes.
+         */
+        std::unordered_set< std::pair<unsigned, unsigned>, EdgePairHash > mEdgesVisited;
 
         TetrahedralMesh& mrMesh;   /**< The mesh. */
 

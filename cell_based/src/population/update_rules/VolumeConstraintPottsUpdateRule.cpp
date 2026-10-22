@@ -56,8 +56,8 @@ double VolumeConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(uns
 {
     double delta_H = 0.0;
 
-    std::set<unsigned> containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
-    std::set<unsigned> new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();
+    const std::set<unsigned>& containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
+    const std::set<unsigned>& new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();
 
     bool current_node_contained = !containing_elements.empty();
     bool target_node_contained = !new_location_containing_elements.empty();

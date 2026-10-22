@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool CryptShovingCaBasedDivisionRule::IsNodeOnBase(unsigned NodeIndex, PottsMesh<2>* pPottsMesh)
 {
-    std::set<unsigned> neighbouring_node_indices = pPottsMesh->GetVonNeumannNeighbouringNodeIndices(NodeIndex);
+    const std::vector<unsigned>& neighbouring_node_indices = pPottsMesh->GetVonNeumannNeighbouringNodeIndices(NodeIndex);
     unsigned num_neighbours = neighbouring_node_indices.size();
 
     // No strange neighbourhoods and in 2D so need 3 or 4 neighbours
@@ -98,16 +98,10 @@ unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(CellPtr pNe
     }
 
 
-    std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(parent_node_index);
+    const std::vector<unsigned>& neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(parent_node_index);
 
-    std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-    for (unsigned  i=0; i<direction; i++)
-    {
-        ++neighbour_iter;
-    }
-    assert(neighbour_iter != neighbouring_node_indices.end());
-
-    unsigned daughter_node_index = *neighbour_iter;
+    assert(direction < neighbouring_node_indices.size());
+    unsigned daughter_node_index = neighbouring_node_indices[direction];
 
     assert(daughter_node_index < static_cast_mesh->GetNumNodes());
 
@@ -124,21 +118,14 @@ unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(CellPtr pNe
         {
             current_node_index = target_node_index;
 
-            std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(current_node_index);
-            unsigned num_neighbours = neighbouring_node_indices.size();
+            const std::vector<unsigned>& neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(current_node_index);
 
             // Check to see if the current node is on the boundary
             IsNodeOnBase(current_node_index, static_cast_mesh);
 
-            // Select the appropriate neighbour
-            std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-            for (unsigned i=0; i<num_neighbours-1; i++)
-            {
-                ++neighbour_iter;
-            }
-            assert(neighbour_iter != neighbouring_node_indices.end());
-
-            target_node_index = *neighbour_iter;
+            // Select the appropriate neighbour: always the last one in the neighbourhood
+            assert(!neighbouring_node_indices.empty());
+            target_node_index = neighbouring_node_indices.back();
 
             std::pair<unsigned, unsigned> new_move(current_node_index, target_node_index);
 

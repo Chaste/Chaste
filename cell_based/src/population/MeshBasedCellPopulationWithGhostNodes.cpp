@@ -312,6 +312,13 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::ApplyGhostForces()
         unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
         unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
 
+        // Edges between two non-ghost nodes never contribute to drdt (only ghost nodes have
+        // their applied force updated below), so skip the (non-trivial) force calculation for them.
+        if (!this->mIsGhostNode[nodeA_global_index] && !this->mIsGhostNode[nodeB_global_index])
+        {
+            continue;
+        }
+
         c_vector<double, DIM> force = CalculateForceBetweenGhostNodes(nodeA_global_index, nodeB_global_index);
 
         if (!this->mIsGhostNode[nodeA_global_index])

@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <utility>
+
 #include "PottsMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 
@@ -40,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
                           std::vector<PottsElement<DIM>*> pottsElements,
-                          std::vector<std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
-                          std::vector<std::set<unsigned> > mooreNeighbouringNodeIndices)
+                          std::vector<std::vector<unsigned> > vonNeumannNeighbouringNodeIndices,
+                          std::vector<std::vector<unsigned> > mooreNeighbouringNodeIndices)
 {
     // Reset member variables and clear mNodes, mElements.
     Clear();
@@ -51,8 +53,8 @@ PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
     {
         EXCEPTION("Nodes and neighbour information for a Potts mesh need to be the same length.");
     }
-    mVonNeumannNeighbouringNodeIndices = vonNeumannNeighbouringNodeIndices;
-    mMooreNeighbouringNodeIndices = mooreNeighbouringNodeIndices;
+    mVonNeumannNeighbouringNodeIndices = std::move(vonNeumannNeighbouringNodeIndices);
+    mMooreNeighbouringNodeIndices = std::move(mooreNeighbouringNodeIndices);
 
     // Populate mNodes and mElements
     for (unsigned node_index=0; node_index<nodes.size(); node_index++)
@@ -207,13 +209,13 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
     double surface_area = 0.0;
     for (unsigned node_index=0; node_index<num_nodes; node_index++)
     {
-        std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
+        const std::vector<unsigned>& neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
         unsigned local_edges = 2*DIM;
-        for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+        for (std::vector<unsigned>::const_iterator iter = neighbouring_node_indices.begin();
              iter != neighbouring_node_indices.end();
              iter++)
         {
-            std::set<unsigned> neighbouring_node_element_indices = this->mNodes[*iter]->rGetContainingElementIndices();
+            const std::set<unsigned>& neighbouring_node_element_indices = this->mNodes[*iter]->rGetContainingElementIndices();
 
             if (!(neighbouring_node_element_indices.empty()) && (local_edges!=0))
             {
@@ -230,13 +232,13 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 }
 
 template<unsigned DIM>
-std::set<unsigned> PottsMesh<DIM>::GetMooreNeighbouringNodeIndices(unsigned nodeIndex)
+const std::vector<unsigned>& PottsMesh<DIM>::GetMooreNeighbouringNodeIndices(unsigned nodeIndex)
 {
     return mMooreNeighbouringNodeIndices[nodeIndex];
 }
 
 template<unsigned DIM>
-std::set<unsigned> PottsMesh<DIM>::GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex)
+const std::vector<unsigned>& PottsMesh<DIM>::GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex)
 {
     return mVonNeumannNeighbouringNodeIndices[nodeIndex];
 }
@@ -302,8 +304,19 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
          node_index++)
     {
         // Remove node "index" from the Von Neuman neighbourhood of node "node_index".
-        mVonNeumannNeighbouringNodeIndices[node_index].erase(index);
-        mMooreNeighbouringNodeIndices[node_index].erase(index);
+        std::vector<unsigned>& von_neumann_neighbours = mVonNeumannNeighbouringNodeIndices[node_index];
+        std::vector<unsigned>::iterator von_neumann_it = std::find(von_neumann_neighbours.begin(), von_neumann_neighbours.end(), index);
+        if (von_neumann_it != von_neumann_neighbours.end())
+        {
+            von_neumann_neighbours.erase(von_neumann_it);
+        }
+
+        std::vector<unsigned>& moore_neighbours = mMooreNeighbouringNodeIndices[node_index];
+        std::vector<unsigned>::iterator moore_it = std::find(moore_neighbours.begin(), moore_neighbours.end(), index);
+        if (moore_it != moore_neighbours.end())
+        {
+            moore_neighbours.erase(moore_it);
+        }
 
         // Check there's still connectivity for the other non-deleted nodes
         if (!this->mNodes[node_index]->IsDeleted())
@@ -335,34 +348,36 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
 
         // Reduce the index of all nodes greater than  node "index"
         // in the Moore and Von Neuman neighbourhoods.
-        std::set<unsigned> von_neuman = mVonNeumannNeighbouringNodeIndices[node_index];
+        // Note: "index" itself was already removed from every neighbourhood above, so this
+        // shift is strictly order-preserving and the result needs no re-sorting.
+        std::vector<unsigned> von_neuman = mVonNeumannNeighbouringNodeIndices[node_index];
         mVonNeumannNeighbouringNodeIndices[node_index].clear();
-        for (std::set<unsigned>::iterator iter = von_neuman.begin();
+        for (std::vector<unsigned>::iterator iter = von_neuman.begin();
              iter != von_neuman.end();
              iter++)
         {
             if (*iter >= index)
             {
-                mVonNeumannNeighbouringNodeIndices[node_index].insert(*iter-1);
+                mVonNeumannNeighbouringNodeIndices[node_index].push_back(*iter-1);
             }
             else
             {
-                mVonNeumannNeighbouringNodeIndices[node_index].insert(*iter);
+                mVonNeumannNeighbouringNodeIndices[node_index].push_back(*iter);
             }
         }
-        std::set<unsigned> moore = mMooreNeighbouringNodeIndices[node_index];
+        std::vector<unsigned> moore = mMooreNeighbouringNodeIndices[node_index];
         mMooreNeighbouringNodeIndices[node_index].clear();
-        for (std::set<unsigned>::iterator iter = moore.begin();
+        for (std::vector<unsigned>::iterator iter = moore.begin();
              iter != moore.end();
              iter++)
         {
             if (*iter >= index)
             {
-                mMooreNeighbouringNodeIndices[node_index].insert(*iter-1);
+                mMooreNeighbouringNodeIndices[node_index].push_back(*iter-1);
             }
             else
             {
-                mMooreNeighbouringNodeIndices[node_index].insert(*iter);
+                mMooreNeighbouringNodeIndices[node_index].push_back(*iter);
             }
         }
     }
@@ -545,14 +560,14 @@ std::set<unsigned> PottsMesh<DIM>::GetNeighbouringElementIndices(unsigned elemen
         // Find the indices of the elements owned by neighbours of this node
 
         // Loop over neighbouring nodes. Only want Von Neuman neighbours (i.e N,S,E,W) as need to share an edge
-        std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_node->GetIndex());
+        const std::vector<unsigned>& neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_node->GetIndex());
 
          // Iterate over these neighbouring nodes
-         for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+         for (std::vector<unsigned>::const_iterator neighbour_iter = neighbouring_node_indices.begin();
               neighbour_iter != neighbouring_node_indices.end();
               ++neighbour_iter)
          {
-             std::set<unsigned> neighbouring_node_containing_elem_indices = this->GetNode(*neighbour_iter)->rGetContainingElementIndices();
+             const std::set<unsigned>& neighbouring_node_containing_elem_indices = this->GetNode(*neighbour_iter)->rGetContainingElementIndices();
 
              assert(neighbouring_node_containing_elem_indices.size()<2); // Either in element or in medium
 

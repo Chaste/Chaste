@@ -604,6 +604,10 @@ TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::EdgeIterator(TetrahedralM
     }
 
     mEdgesVisited.clear();
+    // Reserve for a safe upper bound on the number of distinct edges (each element has
+    // ELEMENT_DIM*(ELEMENT_DIM+1)/2 edges; most are shared by two elements, but treating
+    // every element's edges as distinct avoids ever needing to rehash during iteration).
+    mEdgesVisited.reserve(mrMesh.GetNumAllElements() * ELEMENT_DIM * (ELEMENT_DIM + 1) / 2);
 
     // Add the current node pair to the store
     unsigned node_a_global_index = mrMesh.GetElement(mElemIndex)->GetNodeGlobalIndex(mNodeALocalIndex);
@@ -848,6 +852,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
     Clear();
 
     // Construct the nodes
+    this->mNodes.reserve(mesherOutput.numberofpoints);
     for (unsigned node_index = 0; node_index < (unsigned)mesherOutput.numberofpoints; node_index++)
     {
         this->mNodes.push_back(new Node<SPACE_DIM>(node_index, &mesherOutput.pointlist[node_index * SPACE_DIM], false));
