@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
+#include <numeric>
+
 #include "CombinedOdeSystemInformation.hpp"
 
 #include <cassert>
@@ -89,11 +91,9 @@ boost::shared_ptr<CombinedOdeSystemInformation> CombinedOdeSystemInformation::In
 CombinedOdeSystemInformation::CombinedOdeSystemInformation(const std::vector<boost::shared_ptr<const AbstractOdeSystemInformation> >& rSubsystemInfo)
 {
     // Figure out our size
-    unsigned total_system_size = 0u;
-    for (unsigned i=0; i<rSubsystemInfo.size(); i++)
-    {
-        total_system_size += rSubsystemInfo[i]->rGetStateVariableNames().size();
-    }
+    unsigned total_system_size = std::accumulate(rSubsystemInfo.begin(), rSubsystemInfo.end(), 0u,
+        [](unsigned total, const boost::shared_ptr<const AbstractOdeSystemInformation>& pInfo)
+        { return total + static_cast<unsigned>(pInfo->rGetStateVariableNames().size()); });
     mVariableNames.reserve(total_system_size);
     mVariableUnits.reserve(total_system_size);
     mInitialConditions.reserve(total_system_size);

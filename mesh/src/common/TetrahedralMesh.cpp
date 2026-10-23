@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <numeric>
+
 #include "TetrahedralMesh.hpp"
 
 #include <cassert>
@@ -210,11 +212,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(const st
         EXCEPTION("Unable to read nodes per processor file " + rNodesPerProcessorFile);
     }
 
-    unsigned sum = 0;
-    for (unsigned i = 0; i < nodes_per_processor_vec.size(); i++)
-    {
-        sum += nodes_per_processor_vec[i];
-    }
+    unsigned sum = std::accumulate(nodes_per_processor_vec.begin(), nodes_per_processor_vec.end(), 0u);
 
     if (sum != this->GetNumNodes())
     {
