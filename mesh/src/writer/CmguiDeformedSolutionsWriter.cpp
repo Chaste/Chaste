@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+#include <iterator>
+
 #include "CmguiDeformedSolutionsWriter.hpp"
 #include "Exception.hpp"
 
@@ -90,10 +93,7 @@ CmguiDeformedSolutionsWriter<DIM>::CmguiDeformedSolutionsWriter(std::string outp
                 // QuadraticBasisFunction::ComputeBasisFunction() to CMGUI ordering
                 // ("psi1 increasing, then psi1 increasing")
                 unsigned reordering[6] = {0,5,1,4,3,2};
-                for (unsigned i=0; i<6; i++)
-                {
-                    this->mReordering[i] = reordering[i];
-                }
+                std::copy(std::begin(reordering), std::end(reordering), this->mReordering.begin());
                 break;
             }
             case 3:
@@ -108,10 +108,7 @@ CmguiDeformedSolutionsWriter<DIM>::CmguiDeformedSolutionsWriter(std::string outp
                 // QuadraticBasisFunction::ComputeBasisFunction() to CMGUI ordering
                 // ("psi1 increasing, then psi2 increasing, then psi3 increasing")
                 unsigned reordering[10] = {0,4,1,6,5,2,7,8,9,3};
-                for (unsigned i=0; i<10; i++)
-                {
-                    this->mReordering[i] = reordering[i];
-                }
+                std::copy(std::begin(reordering), std::end(reordering), this->mReordering.begin());
                 break;
             }
             default:

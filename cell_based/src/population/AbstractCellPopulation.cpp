@@ -259,11 +259,8 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellPro
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyclePhaseCount()
 {
+    // Note that std::vector value-initialises its elements, so these counts start at zero
     std::vector<unsigned> cell_cycle_phase_count(5);
-    for (unsigned i=0; i<5; i++)
-    {
-        cell_cycle_phase_count[i] = 0;
-    }
 
     /*
      * Note that in parallel with a poor partition a process could end up with zero cells
