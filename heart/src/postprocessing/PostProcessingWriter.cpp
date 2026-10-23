@@ -44,7 +44,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartEventHandler.hpp"
 #include "Hdf5DataWriter.hpp"
 
+#include <algorithm>
 #include <iostream>
+#include <numeric>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::PostProcessingWriter(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
@@ -202,15 +204,12 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const s
         writer.EmptyDataset();
     }
 
-    //Determine the maximum number of paces
-    unsigned local_max_paces = 0u;
-    for (unsigned node_index = 0; node_index < rDataPayload.size(); ++node_index)
-    {
-        if (rDataPayload[node_index].size() > local_max_paces)
-        {
-             local_max_paces = rDataPayload[node_index].size();
-        }
-    }
+    //Determine the maximum number of paces (rDataPayload is empty on a process owning no nodes)
+    unsigned local_max_paces = std::accumulate(rDataPayload.begin(), rDataPayload.end(), 0u,
+                                               [](unsigned max_so_far, const std::vector<double>& rPaces)
+                                               {
+                                                   return std::max(max_so_far, static_cast<unsigned>(rPaces.size()));
+                                               });
 
     unsigned max_paces = 0u;
     MPI_Allreduce(&local_max_paces, &max_paces, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);

@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VertexMesh.hpp"
+
+#include <algorithm>
 #include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
@@ -787,10 +789,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetRosetteRankOfElement(unsigned in
     {
         unsigned num_elems_this_node = p_element->GetNode(node_idx)->rGetContainingElementIndices().size();
 
-        if (num_elems_this_node > rosette_rank)
-        {
-            rosette_rank = num_elems_this_node;
-        }
+        rosette_rank = std::max(rosette_rank, num_elems_this_node);
     }
 
     // Return the rosette rank
