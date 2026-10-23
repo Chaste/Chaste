@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "ChasteNodesList.hpp"
 
 template <unsigned SPACE_DIM>
@@ -57,17 +59,9 @@ ChasteNodesList<SPACE_DIM>::~ChasteNodesList()
 template <unsigned SPACE_DIM>
 bool ChasteNodesList<SPACE_DIM>::DoesContain(const ChastePoint<SPACE_DIM>& rPointToCheck) const
 {
-    bool returned_value = false;
-    for (unsigned index = 0; index < mListOfNodes.size(); index++)
-    {
-        if (mListOfNodes[index]->GetPoint().IsSamePoint(rPointToCheck))
-        {
-            returned_value = true;
-            break;
-        }
-    }
-
-    return returned_value;
+    return std::any_of(mListOfNodes.begin(), mListOfNodes.end(),
+                       [&rPointToCheck](const Node<SPACE_DIM>* pNode)
+                       { return pNode->GetPoint().IsSamePoint(rPointToCheck); });
 }
 
 template <unsigned SPACE_DIM>

@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "MajorAirwaysCentreLinesCleaner.hpp"
 
 
@@ -58,14 +60,11 @@ void  MajorAirwaysCentreLinesCleaner::CleanElementUsingHorsfieldOrder(Element<1,
     std::vector<Element<1,3>* > child_eles = mWalker.GetChildElements(pElement);
 
     // If either of the children of this element are below the order limit delete BOTH of them.
-    bool delete_children = delete_me; //Always delete children if this element is to be deleted.
-    for (unsigned i = 0; i < child_eles.size(); ++i)
-    {
-        if (mWalker.GetElementHorsfieldOrder(child_eles[i]) <= mMaxOrder)
-        {
-            delete_children = true;
-        }
-    }
+    //Always delete children if this element is to be deleted.
+    bool delete_children = delete_me
+                           || std::any_of(child_eles.begin(), child_eles.end(),
+                                          [this](Element<1, 3>* pChild)
+                                          { return mWalker.GetElementHorsfieldOrder(pChild) <= mMaxOrder; });
 
     // Recursively process children
     for (unsigned i = 0; i < child_eles.size(); ++i)
