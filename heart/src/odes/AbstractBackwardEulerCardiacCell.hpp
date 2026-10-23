@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTBACKWARDEULERCARDIACCELL_HPP_
 #define ABSTRACTBACKWARDEULERCARDIACCELL_HPP_
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 
@@ -228,10 +229,7 @@ OdeSolution AbstractBackwardEulerCardiacCell<SIZE>::Compute(double tStart, doubl
     //     using backward Euler
 
     // Check length of time interval
-    if (tSamp < mDt)
-    {
-        tSamp = mDt;
-    }
+    tSamp = std::max(tSamp, mDt);
     double _n_steps = (tEnd - tStart) / tSamp;
     const unsigned n_steps = (unsigned) floor(_n_steps+0.5);
     assert(fabs(tStart+n_steps*tSamp - tEnd) < 1e-12);
@@ -387,10 +385,7 @@ public:
         //     using backward Euler
 
         // Check length of time interval
-        if (tSamp < mDt)
-        {
-            tSamp = mDt;
-        }
+        tSamp = std::max(tSamp, mDt);
         double _n_steps = (tEnd - tStart) / tSamp;
         const unsigned n_steps = (unsigned) floor(_n_steps+0.5);
         assert(fabs(tStart+n_steps*tSamp - tEnd) < 1e-12);

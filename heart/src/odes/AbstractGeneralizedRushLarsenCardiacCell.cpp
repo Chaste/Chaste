@@ -43,6 +43,8 @@ Science and Engineering Research Council (NSERC) of Canada
 and the MITACS/Mprime Canadian Network of Centres of Excellence.
 */
 
+#include <algorithm>
+
 #include "AbstractGeneralizedRushLarsenCardiacCell.hpp"
 #include <cassert>
 #include <cmath>
@@ -70,10 +72,7 @@ AbstractGeneralizedRushLarsenCardiacCell::~AbstractGeneralizedRushLarsenCardiacC
 OdeSolution AbstractGeneralizedRushLarsenCardiacCell::Compute(double tStart, double tEnd, double tSamp)
 {
     // Check length of time interval
-    if (tSamp < mDt)
-    {
-        tSamp = mDt;
-    }
+    tSamp = std::max(tSamp, mDt);
     const unsigned n_steps = (unsigned) floor((tEnd - tStart)/tSamp + 0.5);
     assert(fabs(tStart+n_steps*tSamp - tEnd) < 1e-12);
     const unsigned n_small_steps = (unsigned) floor(tSamp/mDt+0.5);
