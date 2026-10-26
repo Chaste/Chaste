@@ -38,6 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <cstddef>
 #include <algorithm>
+#include <petsc.h>
+
+#include "PetscException.hpp"
 
 CommandLineArguments::CommandLineArguments()
     : p_argc(nullptr),
@@ -119,10 +122,65 @@ int CommandLineArguments::GetIndexForArgument(std::string rOption)
     {
         if (rOption==std::string((*p_argv)[i]))
         {
+            MarkOptionUsed(rOption);
             return i;
         }
     }
     EXCEPTION("Command line option '"+rOption+"' does not exist");
+}
+
+void CommandLineArguments::MarkOptionUsed(const std::string& rOption)
+{
+    mUsedOptions.insert(rOption);
+
+    PetscBool petsc_is_initialised;
+    PetscInitialized(&petsc_is_initialised);
+    if (petsc_is_initialised)
+    {
+        // Looking an option up in PETSc's database is what marks it as used there.
+        PetscBool found;
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7 or later
+        PETSCEXCEPT(PetscOptionsHasName(nullptr, nullptr, rOption.c_str(), &found));
+#else
+        PETSCEXCEPT(PetscOptionsHasName(nullptr, rOption.c_str(), &found));
+#endif
+    }
+}
+
+std::vector<std::string> CommandLineArguments::GetUnusedOptions()
+{
+    PetscBool petsc_is_initialised;
+    PetscInitialized(&petsc_is_initialised);
+
+    std::vector<std::string> unused;
+    for (int i=1; i<*p_argc; i++)
+    {
+        std::string argument = std::string((*p_argv)[i]);
+        bool is_option = (argument.substr(0,1)=="-" && argument.substr(1,1).find_first_of("0123456789")==std::string::npos);
+        if (!is_option
+            || mUsedOptions.count(argument) > 0
+            || std::find(unused.begin(), unused.end(), argument) != unused.end())
+        {
+            continue;
+        }
+
+        PetscBool used_by_petsc = PETSC_FALSE;
+        if (petsc_is_initialised)
+        {
+            // Unlike most PETSc options functions, PetscOptionsUsed expects the name without its first '-'
+            std::string petsc_name = argument.substr(1);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7 or later
+            PETSCEXCEPT(PetscOptionsUsed(nullptr, petsc_name.c_str(), &used_by_petsc));
+#else
+            PETSCEXCEPT(PetscOptionsUsed(petsc_name.c_str(), &used_by_petsc));
+#endif
+        }
+        if (!used_by_petsc)
+        {
+            unused.push_back(argument);
+        }
+    }
+    return unused;
 }
 
 int CommandLineArguments::GetNumberOfArgumentsForOption(const std::string& rOption, bool throwIfNone)
