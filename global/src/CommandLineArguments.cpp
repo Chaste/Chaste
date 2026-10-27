@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <petsc.h>
 
 #include "PetscException.hpp"
+#include "PetscTools.hpp"
 
 CommandLineArguments::CommandLineArguments()
     : p_argc(nullptr),
@@ -133,25 +134,17 @@ void CommandLineArguments::MarkOptionUsed(const std::string& rOption)
 {
     mUsedOptions.insert(rOption);
 
-    PetscBool petsc_is_initialised;
-    PetscInitialized(&petsc_is_initialised);
-    if (petsc_is_initialised)
+    if (PetscTools::IsInitialised())
     {
         // Looking an option up in PETSc's database is what marks it as used there.
         PetscBool found;
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7 or later
         PETSCEXCEPT(PetscOptionsHasName(nullptr, nullptr, rOption.c_str(), &found));
-#else
-        PETSCEXCEPT(PetscOptionsHasName(nullptr, rOption.c_str(), &found));
-#endif
+
     }
 }
 
 std::vector<std::string> CommandLineArguments::GetUnusedOptions()
 {
-    PetscBool petsc_is_initialised;
-    PetscInitialized(&petsc_is_initialised);
-
     std::vector<std::string> unused;
     for (int i=1; i<*p_argc; i++)
     {
@@ -165,7 +158,7 @@ std::vector<std::string> CommandLineArguments::GetUnusedOptions()
         }
 
         PetscBool used_by_petsc = PETSC_FALSE;
-        if (petsc_is_initialised)
+        if (PetscTools::IsInitialised())
         {
             // Unlike most PETSc options functions, PetscOptionsUsed expects the name without its first '-'
             std::string petsc_name = argument.substr(1);
