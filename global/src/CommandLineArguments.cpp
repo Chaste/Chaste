@@ -169,11 +169,7 @@ std::vector<std::string> CommandLineArguments::GetUnusedOptions()
         {
             // Unlike most PETSc options functions, PetscOptionsUsed expects the name without its first '-'
             std::string petsc_name = argument.substr(1);
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7 or later
             PETSCEXCEPT(PetscOptionsUsed(nullptr, petsc_name.c_str(), &used_by_petsc));
-#else
-            PETSCEXCEPT(PetscOptionsUsed(petsc_name.c_str(), &used_by_petsc));
-#endif
         }
         if (!used_by_petsc)
         {
