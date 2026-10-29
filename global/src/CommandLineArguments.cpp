@@ -137,7 +137,7 @@ void CommandLineArguments::MarkOptionUsed(const std::string& rOption)
 
     if (PetscTools::IsInitialised())
     {
-        // Register this option with PETSc, so PETSc doesn't complain about an unused 
+        // Register this option with PETSc, so PETSc doesn't complain about an unused option.
         // Looking an option up in PETSc's database is what marks it as used there.
         PetscBool found;
         PETSCEXCEPT(PetscOptionsHasName(nullptr, nullptr, rOption.c_str(), &found));
