@@ -86,7 +86,7 @@ jobs:
         if ! git diff --quiet --exit-code; then
           echo
           echo "Error: check for tabs and trailing whitespace failed."
-          echo "Run python/infra/RemoveTabsAndTrailingWhitespace.py and commit the results."
+          echo "Run 'python python/utils/RemoveTabsAndTrailingWhitespace.py' and commit the results."
           echo "The following files have problems:"
           echo
           git status
