@@ -38,6 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <cstddef>
 #include <algorithm>
+#include <petsc.h>
+
+#include "PetscException.hpp"
+#include "PetscTools.hpp"
 
 CommandLineArguments::CommandLineArguments()
     : p_argc(nullptr),
@@ -119,10 +123,55 @@ int CommandLineArguments::GetIndexForArgument(std::string rOption)
     {
         if (rOption==std::string((*p_argv)[i]))
         {
+            MarkOptionUsed(rOption);
             return i;
         }
     }
     EXCEPTION("Command line option '"+rOption+"' does not exist");
+}
+
+void CommandLineArguments::MarkOptionUsed(const std::string& rOption)
+{
+    // Register this option
+    mUsedOptions.insert(rOption);
+
+    if (PetscTools::IsInitialised())
+    {
+        // Register this option with PETSc, so PETSc doesn't complain about an unused option.
+        // Looking an option up in PETSc's database is what marks it as used there.
+        PetscBool found;
+        PETSCEXCEPT(PetscOptionsHasName(nullptr, nullptr, rOption.c_str(), &found));
+
+    }
+}
+
+std::vector<std::string> CommandLineArguments::GetUnusedOptions()
+{
+    std::vector<std::string> unused;
+    for (int i=1; i<*p_argc; i++)
+    {
+        std::string argument = std::string((*p_argv)[i]);
+        bool is_option = (argument.substr(0,1)=="-" && argument.substr(1,1).find_first_of("0123456789")==std::string::npos);
+        if (!is_option
+            || mUsedOptions.count(argument) > 0
+            || std::find(unused.begin(), unused.end(), argument) != unused.end())
+        {
+            continue;
+        }
+
+        PetscBool used_by_petsc = PETSC_FALSE;
+        if (PetscTools::IsInitialised())
+        {
+            // Unlike most PETSc options functions, PetscOptionsUsed expects the name without its first '-'
+            std::string petsc_name = argument.substr(1);
+            PETSCEXCEPT(PetscOptionsUsed(nullptr, petsc_name.c_str(), &used_by_petsc));
+        }
+        if (!used_by_petsc)
+        {
+            unused.push_back(argument);
+        }
+    }
+    return unused;
 }
 
 int CommandLineArguments::GetNumberOfArgumentsForOption(const std::string& rOption, bool throwIfNone)

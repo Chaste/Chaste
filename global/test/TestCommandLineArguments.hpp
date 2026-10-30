@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include "CommandLineArguments.hpp"
 #include "CommandLineArgumentsMocker.hpp"
+#include "PetscException.hpp"
+#include "PetscTools.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 /* HOW_TO_TAG General
@@ -57,10 +59,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * For example:
  * `cmake ..` where `..` is the Chaste source directory, followed by
  * `make <target> -D<option=value>` where `target` is the build target you are building (e.g. Chaste, heart, or a user project such as ApPredict), and `option` and `value` pairs set build options.
- * Note: error messages such as
+ * Note: at the end of a run, PETSc may report messages such as
  *   WARNING! There are options you set that were not used!
  *   WARNING! could be spelling mistake, etc!
- * are due to PETSc thinking the parameter must have been for it rather than Chaste, and can be ignored.
+ * Options that are read through CommandLineArguments are marked as used, so any options listed here
+ * were read by neither PETSc nor Chaste - check them for spelling mistakes. The same list is available
+ * from CommandLineArguments::Instance()->GetUnusedOptions().
  *
  */
 class TestCommandLineArguments : public CxxTest::TestSuite
@@ -291,6 +295,74 @@ public:
         size_t pos = arg_as_string.find("TestCommandLineArguments");
         // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
         TS_ASSERT_DIFFERS(pos, std::string::npos);
+    }
+
+    void TestUnusedOptions()
+    {
+        CommandLineArgumentsMocker wrapper("-read_flag -read_value 3 -unread_flag -unread_values 1 -2 --double_dash x -unread_flag");
+        CommandLineArguments* p_args = CommandLineArguments::Instance();
+
+        std::vector<std::string> unused = p_args->GetUnusedOptions();
+        TS_ASSERT_EQUALS(unused.size(), 5u);
+
+        TS_ASSERT(p_args->OptionExists("-read_flag"));
+        TS_ASSERT_EQUALS(p_args->GetUnsignedCorrespondingToOption("-read_value"), 3u);
+        TS_ASSERT(!p_args->OptionExists("-not_given"));
+
+        // Repeated options are listed once, and the negative number is a value rather than an option
+        unused = p_args->GetUnusedOptions();
+        TS_ASSERT_EQUALS(unused.size(), 3u);
+        TS_ASSERT_EQUALS(unused[0], "-unread_flag");
+        TS_ASSERT_EQUALS(unused[1], "-unread_values");
+        TS_ASSERT_EQUALS(unused[2], "--double_dash");
+
+        TS_ASSERT(p_args->OptionExists("--double_dash"));
+        TS_ASSERT_EQUALS(p_args->GetUnusedOptions().size(), 2u);
+
+        TS_ASSERT(p_args->OptionExists("-unread_flag"));
+        TS_ASSERT_EQUALS(p_args->GetUnusedOptions().size(), 1u);
+        TS_ASSERT(p_args->OptionExists("-unread_flag"));
+    }
+
+    void TestUnusedOptionsSharedWithPetsc()
+    {
+        // These options are put in PETSc's database as well, as they would be if given on the real command line
+        PetscTools::SetOption("-chaste_reads_this", nullptr);
+        PetscTools::SetOption("-petsc_reads_this", nullptr);
+        PetscTools::SetOption("--petsc_reads_this_too", nullptr);
+        PetscTools::SetOption("-nobody_reads_this", nullptr);
+
+        // Note PetscOptionsUsed expects the name without its first '-'
+        PetscBool used;
+        PETSCEXCEPT(PetscOptionsUsed(nullptr, "chaste_reads_this", &used));
+        TS_ASSERT(!used);
+
+        {
+            CommandLineArgumentsMocker wrapper("-chaste_reads_this -petsc_reads_this --petsc_reads_this_too -nobody_reads_this");
+            CommandLineArguments* p_args = CommandLineArguments::Instance();
+
+            // Reading an option through Chaste marks it as used in PETSc's database too
+            TS_ASSERT(p_args->OptionExists("-chaste_reads_this"));
+            PETSCEXCEPT(PetscOptionsUsed(nullptr, "chaste_reads_this", &used));
+            TS_ASSERT(used);
+
+            // Options read by PETSc are not reported as unused by Chaste
+            PetscBool found;
+            PETSCEXCEPT(PetscOptionsHasName(nullptr, nullptr, "-petsc_reads_this", &found));
+            TS_ASSERT(found);
+            PETSCEXCEPT(PetscOptionsHasName(nullptr, nullptr, "--petsc_reads_this_too", &found));
+            TS_ASSERT(found);
+
+            std::vector<std::string> unused = p_args->GetUnusedOptions();
+            TS_ASSERT_EQUALS(unused.size(), 1u);
+            TS_ASSERT_EQUALS(unused[0], "-nobody_reads_this");
+        }
+
+        // Tidy up so PETSc does not warn about this at the end of the test
+        PETSCEXCEPT(PetscOptionsClearValue(nullptr, "-chaste_reads_this"));
+        PETSCEXCEPT(PetscOptionsClearValue(nullptr, "-petsc_reads_this"));
+        PETSCEXCEPT(PetscOptionsClearValue(nullptr, "--petsc_reads_this_too"));
+        PETSCEXCEPT(PetscOptionsClearValue(nullptr, "-nobody_reads_this"));
     }
 
     /* A test which a user can run in order to check that they are passing command line arguments correctly*/
