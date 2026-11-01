@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DiscreteSystemForceCalculator.hpp"
 
+#include <algorithm>
+
 DiscreteSystemForceCalculator::DiscreteSystemForceCalculator(MeshBasedCellPopulation<2>& rCellPopulation,
                                                              std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > forceCollection)
     : mrCellPopulation(rCellPopulation),
@@ -56,27 +58,16 @@ std::vector< std::vector<double> > DiscreteSystemForceCalculator::CalculateExtre
         std::vector<double> sampling_angles = GetSamplingAngles(i);
         std::vector<double> extremal_angles = GetExtremalAngles(i, sampling_angles);
 
-        double minimum_normal_force_for_node_i = DBL_MAX;
-        double maximum_normal_force_for_node_i = -DBL_MAX;
+        // Evaluate the normal force at each extremal angle, then take the extremes of those
+        std::vector<double> normal_forces(extremal_angles.size());
+        std::transform(extremal_angles.begin(), extremal_angles.end(), normal_forces.begin(),
+                       [&](double angle) { return CalculateFtAndFn(i, angle)[1]; });
 
-        for (unsigned j=0; j<extremal_angles.size(); j++)
-        {
-            double current_normal_force = CalculateFtAndFn(i, extremal_angles[j])[1];
+        assert(!normal_forces.empty());
+        auto minmax_normal_force = std::minmax_element(normal_forces.begin(), normal_forces.end());
 
-            if (current_normal_force > maximum_normal_force_for_node_i)
-            {
-                maximum_normal_force_for_node_i = current_normal_force;
-            }
-            if (current_normal_force < minimum_normal_force_for_node_i)
-            {
-                minimum_normal_force_for_node_i = current_normal_force;
-            }
-        }
-
-        assert( minimum_normal_force_for_node_i <= maximum_normal_force_for_node_i);
-
-        minimum_normal_forces[i] = minimum_normal_force_for_node_i;
-        maximum_normal_forces[i] = maximum_normal_force_for_node_i;
+        minimum_normal_forces[i] = *minmax_normal_force.first;
+        maximum_normal_forces[i] = *minmax_normal_force.second;
     }
 
     extremal_normal_forces.push_back(minimum_normal_forces);

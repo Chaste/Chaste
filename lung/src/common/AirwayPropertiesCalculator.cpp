@@ -36,6 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AirwayPropertiesCalculator.hpp"
 
+#include <algorithm>
+#include <limits>
+#include <numeric>
+
 AirwayPropertiesCalculator::AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAirwaysMesh,
                                                        unsigned rootIndex,
                                                        bool radiusOnEdge) :
@@ -280,44 +284,28 @@ std::vector<double> AirwayPropertiesCalculator::GetUpstreamPoiseuilleResistances
 
 unsigned AirwayPropertiesCalculator::GetMaximumTerminalGeneration()
 {
-    unsigned max_generation = 0;
-
-    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-         iter != mBranches.end();
-         ++iter)
-    {
-        if ((*iter)->IsTerminal())
-        {
-            unsigned generation = mWalker.GetElementGeneration((*iter)->GetElements().front());
-            if (generation > max_generation)
-            {
-                max_generation = generation;
-            }
-        }
-    }
-
-    return max_generation;
+    return std::accumulate(mBranches.begin(), mBranches.end(), 0u,
+                           [this](unsigned max_so_far, AirwayBranch* pBranch)
+                           {
+                               if (!pBranch->IsTerminal())
+                               {
+                                   return max_so_far;
+                               }
+                               return std::max(max_so_far, mWalker.GetElementGeneration(pBranch->GetElements().front()));
+                           });
 }
 
 unsigned AirwayPropertiesCalculator::GetMinimumTerminalGeneration()
 {
-    unsigned min_generation = std::numeric_limits<unsigned>::max();
-
-    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-         iter != mBranches.end();
-         ++iter)
-    {
-        if ((*iter)->IsTerminal())
-        {
-            unsigned generation = mWalker.GetElementGeneration((*iter)->GetElements().front());
-            if (generation < min_generation)
-            {
-                min_generation = generation;
-            }
-        }
-    }
-
-    return min_generation;
+    return std::accumulate(mBranches.begin(), mBranches.end(), std::numeric_limits<unsigned>::max(),
+                           [this](unsigned min_so_far, AirwayBranch* pBranch)
+                           {
+                               if (!pBranch->IsTerminal())
+                               {
+                                   return min_so_far;
+                               }
+                               return std::min(min_so_far, mWalker.GetElementGeneration(pBranch->GetElements().front()));
+                           });
 }
 
 unsigned AirwayPropertiesCalculator::GetMeanTerminalGeneration()
