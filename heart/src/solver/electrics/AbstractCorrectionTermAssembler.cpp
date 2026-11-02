@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "AbstractCorrectionTermAssembler.hpp"
 #include <typeinfo>
 
@@ -84,10 +86,7 @@ void AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ResetIn
 {
     // reset ionic current, and state variables
     mIionicInterp = 0;
-    for (unsigned i=0; i<mStateVariablesAtQuadPoint.size(); i++)
-    {
-        mStateVariablesAtQuadPoint[i] = 0;
-    }
+    std::fill(mStateVariablesAtQuadPoint.begin(), mStateVariablesAtQuadPoint.end(), 0.0);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

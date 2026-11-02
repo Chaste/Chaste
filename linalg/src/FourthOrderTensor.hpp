@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _FOURTHORDERTENSOR_HPP_
 #define _FOURTHORDERTENSOR_HPP_
 
+#include <algorithm>
 #include <cassert>
 #include <vector>
 
@@ -351,10 +352,7 @@ double& FourthOrderTensor<DIM1,DIM2,DIM3,DIM4>::operator()(unsigned M, unsigned 
 template<unsigned DIM1, unsigned DIM2, unsigned DIM3, unsigned DIM4>
 void FourthOrderTensor<DIM1,DIM2,DIM3,DIM4>::Zero()
 {
-    for (unsigned i=0; i<mData.size(); i++)
-    {
-        mData[i] = 0.0;
-    }
+    std::fill(mData.begin(), mData.end(), 0.0);
 }
 
 #endif //_FOURTHORDERTENSOR_HPP_

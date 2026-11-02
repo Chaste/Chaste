@@ -32,6 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+#include <numeric>
+
 #include <cassert>
 #include <algorithm>
 
@@ -274,10 +276,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
     // Once we know the offsets we can compute the permutation vector
     PetscInt* global_range = new PetscInt[num_nodes];
-    for (unsigned i=0; i<num_nodes; i++)
-    {
-        global_range[i] = i;
-    }
+    std::iota(global_range, global_range + num_nodes, 0);
     AOPetscToApplication(ordering, num_nodes, global_range);
 
     rNodePermutation.resize(num_nodes);
