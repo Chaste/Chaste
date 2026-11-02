@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "VertexMesh.hpp"
 #include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -1045,19 +1047,12 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetMeshF
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::IsNearExistingNodes(c_vector<double,SPACE_DIM> newNodeLocation, std::vector<Node<SPACE_DIM> *> nodesToCheck, double minClearance)
 {
-    bool node_near = false;
-
-    for (unsigned i=0; i<nodesToCheck.size(); i++)
-    {
-        double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodesToCheck[i]->rGetLocation(), newNodeLocation));
-        if (distance < minClearance)
-        {
-            node_near = true;
-            break;
-        }
-    }
-
-    return node_near;
+    return std::any_of(nodesToCheck.begin(), nodesToCheck.end(),
+                       [&](const Node<SPACE_DIM>* pNode)
+                       {
+                           return norm_2(mpDelaunayMesh->GetVectorFromAtoB(pNode->rGetLocation(),
+                                                                          newNodeLocation)) < minClearance;
+                       });
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates

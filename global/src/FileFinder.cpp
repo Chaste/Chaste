@@ -204,15 +204,9 @@ bool FileFinder::IsEmpty() const
     }
     else if (IsDir())
     {
-        fs::directory_iterator end_iter;
-        for (fs::directory_iterator dir_iter(mAbsPath); dir_iter != end_iter; ++dir_iter)
-        {
-            if ((dir_iter->path().filename().string()).substr(0, 1) != ".")
-            {
-                empty = false;
-                break;
-            }
-        }
+        empty = std::none_of(fs::directory_iterator(mAbsPath), fs::directory_iterator(),
+                             [](const fs::directory_entry& rEntry)
+                             { return rEntry.path().filename().string().substr(0, 1) != "."; });
     }
     else
     {
@@ -500,17 +494,10 @@ std::vector<FileFinder> FileFinder::FindMatches(const std::string& rPattern) con
                         // Match against first len chars
                         match = leafname.substr(0, len);
                     }
-                    bool ok = true;
-                    for (std::string::const_iterator it_p = pattern.begin(), it_m = match.begin();
-                         it_p != pattern.end();
-                         ++it_p, ++it_m)
-                    {
-                        if (*it_p != '?' && *it_p != *it_m)
-                        {
-                            ok = false;
-                            break;
-                        }
-                    }
+                    // '?' in the pattern matches any single character
+                    bool ok = std::equal(pattern.begin(), pattern.end(), match.begin(),
+                                         [](char patternChar, char matchChar)
+                                         { return patternChar == '?' || patternChar == matchChar; });
                     if (ok)
                     {
                         results.push_back(FileFinder(our_path / leafname));

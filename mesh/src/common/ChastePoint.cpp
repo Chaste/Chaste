@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "ChastePoint.hpp"
 #include "Exception.hpp"
 
@@ -114,16 +116,7 @@ void ChastePoint<DIM>::SetCoordinate(unsigned i, double value)
 template<unsigned DIM>
 bool ChastePoint<DIM>::IsSamePoint(const ChastePoint<DIM>& rPoint) const
 {
-    bool returned_value = true;
-    for (unsigned dim=0; dim<DIM; dim++)
-    {
-        if (rPoint[dim] != mLocation[dim])
-        {
-            returned_value = false;
-            break;
-        }
-    }
-    return returned_value;
+    return std::equal(std::begin(mLocation), std::end(mLocation), std::begin(rPoint.rGetLocation()));
 }
 
 // Methods of the 0d version

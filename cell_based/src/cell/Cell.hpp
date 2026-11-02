@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CELL_HPP_
 #define CELL_HPP_
 
+#include <algorithm>
+
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -329,22 +331,13 @@ public:
     template<typename CLASS>
     void RemoveCellProperty()
     {
-        bool cell_has_property = false;
+        auto property_iter = std::find_if(mCellPropertyCollection.Begin(), mCellPropertyCollection.End(),
+                                          [](const boost::shared_ptr<AbstractCellProperty>& pProperty)
+                                          { return pProperty->IsType<CLASS>(); });
 
-        for (std::set<boost::shared_ptr<AbstractCellProperty> >::iterator property_iter = mCellPropertyCollection.Begin();
-             property_iter != mCellPropertyCollection.End();
-             ++property_iter)
+        if (property_iter != mCellPropertyCollection.End())
         {
-            if ((*property_iter)->IsType<CLASS>())
-            {
-                cell_has_property = true;
-                (*property_iter)->DecrementCellCount();
-                break;
-            }
-        }
-
-        if (cell_has_property)
-        {
+            (*property_iter)->DecrementCellCount();
             mCellPropertyCollection.RemoveProperty<CLASS>();
         }
     }
