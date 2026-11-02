@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "HeartGeometryInformation.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <sstream>
@@ -423,17 +424,12 @@ ChasteCuboid<SPACE_DIM> HeartGeometryInformation<SPACE_DIM>::CalculateBoundingBo
         {
             const c_vector<double, SPACE_DIM>& r_position = mpMesh->GetNode(global_index)->rGetLocation();
             //Update max/min
-            for (unsigned i=0; i<SPACE_DIM; i++)
-            {
-                if (r_position[i] < my_minimum_point[i])
-                {
-                    my_minimum_point[i] = r_position[i];
-                }
-                if (r_position[i] > my_maximum_point[i])
-                {
-                    my_maximum_point[i] = r_position[i];
-                }
-            }
+            std::transform(std::begin(r_position), std::end(r_position), std::begin(my_minimum_point),
+                           std::begin(my_minimum_point),
+                           [](double a, double b) { return std::min(a, b); });
+            std::transform(std::begin(r_position), std::end(r_position), std::begin(my_maximum_point),
+                           std::begin(my_maximum_point),
+                           [](double a, double b) { return std::max(a, b); });
         }
     }
 

@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "RadialCellDataDistributionWriter.hpp"
+
+#include <algorithm>
 #include "MeshBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -65,10 +67,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulatio
         double distance = norm_2(pCellPopulation->GetLocationOfCellCentre(*cell_iter) - centre);
         radius_cell_map[distance] = *cell_iter;
 
-        if (distance > max_distance_from_centre)
-        {
-            max_distance_from_centre = distance;
-        }
+        max_distance_from_centre = std::max(max_distance_from_centre, distance);
     }
 
     // Create vector of radius intervals
@@ -121,10 +120,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCe
         double distance = norm_2(pCellPopulation->GetLocationOfCellCentre(*cell_iter) - centre);
         radius_cell_map[distance] = *cell_iter;
 
-        if (distance > max_distance_from_centre)
-        {
-            max_distance_from_centre = distance;
-        }
+        max_distance_from_centre = std::max(max_distance_from_centre, distance);
     }
 
     // Create vector of radius intervals
