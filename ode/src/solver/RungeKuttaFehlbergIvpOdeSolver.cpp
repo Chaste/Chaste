@@ -234,10 +234,7 @@ void RungeKuttaFehlbergIvpOdeSolver::AdjustStepSize(double& rCurrentStepSize,
         rCurrentStepSize *= delta;
     }
 
-    if (rCurrentStepSize > rMaxTimeStep)
-    {
-        rCurrentStepSize = rMaxTimeStep;
-    }
+    rCurrentStepSize = std::min(rCurrentStepSize, rMaxTimeStep);
 
     if (rCurrentStepSize < rMinTimeStep)
     {
