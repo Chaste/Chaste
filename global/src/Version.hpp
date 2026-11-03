@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <map>
 #include "FileFinder.hpp"
+#include "SourceRevision.hpp"
 #include <boost/algorithm/string/trim.hpp>
 
 /**
@@ -58,8 +59,9 @@ public:
     static const char* GetRootDir();
 
     /**
-     * @return A string representation of the current Chaste version. This combines the
-     * information from GetMajorReleaseNumber, GetMinorReleaseNumber, and GetRevisionNumber.
+     * @return A string representation of the current Chaste version: the major and minor release
+     * numbers, then the short commit as build metadata, e.g. "2026.1+89a89a5c1a2b". If the commit
+     * is unknown, just the release numbers, e.g. "2026.1".
      */
     static std::string GetVersionString();
 
@@ -80,22 +82,12 @@ public:
     static unsigned GetMinorReleaseNumber();
 
     /**
-     * @return  Get the Git revision number of the Chaste source tree.
-     *
-     * If the file ReleaseVersion.txt exists in the directory given by GetRootDir, then
-     * we assume this is not a working copy, and read the version information from there.
-     *
-     * Otherwise, we assume this is a checked-out tree, and get Git revision info via CMake
-     * during the build.  Whether the working copy is modified is ignored by this method; use
-     * IsWorkingCopyModified to test that.
+     * @return The commit the Chaste source tree was built from, and whether it had uncommitted
+     * changes. This comes from git for a working copy, or from the commit git records in a
+     * release tarball or other archive; otherwise the commit is unknown. Returned by value (it is
+     * small, and read only once per process) so PyChaste can bind it without a lifetime policy.
      */
-    static unsigned long long GetRevisionNumber();
-
-    /**
-     * @return  If this Chaste was built from a subversion working copy, then return whether there
-     * were local modifications.  If it's not a working copy, return false.
-     */
-    static bool IsWorkingCopyModified();
+    static SourceRevision GetChasteRevision();
 
     /**
      * @return The date and time at which Chaste was built.
@@ -141,14 +133,10 @@ public:
     static const char* GetXsdVersion();
 
     /**
-     * @return  The version numbers (i.e. revisions) of any checked-out projects.
+     * @return  The revision of each checked-out project, keyed by project name. Returned by value
+     * for the same reason as GetChasteRevision().
      */
-    static const std::map<std::string, std::string>& rGetProjectVersions();
-
-    /**
-     * @return  Whether any checked-out projects have uncommitted revisions.
-     */
-    static const std::map<std::string, std::string>& rGetIfProjectsModified();
+    static std::map<std::string, SourceRevision> GetProjectRevisions();
 
     /**
      * @return  A single-line string representation of the provenance information to be attached

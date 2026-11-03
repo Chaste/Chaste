@@ -96,9 +96,7 @@ public:
         TS_ASSERT_DELTA(pressure[1], 84.5107, 1e-4);
         TS_ASSERT_DELTA(pressure[2], 0.0, 1e-6); //BC
         TS_ASSERT_DELTA(pressure[3], 0.0, 1e-6); //BC
-#ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "small_conical");
-#endif
     }
     void TestOnBranchCylindrical()
     {
@@ -124,9 +122,7 @@ public:
         TS_ASSERT_DELTA(pressure[2], 0.0, 1e-6); //BC
         TS_ASSERT_DELTA(pressure[3], 0.0, 1e-6); //BC
 
-#ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "small_cylindrical");
-#endif
     }
 
     void TestThreeBifurcationsWithRadiusOnEdgeFile()
@@ -137,9 +133,7 @@ public:
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(0.00148608);
         problem.Solve();
-#ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations");
-#endif
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
@@ -263,9 +257,7 @@ public:
         //This is the extra node at the Trachea
         TS_ASSERT_DELTA(pressure[8], 3.33335 + 1.0, 1e-4); //Between root and first bifurcation
 
-#ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_extra_links");
-#endif
     }
 
     void TestThreeBifurcationsFluxBoundaries()
@@ -320,9 +312,7 @@ public:
         TS_ASSERT_DELTA(pressure[6], 1.5e5, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], 1.5e5, 1e-8); //BC
         TS_ASSERT_DELTA(flux[6], -4.424511e-7, 1e-11);
-#ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
-#endif
     }
     void TestThreeBifurcationsExtraLinksWithDynamicResistance()
     {
@@ -346,9 +336,7 @@ public:
         TS_ASSERT_DELTA(pressure[6], 1.5e5, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], 1.5e5, 1e-8); //BC
         TS_ASSERT_DELTA(flux[6], -4.424511e-7, 1e-11);
-#ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
-#endif
     }
 
     void TestThreeBifurcationsWithPerElementDynamicResistance()
@@ -372,9 +360,7 @@ public:
         TS_ASSERT_DELTA(pressure[6], 1.5e5, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], 1.5e5, 1e-8); //BC
         TS_ASSERT_DELTA(flux[6], -6.2138e-7, 1e-11);  // -4.424511e-7 with Pedley. -7.1017e-7 with static
-#ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
-#endif
     }
 
     void TestTimeVaryingThreeBifurcations()
@@ -496,9 +482,7 @@ public:
             TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -7.975182e-3, 1e-7);
             TS_ASSERT_DELTA(top_reynolds_number, 37768, 1.0);
         }
-#ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "patient_data");
-#endif
     }
     void longTestPatientDataLong()
     {

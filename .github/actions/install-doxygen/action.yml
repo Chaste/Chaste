@@ -1,0 +1,37 @@
+name: "Install doxygen"
+description: >
+  Download a pinned doxygen release, verify its checksum, and extract it.
+  Version and checksum default to the pin below and are not auto-updated, so
+  generated HTML stays byte-stable between runs; bump both together when a
+  version change is actually wanted.
+
+inputs:
+  version:
+    description: 'doxygen release version to install'
+    required: false
+    default: "1.9.8"
+  sha256:
+    description: 'expected sha256 of the release tarball'
+    required: false
+    default: "dda773bdc62384b7d796fe8b6c5029daad72483e4c8ad4abf6ee9fb98b649388"
+
+outputs:
+  bin:
+    description: 'path to the extracted doxygen executable'
+    value: ${{ steps.install.outputs.bin }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: download, verify and extract doxygen
+      id: install
+      shell: bash
+      run: |
+        sudo apt-get install graphviz
+        wget "https://github.com/doxygen/doxygen/releases/download/Release_${VERSION//./_}/doxygen-${VERSION}.linux.bin.tar.gz"
+        echo "${SHA256}  doxygen-${VERSION}.linux.bin.tar.gz" | sha256sum -c -
+        tar -xzvf "doxygen-${VERSION}.linux.bin.tar.gz"
+        echo "bin=doxygen-${VERSION}/bin/doxygen" >> "$GITHUB_OUTPUT"
+      env:
+        VERSION: ${{ inputs.version }}
+        SHA256: ${{ inputs.sha256 }}

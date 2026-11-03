@@ -160,7 +160,7 @@ A series of test suites must all pass before any commit is considered a release-
 Most testing is performed on Long Term Support (LTS) versions of Ubuntu Linux, with unit tests additionally being run on macOS.
 
 Testing includes compilation of all libraries with GCC, Clang and Intel C++ compilers; extensive unit testing; performance profiling to identify any slowdowns over time; memory testing with valgrind; verification of code coverage; and running unit tests with different combinations of dependencies to ensure portability.
-The output of these tests is available at [https://chaste.cs.ox.ac.uk/buildbot/](https://chaste.cs.ox.ac.uk/buildbot/).
+The output of these tests is available at ~~https://chaste.cs.ox.ac.uk/buildbot/~~ [https://github.com/Chaste/Chaste/actions](https://github.com/Chaste/Chaste/actions).
 
 Since 2013, Chaste has substantially changed to modernise its infrastructure and to enable new science.
 In terms of infrastructure, Chaste now uses a modern CMake build system, the C++14 language standard, and makes extensive use of BuildBot for continuous integration.
@@ -211,7 +211,7 @@ In addition to simplifying the set-up and execution of Chaste, importantly this 
 ## Example usage
 
 Chaste has tutorials to walk users through basic functionality for each application area.
-Tutorial examples are bundled for each specific release version, and examples for this release are available at [https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2019.1](https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2019.1).
+Tutorial examples are bundled for each specific release version, and examples for this release are available at [https://chaste.github.io/old_releases/release_2019.1/UserTutorials.html](https://chaste.github.io/old_releases/release_2019.1/UserTutorials.html).
 
 Tutorials take the form of C++ header files that each define 'tests' in the Chaste testing infrastructure.
 These tests must be compiled and run to produce an output, which can be visualised using [ParaView](https://www.paraview.org/).

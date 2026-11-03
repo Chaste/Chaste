@@ -65,11 +65,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "SingleTraceOutputModifier.hpp"
 
-#ifdef CHASTE_VTK
-#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include <vtkVersion.h>
-#endif
-
 /**
  * This stimulus causes an exception to be thrown when normally a simple stimulus would activate.
  *
@@ -864,8 +859,6 @@ public:
         //HeartConfig XML
         TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
 
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "AxisymmetricBidomain/vtk_output/";
 
         VtkMeshReader<3,3> mesh_reader(results_dir + "axi3d.vtu");
@@ -897,10 +890,6 @@ public:
 
         //HeartConfig XML
         TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
-#else
-        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
      }
 
     // Test the functionality for outputting the values of requested cell state variables

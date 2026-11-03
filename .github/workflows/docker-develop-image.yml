@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build:
-    uses: docker/github-builder/.github/workflows/build.yml@v1
+    uses: docker/github-builder/.github/workflows/build.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a # v1.17.0
     permissions:
       contents: read
       id-token: write
@@ -37,7 +37,6 @@ jobs:
           'GIT_TAG=.'
           'CMAKE_BUILD_TYPE="Debug"'
           'Chaste_ERROR_ON_WARNING="ON"'
-          'Chaste_UPDATE_PROVENANCE="OFF"'
       platforms: linux/amd64,linux/arm64
       output: image
       push: true

@@ -657,7 +657,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity_1"), analytic_solution, 1e-2);
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity_2"), analytic_solution, 1e-2);
         }
-#ifdef CHASTE_VTK
         // First file exists
         FileFinder vtk_file("TestPottsBasedCellPopulationWithTwoPdes/results_from_time_0/pde_results_quantity_1_0.vtu", RelativeTo::ChasteTestOutput);
         TS_ASSERT(vtk_file.Exists());
@@ -668,7 +667,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // There is no Oxygen
         TS_ASSERT_THROWS_CONTAINS(vtk_reader.GetPointData("Oxygen", data1), "No point data");
         TS_ASSERT(data1.empty());
-#endif //CHASTE_VTK
     }
 
     // Under construction: Test growth of a population of cells that consumes nutrient

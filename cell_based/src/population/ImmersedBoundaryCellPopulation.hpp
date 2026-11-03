@@ -100,15 +100,6 @@ private:
     /** Call ReMesh every ReMeshFrequency number of time steps. */
     unsigned mReMeshFrequency;
 
-    /** Used to ensure step size exception is only thrown once. */
-    bool mThrowStepSizeException;
-
-    /**
-     * Distance above which a vertex movement will trigger a step size
-     * exception.
-     */
-    double mCellRearrangementThreshold;
-
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
@@ -138,8 +129,6 @@ private:
         archive& mPopulationHasActiveSources;
         archive& mInteractionDistance;
         archive& mReMeshFrequency;
-        archive& mThrowStepSizeException;
-        archive& mCellRearrangementThreshold;
     }
 
     /**
@@ -281,35 +270,9 @@ public:
     unsigned GetReMeshFrequency() const;
 
     /**
-     * Sets whether an exception will be thrown if nodes move too far within
-     * a single timestep.
-     *
-     * @param throws whether an exception should be thrown
-     */
-    void SetThrowsStepSizeException(bool throws);
-
-    /**
-     * @return mThrowsStepSizeException.
-     */
-    bool ThrowsStepSizeException() const;
-
-    /**
      * @return the intrinsic node spacing
      */
     double GetIntrinsicSpacing() const;
-
-    /**
-     * Set the maximum distance two nodes should be allowed to move apart from each other
-     * in a single step.
-     *
-     * @param newThreshold the new cell rearrangement threshold
-     */
-    void SetCellRearrangementThreshold(double newThreshold);
-
-    /**
-     * @return mCellRearrangementThreshold.
-     */
-    double GetCellRearrangementThreshold() const;
 
     /**
      * Overridden GetLocationOfCellCentre() method. Find the centre of mass of a
@@ -588,22 +551,6 @@ public:
     void SetOutputNodeRegionToVtk(bool outputNodeRegionsToVtk);
 
     /**
-     * Checks whether a given node displacement violates the movement threshold
-     * for this population. If so, a stepSizeException is generated that
-     * contains a warning/error message and a suggested smaller dt that should
-     * avoid the problem.
-     *
-     * @param nodeIndex Index of the node in question (allows us to check
-     *     whether this is a ghost or particle)
-     * @param rDisplacement Movement vector of the node at this time step
-     * @param dt Current time step size
-     */
-    virtual void CheckForStepSizeException(
-        unsigned nodeIndex,
-        c_vector<double, DIM>& rDisplacement,
-        double dt);
-
-    /**
      * Overridden GetDefaultTimeStep() method.
      *
      * @return a default value for the time step to use when simulating the cell
@@ -636,8 +583,6 @@ namespace serialization
         ar& t->DoesPopulationHaveActiveSources();
         ar& t->GetInteractionDistance();
         ar& t->GetReMeshFrequency();
-        ar& t->ThrowsStepSizeException();
-        ar& t->GetCellRearrangementThreshold();
     }
 
     /**
@@ -657,18 +602,12 @@ namespace serialization
         ar >> interactionDistance;
         unsigned int reMeshFrequency = 1;
         ar >> reMeshFrequency;
-        bool throwStepSizeException = false;
-        ar >> throwStepSizeException;
-        double cellRearrangementThreshold = 0.5;
-        ar >> cellRearrangementThreshold;
 
         // Invoke inplace constructor to initialise instance
         ::new (t) ImmersedBoundaryCellPopulation<DIM>(*p_mesh);
         t->SetIfPopulationHasActiveSources(hasActiveSources);
         t->SetInteractionDistance(interactionDistance);
         t->SetReMeshFrequency(reMeshFrequency);
-        t->SetThrowsStepSizeException(true);
-        t->SetCellRearrangementThreshold(cellRearrangementThreshold);
     }
 }
 } // namespace ...

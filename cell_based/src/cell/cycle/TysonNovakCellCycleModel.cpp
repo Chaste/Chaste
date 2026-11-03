@@ -42,19 +42,12 @@ TysonNovakCellCycleModel::TysonNovakCellCycleModel(boost::shared_ptr<AbstractCel
 {
     if (!mpOdeSolver)
     {
-#ifdef CHASTE_CVODE
         mpOdeSolver = CellCycleModelOdeSolver<TysonNovakCellCycleModel, CvodeAdaptor>::Instance();
         mpOdeSolver->Initialise();
         // Chaste solvers always check for stopping events, CVODE needs to be instructed to do so
         mpOdeSolver->CheckForStoppingEvents();
         mpOdeSolver->SetMaxSteps(10000);
         mpOdeSolver->SetTolerances(1e-6, 1e-8);
-#else
-        mpOdeSolver = CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver>::Instance();
-        mpOdeSolver->SetSizeOfOdeSystem(6);
-        mpOdeSolver->Initialise();
-        SetDt(0.1/90.0);
-#endif //CHASTE_CVODE
     }
 }
 
@@ -100,18 +93,8 @@ void TysonNovakCellCycleModel::ResetForDivision()
      *
      * In theory, the solution to the Tyson-Novak equations should exhibit stable
      * oscillations, and we only need to halve the mass of the cell each period.
-     *
-     * However, the backward Euler solver used to solve the equations
-     * currently returns a solution that diverges after long times, so
-     * we must reset the initial conditions each period.
-     *
-     * When running with CVODE however we can use the halving the mass of the cell method.
      */
-#ifdef CHASTE_CVODE
     mpOdeSystem->rGetStateVariables()[5] = 0.5*mpOdeSystem->rGetStateVariables()[5];
-#else
-    mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
-#endif //CHASTE_CVODE
 }
 
 void TysonNovakCellCycleModel::InitialiseDaughterCell()

@@ -231,7 +231,6 @@ public:
 
     void TestFibretoVtk()
     {
-#ifdef CHASTE_VTK
         //See TestConductivityTensors
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(1,1,1);
@@ -267,10 +266,6 @@ public:
         vtk_file.open(command.c_str());
         TS_ASSERT(vtk_file.is_open());
         vtk_file.close();
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestFibreReaderExceptions()

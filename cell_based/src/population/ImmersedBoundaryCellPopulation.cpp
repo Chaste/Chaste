@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMeshWriter.hpp"
 #include "ImmersedBoundaryBoundaryCellWriter.hpp"
 #include "ShortAxisImmersedBoundaryDivisionRule.hpp"
-#include "StepSizeException.hpp"
 #include "Warnings.hpp"
 
 template <unsigned DIM>
@@ -57,9 +56,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(
       mIntrinsicSpacing(0.01),
       mPopulationHasActiveSources(false),
       mOutputNodeRegionToVtk(false),
-      mReMeshFrequency(UINT_MAX),
-      mThrowStepSizeException(true),
-      mCellRearrangementThreshold(0.5)
+      mReMeshFrequency(UINT_MAX)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
     mpImmersedBoundaryDivisionRule.reset(new ShortAxisImmersedBoundaryDivisionRule<DIM>());
@@ -97,9 +94,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(
       mIntrinsicSpacing(0.01),
       mPopulationHasActiveSources(false),
       mOutputNodeRegionToVtk(false),
-      mReMeshFrequency(UINT_MAX),
-      mThrowStepSizeException(true),
-      mCellRearrangementThreshold(0.5)
+      mReMeshFrequency(UINT_MAX)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
 }
@@ -199,30 +194,6 @@ template <unsigned DIM>
 unsigned ImmersedBoundaryCellPopulation<DIM>::GetReMeshFrequency() const
 {
     return mReMeshFrequency;
-}
-
-template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::SetCellRearrangementThreshold(double newThreshold)
-{
-    mCellRearrangementThreshold = newThreshold;
-}
-
-template <unsigned DIM>
-double ImmersedBoundaryCellPopulation<DIM>::GetCellRearrangementThreshold() const
-{
-    return mCellRearrangementThreshold;
-}
-
-template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::SetThrowsStepSizeException(bool throws)
-{
-    mThrowStepSizeException = throws;
-}
-
-template <unsigned DIM>
-bool ImmersedBoundaryCellPopulation<DIM>::ThrowsStepSizeException() const
-{
-    return mThrowStepSizeException;
 }
 
 template <unsigned DIM>
@@ -408,8 +379,6 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
                 displacement *= characteristic_spacing / norm_2(displacement);
             }
 
-            CheckForStepSizeException(node_iter->GetIndex(), displacement, dt);
-
             // Get new node location
             node_location += displacement;
 
@@ -575,33 +544,6 @@ void ImmersedBoundaryCellPopulation<DIM>::Validate()
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(
-    unsigned nodeIndex,
-    c_vector<double, DIM>& rDisplacement,
-    double dt)
-{
-    double length = boost::numeric::ublas::norm_2(rDisplacement);
-
-    if (length > 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold())
-    {
-        rDisplacement *= 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold()/length;
-
-        std::ostringstream message;
-        message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
-        message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
-
-        double suggested_step = 0.95*dt*((0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold())/length);
-
-        // The first time we see this behaviour, throw a StepSizeException, but not more than once
-        if(mThrowStepSizeException)
-        {
-            mThrowStepSizeException = false;
-            throw StepSizeException(suggested_step, message.str(), false);
-        }
-    }
-}
-
-template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationWriter(
     boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
@@ -645,7 +587,6 @@ template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(
     const std::string& rDirectory)
 {
-#ifdef CHASTE_VTK
     // Create mesh writer for VTK output
     ImmersedBoundaryMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
@@ -789,7 +730,6 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
-#endif //CHASTE_VTK
 }
 
 template <unsigned DIM>

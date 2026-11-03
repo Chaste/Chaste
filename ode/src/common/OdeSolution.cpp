@@ -175,7 +175,6 @@ std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractPa
     return mDerivedQuantities;
 }
 
-#ifdef CHASTE_CVODE
 std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractParameterisedSystem<N_Vector>* pOdeSystem)
 {
     assert(pOdeSystem != nullptr);
@@ -201,7 +200,6 @@ std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractPa
     assert(mDerivedQuantities.size()==mTimes.size());
     return mDerivedQuantities;
 }
-#endif // CHASTE_CVODE
 
 
 void OdeSolution::WriteToFile(std::string directoryName,
@@ -323,10 +321,8 @@ void OdeSolution::WriteToFile(std::string directoryName,
 template std::vector<double>& OdeSolution::rGetParameters(AbstractParameterisedSystem<std::vector<double> >* pOdeSystem);
 template void OdeSolution::CalculateDerivedQuantitiesAndParameters(AbstractParameterisedSystem<std::vector<double> >* pOdeSystem);
 
-#ifdef CHASTE_CVODE
 template std::vector<double>& OdeSolution::rGetParameters(AbstractParameterisedSystem<N_Vector>* pOdeSystem);
 template void OdeSolution::CalculateDerivedQuantitiesAndParameters(AbstractParameterisedSystem<N_Vector>* pOdeSystem);
-#endif // CHASTE_CVODE
 
 /**
  * \endcond

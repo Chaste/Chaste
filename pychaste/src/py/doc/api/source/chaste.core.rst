@@ -27,6 +27,9 @@ Module contents
 .. autoclass:: chaste.core.ChasteBuildInfo
     :members:
 
+.. autoclass:: chaste.core.SourceRevision
+    :members:
+
 .. autoclass:: chaste.core.PetscTools
     :members:
 

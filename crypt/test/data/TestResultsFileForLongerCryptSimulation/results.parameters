@@ -77,7 +77,7 @@
 	<NumericalMethod>
 		<ForwardEulerNumericalMethod-2-2>
 			<UseAdaptiveTimestep>0</UseAdaptiveTimestep> 
-			<UseUpdateNodeLocation>0</UseUpdateNodeLocation> 
+			<DelegatesToPopulation>0</DelegatesToPopulation> 
 			<GhostNodeForcesEnabled>0</GhostNodeForcesEnabled> 
 		</ForwardEulerNumericalMethod-2-2>
 	</NumericalMethod>

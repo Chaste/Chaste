@@ -70,7 +70,6 @@ private:
     double tol = 0.02; // mV
     void InterpolatorTimesAndGenerateReferenceTrace(std::vector<std::string> args, std::string outputFolder, double tol)
     {
-#ifdef CHASTE_CVODE
         OutputFileHandler handler(outputFolder, true);
 
         FileFinder cellml_file("_deps/cellml_repo-src/cellml/shannon_wang_puglisi_weber_bers_2004.cellml", RelativeTo::ChasteBuildRoot);
@@ -214,14 +213,9 @@ private:
                 data_clamp_voltage_results_file->close();
             }
         }
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif
     }
 
-#ifdef CHASTE_CVODE
     boost::shared_ptr<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp >> mpModel;
-#endif
 
 public:
     void TestInterpolatorTimesAndGenerateReferenceTrace()
@@ -238,7 +232,6 @@ public:
     void TestArchivingCvodeCellsWithDataClamp()
     {
         // We also hijack this test to test the archiving and restoration of modifiers.
-#ifdef CHASTE_CVODE
         //Archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
@@ -329,9 +322,6 @@ public:
 
             delete p_cell;
         }
-#else
-       std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
    }
 };
 

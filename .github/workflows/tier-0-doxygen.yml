@@ -1,0 +1,67 @@
+name: "T0: Doxygen"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    uses: $/.github/workflows/_ci-gate.yml
+
+  coverage:
+    name: "T0 · doxygen coverage"
+    runs-on: ubuntu-latest
+
+    needs: gate
+
+    if: >
+      needs.gate.outputs.run_tier0 == 'true' &&
+      github.repository == 'Chaste/Chaste'
+
+    concurrency:
+      group: tier-0-doxygen-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ needs.gate.outputs.cancel_tier0 == 'true' }}
+
+    # One-value matrix: GitHub names a running job "<name> (ran)" but a
+    # skipped one just "<name>", so a skipped re-run (e.g. from an
+    # unrelated relabel) posts a separate bare row instead of overwriting
+    # the real "(ran)" check. See _ci-gate.yml.
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [ran]
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: install doxygen
+        id: install-doxygen
+        uses: $/.github/actions/install-doxygen
+
+      - name: build doxygen
+        run: |
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=PR_branch::${GITHUB_HEAD_REF}" ) | "${STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN}" - 2>doxygen-error.log 1>doxygen-output.log
+        env:
+          STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN: ${{ steps.install-doxygen.outputs.bin }}
+
+      - name: check doxygen coverage
+        run: |
+          mkdir doxygen/coverage
+          python python/infra/ParseDoxygen.py doxygen-output.log doxygen-error.log doxygen/coverage
+
+      - name: print doxygen coverage errors
+        if: failure()
+        run: |
+          echo "Printing file contents:"
+          for FILE in doxygen/coverage/*; do
+          echo "------------------------"
+          echo "Contents of $FILE:"
+          cat "$FILE"
+          echo "------------------------"
+          done

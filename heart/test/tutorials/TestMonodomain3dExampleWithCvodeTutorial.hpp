@@ -77,16 +77,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /*
- * Since CVODE is an optional extra dependency for Chaste - albeit now
- * one that is highly recommended - see the [wiki:InstallGuides/InstallGuide InstallGuide].
- *
- * We guard any code that relies upon it with the following `#ifdef`.
- * This `CHASTE_CVODE` flag is set automatically by `cmake` during the build process.
- *
- */
-#ifdef CHASTE_CVODE
-
-/*
  * The major changes required to run with CVODE cells are in the cell factory.
  */
 class BenchmarkCellFactory : public AbstractCardiacCellFactory<3> // <3> here
@@ -150,17 +140,11 @@ public:
     }
 };
 
-#endif // CHASTE_CVODE
-
-/*
- * The rest of the test is almost identical to the non-CVODE cell case (just note the `#ifdef` tag).
- */
 class TestMonodomain3dExampleWithCvodeTutorial : public CxxTest::TestSuite
 {
 public:
     void TestMonodomain3d()
     {
-#ifdef CHASTE_CVODE
         DistributedTetrahedralMesh<3,3> mesh;
         double h=0.02;
         mesh.ConstructRegularSlabMesh(h, 0.8 /*length*/, 0.3 /*width*/, 0.3 /*depth*/);
@@ -215,19 +199,6 @@ public:
          * Forward Euler, so this result has been tweaked from previous tutorial (34.9032mV previously).
          */
         TS_ASSERT_DELTA(voltage[0], 34.7740, 1e-1); // Slack tolerance for different CVODE versions.
-
-        /*
-         * Here we add a visual warning in case CVODE is not installed and/or set up.
-         * If you want to make sure CVODE is run in your own tests you could add in
-         * the `TS_ASSERT(false);` line.
-         *
-         * Since CVODE is still optional for Chaste we allow the test to pass without it,
-         * but note that if this is the case, then the test is not doing anything!
-         */
-#else
-        std::cout << "CVODE is not installed, or CHASTE is not configured to use it, check your hostconfig settings." << std::endl;
-        // TS_ASSERT(false); // uncomment if you want to ensure CVODE is set up on your system.
-#endif // CHASTE_CVODE
     }
 };
 #endif /*TESTMONODOMAIN3DEXAMPLEWITHCVODETUTORIAL_HPP_*/

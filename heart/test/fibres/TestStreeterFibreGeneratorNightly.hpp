@@ -187,7 +187,6 @@ public:
         TS_ASSERT_DELTA(fibres[127320][2],  0.0023, tolerance);
 
 
-#ifdef CHASTE_VTK
         //Output to VTK.
         VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "downsampled_fibres", false);
         writer.AddCellData("OrthoFibres", fibres);
@@ -212,10 +211,6 @@ public:
             ifs.close();
         }
         writer.WriteFilesUsingMesh(mesh);
-#else
-        std::cout << "This test ran, but did not test VTK-dependent methods." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on Chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 };
 

@@ -191,7 +191,6 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
             (*mpVizPdeSolutionResultsFile) << "\n";
         }
     }
-#ifdef CHASTE_VTK
     if (DIM > 1)
     {
         std::ostringstream time_string;
@@ -212,7 +211,6 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
         p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
         delete p_vtk_mesh_writer;
     }
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>

@@ -234,10 +234,6 @@ public:
         TS_ASSERT_THROWS_NOTHING(p_solver->CheckForStoppingEvents());
         TS_ASSERT_THROWS_NOTHING(p_solver->SetMaxSteps(1000));
         TS_ASSERT_THROWS_NOTHING(p_solver->SetTolerances(1e-5, 1e-5));
-#else
-        std::cout << "CVODE is not enabled. " << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_CVODE
     }
 
     void TestArchiving()

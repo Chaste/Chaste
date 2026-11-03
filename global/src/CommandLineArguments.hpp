@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define COMMANDLINEARGUMENTS_HPP_
 
 #include "Exception.hpp"
+#include <set>
+#include <string>
 #include <vector>
 #include <boost/utility.hpp>
 
@@ -58,6 +60,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The cxxtest harness will fill in the member variables when a test is
  * started.  They can then be read by PETSc when it is initialised, and
  * by other code as required.
+ *
+ * Every option that is looked up and found is recorded as used. If PETSc is initialised at the
+ * time, the option is also marked as used in PETSc's options database, so that PETSc's report of
+ * unused options at PetscFinalize (on by default in debug builds of PETSc, or with -options_left)
+ * only lists options that neither Chaste nor PETSc has read. GetUnusedOptions() gives the same
+ * information on demand.
  */
 class CommandLineArguments : private boost::noncopyable
 {
@@ -68,6 +76,16 @@ private:
 
     /** The single instance of the class. */
     static CommandLineArguments* mpInstance;
+
+    /** The options that have been looked up and found. */
+    std::set<std::string> mUsedOptions;
+
+    /**
+     * Record that an option has been used, and tell PETSc so it is not reported as unused.
+     *
+     * @param rOption  the option name.
+     */
+    void MarkOptionUsed(const std::string& rOption);
 
     /**
      * @return the index for the given argument. Returns -1 if the argument is not found.
@@ -214,6 +232,13 @@ public:
      * @return Whether the option was set to true or false.
      */
     bool GetBoolCorrespondingToOption(const std::string& rOption);
+
+    /**
+     * @return the options given on the command line that have not been read, either through
+     * this class or (if PETSc is initialised) by PETSc itself, in the order they were given.
+     * Values following an option are not listed separately.
+     */
+    std::vector<std::string> GetUnusedOptions();
 };
 
 #endif // COMMANDLINEARGUMENTS_HPP_

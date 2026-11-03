@@ -33,11 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/*
- * Note: Do not put any VTK-specific functionality in this file, as we
- * don't ever test it with VTK support turned off!
- */
-
 // Most of the work is done by this class.  It must be included first.
 //#include "CardiacSimulation.hpp"
 
@@ -68,11 +63,7 @@ int main(int argc, char *argv[])
         else
         {
             std::string base=basename(argv[1]);
-#ifdef CHASTE_VTK
             ExecutableSupport::Print("Note: for VTK reading, give the full file path (including '.vtu' extension)");
-#else
-            ExecutableSupport::Print("Note: VTK reading is not supported");
-#endif
 
             ExecutableSupport::Print("Opening "+base+" mesh file(s).");
 

@@ -10,6 +10,11 @@ const char* ChasteSourceRootDir()
     return "${Chaste_SOURCE_DIR}/";
 }
 
+const char* ChasteInstallRootDir()
+{
+    return "${CMAKE_INSTALL_PREFIX}/";
+}
+
 std::string ChasteComponentBuildDir(const std::string& rComponent)
 {
     return std::string(ChasteBuildRootDir()) + rComponent + "/${Chaste_BUILD_DIR_NAME}/" ;
@@ -30,4 +35,3 @@ std::string ChasteBuildType()
     return "${Chaste_BUILD_TYPE}";
 }
 
-${additional}

@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FluidSource.hpp"
 #include "SmartPointers.hpp"
 
-#include "ForwardEulerNumericalMethod.hpp"
+#include "NoNumericalMethod.hpp"
 #include <boost/make_shared.hpp>
 
 // Simulation does not run in parallel
@@ -99,8 +99,7 @@ public:
         cell_population.SetIfPopulationHasActiveSources(false);
 
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
+        simulator.SetNumericalMethod(boost::make_shared<NoNumericalMethod<2,2> >());
 
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
@@ -145,8 +144,7 @@ public:
         cell_population.SetIfPopulationHasActiveSources(true);
 
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
+        simulator.SetNumericalMethod(boost::make_shared<NoNumericalMethod<2,2> >());
 
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
@@ -197,8 +195,7 @@ public:
         cell_population.SetIfPopulationHasActiveSources(false);
 
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
+        simulator.SetNumericalMethod(boost::make_shared<NoNumericalMethod<2,2> >());
 
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);

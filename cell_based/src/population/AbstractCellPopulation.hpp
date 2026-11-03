@@ -620,7 +620,7 @@ public:
      * Open output files (and, if required, write headers) for any writers in the members
      * mCellPopulationCountWriters, mCellPopulationWriters and mCellWriters.
      *
-     * The method also writes the header for the .pvd output file if VTK is available.
+     * The method also writes the header for the .pvd output file.
      *
      * Before doing this, the method also creates appropriate writer objects if
      * mOutputResultsForChasteVisualizer is set to true.
@@ -635,7 +635,7 @@ public:
      * Close output files associated with any writers in the members
      * mCellPopulationCountWriters, mCellPopulationWriters and mCellWriters.
      *
-     * The method also closes the .pvd output file if VTK is available.
+     * The method also closes the .pvd output file.
      */
     virtual void CloseWritersFiles();
 

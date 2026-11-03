@@ -442,8 +442,6 @@ public:
             soln_repl.ReplicatePetscVector(purkinje_problem.GetSolution());
         }
 
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         //Check for VTK file
         std::string filepath = OutputFileHandler::GetChasteTestOutputDirectory() + "TestMonodomainPurkinjeProblem_purkinje_branched/vtk_output/";
 
@@ -458,10 +456,6 @@ public:
             FileFinder pvtk_file(filepath2 + "SimulationResults.pvtu", RelativeTo::Absolute);
             TS_ASSERT(pvtk_file.Exists());
         }
-#else
-        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
 
         for(unsigned i=0; i<mesh.GetNumNodes(); i++)
         {

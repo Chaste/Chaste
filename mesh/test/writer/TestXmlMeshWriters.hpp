@@ -53,18 +53,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include <iostream>
 
-#ifdef CHASTE_VTK
-#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include <vtkVersion.h>
-#endif
-
 class TestXmlMeshWriters : public CxxTest::TestSuite
 {
 public:
     void TestBasicVtkMeshWriter()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(reader);
@@ -90,16 +83,10 @@ public:
             TS_ASSERT_EQUALS(mesh.GetNumElements(), vtk_mesh.GetNumElements());
             TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), vtk_mesh.GetNumBoundaryElements());
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestSequentialMeshCannotWriteParallelFiles()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(reader);
@@ -108,16 +95,10 @@ public:
 
         TS_ASSERT_THROWS_THIS( writer.SetParallelFiles(mesh),
                                "Cannot write parallel files using a sequential mesh");
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestParallelVtkMeshWriter()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
         DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
@@ -238,16 +219,10 @@ public:
                 }
             }
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestParallelVtkMeshWriter2d()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
         DistributedTetrahedralMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(reader);
@@ -303,16 +278,10 @@ public:
                 TS_ASSERT_EQUALS(rank_read[i], PetscTools::GetMyRank());
             }
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestVtkMeshWriter2D()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(reader);
@@ -428,16 +397,10 @@ public:
 
             ///\todo #2254  Implement reading of tensor data & test.
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestDeformedVtkMeshWriter2D()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(reader);
@@ -561,16 +524,10 @@ public:
         std::vector<c_vector<double,2> > empty = {};
         TS_ASSERT_THROWS_THIS(writer.ApplyDeformation(empty),
         "Deformed positions vector has 0 elements. The mesh has 121 nodes. The two must be the same.");
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestParallelVtkMeshWriter1d()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_10_elements");
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(reader);
@@ -625,16 +582,10 @@ public:
                 TS_ASSERT_EQUALS(rank_read[i], PetscTools::GetMyRank());
             }
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestVtkMeshWriter1D()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_10_elements");
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(reader);
@@ -655,17 +606,11 @@ public:
             read_mesh.ConstructFromMeshReader(vtk_reader);
             TS_ASSERT_DELTA(read_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-8);
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
 
     void TestVtkMeshWriterWithData()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<3,3> reader("heart/test/data/UCSD_heart_decimated_173nodes");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(reader);
@@ -768,16 +713,10 @@ public:
             TS_ASSERT_EQUALS(centroid_read.size(),centroid.size());
             ///\todo #1731 - need to read the tensors too.
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestVtkMeshWriterForCables()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/cylinder");
         TrianglesMeshReader<3,3> reader(mesh_base);
         MixedDimensionMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
@@ -809,16 +748,10 @@ public:
         writer.WriteFilesUsingMesh(mesh);
 
         ///\todo #2052 We can't yet test if the cables are written correctly, because we don't have the reader part.
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestVtkMeshWriterForQuadraticMesh2D()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
         QuadraticMesh<2> mesh;
         mesh.ConstructFromLinearMeshReader(reader);
@@ -898,16 +831,10 @@ public:
                 }
             }
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestBasicQuadraticVtkMeshWriter()
     {
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
         QuadraticMesh<3> mesh;
         mesh.ConstructFromLinearMeshReader(reader);
@@ -928,16 +855,11 @@ public:
             ///\todo: The reader can open a quadratic vtu file, but not construct a QuadraticMesh
             //further tests of the written output should be made once this is supported.
         }
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     //Test that the vtk mesh writer can output a 1D mesh embedded in 3D space
     void TestVtkMeshWriter1Din3D()
     {
-#ifdef CHASTE_VTK
         TrianglesMeshReader<1,3> reader("mesh/test/data/branched_1d_in_3d_mesh");
         TetrahedralMesh<1,3> mesh;
         mesh.ConstructFromMeshReader(reader);
@@ -956,17 +878,11 @@ public:
             TS_ASSERT_EQUALS(vtk_reader.GetNumEdges(), reader.GetNumEdges());
             TS_ASSERT_EQUALS(vtk_reader.GetNumEdges(), mesh.GetNumBoundaryElements());
         }
-
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     //Test that the vtk mesh writer can output a 2D mesh embedded in 3D space
     void TestVtkMeshWriterWithSurfaceMesh()
     {
-#ifdef CHASTE_VTK
         VtkMeshReader<2,3> mesh_reader("mesh/test/data/cylinder.vtu");
         TetrahedralMesh<2,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -984,11 +900,6 @@ public:
             TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 1632u);
             TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 32u);
         }
-
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     void TestXdmfWriter()

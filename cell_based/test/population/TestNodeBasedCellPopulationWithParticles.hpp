@@ -446,7 +446,7 @@ public:
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the Maximum cell Id to zero (to account for previous tests)

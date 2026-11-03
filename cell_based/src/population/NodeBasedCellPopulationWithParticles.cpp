@@ -208,7 +208,6 @@ void NodeBasedCellPopulationWithParticles<DIM>::AcceptCellWritersAcrossPopulatio
 template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-#ifdef CHASTE_VTK
     // Store the present time as a string
     std::stringstream time;
     time << SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -326,7 +325,6 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
         // Parallel vtu files  .vtu -> .pvtu
         *(this->mpVtkMetaFile) << ".pvtu\"/>\n";
     }*/
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>
