@@ -103,7 +103,7 @@ public:
      */
     virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX,
                                                                         unsigned pdeIndex,
-                                                                        Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
+                                                                        Element<ELEMENT_DIM,SPACE_DIM>* pElement=nullptr)=0;
 
     /**
      * Destructor.

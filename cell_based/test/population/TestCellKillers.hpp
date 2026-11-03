@@ -571,7 +571,7 @@ public:
 
         {
             // Create an output archive
-             TargetedCellKiller<2> cell_killer(NULL, 1u);
+             TargetedCellKiller<2> cell_killer(nullptr, 1u);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -608,7 +608,7 @@ public:
 
         {
             // Create an output archive
-            RandomCellKiller<2> cell_killer(NULL, 0.134);
+            RandomCellKiller<2> cell_killer(nullptr, 0.134);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -644,7 +644,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "oxygen_based_killer.arch";
         {
             // Create an output archive
-            ApoptoticCellKiller<2> cell_killer(NULL);
+            ApoptoticCellKiller<2> cell_killer(nullptr);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -665,7 +665,7 @@ public:
             // Restore from the archive
             input_arch >> p_cell_killer;
 
-            TS_ASSERT(p_cell_killer != NULL);
+            TS_ASSERT(p_cell_killer != nullptr);
 
             // Tidy up
             delete p_cell_killer;
@@ -681,7 +681,7 @@ public:
         {
             // Create an output archive
 
-            PlaneBasedCellKiller<2> cell_killer(NULL, zero_vector<double>(2), unit_vector<double>(2,1));
+            PlaneBasedCellKiller<2> cell_killer(nullptr, zero_vector<double>(2), unit_vector<double>(2,1));
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -755,8 +755,8 @@ public:
             // Restore from the archive
             (*p_arch) >> p_cell_killer;
 
-            TS_ASSERT(p_cell_killer != NULL);
-            TS_ASSERT(p_cell_killer->GetCellPopulation() != NULL);
+            TS_ASSERT(p_cell_killer != nullptr);
+            TS_ASSERT(p_cell_killer->GetCellPopulation() != nullptr);
 
             // Tidy up
             delete p_cell_killer->mpCellPopulation;
@@ -770,7 +770,7 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
 
         // Test with TargetedCellKiller
-        TargetedCellKiller<2> targeted_cell_killer(NULL, 1u);
+        TargetedCellKiller<2> targeted_cell_killer(nullptr, 1u);
         TS_ASSERT_EQUALS(targeted_cell_killer.GetIdentifier(), "TargetedCellKiller-2");
 
         out_stream targeted_cell_killer_parameter_file = output_file_handler.OpenOutputFile("targeted_results.parameters");
@@ -787,7 +787,7 @@ public:
         }
 
         // Test with RandomCellKiller
-        RandomCellKiller<2> random_cell_killer(NULL, 0.01);
+        RandomCellKiller<2> random_cell_killer(nullptr, 0.01);
         TS_ASSERT_EQUALS(random_cell_killer.GetIdentifier(), "RandomCellKiller-2");
 
         out_stream random_cell_killer_parameter_file = output_file_handler.OpenOutputFile("random_results.parameters");
@@ -804,7 +804,7 @@ public:
         }
 
         // Test with ApoptoticCellKiller
-        ApoptoticCellKiller<2> apop_cell_killer(NULL);
+        ApoptoticCellKiller<2> apop_cell_killer(nullptr);
         TS_ASSERT_EQUALS(apop_cell_killer.GetIdentifier(), "ApoptoticCellKiller-2");
 
         out_stream apop_cell_killer_parameter_file = output_file_handler.OpenOutputFile("apop_results.parameters");
@@ -820,7 +820,7 @@ public:
         }
 
         // Test with PlaneBasedCellKiller
-        PlaneBasedCellKiller<2> region_cell_killer(NULL, zero_vector<double>(2), unit_vector<double>(2,1)); // y<0;
+        PlaneBasedCellKiller<2> region_cell_killer(nullptr, zero_vector<double>(2), unit_vector<double>(2,1)); // y<0;
         TS_ASSERT_EQUALS(region_cell_killer.GetIdentifier(), "PlaneBasedCellKiller-2");
 
         out_stream region_cell_killer_parameter_file = output_file_handler.OpenOutputFile("region_results.parameters");

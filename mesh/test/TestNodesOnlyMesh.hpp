@@ -290,7 +290,7 @@ public:
 
         DistributedBoxCollection<3>* p_box_collection = mesh.mpBoxCollection;
 
-        TS_ASSERT(p_box_collection != NULL);
+        TS_ASSERT(p_box_collection != nullptr);
 
         // 5x5xnum_procs box collection
         unsigned num_boxes = 5*5*PetscTools::GetNumProcs();

@@ -567,7 +567,7 @@ public:
         {
             double x = (*node_iter)->GetPoint()[0];
             double y = (*node_iter)->GetPoint()[1];
-            p_boundary_condition = NULL;
+            p_boundary_condition = nullptr;
             if (fabs(x) < 1e-12)
             {
                 // On x=0, u=1+y^2
@@ -591,7 +591,7 @@ public:
         {
             double x = (*elt_iter)->GetNodeLocation(0,0);
             double y = (*elt_iter)->GetNodeLocation(0,1);
-            p_functional_bc = NULL;
+            p_functional_bc = nullptr;
             if (fabs(y-1.0) < 1e-12)
             {
                 // On y=1, Dgradu_dot_n = 2(2+x^2)
@@ -665,7 +665,7 @@ public:
         {
             double x = (*node_iter)->GetPoint()[0];
             double y = (*node_iter)->GetPoint()[1];
-            p_boundary_condition = NULL;
+            p_boundary_condition = nullptr;
             if (fabs(x) < 1e-12)
             {
                 // On x=0, u=1+y^2
@@ -689,7 +689,7 @@ public:
         {
             double x = (*elt_iter)->GetNodeLocation(0,0);
             double y = (*elt_iter)->GetNodeLocation(0,1);
-            p_functional_bc = NULL;
+            p_functional_bc = nullptr;
             if (fabs(y-1.0) < 1e-12)
             {
                 // On y=1, Dgradu_dot_n = 2(2+sin^2(x))

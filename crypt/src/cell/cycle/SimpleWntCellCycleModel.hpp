@@ -153,7 +153,7 @@ public:
      *
      * @return the new cell-cycle model
      */
-    virtual AbstractCellCycleModel* CreateCellCycleModel();
+    [[nodiscard]] virtual AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
      * @return mUseCellProliferativeTypeDependentG1Duration

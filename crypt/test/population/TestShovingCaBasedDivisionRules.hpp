@@ -222,7 +222,7 @@ public:
             input_arch >> p_division_rule;
             ifs.close();
 
-            TS_ASSERT(p_division_rule != NULL);
+            TS_ASSERT(p_division_rule != nullptr);
 
             // Tidy up
             delete p_division_rule;
@@ -414,7 +414,7 @@ public:
             input_arch >> p_division_rule;
             ifs.close();
 
-            TS_ASSERT(p_division_rule != NULL);
+            TS_ASSERT(p_division_rule != nullptr);
 
             // Tidy up
             delete p_division_rule;

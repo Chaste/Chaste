@@ -224,7 +224,7 @@ private:
         FourthOrderTensor<2,2,2,2> dTdE_Yfibres;
 
         double p = 1.0;
-        if (dynamic_cast<AbstractCompressibleMaterialLaw<2>*>(pLaw) != NULL)
+        if (dynamic_cast<AbstractCompressibleMaterialLaw<2>*>(pLaw) != nullptr)
         {
             p = 0.0; // ie if compressible, then should give p=0
         }

@@ -125,7 +125,7 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCe
         }
     }
 
-    AbstractCardiacCellInterface* p_cell = NULL;
+    AbstractCardiacCellInterface* p_cell = nullptr;
 
     if (ionic_model.Dynamic().present())
     {

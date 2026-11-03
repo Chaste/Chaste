@@ -267,13 +267,13 @@ namespace random
     class exponential_distribution_v165
     {
     public:
-        typedef RealType input_type;
-        typedef RealType result_type;
+        using input_type = RealType;
+        using result_type = RealType;
 
         class param_type
         {
         public:
-            typedef exponential_distribution_v165 distribution_type;
+            using distribution_type = exponential_distribution_v165;
 
             /**
          * Constructs parameters with a given lambda.

@@ -123,7 +123,7 @@ public:
      *
      * @return new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    [[nodiscard]] AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
      * Return the rate parameter (lambda) of the exponential distribution.

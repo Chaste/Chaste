@@ -46,7 +46,7 @@ CvodeContextManager::CvodeContextManager()
 #if CHASTE_SUNDIALS_VERSION >= 70000
     SUNContext_Create(SUN_COMM_NULL, &mSundialsContext);
 #else
-    SUNContext_Create(NULL, &mSundialsContext);  //"a pointer to the MPI communicator or NULL if not using MPI"
+    SUNContext_Create(nullptr, &mSundialsContext);  //"a pointer to the MPI communicator or NULL if not using MPI"
 #endif
 }
 

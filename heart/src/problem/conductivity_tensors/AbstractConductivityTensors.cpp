@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractConductivityTensors<ELEMENT_DIM,SPACE_DIM>::AbstractConductivityTensors()
-    : mpMesh(NULL),
+    : mpMesh(nullptr),
       mUseNonConstantConductivities(false),
       mUseFibreOrientation(false),
       mInitialised(false)

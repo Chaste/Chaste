@@ -134,7 +134,7 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<UniformSourceParabolicPde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<UniformSourceParabolicPde<2>*>(p_pde) != nullptr);
 
             UniformSourceParabolicPde<2>* p_static_cast_pde = static_cast<UniformSourceParabolicPde<2>*>(p_pde);
             TS_ASSERT_DELTA(p_static_cast_pde->GetConstantCoefficient(), 0.01, 1e-6);
@@ -262,7 +262,7 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<CellwiseSourceParabolicPde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<CellwiseSourceParabolicPde<2>*>(p_pde) != nullptr);
 
             CellwiseSourceParabolicPde<2>* p_static_cast_pde = static_cast<CellwiseSourceParabolicPde<2>*>(p_pde);
             TS_ASSERT_EQUALS(p_static_cast_pde->mrCellPopulation.GetNumRealCells(), 25u);
@@ -484,7 +484,7 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<AveragedSourceParabolicPde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<AveragedSourceParabolicPde<2>*>(p_pde) != nullptr);
 
             AveragedSourceParabolicPde<2>* p_static_cast_pde = static_cast<AveragedSourceParabolicPde<2>*>(p_pde);
             TS_ASSERT_EQUALS(p_static_cast_pde->mrCellPopulation.GetNumRealCells(), 25u);

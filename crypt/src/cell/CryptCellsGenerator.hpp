@@ -70,7 +70,7 @@ bool ClassesAreSame()
 {
     using namespace boost::mpl;
     using namespace boost;
-    typedef typename if_< is_same<T1, T2>, integral_c<unsigned, 1>, integral_c<unsigned, 0> >::type selector_t;
+    using selector_t = typename if_< is_same<T1, T2>, integral_c<unsigned, 1>, integral_c<unsigned, 0> >::type;
     return  (selector_t()==1);
 }
 

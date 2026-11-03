@@ -85,7 +85,7 @@ public:
          * * .../TestCommandLineArgumentsRunner.exe
          */
         char** argv = *(CommandLineArguments::Instance()->p_argv);
-        assert(argv != NULL);
+        assert(argv != nullptr);
         std::string arg_as_string(argv[0]);
         size_t pos = arg_as_string.find("TestCommandLineArguments");
         // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
@@ -290,7 +290,7 @@ public:
 
         // Check the original arguments are still working...
         char** argv = *(CommandLineArguments::Instance()->p_argv);
-        assert(argv != NULL);
+        assert(argv != nullptr);
         std::string arg_as_string(argv[0]);
         size_t pos = arg_as_string.find("TestCommandLineArguments");
         // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos

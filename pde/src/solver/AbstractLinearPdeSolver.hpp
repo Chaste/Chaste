@@ -87,7 +87,7 @@ public:
      * is not already set up. Can use an initial solution as PETSc template,
      * or base it on the mesh size.
      *
-     * @param initialSolution Initial solution (defaults to NULL) for PETSc
+     * @param initialSolution Initial solution (defaults to nullptr) for PETSc
      *  to use as a template.
      */
     virtual void InitialiseForSolve(Vec initialSolution = nullptr);
@@ -133,7 +133,7 @@ public:
      * be solved (that timestep, if dynamic PDEs).
      *
      * @param currentSolution The current solution which can be used in setting up
-     *  the linear system if needed (NULL if there isn't a current solution)
+     *  the linear system if needed (nullptr if there isn't a current solution)
      * @param computeMatrix Whether to compute the LHS matrix of the linear system
      *  (mainly for dynamic solves).
      */

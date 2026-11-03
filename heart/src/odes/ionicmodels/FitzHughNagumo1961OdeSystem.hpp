@@ -81,7 +81,7 @@ public:
      *
      * @return the total ionic current
      */
-    double GetIIonic(const std::vector<double>* pStateVariables=NULL);
+    double GetIIonic(const std::vector<double>* pStateVariables=nullptr);
 };
 
 #endif //_FITZHUGHNAGUMO1961ODESYSTEM_HPP_

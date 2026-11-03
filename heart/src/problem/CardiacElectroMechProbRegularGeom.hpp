@@ -78,9 +78,9 @@ public:
                                       std::string outputDirectory = "")
         : CardiacElectroMechanicsProblem<DIM,1>(compressibilityType,
                                               MONODOMAIN,
-                                              NULL, NULL,
+                                              nullptr, nullptr,
                                               pCellFactory,
-                                              NULL,
+                                              nullptr,
                                               outputDirectory)
     {
         assert(DIM==2); // the below assumes DIM==2

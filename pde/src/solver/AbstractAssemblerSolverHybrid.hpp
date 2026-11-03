@@ -99,7 +99,7 @@ public:
      * AbstractLinearPdeSolver::SetupLinearSystem which calls this method.
      *
      * @param currentSolution The current solution which can be used in setting up
-     *  the linear system if needed (NULL if there isn't a current solution)
+     *  the linear system if needed (nullptr if there isn't a current solution)
      * @param computeMatrix Whether to compute the LHS matrix of the linear system
      *  (mainly for dynamic solves)
      * @param pLinearSystem  The linear system to set up.

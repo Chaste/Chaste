@@ -249,7 +249,7 @@ public:
     {
         VaryingDiffusionAndSourceTermPde<1> pde;
         ChastePoint<1> evaluation_point(2);
-        TS_ASSERT_EQUALS(pde.ComputeConstantInUSourceTerm(evaluation_point, NULL),8.0);
+        TS_ASSERT_EQUALS(pde.ComputeConstantInUSourceTerm(evaluation_point, nullptr),8.0);
         c_matrix<double, 1, 1> diffusion_term = pde.ComputeDiffusionTerm(evaluation_point);
         TS_ASSERT_EQUALS(diffusion_term(0,0), 4);
     }
@@ -258,7 +258,7 @@ public:
     {
         VaryingDiffusionAndSourceTermPde<2> pde;
         ChastePoint<2> evaluation_point(3,4);
-        TS_ASSERT_EQUALS(pde.ComputeConstantInUSourceTerm(evaluation_point, NULL),125.0);
+        TS_ASSERT_EQUALS(pde.ComputeConstantInUSourceTerm(evaluation_point, nullptr),125.0);
         c_matrix<double, 2, 2> diffusion_term = pde.ComputeDiffusionTerm(evaluation_point);
         TS_ASSERT_EQUALS(diffusion_term(0,0), 25.0);
         TS_ASSERT_EQUALS(diffusion_term(0,1), 0.0);
@@ -321,7 +321,7 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<SimpleUniformSourceParabolicPde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<SimpleUniformSourceParabolicPde<2>*>(p_pde) != nullptr);
 
             SimpleUniformSourceParabolicPde<2>* p_static_cast_pde = static_cast<SimpleUniformSourceParabolicPde<2>*>(p_pde);
             TS_ASSERT_EQUALS(p_static_cast_pde->GetCoefficient(),0.1);

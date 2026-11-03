@@ -56,13 +56,13 @@ class CellPropertyCollection
 {
 private:
     /** The type of container used to store properties */
-    typedef std::set<boost::shared_ptr<AbstractCellProperty> > CollectionType;
+    using CollectionType = std::set<boost::shared_ptr<AbstractCellProperty> >;
 
     /** Type of a const iterator over the container */
-    typedef CollectionType::const_iterator ConstIteratorType;
+    using ConstIteratorType = CollectionType::const_iterator;
 
     /** Type of an iterator over the container */
-    typedef CollectionType::iterator IteratorType;
+    using IteratorType = CollectionType::iterator;
 
     /** The properties stored in this collection. */
     CollectionType mProperties;
@@ -188,7 +188,7 @@ public:
      * An iterator type over this collection.
      * Don't rely on the particular implementation of the iterator.
      */
-    typedef CollectionType::iterator Iterator;
+    using Iterator = CollectionType::iterator;
 
     /**
      * @return an Iterator to the start of this collection.

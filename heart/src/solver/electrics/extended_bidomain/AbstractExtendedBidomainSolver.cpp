@@ -39,7 +39,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
     // The base class method that calls this function will only call it with a null linear system
-    assert(this->mpLinearSystem == NULL);
+    assert(this->mpLinearSystem == nullptr);
 
     // linear system created here
     AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 3>::InitialiseForSolve(initialSolution);
@@ -209,8 +209,8 @@ AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractExtendedBidomainS
               mpExtendedBidomainTissue(pTissue),
               mpBoundaryConditions(pBcc)
 {
-    assert(pTissue != NULL);
-    assert(pBcc != NULL);
+    assert(pTissue != nullptr);
+    assert(pBcc != nullptr);
 
     mNullSpaceCreated = false;
 
@@ -220,7 +220,7 @@ AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractExtendedBidomainS
     mRowForAverageOfPhiZeroed = INT_MAX; //this->mpLinearSystem->GetSize() - 1;
     mpConfig = HeartConfig::Instance();
 
-    mpExtendedBidomainAssembler = NULL; // can't initialise until know what dt is
+    mpExtendedBidomainAssembler = nullptr; // can't initialise until know what dt is
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

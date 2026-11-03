@@ -48,9 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-typedef GmshMeshReader<2,2> READER_2D;
-typedef GmshMeshReader<3,3> READER_3D;
-typedef GmshMeshReader<2,3> READER_2D_3D;
+using READER_2D = GmshMeshReader<2,2>;
+using READER_3D = GmshMeshReader<3,3>;
+using READER_2D_3D = GmshMeshReader<2,3>;
 
 class TestGmshMeshReader : public CxxTest::TestSuite
 {

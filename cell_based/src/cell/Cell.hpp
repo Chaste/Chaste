@@ -59,7 +59,7 @@ class AbstractSrnModel; // Circular definition (cells need to know about subcell
 class Cell;
 
 /** Cells shouldn't be copied - it doesn't make sense.  So all access is via this pointer type. */
-typedef boost::shared_ptr<Cell> CellPtr;
+using CellPtr = boost::shared_ptr<Cell>;
 
 /**
  * null_deleter means "doesn't delete" rather than "deletes nulls".
@@ -166,7 +166,7 @@ public:
      *      This MUST be allocated using new, and will be deleted when the cell is destroyed.
      *      (Defaults to NULL and is replcaed by a new NullSrnModel in the constructr)
      * @param archiving  whether this constructor is being called by the archiver - do things slightly differently! (defaults to false)
-     * @param cellPropertyCollection the cell property collection (defaults to NULL)
+     * @param cellPropertyCollection the cell property collection (defaults to nullptr)
      */
     Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
          AbstractCellCycleModel* pCellCycleModel,

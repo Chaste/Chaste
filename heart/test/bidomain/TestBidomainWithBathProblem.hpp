@@ -758,11 +758,11 @@ public:
                 FakeBathCell* p_fake = dynamic_cast<FakeBathCell*>(p_abstract_problem->GetTissue()->GetCardiacCell(i));
                 if (HeartRegionCode::IsRegionBath(r_mesh.GetNode(i)->GetRegion()))
                 {
-                    TS_ASSERT(p_fake != NULL);
+                    TS_ASSERT(p_fake != nullptr);
                 }
                 else
                 {
-                    TS_ASSERT(p_fake == NULL);
+                    TS_ASSERT(p_fake == nullptr);
                 }
             }
 

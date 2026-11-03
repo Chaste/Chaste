@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cell.hpp"
 
 class Cell; // Circular definition (cells need to know about cycle models and vice-versa)
-typedef boost::shared_ptr<Cell> CellPtr;
+using CellPtr = boost::shared_ptr<Cell>;
 
 /**
  * The AbstractCellCycleModel contains basic information to all cell-cycle models.
@@ -261,7 +261,7 @@ public:
      *
      * @return new cell-cycle model
      */
-    virtual AbstractCellCycleModel* CreateCellCycleModel()=0;
+    [[nodiscard]] virtual AbstractCellCycleModel* CreateCellCycleModel()=0;
 
     /**
      *  @return whether a cell with this cell-cycle model is able to fully (terminally) differentiate.

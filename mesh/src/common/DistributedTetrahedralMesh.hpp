@@ -462,7 +462,7 @@ public:
     // The other iterators aren't (so only need to be dereferenced once). Consistency would be good...
 
     /** Definition of halo node Iterator type. */
-    typedef typename std::vector<Node<SPACE_DIM> *>::const_iterator HaloNodeIterator;
+    using HaloNodeIterator = typename std::vector<Node<SPACE_DIM> *>::const_iterator;
 
     /**
      * @return an iterator to the first halo node in the mesh.

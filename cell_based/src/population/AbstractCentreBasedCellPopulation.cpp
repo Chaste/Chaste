@@ -97,10 +97,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     // Calculate the locations of the two daughter cells
-    std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
-
-    c_vector<double, SPACE_DIM> parent_position = positions.first;
-    c_vector<double, SPACE_DIM> daughter_position = positions.second;
+    auto [parent_position, daughter_position] = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
 
     // Set the parent cell to use this location
     ChastePoint<SPACE_DIM> parent_point(parent_position);

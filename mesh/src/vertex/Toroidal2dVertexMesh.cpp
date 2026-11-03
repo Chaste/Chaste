@@ -284,7 +284,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh()
 
 Toroidal2dVertexMesh::~Toroidal2dVertexMesh()
 {
-    if (mpMeshForVtk != NULL)
+    if (mpMeshForVtk != nullptr)
     {
          delete mpMeshForVtk;
     }

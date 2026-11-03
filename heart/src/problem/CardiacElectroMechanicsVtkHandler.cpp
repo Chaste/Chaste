@@ -43,8 +43,8 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
     ReplicatableVector& rElectricsInitialCondition,
     const std::string& rOutputDir)
    : mrMechanicsSolver(rMechanicsSolver),
-     mpVtkElastictyWriter(NULL),
-     mpInterpolater(NULL)
+     mpVtkElastictyWriter(nullptr),
+     mpInterpolater(nullptr)
 {
 
     //create an internal copy of the quadratic mesh (we will modify node locations for oputput)

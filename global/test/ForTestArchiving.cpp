@@ -45,7 +45,7 @@ BaseClass::~BaseClass()
 {
 }
 
-ChildClass::ChildClass() : mTag(1), mpParent(NULL)
+ChildClass::ChildClass() : mTag(1), mpParent(nullptr)
 {
     assert(mTagInBaseClass == 4);
 }

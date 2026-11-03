@@ -151,7 +151,7 @@ public:
      *
      * @return new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    [[nodiscard]] AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
      * @return mHypoxicConcentration

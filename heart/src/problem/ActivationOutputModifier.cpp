@@ -66,7 +66,7 @@ void ActivationOutputModifier::FinaliseAtEnd()
 
     PetscTools::BeginRoundRobin();
     {
-        out_stream file_stream = out_stream(NULL);
+        out_stream file_stream = out_stream(nullptr);
         // Open the file as new or append
         if (PetscTools::AmMaster())
         {

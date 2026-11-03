@@ -42,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-typedef FemlabMeshReader<2,2> READER_2D;
-typedef FemlabMeshReader<1,1> READER_1D;
+using READER_2D = FemlabMeshReader<2,2>;
+using READER_1D = FemlabMeshReader<1,1>;
 
 class TestFemlabMeshReaders : public CxxTest::TestSuite
 {
