@@ -1,0 +1,57 @@
+Copyright (c) 2005-2026, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+This version of Chaste was compiled on:
+Mon, 03 Aug 2026 15:53:27 +0000 by Linux (uname)
+from revision number dc19cfe with build type Release.
+
+-- The C compiler identification is GNU 11.4.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Python3: /usr/bin/python3.10 (found suitable version "3.10.12", minimum required is "3.5") found components: Interpreter 
+-- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/jmpf/Workspace/Chaste/acceptance/heart/dynamic/tmp_1278744_1785847008
+[ 33%] Processing CellML file ../../../../../../.texttest/tmp/chaste.04Aug133629.1278133/chaste/UsingCellmlFiles/LuoRudy1991.cellml
+[ 66%] Building CXX object CMakeFiles/LuoRudy1991.dir/home/jmpf/.texttest/tmp/chaste.04Aug133629.1278133/chaste/UsingCellmlFiles/LuoRudy1991.cpp.o
+[100%] Linking CXX shared library libLuoRudy1991.so
+[100%] Built target LuoRudy1991
+so file: /home/jmpf/Workspace/Chaste/acceptance/heart//dynamic/tmp_1278744_1785847008//libLuoRudy1991.so
+         InMesh             Init           AssSys              Ode            Comms           AssRhs           NeuBCs           DirBCs              Ksp           Output   DataConversion         PostProc            User1            User2            User3            Total  
+   0.001 (  1%)     0.002 (  2%)     0.000 (  0%)     0.028 ( 36%)     0.004 (  5%)     0.001 (  2%)     0.000 (  0%)     0.000 (  0%)     0.006 (  8%)     0.029 ( 37%)     0.005 (  7%)     0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     0.078 (100%)  (seconds) 

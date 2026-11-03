@@ -2,6 +2,11 @@ binary:$TEXTTEST_CHECKOUT/apps/texttest/chaste/wrapper
 default_checkout:Chaste
 create_catalogues:true
 
+# Turn off automatically running the tests in parallel.
+# (Note that "default" is no longer the default behaviour and the docs say 
+# "Why this works is a little obscure to me.".)
+config_module:default
+
 # Note that texttest checks some binary results by 
 # 1. converting from binary to text using h5dump from HDF5
 #  * (we currently use version 1.8.11 of the h5dump binary for regular acceptance)
@@ -180,6 +185,10 @@ output:RunXsd\(\[.*\], \[(.*)\]\){REPLACE Run Xsd on \1}
 output:[^ ]*mpicxx .*(/[^/]+\.[a-zA-Z]+){REPLACE mpicxx <args> <path>\1}
 output:Running \['.*/chaste_python3_venv/bin/chaste_codegen', '-A', '-p', '--output-dir', '<chaste_dir>/<build_path>', '-y', '<build_path>/(.*).cellml'\]{REPLACE Running chaste_codegen on \1}
 
-output:scons: building associated
-output:scons: Reading SConscript files ...{LINES 10}
-output:-- The C compiler identification is{LINES 19}
+#output:scons: building associated
+#output:scons: Reading SConscript files ...{LINES 10}
+output:-- The C compiler identification is{LINES 22}
+
+# Why is CMake writing to stderr?
+errors:-- Found Chaste libraries in /
+
