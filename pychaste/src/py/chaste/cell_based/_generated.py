@@ -59,6 +59,12 @@ from chaste._pychaste_all import (
     BernoulliTrialCellCycleModel,
     BetaCateninOneHitCellMutationState,
     BiasedBernoulliTrialCellCycleModel,
+    BoundaryNodePointDataWriter_1_1,
+    BoundaryNodePointDataWriter_1_2,
+    BoundaryNodePointDataWriter_1_3,
+    BoundaryNodePointDataWriter_2_2,
+    BoundaryNodePointDataWriter_2_3,
+    BoundaryNodePointDataWriter_3_3,
     BoundaryNodeWriter_1_1,
     BoundaryNodeWriter_1_2,
     BoundaryNodeWriter_1_3,
@@ -173,6 +179,12 @@ from chaste._pychaste_all import (
     CellPopulationElementWriter_2_2,
     CellPopulationElementWriter_2_3,
     CellPopulationElementWriter_3_3,
+    CellPopulationExtentWriter_1_1,
+    CellPopulationExtentWriter_1_2,
+    CellPopulationExtentWriter_1_3,
+    CellPopulationExtentWriter_2_2,
+    CellPopulationExtentWriter_2_3,
+    CellPopulationExtentWriter_3_3,
     CellProliferativePhasesCountWriter_1_1,
     CellProliferativePhasesCountWriter_1_2,
     CellProliferativePhasesCountWriter_1_3,
@@ -301,6 +313,12 @@ from chaste._pychaste_all import (
     DivisionBiasTrackingModifier_1,
     DivisionBiasTrackingModifier_2,
     DivisionBiasTrackingModifier_3,
+    ElementIdNodePointDataWriter_1_1,
+    ElementIdNodePointDataWriter_1_2,
+    ElementIdNodePointDataWriter_1_3,
+    ElementIdNodePointDataWriter_2_2,
+    ElementIdNodePointDataWriter_2_3,
+    ElementIdNodePointDataWriter_3_3,
     ExclusionCaBasedDivisionRule_1,
     ExclusionCaBasedDivisionRule_2,
     ExclusionCaBasedDivisionRule_3,
@@ -428,6 +446,12 @@ from chaste._pychaste_all import (
     NodeLocationWriter_2_2,
     NodeLocationWriter_2_3,
     NodeLocationWriter_3_3,
+    NodeRegionPointDataWriter_1_1,
+    NodeRegionPointDataWriter_1_2,
+    NodeRegionPointDataWriter_1_3,
+    NodeRegionPointDataWriter_2_2,
+    NodeRegionPointDataWriter_2_3,
+    NodeRegionPointDataWriter_3_3,
     NodeVelocityWriter_1_1,
     NodeVelocityWriter_1_2,
     NodeVelocityWriter_1_3,
@@ -497,6 +521,25 @@ from chaste._pychaste_all import (
     RandomDirectionVertexBasedDivisionRule_1,
     RandomDirectionVertexBasedDivisionRule_2,
     RandomDirectionVertexBasedDivisionRule_3,
+    SemBasedCellPopulation_1,
+    SemBasedCellPopulation_2,
+    SemBasedCellPopulation_3,
+    SemForce_1,
+    SemForce_2,
+    SemForce_3,
+    SemGaussianRandomForce_1,
+    SemGaussianRandomForce_2,
+    SemGaussianRandomForce_3,
+    SemLinearForce_1,
+    SemLinearForce_2,
+    SemLinearForce_3,
+    SemNScaledParameters,
+    SemRegionalForce_1,
+    SemRegionalForce_2,
+    SemRegionalForce_3,
+    SemSpatiallyCorrelatedRandomForce_1,
+    SemSpatiallyCorrelatedRandomForce_2,
+    SemSpatiallyCorrelatedRandomForce_3,
     ShortAxisImmersedBoundaryDivisionRule_1,
     ShortAxisImmersedBoundaryDivisionRule_2,
     ShortAxisImmersedBoundaryDivisionRule_3,
@@ -539,6 +582,9 @@ from chaste._pychaste_all import (
     TargetedCellKiller_3,
     TransitCellProliferativeType,
     TysonNovakCellCycleModel,
+    UniaxialLoadForce_1,
+    UniaxialLoadForce_2,
+    UniaxialLoadForce_3,
     UniformCellCycleModel,
     UniformG1GenerationalCellCycleModel,
     VertexBasedCellPopulation_1,
@@ -619,6 +665,13 @@ __all__ = [
     "BernoulliTrialCellCycleModel",
     "BetaCateninOneHitCellMutationState",
     "BiasedBernoulliTrialCellCycleModel",
+    "BoundaryNodePointDataWriter",
+    "BoundaryNodePointDataWriter_1_1",
+    "BoundaryNodePointDataWriter_1_2",
+    "BoundaryNodePointDataWriter_1_3",
+    "BoundaryNodePointDataWriter_2_2",
+    "BoundaryNodePointDataWriter_2_3",
+    "BoundaryNodePointDataWriter_3_3",
     "BoundaryNodeWriter",
     "BoundaryNodeWriter_1_1",
     "BoundaryNodeWriter_1_2",
@@ -753,6 +806,13 @@ __all__ = [
     "CellPopulationElementWriter_2_2",
     "CellPopulationElementWriter_2_3",
     "CellPopulationElementWriter_3_3",
+    "CellPopulationExtentWriter",
+    "CellPopulationExtentWriter_1_1",
+    "CellPopulationExtentWriter_1_2",
+    "CellPopulationExtentWriter_1_3",
+    "CellPopulationExtentWriter_2_2",
+    "CellPopulationExtentWriter_2_3",
+    "CellPopulationExtentWriter_3_3",
     "CellProliferativePhasesCountWriter",
     "CellProliferativePhasesCountWriter_1_1",
     "CellProliferativePhasesCountWriter_1_2",
@@ -901,6 +961,13 @@ __all__ = [
     "DivisionBiasTrackingModifier_1",
     "DivisionBiasTrackingModifier_2",
     "DivisionBiasTrackingModifier_3",
+    "ElementIdNodePointDataWriter",
+    "ElementIdNodePointDataWriter_1_1",
+    "ElementIdNodePointDataWriter_1_2",
+    "ElementIdNodePointDataWriter_1_3",
+    "ElementIdNodePointDataWriter_2_2",
+    "ElementIdNodePointDataWriter_2_3",
+    "ElementIdNodePointDataWriter_3_3",
     "ExclusionCaBasedDivisionRule",
     "ExclusionCaBasedDivisionRule_1",
     "ExclusionCaBasedDivisionRule_2",
@@ -1058,6 +1125,13 @@ __all__ = [
     "NodeLocationWriter_2_2",
     "NodeLocationWriter_2_3",
     "NodeLocationWriter_3_3",
+    "NodeRegionPointDataWriter",
+    "NodeRegionPointDataWriter_1_1",
+    "NodeRegionPointDataWriter_1_2",
+    "NodeRegionPointDataWriter_1_3",
+    "NodeRegionPointDataWriter_2_2",
+    "NodeRegionPointDataWriter_2_3",
+    "NodeRegionPointDataWriter_3_3",
     "NodeVelocityWriter",
     "NodeVelocityWriter_1_1",
     "NodeVelocityWriter_1_2",
@@ -1143,6 +1217,31 @@ __all__ = [
     "RandomDirectionVertexBasedDivisionRule_1",
     "RandomDirectionVertexBasedDivisionRule_2",
     "RandomDirectionVertexBasedDivisionRule_3",
+    "SemBasedCellPopulation",
+    "SemBasedCellPopulation_1",
+    "SemBasedCellPopulation_2",
+    "SemBasedCellPopulation_3",
+    "SemForce",
+    "SemForce_1",
+    "SemForce_2",
+    "SemForce_3",
+    "SemGaussianRandomForce",
+    "SemGaussianRandomForce_1",
+    "SemGaussianRandomForce_2",
+    "SemGaussianRandomForce_3",
+    "SemLinearForce",
+    "SemLinearForce_1",
+    "SemLinearForce_2",
+    "SemLinearForce_3",
+    "SemNScaledParameters",
+    "SemRegionalForce",
+    "SemRegionalForce_1",
+    "SemRegionalForce_2",
+    "SemRegionalForce_3",
+    "SemSpatiallyCorrelatedRandomForce",
+    "SemSpatiallyCorrelatedRandomForce_1",
+    "SemSpatiallyCorrelatedRandomForce_2",
+    "SemSpatiallyCorrelatedRandomForce_3",
     "ShortAxisImmersedBoundaryDivisionRule",
     "ShortAxisImmersedBoundaryDivisionRule_1",
     "ShortAxisImmersedBoundaryDivisionRule_2",
@@ -1196,6 +1295,10 @@ __all__ = [
     "TargetedCellKiller_3",
     "TransitCellProliferativeType",
     "TysonNovakCellCycleModel",
+    "UniaxialLoadForce",
+    "UniaxialLoadForce_1",
+    "UniaxialLoadForce_2",
+    "UniaxialLoadForce_3",
     "UniformCellCycleModel",
     "UniformG1GenerationalCellCycleModel",
     "VertexBasedCellPopulation",
@@ -1291,6 +1394,20 @@ class AttractingPlaneBoundaryCondition(TemplateClass):
         ("2", "3"): AttractingPlaneBoundaryCondition_2_3,
         ("3", "3"): AttractingPlaneBoundaryCondition_3_3,
         ("3",): AttractingPlaneBoundaryCondition_3_3,
+    }
+
+
+class BoundaryNodePointDataWriter(TemplateClass):
+    _instantiations = {
+        ("1", "1"): BoundaryNodePointDataWriter_1_1,
+        ("1",): BoundaryNodePointDataWriter_1_1,
+        ("1", "2"): BoundaryNodePointDataWriter_1_2,
+        ("2", "2"): BoundaryNodePointDataWriter_2_2,
+        ("2",): BoundaryNodePointDataWriter_2_2,
+        ("1", "3"): BoundaryNodePointDataWriter_1_3,
+        ("2", "3"): BoundaryNodePointDataWriter_2_3,
+        ("3", "3"): BoundaryNodePointDataWriter_3_3,
+        ("3",): BoundaryNodePointDataWriter_3_3,
     }
 
 
@@ -1550,6 +1667,20 @@ class CellPopulationElementWriter(TemplateClass):
     }
 
 
+class CellPopulationExtentWriter(TemplateClass):
+    _instantiations = {
+        ("1", "1"): CellPopulationExtentWriter_1_1,
+        ("1",): CellPopulationExtentWriter_1_1,
+        ("1", "2"): CellPopulationExtentWriter_1_2,
+        ("2", "2"): CellPopulationExtentWriter_2_2,
+        ("2",): CellPopulationExtentWriter_2_2,
+        ("1", "3"): CellPopulationExtentWriter_1_3,
+        ("2", "3"): CellPopulationExtentWriter_2_3,
+        ("3", "3"): CellPopulationExtentWriter_3_3,
+        ("3",): CellPopulationExtentWriter_3_3,
+    }
+
+
 class CellProliferativePhasesCountWriter(TemplateClass):
     _instantiations = {
         ("1", "1"): CellProliferativePhasesCountWriter_1_1,
@@ -1796,6 +1927,20 @@ class DivisionBiasTrackingModifier(TemplateClass):
         ("1",): DivisionBiasTrackingModifier_1,
         ("2",): DivisionBiasTrackingModifier_2,
         ("3",): DivisionBiasTrackingModifier_3,
+    }
+
+
+class ElementIdNodePointDataWriter(TemplateClass):
+    _instantiations = {
+        ("1", "1"): ElementIdNodePointDataWriter_1_1,
+        ("1",): ElementIdNodePointDataWriter_1_1,
+        ("1", "2"): ElementIdNodePointDataWriter_1_2,
+        ("2", "2"): ElementIdNodePointDataWriter_2_2,
+        ("2",): ElementIdNodePointDataWriter_2_2,
+        ("1", "3"): ElementIdNodePointDataWriter_1_3,
+        ("2", "3"): ElementIdNodePointDataWriter_2_3,
+        ("3", "3"): ElementIdNodePointDataWriter_3_3,
+        ("3",): ElementIdNodePointDataWriter_3_3,
     }
 
 
@@ -2099,6 +2244,20 @@ class NodeLocationWriter(TemplateClass):
     }
 
 
+class NodeRegionPointDataWriter(TemplateClass):
+    _instantiations = {
+        ("1", "1"): NodeRegionPointDataWriter_1_1,
+        ("1",): NodeRegionPointDataWriter_1_1,
+        ("1", "2"): NodeRegionPointDataWriter_1_2,
+        ("2", "2"): NodeRegionPointDataWriter_2_2,
+        ("2",): NodeRegionPointDataWriter_2_2,
+        ("1", "3"): NodeRegionPointDataWriter_1_3,
+        ("2", "3"): NodeRegionPointDataWriter_2_3,
+        ("3", "3"): NodeRegionPointDataWriter_3_3,
+        ("3",): NodeRegionPointDataWriter_3_3,
+    }
+
+
 class NodeVelocityWriter(TemplateClass):
     _instantiations = {
         ("1", "1"): NodeVelocityWriter_1_1,
@@ -2268,6 +2427,54 @@ class RandomDirectionVertexBasedDivisionRule(TemplateClass):
     }
 
 
+class SemBasedCellPopulation(TemplateClass):
+    _instantiations = {
+        ("1",): SemBasedCellPopulation_1,
+        ("2",): SemBasedCellPopulation_2,
+        ("3",): SemBasedCellPopulation_3,
+    }
+
+
+class SemForce(TemplateClass):
+    _instantiations = {
+        ("1",): SemForce_1,
+        ("2",): SemForce_2,
+        ("3",): SemForce_3,
+    }
+
+
+class SemGaussianRandomForce(TemplateClass):
+    _instantiations = {
+        ("1",): SemGaussianRandomForce_1,
+        ("2",): SemGaussianRandomForce_2,
+        ("3",): SemGaussianRandomForce_3,
+    }
+
+
+class SemLinearForce(TemplateClass):
+    _instantiations = {
+        ("1",): SemLinearForce_1,
+        ("2",): SemLinearForce_2,
+        ("3",): SemLinearForce_3,
+    }
+
+
+class SemRegionalForce(TemplateClass):
+    _instantiations = {
+        ("1",): SemRegionalForce_1,
+        ("2",): SemRegionalForce_2,
+        ("3",): SemRegionalForce_3,
+    }
+
+
+class SemSpatiallyCorrelatedRandomForce(TemplateClass):
+    _instantiations = {
+        ("1",): SemSpatiallyCorrelatedRandomForce_1,
+        ("2",): SemSpatiallyCorrelatedRandomForce_2,
+        ("3",): SemSpatiallyCorrelatedRandomForce_3,
+    }
+
+
 class ShortAxisImmersedBoundaryDivisionRule(TemplateClass):
     _instantiations = {
         ("1",): ShortAxisImmersedBoundaryDivisionRule_1,
@@ -2359,6 +2566,14 @@ class TargetedCellKiller(TemplateClass):
         ("1",): TargetedCellKiller_1,
         ("2",): TargetedCellKiller_2,
         ("3",): TargetedCellKiller_3,
+    }
+
+
+class UniaxialLoadForce(TemplateClass):
+    _instantiations = {
+        ("1",): UniaxialLoadForce_1,
+        ("2",): UniaxialLoadForce_2,
+        ("3",): UniaxialLoadForce_3,
     }
 
 

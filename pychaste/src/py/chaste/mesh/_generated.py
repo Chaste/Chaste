@@ -127,6 +127,22 @@ from chaste._pychaste_all import (
     PottsMesh_1,
     PottsMesh_2,
     PottsMesh_3,
+    SemElement_1,
+    SemElement_2,
+    SemElement_3,
+    SemLatticeType,
+    SemMesh_1,
+    SemMesh_2,
+    SemMesh_3,
+    SemMultiElementMeshGenerator_1,
+    SemMultiElementMeshGenerator_2,
+    SemMultiElementMeshGenerator_3,
+    SemSingleElementMeshGenerator_1,
+    SemSingleElementMeshGenerator_2,
+    SemSingleElementMeshGenerator_3,
+    SemSphericalElementMeshGenerator_1,
+    SemSphericalElementMeshGenerator_2,
+    SemSphericalElementMeshGenerator_3,
     TetrahedralMesh_1_1,
     TetrahedralMesh_1_2,
     TetrahedralMesh_1_3,
@@ -253,6 +269,27 @@ __all__ = [
     "PottsMesh_1",
     "PottsMesh_2",
     "PottsMesh_3",
+    "SemElement",
+    "SemElement_1",
+    "SemElement_2",
+    "SemElement_3",
+    "SemLatticeType",
+    "SemMesh",
+    "SemMesh_1",
+    "SemMesh_2",
+    "SemMesh_3",
+    "SemMultiElementMeshGenerator",
+    "SemMultiElementMeshGenerator_1",
+    "SemMultiElementMeshGenerator_2",
+    "SemMultiElementMeshGenerator_3",
+    "SemSingleElementMeshGenerator",
+    "SemSingleElementMeshGenerator_1",
+    "SemSingleElementMeshGenerator_2",
+    "SemSingleElementMeshGenerator_3",
+    "SemSphericalElementMeshGenerator",
+    "SemSphericalElementMeshGenerator_1",
+    "SemSphericalElementMeshGenerator_2",
+    "SemSphericalElementMeshGenerator_3",
     "TetrahedralMesh",
     "TetrahedralMesh_1_1",
     "TetrahedralMesh_1_2",
@@ -465,6 +502,46 @@ class PottsMeshWriter(TemplateClass):
         ("1",): PottsMeshWriter_1,
         ("2",): PottsMeshWriter_2,
         ("3",): PottsMeshWriter_3,
+    }
+
+
+class SemElement(TemplateClass):
+    _instantiations = {
+        ("1",): SemElement_1,
+        ("2",): SemElement_2,
+        ("3",): SemElement_3,
+    }
+
+
+class SemMesh(TemplateClass):
+    _instantiations = {
+        ("1",): SemMesh_1,
+        ("2",): SemMesh_2,
+        ("3",): SemMesh_3,
+    }
+
+
+class SemMultiElementMeshGenerator(TemplateClass):
+    _instantiations = {
+        ("1",): SemMultiElementMeshGenerator_1,
+        ("2",): SemMultiElementMeshGenerator_2,
+        ("3",): SemMultiElementMeshGenerator_3,
+    }
+
+
+class SemSingleElementMeshGenerator(TemplateClass):
+    _instantiations = {
+        ("1",): SemSingleElementMeshGenerator_1,
+        ("2",): SemSingleElementMeshGenerator_2,
+        ("3",): SemSingleElementMeshGenerator_3,
+    }
+
+
+class SemSphericalElementMeshGenerator(TemplateClass):
+    _instantiations = {
+        ("1",): SemSphericalElementMeshGenerator_1,
+        ("2",): SemSphericalElementMeshGenerator_2,
+        ("3",): SemSphericalElementMeshGenerator_3,
     }
 
 
