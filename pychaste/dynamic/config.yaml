@@ -494,40 +494,40 @@ modules:
       - name: ImmersedBoundaryCellPopulation
         excluded_methods:
           - rGetMesh # non-const ref to mesh
-        custom_generator: *population_template
+        custom_generator: &off_lattice_population_template "CPPWG_SOURCEROOT/pychaste/dynamic/templates/OffLatticePopulationWriterCustomTemplate.py"
 
       - name: MeshBasedCellPopulation
         excluded_methods:
           - GetVoronoiTessellation # raw ptr to cached tessellation
           - rGetNodePairs # vector of raw node pairs
           - rGetMesh # non-const ref to mesh
-        custom_generator: *population_template
+        custom_generator: *off_lattice_population_template
 
       - name: MeshBasedCellPopulationWithGhostNodes
-        custom_generator: *population_template
+        custom_generator: *off_lattice_population_template
 
       - name: NodeBasedCellPopulation
         excluded_methods:
           - rGetNodePairs # vector of raw node pairs
           - rGetMesh # non-const ref to mesh
-        custom_generator: *population_template
+        custom_generator: *off_lattice_population_template
 
       - name: NodeBasedCellPopulationWithBuskeUpdate
         excluded_methods:
           - rGetMesh # non-const ref to mesh
-        custom_generator: *population_template
+        custom_generator: *off_lattice_population_template
 
       - name: NodeBasedCellPopulationWithParticles
         excluded_methods:
           - rGetMesh # non-const ref to mesh
-        custom_generator: *population_template
+        custom_generator: *off_lattice_population_template
 
       - name: VertexBasedCellPopulation
         excluded_methods:
           - GetElementCorrespondingToCell # raw ptr to internal element
           - GetElement # raw ptr to internal element
           - rGetMesh # non-const ref to mesh
-        custom_generator: *population_template
+        custom_generator: *off_lattice_population_template
 
       - name: PottsBasedCellPopulation
         excluded_methods:
@@ -544,7 +544,7 @@ modules:
           - GetElement
           - GetTetrahedralMeshForPdeModifier
           - rGetMesh
-        custom_generator: *population_template
+        custom_generator: *off_lattice_population_template
 
       - name: CellwiseDataGradient
         excluded: True # internal helper; non-const c_vector& ref API

@@ -62,6 +62,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Boost
 #include <boost/shared_ptr.hpp>
 
+#include <sstream>
+
 #include "PetscSetupAndFinalize.hpp"
 
 
@@ -242,6 +244,46 @@ public:
 
             input_arch >> p_cell_writer_2;
         }
+    }
+
+    void TestAddNodePointDataWritersToVertexBasedCellPopulation()
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a regular vertex mesh
+        HoneycombVertexMeshGenerator generator(2, 2);
+        const boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        const boost::shared_ptr<TransitCellProliferativeType> p_transit_type;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
+
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Add one writer by type and one through an input argument
+        cell_population.AddNodePointDataWriter<ElementIdNodePointDataWriter>();
+        cell_population.AddNodePointDataWriter(boost::shared_ptr<AbstractNodePointDataWriter<2,2> >(new BoundaryNodePointDataWriter<2,2>));
+
+        // VTK writing needs a simulation time
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        std::string output_directory = "TestAddNodePointDataWritersToVertexBasedCellPopulation";
+        OutputFileHandler output_file_handler(output_directory, false);
+        cell_population.OpenWritersFiles(output_file_handler);
+        cell_population.WriteResultsToFiles(output_directory);
+        cell_population.CloseWritersFiles();
+
+        // Test that both writers' point data arrays appear in the VTK output
+        FileFinder vtk_file(output_directory + "/results_0.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
+
+        std::ifstream vtk_file_stream(vtk_file.GetAbsolutePath());
+        std::stringstream vtk_file_string_buffer;
+        vtk_file_string_buffer << vtk_file_stream.rdbuf();
+        const std::string vtk_file_string = vtk_file_string_buffer.str();
+        TS_ASSERT_DIFFERS(vtk_file_string.find("Name=\"Element ID\""), std::string::npos);
+        TS_ASSERT_DIFFERS(vtk_file_string.find("Name=\"Boundary Node\""), std::string::npos);
     }
 };
 

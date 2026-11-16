@@ -104,7 +104,7 @@ protected:
     std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> > mNodePairs = {};
 
     /** A vector of node point data writers. */
-    std::vector<std::shared_ptr<AbstractNodePointDataWriter<ELEMENT_DIM, SPACE_DIM>>> mNodePointDataWriters;
+    std::vector<boost::shared_ptr<AbstractNodePointDataWriter<ELEMENT_DIM, SPACE_DIM> > > mNodePointDataWriters;
 
     /**
      * Constructor that just takes in a mesh.
@@ -256,7 +256,20 @@ public:
             "Writer must derive from AbstractNodePointDataWriter<ELEMENT_DIM, SPACE_DIM>"
         );
 
-        mNodePointDataWriters.emplace_back(std::make_shared<Writer<ELEMENT_DIM, SPACE_DIM>>());
+        mNodePointDataWriters.push_back(boost::shared_ptr< Writer<ELEMENT_DIM, SPACE_DIM> >(new Writer<ELEMENT_DIM, SPACE_DIM>));
+    }
+
+    /**
+     * Add a node point data writer through an input argument.
+     * This alternative to the templated AddNodePointDataWriter()
+     * method allows the user to, for example, add a writer
+     * that has been constructed elsewhere.
+     *
+     * @param pNodePointDataWriter shared pointer to a node point data writer
+     */
+    void AddNodePointDataWriter(boost::shared_ptr<AbstractNodePointDataWriter<ELEMENT_DIM, SPACE_DIM> > pNodePointDataWriter)
+    {
+        mNodePointDataWriters.push_back(pNodePointDataWriter);
     }
 
     /**
