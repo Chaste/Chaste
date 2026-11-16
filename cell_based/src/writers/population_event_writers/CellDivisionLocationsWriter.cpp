@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
+#include "SemBasedCellPopulation.hpp"
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::CellDivisionLocationsWriter()
@@ -102,6 +103,12 @@ void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    VisitAnyPopulation(pCellPopulation);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }

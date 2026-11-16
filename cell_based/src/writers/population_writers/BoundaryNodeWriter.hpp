@@ -172,6 +172,16 @@ public:
      * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
      */
     virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the population and write the data.
+     *
+     * This is an empty dummy function, since SEM marks membrane nodes with node regions
+     * rather than the boundary node flag this writer reads; use NodeRegionPointDataWriter instead.
+     *
+     * @param pCellPopulation a pointer to the SemBasedCellPopulation to visit.
+     */
+    virtual void Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

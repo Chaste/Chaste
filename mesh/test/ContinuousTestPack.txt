@@ -27,6 +27,14 @@ reader/TestGmshMeshReader.hpp
 reader/TestMemfemMeshReader.hpp
 reader/TestTrianglesMeshReader.hpp
 reader/TestVtkMeshReader.hpp
+sem/TestSemElement.hpp
+sem/TestSemLatticeGeometry.hpp
+sem/TestSemMesh.hpp
+sem/TestSemMeshReader.hpp
+sem/TestSemMeshWriter.hpp
+sem/TestSemMultiElementMeshGenerator.hpp
+sem/TestSemSingleElementMeshGenerator.hpp
+sem/TestSemSphericalElementMeshGenerator.hpp
 utilities/TestDistributedBoxCollection.hpp
 utilities/TestDistanceMapCalculator.hpp
 utilities/TestMeshUtilityFunctions.hpp

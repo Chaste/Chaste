@@ -159,6 +159,16 @@ public:
      * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
      */
     virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the population and write the data.
+     *
+     * This writer is not defined for use with a SemBasedCellPopulation, so this method
+     * throws an exception.
+     *
+     * @param pCellPopulation a pointer to the SemBasedCellPopulation to visit.
+     */
+    virtual void Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

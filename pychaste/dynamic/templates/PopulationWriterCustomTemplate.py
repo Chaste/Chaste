@@ -74,6 +74,7 @@ class PopulationWriterCustomTemplate(cppwg.templates.custom.Custom):
         "CellPopulationAdjacencyMatrixWriter",
         "CellPopulationAreaWriter",
         "CellPopulationElementWriter",
+        "CellPopulationExtentWriter",
         "HeterotypicBoundaryLengthWriter",
         "NodeLocationWriter",
         "NodeVelocityWriter",

@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "SemBasedCellPopulation.hpp"
 
 #include "CellLabel.hpp"
 
@@ -505,6 +506,12 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoun
                        << total_shared_edges_length << '\t'
                        << heterotypic_elem_pairs.size() << '\t'
                        << total_elem_pairs.size();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    EXCEPTION("HeterotypicBoundaryLengthWriter cannot be used with a SemBasedCellPopulation");
 }
 
 // Explicit instantiation

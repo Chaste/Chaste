@@ -86,6 +86,47 @@ class TestPyVertexBasedCellPopulation(chaste.cell_based.AbstractCellBasedTestSui
 
         simulator.Solve()
 
+    def test_add_node_point_data_writers(self):
+
+        output_directory = "Python/TestVertexBasedCellPopulationNodePointDataWriters"
+        file_handler = chaste.core.OutputFileHandler(output_directory)
+
+        # Set up the mesh
+        mesh_generator = chaste.mesh.HoneycombVertexMeshGenerator(2, 2)
+        mesh = mesh_generator.GetMesh()
+
+        # Make the cells
+        proliferative_type = chaste.cell_based.DefaultCellProliferativeType()
+        cell_generator = chaste.cell_based.CellsGenerator["UniformCellCycleModel", 2]()
+        cells = cell_generator.GenerateBasicRandom(
+            mesh.GetNumElements(), proliferative_type
+        )
+
+        # Make the cell population
+        cell_population = chaste.cell_based.VertexBasedCellPopulation[2](mesh, cells)
+
+        # Add one writer by type and one through an input argument
+        cell_population.AddNodePointDataWriter["ElementIdNodePointDataWriter"]()
+        cell_population.AddNodePointDataWriter(
+            chaste.cell_based.BoundaryNodePointDataWriter[2]()
+        )
+
+        # VTK writing needs a simulation time
+        chaste.cell_based.SimulationTime.Instance().SetEndTimeAndNumberOfTimeSteps(
+            1.0, 1
+        )
+
+        cell_population.OpenWritersFiles(file_handler)
+        cell_population.WriteResultsToFiles(output_directory)
+        cell_population.CloseWritersFiles()
+
+        # Test that both writers' point data arrays appear in the VTK output
+        vtk_path = file_handler.GetOutputDirectoryFullPath() + "results_0.vtu"
+        with open(vtk_path, "r", errors="replace") as vtk_file:
+            vtk_contents = vtk_file.read()
+        self.assertIn('Name="Element ID"', vtk_contents)
+        self.assertIn('Name="Boundary Node"', vtk_contents)
+
 
 if __name__ == "__main__":
     unittest.main()

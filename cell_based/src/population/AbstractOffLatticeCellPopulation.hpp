@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulation.hpp"
 
+#include "AbstractNodePointDataWriter.hpp"
+
 /**
  * An abstract facade class encapsulating an off-lattice (centre- or
  * vertex-based) cell population.
@@ -69,6 +71,7 @@ private:
         archive & mDampingConstantNormal;
         archive & mDampingConstantMutant;
         archive & mAbsoluteMovementThreshold;
+        archive & mNodePointDataWriters;
     }
 
 protected:
@@ -99,6 +102,9 @@ protected:
      * NodeBased) need to provide pairs of nodes for force calculations.
      */
     std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> > mNodePairs = {};
+
+    /** A vector of node point data writers. */
+    std::vector<boost::shared_ptr<AbstractNodePointDataWriter<ELEMENT_DIM, SPACE_DIM> > > mNodePointDataWriters;
 
     /**
      * Constructor that just takes in a mesh.
@@ -237,6 +243,34 @@ public:
      * @return A modifiable reference to mNodePairs.
      */
     [[nodiscard]] virtual std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rGetModifiableNodePairs();
+
+    /**
+     * Add a node point data writer. Template parameters are inferred from the population.
+     * The implementation of this function must be available in the header file.
+     */
+    template <template <unsigned, unsigned> class Writer>
+    void AddNodePointDataWriter()
+    {
+        static_assert(
+            std::is_base_of_v<AbstractNodePointDataWriter<ELEMENT_DIM, SPACE_DIM>, Writer<ELEMENT_DIM, SPACE_DIM>>,
+            "Writer must derive from AbstractNodePointDataWriter<ELEMENT_DIM, SPACE_DIM>"
+        );
+
+        mNodePointDataWriters.push_back(boost::shared_ptr< Writer<ELEMENT_DIM, SPACE_DIM> >(new Writer<ELEMENT_DIM, SPACE_DIM>));
+    }
+
+    /**
+     * Add a node point data writer through an input argument.
+     * This alternative to the templated AddNodePointDataWriter()
+     * method allows the user to, for example, add a writer
+     * that has been constructed elsewhere.
+     *
+     * @param pNodePointDataWriter shared pointer to a node point data writer
+     */
+    void AddNodePointDataWriter(boost::shared_ptr<AbstractNodePointDataWriter<ELEMENT_DIM, SPACE_DIM> > pNodePointDataWriter)
+    {
+        mNodePointDataWriters.push_back(pNodePointDataWriter);
+    }
 
     /**
      * Overridden OutputCellPopulationParameters() method.

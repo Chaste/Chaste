@@ -1,0 +1,435 @@
+/*
+
+Copyright (c) 2005-2026, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+#include "SemMesh.hpp"
+#include "SemElementGeometry.hpp"
+#include "Exception.hpp"
+
+#include <cmath>
+
+template<unsigned DIM>
+SemMesh<DIM>::SemMesh(std::vector<Node<DIM>*> nodes,
+                      std::vector<SemElement<DIM>*> semElements)
+    : mMaximumInteractionDistance(1.0),
+      mOutputElementSurfacesToVtk(true),
+      mSemSurfaceAlphaMultiplier(2.0),
+      mSemSurfaceExpansionMultiplier(0.5),
+      mUseExpandedSemSurfaceForVolume(true)
+{
+    // Reset member variables and clear mNodes and mElements
+    Clear();
+
+    // Populate mNodes and mElements
+    for (unsigned node_index = 0; node_index < nodes.size(); node_index++)
+    {
+        Node<DIM>* p_temp_node = nodes[node_index];
+        this->mNodes.push_back(p_temp_node);
+    }
+    for (unsigned elem_index = 0; elem_index < semElements.size(); elem_index++)
+    {
+        SemElement<DIM>* p_temp_sem_element = semElements[elem_index];
+        mElements.push_back(p_temp_sem_element);
+    }
+}
+
+template<unsigned DIM>
+SemMesh<DIM>::SemMesh()
+    : mMaximumInteractionDistance(1.0),
+      mOutputElementSurfacesToVtk(true),
+      mSemSurfaceAlphaMultiplier(2.0),
+      mSemSurfaceExpansionMultiplier(0.5),
+      mUseExpandedSemSurfaceForVolume(true)
+{
+    // Reset member variables and clear mNodes and mElements
+    Clear();
+}
+
+template<unsigned DIM>
+SemMesh<DIM>::~SemMesh()
+{
+    // Reset member variables and clear mNodes and mElements
+    Clear();
+}
+
+template<unsigned DIM>
+unsigned SemMesh<DIM>::GetNumNodes() const
+{
+    return this->mNodes.size();
+}
+
+template<unsigned DIM>
+unsigned SemMesh<DIM>::AddNode(Node<DIM>* pNewNode)
+{
+    unsigned node_index = this->mNodes.size();
+    this->mNodes.push_back(pNewNode);
+    return node_index;
+}
+
+template<unsigned DIM>
+unsigned SemMesh<DIM>::GetNumElements() const
+{
+    return mElements.size();
+}
+
+template<unsigned DIM>
+unsigned SemMesh<DIM>::GetNumAllElements() const
+{
+    return mElements.size();
+}
+
+template<unsigned DIM>
+SemElement<DIM>* SemMesh<DIM>::GetElement(unsigned index) const
+{
+    assert(index < mElements.size());
+    return mElements[index];
+}
+
+template <unsigned DIM>
+c_vector<double, DIM> SemMesh<DIM>::GetCentroidOfElement(unsigned index)
+{
+    SemElement<DIM>* p_element = GetElement(index);
+    unsigned num_nodes = p_element->GetNumNodes();
+
+    const c_vector<double, DIM> reference_location = p_element->GetNode(0u)->rGetLocation();
+
+    c_vector<double, DIM> displacement = zero_vector<double>(DIM);
+    for (unsigned i = 1u; i < num_nodes; ++i)
+    {
+        displacement += this->GetVectorFromAtoB(reference_location, p_element->GetNode(i)->rGetLocation());
+    }
+    displacement /= static_cast<double>(num_nodes);
+
+    return reference_location + displacement;
+}
+
+template <unsigned DIM>
+ChasteCuboid<DIM> SemMesh<DIM>::CalculateBoundingBoxOfElement(unsigned index)
+{
+    SemElement<DIM>* p_element = GetElement(index);
+    return this->CalculateBoundingBox(p_element->rGetNodes());
+}
+
+template<unsigned DIM>
+SemMesh<DIM>* SemMesh<DIM>::GetMeshForVtk()
+{
+    return this;
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::UpdateBoxCollection()
+{
+    assert(mpBoxCollection);
+
+    // Remove node pointers from boxes in BoxCollection.
+    mpBoxCollection->EmptyBoxes();
+
+    AddNodesToBoxes();
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::AddNodesToBoxes()
+{
+     // Put the nodes in the boxes.
+     for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+               node_iter != this->GetNodeIteratorEnd();
+               ++node_iter)
+     {
+          unsigned box_index = mpBoxCollection->CalculateContainingBox(&(*node_iter));
+          mpBoxCollection->rGetBox(box_index).AddNode(&(*node_iter));
+     }
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::CalculateNodePairs(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
+{
+    assert(mpBoxCollection);
+
+    mpBoxCollection->CalculateNodePairs(this->mNodes, rNodePairs);
+}
+
+template <unsigned DIM>
+void SemMesh<DIM>::SetUpBoxCollection(const std::vector<Node<DIM>*>& rNodes)
+{
+    ClearBoxCollection();
+
+    ChasteCuboid<DIM> bounding_box = this->CalculateBoundingBox(rNodes);
+
+    c_vector<double, 2 * DIM> domain_size;
+    for (unsigned i = 0; i < DIM; i++)
+    {
+        // Grow domain to next representable number to ensure all nodes are strictly inside
+        domain_size[2 * i] = std::nextafter(bounding_box.rGetLowerCorner()[i], -std::numeric_limits<double>::infinity());
+        domain_size[2 * i + 1] = std::nextafter(bounding_box.rGetUpperCorner()[i], std::numeric_limits<double>::infinity());
+    }
+
+    SetUpBoxCollection(mMaximumInteractionDistance, domain_size);
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::ClearBoxCollection()
+{
+    mpBoxCollection.reset();
+}
+
+template <unsigned DIM>
+void SemMesh<DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2 * DIM> domainSize, int numLocalRows, c_vector<bool, DIM> isDimPeriodic)
+{
+    ClearBoxCollection();
+
+    bool isPeriodicInX = false;
+    bool isPeriodicInY = false;
+    bool isPeriodicInZ = false;
+
+    for (unsigned i = 0; i < DIM; i++)
+    {
+        if (i == 0)
+        {
+            isPeriodicInX = isDimPeriodic(i);
+        }
+        if (i == 1)
+        {
+            isPeriodicInY = isDimPeriodic(i);
+        }
+        if (i == 2)
+        {
+            isPeriodicInZ = isDimPeriodic(i);
+        }
+    }
+    mpBoxCollection = std::make_unique<DistributedBoxCollection<DIM> >(cutOffLength, domainSize, isPeriodicInX, isPeriodicInY, isPeriodicInZ, numLocalRows);
+    mpBoxCollection->SetupLocalBoxesHalfOnly();
+
+    // Keep this false for now; in NodesOnlyMesh this is configured with mCalculateNodeNeighbours
+    mpBoxCollection->SetCalculateNodeNeighbours(false);
+}
+
+
+template<unsigned DIM>
+void SemMesh<DIM>::SetMaximumInteractionDistance(double maxDistance)
+{
+    mMaximumInteractionDistance = maxDistance;
+}
+
+template<unsigned DIM>
+double SemMesh<DIM>::GetMaximumInteractionDistance() const
+{
+    return mMaximumInteractionDistance;
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::SetOutputElementSurfacesToVtk(bool outputElementSurfacesToVtk)
+{
+    mOutputElementSurfacesToVtk = outputElementSurfacesToVtk;
+}
+
+template<unsigned DIM>
+bool SemMesh<DIM>::GetOutputElementSurfacesToVtk() const
+{
+    return mOutputElementSurfacesToVtk;
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::SetSemSurfaceAlphaMultiplier(double semSurfaceAlphaMultiplier)
+{
+    if (semSurfaceAlphaMultiplier <= 0.0)
+    {
+        EXCEPTION("SEM surface alpha multiplier must be positive");
+    }
+    mSemSurfaceAlphaMultiplier = semSurfaceAlphaMultiplier;
+}
+
+template<unsigned DIM>
+double SemMesh<DIM>::GetSemSurfaceAlphaMultiplier() const
+{
+    return mSemSurfaceAlphaMultiplier;
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::SetSemSurfaceExpansionMultiplier(double semSurfaceExpansionMultiplier)
+{
+    if (semSurfaceExpansionMultiplier < 0.0)
+    {
+        EXCEPTION("SEM surface expansion multiplier must be non-negative");
+    }
+    mSemSurfaceExpansionMultiplier = semSurfaceExpansionMultiplier;
+}
+
+template<unsigned DIM>
+double SemMesh<DIM>::GetSemSurfaceExpansionMultiplier() const
+{
+    return mSemSurfaceExpansionMultiplier;
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::SetUseExpandedSemSurfaceForVolume(bool useExpandedSemSurfaceForVolume)
+{
+    mUseExpandedSemSurfaceForVolume = useExpandedSemSurfaceForVolume;
+}
+
+template<unsigned DIM>
+bool SemMesh<DIM>::GetUseExpandedSemSurfaceForVolume() const
+{
+    return mUseExpandedSemSurfaceForVolume;
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader)
+{
+    assert(rMeshReader.HasNodePermutation() == false);
+    this->mMeshFileBaseName = rMeshReader.GetMeshFileBaseName();
+
+    // Record number of corner nodes
+    unsigned num_nodes = rMeshReader.GetNumNodes();
+
+    /*
+     * Reserve memory for nodes, so we don't have problems with
+     * pointers stored in elements becoming invalid.
+     */
+    this->mNodes.reserve(num_nodes);
+
+    rMeshReader.Reset();
+
+    //typename std::map<std::pair<unsigned,unsigned>,unsigned>::const_iterator iterator;
+    //std::map<std::pair<unsigned,unsigned>,unsigned> internal_nodes_map;
+
+    // Add nodes
+    std::vector<double> coords;
+    for (unsigned node_index = 0; node_index < num_nodes; node_index++)
+    {
+        coords = rMeshReader.GetNextNode();
+        Node<DIM>* p_node = new Node<DIM>(node_index, coords, false);
+
+        // The final entry returned by GetNextNode() is the per-node SEM region
+        // (interior/boundary); restore it so region-dependent forces behave as before the round-trip.
+        p_node->SetRegion(static_cast<unsigned>(coords[DIM]));
+
+        this->mNodes.push_back(p_node);
+    }
+
+    //unsigned new_node_index = mNumCornerNodes;
+
+    rMeshReader.Reset();
+    // Add elements
+    //new_node_index = mNumCornerNodes;
+    this->mElements.reserve(rMeshReader.GetNumElements());
+
+    for (unsigned element_index = 0; element_index < (unsigned)rMeshReader.GetNumElements(); element_index++)
+    {
+        ElementData element_data = rMeshReader.GetNextElementData();
+        std::vector<Node<DIM>*> nodes;
+
+        for (unsigned j = 0; j < element_data.NodeIndices.size(); j++)
+        {
+            assert(element_data.NodeIndices[j] < this->mNodes.size());
+            nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);
+        }
+
+        SemElement<DIM>* p_element = new SemElement<DIM>(element_index, nodes);
+
+        this->mElements.push_back(p_element);
+    }
+
+    // A SEM mesh has no faces: SemMeshWriter never writes a face file and SemMeshReader reports
+    // GetNumFaces() as zero, so there are no boundary elements or boundary nodes to read back.
+
+    rMeshReader.Reset();
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::Clear()
+{
+    // Delete elements
+    for (unsigned i = 0; i < mElements.size(); i++)
+    {
+        delete mElements[i];
+    }
+    mElements.clear();
+
+    // Delete nodes
+    for (unsigned i = 0; i < this->mNodes.size(); i++)
+    {
+        delete this->mNodes[i];
+    }
+    this->mNodes.clear();
+}
+
+template<unsigned DIM>
+double SemMesh<DIM>::GetVolumeOfElement(unsigned index)
+{
+    SemElementSurface<DIM> surface = SemElementGeometry<DIM>::GenerateSurface(*this,
+                                                                              index,
+                                                                              mSemSurfaceAlphaMultiplier,
+                                                                              mSemSurfaceExpansionMultiplier,
+                                                                              mUseExpandedSemSurfaceForVolume);
+    return surface.Measure;
+}
+
+template<unsigned DIM>
+unsigned SemMesh<DIM>::SolveNodeMapping(unsigned index) const
+{
+    assert(index < this->mNodes.size());
+    return index;
+}
+
+template<unsigned DIM>
+unsigned SemMesh<DIM>::AddElement(SemElement<DIM>* pNewElement)
+{
+    unsigned int new_element_index = mElements.size();
+    mElements.push_back(pNewElement);
+    return new_element_index;
+}
+
+
+template<unsigned DIM>
+void SemMesh<DIM>::DeleteNodePriorToReMesh(unsigned int node)
+{
+    (void)node;
+    EXCEPTION("DeleteNodePriorToReMesh is not supported for SemMesh. "
+              "Element removal is managed via SemBasedCellPopulation::RemoveDeadCells().");
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::ReMesh(NodeMap map)
+{
+    (void)map;
+}
+
+// Explicit instantiation
+template class SemMesh<1>;
+template class SemMesh<2>;
+template class SemMesh<3>;
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(SemMesh)

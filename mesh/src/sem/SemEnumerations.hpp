@@ -1,0 +1,83 @@
+/*
+
+Copyright (c) 2005-2026, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+#ifndef SEMENUMERATIONS_HPP_
+#define SEMENUMERATIONS_HPP_
+
+/**
+ * Named region labels for SEM subcellular nodes, stored as Node region IDs.
+ *
+ * The underlying type is unsigned so values are implicitly convertible to/from
+ * the unsigned arguments expected by Node::SetRegion() and Node::GetRegion().
+ * The ordering is significant: SEM_INTERIOR_REGION = 0, SEM_BOUNDARY_REGION = 1,
+ * matching the index convention used by SemRegionalForce's spring-constant and
+ * rest-length parameter arrays.
+ */
+enum SemNodeRegion : unsigned
+{
+    SEM_INTERIOR_REGION, ///< subcellular nodes in the cell interior
+    SEM_BOUNDARY_REGION  ///< subcellular nodes on the cell surface / cortex
+};
+
+/**
+ * Structure encapsulating the regular lattices available to the SEM mesh generators, used both for
+ * the arrangement of subcellular nodes within an element and for the arrangement of elements within
+ * a multi-element mesh.
+ *
+ * This is a struct wrapping an enum, rather than a bare enum, so that it can be exposed to Python:
+ * the wrapper generator recognises only this pattern (see RelativeTo in FileFinder.hpp, which is
+ * wrapped the same way). It also lets values be written as SemLatticeType::SEM_LATTICE_CUBIC.
+ */
+struct SemLatticeType
+{
+    /**
+     * The lattices available.
+     *
+     * SEM_LATTICE_CUBIC places points on an axis-aligned grid, so each point has
+     * 2*DIM nearest neighbours. SEM_LATTICE_CLOSE_PACKED staggers successive rows
+     * (and, in 3D, successive layers) to give the densest regular packing of equal
+     * spheres: a triangular lattice in 2D (6 nearest neighbours) and hexagonal
+     * close packing in 3D (12 nearest neighbours). Both lattices place nearest
+     * neighbours exactly one spacing apart. In 1D the two are identical, as there
+     * is only one way to space points along a line.
+     */
+    enum Value : unsigned
+    {
+        SEM_LATTICE_CUBIC,       ///< axis-aligned grid
+        SEM_LATTICE_CLOSE_PACKED ///< triangular lattice in 2D, hexagonal close packed in 3D
+    };
+};
+
+#endif // SEMENUMERATIONS_HPP_

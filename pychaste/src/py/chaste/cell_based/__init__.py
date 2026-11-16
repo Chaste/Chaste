@@ -67,6 +67,7 @@ _WRITER_METHOD_BASES = (
     "AddCellPopulationCountWriter",
     "AddCellPopulationEventWriter",
     "AddPopulationWriter",
+    "AddNodePointDataWriter",
 )
 
 
