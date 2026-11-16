@@ -204,6 +204,7 @@ from chaste.core import (
     RandomNumberGenerator,
     RelativeTo,
     ReplicatableVector,
+    SourceRevision,
     TimeStepper,
     Timer,
 )
@@ -462,6 +463,7 @@ __all__ = [
     "SimpleTargetAreaModifier",
     "SimulationTime",
     "SlidingBoundaryCondition",
+    "SourceRevision",
     "SphereGeometryBoundaryCondition",
     "StemCellProliferativeType",
     "StochasticOxygenBasedCellCycleModel",

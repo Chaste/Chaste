@@ -168,7 +168,7 @@ jobs:
           path: chaste-build-dir/coverage.info
 
       - name: Upload to codecov
-        uses: codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4 # v7.1.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         # Skip on forks running this workflow against their own repository, where the upload
         # has nowhere useful to go. Note this does not skip pull requests from forks, which
         # run in the upstream repository's context and whose coverage we do want.

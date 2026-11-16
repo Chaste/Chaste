@@ -38,16 +38,144 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This is a template file for generating the Version.cpp source on the fly.
  * Content of the form ${example} is replaced by suitable values.
+ *
+ * Most of the methods below return values that are fixed for the life of a cmake
+ * configuration (the Chaste version number, compiler information, and so on): these are
+ * substituted directly into this file by cmake, exactly as before.
+ *
+ * A few methods instead return information that can change between two builds with no
+ * reconfigure in between: the build timestamp, and the commit and modified flag of Chaste and
+ * of each checked-out project. Rather than being substituted here, these are read at
+ * runtime from plain files under a provenance/ directory, refreshed on every build by the
+ * generate_provenance target in global/CMakeLists.txt. Embedding build-time-variable content
+ * directly in this file would make it, and hence chaste_global, recompile and relink on
+ * every build; reading it from a file that nothing is compiled from avoids that entirely.
  */
 
 #include "Version.hpp"
+#include "ChasteBuildRoot.hpp"
+#include <fstream>
 #include <sstream>
 #include <ctime>
 #include <climits>
+#include <vector>
+
+namespace
+{
+
+/**
+ * @return the provenance directory for this build: the build tree location if it exists (the
+ * common case, covering dev machines and CI alike), else the installed location if it exists
+ * (a genuinely installed, out-of-tree Chaste), else an unset FileFinder if neither is present.
+ *
+ * In the build tree, each configuration has its own subdirectory, named by ChasteBuildDirName():
+ * "." for a single-config generator, or the configuration name for a multi-config one.
+ */
+FileFinder FindProvenanceDir()
+{
+    FileFinder build_tree_dir("global/provenance/" + ChasteBuildDirName(), RelativeTo::ChasteBuildRoot);
+    if (build_tree_dir.IsDir())
+    {
+        return build_tree_dir;
+    }
+    FileFinder install_dir(std::string(ChasteInstallRootDir()) + "lib/chaste/provenance", RelativeTo::Absolute);
+    if (install_dir.IsDir())
+    {
+        return install_dir;
+    }
+    return FileFinder();
+}
+
+/**
+ * @return the provenance directory, resolved once per process.
+ */
+const FileFinder& rGetProvenanceDir()
+{
+    static const FileFinder provenance_dir = FindProvenanceDir();
+    return provenance_dir;
+}
+
+/**
+ * @return the contents of the named file inside rDir, with any trailing whitespace (such as a
+ * final newline) removed, or rDefault if rDir is unset or the file cannot be found.
+ *
+ * @param rDir  the directory to look in
+ * @param rName  the leaf name of the file to read
+ * @param rDefault  what to return if the file cannot be found
+ */
+std::string ReadFileIn(const FileFinder& rDir, const std::string& rName, const std::string& rDefault)
+{
+    if (!rDir.IsPathSet())
+    {
+        return rDefault;
+    }
+    FileFinder file(rName, rDir);
+    if (!file.IsFile())
+    {
+        return rDefault;
+    }
+    std::ifstream in(file.GetAbsolutePath().c_str());
+    std::ostringstream contents;
+    contents << in.rdbuf();
+    std::string result = contents.str();
+    boost::algorithm::trim_right(result);
+    return result;
+}
+
+/**
+ * @return the contents of the named file within the provenance directory, read once per
+ * process and cached by the caller, or rDefault if it cannot be found.
+ *
+ * @param rName  the leaf name of the file to read
+ * @param rDefault  what to return if the file cannot be found
+ */
+std::string ReadProvenanceFile(const std::string& rName, const std::string& rDefault)
+{
+    return ReadFileIn(rGetProvenanceDir(), rName, rDefault);
+}
+
+/**
+ * @return the revision recorded in rDir, which holds the same "commit" and "modified" files for
+ * Chaste itself (the provenance directory) as for each checked-out project (its subdirectory of
+ * provenance/projects/), or an unknown, unmodified revision if they cannot be found.
+ *
+ * @param rDir  the directory to read from
+ */
+SourceRevision ReadRevision(const FileFinder& rDir)
+{
+    return SourceRevision(ReadFileIn(rDir, "commit", "unknown"), ReadFileIn(rDir, "modified", "false") == "true");
+}
+
+/**
+ * @return the revision of every checked-out project. The subdirectories of provenance/projects/
+ * are discovered with FileFinder::FindMatches, rather than from any separate manifest.
+ */
+std::map<std::string, SourceRevision> LoadProjectRevisions()
+{
+    std::map<std::string, SourceRevision> revisions;
+    const FileFinder& r_provenance_dir = rGetProvenanceDir();
+    if (r_provenance_dir.IsPathSet())
+    {
+        FileFinder projects_dir("projects", r_provenance_dir);
+        if (projects_dir.IsDir())
+        {
+            for (const FileFinder& r_project_dir : projects_dir.FindMatches("*"))
+            {
+                if (r_project_dir.IsDir())
+                {
+                    revisions.emplace(r_project_dir.GetLeafName(), ReadRevision(r_project_dir));
+                }
+            }
+        }
+    }
+    return revisions;
+}
+
+} // anonymous namespace
 
 std::string ChasteBuildInfo::GetLicenceText()
 {
-    return "${licence}";
+    return R"licence(${licence_text})licence";
 }
 
 const char* ChasteBuildInfo::GetRootDir()
@@ -58,8 +186,11 @@ const char* ChasteBuildInfo::GetRootDir()
 std::string ChasteBuildInfo::GetVersionString()
 {
     std::stringstream version;
-    version << GetMajorReleaseNumber() << "." << GetMinorReleaseNumber()
-            << "." << std::hex << GetRevisionNumber() << std::dec;
+    version << GetMajorReleaseNumber() << "." << GetMinorReleaseNumber();
+    if (GetChasteRevision().IsKnown())
+    {
+        version << "+" << GetChasteRevision().GetShortCommit();
+    }
     return version.str();
 }
 
@@ -73,27 +204,24 @@ unsigned ChasteBuildInfo::GetMinorReleaseNumber()
     return ${Chaste_VERSION_MINOR}u;
 }
 
-unsigned long long ChasteBuildInfo::GetRevisionNumber()
+SourceRevision ChasteBuildInfo::GetChasteRevision()
 {
-    return 0x${Chaste_revision};
-}
-
-bool ChasteBuildInfo::IsWorkingCopyModified()
-{
-    return ${Chaste_WC_MODIFIED};
+    static const SourceRevision revision = ReadRevision(rGetProvenanceDir());
+    return revision;
 }
 
 const char* ChasteBuildInfo::GetBuildTime()
 {
-    return "${build_time}";
+    static const std::string build_time = ReadProvenanceFile("timestamp", "unknown");
+    return build_time.c_str();
 }
 
 const char* ChasteBuildInfo::GetCurrentTime()
 {
-    // Get time in UTC
+    // Get local time; the format's %z gives its offset from UTC
     time_t rawtime;
     time(&rawtime);
-    struct tm* p_timeinfo = gmtime(&rawtime);
+    struct tm* p_timeinfo = localtime(&rawtime);
     // Convert to string
     const unsigned bufsize = ${time_size};
     static char buffer[bufsize];
@@ -108,7 +236,7 @@ const char* ChasteBuildInfo::GetBuilderUnameInfo()
 
 const char* ChasteBuildInfo::GetBuildInformation()
 {
-    return "${CMAKE_BUILD_TYPE}";
+    return "${Chaste_BUILD_TYPE}";
 }
 
 const char* ChasteBuildInfo::GetCompilerType()
@@ -126,31 +254,17 @@ const char* ChasteBuildInfo::GetCompilerFlags()
     return "${ALL_CXX_FLAGS}";
 }
 
-const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()
+std::map<std::string, SourceRevision> ChasteBuildInfo::GetProjectRevisions()
 {
-    static std::map<std::string, std::string> versions;
-    if (versions.empty())
-    {
-        ${project_versions}
-    }
-    return versions;
-}
-
-const std::map<std::string, std::string>& ChasteBuildInfo::rGetIfProjectsModified()
-{
-    static std::map<std::string, std::string> modified;
-    if (modified.empty())
-    {
-        ${projects_modified}
-    }
-    return modified;
+    static const std::map<std::string, SourceRevision> revisions = LoadProjectRevisions();
+    return revisions;
 }
 
 std::string ChasteBuildInfo::GetProvenanceString()
 {
     std::stringstream prov;
     prov << "Created by Chaste version " << GetVersionString();
-    if (IsWorkingCopyModified())
+    if (GetChasteRevision().IsModified())
     {
         prov << " (with uncommitted modifications)";
     }
@@ -158,12 +272,10 @@ std::string ChasteBuildInfo::GetProvenanceString()
     prov << "Chaste was built on " << GetBuildTime()
          << " by machine (uname) '" << GetBuilderUnameInfo()
          << "' using settings: " << GetBuildInformation();
-    const std::map<std::string, std::string>& r_project_versions = rGetProjectVersions();
-    for (std::map<std::string, std::string>::const_iterator iter = r_project_versions.begin();
-         iter != r_project_versions.end();
-         ++iter)
+    const std::map<std::string, SourceRevision> project_revisions = GetProjectRevisions();
+    for (auto iter = project_revisions.begin(); iter != project_revisions.end(); ++iter)
     {
-        if (iter == r_project_versions.begin())
+        if (iter == project_revisions.begin())
         {
             prov << ".  Checked-out project versions: ";
         }
@@ -171,7 +283,11 @@ std::string ChasteBuildInfo::GetProvenanceString()
         {
             prov << "; ";
         }
-        prov << iter->first << "=" << iter->second;
+        prov << iter->first << "=" << iter->second.GetShortCommit();
+        if (iter->second.IsModified())
+        {
+            prov << " (modified)";
+        }
     }
     prov << "." << std::endl;
     return prov.str();

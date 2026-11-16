@@ -46,7 +46,7 @@ jobs:
 
       - name: generate pychaste tutorial markdown
         run: |
-          python GeneratePyChasteTutorials.py
+          python GeneratePyChasteTutorials.py --format markdown
         working-directory: python/infra
 
       - name: upload archive files
@@ -54,4 +54,4 @@ jobs:
         with:
           name: pychaste-tutorial-markdown
           path: |
-            pychaste/src/py/doc/tutorial/*.md
+            tutorials/PyChasteTutorials/*.md
