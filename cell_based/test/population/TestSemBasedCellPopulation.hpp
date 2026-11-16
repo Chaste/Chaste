@@ -49,6 +49,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellDivisionLocationsWriter.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 #include "CellVolumesWriter.hpp"
+#include "CellPopulationAdjacencyMatrixWriter.hpp"
+#include "CellPopulationAreaWriter.hpp"
+#include "CellPopulationElementWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "CellRemovalLocationsWriter.hpp"
+#include "HeterotypicBoundaryLengthWriter.hpp"
+#include "NodeLocationWriter.hpp"
+#include "NodeVelocityWriter.hpp"
+#include "RadialCellDataDistributionWriter.hpp"
+#include "VertexIntersectionSwapLocationsWriter.hpp"
+#include "VertexT1SwapLocationsWriter.hpp"
+#include "VertexT2SwapLocationsWriter.hpp"
+#include "VertexT3SwapLocationsWriter.hpp"
+#include "VoronoiDataWriter.hpp"
+#include "FileComparison.hpp"
 #include "OutputFileHandler.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
@@ -292,22 +308,29 @@ public:
     }
 
     /**
-     * The population accepts count and event writers, both of which are deliberate no-ops for SEM
-     * because element division and removal events are not tracked.
+     * The population accepts count and event writers, which write their output as for any other
+     * population. Element division is not implemented, so the division writer records no events.
      */
     void TestAcceptsPopulationCountAndEventWriters()
     {
         TwoElementSemMesh fixture;
         std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
         SemBasedCellPopulation<2> cell_population(fixture.mesh, cells);
+        cell_population.SetDefaultCellMutationStateAndProliferativeTypeOrdering();
+
+        OutputFileHandler output_file_handler("TestSemBasedCellPopulationAcceptsWriters", false);
 
         boost::shared_ptr<AbstractCellPopulationCountWriter<2, 2> > p_count_writer(
             new CellMutationStatesCountWriter<2, 2>());
+        p_count_writer->OpenOutputFile(output_file_handler);
         TS_ASSERT_THROWS_NOTHING(cell_population.AcceptPopulationCountWriter(p_count_writer));
+        p_count_writer->CloseFile();
 
         boost::shared_ptr<AbstractCellPopulationEventWriter<2, 2> > p_event_writer(
             new CellDivisionLocationsWriter<2, 2>());
+        p_event_writer->OpenOutputFile(output_file_handler);
         TS_ASSERT_THROWS_NOTHING(cell_population.AcceptPopulationEventWriter(p_event_writer));
+        p_event_writer->CloseFile();
     }
 
     /**
@@ -492,6 +515,114 @@ public:
             TS_ASSERT_DELTA(p_volumes->GetTuple1(cell), expected_volume, 1e-6);
         }
 #endif // CHASTE_VTK
+    }
+
+    void TestWritersWithSemBasedCellPopulation()
+    {
+        // Set up SimulationTime (needed for VTK output)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
+        // Two triangular elements whose nearest nodes (1 and 3) are close enough to interact
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0u, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1u, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2u, false, 0.5, 1.0));
+        nodes.push_back(new Node<2>(3u, false, 1.05, 0.0));
+        nodes.push_back(new Node<2>(4u, false, 2.05, 0.0));
+        nodes.push_back(new Node<2>(5u, false, 1.55, 1.0));
+
+        std::vector<Node<2>*> element_0_nodes(nodes.begin(), nodes.begin() + 3);
+        std::vector<Node<2>*> element_1_nodes(nodes.begin() + 3, nodes.end());
+        std::vector<SemElement<2>*> elements;
+        elements.push_back(new SemElement<2>(0u, element_0_nodes));
+        elements.push_back(new SemElement<2>(1u, element_1_nodes));
+        SemMesh<2> mesh(nodes, elements);
+
+        std::vector<CellPtr> cells = CreateCells(mesh.GetNumElements());
+        SemBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // A box collection is needed for Update() to find the node pair between the two elements
+        c_vector<double, 4> domain;
+        domain[0] = -0.1;
+        domain[1] =  2.2;
+        domain[2] = -0.1;
+        domain[3] =  1.1;
+        mesh.SetUpBoxCollection(0.2, domain);
+        cell_population.Update(false);
+        TS_ASSERT_EQUALS(cell_population.GetNeighbouringLocationIndices(cell_population.GetCellUsingLocationIndex(0u)).size(), 1u);
+
+        // Give one cell a different mutation state, and give each cell some data for the radial writer
+        boost::shared_ptr<AbstractCellProperty> p_apc1(cell_population.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
+        cell_population.GetCellUsingLocationIndex(1u)->SetMutationState(p_apc1);
+        cell_population.GetCellUsingLocationIndex(0u)->GetCellData()->SetItem("variable", 1.0);
+        cell_population.GetCellUsingLocationIndex(1u)->GetCellData()->SetItem("variable", 2.0);
+
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
+
+        cell_population.AddCellPopulationEventWriter<CellDivisionLocationsWriter>();
+        cell_population.AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
+
+        cell_population.AddPopulationWriter<CellPopulationAdjacencyMatrixWriter>();
+        cell_population.AddPopulationWriter<CellPopulationElementWriter>();
+        cell_population.AddPopulationWriter<NodeLocationWriter>();
+        cell_population.AddPopulationWriter<NodeVelocityWriter>();
+        cell_population.AddPopulationWriter<VertexIntersectionSwapLocationsWriter>();
+        cell_population.AddPopulationWriter<VertexT1SwapLocationsWriter>();
+        cell_population.AddPopulationWriter<VertexT2SwapLocationsWriter>();
+        cell_population.AddPopulationWriter<VertexT3SwapLocationsWriter>();
+
+        boost::shared_ptr<RadialCellDataDistributionWriter<2, 2> > p_radial_writer(new RadialCellDataDistributionWriter<2, 2>());
+        p_radial_writer->SetVariableName("variable");
+        p_radial_writer->SetNumRadialBins(2);
+        cell_population.AddPopulationWriter(p_radial_writer);
+
+        std::string output_directory = "TestSemBasedCellPopulationWriters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        cell_population.OpenWritersFiles(output_file_handler);
+        cell_population.WriteResultsToFiles(output_directory);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        cell_population.Update(false);
+        cell_population.WriteResultsToFiles(output_directory);
+
+        cell_population.CloseWritersFiles();
+
+        // Compare output with saved files of what they should look like
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestSemBasedCellPopulationWriters/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestSemBasedCellPopulationWriters/celltypes.dat").CompareFiles();
+        FileComparison(results_dir + "cellpopulationadjacency.dat", "cell_based/test/data/TestSemBasedCellPopulationWriters/cellpopulationadjacency.dat").CompareFiles();
+        FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestSemBasedCellPopulationWriters/results.vizelements").CompareFiles();
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestSemBasedCellPopulationWriters/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "nodevelocities.dat", "cell_based/test/data/TestSemBasedCellPopulationWriters/nodevelocities.dat").CompareFiles();
+        FileComparison(results_dir + "radial_dist.dat", "cell_based/test/data/TestSemBasedCellPopulationWriters/radial_dist.dat").CompareFiles();
+    }
+
+    void TestWritersThatCannotBeUsedWithSemBasedCellPopulation()
+    {
+        TwoElementSemMesh fixture;
+        std::vector<CellPtr> cells = CreateCells(fixture.mesh.GetNumElements());
+        SemBasedCellPopulation<2> cell_population(fixture.mesh, cells);
+
+        CellPopulationAreaWriter<2, 2> area_writer;
+        TS_ASSERT_THROWS_THIS(area_writer.Visit(&cell_population),
+                              "CellPopulationAreaWriter cannot be used with a SemBasedCellPopulation");
+
+        HeterotypicBoundaryLengthWriter<2, 2> heterotypic_boundary_length_writer;
+        TS_ASSERT_THROWS_THIS(heterotypic_boundary_length_writer.Visit(&cell_population),
+                              "HeterotypicBoundaryLengthWriter cannot be used with a SemBasedCellPopulation");
+
+        VoronoiDataWriter<2, 2> voronoi_writer;
+        TS_ASSERT_THROWS_THIS(voronoi_writer.Visit(&cell_population),
+                              "VoronoiDataWriter cannot be used with a SemBasedCellPopulation");
+
+        // The cells here have a NoCellCycleModel, which has no cell cycle phases to count
+        CellProliferativePhasesCountWriter<2, 2> phases_count_writer;
+        TS_ASSERT_THROWS_THIS(phases_count_writer.Visit(&cell_population),
+                              "You are trying to record the cell cycle phase of cells with a non phase based cell cycle model.");
     }
 };
 

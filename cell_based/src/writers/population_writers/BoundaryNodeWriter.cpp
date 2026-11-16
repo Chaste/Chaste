@@ -110,7 +110,9 @@ void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopul
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    //VisitAnyPopulation(pCellPopulation);
+    // SEM marks membrane nodes with node regions rather than the boundary node flag this writer
+    // reads, so there is nothing meaningful to write. This writer is added by default for the
+    // Chaste visualiser, so it must not throw; use NodeRegionPointDataWriter for SEM instead.
 }
 
 // Explicit instantiation

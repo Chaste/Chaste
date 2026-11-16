@@ -174,18 +174,12 @@ public:
     virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write whether each node is a boundary node.
+     * Visit the population and write the data.
      *
-     * Outputs a line of space-separated values of the form:
-     * [node 0 is boundary node] [node 1 is boundary node] ...
+     * This is an empty dummy function, since SEM marks membrane nodes with node regions
+     * rather than the boundary node flag this writer reads; use NodeRegionPointDataWriter instead.
      *
-     * where [node 0 is boundary node] is 1 if node 0 is a boundary node and 0 if it is not, and so on.
-     * Here the indexing of nodes is as given by the NodeIterator.
-     *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
-     *
-     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
+     * @param pCellPopulation a pointer to the SemBasedCellPopulation to visit.
      */
     virtual void Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
