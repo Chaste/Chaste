@@ -42,6 +42,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////
 
+#ifdef CHASTE_USE_POOLED_ELEMENT_ALLOCATOR
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+boost::pool<>& Element<ELEMENT_DIM, SPACE_DIM>::rGetMemoryPool()
+{
+    static boost::pool<> pool(sizeof(Element<ELEMENT_DIM, SPACE_DIM>));
+    return pool;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void* Element<ELEMENT_DIM, SPACE_DIM>::operator new(std::size_t size)
+{
+    assert(size == sizeof(Element<ELEMENT_DIM, SPACE_DIM>));
+    void* p_mem = rGetMemoryPool().malloc();
+    if (p_mem == nullptr)
+    {
+        throw std::bad_alloc();
+    }
+    return p_mem;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void Element<ELEMENT_DIM, SPACE_DIM>::operator delete(void* pElement)
+{
+    rGetMemoryPool().free(pElement);
+}
+#endif // CHASTE_USE_POOLED_ELEMENT_ALLOCATOR
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Element<ELEMENT_DIM, SPACE_DIM>::Element(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes, bool registerWithNodes)
     : AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes)

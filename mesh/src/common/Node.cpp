@@ -107,6 +107,33 @@ Node<SPACE_DIM>::~Node()
     delete mpNodeAttributes;
 }
 
+#ifdef CHASTE_USE_POOLED_NODE_ALLOCATOR
+template<unsigned SPACE_DIM>
+boost::pool<>& Node<SPACE_DIM>::rGetMemoryPool()
+{
+    static boost::pool<> pool(sizeof(Node<SPACE_DIM>));
+    return pool;
+}
+
+template<unsigned SPACE_DIM>
+void* Node<SPACE_DIM>::operator new(std::size_t size)
+{
+    assert(size == sizeof(Node<SPACE_DIM>));
+    void* p_mem = rGetMemoryPool().malloc();
+    if (p_mem == nullptr)
+    {
+        throw std::bad_alloc();
+    }
+    return p_mem;
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::operator delete(void* pNode)
+{
+    rGetMemoryPool().free(pNode);
+}
+#endif // CHASTE_USE_POOLED_NODE_ALLOCATOR
+
 //////////////////////////////////////////////////////////////////////////
 // Methods dealing with node location
 //////////////////////////////////////////////////////////////////////////
