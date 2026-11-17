@@ -33,8 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <random>
-
 #include "AbstractImmersedBoundaryForce.hpp"
 
 template <unsigned DIM>
@@ -61,16 +59,9 @@ void AbstractImmersedBoundaryForce<DIM>::AddNormalNoiseToNodes(
     {
         unsigned num_nodes_this_elem = rCellPopulation.GetElement(elem_idx)->GetNumNodes();
 
-        // Generate a vector with 0, 1, 2, ..., num_nodes-1
+        // Generate a random permutation of 0, 1, 2, ..., num_nodes-1
         std::vector<unsigned> random_node_order;
-        random_node_order.reserve(num_nodes_this_elem);
-        for (unsigned node_idx = 0; node_idx < num_nodes_this_elem; ++node_idx)
-        {
-            random_node_order.push_back(node_idx);
-        }
-
-        // Shuffle the vector
-        std::shuffle(random_node_order.begin(), random_node_order.end(), std::mt19937(std::random_device()()));
+        p_gen->Shuffle(num_nodes_this_elem, random_node_order);
 
         // Only go to half way (rounded down - forget about the very last node for now)
         unsigned half_way = num_nodes_this_elem / 2;
@@ -104,16 +95,9 @@ void AbstractImmersedBoundaryForce<DIM>::AddNormalNoiseToNodes(
     {
         unsigned num_nodes_this_elem = rCellPopulation.GetLamina(lam_idx)->GetNumNodes();
 
-        // Generate a vector with 0, 1, 2, ..., num_nodes-1
+        // Generate a random permutation of 0, 1, 2, ..., num_nodes-1
         std::vector<unsigned> random_node_order;
-        random_node_order.reserve(num_nodes_this_elem);
-        for (unsigned node_idx = 0; node_idx < num_nodes_this_elem; ++node_idx)
-        {
-            random_node_order.push_back(node_idx);
-        }
-
-        // Shuffle the vector
-        std::shuffle(random_node_order.begin(), random_node_order.end(), std::mt19937(std::random_device()()));
+        p_gen->Shuffle(num_nodes_this_elem, random_node_order);
 
         // Only go to half way (rounded down - forget about the very last node for now)
         unsigned half_way = num_nodes_this_elem / 2;

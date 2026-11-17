@@ -165,7 +165,7 @@ public:
      * Sample an instance of the random field.
      *
      * Calls SampleRandomFieldAtTime() at a time chosen uniformly at random from
-     * 0 to 1.
+     * [0, 1e6), using the RandomNumberGenerator singleton.
      *
      * @return A vector representing an instance of the random field.
      */
