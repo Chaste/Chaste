@@ -135,7 +135,7 @@ private:
         }
 
         // Attribute value has the same tag (assume that it doesn't overtake the previous message)
-        double attribute;
+        double attribute = 0.0;
         MeshEventHandler::BeginEvent(MeshEventHandler::COMM2);
         MPI_Recv(&attribute, 1U, MPI_DOUBLE, MPI_ANY_SOURCE,
                  tag,
