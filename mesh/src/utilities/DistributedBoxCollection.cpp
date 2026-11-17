@@ -32,6 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+#include <cmath>
+
 #include "DistributedBoxCollection.hpp"
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
@@ -327,12 +329,8 @@ unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(c_vector<double, 
     c_vector<unsigned, DIM> containing_box_indices = scalar_vector<unsigned>(DIM, 0u);
     for (unsigned i=0; i<DIM; i++)
     {
-        double box_counter = mDomainSize(2*i);
-        while (!((box_counter + mBoxWidth) > rLocation[i] + msFudge))
-        {
-            containing_box_indices[i]++;
-            box_counter += mBoxWidth;
-        }
+        double relative_location = rLocation[i] - mDomainSize(2*i) + msFudge;
+        containing_box_indices[i] = static_cast<unsigned>(std::floor(relative_location / mBoxWidth));
     }
 
     // Use these to compute the index of the containing box

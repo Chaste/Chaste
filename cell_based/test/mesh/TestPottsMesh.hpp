@@ -65,55 +65,55 @@ public:
         basic_nodes.push_back(new Node<2>(5, false, 2.0, 1.0));
 
         // Specify neighbours of nodes
-        std::set<unsigned> von_neuman_neighbours_0, moore_neighbours_0;
-        moore_neighbours_0.insert(1);
-        moore_neighbours_0.insert(3);
-        moore_neighbours_0.insert(4);
-        von_neuman_neighbours_0.insert(1);
-        von_neuman_neighbours_0.insert(3);
+        std::vector<unsigned> von_neuman_neighbours_0, moore_neighbours_0;
+        moore_neighbours_0.push_back(1);
+        moore_neighbours_0.push_back(3);
+        moore_neighbours_0.push_back(4);
+        von_neuman_neighbours_0.push_back(1);
+        von_neuman_neighbours_0.push_back(3);
 
-        std::set<unsigned> von_neuman_neighbours_1, moore_neighbours_1;
-        moore_neighbours_1.insert(0);
-        moore_neighbours_1.insert(2);
-        moore_neighbours_1.insert(3);
-        moore_neighbours_1.insert(4);
-        moore_neighbours_1.insert(5);
-        von_neuman_neighbours_1.insert(0);
-        von_neuman_neighbours_1.insert(2);
-        von_neuman_neighbours_1.insert(4);
+        std::vector<unsigned> von_neuman_neighbours_1, moore_neighbours_1;
+        moore_neighbours_1.push_back(0);
+        moore_neighbours_1.push_back(2);
+        moore_neighbours_1.push_back(3);
+        moore_neighbours_1.push_back(4);
+        moore_neighbours_1.push_back(5);
+        von_neuman_neighbours_1.push_back(0);
+        von_neuman_neighbours_1.push_back(2);
+        von_neuman_neighbours_1.push_back(4);
 
-        std::set<unsigned> von_neuman_neighbours_2, moore_neighbours_2;
-        moore_neighbours_2.insert(1);
-        moore_neighbours_2.insert(4);
-        moore_neighbours_2.insert(5);
-        von_neuman_neighbours_2.insert(1);
-        von_neuman_neighbours_2.insert(5);
+        std::vector<unsigned> von_neuman_neighbours_2, moore_neighbours_2;
+        moore_neighbours_2.push_back(1);
+        moore_neighbours_2.push_back(4);
+        moore_neighbours_2.push_back(5);
+        von_neuman_neighbours_2.push_back(1);
+        von_neuman_neighbours_2.push_back(5);
 
-        std::set<unsigned> von_neuman_neighbours_3, moore_neighbours_3;
-        moore_neighbours_3.insert(0);
-        moore_neighbours_3.insert(1);
-        moore_neighbours_3.insert(4);
-        von_neuman_neighbours_3.insert(0);
-        von_neuman_neighbours_3.insert(4);
+        std::vector<unsigned> von_neuman_neighbours_3, moore_neighbours_3;
+        moore_neighbours_3.push_back(0);
+        moore_neighbours_3.push_back(1);
+        moore_neighbours_3.push_back(4);
+        von_neuman_neighbours_3.push_back(0);
+        von_neuman_neighbours_3.push_back(4);
 
-        std::set<unsigned> von_neuman_neighbours_4, moore_neighbours_4;
-        moore_neighbours_4.insert(0);
-        moore_neighbours_4.insert(1);
-        moore_neighbours_4.insert(2);
-        moore_neighbours_4.insert(3);
-        moore_neighbours_4.insert(5);
-        von_neuman_neighbours_4.insert(1);
-        von_neuman_neighbours_4.insert(3);
-        von_neuman_neighbours_4.insert(5);
+        std::vector<unsigned> von_neuman_neighbours_4, moore_neighbours_4;
+        moore_neighbours_4.push_back(0);
+        moore_neighbours_4.push_back(1);
+        moore_neighbours_4.push_back(2);
+        moore_neighbours_4.push_back(3);
+        moore_neighbours_4.push_back(5);
+        von_neuman_neighbours_4.push_back(1);
+        von_neuman_neighbours_4.push_back(3);
+        von_neuman_neighbours_4.push_back(5);
 
-        std::set<unsigned> von_neuman_neighbours_5, moore_neighbours_5;
-        moore_neighbours_5.insert(1);
-        moore_neighbours_5.insert(2);
-        moore_neighbours_5.insert(4);
-        von_neuman_neighbours_5.insert(2);
-        von_neuman_neighbours_5.insert(4);
+        std::vector<unsigned> von_neuman_neighbours_5, moore_neighbours_5;
+        moore_neighbours_5.push_back(1);
+        moore_neighbours_5.push_back(2);
+        moore_neighbours_5.push_back(4);
+        von_neuman_neighbours_5.push_back(2);
+        von_neuman_neighbours_5.push_back(4);
 
-        std::vector< std::set<unsigned> > basic_moore_neighbours;
+        std::vector< std::vector<unsigned> > basic_moore_neighbours;
         basic_moore_neighbours.push_back(moore_neighbours_0);
         basic_moore_neighbours.push_back(moore_neighbours_1);
         basic_moore_neighbours.push_back(moore_neighbours_2);
@@ -121,7 +121,7 @@ public:
         basic_moore_neighbours.push_back(moore_neighbours_4);
         basic_moore_neighbours.push_back(moore_neighbours_5);
 
-        std::vector< std::set<unsigned> > basic_von_neuman_neighbours;
+        std::vector< std::vector<unsigned> > basic_von_neuman_neighbours;
         basic_von_neuman_neighbours.push_back(von_neuman_neighbours_0);
         basic_von_neuman_neighbours.push_back(von_neuman_neighbours_1);
         basic_von_neuman_neighbours.push_back(von_neuman_neighbours_2);
@@ -219,107 +219,107 @@ public:
         basic_nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
         // Specify neighbours of nodes
-        std::set<unsigned> von_neuman_neighbours_0, moore_neighbours_0;
-        moore_neighbours_0.insert(1);
-        moore_neighbours_0.insert(2);
-        moore_neighbours_0.insert(3);
-        moore_neighbours_0.insert(4);
-        moore_neighbours_0.insert(5);
-        moore_neighbours_0.insert(6);
-        moore_neighbours_0.insert(7);
-        von_neuman_neighbours_0.insert(1);
-        von_neuman_neighbours_0.insert(2);
-        von_neuman_neighbours_0.insert(4);
+        std::vector<unsigned> von_neuman_neighbours_0, moore_neighbours_0;
+        moore_neighbours_0.push_back(1);
+        moore_neighbours_0.push_back(2);
+        moore_neighbours_0.push_back(3);
+        moore_neighbours_0.push_back(4);
+        moore_neighbours_0.push_back(5);
+        moore_neighbours_0.push_back(6);
+        moore_neighbours_0.push_back(7);
+        von_neuman_neighbours_0.push_back(1);
+        von_neuman_neighbours_0.push_back(2);
+        von_neuman_neighbours_0.push_back(4);
 
-        std::set<unsigned> von_neuman_neighbours_1, moore_neighbours_1;
-        moore_neighbours_1.insert(0);
-        moore_neighbours_1.insert(2);
-        moore_neighbours_1.insert(3);
-        moore_neighbours_1.insert(4);
-        moore_neighbours_1.insert(5);
-        moore_neighbours_1.insert(6);
-        moore_neighbours_1.insert(7);
-        von_neuman_neighbours_1.insert(0);
-        von_neuman_neighbours_1.insert(3);
-        von_neuman_neighbours_1.insert(5);
+        std::vector<unsigned> von_neuman_neighbours_1, moore_neighbours_1;
+        moore_neighbours_1.push_back(0);
+        moore_neighbours_1.push_back(2);
+        moore_neighbours_1.push_back(3);
+        moore_neighbours_1.push_back(4);
+        moore_neighbours_1.push_back(5);
+        moore_neighbours_1.push_back(6);
+        moore_neighbours_1.push_back(7);
+        von_neuman_neighbours_1.push_back(0);
+        von_neuman_neighbours_1.push_back(3);
+        von_neuman_neighbours_1.push_back(5);
 
-        std::set<unsigned> von_neuman_neighbours_2, moore_neighbours_2;
-        moore_neighbours_2.insert(0);
-        moore_neighbours_2.insert(1);
-        moore_neighbours_2.insert(3);
-        moore_neighbours_2.insert(4);
-        moore_neighbours_2.insert(5);
-        moore_neighbours_2.insert(6);
-        moore_neighbours_2.insert(7);
-        von_neuman_neighbours_2.insert(0);
-        von_neuman_neighbours_2.insert(3);
-        von_neuman_neighbours_2.insert(6);
+        std::vector<unsigned> von_neuman_neighbours_2, moore_neighbours_2;
+        moore_neighbours_2.push_back(0);
+        moore_neighbours_2.push_back(1);
+        moore_neighbours_2.push_back(3);
+        moore_neighbours_2.push_back(4);
+        moore_neighbours_2.push_back(5);
+        moore_neighbours_2.push_back(6);
+        moore_neighbours_2.push_back(7);
+        von_neuman_neighbours_2.push_back(0);
+        von_neuman_neighbours_2.push_back(3);
+        von_neuman_neighbours_2.push_back(6);
 
-        std::set<unsigned> von_neuman_neighbours_3, moore_neighbours_3;
-        moore_neighbours_3.insert(0);
-        moore_neighbours_3.insert(1);
-        moore_neighbours_3.insert(2);
-        moore_neighbours_3.insert(3);
-        moore_neighbours_3.insert(4);
-        moore_neighbours_3.insert(5);
-        moore_neighbours_3.insert(6);
-        moore_neighbours_3.insert(7);
-        von_neuman_neighbours_3.insert(1);
-        von_neuman_neighbours_3.insert(2);
-        von_neuman_neighbours_3.insert(7);
+        std::vector<unsigned> von_neuman_neighbours_3, moore_neighbours_3;
+        moore_neighbours_3.push_back(0);
+        moore_neighbours_3.push_back(1);
+        moore_neighbours_3.push_back(2);
+        moore_neighbours_3.push_back(3);
+        moore_neighbours_3.push_back(4);
+        moore_neighbours_3.push_back(5);
+        moore_neighbours_3.push_back(6);
+        moore_neighbours_3.push_back(7);
+        von_neuman_neighbours_3.push_back(1);
+        von_neuman_neighbours_3.push_back(2);
+        von_neuman_neighbours_3.push_back(7);
 
-        std::set<unsigned> von_neuman_neighbours_4, moore_neighbours_4;
-        moore_neighbours_4.insert(0);
-        moore_neighbours_4.insert(1);
-        moore_neighbours_4.insert(2);
-        moore_neighbours_4.insert(3);
-        moore_neighbours_4.insert(4);
-        moore_neighbours_4.insert(5);
-        moore_neighbours_4.insert(6);
-        moore_neighbours_4.insert(7);
-        von_neuman_neighbours_4.insert(0);
-        von_neuman_neighbours_4.insert(5);
-        von_neuman_neighbours_4.insert(6);
+        std::vector<unsigned> von_neuman_neighbours_4, moore_neighbours_4;
+        moore_neighbours_4.push_back(0);
+        moore_neighbours_4.push_back(1);
+        moore_neighbours_4.push_back(2);
+        moore_neighbours_4.push_back(3);
+        moore_neighbours_4.push_back(4);
+        moore_neighbours_4.push_back(5);
+        moore_neighbours_4.push_back(6);
+        moore_neighbours_4.push_back(7);
+        von_neuman_neighbours_4.push_back(0);
+        von_neuman_neighbours_4.push_back(5);
+        von_neuman_neighbours_4.push_back(6);
 
-        std::set<unsigned> von_neuman_neighbours_5, moore_neighbours_5;
-        moore_neighbours_5.insert(0);
-        moore_neighbours_5.insert(1);
-        moore_neighbours_5.insert(2);
-        moore_neighbours_5.insert(3);
-        moore_neighbours_5.insert(4);
-        moore_neighbours_5.insert(5);
-        moore_neighbours_5.insert(6);
-        moore_neighbours_5.insert(7);
-        von_neuman_neighbours_5.insert(1);
-        von_neuman_neighbours_5.insert(4);
-        von_neuman_neighbours_5.insert(7);
+        std::vector<unsigned> von_neuman_neighbours_5, moore_neighbours_5;
+        moore_neighbours_5.push_back(0);
+        moore_neighbours_5.push_back(1);
+        moore_neighbours_5.push_back(2);
+        moore_neighbours_5.push_back(3);
+        moore_neighbours_5.push_back(4);
+        moore_neighbours_5.push_back(5);
+        moore_neighbours_5.push_back(6);
+        moore_neighbours_5.push_back(7);
+        von_neuman_neighbours_5.push_back(1);
+        von_neuman_neighbours_5.push_back(4);
+        von_neuman_neighbours_5.push_back(7);
 
-        std::set<unsigned> von_neuman_neighbours_6, moore_neighbours_6;
-        moore_neighbours_6.insert(0);
-        moore_neighbours_6.insert(1);
-        moore_neighbours_6.insert(2);
-        moore_neighbours_6.insert(3);
-        moore_neighbours_6.insert(4);
-        moore_neighbours_6.insert(5);
-        moore_neighbours_6.insert(6);
-        moore_neighbours_6.insert(7);
-        von_neuman_neighbours_6.insert(2);
-        von_neuman_neighbours_6.insert(4);
-        von_neuman_neighbours_6.insert(7);
+        std::vector<unsigned> von_neuman_neighbours_6, moore_neighbours_6;
+        moore_neighbours_6.push_back(0);
+        moore_neighbours_6.push_back(1);
+        moore_neighbours_6.push_back(2);
+        moore_neighbours_6.push_back(3);
+        moore_neighbours_6.push_back(4);
+        moore_neighbours_6.push_back(5);
+        moore_neighbours_6.push_back(6);
+        moore_neighbours_6.push_back(7);
+        von_neuman_neighbours_6.push_back(2);
+        von_neuman_neighbours_6.push_back(4);
+        von_neuman_neighbours_6.push_back(7);
 
-        std::set<unsigned> von_neuman_neighbours_7, moore_neighbours_7;
-        moore_neighbours_7.insert(0);
-        moore_neighbours_7.insert(1);
-        moore_neighbours_7.insert(2);
-        moore_neighbours_7.insert(3);
-        moore_neighbours_7.insert(4);
-        moore_neighbours_7.insert(5);
-        moore_neighbours_7.insert(6);
-        von_neuman_neighbours_7.insert(3);
-        von_neuman_neighbours_7.insert(5);
-        von_neuman_neighbours_7.insert(6);
+        std::vector<unsigned> von_neuman_neighbours_7, moore_neighbours_7;
+        moore_neighbours_7.push_back(0);
+        moore_neighbours_7.push_back(1);
+        moore_neighbours_7.push_back(2);
+        moore_neighbours_7.push_back(3);
+        moore_neighbours_7.push_back(4);
+        moore_neighbours_7.push_back(5);
+        moore_neighbours_7.push_back(6);
+        von_neuman_neighbours_7.push_back(3);
+        von_neuman_neighbours_7.push_back(5);
+        von_neuman_neighbours_7.push_back(6);
 
-        std::vector< std::set<unsigned> > basic_moore_neighbours;
+        std::vector< std::vector<unsigned> > basic_moore_neighbours;
         basic_moore_neighbours.push_back(moore_neighbours_0);
         basic_moore_neighbours.push_back(moore_neighbours_1);
         basic_moore_neighbours.push_back(moore_neighbours_2);
@@ -329,7 +329,7 @@ public:
         basic_moore_neighbours.push_back(moore_neighbours_6);
         basic_moore_neighbours.push_back(moore_neighbours_7);
 
-        std::vector< std::set<unsigned> > basic_von_neuman_neighbours;
+        std::vector< std::vector<unsigned> > basic_von_neuman_neighbours;
         basic_von_neuman_neighbours.push_back(von_neuman_neighbours_0);
         basic_von_neuman_neighbours.push_back(von_neuman_neighbours_1);
         basic_von_neuman_neighbours.push_back(von_neuman_neighbours_2);
@@ -415,17 +415,17 @@ public:
         basic_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
 
         // Specify neighbours of nodes
-        std::set<unsigned> von_neuman_neighbours_0, moore_neighbours_0;
-        moore_neighbours_0.insert(1);
-        moore_neighbours_0.insert(3);
-        moore_neighbours_0.insert(4);
-        von_neuman_neighbours_0.insert(1);
-        von_neuman_neighbours_0.insert(3);
+        std::vector<unsigned> von_neuman_neighbours_0, moore_neighbours_0;
+        moore_neighbours_0.push_back(1);
+        moore_neighbours_0.push_back(3);
+        moore_neighbours_0.push_back(4);
+        von_neuman_neighbours_0.push_back(1);
+        von_neuman_neighbours_0.push_back(3);
 
-        std::vector< std::set<unsigned> > basic_moore_neighbours;
+        std::vector< std::vector<unsigned> > basic_moore_neighbours;
         basic_moore_neighbours.push_back(moore_neighbours_0);
 
-        std::vector< std::set<unsigned> > basic_von_neuman_neighbours;
+        std::vector< std::vector<unsigned> > basic_von_neuman_neighbours;
         basic_von_neuman_neighbours.push_back(von_neuman_neighbours_0);
 
         // Make one element out of these nodes
@@ -583,9 +583,9 @@ public:
         boost::shared_ptr<PottsMesh<2> > p_periodic_mesh = periodic_generator.GetMesh();
 
         // Test bottom left node
-        std::set<unsigned> neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(0);
+        std::set<unsigned> neighbouring_sites(p_mesh->GetMooreNeighbouringNodeIndices(0).begin(), p_mesh->GetMooreNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        std::set<unsigned> periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(0);
+        std::set<unsigned> periodic_neighbouring_sites(p_periodic_mesh->GetMooreNeighbouringNodeIndices(0).begin(), p_periodic_mesh->GetMooreNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
         std::set<unsigned> expected_neighbouring_sites;
@@ -601,9 +601,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner bottom nodes
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(1);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(1).begin(), p_mesh->GetMooreNeighbouringNodeIndices(1).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(1);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetMooreNeighbouringNodeIndices(1).begin(), p_periodic_mesh->GetMooreNeighbouringNodeIndices(1).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
         expected_neighbouring_sites.clear();
@@ -619,9 +619,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test bottom right node
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(2);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(2).begin(), p_mesh->GetMooreNeighbouringNodeIndices(2).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(2);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetMooreNeighbouringNodeIndices(2).begin(), p_periodic_mesh->GetMooreNeighbouringNodeIndices(2).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
         expected_neighbouring_sites.clear();
@@ -637,9 +637,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner left nodes
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(3);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(3).begin(), p_mesh->GetMooreNeighbouringNodeIndices(3).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(3);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetMooreNeighbouringNodeIndices(3).begin(), p_periodic_mesh->GetMooreNeighbouringNodeIndices(3).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
         expected_neighbouring_sites.clear();
@@ -655,9 +655,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test centre node
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(4);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(4).begin(), p_mesh->GetMooreNeighbouringNodeIndices(4).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 8u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(4);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetMooreNeighbouringNodeIndices(4).begin(), p_periodic_mesh->GetMooreNeighbouringNodeIndices(4).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
         expected_neighbouring_sites.clear();
@@ -671,9 +671,9 @@ public:
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner right nodes
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(5);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(5).begin(), p_mesh->GetMooreNeighbouringNodeIndices(5).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(5);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetMooreNeighbouringNodeIndices(5).begin(), p_periodic_mesh->GetMooreNeighbouringNodeIndices(5).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
         expected_neighbouring_sites.clear();
@@ -689,9 +689,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test top left node
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(6);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(6).begin(), p_mesh->GetMooreNeighbouringNodeIndices(6).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(6);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetMooreNeighbouringNodeIndices(6).begin(), p_periodic_mesh->GetMooreNeighbouringNodeIndices(6).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
         expected_neighbouring_sites.clear();
@@ -707,9 +707,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner top nodes
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(7);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(7).begin(), p_mesh->GetMooreNeighbouringNodeIndices(7).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(7);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetMooreNeighbouringNodeIndices(7).begin(), p_periodic_mesh->GetMooreNeighbouringNodeIndices(7).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
         expected_neighbouring_sites.clear();
@@ -725,9 +725,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test top right node
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(8);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(8).begin(), p_mesh->GetMooreNeighbouringNodeIndices(8).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(8);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetMooreNeighbouringNodeIndices(8).begin(), p_periodic_mesh->GetMooreNeighbouringNodeIndices(8).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
         expected_neighbouring_sites.clear();
@@ -768,9 +768,9 @@ public:
         boost::shared_ptr<PottsMesh<3> > p_periodic_mesh = periodic_generator.GetMesh();
 
         // Test bottom left node
-        std::set<unsigned> neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(0);
+        std::set<unsigned> neighbouring_sites(p_mesh->GetMooreNeighbouringNodeIndices(0).begin(), p_mesh->GetMooreNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 7u);
-        std::set<unsigned> x_periodic_neighbouring_sites = p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(0);
+        std::set<unsigned> x_periodic_neighbouring_sites(p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(0).begin(), p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 11u)
 
         std::set<unsigned> expected_neighbouring_sites;
@@ -789,9 +789,9 @@ public:
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test middle bottom
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(4);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(4).begin(), p_mesh->GetMooreNeighbouringNodeIndices(4).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 17u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(4);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(4).begin(), p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(4).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 17u)
 
         expected_neighbouring_sites.clear();
@@ -816,9 +816,9 @@ public:
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test middle middle node
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(13);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(13).begin(), p_mesh->GetMooreNeighbouringNodeIndices(13).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 26u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(13);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(13).begin(), p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(13).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 26u)
 
         expected_neighbouring_sites.clear();
@@ -852,9 +852,9 @@ public:
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner left node
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(21);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(21).begin(), p_mesh->GetMooreNeighbouringNodeIndices(21).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 11u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(21);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(21).begin(), p_x_periodic_mesh->GetMooreNeighbouringNodeIndices(21).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 17u)
 
         expected_neighbouring_sites.clear();
@@ -889,7 +889,7 @@ public:
                     expected_neighbouring_sites.insert(i);
                 }
             }
-            std::set<unsigned> periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(node_index);
+            std::set<unsigned> periodic_neighbouring_sites(p_periodic_mesh->GetMooreNeighbouringNodeIndices(node_index).begin(), p_periodic_mesh->GetMooreNeighbouringNodeIndices(node_index).end());
             TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 26u)
             TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
         }
@@ -912,9 +912,9 @@ public:
         boost::shared_ptr<PottsMesh<2> > p_periodic_mesh = periodic_generator.GetMesh();
 
         // Test bottom left node
-        std::set<unsigned> neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(0);
+        std::set<unsigned> neighbouring_sites(p_mesh->GetVonNeumannNeighbouringNodeIndices(0).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
-        std::set<unsigned> periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(0);
+        std::set<unsigned> periodic_neighbouring_sites(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(0).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 4u);
 
         std::set<unsigned> expected_neighbouring_sites;
@@ -926,9 +926,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner bottom nodes
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(1);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(1).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(1).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(1);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(1).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(1).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 4u);
 
         expected_neighbouring_sites.clear();
@@ -940,9 +940,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test bottom right node
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(2);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(2).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(2).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(2);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(2).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(2).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 4u);
 
         expected_neighbouring_sites.clear();
@@ -954,9 +954,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner left nodes
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(3);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(3).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(3).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(3);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(3).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(3).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 4u);
 
         expected_neighbouring_sites.clear();
@@ -968,9 +968,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test centre node
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(4);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(4).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(4).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(4);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(4).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(4).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 4u);
 
         expected_neighbouring_sites.clear();
@@ -982,9 +982,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner right nodes
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(5);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(5).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(5).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(5);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(5).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(5).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 4u);
 
         expected_neighbouring_sites.clear();
@@ -996,9 +996,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test top left node
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(6);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(6).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(6).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(6);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(6).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(6).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 4u);
 
         expected_neighbouring_sites.clear();
@@ -1010,9 +1010,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner top nodes
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(7);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(7).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(7).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(7);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(7).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(7).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 4u);
 
         expected_neighbouring_sites.clear();
@@ -1024,9 +1024,9 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test top right node
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(8);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(8).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(8).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(8);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(8).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(8).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 4u);
 
         expected_neighbouring_sites.clear();
@@ -1060,11 +1060,11 @@ public:
         boost::shared_ptr<PottsMesh<3> > p_periodic_mesh = periodic_generator.GetMesh();
 
         // Test bottom left node
-        std::set<unsigned> neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(0);
+        std::set<unsigned> neighbouring_sites(p_mesh->GetVonNeumannNeighbouringNodeIndices(0).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        std::set<unsigned> x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(0);
+        std::set<unsigned> x_periodic_neighbouring_sites(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(0).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 4u);
-        std::set<unsigned> periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(0);
+        std::set<unsigned> periodic_neighbouring_sites(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(0).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         std::set<unsigned> expected_neighbouring_sites;
@@ -1079,11 +1079,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner bottom nodes
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(1);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(1).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(1).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(1);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(1).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(1).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 4u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(1);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(1).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(1).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1098,11 +1098,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test bottom right node
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(2);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(2).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(2).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(2);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(2).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(2).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 4u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(2);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(2).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(2).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1117,11 +1117,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner left nodes
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(3);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(3).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(3).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(3);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(3).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(3).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 5u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(3);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(3).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(3).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1136,11 +1136,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test centre node on the first slice
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(4);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(4).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(4).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(4);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(4).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(4).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 5u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(4);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(4).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(4).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1155,11 +1155,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner right nodes
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(5);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(5).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(5).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(5);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(5).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(5).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 5u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(5);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(5).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(5).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1174,11 +1174,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test top left node
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(6);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(6).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(6).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(6);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(6).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(6).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 4u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(6);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(6).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(6).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1193,11 +1193,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test non-corner top node
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(7);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(7).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(7).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(7);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(7).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(7).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 4u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(7);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(7).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(7).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1212,11 +1212,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test top right node
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(8);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(8).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(8).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(8);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(8).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(8).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 4u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(8);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(8).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(8).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1231,11 +1231,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test middle middle node
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(13);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(13).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(13).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 6u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(13);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(13).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(13).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 6u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(13);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(13).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(13).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1250,11 +1250,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test centre node on the top
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(22);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(22).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(22).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(22);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(22).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(22).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 5u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(22);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(22).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(22).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1269,11 +1269,11 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test top on the front
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(19);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(19).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(19).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
-        x_periodic_neighbouring_sites = p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(19);
+        x_periodic_neighbouring_sites = std::set<unsigned>(p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(19).begin(), p_x_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(19).end());
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites.size(), 4u);
-        periodic_neighbouring_sites = p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(19);
+        periodic_neighbouring_sites = std::set<unsigned>(p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(19).begin(), p_periodic_mesh->GetVonNeumannNeighbouringNodeIndices(19).end());
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 6u);
 
         expected_neighbouring_sites.clear();
@@ -1380,7 +1380,7 @@ public:
         std::vector<PottsElement<2>*> elements;
         elements.push_back(new PottsElement<2>(0, nodes_elem_0));
 
-        std::vector< std::set<unsigned> > empty_vector;
+        std::vector< std::vector<unsigned> > empty_vector;
         empty_vector.resize(nodes.size());
 
         // Make a Potts mesh
@@ -1419,7 +1419,7 @@ public:
             basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
             basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
 
-            std::vector< std::set<unsigned> > empty_vector;
+            std::vector< std::vector<unsigned> > empty_vector;
             empty_vector.resize(basic_nodes.size());
 
             // Make a Potts mesh
@@ -1470,7 +1470,7 @@ public:
             basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
             basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
 
-            std::vector< std::set<unsigned> > empty_vector;
+            std::vector< std::vector<unsigned> > empty_vector;
             empty_vector.resize(basic_nodes.size());
 
             // Make a Potts mesh
@@ -1517,7 +1517,7 @@ public:
             std::vector<PottsElement<2>*> basic_potts_elements;
             basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem));
 
-            std::vector< std::set<unsigned> > empty_vector;
+            std::vector< std::vector<unsigned> > empty_vector;
             empty_vector.resize(basic_nodes.size());
 
             // Make a Potts mesh
@@ -1555,7 +1555,7 @@ public:
             basic_potts_elements.push_back(new PottsElement<3>(0, nodes_elem_0));
             basic_potts_elements.push_back(new PottsElement<3>(1, nodes_elem_1));
 
-            std::vector< std::set<unsigned> > empty_vector;
+            std::vector< std::vector<unsigned> > empty_vector;
             empty_vector.resize(basic_nodes.size());
 
             // Make a Potts mesh
@@ -1606,7 +1606,7 @@ public:
             basic_potts_elements.push_back(new PottsElement<3>(0, nodes_elem_0));
             basic_potts_elements.push_back(new PottsElement<3>(1, nodes_elem_1));
 
-            std::vector< std::set<unsigned> > empty_vector;
+            std::vector< std::vector<unsigned> > empty_vector;
             empty_vector.resize(basic_nodes.size());
 
             // Make a Potts mesh
@@ -1658,7 +1658,7 @@ public:
         basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
         basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
 
-        std::vector< std::set<unsigned> > empty_vector;
+        std::vector< std::vector<unsigned> > empty_vector;
         empty_vector.resize(basic_nodes.size());
 
         // Make a Potts mesh
@@ -1738,35 +1738,35 @@ public:
 
         //Test Neighbourhoods
         // Test Node 0
-        std::set<unsigned> neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(0);
+        std::set<unsigned> neighbouring_sites(p_mesh->GetVonNeumannNeighbouringNodeIndices(0).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 1u);
         std::set<unsigned> expected_neighbouring_sites;
         expected_neighbouring_sites.insert(2u);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
         expected_neighbouring_sites.insert(1u);
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(0);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(0).begin(), p_mesh->GetMooreNeighbouringNodeIndices(0).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
 
         //Test Node 1
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(1);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(1).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(1).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 1u);
         expected_neighbouring_sites.clear();
         expected_neighbouring_sites.insert(2);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(1);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(1).begin(), p_mesh->GetMooreNeighbouringNodeIndices(1).end());
         expected_neighbouring_sites.insert(0);
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
 
         // Test Node 3
-        neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(2);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetVonNeumannNeighbouringNodeIndices(2).begin(), p_mesh->GetVonNeumannNeighbouringNodeIndices(2).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
         expected_neighbouring_sites.clear();
         expected_neighbouring_sites.insert(0);
         expected_neighbouring_sites.insert(1);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(2);
+        neighbouring_sites = std::set<unsigned>(p_mesh->GetMooreNeighbouringNodeIndices(2).begin(), p_mesh->GetMooreNeighbouringNodeIndices(2).end());
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
 
@@ -1894,7 +1894,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNode(1), mesh.GetNode(3));
 
         // Check Neighbours are not defined see #1932
-        std::set<unsigned> empty_set;
+        std::vector<unsigned> empty_set;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_EQUALS(mesh.GetVonNeumannNeighbouringNodeIndices(i), empty_set);

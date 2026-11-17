@@ -35,6 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PottsMeshGenerator.hpp"
 
+#include <algorithm>
+#include <utility>
+
 #include <boost/make_shared.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
@@ -55,10 +58,12 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
 
     std::vector<Node<DIM>*> nodes;
     std::vector<PottsElement<DIM>*>  elements;
-    std::vector<std::set<unsigned> > moore_neighbours;
-    std::vector<std::set<unsigned> > von_neumann_neighbours;
+    std::vector<std::vector<unsigned> > moore_neighbours;
+    std::vector<std::vector<unsigned> > von_neumann_neighbours;
 
     unsigned num_nodes = numNodesAcross*numNodesUp*numNodesDeep;
+    nodes.reserve(num_nodes);
+    elements.reserve(numElementsAcross*numElementsUp*numElementsDeep);
 
     unsigned next_node_index = 0;
     boost::scoped_array<unsigned> node_indices(new unsigned[elementWidth*elementHeight*elementDepth]);
@@ -161,6 +166,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
             case 2:
             {
                 assert(DIM == 2);
+                moore_neighbours[node_index].reserve(8);
                 /*
                  * This stores the available neighbours using the following numbering:
                  *
@@ -271,14 +277,16 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                     if (available_neighbours[i])
                     {
                         assert(moore_neighbour_indices_vector[i] < nodes.size());
-                        moore_neighbours[node_index].insert(moore_neighbour_indices_vector[i]);
+                        moore_neighbours[node_index].push_back(moore_neighbour_indices_vector[i]);
                     }
                 }
+                std::sort(moore_neighbours[node_index].begin(), moore_neighbours[node_index].end());
                 break;
             }
             case 3:
             {
                 assert(DIM ==3);
+                moore_neighbours[node_index].reserve(26);
                 /*
                  * This stores the available neighbours using the following numbering:
                  *                      FRONT           BACK
@@ -543,9 +551,10 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                     if (available_neighbours[i] && moore_neighbour_indices_vector[i] < numNodesAcross*numNodesUp*numNodesDeep)
                     {
                         assert(moore_neighbour_indices_vector[i] < nodes.size());
-                        moore_neighbours[node_index].insert(moore_neighbour_indices_vector[i]);
+                        moore_neighbours[node_index].push_back(moore_neighbour_indices_vector[i]);
                     }
                 }
+                std::sort(moore_neighbours[node_index].begin(), moore_neighbours[node_index].end());
                 break;
             }
             default:
@@ -560,6 +569,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
             case 2:
             {
                 assert(DIM == 2);
+                von_neumann_neighbours[node_index].reserve(4);
                 /*
                  * This stores the available neighbours using the following numbering:
                  *
@@ -628,14 +638,16 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                     if (available_neighbours[i])
                     {
                         assert(von_neumann_neighbour_indices_vector[i] < nodes.size());
-                        von_neumann_neighbours[node_index].insert(von_neumann_neighbour_indices_vector[i]);
+                        von_neumann_neighbours[node_index].push_back(von_neumann_neighbour_indices_vector[i]);
                     }
                 }
+                std::sort(von_neumann_neighbours[node_index].begin(), von_neumann_neighbours[node_index].end());
                 break;
             }
             case 3:
             {
                 assert(DIM == 3);
+                von_neumann_neighbours[node_index].reserve(6);
 
                 /*
                  * This stores the available neighbours using the following numbering:
@@ -726,9 +738,10 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                     if (available_neighbours[i] && von_neumann_neighbour_indices_vector[i]<numNodesAcross*numNodesUp*numNodesDeep)
                     {
                         assert(von_neumann_neighbour_indices_vector[i] < nodes.size());
-                        von_neumann_neighbours[node_index].insert(von_neumann_neighbour_indices_vector[i]);
+                        von_neumann_neighbours[node_index].push_back(von_neumann_neighbour_indices_vector[i]);
                     }
                 }
+                std::sort(von_neumann_neighbours[node_index].begin(), von_neumann_neighbours[node_index].end());
                 break;
             }
             default:
@@ -736,7 +749,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
         }
     }
 
-    mpMesh = boost::make_shared<PottsMesh<DIM> >(nodes, elements, von_neumann_neighbours, moore_neighbours);
+    mpMesh = boost::make_shared<PottsMesh<DIM> >(std::move(nodes), std::move(elements), std::move(von_neumann_neighbours), std::move(moore_neighbours));
 }
 
 template<unsigned DIM>
