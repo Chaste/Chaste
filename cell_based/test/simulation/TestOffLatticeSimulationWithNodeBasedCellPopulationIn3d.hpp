@@ -45,7 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
@@ -124,7 +125,7 @@ public:
         simulator.SetEndTime(10.0); // 50.0
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
+        MAKE_PTR(PathmanathanInteractionForce<3>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -207,7 +208,7 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
+        MAKE_PTR(PathmanathanInteractionForce<3>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -278,9 +279,9 @@ public:
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanInteractionForce<3>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
@@ -312,7 +313,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells_2;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator_2;
         cells_generator_2.GenerateBasicRandom(cells_2, mesh_2.GetNumNodes());
 
         // Create a node-based cell population
@@ -327,7 +328,7 @@ public:
         simulator_2.SetEndTime(5.0);
 
         // Pass the same force law to the simulation
-        simulator_2.AddForce(p_linear_force);
+        simulator_2.AddForce(p_force);
 
         simulator_2.Solve();
 
@@ -388,7 +389,7 @@ public:
             simulator_3.SetEndTime(5.0);
 
             // Pass the same force law to the simulation
-            simulator_3.AddForce(p_linear_force);
+            simulator_3.AddForce(p_force);
 
             simulator_3.Solve();
 
@@ -436,9 +437,9 @@ public:
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanInteractionForce<3>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
@@ -470,7 +471,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells_2;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator_2;
         cells_generator_2.GenerateBasicRandom(cells_2, mesh_2.GetNumNodes());
 
         // Create a node-based cell population
@@ -485,7 +486,7 @@ public:
         simulator_2.SetEndTime(5.0);
 
         // Pass the same force law to the simulation
-        simulator_2.AddForce(p_linear_force);
+        simulator_2.AddForce(p_force);
 
         simulator_2.Solve();
 
@@ -545,7 +546,7 @@ public:
             simulator_3.SetEndTime(5.0);
 
             // Pass the same force law to the simulation
-            simulator_3.AddForce(p_linear_force);
+            simulator_3.AddForce(p_force);
 
             simulator_3.Solve();
 
@@ -593,9 +594,9 @@ public:
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanInteractionForce<3>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
          simulator.Solve();
 
@@ -627,7 +628,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells_2;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator_2;
         cells_generator_2.GenerateBasicRandom(cells_2, mesh_2.GetNumNodes());
 
         // Create a node-based cell population
@@ -642,7 +643,7 @@ public:
         simulator_2.SetEndTime(5.0);
 
         // Pass the same force law to the simulation
-        simulator_2.AddForce(p_linear_force);
+        simulator_2.AddForce(p_force);
 
         simulator_2.Solve();
 
@@ -702,7 +703,7 @@ public:
             simulator_3.SetEndTime(5.0);
 
             // Pass the same force law to the simulation
-            simulator_3.AddForce(p_linear_force);
+            simulator_3.AddForce(p_force);
 
             simulator_3.Solve();
 
@@ -752,9 +753,9 @@ public:
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanInteractionForce<3>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
@@ -788,7 +789,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells_2;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator_2;
         cells_generator_2.GenerateBasicRandom(cells_2, mesh_2.GetNumNodes());
 
         // Create a node-based cell population
@@ -803,7 +804,7 @@ public:
         simulator_2.SetEndTime(5.0);
 
         // Pass the same force law to the simulation
-        simulator_2.AddForce(p_linear_force);
+        simulator_2.AddForce(p_force);
 
         simulator_2.Solve();
 
@@ -873,7 +874,7 @@ public:
             simulator_3.SetEndTime(5.0);
 
             // Pass the same force law to the simulation
-            simulator_3.AddForce(p_linear_force);
+            simulator_3.AddForce(p_force);
 
             simulator_3.Solve();
 

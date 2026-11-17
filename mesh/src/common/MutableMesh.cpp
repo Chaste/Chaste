@@ -385,8 +385,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::MoveMergeNode(unsigned index,
         }
     }
 
-    for (std::set<unsigned>::const_iterator boundary_element_iter=
-                 unshared_boundary_element_indices.begin();
+    for (auto boundary_element_iter = unshared_boundary_element_indices.begin();
              boundary_element_iter != unshared_boundary_element_indices.end();
              boundary_element_iter++)
     {
@@ -487,8 +486,7 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::RefineElement(
             mDeletedElementIndices.pop_back();
         }
 
-        Element<ELEMENT_DIM,SPACE_DIM>* p_new_element=
-            new Element<ELEMENT_DIM,SPACE_DIM>(*pElement, new_elt_index);
+        auto* p_new_element = new Element<ELEMENT_DIM,SPACE_DIM>(*pElement, new_elt_index);
 
         // Second, update the node in the element with the new one
         p_new_element->UpdateNode(ELEMENT_DIM-1-i, this->mNodes[new_node_index]);
@@ -523,8 +521,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteBoundaryNodeAt(unsigned index)
     mDeletedNodeIndices.push_back(index);
 
     // Update the boundary node vector
-    typename std::vector<Node<SPACE_DIM>*>::iterator b_node_iter
-    = std::find(this->mBoundaryNodes.begin(), this->mBoundaryNodes.end(), this->mNodes[index]);
+    auto b_node_iter = std::find(this->mBoundaryNodes.begin(), this->mBoundaryNodes.end(), this->mNodes[index]);
     this->mBoundaryNodes.erase(b_node_iter);
 
     // Remove boundary elements containing this node
@@ -940,7 +937,7 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
         Element<ELEMENT_DIM,SPACE_DIM>* p_original_element = this->GetElement(elementIndex);
 
         // First, make a copy of the current element and assign an unused index
-        Element<ELEMENT_DIM,SPACE_DIM>* p_new_element = new Element<ELEMENT_DIM,SPACE_DIM>(*p_original_element, UINT_MAX);
+        auto* p_new_element = new Element<ELEMENT_DIM,SPACE_DIM>(*p_original_element, UINT_MAX);
 
         // Second, add the new element to the set of existing elements. This method will assign a proper index to the element.
         AddElement(p_new_element);

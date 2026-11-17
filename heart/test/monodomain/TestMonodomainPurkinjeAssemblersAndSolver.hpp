@@ -50,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscMatTools.hpp"
 #include "MonodomainPurkinjeSolver.hpp"
 #include "MonodomainSolver.hpp"
-#include "TetrahedralMesh.hpp"
 #include "MonodomainProblem.hpp"
 #include "MonodomainPurkinjeProblem.hpp"
 

@@ -212,6 +212,238 @@ public:
         }
     }
 
+    void TestSetupSolveStoresOldCellLocationsWhenMovingSolutionWithCells()
+    {
+        // Coverage: SetupSolve() only stores mOldCellLocations when mMoveSolutionWithCells is set;
+        // elsewhere in this suite the flag is only used via the getter/setter or an archiving
+        // round-trip, never through a real call to SetupSolve().
+        HoneycombMeshGenerator generator(3, 3, 0);
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            cells[i]->GetCellData()->SetItem("variable", 1.0);
+        }
+
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        double constant_coefficient = -0.1;
+        double linear_coefficient = -0.2;
+        double diffusion_coefficient = 0.1;
+        double rate_coefficient = 0.1;
+        MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        ChastePoint<2> lower(-5.0, -5.0);
+        ChastePoint<2> upper(15.0, 15.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("variable");
+        p_pde_modifier->SetMoveSolutionWithCells(true);
+
+        TS_ASSERT_EQUALS(p_pde_modifier->mOldCellLocations.size(), 0u);
+        p_pde_modifier->SetupSolve(cell_population, "TestParabolicBoxDomainPdeModifierStoresOldCellLocations");
+        TS_ASSERT_EQUALS(p_pde_modifier->mOldCellLocations.size(), cell_population.GetNumRealCells());
+
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            c_vector<double, 2> stored_location = p_pde_modifier->mOldCellLocations[*cell_iter];
+            c_vector<double, 2> actual_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+            TS_ASSERT_DELTA(stored_location[0], actual_location[0], 1e-6);
+            TS_ASSERT_DELTA(stored_location[1], actual_location[1], 1e-6);
+        }
+
+        // Clear memory
+        delete p_mesh;
+    }
+
+    void TestInterpolateSolutionFromCellMovementReproducesFieldWhenCellsHaveNotMoved()
+    {
+        // InterpolateSolutionFromCellMovement() builds a mesh from cell centres, deforms a copy of
+        // the FE mesh according to how those centres have moved since mOldCellLocations was last
+        // recorded, then interpolates the previous solution from the deformed mesh back onto the
+        // (fixed) original FE mesh nodes.
+        //
+        // We check a mathematically exact special case here, rather than trusting a value obtained
+        // by simply running the code once: if every cell's centre is unchanged since the last
+        // timestep, every interpolated displacement is exactly zero (a weighted average of zero
+        // vectors), so the "deformed" mesh is geometrically identical to the original FE mesh, and
+        // the method must return the input solution field completely unchanged.
+        //
+        // A non-zero *uniform* cell displacement was considered instead of this (it is also exactly
+        // hand-computable, since piecewise-linear FE interpolation reproduces an affine function
+        // exactly) but is unsafe to use: the method's second interpolation stage restricts its
+        // containing-element search to each node's own originally-incident elements, and a corner
+        // of a rectangular FE mesh is incident to only one or two elements spanning at most its
+        // local 90-degree angle. The four corners of the box need that restricted search to succeed
+        // in four different (mutually exclusive, one per quadrant) directions, so *any* non-zero
+        // uniform translation of the whole mesh is guaranteed to fail this search at one corner or
+        // more - hitting the method's assert(0) on a Debug build. The zero-displacement case has no
+        // such failure mode: every node's own position is trivially "contained" (as a vertex, with
+        // weight 1) by its own unmoved incident elements.
+        MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (0.0, 0.0, 1.0, 0.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (0.0));
+
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(4.0, 2.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 1.0));
+        p_pde_modifier->SetDependentVariableName("variable");
+        p_pde_modifier->SetMoveSolutionWithCells(true);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Four cells forming a box that comfortably contains the FE mesh box [0,4]x[0,2] in its
+        // convex hull, so every FE mesh node has a containing element in the cell mesh.
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, -2.0, -2.0));
+        nodes.push_back(new Node<2>(1, false,  6.0, -2.0));
+        nodes.push_back(new Node<2>(2, false,  6.0,  4.0));
+        nodes.push_back(new Node<2>(3, false, -2.0,  4.0));
+        NodesOnlyMesh<2> cell_mesh;
+        cell_mesh.ConstructNodesWithoutMesh(nodes, 20.0);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, cell_mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(cell_mesh, cells);
+
+        // Cells have not moved: their recorded "old" locations equal their current locations.
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            p_pde_modifier->mOldCellLocations[*cell_iter] = cell_population.GetLocationOfCellCentre(*cell_iter);
+        }
+
+        // A real, non-constant "previous" solution field: each FE node's own x-coordinate.
+        unsigned num_fe_nodes = p_pde_modifier->mpFeMesh->GetNumNodes();
+        std::vector<double> solution_values(num_fe_nodes);
+        for (unsigned node_index=0; node_index<num_fe_nodes; node_index++)
+        {
+            solution_values[node_index] = p_pde_modifier->mpFeMesh->GetNode(node_index)->rGetLocation()[0];
+        }
+        Vec solution = PetscTools::CreateVec(solution_values);
+        p_pde_modifier->mSolution = solution;
+
+        Vec interpolated_solution = p_pde_modifier->InterpolateSolutionFromCellMovement(cell_population);
+        ReplicatableVector interpolated_solution_repl(interpolated_solution);
+
+        for (unsigned node_index=0; node_index<num_fe_nodes; node_index++)
+        {
+            TS_ASSERT_DELTA(interpolated_solution_repl[node_index], solution_values[node_index], 1e-9);
+        }
+
+        PetscTools::Destroy(interpolated_solution);
+
+        // Tidy up (ConstructNodesWithoutMesh() copies the nodes rather than taking ownership)
+        delete nodes[0];
+        delete nodes[1];
+        delete nodes[2];
+        delete nodes[3];
+    }
+
+    void TestUpdateAtEndOfTimeStepWhenMovingSolutionWithCells()
+    {
+        // Coverage: exercises the mMoveSolutionWithCells branch via a real UpdateAtEndOfTimeStep()
+        // call (elsewhere only hit directly/via SetupSolve()). Needs an averaged source PDE, since
+        // UpdateAtEndOfTimeStep() asserts HasAveragedSourcePde(). Cells don't move here, so
+        // displacement is exactly zero - the same safe case as the identity test above.
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        bool scale_by_cell_volume = false;
+
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(4.0, 2.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        // Four cells inside the FE mesh box [0,4]x[0,2] - unlike
+        // TestInterpolateSolutionFromCellMovementReproducesFieldWhenCellsHaveNotMoved() above, this
+        // test also exercises UpdateCellPdeElementMap(), which requires every cell centre to have a
+        // containing element in mpFeMesh itself.
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 1.0, 0.5));
+        nodes.push_back(new Node<2>(1, false, 3.0, 0.5));
+        nodes.push_back(new Node<2>(2, false, 1.0, 1.5));
+        nodes.push_back(new Node<2>(3, false, 3.0, 1.5));
+        NodesOnlyMesh<2> cell_mesh;
+        cell_mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, cell_mesh.GetNumNodes());
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            cells[i]->GetCellData()->SetItem("variable", 1.0);
+        }
+
+        NodeBasedCellPopulation<2> cell_population(cell_mesh, cells);
+
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (0.0));
+
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 1.0));
+        p_pde_modifier->SetDependentVariableName("variable");
+        p_pde_modifier->SetMoveSolutionWithCells(true);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        p_pde_modifier->SetupSolve(cell_population, "TestUpdateAtEndOfTimeStepWhenMovingSolutionWithCells");
+        TS_ASSERT_EQUALS(p_pde_modifier->mOldCellLocations.size(), cell_population.GetNumRealCells());
+
+        // Kill one cell before UpdateAtEndOfTimeStep(), so a correctly-refreshed mOldCellLocations
+        // must shrink to match the reduced population - a stale or no-op refresh would still show
+        // the pre-kill count of 4. This is what actually distinguishes "the refresh ran" from "the
+        // values already happened to be right" (see NOTE below).
+        cell_population.Begin()->Kill();
+        cell_population.RemoveDeadCells();
+        cell_population.Update();
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 3u);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        // NOTE: with zero displacement, InterpolateSolutionFromCellMovement() (line 88) is a
+        // mathematical no-op, so this only proves the call doesn't crash - not that its result is
+        // actually used. Proving that would need nonzero cell displacement, which risks the
+        // corner-search failure documented in the identity test above; not attempted here.
+        TS_ASSERT_THROWS_NOTHING(p_pde_modifier->UpdateAtEndOfTimeStep(cell_population));
+
+        // Unlike line 88, this IS a meaningful check: mOldCellLocations must have shrunk to 3 to
+        // match the post-kill population, which only happens if the refresh actually ran.
+        TS_ASSERT_EQUALS(p_pde_modifier->mOldCellLocations.size(), cell_population.GetNumRealCells());
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            c_vector<double, 2> stored_location = p_pde_modifier->mOldCellLocations[*cell_iter];
+            c_vector<double, 2> actual_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+            TS_ASSERT_DELTA(stored_location[0], actual_location[0], 1e-6);
+            TS_ASSERT_DELTA(stored_location[1], actual_location[1], 1e-6);
+        }
+
+        // Tidy up (ConstructNodesWithoutMesh() copies the nodes rather than taking ownership)
+        delete nodes[0];
+        delete nodes[1];
+        delete nodes[2];
+        delete nodes[3];
+    }
+
     void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
@@ -335,7 +567,7 @@ public:
         MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
-        // Change where BCS are appied here we want the bcs applied on the boundary of the cells.
+        // Change where BCS are applied here we want the bcs applied on the boundary of the cells.
         // Good for compact tissues
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
         p_pde_modifier->SetBcsOnBoxBoundary(false);
@@ -419,7 +651,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
-        // Change where BCS are appied here we want the bcs applied on the boundary of the cells.
+        // Change where BCS are applied here we want the bcs applied on the boundary of the cells.
         // Good for compact tissues
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
         p_pde_modifier->SetBcsOnBoxBoundary(false);

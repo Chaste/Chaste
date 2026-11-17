@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OffLatticeSimulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
 #include "RandomCellKiller.hpp"
@@ -102,7 +102,7 @@ public:
         simulator.SetEndTime(50.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 

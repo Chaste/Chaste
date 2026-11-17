@@ -106,7 +106,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "OutputFileHandler.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"
 #include "SimpleTargetAreaModifier.hpp"
 #include "SimulationTime.hpp"
@@ -178,7 +178,7 @@ public:
 
         /* Next, we create a force law (springs) to be applied between cell centres and set up a
          * cut-off length beyond which cells stop interacting. We then pass this to the `VolumeTrackedOffLatticeSimulation`. */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
@@ -287,7 +287,7 @@ public:
 
         /* Next, we create a force law (springs) to be applied between cell centres and set up a
          * cut-off length beyond which cells stop interacting. We then pass this to the `VolumeTrackedOffLatticeSimulation` */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 

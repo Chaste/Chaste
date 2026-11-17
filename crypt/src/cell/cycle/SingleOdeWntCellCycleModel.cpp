@@ -44,15 +44,9 @@ SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(boost::shared_ptr<Abstrac
 {
     if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
-#ifdef CHASTE_CVODE
         mpOdeSolver = CellCycleModelOdeSolver<SingleOdeWntCellCycleModel, CvodeAdaptor>::Instance();
         mpOdeSolver->Initialise();
         mpOdeSolver->SetMaxSteps(10000);
-#else
-        mpOdeSolver = CellCycleModelOdeSolver<SingleOdeWntCellCycleModel, RungeKutta4IvpOdeSolver>::Instance();
-        mpOdeSolver->Initialise();
-        SetDt(0.001);
-#endif //CHASTE_CVODE
     }
     assert(mpOdeSolver->IsSetUp());
 }
@@ -144,14 +138,12 @@ void SingleOdeWntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCate
          * would be incorrect. We must therefore access the CellProliferativeType via the cell's
          * CellPropertyCollection.
          */
-        boost::shared_ptr<AbstractCellProperty> p_diff_type =
-            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
+        auto p_diff_type = mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }
     else
     {
-        boost::shared_ptr<AbstractCellProperty> p_transit_type =
-            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
+        auto p_transit_type = mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_transit_type);
     }
 }

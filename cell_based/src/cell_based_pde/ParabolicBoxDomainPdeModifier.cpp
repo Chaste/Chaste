@@ -317,7 +317,7 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
             // p_vtk_mesh_writer->WriteFilesUsingMesh(*p_deformed_mesh);
             // delete p_vtk_mesh_writer;
 
-            assert(0);
+            TERMINATE("Cell movement too large to interpolate solution at node " << node_index << ": " << e.GetMessage());
         }
     }
 

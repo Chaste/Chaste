@@ -1,0 +1,7 @@
+			<HomotypicLabelledSpringConstantMultiplier>1</HomotypicLabelledSpringConstantMultiplier>
+			<HeterotypicSpringConstantMultiplier>1</HeterotypicSpringConstantMultiplier>
+			<SpringStiffness>15</SpringStiffness>
+			<DivisionRestingSpringLength>0.5</DivisionRestingSpringLength>
+			<SpringGrowthDuration>1</SpringGrowthDuration>
+			<UseCutOffLength>1</UseCutOffLength>
+			<CutOffLength>1.5</CutOffLength>

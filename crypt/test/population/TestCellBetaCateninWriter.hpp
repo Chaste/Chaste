@@ -142,7 +142,7 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Set up SimulationTime (needed if VTK is used)
+        // Set up SimulationTime (needed for VTK output)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh-based cell population, comprising various cell types in various cell cycle phases

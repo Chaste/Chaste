@@ -247,22 +247,19 @@ void SimpleWntCellCycleModel::UpdateCellCyclePhase()
              * would be incorrect. We must therefore access the CellProliferativeType via the cell's
              * CellPropertyCollection.
              */
-            boost::shared_ptr<AbstractCellProperty> p_stem_type =
-                mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<StemCellProliferativeType>();
+            auto p_stem_type = mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<StemCellProliferativeType>();
             mpCell->SetCellProliferativeType(p_stem_type);
         }
         else
         {
-            boost::shared_ptr<AbstractCellProperty> p_transit_type =
-                mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
+            auto p_transit_type = mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
             mpCell->SetCellProliferativeType(p_transit_type);
         }
     }
     else
     {
         // The cell is set to have DifferentiatedCellProliferativeType and so in G0 phase
-        boost::shared_ptr<AbstractCellProperty> p_diff_type =
-            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
+        auto p_diff_type = mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }
     AbstractSimplePhaseBasedCellCycleModel::UpdateCellCyclePhase();
@@ -274,8 +271,7 @@ void SimpleWntCellCycleModel::InitialiseDaughterCell()
 
     if (wnt_type == RADIAL)
     {
-        boost::shared_ptr<AbstractCellProperty> p_transit_type =
-            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
+        auto p_transit_type = mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_transit_type);
     }
 

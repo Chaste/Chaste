@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifdef CHASTE_CVODE
 #ifndef _CVODE1_HPP_
 #define _CVODE1_HPP_
 
@@ -69,5 +68,4 @@ void OdeSystemInformation<Cvode1>::Initialise()
 }
 
 #endif //_CVODE1_HPP_
-#endif // CHASTE_CVODE
 

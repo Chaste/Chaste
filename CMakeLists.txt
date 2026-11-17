@@ -116,15 +116,20 @@ include (ChasteMacros)
 set (Chaste_NUM_CPUS_TEST 1 CACHE STRING "Number of cpus to use when running tests.")
 
 
-option (Chaste_USE_VTK "Compile Chaste with VTK support" ON)
-option (Chaste_USE_CVODE "Compile Chaste with CVODE support" ON)
-
-option (Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
+include (ChasteDeprecatedOptions)
 
 option (Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
 option (Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
 
-option (Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-linking of all Chaste libraries" ON)
+# A plain, non-cached snapshot of the current commit, shortened to 12 characters as everywhere
+# else it is displayed, used only to label the coverage and doxygen targets below: both are
+# triggered manually, not part of an ordinary test build, so a value that is fresh as of the last
+# reconfigure (rather than every build) is fine here. The provenance read by ChasteBuildInfo at
+# runtime (see global/CMakeLists.txt) is generated separately, and refreshed on every build.
+include (ChasteSourceRevision)
+chaste_get_source_revision ("${Chaste_SOURCE_DIR}" Chaste_COMMIT Chaste_COMMIT_MODIFIED)
+string (SUBSTRING "${Chaste_COMMIT}" 0 12 Chaste_REVISION)
+message (STATUS "Chaste commit: ${Chaste_COMMIT} (modified: ${Chaste_COMMIT_MODIFIED})")
 
 option(RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
@@ -287,8 +292,6 @@ message("Codegen version: ${Chaste_CODEGEN_VERSION}")
 
 # Get pychaste dependencies
 if (Chaste_ENABLE_PYCHASTE)
-    set(Chaste_USE_VTK ON)
-
     # Get pybind11
     include(FetchContent)
     FetchContent_Declare(
@@ -304,7 +307,7 @@ if (Chaste_ENABLE_PYCHASTE)
     FetchContent_Declare(
         cppwg
         GIT_REPOSITORY https://github.com/Chaste/cppwg.git
-        GIT_TAG stable
+        GIT_TAG v0.5.0
         GIT_SHALLOW 1
     )
     FetchContent_MakeAvailable(cppwg)
@@ -326,74 +329,75 @@ endif ()
 ################################
 ####  Find VTK
 ################################
-if (Chaste_USE_VTK)
-    # The complexity here is for two reasons:
-    #   1. VTK has renamed its components several times
-    #   2. From VTK 9, a simple call to find_package(VTK) will try to find QT, which is not a Chaste dependency
-    #
-    # We first find the VTK common library, which can have one of two names: this will populate the VTK version
-    # number. This is then used to find the specific list of required VTK components.
+# The complexity here is for two reasons:
+#   1. VTK has renamed its components several times
+#   2. From VTK 9, a simple call to find_package(VTK) will try to find QT, which is not a Chaste dependency
+#
+# We first find the VTK common library, which can have one of two names: this will populate the VTK version
+# number. This is then used to find the specific list of required VTK components.
 
-    # List of possible base modules across different VTK versions
-    set(POSSIBLE_VTK_BASE_MODULES vtkCommonCore CommonCore)
+# List of possible base modules across different VTK versions
+set(POSSIBLE_VTK_BASE_MODULES vtkCommonCore CommonCore)
 
-    foreach (BASE_MODULE ${POSSIBLE_VTK_BASE_MODULES})
-        find_package(VTK COMPONENTS ${BASE_MODULE} QUIET)
-        if (VTK_FOUND)
-            message (STATUS "VTK version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
-            break()
-        endif ()
-    endforeach ()
-
-    if (NOT ${VTK_FOUND})
-        message(FATAL_ERROR "Did not find VTK")
+foreach (BASE_MODULE ${POSSIBLE_VTK_BASE_MODULES})
+    find_package(VTK COMPONENTS ${BASE_MODULE} QUIET)
+    if (VTK_FOUND)
+        message (STATUS "VTK version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+        break()
     endif ()
+endforeach ()
 
-    # Depending on the VTK version, we need different components.
-    set (_vtk_modules "")
-    if (VTK_MAJOR_VERSION LESS 9)
-        list (APPEND _vtk_modules
-                vtkCommonCore vtkCommonDataModel vtkFiltersCore
-                vtkFiltersGeneral vtkFiltersGeneric vtkFiltersGeometry
-                vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
-                vtkIOLegacy vtkIOParallelXML vtkIOXML
-             )
-        if (Chaste_ENABLE_PYCHASTE)
-            # Additional modules required by PyChaste
-            list (APPEND _vtk_modules
-                    vtkInteractionStyle vtkIOImage vtkIOMovie
-                    vtkRenderingAnnotation vtkRenderingCore vtkRenderingFreeType
-                    vtkWrappingPythonCore
-                 )
-            if (VTK_MAJOR_VERSION LESS 7)
-                list (APPEND _vtk_modules vtkRenderingOpenGL)
-            else ()
-                list (APPEND _vtk_modules
-                        vtkFiltersProgrammable vtkFiltersVerdict
-                        vtkRenderingOpenGL2
-                     )
-            endif ()
-        endif ()
-    else ()
-        # VTK 9.0 and above require the following
-        list (APPEND _vtk_modules
-                CommonCore CommonDataModel FiltersCore FiltersGeneral
-                FiltersGeneric FiltersGeometry FiltersModeling FiltersSources
-                IOCore IOGeometry IOLegacy IOParallelXML IOXML
-             )
-        if (Chaste_ENABLE_PYCHASTE)
-            # Additional modules required by PyChaste
-            list (APPEND _vtk_modules
-                    FiltersProgrammable FiltersVerdict InteractionStyle IOImage
-                    IOMovie IOOggTheora RenderingAnnotation RenderingCore
-                    RenderingFreeType RenderingOpenGL2 WrappingPythonCore
-                 )
-        endif ()
-    endif ()
-    find_package (VTK COMPONENTS ${_vtk_modules} REQUIRED)
-
-    add_definitions (-DCHASTE_VTK)
+if (NOT ${VTK_FOUND})
+    message(FATAL_ERROR "Did not find VTK")
 endif ()
+
+# VTK 6.0 introduced the SetInputData()/SetInputConnection() pipeline API, which Chaste's
+# VTK code now uses unconditionally (it used to be optional, guarded by Chaste_USE_VTK), so
+# earlier versions definitely will not build. VTK 7.1 is the oldest version we actually test.
+if ("${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" VERSION_LESS 6.0)
+    message(FATAL_ERROR "VTK 6.0 or later is required, but found VTK ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+elseif ("${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" VERSION_LESS 7.1)
+    message(WARNING "VTK ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} found: Chaste might work, but we only test VTK 7.1 and later")
+endif ()
+
+# Depending on the VTK version, we need different components.
+set (_vtk_modules "")
+if (VTK_MAJOR_VERSION LESS 9)
+    list (APPEND _vtk_modules
+            vtkCommonCore vtkCommonDataModel vtkFiltersCore
+            vtkFiltersGeneral vtkFiltersGeneric vtkFiltersGeometry
+            vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
+            vtkIOLegacy vtkIOParallelXML vtkIOXML
+         )
+    if (Chaste_ENABLE_PYCHASTE)
+        # Additional modules required by PyChaste
+        list (APPEND _vtk_modules
+                vtkInteractionStyle vtkIOImage vtkIOMovie
+                vtkRenderingAnnotation vtkRenderingCore vtkRenderingFreeType
+                vtkWrappingPythonCore
+             )
+        list (APPEND _vtk_modules
+                vtkFiltersProgrammable vtkFiltersVerdict
+                vtkRenderingOpenGL2
+             )
+    endif ()
+else ()
+    # VTK 9.0 and above require the following
+    list (APPEND _vtk_modules
+            CommonCore CommonDataModel FiltersCore FiltersGeneral
+            FiltersGeneric FiltersGeometry FiltersModeling FiltersSources
+            IOCore IOGeometry IOLegacy IOParallelXML IOXML
+         )
+    if (Chaste_ENABLE_PYCHASTE)
+        # Additional modules required by PyChaste
+        list (APPEND _vtk_modules
+                FiltersProgrammable FiltersVerdict InteractionStyle IOImage
+                IOMovie IOOggTheora RenderingAnnotation RenderingCore
+                RenderingFreeType RenderingOpenGL2 WrappingPythonCore
+             )
+    endif ()
+endif ()
+find_package (VTK COMPONENTS ${_vtk_modules} REQUIRED)
 
 
 ################################
@@ -500,23 +504,29 @@ list (APPEND Chaste_INCLUDES "${PARMETIS_INCLUDE_DIR}")
 ################################
 ####  Find Sundials
 ################################
-if (Chaste_USE_CVODE)
-    if (BUILD_SHARED_LIBS)
-        set (SUNDIALS_USE_STATIC_LIBRARIES OFF)
-    else ()
-        set (SUNDIALS_USE_STATIC_LIBRARIES ON)
-    endif ()
-    find_package (SUNDIALS COMPONENTS  sundials_cvode sundials_nvecserial REQUIRED)
-    if (SUNDIALS_VERSION_MAJOR GREATER_EQUAL 7) # Newer CVODE requires a core sundials library to be linked in
-        find_package (SUNDIALS COMPONENTS  sundials_core REQUIRED)
-    endif ()
-    list (APPEND Chaste_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
-    #chaste_add_libraries(Chaste_LINK_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES Chaste_LINK_LIBRARIES)
-    list (APPEND Chaste_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
-    add_definitions (-DCHASTE_CVODE)
-    math (EXPR Chaste_SUNDIALS_VERSION "${SUNDIALS_VERSION_MAJOR}*10000 + ${SUNDIALS_VERSION_MINOR}*100 + ${SUNDIALS_VERSION_SUBMINOR}")
-    add_definitions (-DCHASTE_SUNDIALS_VERSION=${Chaste_SUNDIALS_VERSION})
+if (BUILD_SHARED_LIBS)
+    set (SUNDIALS_USE_STATIC_LIBRARIES OFF)
+else ()
+    set (SUNDIALS_USE_STATIC_LIBRARIES ON)
 endif ()
+find_package (SUNDIALS COMPONENTS  sundials_cvode sundials_nvecserial REQUIRED)
+# SUNDIALS 4.0.0 renamed the generic linear-solver API (CVDlsSetLinearSolver -> CVodeSetLinearSolver,
+# SUNDenseLinearSolver -> SUNLinSol_Dense), which Chaste's CVODE code now uses unconditionally (it used
+# to be optional, guarded by Chaste_USE_CVODE), so earlier versions definitely will not build.
+# SUNDIALS 5.8.0 is the oldest version we actually test.
+if ("${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_SUBMINOR}" VERSION_LESS 4.0.0)
+    message(FATAL_ERROR "SUNDIALS 4.0.0 or later is required, but found SUNDIALS ${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_SUBMINOR}")
+elseif ("${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_SUBMINOR}" VERSION_LESS 5.8.0)
+    message(WARNING "SUNDIALS ${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_SUBMINOR} found: Chaste might work, but we only test SUNDIALS 5.8.0 and later")
+endif ()
+if (SUNDIALS_VERSION_MAJOR GREATER_EQUAL 7) # Newer CVODE requires a core sundials library to be linked in
+    find_package (SUNDIALS COMPONENTS  sundials_core REQUIRED)
+endif ()
+list (APPEND Chaste_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
+#chaste_add_libraries(Chaste_LINK_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES Chaste_LINK_LIBRARIES)
+list (APPEND Chaste_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
+math (EXPR Chaste_SUNDIALS_VERSION "${SUNDIALS_VERSION_MAJOR}*10000 + ${SUNDIALS_VERSION_MINOR}*100 + ${SUNDIALS_VERSION_SUBMINOR}")
+add_definitions (-DCHASTE_SUNDIALS_VERSION=${Chaste_SUNDIALS_VERSION})
 
 
 # ParMETIS and Sundials might need MPI, so add MPI libraries after these
@@ -524,26 +534,35 @@ endif ()
 list (APPEND Chaste_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
 # make sure VTK libraries added after HDF5 so VTK's link with HDF5 isn't used
-if (Chaste_USE_VTK)
-    if (VTK_MAJOR_VERSION LESS 9)
-        list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
-        list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
-    else ()
-        target_link_libraries(Chaste_COMMON_DEPS INTERFACE ${VTK_LIBRARIES})
-    endif ()
+if (VTK_MAJOR_VERSION LESS 9)
+    list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
+    list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
+else ()
+    target_link_libraries(Chaste_COMMON_DEPS INTERFACE ${VTK_LIBRARIES})
 endif ()
 
 
 ################################
 ####  Find Xerces and XSD
 ################################
-if (Chaste_USE_XERCES)
-    find_package (Xerces REQUIRED)
-    find_package (XSD REQUIRED)
-    list (APPEND Chaste_INCLUDES "${XERCESC_INCLUDE}" "${XSD_INCLUDE_DIRS}")
-    list (APPEND Chaste_LINK_LIBRARIES "${XERCESC_LIBRARY}")
-    add_definitions (-DCHASTE_XERCES)
+find_package (Xerces REQUIRED)
+find_package (XSD REQUIRED)
+# Xerces-C 3.0.0 introduced the DOM Level 3 LS serialization API (DOMLSSerializer /
+# createLSSerializer()), which Chaste's XML writing code now uses unconditionally (it used
+# to be optional, guarded by Chaste_USE_XERCES), so earlier versions definitely will not build.
+# Xerces-C 3.2.0 is the oldest version we actually test.
+if (XERCESC_VERSION AND XERCESC_VERSION VERSION_LESS 3.0.0)
+    message (FATAL_ERROR "Xerces-C 3.0.0 or later is required, but found Xerces-C ${XERCESC_VERSION}")
+elseif (XERCESC_VERSION AND XERCESC_VERSION VERSION_LESS 3.2.0)
+    message (WARNING "Xerces-C ${XERCESC_VERSION} found: Chaste might work, but we only test Xerces-C 3.2.0 and later")
 endif ()
+if (XSD_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$" AND XSD_VERSION VERSION_LESS 4.0.0)
+    message (FATAL_ERROR "XSD 4.0.0 or later is required, but found XSD ${XSD_VERSION}")
+endif ()
+list (APPEND Chaste_INCLUDES "${XERCESC_INCLUDE}" "${XSD_INCLUDE_DIRS}")
+list (APPEND Chaste_LINK_LIBRARIES "${XERCESC_LIBRARY}")
+
+include (ChasteLegacyDefinitions)
 
 
 add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
@@ -804,6 +823,9 @@ configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
 file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake
         DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
 
+file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteLegacyDefinitions.cmake
+        DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
+
 file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake
         DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
 
@@ -821,6 +843,7 @@ install(FILES
 
 install(FILES
         "${Chaste_BINARY_DIR}/cmake/Modules/ChasteMacros.cmake"
+        "${Chaste_BINARY_DIR}/cmake/Modules/ChasteLegacyDefinitions.cmake"
         "${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake"
         DESTINATION lib/chaste/cmake/Modules
         COMPONENT Config)
@@ -866,12 +889,13 @@ if (Chaste_COVERAGE)
                        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_COVERAGE_CPUS}" "-L" "Continuous" "--output-on-failure"
                        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-L" "Parallel" "--output-on-failure"
 
-                       # Capturing lcov counters and generating report
-                       COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
-                       COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */test/* */3rdparty/* */global/src/random/* Debug/* Debug_*/* cxxtest/* --output-file ${_outputname}.info.cleaned
+                       # Capture, then build the HTML. Exclude patterns live in
+                       # cmake/Config/lcovrc (shared with the CI workflow) and apply at
+                       # capture time, so no `lcov --remove` pass is needed.
+                       COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --parallel ${Chaste_COVERAGE_CPUS} --output-file ${_outputname}.info
                        set (_page_title "\"Chaste Coverage Results for commit ${Chaste_REVISION}\"")
-                       COMMAND ${GENHTML_PATH} --title "${_page_title}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
-                       COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
+                       COMMAND ${GENHTML_PATH} --title "${_page_title}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info
+                       COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info
                        COMMAND ${Python3_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_coverage_output.py" "${_outputname}"
 
                        DEPENDS Continuous Parallel

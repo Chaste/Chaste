@@ -51,6 +51,11 @@ import xvfbwrapper
 
 from chaste.cell_based import SimulationTime, VtkSceneModifier_2, VtkSceneModifier_3
 
+# TODO: Modernise visualisation code, considering the following:
+# - Remove Xvfb dependency and use EGL/OSMesa for off-screen rendering
+#   (May require VTK 9+, see https://github.com/Chaste/PyChaste/issues/56)
+# - Use vtk.js or vtk.wasm for browser-based rendering instead of three.js and
+#   VRML export
 
 class JupyterNotebookManager:
     """

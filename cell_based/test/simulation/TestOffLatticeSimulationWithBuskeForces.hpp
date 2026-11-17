@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BuskeAdhesiveForce.hpp"
 #include "BuskeElasticForce.hpp"
 #include "BuskeCompressionForce.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 

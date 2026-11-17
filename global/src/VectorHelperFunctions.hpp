@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <vector>
 
-#ifdef CHASTE_CVODE
 // CVODE headers
 #include <nvector/nvector_serial.h>
 #if CHASTE_SUNDIALS_VERSION >= 70000
@@ -57,8 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if CHASTE_SUNDIALS_VERSION >= 60000
 #include "CvodeContextManager.hpp"  // access to shared SUNContext object required by Sundials 6.0+
-#endif
-
 #endif
 
 /**
@@ -314,8 +311,6 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, std::vector<doubl
 
 // Specialisations for N_Vector
 
-#ifdef CHASTE_CVODE
-
 /**
  * Specialisation for CVODE's N_Vector type.
  * @param rVec
@@ -511,8 +506,6 @@ inline N_Vector MakeNVector(const std::vector<double>& rSrc)
     CopyFromStdVector(rSrc, nv);
     return nv;
 }
-
-#endif // CHASTE_CVODE
 
 // End of helper functions
 

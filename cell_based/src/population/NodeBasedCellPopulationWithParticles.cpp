@@ -35,11 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "NodeBasedCellPopulationWithParticles.hpp"
 #include "VtkMeshWriter.hpp"
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellVolumesWriter.hpp"
-#include "CellMutationStatesCountWriter.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh,
@@ -213,7 +208,6 @@ void NodeBasedCellPopulationWithParticles<DIM>::AcceptCellWritersAcrossPopulatio
 template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-#ifdef CHASTE_VTK
     // Store the present time as a string
     std::stringstream time;
     time << SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -331,7 +325,6 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
         // Parallel vtu files  .vtu -> .pvtu
         *(this->mpVtkMetaFile) << ".pvtu\"/>\n";
     }*/
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>

@@ -78,10 +78,8 @@ class CardiacElectroMechanicsVtkHandler
     /** Pointer to the mechanics solution writer class. Used to calculate some mechanics quantities */
     VtkNonlinearElasticitySolutionWriter<DIM>* mpVtkElastictyWriter;
 
-#ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
     /** Poiunter to the actual mesh VTK writer. Initialized upon construction */
     VtkDeformedMeshWriter<DIM>* mpVtkWriter;
-#endif
 
     /** Used to interpolate electrics solution onto mechanics mesh for VTK output*/
     VoltageInterpolaterOntoMechanicsMesh<DIM>* mpInterpolater;

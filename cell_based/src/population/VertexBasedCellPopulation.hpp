@@ -107,13 +107,6 @@ private:
      */
     bool mRestrictVertexMovement;
 
-    /**
-     * Whether to throw StepSizeExceptions, which defaults to true but is made false after the first StepSizeException
-     * is thrown. In vertex based cell populations a StepSizeException is not considered terminal, so there is no need
-     * to throw more than one (as the numerical method uses WARN_ONCE_ONLY).
-     */
-     bool mThrowStepSizeException = true;
-
      /**
       * SRN remapping helper class
       */

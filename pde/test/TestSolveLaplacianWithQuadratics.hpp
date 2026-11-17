@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraticBasisFunction.hpp"
 #include "QuadraticMesh.hpp"
 #include "LinearSystem.hpp"
-#include "BoundaryConditionsContainer.hpp"
 #include "GaussianQuadratureRule.hpp"
 #include "EllipticPdeWithLinearSource.hpp"
 #include "SimpleLinearEllipticSolver.hpp"

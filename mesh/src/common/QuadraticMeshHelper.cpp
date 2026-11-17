@@ -149,8 +149,7 @@ void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMes
         // This counter keeps track of our position in the file.
         unsigned next_face_on_file = 0u;
 
-        for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-                 = pMesh->GetBoundaryElementIteratorBegin();
+        for (auto iter = pMesh->GetBoundaryElementIteratorBegin();
              iter != pMesh->GetBoundaryElementIteratorEnd();
              ++iter)
         {
@@ -247,8 +246,7 @@ void QuadraticMeshHelper<DIM>::CheckBoundaryElements(AbstractTetrahedralMesh<DIM
 {
 #ifndef NDEBUG
     unsigned expected_num_nodes = DIM*(DIM+1)/2;
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-             = pMesh->GetBoundaryElementIteratorBegin();
+    for (auto iter = pMesh->GetBoundaryElementIteratorBegin();
          iter != pMesh->GetBoundaryElementIteratorEnd();
          ++iter)
     {
