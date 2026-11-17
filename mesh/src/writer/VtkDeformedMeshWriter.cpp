@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifdef CHASTE_VTK
 #include "VtkDeformedMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "TetrahedralMesh.hpp"
@@ -88,4 +87,3 @@ void VtkDeformedMeshWriter<DIM>::ApplyDeformation(const std::vector<c_vector<dou
 // Explicit instantiation
 template class VtkDeformedMeshWriter<2>;
 template class VtkDeformedMeshWriter<3>;
-#endif //CHASTE_VTK

@@ -17,6 +17,9 @@ on:
       - develop
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
 
   doxygen-latest:
@@ -25,17 +28,19 @@ jobs:
     if: github.repository == 'Chaste/Chaste'
     steps:
       - name: checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - name: install dependencies
-        run: |
-          sudo apt-get install graphviz
-          wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz
-          tar -xzvf doxygen-1.9.8.linux.bin.tar.gz
+      - name: install doxygen
+        id: install-doxygen
+        uses: $/.github/actions/install-doxygen
 
       - name: build doxygen
         run: |
-          ( cat Doxyfile ; echo "PROJECT_NUMBER=Commit::$GITHUB_SHA" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=Commit::$GITHUB_SHA" ) | "${STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN}" - 2>doxygen-error.log 1>doxygen-output.log
+        env:
+          STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN: ${{ steps.install-doxygen.outputs.bin }}
 
       - name: check doxygen coverage
         run: |
@@ -54,12 +59,13 @@ jobs:
           done
 
       - name: checkout doxygen-latest
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Chaste/doxygen-latest
           path: doxygen-latest
           fetch-depth: 0
           token: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
+          persist-credentials: false
         if: always()
 
       - name: copy results
@@ -68,13 +74,27 @@ jobs:
         if: always()
 
       - name: commit and push if changed
+        # A concurrent push (e.g. an overlapping run of this same workflow) can reject
+        # this push as non-fast-forward; rebase onto the new remote state and retry.
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
           git add --all
           git commit -m "update doxygen-latest" || echo "No changes to commit"
-          git push
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/doxygen-latest.git"
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            if [ "${attempt}" -eq 5 ]; then
+              echo "push failed after 5 attempts" >&2
+              exit 1
+            fi
+            sleep "$(( (RANDOM % 5) + 1 ))"
+            echo "push rejected, pulling and retrying (attempt ${attempt})"
+            git pull --rebase
+          done
         working-directory: doxygen-latest
+        env:
+          TOKEN: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
         if: always()
 
   website-docs:
@@ -83,12 +103,13 @@ jobs:
     if: github.repository == 'Chaste/Chaste'
     steps:
       - name: checkout Chaste
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0  # history needed for per-tutorial revision info
+          persist-credentials: false
 
       - name: setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.x'
 
@@ -104,28 +125,43 @@ jobs:
         working-directory: python/infra
 
       - name: generate pychaste-tutorial markdown
-        run: python GeneratePyChasteTutorials.py
+        run: python GeneratePyChasteTutorials.py --format markdown
         working-directory: python/infra
 
       - name: checkout website repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Chaste/Chaste.github.io
           token: ${{ secrets.WEBSITE_ACCESS }}
           path: chaste-website
           fetch-depth: 0  # Fetch all history for all tags and branches
+          persist-credentials: false
 
       - name: copy markdown into website repository
         run: |
           cp chaste_howto_webpage.md chaste-website/site/content/docs/how-tos/_index.md
           cp tutorials/UserTutorials/*.md chaste-website/site/content/docs/user-tutorials/
-          cp pychaste/src/py/doc/tutorial/*.md chaste-website/site/content/pychaste/tutorials
+          cp tutorials/PyChasteTutorials/*.md chaste-website/site/content/pychaste/tutorials
 
       - name: commit and push if changed
+        # A concurrent push (e.g. an overlapping run of this same workflow) can reject
+        # this push as non-fast-forward; rebase onto the new remote state and retry.
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
           git add --all
           git commit -m "update how-tos and tutorials" || echo "No changes to commit"
-          git push
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/Chaste/Chaste.github.io.git"
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            if [ "${attempt}" -eq 5 ]; then
+              echo "push failed after 5 attempts" >&2
+              exit 1
+            fi
+            sleep "$(( (RANDOM % 5) + 1 ))"
+            echo "push rejected, pulling and retrying (attempt ${attempt})"
+            git pull --rebase
+          done
         working-directory: chaste-website
+        env:
+          TOKEN: ${{ secrets.WEBSITE_ACCESS }}

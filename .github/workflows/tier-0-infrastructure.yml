@@ -8,10 +8,13 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: read
+
 jobs:
 
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   build-and-test:
 
@@ -43,7 +46,9 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - name: install dependencies
       run: |
@@ -81,7 +86,7 @@ jobs:
         if ! git diff --quiet --exit-code; then
           echo
           echo "Error: check for tabs and trailing whitespace failed."
-          echo "Run python/infra/RemoveTabsAndTrailingWhitespace.py and commit the results."
+          echo "Run 'python python/utils/RemoveTabsAndTrailingWhitespace.py' and commit the results."
           echo "The following files have problems:"
           echo
           git status

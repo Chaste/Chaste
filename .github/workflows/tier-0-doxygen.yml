@@ -4,9 +4,12 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
+permissions:
+  contents: read
+
 jobs:
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   coverage:
     name: "T0 · doxygen coverage"
@@ -33,17 +36,19 @@ jobs:
 
     steps:
       - name: checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - name: install dependencies
-        run: |
-          sudo apt-get install graphviz
-          wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz
-          tar -xzvf doxygen-1.9.8.linux.bin.tar.gz
+      - name: install doxygen
+        id: install-doxygen
+        uses: $/.github/actions/install-doxygen
 
       - name: build doxygen
         run: |
-          ( cat Doxyfile ; echo "PROJECT_NUMBER=PR_branch::${{ github.head_ref }}" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=PR_branch::${GITHUB_HEAD_REF}" ) | "${STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN}" - 2>doxygen-error.log 1>doxygen-output.log
+        env:
+          STEPS_INSTALL_DOXYGEN_OUTPUTS_BIN: ${{ steps.install-doxygen.outputs.bin }}
 
       - name: check doxygen coverage
         run: |

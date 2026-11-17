@@ -33,47 +33,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCHASTEXSDVERSION_HPP_
-#define TESTCHASTEXSDVERSION_HPP_
+#include "SourceRevision.hpp"
 
-#include <cxxtest/TestSuite.h>
-
-#include "ChasteXsdVersion.hpp"
-
-class TestChasteXsdVersion : public CxxTest::TestSuite
+SourceRevision::SourceRevision(const std::string& rCommit, bool isModified)
+    : mCommit(rCommit),
+      mIsModified(isModified)
 {
-public:
+}
 
-    /*
-     * This test is performed entirely at compile time, so this test has passed if this test suite compiles
-     */
-    void TestChasteXsdVersionAtLeast()
-    {
-#pragma push_macro("CHASTE_XSD_VERSION_MAJOR")
-#pragma push_macro("CHASTE_XSD_VERSION_MINOR")
-#pragma push_macro("CHASTE_XSD_VERSION_PATCH")
+const std::string& SourceRevision::rGetCommit() const
+{
+    return mCommit;
+}
 
-#undef CHASTE_XSD_VERSION_MAJOR
-#undef CHASTE_XSD_VERSION_MINOR
-#undef CHASTE_XSD_VERSION_PATCH
+std::string SourceRevision::GetShortCommit() const
+{
+    return IsKnown() ? mCommit.substr(0, SHORT_COMMIT_LENGTH) : mCommit;
+}
 
-#define CHASTE_XSD_VERSION_MAJOR 4
-#define CHASTE_XSD_VERSION_MINOR 2
-#define CHASTE_XSD_VERSION_PATCH 0
+bool SourceRevision::IsKnown() const
+{
+    return mCommit != "unknown";
+}
 
-static_assert(CHASTE_XSD_VERSION_AT_LEAST(4, 0, 0));
-static_assert(CHASTE_XSD_VERSION_AT_LEAST(4, 2, 0));
-static_assert(CHASTE_XSD_VERSION_AT_LEAST(4, 1, 9));
-static_assert(CHASTE_XSD_VERSION_AT_LEAST(3, 9, 9));
-static_assert(!CHASTE_XSD_VERSION_AT_LEAST(4, 2, 1));
-static_assert(!CHASTE_XSD_VERSION_AT_LEAST(4, 3, 0));
-static_assert(!CHASTE_XSD_VERSION_AT_LEAST(5, 0, 0));
-
-// Restore original values.
-#pragma pop_macro("CHASTE_XSD_VERSION_PATCH")
-#pragma pop_macro("CHASTE_XSD_VERSION_MINOR")
-#pragma pop_macro("CHASTE_XSD_VERSION_MAJOR")
-    }
-};
-
-#endif /*TESTCHASTEXSDVERSION_HPP_*/
+bool SourceRevision::IsModified() const
+{
+    return mIsModified;
+}

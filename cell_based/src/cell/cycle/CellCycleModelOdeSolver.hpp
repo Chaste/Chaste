@@ -143,12 +143,10 @@ void CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::Initialise()
     // If this is a CVODE solver we need to tell it to reset. Otherwise
     // the fact this is a singleton will lead to all sorts of problems
     // as CVODE will have the internal state for the wrong ODE system!
-#ifdef CHASTE_CVODE
     if (boost::dynamic_pointer_cast<CvodeAdaptor>(mpOdeSolver))
     {
         (boost::static_pointer_cast<CvodeAdaptor>(mpOdeSolver))->SetForceReset(true);
     }
-#endif //CHASTE_CVODE
 }
 
 template<class CELL_CYCLE_MODEL, class ODE_SOLVER>

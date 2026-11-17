@@ -66,7 +66,6 @@ TestAbstractContractionCellFactory.hpp
 TestAbstractPurkinjeCellFactory.hpp
 TestCardiacSimulation.hpp
 TestCardiacSimulationArchiver.hpp
-TestChasteXsdVersion.hpp
 TestCheckpointing.hpp
 TestConductivityTensors.hpp
 TestElectrodes.hpp

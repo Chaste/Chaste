@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VTKDEFORMEDMESHWRITER_HPP_
 #define VTKDEFORMEDMESHWRITER_HPP_
 
-#ifdef CHASTE_VTK
-
 #include <cstring>
 #include "VtkMeshWriter.hpp"
 #include "AbstractTetrahedralMesh.hpp"
@@ -124,8 +122,6 @@ public:
     void ApplyDeformation(const std::vector<c_vector<double,DIM> >& rPositions);
 
 };
-
-#endif //CHASTE_VTK
 
 #endif /*VTKDEFORMEDMESHWRITER_HPP_*/
 

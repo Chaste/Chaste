@@ -8,9 +8,12 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: read
+
 jobs:
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   build-and-test:
     name: "T1 · coverage build & test"
@@ -54,9 +57,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Compiler version
         run: |
@@ -158,13 +162,13 @@ jobs:
       # Uploaded before the codecov step so the coverage data is retained even if the
       # upload below fails.
       - name: Upload as artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: coverage-info
           path: chaste-build-dir/coverage.info
 
       - name: Upload to codecov
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         # Skip on forks running this workflow against their own repository, where the upload
         # has nowhere useful to go. Note this does not skip pull requests from forks, which
         # run in the upstream repository's context and whose coverage we do want.

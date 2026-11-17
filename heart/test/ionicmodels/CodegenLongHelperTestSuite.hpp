@@ -113,7 +113,6 @@ private:
                 pCell->SetTimestep(dt);
             }
         }
-#ifdef CHASTE_CVODE
         AbstractCvodeSystem* p_cvode_cell = dynamic_cast<AbstractCvodeSystem*>(pCell.get());
         if (p_cvode_cell)
         {
@@ -130,7 +129,6 @@ private:
                 p_cvode_cell->ForceUseOfNumericalJacobian();
             }
         }
-#endif
         double sampling_interval = 1.0; // ms; used as max dt for CVODE too
         Timer::Reset();
         OdeSolution solution = pCell->Compute(0.0, end_time, sampling_interval);

@@ -370,7 +370,6 @@ public:
         solver.SetInitialCondition(initial_condition);
 
         solver.SolveAndWriteResultsToFile();
-#ifdef CHASTE_VTK
         // Read back a sample of the output from VTK
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestHeatEquationForCoupledOdeSystemIn2dWithZeroDirichletWithOutput/";
         //Meta file
@@ -391,7 +390,6 @@ public:
         // Top corner
         TS_ASSERT_DELTA(pde_result[2], 0.0, 1e-4);
         TS_ASSERT_DELTA(ode_result[2], 1.0, 1e-4);
-#endif // CHASTE_VTK
 
         // Tidy up
         PetscTools::Destroy(initial_condition);

@@ -16,12 +16,8 @@ find_program (XSD_EXECUTABLE NAMES xsdcxx xsd
 
 # Now try other system paths
 find_program (XSD_EXECUTABLE NAMES xsdcxx xsd
-              PATHS /usr/local/xsd-3.2.0-i686-macosx/bin
-              /usr/local/xsd-3.2.0-x86_64-linux-gnu/bin
-              /usr/local/bin
+              PATHS /usr/local/bin
               /usr/bin
-              /opt/xsd-3.2.0-i686-macosx/bin
-              /opt/xsd-3.2.0-x86_64-linux-gnu/bin
               /usr/bin
               ENV PATH)
 
@@ -50,6 +46,7 @@ if (XSD_EXECUTABLE)
         set (xsd_version "undertermined")
         message (WARNING "XSD found, but version undetermined")
     endif ()
+    set (XSD_VERSION "${xsd_version}")
 
 endif (XSD_EXECUTABLE)
 

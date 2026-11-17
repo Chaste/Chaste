@@ -93,6 +93,8 @@ modules:
       - name: ChasteBuildInfo
         source_file: Version.hpp
 
+      - name: SourceRevision
+
       ##=== core: Chaste/global/src/checkpointing
       - name: Identifiable
 

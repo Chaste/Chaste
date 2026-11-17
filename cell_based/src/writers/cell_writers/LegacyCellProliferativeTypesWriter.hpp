@@ -46,9 +46,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Note this version will overwitew cell color if the cell is lableled or mutant for use
  * in the Java Vizialiser.
  *
- * The output file is called results.vizcelltypes by default. If VTK is switched on,
- * then the writer also specifies the VTK output for each cell, which is stored in
- * the VTK cell data "Cell types" by default.
+ * The output file is called results.vizcelltypes by default. The writer also specifies
+ * the VTK output for each cell, which is stored in the VTK cell data "Cell types" by
+ * default.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class LegacyCellProliferativeTypesWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>

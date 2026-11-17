@@ -4,10 +4,13 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
+permissions:
+  contents: read
+
 jobs:
 
   gate:
-    uses: ./.github/workflows/_ci-gate.yml
+    uses: $/.github/workflows/_ci-gate.yml
 
   generate-tutorial-markdown:
     name: "T1 · generate user tutorials"
@@ -27,12 +30,13 @@ jobs:
         config: [ran]
     steps:
       - name: checkout Chaste
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0  # Fetch all history in order to get revision info for tutorial files
+          persist-credentials: false
 
       - name: setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.x'
 
@@ -42,7 +46,7 @@ jobs:
         working-directory: python/infra
 
       - name: Upload archive files
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: user-tutorial-markdown
           path: |

@@ -43,6 +43,11 @@ class TestPyVersion(unittest.TestCase):
 
         print(chaste.core.ChasteBuildInfo.GetRootDir())
 
+        print(chaste.core.ChasteBuildInfo.GetVersionString())
+
+        revision = chaste.core.ChasteBuildInfo.GetChasteRevision()
+        print(revision.rGetCommit(), revision.IsModified())
+
 
 if __name__ == "__main__":
     unittest.main()
