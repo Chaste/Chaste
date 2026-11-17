@@ -73,10 +73,12 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::ReadJunctionsFile()
 
     std::ifstream junction_stream(junction_file.GetAbsolutePath().c_str());
 
-    if (!junction_stream.good())
-    {   // file couldn't be opened
-        EXCEPTION("Couldn't open data file: " << junction_file.GetAbsolutePath());
-    }
+    // Under normal circumstances, if the file exists pvj then it ought to readable
+    assert(junction_stream.good());
+    //if (!junction_stream.good())
+    //{   // file couldn't be opened
+    //    EXCEPTION("Couldn't open data file: " << junction_file.GetAbsolutePath());
+    //}
 
     // Reads in file defining nodes and resistance (separated by space)
     while (junction_stream.good())

@@ -63,8 +63,13 @@ class TestPyWrapperChanges(unittest.TestCase):
             len(unknown_classes),
             0,
             "\n" + "".join(unknown_classes) + "Found unknown classes"
-            "\n-- to wrap, add relevant entries to config.yaml. "
-            "\n-- to exclude from wrapping, add to config.yaml with the `exclude` option.",
+            "\n-- to wrap: add the class to pychaste/dynamic/config.yaml AND assign"
+            " it to a subpackage in pychaste/dynamic/package_layout.yaml, then run"
+            " pychaste/dynamic/regenerate.sh <build-dir>."
+            "\n-- to exclude from wrapping: add it to config.yaml with the `exclude`"
+            " option."
+            "\n-- when removing a class: drop it from config.yaml and"
+            " package_layout.yaml, then regenerate.",
         )
 
 

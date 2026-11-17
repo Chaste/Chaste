@@ -1,0 +1,8 @@
+build_artifacts/
+.osx-sdk/
+.bash_logout
+.bash_profile
+.bashrc
+.conda
+.condarc
+.profile

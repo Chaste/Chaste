@@ -45,4 +45,19 @@ else()
     if (post_not_successful)
         message( SEND_ERROR "post_processing ${post_cmd} failed")
     endif()
+
+    # optional second post-processing command, e.g. gperftools emits both a text report and an svg call graph
+    if( post_cmd2 )
+        separate_arguments( post_args2 )
+        message("executing second post-processing command:")
+        message("\t${post_cmd2} ${post_args2}")
+        execute_process(
+            COMMAND ${post_cmd2} ${post_args2}
+            OUTPUT_FILE ${output_file2}
+            RESULT_VARIABLE post2_not_successful
+            )
+        if (post2_not_successful)
+            message( SEND_ERROR "second post_processing ${post_cmd2} failed")
+        endif()
+    endif()
 endif()

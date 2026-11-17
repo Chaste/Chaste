@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractMesh.hpp"
 #include "Exception.hpp"
 #include "UblasCustomFunctions.hpp"
+#include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -489,16 +490,17 @@ bool AbstractMesh<ELEMENT_DIM, SPACE_DIM>::IsMeshChanging() const
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumContainingElementsPerProcess() const
 {
-    unsigned max_num = 0u;
-    for (unsigned local_node_index = 0; local_node_index < mNodes.size(); local_node_index++)
+    if (mNodes.empty())
     {
-        unsigned num = mNodes[local_node_index]->GetNumContainingElements();
-        if (num > max_num)
-        {
-            max_num = num;
-        }
+        // This can happen in parallel if a process isn't assigned any nodes.
+        // Covered in TestDistributedTetrahedralMesh::TestConstructLinearMeshSmallest but only when there are 3 or more processes
+        return 0u; // LCOV_EXCL_LINE
     }
-    return max_num;
+    return (*std::max_element(mNodes.begin(), mNodes.end(),
+                              [](const Node<SPACE_DIM>* a, const Node<SPACE_DIM>* b)
+                              {
+                                  return a->GetNumContainingElements() < b->GetNumContainingElements();
+                              }))->GetNumContainingElements();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

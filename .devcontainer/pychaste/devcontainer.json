@@ -1,0 +1,34 @@
+{
+    // Lightweight environment for running PyChaste notebooks (no C++ build).
+    // Open a .ipynb and pick the /opt/conda/bin/python kernel.
+    "name": "Chaste/PyChaste",
+    "image": "chaste/pychaste",
+
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/mambauser/src,type=bind",
+    "workspaceFolder": "/home/mambauser/src",
+    "remoteUser": "mambauser",
+
+    // Provide a virtual X display so VTK visualisation works.
+    "containerEnv": {
+        "DISPLAY": ":99"
+    },
+    "postStartCommand": "bash -lc 'pgrep -x Xvfb >/dev/null || (Xvfb :99 -screen 0 1024x768x24 >/dev/null 2>&1 &)'",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-toolsai.jupyter"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/opt/conda/bin/python"
+            }
+        }
+    },
+
+    "hostRequirements": {
+        "cpus": 2,
+        "memory": "4gb",
+        "storage": "8gb"
+    }
+}

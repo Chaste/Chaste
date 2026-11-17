@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CodegenLongHelperTestSuite.hpp"
 
-#include <boost/foreach.hpp>
 #include <vector>
 
 #include "HeartConfig.hpp"
@@ -54,7 +53,6 @@ class TestCodegenLongEasyModels : public CodegenLongHelperTestSuite
 public:
     void TestAnalyticCvodeCellsOpt()
     {
-#ifdef CHASTE_CVODE
         std::string dirname("TestCodegenLongCvodeAnalyticJ-easy_models-opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
@@ -63,7 +61,6 @@ public:
         args.push_back("--opt");
 
         RunTests(dirname, easy_models, args);
-#endif
     }
 
     void TestBackwardEulerCellsOpt()

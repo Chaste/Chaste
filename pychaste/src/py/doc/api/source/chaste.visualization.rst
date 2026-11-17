@@ -1,18 +1,6 @@
 chaste.visualization package
 ============================
 
-Submodules
-----------
-
-chaste.visualization.fortests module
-------------------------------------
-
-.. automodule:: chaste.visualization.fortests
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 
@@ -21,22 +9,14 @@ Module contents
     :undoc-members:
     :show-inheritance:
 
-.. autoclass:: chaste.visualization.VtkScene3
+.. autoclass:: chaste.visualization.VtkScene_2
     :members:
 
-.. autoclass:: chaste.visualization.VtkScene2
+.. autoclass:: chaste.visualization.VtkScene_3
     :members:
 
-.. autoclass:: chaste.visualization.AbstractPyChasteActorGenerator2
+.. autoclass:: chaste.visualization.CellPopulationPyChasteActorGenerator_2
     :members:
 
-.. autoclass:: chaste.visualization.AbstractPyChasteActorGenerator3
+.. autoclass:: chaste.visualization.CellPopulationPyChasteActorGenerator_3
     :members:
-
-.. autoclass:: chaste.visualization.CellPopulationPyChasteActorGenerator2
-    :members:
-
-.. autoclass:: chaste.visualization.CellPopulationPyChasteActorGenerator3
-    :members:
-
-

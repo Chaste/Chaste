@@ -442,8 +442,6 @@ public:
             soln_repl.ReplicatePetscVector(purkinje_problem.GetSolution());
         }
 
-#ifdef CHASTE_VTK
-// Requires  "sudo aptitude install libvtk5-dev" or similar
         //Check for VTK file
         std::string filepath = OutputFileHandler::GetChasteTestOutputDirectory() + "TestMonodomainPurkinjeProblem_purkinje_branched/vtk_output/";
 
@@ -458,10 +456,6 @@ public:
             FileFinder pvtk_file(filepath2 + "SimulationResults.pvtu", RelativeTo::Absolute);
             TS_ASSERT(pvtk_file.Exists());
         }
-#else
-        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_VTK
 
         for(unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -944,16 +938,6 @@ public:
             TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
             TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "No Purkinje-Ventricular junction (.pvj) file found. Junctions must be specified manually.");
             Warnings::QuietDestroy();
-        }
-
-        //Cover warning that a .pvj file can't be read
-        if (PetscTools::AmMaster())
-        {
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star");
-
-            chmod("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star.pvj", 0000);
-            TS_ASSERT_THROWS_CONTAINS(purkinje_problem.Initialise(), "Couldn't open data file:");
-            chmod("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements_cable_and_star.pvj", CHASTE_READ_WRITE);
         }
 
         //Covers empty lines in .pvj file

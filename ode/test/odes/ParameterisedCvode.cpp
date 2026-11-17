@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OdeSystemInformation.hpp"
 #include "VectorHelperFunctions.hpp"
 
-#ifdef CHASTE_CVODE
 bool ParameterisedCvode::fakeSecondParameter = false;
 bool ParameterisedCvode::noParameterDefaults = false;
 
@@ -93,4 +92,3 @@ void OdeSystemInformation<ParameterisedCvode>::Initialise()
 
     this->mInitialised = true;
 }
-#endif // CHASTE_CVODE

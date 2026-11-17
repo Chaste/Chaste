@@ -1,0 +1,31 @@
+name: Add ci:all label on review request
+
+# Requesting review is treated as "this is ready to be fully checked": if
+# ci:all isn't already on the PR, add it. This is the only place a developer
+# needs to interact with the tiered-CI labels for the normal
+# author -> review -> merge flow; ci:off remains a manual, deliberate opt-out
+# for docs-only or WIP changes and is left untouched here.
+
+on:
+  pull_request:
+    types: [review_requested]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  add-label:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:all') }}
+    steps:
+      - name: add ci:all label
+        # Must NOT be secrets.GITHUB_TOKEN: GitHub Actions does not fire new
+        # workflow runs from events triggered by the default GITHUB_TOKEN
+        # (pull_request/labeled is not one of the exempted event types), so
+        # a GITHUB_TOKEN-added label would sit on the PR without ever
+        # actually starting T1. PR_LABEL_ACCESS is a fine-grained PAT scoped
+        # to Chaste/Chaste, "Pull requests: Read and write" only.
+        env:
+          GH_TOKEN: ${{ secrets.PR_LABEL_ACCESS }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr edit "$PR" --add-label "ci:all" --repo "$GITHUB_REPOSITORY"

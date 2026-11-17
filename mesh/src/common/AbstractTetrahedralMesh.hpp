@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <string>
 #include <cassert>
-#include <boost/foreach.hpp>
 
 #include "AbstractMesh.hpp"
 #include "BoundaryElement.hpp"
@@ -147,8 +146,7 @@ private:
 
             // Mesh in disc, copy it to the archiving folder
             std::string original_file=this->GetMeshFileBaseName();
-            std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
-                = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file, order_of_element, order_of_boundary_element);
+            auto p_original_mesh_reader = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file, order_of_element, order_of_boundary_element);
 
             if (p_original_mesh_reader->IsFileFormatBinary())
             {
@@ -160,7 +158,7 @@ private:
                     std::string mesh_leaf_name = mesh_base.GetLeafNameNoExtension();
                     std::vector<FileFinder> mesh_files = mesh_folder.FindMatches(mesh_leaf_name + ".*");
                     FileFinder dest_dir(ArchiveLocationInfo::GetArchiveDirectory());
-                    BOOST_FOREACH(const FileFinder& r_mesh_file, mesh_files)
+                    for (const FileFinder& r_mesh_file : mesh_files)
                     {
                         FileFinder dest_file(ArchiveLocationInfo::GetMeshFilename() + r_mesh_file.GetExtension(),
                                              dest_dir);

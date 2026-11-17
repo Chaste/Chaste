@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _TESTABSTRACTCVODESYSTEM_HPP_
 
 #include <cmath>
-#include <iostream>
 #include "CheckpointArchiveTypes.hpp"
 
 #include "Cvode1.hpp"
@@ -58,7 +57,6 @@ class TestAbstractCvodeSystem : public CxxTest::TestSuite
 public:
     void TestOdeSystemOne()
     {
-#ifdef CHASTE_CVODE
         // Test Ode1 class
         Cvode1 ode1;
         // dy
@@ -71,14 +69,10 @@ public:
 
         DeleteVector(y);
         DeleteVector(dy);
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 
     void TestExceptions()
     {
-#ifdef CHASTE_CVODE
         Cvode1 ode;
         TS_ASSERT_EQUALS(ode.GetNumberOfStateVariables(), 1u);
 
@@ -95,14 +89,10 @@ public:
                               "Analytic Jacobian requested, but this ODE system doesn't have one. You can check this with HasAnalyticJacobian().");
 
         DeleteVector(v);
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 
     void TestParameters()
     {
-#ifdef CHASTE_CVODE
         ParameterisedCvode ode;
         boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
 
@@ -205,14 +195,10 @@ public:
         TS_ASSERT_THROWS_THIS(p_info->GetParameterUnits(1u), "The index passed in must be less than the number of parameters.");
         TS_ASSERT_THROWS_THIS(p_info->GetStateVariableUnits(1u), "The index passed in must be less than the number of state variables.");
         TS_ASSERT_THROWS_THIS(p_info->GetAnyVariableUnits(3u), "Invalid index passed to GetAnyVariableUnits.");
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 
     void TestAttributes()
     {
-#ifdef CHASTE_CVODE
         ParameterisedCvode ode;
         TS_ASSERT_EQUALS(ode.GetNumberOfAttributes(), 1u);
         TS_ASSERT(ode.HasAttribute("attr"));
@@ -226,14 +212,10 @@ public:
         TS_ASSERT_DELTA(p_info->GetAttribute("attr"), 1.1, 1e-12);
         TS_ASSERT(!p_info->HasAttribute("missing"));
         TS_ASSERT_THROWS_THIS(p_info->GetAttribute("missing"), "No attribute 'missing' found.");
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 
     void TestDerivedQuantities()
     {
-#ifdef CHASTE_CVODE
         ParameterisedCvode ode;
         boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
 
@@ -297,15 +279,11 @@ public:
                               "This ODE system does not define derived quantities.");
 
         DeleteVector(derived);
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 
     // This test is mainly for coverage purposes.
     void TestDumpState()
     {
-#ifdef CHASTE_CVODE
         // Create a two variable system
         TwoDimCvodeSystem ode_system;
 
@@ -342,14 +320,10 @@ public:
         }
 
         DeleteVector(n_vec);
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 
     void TestSimpleSolveUsingCvode()
     {
-#ifdef CHASTE_CVODE
         CvodeFirstOrder ode_system;
 
         double h_value = 0.01;
@@ -377,26 +351,10 @@ public:
         // This covers both cases in the code.
         TS_ASSERT_THROWS_CONTAINS(ode_system.Solve(0.0, 2.0, h_value, 0.1),
                                   "CVODE failed to solve system");
-
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 
     void TestSequentialSolveCalls()
     {
-        /*
-         * All of the tests in this section pass when using Sundials >= 2.4.0
-         * with 'ForcedReset' defaulting to false.
-         *
-         * Unfortunately they don't pass when using Sundials 2.3.0, probably because it
-         * isn't as smart about going back in time when it sees changes in the RHS function.
-         * (done as parameter changes here).
-         *
-         * So this messiness means that we have to switch on 'Forced Resetting' for
-         * Sundials 2.3.0 as default to make sure it gives good answers.
-         */
-#ifdef CHASTE_CVODE
         {
             ParameterisedCvode ode;
 
@@ -442,21 +400,13 @@ public:
                 ode.SetParameter("a", i); // dy/dt = a
                 ode.Solve(15.0 + i, i + 16.0, 1.0);
             }
-#if CHASTE_SUNDIALS_VERSION >= 20400
             TS_ASSERT_DELTA(ode.GetStateVariable(0u), 50.0, 1e-12); // N.B. This is wrong!
-#else
-            TS_ASSERT_DELTA(ode.GetStateVariable(0u), 40.8181, 1e-4); // N.B. This is also wrong!
-#endif
             // (We tricked ODE system by resetting a state variable in minimal reset mode).
         }
-#else
-        std::cout << "Cvode is not enabled - this test was not run.\n";
-#endif // CHASTE_CVODE
     }
 
     void TestArchiving()
     {
-#ifdef CHASTE_CVODE
         OutputFileHandler handler("archive", false);
         std::string archive_filename;
         archive_filename = handler.GetOutputDirectoryFullPath() + "parameterised_cvode.arch";
@@ -526,9 +476,6 @@ public:
             delete p_ode;
             delete p_ode2;
         }
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 };
 

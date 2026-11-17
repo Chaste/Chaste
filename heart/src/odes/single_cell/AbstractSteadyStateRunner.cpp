@@ -35,13 +35,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractSteadyStateRunner.hpp"
 
-#ifdef CHASTE_CVODE
-
 AbstractSteadyStateRunner::AbstractSteadyStateRunner(boost::shared_ptr<AbstractCvodeCell> pModel)
         : mpModel(pModel),
           mNumEvaluations(0u),
           mMaxNumPaces(10000u),
-          mSuppressOutput(false)
+          mSuppressOutput(false),
+          mSuppressWarnings(false)
 {
 }
 
@@ -69,7 +68,10 @@ bool AbstractSteadyStateRunner::RunToSteadyState()
         {
             std::cout << "Steady state not reached after " << GetNumEvaluations() << " paces." << std::endl;
         }
-        WARNING("Model " << mpModel->GetSystemName() << " did not reach steady state within " << mMaxNumPaces << " paces.");
+        if (!mSuppressWarnings)
+        {
+            WARNING("Model " << mpModel->GetSystemName() << " did not reach steady state within " << mMaxNumPaces << " paces.");
+        }
         return false;
     }
 }
@@ -77,6 +79,11 @@ bool AbstractSteadyStateRunner::RunToSteadyState()
 void AbstractSteadyStateRunner::SuppressOutput(bool suppress)
 {
     mSuppressOutput = suppress;
+}
+
+void AbstractSteadyStateRunner::SuppressWarnings(bool suppress)
+{
+    mSuppressWarnings = suppress;
 }
 
 unsigned AbstractSteadyStateRunner::GetNumEvaluations()
@@ -92,5 +99,3 @@ void AbstractSteadyStateRunner::SetMaxNumPaces(unsigned numPaces)
     }
     mMaxNumPaces = numPaces;
 }
-
-#endif // CHASTE_CVODE

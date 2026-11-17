@@ -468,8 +468,6 @@ public:
         TS_ASSERT_EQUALS(sequential_layers.size(), info.rGetLayerForEachNode().size());
         TS_ASSERT_EQUALS(sequential_layers.size(), sequential_relative_wall_position.size());
 
-//#ifdef CHASTE_VTK
-//// Requires  "sudo aptitude install libvtk5-dev" or similar
 //        if  (PetscTools::IsParallel())
 //        {
 //            VtkMeshWriter<3,3> writer("", "epi_distance_par", false);
@@ -484,7 +482,6 @@ public:
 //            writer.AddPointData("Error compared to sequential", errors);
 //            writer.WriteFilesUsingMesh(mesh);
 //        }
-//#endif //CHASTE_VTK
 
 
         if (PetscTools::IsSequential())

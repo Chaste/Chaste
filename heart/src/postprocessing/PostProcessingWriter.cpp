@@ -43,8 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Version.hpp"
 #include "HeartEventHandler.hpp"
 #include "Hdf5DataWriter.hpp"
-#include "Hdf5ToMeshalyzerConverter.hpp"
-#include "Hdf5ToVtkConverter.hpp"
 
 #include <iostream>
 

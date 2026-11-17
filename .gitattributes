@@ -1,0 +1,4 @@
+# git substitutes the commit hash into .git_archival.txt whenever it creates an archive of the
+# repository, such as the source tarball GitHub attaches to each release, so builds from an
+# archive still know which commit they came from (see cmake/Modules/ChasteSourceRevision.cmake).
+.git_archival.txt export-subst

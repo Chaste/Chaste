@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CodegenLongHelperTestSuite.hpp"
 
-#include <boost/foreach.hpp>
 #include <vector>
 
 #include "HeartConfig.hpp"
@@ -54,7 +53,6 @@ class TestCodegenLongAnalyticCvodeOpt : public CodegenLongHelperTestSuite
 public:
     void TestAnalyticCvodeCellsOpt()
     {
-#ifdef CHASTE_CVODE
         std::string dirname("TestCodegenLongCvodeAnalyticJ-opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
@@ -67,7 +65,6 @@ public:
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args);
-#endif
     }
 };
 

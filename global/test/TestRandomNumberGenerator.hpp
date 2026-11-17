@@ -47,11 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-#ifdef _MSC_VER
-#define srandom srand
-#define random rand
-#endif
-
 class TestRandomNumberGenerator : public CxxTest::TestSuite
 {
 public:

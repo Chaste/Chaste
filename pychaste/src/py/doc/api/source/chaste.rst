@@ -11,7 +11,6 @@ Subpackages
     chaste.mesh
     chaste.ode
     chaste.pde
-    chaste.tutorial
     chaste.visualization
 
 Module contents

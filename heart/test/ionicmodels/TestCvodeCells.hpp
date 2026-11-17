@@ -52,7 +52,6 @@ the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src
 #include "Shannon2004.hpp"
 
 #include "CellMLToSharedLibraryConverter.hpp"
-#include "AbstractCvodeCell.hpp"
 #include "AbstractCardiacCellWithModifiers.hpp"
 #include "AbstractModifier.hpp"
 
@@ -72,8 +71,6 @@ the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
-
-#ifdef CHASTE_CVODE
 
 class ExceptionalCell : public AbstractCvodeCell
 {
@@ -126,7 +123,6 @@ void OdeSystemInformation<ExceptionalCell>::Initialise(void)
 
     this->mInitialised = true;
 }
-#endif // CHASTE_CVODE
 
 class TestCvodeCells : public CxxTest::TestSuite
 {
@@ -134,7 +130,6 @@ public:
 
     void TestLuoRudyCvodeCell()
     {
-#ifdef CHASTE_CVODE
         // Set stimulus
         double magnitude = -25.5;
         double duration  = 2.0 ;  // ms
@@ -322,14 +317,10 @@ public:
             lr91_cvode_system.ComputeExceptVoltage(start_time, end_time);
             TS_ASSERT_EQUALS(lr91_cvode_system.GetAnyVariable("membrane_voltage"), voltage_was);
         }
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 
     void TestShannon2004()
     {
-#ifdef CHASTE_CVODE
         // Set stimulus
         double magnitude = -25.5;
         double duration  = 2.0 ;  // ms
@@ -492,14 +483,10 @@ public:
         CompareCellModelResults("sh04_block_param", "sh04_block_modifier", 1e-6, voltage_only, "TestCvodeCells");
 
         delete sh04_cvode_system;
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 
     void TestArchivingCvodeCells()
     {
-#ifdef CHASTE_CVODE
         //Archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
@@ -558,9 +545,6 @@ public:
 
             delete p_luo_rudy_cell;
         }
-#else
-        std::cout << "Cvode is not enabled.\n";
-#endif // CHASTE_CVODE
     }
 };
 

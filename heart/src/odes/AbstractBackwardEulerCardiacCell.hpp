@@ -532,7 +532,6 @@ protected:
 // Debugging
 #ifndef NDEBUG
 #include "OutputFileHandler.hpp"
-#include <boost/foreach.hpp>
 template<unsigned SIZE>
 void DumpJacobianToFile(double time, const double rCurrentGuess[SIZE], double rJacobian[SIZE][SIZE],
                         const std::vector<double>& rY)
@@ -541,7 +540,7 @@ void DumpJacobianToFile(double time, const double rCurrentGuess[SIZE], double rJ
     out_stream p_file = handler.OpenOutputFile("J.txt", std::ios::app);
     (*p_file) << "At " << time << " " << SIZE << std::endl;
     (*p_file) << "rY";
-    BOOST_FOREACH(double y, rY)
+    for (double y : rY)
     {
         (*p_file) << " " << y;
     }

@@ -21,8 +21,7 @@
     "containerEnv": {
         "RUNNER_OFF": "1",
         "CMAKE_BUILD_TYPE": "Debug",
-        "Chaste_ERROR_ON_WARNING": "ON",
-        "Chaste_UPDATE_PROVENANCE": "OFF"
+        "Chaste_ERROR_ON_WARNING": "ON"
     },
 
     "onCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",

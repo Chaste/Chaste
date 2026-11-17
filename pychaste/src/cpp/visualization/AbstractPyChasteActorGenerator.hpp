@@ -37,16 +37,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTPYCHASTEACTORGENERATOR_HPP_
 
 #include <vector>
+
 #include <vtkColorTransferFunction.h>
 #include <vtkRenderer.h>
 #include <vtkScalarBarActor.h>
 #include <vtkSmartPointer.h>
 #include <vtkTextProperty.h>
+
 #include "SmartPointers.hpp"
 #include "UblasVectorInclude.hpp"
 
 /**
- * This class generates VTK actors for geometric features.
+ * Abstract base for the PyChaste actor generators.
+ *
+ * It does not build any actors itself - AddActor() is pure virtual and
+ * implemented by each concrete generator. Instead it holds the rendering
+ * configuration they share: the continuous and discrete colour transfer
+ * functions, the edge/point/volume colours, sizes and opacity, the data label
+ * to colour by, and the scale bar. The constructor seeds these with sensible
+ * defaults, and the Set... methods adjust them.
  */
 template <unsigned DIM>
 class AbstractPyChasteActorGenerator
@@ -56,7 +65,7 @@ protected:
     /**
      * The color lookup for continuous entities
      */
-    vtkSmartPointer<vtkColorTransferFunction> mpColorTransferFunction;
+    vtkSmartPointer<vtkColorTransferFunction> mpContinuousColorTransferFunction;
 
     /**
      * The color lookup for discrete entities
@@ -66,17 +75,17 @@ protected:
     /**
      * Show the edges, using a tube filter
      */
-    bool mShowEdges;
+    bool mShowEdges = true;
 
     /**
      * Show the points, using a glyph filter
      */
-    bool mShowPoints;
+    bool mShowPoints = false;
 
     /**
      * Show the volume
      */
-    bool mShowVolume;
+    bool mShowVolume = true;
 
     /**
      * The edge color in RGB
@@ -96,20 +105,20 @@ protected:
     /**
      * The volume opacity
      */
-    double mVolumeOpacity;
+    double mVolumeOpacity = 0.9;
 
     /**
      * The default size for points
      */
-    double mPointSize;
+    double mPointSize = 0.5;
 
     /**
      * The default size for edges
      */
-    double mEdgeSize;
+    double mEdgeSize = 0.01;
 
     /**
-     * The label for contouring on data
+     * The name of the data field to colour by, when colouring by data
      */
     std::string mDataLabel;
 
@@ -121,39 +130,72 @@ protected:
     /**
      * Show the scale bar
      */
-    bool mShowScaleBar;
+    bool mShowScaleBar = false;
 
 public:
+
     /**
-     * Constructor
+     * Constructor. Initialises the continuous (viridis) and discrete (accent)
+     * colour transfer functions and the scale bar with their default settings.
      */
     AbstractPyChasteActorGenerator();
 
     /**
      * Destructor
      */
-    virtual ~AbstractPyChasteActorGenerator();
+    virtual ~AbstractPyChasteActorGenerator() = default;
 
     /**
-     * @return return the color transfer function
-     */
-    vtkSmartPointer<vtkColorTransferFunction> GetColorTransferFunction();
-
-    /**
-     * @return return the discrete color transfer function
-     */
-    vtkSmartPointer<vtkColorTransferFunction> GetDiscreteColorTransferFunction();
-
-    /**
-     * @return return the scale bar
-     */
-    vtkSmartPointer<vtkScalarBarActor> GetScaleBar();
-
-    /**
-     * Add the Abstract actor to the renderer
-     * @param pRenderer the current renderer
+     * Build the generated actors and add them to the renderer. Pure virtual:
+     * each concrete generator adds the actors appropriate to what it renders.
+     * @param pRenderer the renderer to add the actors to
      */
     virtual void AddActor(vtkSmartPointer<vtkRenderer> pRenderer) = 0;
+
+    /**
+     * @return the continuous (data) colour transfer function
+     */
+    vtkSmartPointer<vtkColorTransferFunction> GetContinuousColorTransferFunction() const;
+
+    /**
+     * @return the discrete (cell id/type) colour transfer function
+     */
+    vtkSmartPointer<vtkColorTransferFunction> GetDiscreteColorTransferFunction() const;
+
+    /**
+     * @return the scale bar
+     */
+    vtkSmartPointer<vtkScalarBarActor> GetScaleBar() const;
+
+    /**
+     * Set the name of the data field to colour by (used when colouring by data)
+     * @param rLabel the data field name
+     */
+    void SetDataLabel(const std::string& rLabel);
+
+    /**
+     * Set the edge color in RGB (e.g. (255,255,255) is white)
+     * @param rColor the edge color
+     */
+    void SetEdgeColor(const c_vector<double, 3>& rColor);
+
+    /**
+     * Set the default edge size
+     * @param size the default edge size
+     */
+    void SetEdgeSize(double size);
+
+    /**
+     * Set the point color in RGB (e.g. (255,255,255) is white)
+     * @param rColor the point color
+     */
+    void SetPointColor(const c_vector<double, 3>& rColor);
+
+    /**
+     * Set the default point size
+     * @param size the default point size
+     */
+    void SetPointSize(double size);
 
     /**
      * Set whether to show the edges
@@ -168,22 +210,16 @@ public:
     void SetShowPoints(bool show);
 
     /**
+     * Set whether to show the scale bar
+     * @param show whether to show the scale bar
+     */
+    void SetShowScaleBar(double show);
+
+    /**
      * Set whether to show the volume
-     * @param show whether to show the volumes
+     * @param show whether to show the volume
      */
     void SetShowVolume(bool show);
-
-    /**
-     * Set the edge color in RGB (e.g. (255,255,255) is white)
-     * @param rColor the edge color
-     */
-    void SetEdgeColor(const c_vector<double, 3>& rColor);
-
-    /**
-     * Set the point color in RGB (e.g. (255,255,255) is white)
-     * @param rColor the point color
-     */
-    void SetPointColor(const c_vector<double, 3>& rColor);
 
     /**
      * Set the volume color in RGB (e.g. (255,255,255) is white)
@@ -196,30 +232,6 @@ public:
      * @param opacity the opacity for the volume
      */
     void SetVolumeOpacity(double opacity);
-
-    /**
-     * Set the default point size
-     * @param size the default point size
-     */
-    void SetPointSize(double size);
-
-    /**
-     * Set the default edge size
-     * @param size the default edge size
-     */
-    void SetEdgeSize(double size);
-
-    /**
-     * Set the label for contouring data
-     * @param rLabel the label for contouring data
-     */
-    void SetDataLabel(const std::string& rLabel);
-
-    /**
-     * Set show scale bar
-     * @param show show scale bar
-     */
-    void SetShowScaleBar(double show);
 };
 
 #endif // ABSTRACTPYCHASTEACTORGENERATOR_HPP_

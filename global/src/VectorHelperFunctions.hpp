@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <vector>
 
-#ifdef CHASTE_CVODE
 // CVODE headers
 #include <nvector/nvector_serial.h>
 #if CHASTE_SUNDIALS_VERSION >= 70000
@@ -57,8 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if CHASTE_SUNDIALS_VERSION >= 60000
 #include "CvodeContextManager.hpp"  // access to shared SUNContext object required by Sundials 6.0+
-#endif
-
 #endif
 
 /**
@@ -314,8 +311,6 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, std::vector<doubl
 
 // Specialisations for N_Vector
 
-#ifdef CHASTE_CVODE
-
 /**
  * Specialisation for CVODE's N_Vector type.
  * @param rVec
@@ -449,7 +444,7 @@ inline void CopyToStdVector(const N_Vector& rSrc, std::vector<double>& rDest)
 {
     // Check for no-op
     realtype* p_src = NV_DATA_S(rSrc);
-    if (!rDest.empty() && p_src == &(rDest[0]))
+    if (p_src == rDest.data())
         return;
     // Set dest size
     long size = NV_LENGTH_S(rSrc);
@@ -472,7 +467,7 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, N_Vector& rDest)
 {
     // Check for no-op
     realtype* p_dest = NV_DATA_S(rDest);
-    if (p_dest == &(rSrc[0])) return;
+    if (p_dest == rSrc.data()) return;
 
     // Check dest size
     long size = NV_LENGTH_S(rDest);
@@ -511,8 +506,6 @@ inline N_Vector MakeNVector(const std::vector<double>& rSrc)
     CopyFromStdVector(rSrc, nv);
     return nv;
 }
-
-#endif // CHASTE_CVODE
 
 // End of helper functions
 

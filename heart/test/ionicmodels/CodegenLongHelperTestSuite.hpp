@@ -46,7 +46,6 @@ the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src
 
 #include <algorithm>
 #include <boost/assign/list_of.hpp>
-#include <boost/foreach.hpp>
 #include <cstring>
 #include <iostream>
 #include <vector>
@@ -114,7 +113,6 @@ private:
                 pCell->SetTimestep(dt);
             }
         }
-#ifdef CHASTE_CVODE
         AbstractCvodeSystem* p_cvode_cell = dynamic_cast<AbstractCvodeSystem*>(pCell.get());
         if (p_cvode_cell)
         {
@@ -131,7 +129,6 @@ private:
                 p_cvode_cell->ForceUseOfNumericalJacobian();
             }
         }
-#endif
         double sampling_interval = 1.0; // ms; used as max dt for CVODE too
         Timer::Reset();
         OdeSolution solution = pCell->Compute(0.0, end_time, sampling_interval);
@@ -249,7 +246,7 @@ protected:
     // Returns a list of all models in special_treatment_models that exist in all_models and deletes these models from all_models
     std::vector<std::string> special_treatment_models(std::vector<std::string>& all_models, std::vector<std::string> special_treatment_models)
     {
-        BOOST_FOREACH (std::string model, special_treatment_models)
+        for (std::string model : special_treatment_models)
         {
             auto special_model = std::find(all_models.begin(), all_models.end(), model);
             bool found = special_model != all_models.end();

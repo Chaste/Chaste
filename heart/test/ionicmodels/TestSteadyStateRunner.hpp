@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Shannon2004Cvode.hpp"
 #include "SteadyStateRunner.hpp"
+#include "Warnings.hpp"
 #include "ZeroStimulus.hpp"
 
 //This test is always run sequentially (never in parallel)
@@ -56,7 +57,6 @@ class TestSteadyStateRunner : public CxxTest::TestSuite
 public:
     void TestSteadyStateRunnerConverges(void)
     {
-#ifdef CHASTE_CVODE
         //////////// DEFINE PARAMETERS ///////////////
         // Get the frequency
         double hertz = 1.0;
@@ -105,6 +105,12 @@ public:
         // Here we don't reach steady state by max num paces
         steady_runner.SetMaxNumPaces(1u);
         result = steady_runner.RunToSteadyState();
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+
+        steady_runner.SuppressWarnings(true);
+        result = steady_runner.RunToSteadyState();
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u); // No increase in number of warnings, so we know they were suppressed.
+        steady_runner.SuppressWarnings(false);
 
         TS_ASSERT_EQUALS(result, false);
 
@@ -122,9 +128,6 @@ public:
 
         // For coverage
         steady_runner.SuppressOutput();
-#else
-        std::cout << "CVODE must be enabled for the steady state runner to work." << std::endl;
-#endif //_CHASTE_CVODE
     }
 };
 

@@ -43,6 +43,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 AbstractUntemplatedParameterisedSystem::AbstractUntemplatedParameterisedSystem(unsigned numberOfStateVariables)
     : mNumberOfStateVariables(numberOfStateVariables)
 {
+    if (mNumberOfStateVariables == 0)
+    {
+        EXCEPTION("A system of equations must have some unknowns/state variables.");
+    }
 }
 
 AbstractUntemplatedParameterisedSystem::~AbstractUntemplatedParameterisedSystem()

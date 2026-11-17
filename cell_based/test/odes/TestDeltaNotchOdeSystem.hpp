@@ -61,7 +61,6 @@ public:
 
     void TestDeltaNotchOdeSystemSetup()
     {
-#ifdef CHASTE_CVODE
         DeltaNotchOdeSystem ode_system;
 
         double h_value = 1.0; // Was 0.0001 for some utterly bizarre reason
@@ -85,15 +84,10 @@ public:
         // Decent results
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 0.9615, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 0.0107, 1e-4);
-#else
-        std::cout << "CVODE is not enabled. " << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-#endif //CHASTE_CVODE
     }
 
     void TestArchiving()
     {
-#ifdef CHASTE_CVODE
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "delta_notch_ode.arch";
 
@@ -155,13 +149,10 @@ public:
             // Tidy up
             delete p_ode_system;
         }
-#endif //CHASTE_CVODE
     }
 
     void TestSetStateVariables()
     {
-#ifdef CHASTE_CVODE
-
         std::vector<double> state_vars;
         state_vars.push_back(0.0);
         state_vars.push_back(1.0);
@@ -169,8 +160,6 @@ public:
 
         TS_ASSERT_EQUALS(ode_system.GetStateVariable(0),0.0);
         TS_ASSERT_EQUALS(ode_system.GetStateVariable(1),1.0);
-
-#endif //CHASTE_CVODE
    }
 };
 

@@ -57,8 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 'overlapping spheres' description of cell neighbours); and the fourth uses a
  * `VertexBasedCellPopulation` (in which each cell is represented by a polygon).
  * To be able to view these simulations, we must first have
- * downloaded and installed VTK and Paraview, and updated our hostconfig file
- * to ensure that it knows to use VTK.
+ * downloaded and installed Paraview.
  *
  * ### The test
  *
@@ -80,7 +79,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 #include "NagaiHondaForce.hpp"
 #include "SimpleTargetAreaModifier.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -147,7 +147,7 @@ public:
         simulator.SetEndTime(1.0);
 
         /* We create a force law and pass it to the `OffLatticeSimulation`. */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -212,7 +212,7 @@ public:
         simulator.SetOutputDirectory("Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing");
         simulator.SetEndTime(1.0);
 
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -269,9 +269,9 @@ public:
         simulator.SetOutputDirectory("Test2DNodeBasedMonolayerSimulationForVisualizing");
         simulator.SetEndTime(1.0);
 
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 

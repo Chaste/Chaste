@@ -34,8 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SlidingBoundaryCondition.hpp"
-#include "AbstractCentreBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
+#include "AbstractOffLatticeCellPopulation.hpp"
 
 template<unsigned DIM>
 SlidingBoundaryCondition<DIM>::SlidingBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation,

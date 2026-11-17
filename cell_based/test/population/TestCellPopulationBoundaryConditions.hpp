@@ -288,6 +288,137 @@ public:
         }
     }
 
+    void TestPlaneBoundaryConditionWithNodeBasedCellPopulation1d()
+    {
+        // Create a 1D mesh with nodes at x = -1.0, 0.5, 1.5, 2.5
+        std::vector<Node<1>*> nodes;
+        nodes.push_back(new Node<1>(0, false, -1.0));
+        nodes.push_back(new Node<1>(1, false, 0.5));
+        nodes.push_back(new Node<1>(2, false, 1.5));
+        nodes.push_back(new Node<1>(3, false, 2.5));
+
+        NodesOnlyMesh<1> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<1> cell_population(mesh, cells);
+
+        // Test 1: Boundary at x=0, normal=-1 (constraint: x >= 0)
+        c_vector<double, 1> point = zero_vector<double>(1);
+        c_vector<double, 1> normal = zero_vector<double>(1);
+        normal(0) = -1.0;
+        PlaneBoundaryCondition<1> boundary_condition(&cell_population, point, normal);
+
+        TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-1-1");
+
+        // Impose boundary condition
+        std::map<Node<1>*, c_vector<double, 1> > old_locations;
+        for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
+             cell_iter != cell_population.rGetCells().end();
+             ++cell_iter)
+        {
+            Node<1>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            old_locations[p_node] = p_node->rGetLocation();
+        }
+
+        boundary_condition.ImposeBoundaryCondition(old_locations);
+
+        // Test that all nodes satisfy the boundary condition (x >= 0)
+        for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
+             cell_iter != cell_population.rGetCells().end();
+             ++cell_iter)
+        {
+            Node<1>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            c_vector<double, 1> location = p_node->rGetLocation();
+            if (old_locations[p_node][0] < 0.0)
+            {
+                TS_ASSERT_DELTA(0.0, location[0], 1e-6);
+            }
+            else
+            {
+                TS_ASSERT_DELTA(location[0], old_locations[p_node][0], 1e-6);
+            }
+        }
+
+        // Test VerifyBoundaryCondition() method
+        TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
+
+        // Test that jiggling nodes throws an exception in 1D
+        TS_ASSERT_THROWS_THIS(boundary_condition.SetUseJiggledNodesOnPlane(true),
+                              "Jiggling of nodes is not supported in 1D.");
+
+        for (unsigned i = 0; i < nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestPlaneBoundaryConditionWithNodeBasedCellPopulation1dNonZeroPoint()
+    {
+        // Create a fresh 1D mesh with nodes at x = -1.0, 0.5, 1.5, 2.5
+        std::vector<Node<1>*> nodes;
+        nodes.push_back(new Node<1>(0, false, -1.0));
+        nodes.push_back(new Node<1>(1, false, 0.5));
+        nodes.push_back(new Node<1>(2, false, 1.5));
+        nodes.push_back(new Node<1>(3, false, 2.5));
+
+        NodesOnlyMesh<1> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<1> cell_population(mesh, cells);
+
+        // Boundary at x=2.0, normal=-1 (constraint: x >= 2.0)
+        c_vector<double, 1> point = zero_vector<double>(1);
+        point(0) = 2.0;
+        c_vector<double, 1> normal = zero_vector<double>(1);
+        normal(0) = -1.0;
+        PlaneBoundaryCondition<1> boundary_condition(&cell_population, point, normal);
+
+        // Impose boundary condition
+        std::map<Node<1>*, c_vector<double, 1> > old_locations;
+        for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
+             cell_iter != cell_population.rGetCells().end();
+             ++cell_iter)
+        {
+            Node<1>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            old_locations[p_node] = p_node->rGetLocation();
+        }
+
+        boundary_condition.ImposeBoundaryCondition(old_locations);
+
+        // Test that all nodes satisfy the boundary condition (x >= 2.0)
+        for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
+             cell_iter != cell_population.rGetCells().end();
+             ++cell_iter)
+        {
+            Node<1>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            c_vector<double, 1> location = p_node->rGetLocation();
+            if (old_locations[p_node][0] < 2.0)
+            {
+                TS_ASSERT_DELTA(2.0, location[0], 1e-6);
+            }
+            else
+            {
+                TS_ASSERT_DELTA(location[0], old_locations[p_node][0], 1e-6);
+            }
+        }
+
+        // Test VerifyBoundaryCondition() method
+        TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
+
+        for (unsigned i = 0; i < nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
     void TestPlaneBoundaryConditionExceptions()
     {
         // Create a simple 2D PottsMesh
@@ -308,33 +439,8 @@ public:
         c_vector<double,2> normal = zero_vector<double>(2);
         normal(0) = 1.0;
 
-        PlaneBoundaryCondition<2> plane_boundary_condition(&potts_cell_population, point, normal);
-        std::map<Node<2>*, c_vector<double, 2> > old_locations;
-        TS_ASSERT_THROWS_THIS(plane_boundary_condition.ImposeBoundaryCondition(old_locations),
+        TS_ASSERT_THROWS_THIS(PlaneBoundaryCondition<2> plane_boundary_condition(&potts_cell_population, point, normal),
             "PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
-
-        // Test the correct exception is thrown in 1D
-        std::vector<Node<1>*> nodes;
-        nodes.push_back(new Node<1>(0, true,  0.0));
-        nodes.push_back(new Node<1>(1, false, 1.0));
-        NodesOnlyMesh<1> nodes_only_mesh;
-        nodes_only_mesh.ConstructNodesWithoutMesh(nodes, 1.5);
-        std::vector<CellPtr> node_based_cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_1d;
-        cells_generator_1d.GenerateBasicRandom(node_based_cells, nodes_only_mesh.GetNumNodes(), p_diff_type);
-        NodeBasedCellPopulation<1> node_based_cell_population(nodes_only_mesh, node_based_cells);
-
-        c_vector<double,1> point_1d = zero_vector<double>(1);
-        c_vector<double,1> normal_1d = zero_vector<double>(1);
-        normal_1d(0) = 1.0;
-        PlaneBoundaryCondition<1> plane_bc_1d(&node_based_cell_population, point_1d, normal_1d);
-        TS_ASSERT_THROWS_THIS(plane_bc_1d.VerifyBoundaryCondition(),
-            "PlaneBoundaryCondition is not implemented in 1D");
-
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            delete nodes[i];
-        }
     }
 
     void TestSphereGeometryBoundaryCondition()

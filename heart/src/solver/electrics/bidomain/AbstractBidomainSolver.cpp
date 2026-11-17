@@ -279,8 +279,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetFixedExtracellularPotenti
     {
         if (this->mpMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(mFixedExtracellularPotentialNodes[i]))
         {
-            ConstBoundaryCondition<SPACE_DIM>* p_boundary_condition
-                 = new ConstBoundaryCondition<SPACE_DIM>(0.0);
+            auto* p_boundary_condition = new ConstBoundaryCondition<SPACE_DIM>(0.0);
 
             //Throws if node is not owned locally
             Node<SPACE_DIM>* p_node = this->mpMesh->GetNode(mFixedExtracellularPotentialNodes[i]);

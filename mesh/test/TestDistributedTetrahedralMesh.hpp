@@ -1818,6 +1818,12 @@ public:
         ChastePoint<1> origin(0.0);
         TS_ASSERT_EQUALS(smallest_mesh.GetNearestNodeIndex(origin), 0u);
 
+        // This last piece is to cover code in CalculateMaximumContainingElementsPerProcess() method.
+        // Code can only be covered if -np 3 is used, as the third process will own no nodes.
+        unsigned max_containing_elements_all = 0;
+        unsigned max_containing_elements = smallest_mesh.CalculateMaximumContainingElementsPerProcess();
+        MPI_Allreduce(&max_containing_elements, &max_containing_elements_all, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+        TS_ASSERT_EQUALS(max_containing_elements_all, 1U);
     }
 
     void TestConstructRectangularMeshSmallest()

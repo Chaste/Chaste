@@ -34,12 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Debug.hpp"
-// If you ever need backtrace in Windows then the RTFM begins at "CaptureStackBackTrace"
-#ifndef _MSC_VER
 #include <execinfo.h>     //For backtrace
 #include <unistd.h>       // For memory profiling
 #include <sys/resource.h> // For memory profiling
-#endif//_MSC_VER
 //#include <cxxabi.h> // For demangling C++ C-style names
 
 double eMemoryAtMarker = 0.0;
@@ -58,9 +55,7 @@ std::string FormDebugHead()
 
 void PrintTheStack()
 {
-    // If you ever need backtrace in Windows then the RTFM begins at "CaptureStackBackTrace"
     TRACE("Stack information");
-#ifndef _MSC_VER
     // storage array for stack trace address data
     void* address_list[20u]; //20 is about the number of stack symbols we are going to print
 
@@ -77,34 +72,28 @@ void PrintTheStack()
         TRACE("Level " << i << ": " << symbol_list[i]);
     }
     free(symbol_list);
-#endif //_MSC_VER
 }
 
 void MarkMemory()
 {
     TRACE("PRINT_MEMORY will now be relative to here");
 
-#ifndef _MSC_VER
     struct rusage rusage;
     getrusage( RUSAGE_SELF, &rusage );
 
     // Store current memory footprint in Mb to allow calculations relative to this point
     eMemoryAtMarker = double(rusage.ru_maxrss)/1024.0;
-#endif //_MSC_VER
 }
 
 void UnmarkMemory()
 {
     TRACE("PRINT_MEMORY will now be absolute footprint");
 
-#ifndef _MSC_VER
     eMemoryAtMarker = 0.0;
-#endif //_MSC_VER
 }
 
 void PrintMemory()
 {
-#ifndef _MSC_VER
     struct rusage rusage;
     getrusage( RUSAGE_SELF, &rusage );
 
@@ -119,5 +108,4 @@ void PrintMemory()
     {
         std::cout << FormDebugHead() << "Memory change from marker: " << memory << " Mb" << std::endl << std::flush;
     }
-#endif //_MSC_VER
 }

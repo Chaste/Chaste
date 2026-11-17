@@ -38,36 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file
- * This file provides access to some 'system calls' in a cross-platform manner.
- * It provides the normal Linux names, even on Windows.
- * Functions provided: chdir, getpid, chmod, setenv.
+ * This file provides access to some 'system calls'.
+ * Functions provided: chdir, getpid, chmod.
  */
-
-#ifdef _MSC_VER
-
-#include <direct.h>
-#define chdir _chdir
-
-#include <process.h>
-#define getpid _getpid
-
-#include <io.h>
-#define chmod _chmod
-#include <sys/stat.h>
-#define CHASTE_READONLY _S_IREAD
-#define CHASTE_READ_EXECUTE _S_IREAD | _S_IEXEC
-#define CHASTE_READ_WRITE _S_IREAD | _S_IWRITE
-#define CHASTE_READ_WRITE_EXECUTE _S_IREAD | _S_IWRITE | _S_IEXEC
-
-/**
- * Windows version of setenv call.  Note that under Linux we always pass 1 (overwrite) for the third arg.
- * @param name  environment variable to set
- * @param value  value to give the variable
- * @param mode  not used on Windows
- */
-#define setenv(name, value, mode) _putenv_s(name, value)
-
-#else
 
 #include <unistd.h> // For chdir() and getpid()
 #include <sys/stat.h> // For chmod()
@@ -79,7 +52,5 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CHASTE_READ_WRITE 0640
 /** Mode for chmod() to set full permissions for owner, and read-execute for everyone else. */
 #define CHASTE_READ_WRITE_EXECUTE 0755
-
-#endif // _MSC_VER
 
 #endif // CHASTESYSCALLS_HPP_

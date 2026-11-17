@@ -95,7 +95,6 @@ const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& O
     return mForceCollection;
 }
 
-// KARRIGAN
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetMaxAdaptiveTimeStep(unsigned maxAdaptiveTimeStep)
 {
@@ -108,8 +107,6 @@ unsigned OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetMaxAdaptiveTimeStep() c
     return mMaxAdaptiveTimeSteps;
 }
 
-// KARRIGAN
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology()
 {
@@ -119,12 +116,13 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
     double target_time_step  = this->mDt;
     double present_time_step = this->mDt;
 
+    unsigned adaptive_timer = 0;
     while (time_advanced_so_far < target_time_step)
     {
         // Store the initial node positions (these may be needed when applying boundary conditions)
         std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
 
-        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
              node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -137,23 +135,14 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             mpNumericalMethod->UpdateAllNodePositions(present_time_step);
             ApplyBoundaries(old_node_locations);
 
-            // Successful time step! Update time_advanced_so_far
+            // Successful time step: update time_advanced_so_far and reset the adaptive failure counter
             time_advanced_so_far += present_time_step;
-
-            // If using adaptive timestep, then increase the present_time_step (by 1% for now)
-            if (mpNumericalMethod->HasAdaptiveTimestep())
-            {
-                ///\todo #2087 Make this a settable member variable
-                double timestep_increase = 0.01;
-                present_time_step = std::min((1+timestep_increase)*present_time_step, target_time_step - time_advanced_so_far);
-            }
-
+            adaptive_timer = 0;
         }
         catch (StepSizeException& e)
         {
-            unsigned adaptive_timer = 0;
             // Detects if a node has travelled too far in a single time step
-            if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < mMaxAdaptiveTimeSteps )
+            if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < mMaxAdaptiveTimeSteps)
             {
                 // If adaptivity is switched on, revert node locations and choose a suitably smaller time step
                 RevertToOldLocations(old_node_locations);

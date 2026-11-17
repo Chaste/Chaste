@@ -48,6 +48,12 @@
 #  GPERFTOOLS_LIBRARIES          The Gperftools libraries (tcmalloc & profiler)
 #  GPERFTOOLS_INCLUDE_DIR        The location of Gperftools headers
 
+# Allow the root to be given via the environment, e.g. by a CI workflow
+# that builds gperftools from source into a custom prefix
+if (NOT Gperftools_ROOT_DIR AND DEFINED ENV{GPERFTOOLS_ROOT})
+    set(Gperftools_ROOT_DIR $ENV{GPERFTOOLS_ROOT})
+endif()
+
 find_library(GPERFTOOLS_TCMALLOC
   NAMES tcmalloc
   HINTS ${Gperftools_ROOT_DIR}/lib)
@@ -64,9 +70,19 @@ find_path(GPERFTOOLS_INCLUDE_DIR
   NAMES gperftools/heap-profiler.h google/heap-profiler.h
   HINTS ${Gperftools_ROOT_DIR}/include)
 
-find_file(GPERFTOOLS_PPROF_EXE
+# Chaste's profiling post-processing expects the Go pprof (github.com/google/pprof),
+# typically installed to ~/go/bin, rather than the deprecated perl google-pprof
+find_program(GPERFTOOLS_PPROF_EXE
   NAMES pprof google-pprof
-  HINTS ${Gperftools_ROOT_DIR}/bin)
+  HINTS
+    $ENV{GOPATH}/bin
+    $ENV{HOME}/go/bin
+    ${Gperftools_ROOT_DIR}/bin)
+
+if (GPERFTOOLS_PPROF_EXE)
+    message("-- Gperftools: Found pprof")
+    message("-- \t ${GPERFTOOLS_PPROF_EXE}")
+endif()
 
 if (GPERFTOOLS_TCMALLOC_AND_PROFILER)
     message("-- Gperftools: Found combined tcmalloc and profiler")

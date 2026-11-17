@@ -1,0 +1,144 @@
+schema_version: 1
+
+context:
+  version: ${{ env.get("CHASTE_VERSION", default="2026.1") }}
+
+package:
+  name: chaste
+  version: ${{ version }}
+
+source:
+  # CHASTE_SOURCE_DIR is a shallow (depth 1) clone made by the build-package-* scripts, so
+  # this copies the source without the full git history. use_gitignore: false is
+  # required so the git-tracked */test/tutorials/ directories (which match the
+  # "tutorials" .gitignore pattern) are included; otherwise their test targets
+  # fail to configure with "No SOURCES given to target".
+  path: ${{ env.get("CHASTE_SOURCE_DIR", default="/tmp/Chaste") }}
+  use_gitignore: false
+
+build:
+  number: 1
+  # rattler-build sanitizes the build environment and otherwise defaults
+  # CPU_COUNT to the logical CPU count; forward the value set by the
+  # build-package-* scripts so the C++ compile (make -j) stays within the chosen bound.
+  script:
+    file: build.sh
+    env:
+      CPU_COUNT: ${{ env.get("CPU_COUNT", default="") }}
+      # Forwarded into the sanitized build environment for macOS (osx-64) builds;
+      # empty and harmless on Linux. Set by build-package-osx.sh.
+      CONDA_BUILD_SYSROOT: ${{ env.get("CONDA_BUILD_SYSROOT", default="") }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ env.get("MACOSX_DEPLOYMENT_TARGET", default="") }}
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('fortran') }}
+    - castxml
+    # clang++ is used as castxml's "compiler" during wrapper generation (see
+    # pychaste/CMakeLists.txt) so boost.multiprecision does not pull in the
+    # GCC-only quadmath.h. The library itself is built with ${{ compiler('cxx') }}.
+    - clangxx
+    # lld is used for clang ThinLTO links when building with clang (Release).
+    - lld
+    - cmake
+    - git
+    - hdf5
+    - hdf5 * mpi_mpich_*
+    - libtiff
+    - make
+    - matplotlib
+    - metis
+    - mpi4py
+    - mpich
+    - numpy
+    - parmetis
+    - petsc
+    - petsc4py
+    - pip
+    - python
+    - sundials
+    - vtk
+    - xerces-c
+    - xsd
+    - xvfbwrapper
+  host:
+    - boost-cpp
+    - hdf5
+    - hdf5 * mpi_mpich_*
+    - libtiff
+    # X11 libraries (provide the headers VTK's find_package(X11) needs at
+    # configure time). These replace the legacy cdt() CDT packages, which
+    # rattler-build installs outside the sysroot that cmake's FindX11 searches.
+    # Linux only: VTK on macOS renders through Cocoa, not X11.
+    - if: linux
+      then:
+        - xorg-libice
+        - xorg-libsm
+        - xorg-libx11
+        - xorg-libxext
+        - xorg-libxt
+        - xorg-xorgproto
+    - matplotlib
+    - metis
+    - mpi4py
+    - mpich
+    - numpy
+    - parmetis
+    - petsc
+    - petsc4py
+    - pip
+    - python
+    - sundials
+    - vtk
+    - xerces-c
+    - xsd
+    - xvfbwrapper
+  run:
+    # Pin boost to the build version. Like petsc, boost-cpp carries no version
+    # run-export, so without this the runtime libboost soname could drift from
+    # the one the extension was linked against.
+    - ${{ pin_compatible('boost-cpp', upper_bound='x.x') }}
+    - hdf5
+    - hdf5 * mpi_mpich_*
+    - libboost
+    - libopenblas
+    - libtiff
+    - matplotlib
+    - metis
+    - mpi4py
+    - mpich
+    - numpy
+    - parmetis
+    # Pin petsc/petsc4py to the version resolved at build time so the runtime
+    # matches the libpetsc soname the extension was compiled against. rattler-build
+    # ignores the variants' pin_run_as_build, and conda-forge's petsc run-export
+    # only pins the real/complex build string (not the version), so without this
+    # the runtime petsc can drift (e.g. to 3.21 or 3.25) and break `import chaste`
+    # with "libpetsc.so.3.22: cannot open shared object file".
+    - ${{ pin_compatible('petsc', upper_bound='x.x') }}
+    - ${{ pin_compatible('petsc4py', upper_bound='x.x') }}
+    - python
+    - sundials
+    - vtk
+    - xerces-c
+    - xsd
+    - xvfbwrapper
+
+tests:
+  - python:
+      imports:
+        - chaste
+        - chaste.cell_based
+        - chaste.mesh
+        - chaste.ode
+        - chaste.pde
+        - chaste.visualization
+
+about:
+  homepage: https://chaste.github.io
+  license: BSD-3-Clause
+  summary: >
+    Chaste is a general purpose simulation package for computational biology.
+  repository: https://github.com/Chaste/Chaste/
+  documentation: https://chaste.github.io/docs/

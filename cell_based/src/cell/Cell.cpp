@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApoptoticCellProperty.hpp"
 #include "CellAncestor.hpp"
 #include "CellId.hpp"
-#include "CellLabel.hpp"
 #include "DefaultCellProliferativeType.hpp"
 #include "NullSrnModel.hpp"
 #include "SmartPointers.hpp"

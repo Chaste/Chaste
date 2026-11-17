@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CodegenLongHelperTestSuite.hpp"
 
-#include <boost/foreach.hpp>
 #include <vector>
 
 #include "HeartConfig.hpp"
@@ -54,7 +53,6 @@ class TestCodegenLongNumericalCvodeOpt : public CodegenLongHelperTestSuite
 public:
     void TestCvodeCellsOpt()
     {
-#ifdef CHASTE_CVODE
         std::string dirname("TestCodegenLongCvodeNumericalJ-opt");
         std::vector<std::string> args;
         args.push_back("--cvode");
@@ -71,7 +69,6 @@ public:
         RunTests(dirname, different_lookup_table_models, args);
 
         SetUseCvodeJacobian(true);
-#endif
     }
 };
 

@@ -53,11 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 
 
-#ifdef CHASTE_VTK
-#define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
-#include <vtkVersion.h>
-#endif
-
 typedef Hdf5ToVtkConverter<3,3> VTK_3D;
 typedef Hdf5ToMeshalyzerConverter<3,3> MESHA_3D;
 
@@ -86,7 +81,6 @@ public:
      */
     void TestBidomainVtkConversion3D()
     {
-#ifdef CHASTE_VTK // Requires  "sudo aptitude install libvtk5-dev" or similar
         std::string working_directory = "TestHdf5ToVtkConverter_bidomain";
         std::string working_directory2 = "TestHdf5ToVtkConverter_bidomain2";
 
@@ -161,11 +155,6 @@ public:
                                                 + "/vtk_output/cube_2mm_12_elements.vtu");
             TS_ASSERT_EQUALS(vtk_mesh_reader2.GetNumNodes(), 12u);
         }
-
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     /**
@@ -174,7 +163,6 @@ public:
      */
     void TestMonodomainParallelVtkConversion2D()
     {
-#ifdef CHASTE_VTK // Requires  "sudo aptitude install libvtk5-dev" or similar
         std::string working_directory = "TestHdf5ToVtkConverter_monodomain2D";
 
         /*
@@ -249,10 +237,6 @@ public:
         VtkMeshReader<2,2> vtk_mesh_reader2(test_output_directory + working_directory
                                             + "/vtk_output/2D_0_to_1mm_400_elements.vtu");
         TS_ASSERT_EQUALS(vtk_mesh_reader2.GetNumNodes(), 221u);
-#else
-        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
-#endif //CHASTE_VTK
     }
 
     /**
@@ -431,7 +415,6 @@ public:
      */
     void TestHdf5ToXdmfConverter()
     {
-#ifndef _MSC_VER
         std::string working_directory = "TestHdf5Converters_TestHdf5ToXdmfConverter";
 
         CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
@@ -459,7 +442,6 @@ public:
             FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
-#endif // _MSC_VER
     }
 };
 

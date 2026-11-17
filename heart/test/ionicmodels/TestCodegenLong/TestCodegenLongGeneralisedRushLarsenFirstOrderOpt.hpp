@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "CodegenLongHelperTestSuite.hpp"
 
-#include <boost/foreach.hpp>
 #include <vector>
 
 #include "HeartConfig.hpp"

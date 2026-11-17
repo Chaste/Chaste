@@ -54,9 +54,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                                                                  bool keepOriginalElementIndexing)
 {
-#ifdef _MSC_VER
-    EXCEPTION("XDMF is not supported under Windows at present.");
-#else
     assert(keepOriginalElementIndexing);
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
     bool mesh_is_distributed = (this->mpDistributedMesh != nullptr) && PetscTools::IsParallel();
@@ -176,15 +173,11 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
     (*topology_file) << "<!-- " + ChasteBuildInfo::GetProvenanceString() + "-->\n";
     topology_file->close();
     PetscTools::Barrier("XdmfMeshWriter wait for chunks to be written");
-#endif
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
-#ifdef _MSC_VER
-    EXCEPTION("XDMF is not supported under Windows at present.");
-#else
     // This method is only called when there is no mesh.  We are writing from a reader.
     if (PetscTools::AmMaster())
     {
@@ -240,13 +233,11 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         (*topology_file) << "<!-- " + ChasteBuildInfo::GetProvenanceString() + "-->\n";
         topology_file->close();
     }
-#endif
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned numberOfChunks)
 {
-#ifndef _MSC_VER
     assert(PetscTools::AmMaster());
     // Define namespace symbols
     XERCES_CPP_NAMESPACE_USE
@@ -359,27 +350,18 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
 
     XMLFormatTarget* p_target = new LocalFileFormatTarget(X(this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+".xdmf"));
 
-#if _XERCES_VERSION >= 30000
     DOMLSSerializer* p_serializer = ((DOMImplementationLS*)p_DOM_implementation)->createLSSerializer();
     p_serializer->getDomConfig()->setParameter(XMLUni::fgDOMWRTFormatPrettyPrint, true);
     DOMLSOutput* p_output = ((DOMImplementationLS*)p_DOM_implementation)->createLSOutput(); // Calls a new somewhere!
     p_output->setByteStream(p_target);
     p_serializer->write(p_DOM_document, p_output);
-#else
-    DOMWriter* p_serializer = ((DOMImplementationLS*)p_DOM_implementation)->createDOMWriter();
-    p_serializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
-    p_serializer->writeNode(p_target, *p_DOM_document);
-#endif
 
     // Cleanup
     p_serializer->release();
     p_DOM_document->release();
-#if _XERCES_VERSION >= 30000
     delete p_output;
-#endif
     delete p_target;
     XMLPlatformUtils::Terminate();
-#endif // _MSC_VER
 }
 
 // Explicit instantiation

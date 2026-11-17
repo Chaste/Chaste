@@ -31,7 +31,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import platform
-import distro
 
 
 """
@@ -48,11 +47,29 @@ def main():
 
     # Linux
     if platform_name.lower().startswith('linux'):
-        return f"{distro.name()} {distro.version()} ({distro.codename()})"
-    # E.g.               ^ Ubuntu.       ^ 14.04             ^ trusty
+        try:
+            # Python 3.10+
+            info = platform.freedesktop_os_release()
+            name = info.get('NAME', '')
+            version = info.get('VERSION_ID', '')
+            codename = info.get('VERSION_CODENAME', '')
+        except AttributeError:
+            # Fallback: Python < 3.10
+            try:
+                import distro  # type: ignore[import]
+                name = distro.name()
+                version = distro.version()
+                codename = distro.codename()
+            except ImportError:
+                return platform_name
+        if codename:
+            return f"{name} {version} ({codename})"
+        # E.g.       ^ Ubuntu  ^ 14.04  ^ trusty
+        return f"{name} {version}"
 
     # Mac
-    elif platform_name.lower().startswith('darwin'):
+    # platform.platform() has 'macOS-' on modern Python, 'Darwin-' on older.
+    elif platform_name.lower().startswith(('darwin', 'macos')):
         mac_ver = platform.mac_ver()
         mac_name = get_mac_name_from_darwin_version(mac_ver[0])
         return f"{mac_name} ({mac_ver[0]})"
@@ -108,6 +125,12 @@ def get_mac_name_from_darwin_version(version_str):
         return 'macOS Monterey'
     elif version_str.startswith('13.'):
         return 'macOS Ventura'
+    elif version_str.startswith('14.'):
+        return 'macOS Sonoma'
+    elif version_str.startswith('15.'):
+        return 'macOS Sequoia'
+    elif version_str.startswith('26.'):
+        return 'macOS Tahoe'
     else:
         return 'Unknown Mac Version'
 

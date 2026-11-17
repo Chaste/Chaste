@@ -1,0 +1,40 @@
+target_platform:
+  - osx-arm64
+# macOS deployment target and SDK. Apple Silicon (arm64) exists only from macOS
+# 11.0 onwards, so 11.0 is the floor (and it comfortably provides aligned_alloc,
+# which bundled pocketfft needs). CONDA_BUILD_SYSROOT (the path to the matching
+# SDK) is supplied at build time by build-package-osx.sh.
+MACOSX_DEPLOYMENT_TARGET:
+  - "11.0"
+MACOSX_SDK_VERSION:
+  - "11.0"
+c_compiler:
+  - clang
+cxx_compiler:
+  - clangxx
+fortran_compiler:
+  - gfortran
+boostcpp:
+  - ">=1.70,<1.84"
+hdf5:
+  - ">=1.10,<1.15"
+metis:
+  - ">=4.0,<6.0"
+mpich:
+  - ">=4.0,<5.0"
+parmetis:
+  - ">=4.0,<6.0"
+petsc:
+  - ">=3.19,<3.26"
+petsc4py:
+  - ">=3.19,<3.26"
+numpy:
+  - "1.26"
+python:
+  - 3.10.* *_cpython
+sundials:
+  - ">=3.0,<7.0"
+vtk:
+  - ">=7.1,<9.4"
+xercesc:
+  - ">=3.0,<4.0"

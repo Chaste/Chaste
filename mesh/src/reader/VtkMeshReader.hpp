@@ -49,8 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <cassert>
 
-#ifdef CHASTE_VTK
-//Requires  "sudo aptitude install libvtk5-dev" or similar
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkDataArray.h>
 #include <vtkDoubleArray.h>
@@ -253,7 +251,5 @@ public:
      */
     vtkUnstructuredGrid* OutputMeshAsVtkUnstructuredGrid();
 };
-
-#endif/*CHASTE_VTK*/
 
 #endif/*VTKMESHREADER_HPP_*/

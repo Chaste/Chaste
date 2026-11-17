@@ -267,8 +267,8 @@ void VentilationProblem::FillInteractionMatrix(bool redoExisting)
             std::vector<double> resistance_to_add(indices.size()*indices.size(), parent_resistance);
 
             MatSetValues(mTerminalInteractionMatrix,
-                         indices.size(), (PetscInt*) &indices[0],
-                         indices.size(), (PetscInt*) &indices[0], &resistance_to_add[0], ADD_VALUES);
+                         indices.size(), (PetscInt*) indices.data(),
+                         indices.size(), (PetscInt*) indices.data(), resistance_to_add.data(), ADD_VALUES);
         }
         else
         {
