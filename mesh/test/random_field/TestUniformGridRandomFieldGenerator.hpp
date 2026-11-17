@@ -146,6 +146,38 @@ public:
             TS_ASSERT_EQUALS(samples1[0], samples2[0]);
             TS_ASSERT_EQUALS(samples1[2], samples2[1]);
         }
+
+        // Reproducibility: SampleRandomField() is controlled by the RandomNumberGenerator singleton
+        {
+            const unsigned n = 8;
+            UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{n, n}}, {{true, true}}, 0.3);
+
+            RandomNumberGenerator::Instance()->Reseed(42);
+            auto samples_a1 = gen.SampleRandomField();
+            auto samples_a2 = gen.SampleRandomField();
+
+            RandomNumberGenerator::Instance()->Reseed(42);
+            auto samples_b1 = gen.SampleRandomField();
+            auto samples_b2 = gen.SampleRandomField();
+
+            for (unsigned i = 0; i < n * n; i++)
+            {
+                TS_ASSERT_EQUALS(samples_a1[i], samples_b1[i]);
+                TS_ASSERT_EQUALS(samples_a2[i], samples_b2[i]);
+            }
+
+            // Successive samples differ
+            bool any_different = false;
+            for (unsigned i = 0; i < n * n; i++)
+            {
+                if (samples_a1[i] != samples_a2[i])
+                {
+                    any_different = true;
+                    break;
+                }
+            }
+            TS_ASSERT(any_different);
+        }
     }
 
     void TestGetLinearIndex()

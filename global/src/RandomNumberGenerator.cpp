@@ -169,6 +169,11 @@ void RandomNumberGenerator::Shuffle(unsigned num, std::vector<unsigned>& rValues
         rValues[i] = i;
     }
 
+    if (num == 0)
+    {
+        return; // Avoid unsigned underflow of 'end' below
+    }
+
     for (unsigned end = num - 1; end > 0; end--)
     {
         // Pick a random integer from {0,..,end}

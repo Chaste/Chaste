@@ -94,7 +94,12 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(const unsigned se
 template <unsigned SPACE_DIM>
 std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomField()
 {
-    return this->SampleRandomFieldAtTime(rand());
+    // Sample at a random "time" drawn from Chaste's RandomNumberGenerator, so results are reproducible
+    // under RandomNumberGenerator::Reseed().  The range is much larger than the correlation scale (~1) of
+    // the noise in the time coordinate, so successive samples are effectively independent, while keeping
+    // skewed coordinates well within the int range used by OpenSimplex2S::fastFloor().
+    const double time = 1e6 * RandomNumberGenerator::Instance()->ranf();
+    return this->SampleRandomFieldAtTime(time);
 }
 
 template <unsigned SPACE_DIM>

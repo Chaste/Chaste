@@ -279,6 +279,13 @@ public:
             TS_ASSERT_EQUALS(found, true);
         }
 
+        // Edge cases: empty and single-element permutations
+        p_gen->Shuffle(0, shuffled_results);
+        TS_ASSERT(shuffled_results.empty());
+        p_gen->Shuffle(1, shuffled_results);
+        TS_ASSERT_EQUALS(shuffled_results.size(), 1u);
+        TS_ASSERT_EQUALS(shuffled_results[0], 0u);
+
         unsigned num_trials = 1000000;
         unsigned results[5][5];
         for (unsigned i = 0; i < 5; i++)
