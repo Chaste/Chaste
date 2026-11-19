@@ -320,6 +320,12 @@ macro(Chaste_DO_COMMON component)
         RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
+    if (Chaste_USE_CUDA)
+        file(GLOB_RECURSE Chaste_${component}_SOURCES_CUDA
+            RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cu)
+        list(APPEND Chaste_${component}_SOURCES ${Chaste_${component}_SOURCES_CUDA})
+    endif()
 
     # Generate additional source files from cellml
     set(Chaste_${component}_SOURCES_CELLML)
