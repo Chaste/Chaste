@@ -1,1 +1,2 @@
+ionicmodels/TestCardiacCellCollection.hpp
 ionicmodels/TestDeviceTools.hpp
