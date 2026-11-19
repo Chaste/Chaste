@@ -72,6 +72,9 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
         set(codegen_args ${codegen_args} "-y" "-o" ${cellml_file})
     else()
         set(codegen_args ${codegen_args} "--normal" "--opt" "--cvode" "--backward-euler" "--use-analytic-jacobian")
+        if (Chaste_USE_CUDA)
+            set(codegen_args ${codegen_args} "--device-code")
+        endif()
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
 
@@ -82,12 +85,13 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
 
     string(REGEX MATCHALL "[^\n]*\\.hpp" output_files_hpp "${ConvertCellModelDepends}")
     string(REGEX MATCHALL "[^\n]*\\.cpp" output_files_cpp "${ConvertCellModelDepends}")
+    string(REGEX MATCHALL "[^\n]*\\.cu" output_files_cu "${ConvertCellModelDepends}")
 
     if (NOT Chaste_VERBOSE)
         set(codegen_args ${codegen_args} "--quiet")
     endif()
 
-    add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp}
+    add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp} ${output_files_cu}
         COMMAND "${chaste_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
         COMMENT "Processing CellML file ${cellml_file_rel}"
@@ -95,7 +99,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
         VERBATIM
         )
 
-    list(APPEND ${output_sources} ${output_files_cpp} ${output_files_hpp})
+    list(APPEND ${output_sources} ${output_files_cpp} ${output_files_hpp} ${output_files_cu})
 endmacro()
 
 ##########################################################
