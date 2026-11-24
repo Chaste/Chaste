@@ -818,10 +818,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
                 forward_star_nodes.insert(p_elem->GetNodeGlobalIndex(i));
             }
         }
-        if (forward_star_nodes.size() > max_connectivity)
-        {
-            max_connectivity = forward_star_nodes.size();
-        }
+        max_connectivity = std::max(max_connectivity, static_cast<unsigned>(forward_star_nodes.size()));
     }
     return max_connectivity;
 }
