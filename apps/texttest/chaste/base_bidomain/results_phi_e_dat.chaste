@@ -1,4 +1,4 @@
-Warning: These have been filtered by  /home/chaste/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
+Warning: These have been filtered by  /home/jmpf/Workspace/Chaste/acceptance/python/infra/RoundResultsFiles.py .
 This means that all floating point numbers have been rounded to 8 decimal places.
 0
 0
@@ -365286,7 +365286,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -16.5139
 -14.9082
 -12.4083
-0.21638
+0.216379
 6.47448
 8.04696
 8.48122
@@ -365406,7 +365406,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -0.139906
 -0.118969
 -0.0280159
-0.21638
+0.216379
 0.809186
 2.10686
 4.05567
@@ -365622,7 +365622,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 -16.6743
 -15.1719
 -12.6836
-0.0284626
+0.0284625
 6.30216
 7.97484
 8.45809
@@ -365842,7 +365842,7 @@ This means that all floating point numbers have been rounded to 8 decimal places
 8.67718
 8.67726
 0.410445
-0.0284626
+0.0284625
 -0.105582
 -0.139914
 -0.118977
@@ -379701,4 +379701,4 @@ This means that all floating point numbers have been rounded to 8 decimal places
 8.85922
 8.85922
 8.85922
-# Created by Chaste version 3.2.23000 (with uncommitted modifications) on Fri, 31 Oct 2014 12:47:18 +0000.  Chaste was built on Fri, 31 Oct 2014 12:38:50 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOptNative, shared libraries.  Checked-out project versions: DanH=22719M; JohnW=18696.
+# Created by Chaste version 2026.1.1b79cb2 on Thu, 23 Jul 2026 14:11:18 +0000.  Chaste was built on Thu, 23 Jul 2026 15:05:09 +0000 by machine (uname) 'Linux' using settings: Release.
