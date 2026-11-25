@@ -128,10 +128,7 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
 #endif
 
     PetscInt* rows = new PetscInt[rRows.size()];
-    for (unsigned i=0; i<rRows.size(); i++)
-    {
-        rows[i] = rRows[i];
-    }
+    std::copy(rRows.begin(), rRows.end(), rows);
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
     IS is;
     ISCreateGeneral(PETSC_COMM_WORLD, rRows.size(), rows, &is);
