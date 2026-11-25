@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PropagationPropertiesCalculator.hpp"
 #include "CellProperties.hpp"
 #include "Exception.hpp"
+#include <algorithm>
 #include <sstream>
 #include "HeartEventHandler.hpp"
 
@@ -157,15 +158,8 @@ std::vector<std::vector<double> > PropagationPropertiesCalculator::CalculateAllA
 double PropagationPropertiesCalculator::CalculatePeakMembranePotential(unsigned globalNodeIndex)
 {
     std::vector<double>& r_voltages = rGetCachedVoltages(globalNodeIndex);
-    double max = -DBL_MAX;
-    for (unsigned i=0; i<r_voltages.size(); i++)
-    {
-        if (r_voltages[i]>max)
-        {
-            max = r_voltages[i];
-        }
-    }
-    return max;
+    assert(!r_voltages.empty());
+    return *std::max_element(r_voltages.begin(), r_voltages.end());
 }
 
 double PropagationPropertiesCalculator::CalculateConductionVelocity(unsigned globalNearNodeIndex,
