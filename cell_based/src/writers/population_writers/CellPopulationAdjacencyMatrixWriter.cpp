@@ -74,11 +74,8 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
     assert(local_cell_id == num_cells);
 
     // Iterate over cells and calculate the adjacency matrix (stored as a long vector)
+    // Note that std::vector value-initialises its elements, so the matrix starts out zeroed
     std::vector<double> adjacency_matrix(num_cells*num_cells);
-    for (unsigned i=0; i<num_cells*num_cells; i++)
-    {
-        adjacency_matrix[i] = 0;
-    }
 
     for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
@@ -158,11 +155,8 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBase
     assert(local_cell_id == num_cells);
 
     // Iterate over cells and calculate the adjacency matrix (stored as a long vector)
+    // Note that std::vector value-initialises its elements, so the matrix starts out zeroed
     std::vector<double> adjacency_matrix(num_cells*num_cells);
-    for (unsigned i=0; i<num_cells*num_cells; i++)
-    {
-        adjacency_matrix[i] = 0;
-    }
 
     for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
