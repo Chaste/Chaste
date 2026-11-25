@@ -120,7 +120,7 @@ public:
      *
      * @return the new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    [[nodiscard]] AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
      * Set the duration of the G2 phase for the daughter cell.

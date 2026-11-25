@@ -289,7 +289,7 @@ public:
      * @param pDerivedQuantities  optional vector of pre-computed derived quantity values.
      */
     double GetAnyVariable(unsigned index, double time=0.0,
-                          VECTOR* pDerivedQuantities=NULL);
+                          VECTOR* pDerivedQuantities=nullptr);
 
     /**
      * @return the value of a variable, whether a state variable, parameter,
@@ -305,7 +305,7 @@ public:
      * @param pDerivedQuantities  optional vector of pre-computed derived quantity values.
      */
     double GetAnyVariable(const std::string& rName, double time=0.0,
-                          VECTOR* pDerivedQuantities=NULL);
+                          VECTOR* pDerivedQuantities=nullptr);
 
     /**
      * Set the value of a variable, whether a state variable or parameter.

@@ -192,7 +192,7 @@ template<class> struct pack;
  * \todo Check if we need this on Boost>=1.38.  Even if it's not needed there, we might still need it to load earlier archives.
  */
 template<class T> struct pack<void (T)> {
-    typedef T type; /**< Type definition. */
+    using type = T; /**< Type definition. */
 };
 
 /**

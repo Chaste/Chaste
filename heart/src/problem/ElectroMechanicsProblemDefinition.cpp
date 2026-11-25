@@ -43,13 +43,13 @@ ElectroMechanicsProblemDefinition<DIM>::ElectroMechanicsProblemDefinition(Quadra
       mMechanicsSolveTimestep(-1.0),
       mDeformationAffectsConductivity(false),
       mDeformationAffectsCellModels(false),
-      mpDefaultMaterialLaw(NULL),
+      mpDefaultMaterialLaw(nullptr),
       mReadFibreSheetInformationFromFile(false),
       mNumIncrementsForInitialDeformation(1),
       mApplyCrossFibreTension(false),
       mSheetTensionFraction(DOUBLE_UNSET),
       mSheetNormalTensionFraction(DOUBLE_UNSET),
-      mpContractionCellFactory(NULL),
+      mpContractionCellFactory(nullptr),
       mWeMadeCellFactory(false),
       mSolverType(IMPLICIT) // default solver is implicit
 {
@@ -82,7 +82,7 @@ void ElectroMechanicsProblemDefinition<DIM>::SetContractionModel(ContractionMode
     }
 
     // Make sure we aren't overwriting a problem that has been set up with a cell factory.
-    assert(mpContractionCellFactory==NULL);
+    assert(mpContractionCellFactory==nullptr);
 
     AbstractContractionCellFactory<DIM>* p_factory = new LabelBasedContractionCellFactory<DIM>(contractionModel);
     mWeMadeCellFactory = true;
@@ -155,7 +155,7 @@ template<unsigned DIM>
 void ElectroMechanicsProblemDefinition<DIM>::SetContractionCellFactory(AbstractContractionCellFactory<DIM>* pCellFactory)
 {
     // Make sure we aren't overwriting a problem that has been set up with a cell factory already.
-    assert(mpContractionCellFactory == NULL);
+    assert(mpContractionCellFactory == nullptr);
 
     mpContractionCellFactory = pCellFactory;
     mpContractionCellFactory->SetMechanicsMesh(static_cast<QuadraticMesh<DIM>*>(&(this->mrMesh)));

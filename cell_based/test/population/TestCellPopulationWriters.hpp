@@ -1406,7 +1406,7 @@ public:
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_cell_writer_2;
 
-            typedef RadialCellDataDistributionWriter<2,2> RadialWriter;
+            using RadialWriter = RadialCellDataDistributionWriter<2,2>;
             TS_ASSERT_EQUALS(static_cast<RadialWriter*>(p_cell_writer_2)->GetVariableName(), "radial average");
             TS_ASSERT_EQUALS(static_cast<RadialWriter*>(p_cell_writer_2)->GetNumRadialBins(), 5u);
             delete p_cell_writer_2;

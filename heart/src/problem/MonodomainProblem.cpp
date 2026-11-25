@@ -79,14 +79,14 @@ AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>* MonodomainProblem<ELE
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainProblem(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory)
         : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 1>(pCellFactory),
-          mpMonodomainTissue(NULL)
+          mpMonodomainTissue(nullptr)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainProblem()
     : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 1>(),
-      mpMonodomainTissue(NULL)
+      mpMonodomainTissue(nullptr)
 {
 }
 
@@ -98,7 +98,7 @@ MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::~MonodomainProblem()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainTissue<ELEMENT_DIM,SPACE_DIM> * MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::GetMonodomainTissue()
 {
-    assert(mpMonodomainTissue != NULL);
+    assert(mpMonodomainTissue != nullptr);
     return mpMonodomainTissue;
 }
 

@@ -147,10 +147,10 @@ void PottsMeshWriter<SPACE_DIM>::WriteFilesUsingMesh(PottsMesh<SPACE_DIM>& rMesh
     this->mNumNodes = mpMesh->GetNumNodes();
     this->mNumElements = mpMesh->GetNumElements();
 
-    typedef typename AbstractMesh<SPACE_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    using NodeIterType = typename AbstractMesh<SPACE_DIM,SPACE_DIM>::NodeIterator;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
-    typedef typename PottsMesh<SPACE_DIM>::PottsElementIterator ElemIterType;
+    using ElemIterType = typename PottsMesh<SPACE_DIM>::PottsElementIterator;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
 
     // Set up node map if we might have deleted nodes

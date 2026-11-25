@@ -253,7 +253,7 @@ public:
      * @param pStateVariables  optionally can be supplied to evaluate the ionic current at the
      *     given state; by default the cell's internal state will be used.
      */
-    virtual double GetIIonic(const std::vector<double>* pStateVariables=NULL)=0;
+    virtual double GetIIonic(const std::vector<double>* pStateVariables=nullptr)=0;
 
     /**
      * Set the cellular transmembrane potential.
@@ -345,7 +345,7 @@ public:
      */
     virtual AbstractLookupTableCollection* GetLookupTableCollection()
     {
-        return NULL;
+        return nullptr;
     }
 
     /**

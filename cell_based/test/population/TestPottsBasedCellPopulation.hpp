@@ -103,7 +103,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetUpdateRuleCollection().empty(), true);
 
         // Test that the other member variables of this object are initialised correctly
-        TS_ASSERT(cell_population.GetElementTessellation() == NULL);
+        TS_ASSERT(cell_population.GetElementTessellation() == nullptr);
         TS_ASSERT_DELTA(cell_population.GetTemperature(), 0.1, 1e-6);
         TS_ASSERT_EQUALS(cell_population.GetNumSweepsPerTimestep(), 1u);
         TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), true);

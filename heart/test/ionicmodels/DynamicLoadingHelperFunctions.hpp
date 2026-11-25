@@ -68,8 +68,8 @@ AbstractCardiacCellInterface* CreateCellWithStandardStimulus(DynamicCellModelLoa
 
     // Simple sanity checks
     AbstractDynamicallyLoadableEntity* p_entity = dynamic_cast<AbstractDynamicallyLoadableEntity*>(p_cell);
-    TS_ASSERT(p_entity != NULL);
-    if (p_entity != NULL)
+    TS_ASSERT(p_entity != nullptr);
+    if (p_entity != nullptr)
     {
         TS_ASSERT_EQUALS(&rLoader, p_entity->GetLoader().get());
     }

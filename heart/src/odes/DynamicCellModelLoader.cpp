@@ -53,7 +53,7 @@ DynamicCellModelLoader::DynamicCellModelLoader(const std::string& rLoadableModul
 {
     // Open the .so file
     mpDynamicModule = dlopen(rLoadableModulePath.c_str(), RTLD_NOW);
-    if (mpDynamicModule == NULL)
+    if (mpDynamicModule == nullptr)
     {
         EXCEPTION("Unable to load .so file '" + rLoadableModulePath + "': " + dlerror());
     }
@@ -86,7 +86,7 @@ AbstractCardiacCellInterface* DynamicCellModelLoader::CreateCell(boost::shared_p
     AbstractCardiacCellInterface* p_cell = (*mpCreationFunction)(pSolver, pStimulus);
 
     AbstractDynamicallyLoadableEntity* p_entity = dynamic_cast<AbstractDynamicallyLoadableEntity*>(p_cell);
-    assert(p_entity != NULL);
+    assert(p_entity != nullptr);
     p_entity->SetLoader(shared_from_this());
 
     return p_cell;

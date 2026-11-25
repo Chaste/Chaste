@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-typedef MemfemMeshReader<3,3> READER_3D;
-typedef MemfemMeshReader<2,2> READER_2D; // For exception coverage
+using READER_3D = MemfemMeshReader<3,3>;
+using READER_2D = MemfemMeshReader<2,2>; // For exception coverage
 
 class TestMemfemMeshReaders : public CxxTest::TestSuite
 {

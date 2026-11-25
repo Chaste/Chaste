@@ -48,8 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 
 // useful typedef
-typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleImplicitSolver2d;
-typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3> IncompressibleImplicitSolver3d;
+using IncompressibleImplicitSolver2d = ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>;
+using IncompressibleImplicitSolver3d = ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3>;
 
 // helper function - the frobenius norm of a matrix (though any norm would have done).
 double MatrixNorm(c_matrix<double,2,2> mat)
@@ -468,7 +468,7 @@ public:
         // Prevent an assertion being thrown about setting the cell factory more than once.
         // (just for testing)
         delete problem_defn.mpContractionCellFactory;
-        problem_defn.mpContractionCellFactory=NULL;
+        problem_defn.mpContractionCellFactory=nullptr;
 
         problem_defn.SetContractionModel(NONPHYSIOL3,0.01);
         IncompressibleImplicitSolver2d impl_solver2(mesh,problem_defn,"");

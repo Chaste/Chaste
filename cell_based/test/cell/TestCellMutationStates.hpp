@@ -129,7 +129,7 @@ public:
             TS_ASSERT_EQUALS(p_state->GetCellCount(), 1u);
 
             ApcOneHitCellMutationState* p_real_state = dynamic_cast<ApcOneHitCellMutationState*>(p_state);
-            TS_ASSERT(p_real_state != NULL);
+            TS_ASSERT(p_real_state != nullptr);
             TS_ASSERT_EQUALS(p_real_state->GetColour(), 3u);
 
             // Tidy up

@@ -109,8 +109,8 @@ public:
         TS_ASSERT_DELTA(modifier.mGridSpacingX, 0.0, 1e-6);
         TS_ASSERT_DELTA(modifier.mGridSpacingY, 0.0, 1e-6);
         TS_ASSERT_DELTA(modifier.mFftNorm, 0.0, 1e-6);
-        TS_ASSERT(modifier.mpArrays == NULL);
-        TS_ASSERT(modifier.mpFftInterface == NULL);
+        TS_ASSERT(modifier.mpArrays == nullptr);
+        TS_ASSERT(modifier.mpFftInterface == nullptr);
 
         // Test that the correct exception is throw if trying to use the wrong cell population class
         HoneycombVertexMeshGenerator vertex_generator(2, 2);
@@ -136,8 +136,8 @@ public:
         TS_ASSERT_DELTA(modifier.mGridSpacingX, 1.0 / 128.0, 1e-6);
         TS_ASSERT_DELTA(modifier.mGridSpacingY, 1.0 / 128.0, 1e-6);
         TS_ASSERT_DELTA(modifier.mFftNorm, 128.0 * 128.0, 1e-6);
-        TS_ASSERT(modifier.mpArrays != NULL);
-        TS_ASSERT(modifier.mpFftInterface != NULL);
+        TS_ASSERT(modifier.mpArrays != nullptr);
+        TS_ASSERT(modifier.mpFftInterface != nullptr);
     }
 
     void TestClearForcesAndSources()

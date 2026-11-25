@@ -53,8 +53,8 @@ namespace random
         inline typename boost::make_unsigned<typename Engine::result_type>::type
         generate_one_digit_v165(Engine& eng, std::size_t bits)
         {
-            typedef typename Engine::result_type base_result;
-            typedef typename boost::make_unsigned<base_result>::type base_unsigned;
+            using base_result = typename Engine::result_type;
+            using base_unsigned = typename boost::make_unsigned<base_result>::type;
 
             base_unsigned range = detail::subtract<base_result>()((eng.max)(), (eng.min)());
             base_unsigned y0_mask = (base_unsigned(2) << (bits - 1)) - 1;
@@ -70,8 +70,8 @@ namespace random
         template <class RealType, std::size_t w, class Engine>
         std::pair<RealType, int> generate_int_float_pair_v165(Engine& eng, boost::mpl::true_)
         {
-            typedef typename Engine::result_type base_result;
-            typedef typename boost::make_unsigned<base_result>::type base_unsigned;
+            using base_result = typename Engine::result_type;
+            using base_unsigned = typename boost::make_unsigned<base_result>::type;
 
             base_unsigned range = detail::subtract<base_result>()((eng.max)(), (eng.min)());
 
@@ -127,7 +127,7 @@ namespace random
         template <class RealType, std::size_t w, class Engine>
         inline std::pair<RealType, int> generate_int_float_pair_v165(Engine& eng)
         {
-            typedef typename Engine::result_type base_result;
+            using base_result = typename Engine::result_type;
             return generate_int_float_pair_v165<RealType, w>(eng,
                                                              boost::is_integral<base_result>());
         }

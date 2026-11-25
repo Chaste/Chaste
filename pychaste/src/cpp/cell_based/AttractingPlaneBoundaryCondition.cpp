@@ -34,7 +34,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AttractingPlaneBoundaryCondition.hpp"
+
+#include <cassert>
+#include <cmath>
+#include <map>
+
+#include "AbstractCellPopulation.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
+#include "AbstractOffLatticeCellPopulation.hpp"
+#include "Exception.hpp"
+#include "Node.hpp"
+#include "OutputFileHandler.hpp"
+#include "RandomNumberGenerator.hpp"
 #include "UblasIncludes.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
@@ -156,9 +167,7 @@ void AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCon
     }
     else
     {
-        // DIM == 1
-        NEVER_REACHED;
-        // AttractingPlaneBoundaryCondition::ImposeBoundaryCondition is not implemented in 1D
+        EXCEPTION("AttractingPlaneBoundaryCondition is not implemented in 1D");
     }
 }
 

@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 
 class Cell; // Circular definition (cells need to know about SRN models and vice-versa)
-typedef boost::shared_ptr<Cell> CellPtr;
+using CellPtr = boost::shared_ptr<Cell>;
 
 /**
  * The AbstractSrnModel contains basic information to all sub-cellular reaction
@@ -229,7 +229,7 @@ public:
      *
      *  @return new SRN model
      */
-    virtual AbstractSrnModel* CreateSrnModel()=0;
+    [[nodiscard]] virtual AbstractSrnModel* CreateSrnModel()=0;
 
     /**
      * Output SRN model used in the simulation to file and then call

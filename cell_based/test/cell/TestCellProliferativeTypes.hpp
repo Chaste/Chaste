@@ -133,7 +133,7 @@ public:
             TS_ASSERT_EQUALS(p_type->GetCellCount(), 1u);
 
             StemCellProliferativeType* p_real_state = dynamic_cast<StemCellProliferativeType*>(p_type);
-            TS_ASSERT(p_real_state != NULL);
+            TS_ASSERT(p_real_state != nullptr);
             TS_ASSERT_EQUALS(p_real_state->GetColour(), 0u);
 
             // Tidy up
@@ -178,7 +178,7 @@ public:
             TS_ASSERT_EQUALS(p_type->GetCellCount(), 1u);
 
             TransitCellProliferativeType* p_real_state = dynamic_cast<TransitCellProliferativeType*>(p_type);
-            TS_ASSERT(p_real_state != NULL);
+            TS_ASSERT(p_real_state != nullptr);
             TS_ASSERT_EQUALS(p_real_state->GetColour(), 1u);
 
             // Tidy up
@@ -223,7 +223,7 @@ public:
             TS_ASSERT_EQUALS(p_type->GetCellCount(), 1u);
 
             DifferentiatedCellProliferativeType* p_real_state = dynamic_cast<DifferentiatedCellProliferativeType*>(p_type);
-            TS_ASSERT(p_real_state != NULL);
+            TS_ASSERT(p_real_state != nullptr);
             TS_ASSERT_EQUALS(p_real_state->GetColour(), 2u);
 
             // Tidy up
@@ -268,7 +268,7 @@ public:
             TS_ASSERT_EQUALS(p_type->GetCellCount(), 1u);
 
             DefaultCellProliferativeType* p_real_state = dynamic_cast<DefaultCellProliferativeType*>(p_type);
-            TS_ASSERT(p_real_state != NULL);
+            TS_ASSERT(p_real_state != nullptr);
             TS_ASSERT_EQUALS(p_real_state->GetColour(), 0u);
 
             // Tidy up

@@ -259,13 +259,13 @@ namespace random
     class normal_distribution_v165
     {
     public:
-        typedef RealType input_type;
-        typedef RealType result_type;
+        using input_type = RealType;
+        using result_type = RealType;
 
         class param_type
         {
         public:
-            typedef normal_distribution_v165 distribution_type;
+            using distribution_type = normal_distribution_v165;
 
             /**
          * Constructs a @c param_type with a given mean and

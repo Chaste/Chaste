@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
 {
-    out_stream p_file = out_stream(NULL);
+    out_stream p_file = out_stream(nullptr);
 
     unsigned num_nodes = this->mpReader->GetNumberOfRows();
     unsigned num_timesteps = this->mpReader->GetUnlimitedDimensionValues().size();

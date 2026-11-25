@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_diagram;
-typedef boost::polygon::point_data<int> boost_point;
+using boost_point = boost::polygon::point_data<int>;
 
 VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator(unsigned numElementsX,
                                                        unsigned numElementsY,

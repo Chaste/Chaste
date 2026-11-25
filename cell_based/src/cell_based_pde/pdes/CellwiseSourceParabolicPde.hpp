@@ -171,7 +171,7 @@ public:
      *
      * @param rX the point in space at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the point
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
+     * @param pElement the mesh element that x is contained in (optional; defaults to nullptr).
      */
     double ComputeSourceTerm(const ChastePoint<DIM>& rX,
                              double u,
@@ -194,7 +194,7 @@ public:
      * Overridden ComputeDiffusionTerm() method.
      *
      * @param rX the point in space at which the diffusion term is computed
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
+     * @param pElement the mesh element that x is contained in (optional; defaults to nullptr).
      *
      * @return a matrix.
      */

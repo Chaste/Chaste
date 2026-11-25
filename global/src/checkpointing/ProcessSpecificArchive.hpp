@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Note that because this class stores just a pointer to the archive, whatever object owns the
  * archive must ensure it exists for the duration of the serialization process, and call
- * Set(NULL) prior to closing the archive for safety.
+ * Set(nullptr) prior to closing the archive for safety.
  *
  * Note also that implementations of this templated class only exist for text archives, i.e.
  * Archive = boost::archive::text_iarchive or Archive = boost::archive::text_oarchive.

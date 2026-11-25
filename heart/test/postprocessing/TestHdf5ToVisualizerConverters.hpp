@@ -51,7 +51,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-typedef Hdf5ToCmguiConverter<3,3> CMGUI_3D;
+#ifdef CHASTE_VTK
+#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
+#include <vtkVersion.h>
+#endif
+
+using CMGUI_3D = Hdf5ToCmguiConverter<3,3>;
 
 /* HOW_TO_TAG Cardiac/Post-processing
  * Convert already generated simulation (HDF5) results to Cmgui format.

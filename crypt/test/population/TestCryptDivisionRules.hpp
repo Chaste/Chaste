@@ -391,7 +391,7 @@ public:
 
             (*p_arch) >> p_division_rule;
 
-            typedef CryptCentreBasedDivisionRule<2,2> CryptRule;
+            using CryptRule = CryptCentreBasedDivisionRule<2,2>;
             TS_ASSERT(dynamic_cast<CryptRule*>(p_division_rule.get()));
         }
     }
@@ -418,7 +418,7 @@ public:
 
             (*p_arch) >> p_division_rule;
 
-            typedef CryptVertexBasedDivisionRule<2> CryptRule;
+            using CryptRule = CryptVertexBasedDivisionRule<2>;
             TS_ASSERT(dynamic_cast<CryptRule*>(p_division_rule.get()));
         }
     }
@@ -450,7 +450,7 @@ public:
             // Restore from the archive
             input_arch >> p_division_rule;
 
-            TS_ASSERT(p_division_rule != NULL);
+            TS_ASSERT(p_division_rule != nullptr);
 
             // Tidy up
             delete p_division_rule;

@@ -65,7 +65,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 
-typedef VtkMeshReader<3,3> MESH_READER3;
+#ifdef CHASTE_VTK
+using MESH_READER3 = VtkMeshReader<3,3>;
+#endif //CHASTE_VTK
 
 class TestVtkMeshReader : public CxxTest::TestSuite
 {

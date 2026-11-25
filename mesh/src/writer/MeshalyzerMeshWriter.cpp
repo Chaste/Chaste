@@ -307,7 +307,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
 {
     out_stream p_node_file = OpenNodeFile(true);
 
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    using NodeIterType = typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator;
 
     for (NodeIterType iter = this->mpDistributedMesh->GetNodeIteratorBegin();
          iter != this->mpDistributedMesh->GetNodeIteratorEnd();
@@ -332,7 +332,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
 
     out_stream p_element_file = OpenElementFile(true);
 
-    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElemIterType;
+    using ElemIterType = typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator;
 
     for (ElemIterType iter = this->mpDistributedMesh->GetElementIteratorBegin();
          iter != this->mpDistributedMesh->GetElementIteratorEnd();
@@ -362,7 +362,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
     {
         out_stream p_face_file = OpenFaceFile(true);
 
-        typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator BoundaryElemIterType;
+        using BoundaryElemIterType = typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator;
 
         for (BoundaryElemIterType iter = this->mpDistributedMesh->GetBoundaryElementIteratorBegin();
              iter != this->mpDistributedMesh->GetBoundaryElementIteratorEnd();

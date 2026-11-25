@@ -256,7 +256,7 @@ public:
      *  In order to get it to work you need to comment out the following lines:
      *
      *    delete mpSolver;
-     *    mpSolver = NULL;
+     *    mpSolver = nullptr;
      *
      * in AbstractCardiacProblem.cpp (469 and 470 at the time of writing this) so that you don't
      * destroy the cardiac solver and the end of Solve(). Otherwise you will get a segfault when

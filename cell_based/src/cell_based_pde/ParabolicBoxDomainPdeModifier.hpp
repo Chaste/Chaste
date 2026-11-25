@@ -101,13 +101,13 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
+     * @param pPde A shared pointer to a linear PDE object (defaults to nullptr)
      * @param pBoundaryCondition A shared pointer to an abstract boundary condition
-     *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
+     *     (defaults to nullptr, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
-     * @param pMeshCuboid A shared pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
+     * @param pMeshCuboid A shared pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to nullptr)
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
-     * @param solution solution vector (defaults to NULL)
+     * @param solution solution vector (defaults to nullptr)
      */
     ParabolicBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
                                   boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),

@@ -43,7 +43,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
     // The base class method that calls this function will only call it with a null linear system
-    assert(this->mpLinearSystem == NULL);
+    assert(this->mpLinearSystem == nullptr);
 
     // linear system created here
     AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>::InitialiseForSolve(initialSolution);
@@ -241,8 +241,8 @@ AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractBidomainSolver(
       mpBidomainTissue(pTissue),
       mpBoundaryConditions(pBoundaryConditions)
 {
-    assert(pTissue != NULL);
-    assert(pBoundaryConditions != NULL);
+    assert(pTissue != nullptr);
+    assert(pBoundaryConditions != nullptr);
 
     mNullSpaceCreated = false;
 

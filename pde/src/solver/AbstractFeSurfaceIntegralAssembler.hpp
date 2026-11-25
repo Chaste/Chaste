@@ -71,7 +71,7 @@ protected:
     GaussianQuadratureRule<ELEMENT_DIM-1>* mpSurfaceQuadRule;
 
     /** Basis function for use with boundary elements. */
-    typedef LinearBasisFunction<ELEMENT_DIM-1> SurfaceBasisFunction;
+    using SurfaceBasisFunction = LinearBasisFunction<ELEMENT_DIM-1>;
 
     /**
      * @return the vector to be added to full vector

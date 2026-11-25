@@ -123,7 +123,7 @@ public:
         std::set<unsigned> nodes_owned;
         std::vector<unsigned> processor_offset;
 
-        typedef NodePartitioner<2, 2> Partitioner2D;
+        using Partitioner2D = NodePartitioner<2, 2>;
         Partitioner2D::PetscMatrixPartitioning(mesh_reader, nodes_permutation, nodes_owned, processor_offset);
 
         if (PetscTools::GetNumProcs() != 2)

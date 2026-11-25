@@ -119,7 +119,7 @@ public:
      *
      * @return new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    [[nodiscard]] AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
      * If the daughter cell type is stem, change it to transit.

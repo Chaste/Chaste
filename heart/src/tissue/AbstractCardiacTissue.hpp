@@ -221,7 +221,7 @@ private:
 
         // not archiving mpConductivityModifier for the time being (mechanics simulations are only use-case at the moment, and they
         // do not get archived...). mpConductivityModifier has to be reset to NULL upon load.
-        mpConductivityModifier = NULL;
+        mpConductivityModifier = nullptr;
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -289,7 +289,7 @@ protected:
     std::string mFibreFilePathNoExtension;
 
     /**
-     * This class, if not NULL, will be used to modify the conductivity that is obtained from
+     * This class, if not nullptr, will be used to modify the conductivity that is obtained from
      * mpIntracellularConductivityTensors when rGetIntracellularConductivityTensor() is called.
      * For example, it is required when conductivities become deformation dependent.
      */
@@ -535,7 +535,7 @@ public:
         for (unsigned i=0; i<num_cells; i++)
         {
             AbstractDynamicallyLoadableEntity* p_entity = dynamic_cast<AbstractDynamicallyLoadableEntity*>(r_cells_distributed[i]);
-            bool is_dynamic = (p_entity != NULL);
+            bool is_dynamic = (p_entity != nullptr);
             archive & is_dynamic;
             if (is_dynamic)
             {
@@ -586,7 +586,7 @@ public:
             // Paranoia
             for (unsigned i=0; i<mCellsDistributed.size(); i++)
             {
-                assert(mCellsDistributed[i] == NULL);
+                assert(mCellsDistributed[i] == nullptr);
             }
 #endif
         }
@@ -655,7 +655,7 @@ public:
             }
             AbstractCardiacCellInterface* p_cell;
             archive & p_cell;
-            AbstractCardiacCellInterface* p_purkinje_cell = NULL;
+            AbstractCardiacCellInterface* p_purkinje_cell = nullptr;
             if (mHasPurkinje)
             {
                 archive & p_purkinje_cell;
@@ -691,17 +691,17 @@ public:
                 // Note that the original local_index was relative to the archived partition (distributed vector)
                 // The new_local_index is local relative to the new partition in memory
                 unsigned new_local_index = global_index - p_mesh_factory->GetLow();
-                assert(mCellsDistributed[new_local_index] == NULL);
+                assert(mCellsDistributed[new_local_index] == nullptr);
                 mCellsDistributed[new_local_index] = p_cell;
                 if (mHasPurkinje)
                 {
-                    assert(mPurkinjeCellsDistributed[new_local_index] == NULL);
+                    assert(mPurkinjeCellsDistributed[new_local_index] == nullptr);
                     mPurkinjeCellsDistributed[new_local_index] = p_purkinje_cell;
                 }
             }
             else if (halo)
             {
-                assert(mHaloCellsDistributed[halo_position->second] == NULL);
+                assert(mHaloCellsDistributed[halo_position->second] == nullptr);
                 mHaloCellsDistributed[halo_position->second] = p_cell;
             }
             else
