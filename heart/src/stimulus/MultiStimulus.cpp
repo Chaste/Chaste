@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
+#include <numeric>
+
 #include "MultiStimulus.hpp"
 
 void MultiStimulus::AddStimulus(boost::shared_ptr<AbstractStimulusFunction> pStimulus)
@@ -43,14 +45,9 @@ void MultiStimulus::AddStimulus(boost::shared_ptr<AbstractStimulusFunction> pSti
 
 double MultiStimulus::GetStimulus(double time)
 {
-    double total_stimulus = 0.0;
-
-    for (unsigned stimulus_index = 0; stimulus_index < mStimuli.size(); ++stimulus_index)
-    {
-        total_stimulus += mStimuli[stimulus_index]->GetStimulus(time);
-    }
-
-    return total_stimulus;
+    return std::accumulate(mStimuli.begin(), mStimuli.end(), 0.0,
+                           [time](double total, const boost::shared_ptr<AbstractStimulusFunction>& pStimulus)
+                           { return total + pStimulus->GetStimulus(time); });
 }
 
 MultiStimulus::~MultiStimulus()
