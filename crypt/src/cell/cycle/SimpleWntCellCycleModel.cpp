@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+
 #include "SimpleWntCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
@@ -123,10 +125,7 @@ void SimpleWntCellCycleModel::SetG1Duration()
     }
 
     // Check that the normal random deviate has not returned a small or negative G1 duration
-    if (mG1Duration < mMinimumGapDuration)
-    {
-        mG1Duration = mMinimumGapDuration;
-    }
+    mG1Duration = std::max(mG1Duration, mMinimumGapDuration);
 }
 
 double SimpleWntCellCycleModel::GetWntLevel() const

@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "AbstractCardiacCell.hpp"
 
+#include <algorithm>
+
 #include <cassert>
 #include <iostream>
 
@@ -74,10 +76,7 @@ void AbstractCardiacCell::SolveAndUpdateState(double tStart, double tEnd)
 
 OdeSolution AbstractCardiacCell::Compute(double tStart, double tEnd, double tSamp)
 {
-    if (tSamp < mDt)
-    {
-        tSamp = mDt;
-    }
+    tSamp = std::max(tSamp, mDt);
     OdeSolution solution = mpOdeSolver->Solve(this, rGetStateVariables(), tStart, tEnd, mDt, tSamp);
 #ifndef NDEBUG
     // Note that tests which rely on this throwing  (e.g. such-and-such a variable is out of range)
