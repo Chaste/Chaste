@@ -135,6 +135,21 @@ option(RUN_TESTS "This option simply runs Chaste tests. You should also set the 
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
 set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;Codegen")
 
+# Cardiac cell models can be solved on GPUs. This is switched on when a CUDA compiler is found.
+include (CheckLanguage)
+check_language (CUDA)
+if (CMAKE_CUDA_COMPILER)
+    option (Chaste_USE_CUDA "Compile Chaste with CUDA, for solving cardiac cell models on GPUs" ON)
+else ()
+    option (Chaste_USE_CUDA "Compile Chaste with CUDA, for solving cardiac cell models on GPUs" OFF)
+endif ()
+if (Chaste_USE_CUDA)
+    enable_language (CUDA)
+    set (CMAKE_CUDA_STANDARD 17)
+    set (CMAKE_CUDA_STANDARD_REQUIRED ON)
+    list (APPEND TestPackTypes "Cuda")
+endif ()
+
 if (RUN_TESTS)
     list (FIND TestPackTypes ${TEST_FAMILY} found)
     if (found EQUAL -1)
